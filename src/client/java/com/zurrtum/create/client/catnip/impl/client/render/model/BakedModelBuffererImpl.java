@@ -10,11 +10,6 @@ import com.zurrtum.create.client.infrastructure.model.CopycatModel;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import com.zurrtum.create.client.model.LayerBakedModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -29,6 +24,10 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.List;
 
 // Modified from https://github.com/Engine-Room/Flywheel/blob/2f67f54c8898d91a48126c3c753eefa6cd224f84/forge/src/lib/java/dev/engine_room/flywheel/lib/model/baked/BakedModelBufferer.java
 public final class BakedModelBuffererImpl {

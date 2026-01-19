@@ -13,7 +13,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +46,7 @@ public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
 
     public static class Type implements ItemAttributeType {
         @Override
-        public @NotNull ItemAttribute createAttribute() {
+        public ItemAttribute createAttribute() {
             return new InTagAttribute(ItemTags.LOGS);
         }
 

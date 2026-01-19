@@ -9,16 +9,15 @@ import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Widely-applicable mounted storage implementation.

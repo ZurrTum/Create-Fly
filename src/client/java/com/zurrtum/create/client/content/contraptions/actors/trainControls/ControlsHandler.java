@@ -5,18 +5,17 @@ import com.zurrtum.create.client.foundation.utility.ControlsUtil;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.infrastructure.packet.c2s.ControlsInputPacket;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 
 public class ControlsHandler {
 

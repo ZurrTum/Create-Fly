@@ -3,6 +3,7 @@ package com.zurrtum.create.content.logistics.chute;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -15,7 +16,6 @@ import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
@@ -41,8 +41,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.LinkedList;
@@ -494,7 +493,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements Clearable {
         return true;
     }
 
-    private @Nullable Container grabCapability(@NotNull Direction side) {
+    private @Nullable Container grabCapability(Direction side) {
         BlockPos pos = this.worldPosition.relative(side);
         if (level == null)
             return null;

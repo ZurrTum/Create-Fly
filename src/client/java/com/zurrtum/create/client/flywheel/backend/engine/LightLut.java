@@ -1,12 +1,11 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.SectionPos;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-
-import net.minecraft.core.SectionPos;
 
 // Massive kudos to RogueLogix for figuring out this LUT scheme.
 // First layer is Y, then X, then Z.

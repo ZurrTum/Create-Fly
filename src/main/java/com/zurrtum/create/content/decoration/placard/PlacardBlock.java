@@ -13,7 +13,6 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -236,7 +235,7 @@ public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock impleme
     }
 
     @Override
-    protected @NotNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 

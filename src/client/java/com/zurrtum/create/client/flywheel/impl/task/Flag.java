@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.flywheel.impl.task;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.backend.glsl.generate;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

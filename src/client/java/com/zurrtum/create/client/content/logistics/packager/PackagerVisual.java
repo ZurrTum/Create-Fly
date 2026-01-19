@@ -11,12 +11,11 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.packager.PackagerBlock;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class PackagerVisual<T extends PackagerBlockEntity> extends AbstractBlockEntityVisual<T> implements SimpleDynamicVisual {
     public final TransformedInstance hatch;

@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.backend.glsl.generate;
 
 import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

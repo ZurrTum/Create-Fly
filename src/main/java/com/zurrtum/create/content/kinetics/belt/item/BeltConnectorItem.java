@@ -12,11 +12,6 @@ import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -34,13 +29,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class BeltConnectorItem extends BlockItem {
 
     public BeltConnectorItem(Properties properties) {
         super(AllBlocks.BELT, properties);
     }
 
-    @NotNull
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Player playerEntity = context.getPlayer();

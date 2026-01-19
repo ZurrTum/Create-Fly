@@ -20,7 +20,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class LecternControllerRenderer implements BlockEntityRenderer<LecternControllerBlockEntity, LecternControllerRenderer.LecternControllerRenderState> {
     public LecternControllerRenderer(BlockEntityRendererProvider.Context context) {

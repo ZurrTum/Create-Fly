@@ -2,13 +2,13 @@ package com.zurrtum.create.client.content.logistics.factoryBoard;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.factoryBoard.*;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.FactoryPanelConnectionPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FactoryPanelConnectionHandler {
 
@@ -65,8 +65,11 @@ public class FactoryPanelConnectionHandler {
         ((LocalPlayer) player).connection.send(new FactoryPanelConnectionPacket(panel.getPanelPosition(), connectingFrom, false));
 
         player.displayClientMessage(
-            CreateLang.translate("factory_panel.panels_connected", filterFrom.getHoverName().getString(), filterTo.getHoverName().getString())
-                .style(ChatFormatting.GREEN).component(), true
+            CreateLang.translate(
+                "factory_panel.panels_connected",
+                filterFrom.getHoverName().getString(),
+                filterTo.getHoverName().getString()
+            ).style(ChatFormatting.GREEN).component(), true
         );
 
         connectingFrom = null;

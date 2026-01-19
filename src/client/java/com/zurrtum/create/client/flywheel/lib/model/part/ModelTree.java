@@ -1,13 +1,12 @@
 package com.zurrtum.create.client.flywheel.lib.model.part;
 
 import com.zurrtum.create.client.flywheel.api.model.Model;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.model.geom.PartPose;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import net.minecraft.client.model.geom.PartPose;
 
 public final class ModelTree {
     @Nullable

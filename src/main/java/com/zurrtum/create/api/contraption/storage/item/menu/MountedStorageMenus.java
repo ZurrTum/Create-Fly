@@ -10,7 +10,7 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.DispenserMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;

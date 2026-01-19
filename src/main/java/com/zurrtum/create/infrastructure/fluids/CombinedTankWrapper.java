@@ -1,13 +1,11 @@
 package com.zurrtum.create.infrastructure.fluids;
 
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.Direction;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.NoSuchElementException;
-
-import net.minecraft.core.Direction;
 
 public class CombinedTankWrapper implements SidedFluidInventory {
     protected final FluidInventory[] itemHandler;
@@ -172,7 +170,6 @@ public class CombinedTankWrapper implements SidedFluidInventory {
     }
 
     @Override
-    @NotNull
     public java.util.Iterator<FluidStack> iterator(Direction side) {
         if (itemHandler.length == 0) {
             return Collections.emptyIterator();

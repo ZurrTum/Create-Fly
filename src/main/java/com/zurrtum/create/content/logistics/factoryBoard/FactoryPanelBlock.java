@@ -52,7 +52,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -355,7 +354,7 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
-    protected @NotNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

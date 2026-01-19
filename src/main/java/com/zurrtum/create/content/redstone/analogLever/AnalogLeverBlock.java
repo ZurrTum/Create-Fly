@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.block.IBE;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -161,7 +160,7 @@ public class AnalogLeverBlock extends FaceAttachedHorizontalDirectionalBlock imp
     }
 
     @Override
-    protected @NotNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

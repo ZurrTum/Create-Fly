@@ -9,7 +9,6 @@ import com.zurrtum.create.catnip.placement.PlacementHelpers;
 import com.zurrtum.create.content.contraptions.actors.AttachedActorBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
@@ -108,7 +107,7 @@ public class RollerBlock extends AttachedActorBlock implements IBE<RollerBlockEn
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 

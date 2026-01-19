@@ -9,8 +9,7 @@ import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -61,7 +60,7 @@ public abstract class AbstractComputerBehaviour extends BlockEntityBehaviour<Sma
 
     public abstract void queueStationTrain(Train imminentTrain, boolean newlyArrived, boolean trainPresent);
 
-    public abstract void prepareComputerEvent(@NotNull ComputerEvent event);
+    public abstract void prepareComputerEvent(ComputerEvent event);
 
     @Override
     public BehaviourType<?> getType() {

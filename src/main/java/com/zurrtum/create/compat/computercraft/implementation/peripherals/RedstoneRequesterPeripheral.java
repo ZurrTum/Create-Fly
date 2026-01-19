@@ -13,7 +13,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,7 +105,6 @@ public class RedstoneRequesterPeripheral extends SyncedPeripheral<RedstoneReques
         return blockEntity.encodedTargetAdress;
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_RedstoneRequester";

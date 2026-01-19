@@ -12,12 +12,6 @@ import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -41,6 +35,10 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class DisplayLinkBlock extends WrenchableDirectionalBlock implements IBE<DisplayLinkBlockEntity>, NeighborUpdateListeningBlock {
 
@@ -184,7 +182,7 @@ public class DisplayLinkBlock extends WrenchableDirectionalBlock implements IBE<
     }
 
     @Override
-    protected @NotNull MapCodec<? extends DirectionalBlock> codec() {
+    protected MapCodec<? extends DirectionalBlock> codec() {
         return CODEC;
     }
 }

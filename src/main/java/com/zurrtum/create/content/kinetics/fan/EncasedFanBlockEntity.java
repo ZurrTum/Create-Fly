@@ -6,10 +6,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -17,6 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCurrentSource {
 

@@ -16,7 +16,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 public class WrenchItem extends Item {
 
@@ -25,7 +24,6 @@ public class WrenchItem extends Item {
     }
 
     @Override
-    @NotNull
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
         if (player == null || !player.mayBuild())

@@ -10,8 +10,8 @@ import net.fabricmc.fabric.impl.transfer.DebugMessages;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;

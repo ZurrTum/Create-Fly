@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class StickerBlock extends WrenchableDirectionalBlock implements IBE<StickerBlockEntity>, WeakPowerControlBlock, LandingEffectControlBlock, RunningEffectControlBlock {
 

@@ -2,6 +2,7 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.AllSpecialTextures;
@@ -16,7 +17,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -35,7 +35,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

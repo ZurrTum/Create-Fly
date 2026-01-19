@@ -9,19 +9,18 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.util.context.ContextMap;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Properties that NeoForge adds for {@link BlockModel}s and {@link UnbakedModel}s.

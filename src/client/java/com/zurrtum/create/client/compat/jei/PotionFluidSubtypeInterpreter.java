@@ -8,7 +8,7 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

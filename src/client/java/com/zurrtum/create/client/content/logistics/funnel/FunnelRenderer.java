@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FunnelRenderer extends SmartBlockEntityRenderer<FunnelBlockEntity, FunnelRenderer.FunnelRenderState> {
     public FunnelRenderer(BlockEntityRendererProvider.Context context) {

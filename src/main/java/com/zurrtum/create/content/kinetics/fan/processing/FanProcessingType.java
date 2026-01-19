@@ -1,10 +1,6 @@
 package com.zurrtum.create.content.kinetics.fan.processing;
 
 import com.zurrtum.create.api.registry.CreateRegistries;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.Identifier;
@@ -13,6 +9,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public interface FanProcessingType {
     @Nullable

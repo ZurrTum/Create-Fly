@@ -7,14 +7,13 @@ import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceFile;
 import com.zurrtum.create.client.flywheel.backend.glsl.generate.*;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.UnaryOperator;
-
-import net.minecraft.resources.Identifier;
 
 public class UberShaderComponent implements SourceComponent {
     private final Identifier name;

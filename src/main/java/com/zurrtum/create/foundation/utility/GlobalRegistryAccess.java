@@ -4,7 +4,7 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.Create;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Supplier;
 

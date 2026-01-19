@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
 
 public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiodeBlockEntity>, RedStoneConnectBlock {
 
@@ -103,7 +102,7 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
     }
 
     @Override
-    protected @NotNull MapCodec<? extends AbstractDiodeBlock> codec() {
+    protected MapCodec<? extends AbstractDiodeBlock> codec() {
         return CODEC;
     }
 }

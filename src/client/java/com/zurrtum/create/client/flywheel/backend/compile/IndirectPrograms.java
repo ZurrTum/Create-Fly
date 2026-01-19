@@ -16,11 +16,10 @@ import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.backend.util.AtomicReferenceCounted;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-
-import net.minecraft.resources.Identifier;
 
 public class IndirectPrograms extends AtomicReferenceCounted {
     private static final Identifier CULL_SHADER_API_IMPL = ResourceUtil.rl("internal/indirect/cull_api_impl.glsl");

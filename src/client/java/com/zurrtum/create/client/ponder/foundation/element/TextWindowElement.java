@@ -18,8 +18,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Supplier;

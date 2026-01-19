@@ -3,6 +3,7 @@ package com.zurrtum.create.content.logistics.packagerLink;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -12,16 +13,7 @@ import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.content.logistics.packager.repackager.RepackagerBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -32,6 +24,13 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class PackagerLinkBlockEntity extends LinkWithBulbBlockEntity {
 

@@ -7,15 +7,6 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Predicate;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,6 +18,13 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
 
 public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAttribute {
     public static final MapCodec<ShulkerFillLevelAttribute> CODEC = ShulkerLevels.CODEC.xmap(
@@ -117,7 +115,7 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
 
     public static class Type implements ItemAttributeType {
         @Override
-        public @NotNull ItemAttribute createAttribute() {
+        public ItemAttribute createAttribute() {
             return new ShulkerFillLevelAttribute(null);
         }
 

@@ -3,7 +3,7 @@ package com.zurrtum.create.client.catnip.gui;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

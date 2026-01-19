@@ -8,17 +8,16 @@ package com.zurrtum.create.client.model;
 import com.google.gson.*;
 import com.mojang.math.Axis;
 import com.mojang.math.Transformation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.StringRepresentable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import net.minecraft.util.StringRepresentable;
 
 public class TransformationHelper {
     public static Quaternionf quatFromXYZ(float[] xyz, boolean degrees) {

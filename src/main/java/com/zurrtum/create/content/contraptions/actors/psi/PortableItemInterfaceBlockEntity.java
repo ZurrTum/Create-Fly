@@ -12,8 +12,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBlockEntity {
 
@@ -135,7 +134,7 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
         }
 
         @Override
-        public @NotNull java.util.Iterator<ItemStack> iterator(Direction side) {
+        public java.util.Iterator<ItemStack> iterator(Direction side) {
             return wrapped.iterator(side);
         }
     }

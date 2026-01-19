@@ -17,7 +17,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FluidTankMountedStorage extends WrapperMountedFluidStorage<FluidTankMountedStorage.Handler> implements SyncedMountedStorage {
     public static final MapCodec<FluidTankMountedStorage> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(

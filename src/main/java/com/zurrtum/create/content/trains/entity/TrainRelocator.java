@@ -5,19 +5,18 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class TrainRelocator {
     public static boolean relocate(

@@ -2,7 +2,7 @@ package com.zurrtum.create.client.vanillin.compose;
 
 import com.zurrtum.create.client.flywheel.api.visual.Visual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

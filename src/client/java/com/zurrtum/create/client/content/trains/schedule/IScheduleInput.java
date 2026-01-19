@@ -4,14 +4,13 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.content.trains.schedule.ScheduleDataEntry;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public interface IScheduleInput<T extends ScheduleDataEntry> {
     Pair<ItemStack, Component> getSummary(T input);

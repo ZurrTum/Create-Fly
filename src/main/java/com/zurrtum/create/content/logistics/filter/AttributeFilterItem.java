@@ -7,12 +7,6 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.attributes.InT
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.infrastructure.component.AttributeFilterWhitelistMode;
 import com.zurrtum.create.infrastructure.component.ItemAttributeEntry;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
@@ -24,6 +18,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AttributeFilterItem extends FilterItem {
     protected AttributeFilterItem(Properties properties) {

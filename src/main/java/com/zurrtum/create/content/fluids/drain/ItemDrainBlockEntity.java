@@ -2,6 +2,7 @@ package com.zurrtum.create.content.fluids.drain;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -10,18 +11,10 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
@@ -31,6 +24,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class ItemDrainBlockEntity extends SmartBlockEntity {
 

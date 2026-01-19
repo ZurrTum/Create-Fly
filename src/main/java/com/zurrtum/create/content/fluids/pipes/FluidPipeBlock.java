@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlock;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.StructureTransform;
@@ -15,13 +16,6 @@ import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -35,16 +29,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.PipeBlock;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -57,6 +43,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.TickPriority;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock, IWrenchableWithBracket, IBE<FluidPipeBlockEntity>, EncasableBlock, TransformableBlock, NeighborUpdateListeningBlock {
 
@@ -262,7 +252,10 @@ public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock,
             null,
             context.getLevel(),
             context.getClickedPos()
-        ).setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
+        ).setValue(
+            BlockStateProperties.WATERLOGGED,
+            Boolean.valueOf(FluidState.getType() == Fluids.WATER)
+        );
     }
 
     @Override
@@ -380,7 +373,7 @@ public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock,
     }
 
     @Override
-    protected @NotNull MapCodec<? extends PipeBlock> codec() {
+    protected MapCodec<? extends PipeBlock> codec() {
         return CODEC;
     }
 }

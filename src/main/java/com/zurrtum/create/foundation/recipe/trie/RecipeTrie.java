@@ -14,12 +14,6 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +22,10 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.material.Fluid;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class RecipeTrie<R extends Recipe<?>> {
     private static final int MAX_CACHE_SIZE = Integer.getInteger("create.recipe_trie.max_cache_size", 512);
@@ -51,7 +49,7 @@ public class RecipeTrie<R extends Recipe<?>> {
         this.universalIngredientId = universalIngredientId;
     }
 
-    public static @NotNull Set<AbstractVariant> getVariants(@Nullable Container itemStorage, @Nullable FluidInventory fluidStorage) {
+    public static Set<AbstractVariant> getVariants(@Nullable Container itemStorage, @Nullable FluidInventory fluidStorage) {
         Set<AbstractVariant> variants = new HashSet<>();
 
         if (itemStorage != null) {
@@ -77,7 +75,7 @@ public class RecipeTrie<R extends Recipe<?>> {
         return variants;
     }
 
-    private IntSet getAvailableIngredients(@NotNull Set<AbstractVariant> pool) {
+    private IntSet getAvailableIngredients(Set<AbstractVariant> pool) {
         pool.retainAll(variantToId.keySet());
 
         try {
@@ -110,7 +108,7 @@ public class RecipeTrie<R extends Recipe<?>> {
      * @param pool the set of allowable variants. It will be modified to only contain known variants.
      * @return all recipes that can be made with the given pool of resources.
      */
-    public @NotNull List<R> lookup(@NotNull Set<AbstractVariant> pool) {
+    public List<R> lookup(Set<AbstractVariant> pool) {
         return trie.lookup(getAvailableIngredients(pool));
     }
 

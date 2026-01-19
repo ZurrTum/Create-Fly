@@ -1,15 +1,14 @@
 package com.zurrtum.create.foundation.utility;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
 public class ResetableLazy<T> implements Supplier<T> {
 
-    private final Supplier<@NotNull T> supplier;
+    private final Supplier<T> supplier;
     private T value;
 
-    public ResetableLazy(Supplier<@NotNull T> supplier) {
+    public ResetableLazy(Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
@@ -25,7 +24,7 @@ public class ResetableLazy<T> implements Supplier<T> {
         value = null;
     }
 
-    public static <T> ResetableLazy<T> of(Supplier<@NotNull T> supplier) {
+    public static <T> ResetableLazy<T> of(Supplier<T> supplier) {
         return new ResetableLazy<>(supplier);
     }
 

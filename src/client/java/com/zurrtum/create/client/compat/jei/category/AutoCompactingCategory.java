@@ -19,7 +19,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -42,13 +41,11 @@ public class AutoCompactingCategory extends CreateCategory<RecipeHolder<Crafting
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
         return JeiClientPlugin.AUTOMATIC_PACKING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.automatic_packing");
     }

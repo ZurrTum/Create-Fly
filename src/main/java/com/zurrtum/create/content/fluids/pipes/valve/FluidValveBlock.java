@@ -31,8 +31,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.TickPriority;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxisPipe, IBE<FluidValveBlockEntity>, ProperWaterloggedBlock, NeighborUpdateListeningBlock {
 
@@ -63,7 +62,6 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
         return super.prefersConnectionTo(reader, pos, facing, shaftAxis);
     }
 
-    @NotNull
     public static Axis getPipeAxis(BlockState state) {
         if (!(state.getBlock() instanceof FluidValveBlock))
             throw new IllegalStateException("Provided BlockState is for a different block.");

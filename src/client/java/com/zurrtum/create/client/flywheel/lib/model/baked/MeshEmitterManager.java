@@ -9,8 +9,8 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import org.apache.commons.lang3.function.TriFunction;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.Nullable;
 
 class MeshEmitterManager<T extends MeshEmitter> {
     private static final ChunkSectionLayer[] CHUNK_LAYERS = ChunkSectionLayer.values();

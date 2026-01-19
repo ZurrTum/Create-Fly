@@ -8,21 +8,20 @@ import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.ponder.enums.PonderGuiTextures;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 

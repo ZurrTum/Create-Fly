@@ -11,7 +11,7 @@ import com.zurrtum.create.client.flywheel.lib.task.PlanMap;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;

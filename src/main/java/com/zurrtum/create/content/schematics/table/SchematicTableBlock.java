@@ -20,7 +20,6 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 public class SchematicTableBlock extends HorizontalDirectionalBlock implements IBE<SchematicTableBlockEntity> {
 
@@ -75,7 +74,7 @@ public class SchematicTableBlock extends HorizontalDirectionalBlock implements I
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 

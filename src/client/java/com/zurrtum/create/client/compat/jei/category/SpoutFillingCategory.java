@@ -31,8 +31,8 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -41,7 +41,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -120,13 +119,11 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<FillingRecipe>> getRecipeType() {
         return JeiClientPlugin.SPOUT_FILLING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.spout_filling");
     }

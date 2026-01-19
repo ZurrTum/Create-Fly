@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface LayerUnbakedModel {
     static BlockModelPart setBlockRenderLayer(BlockModelPart geometry, ResolvedModel model) {

@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.world.entity.Entity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class NbtSpawnPacket extends ClientboundAddEntityPacket {
     public static final StreamCodec<RegistryFriendlyByteBuf, NbtSpawnPacket> CODEC = Packet.codec(NbtSpawnPacket::write, NbtSpawnPacket::new);

@@ -6,7 +6,6 @@ import com.zurrtum.create.catnip.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.codec.StreamCodec;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
@@ -187,7 +186,6 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
     }
 
     @Override
-    @NotNull
     public Iterator<T> iterator() {
         return new Couplerator<>(this);
     }

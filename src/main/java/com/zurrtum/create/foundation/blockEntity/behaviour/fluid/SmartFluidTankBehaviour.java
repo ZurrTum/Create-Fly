@@ -1,10 +1,10 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.fluid;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
@@ -13,7 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.function.TriFunction;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;

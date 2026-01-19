@@ -22,7 +22,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -33,13 +32,11 @@ public class PotionCategory extends CreateCategory<RecipeHolder<PotionRecipe>> {
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<PotionRecipe>> getRecipeType() {
         return JeiClientPlugin.AUTOMATIC_BREWING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.automatic_brewing");
     }

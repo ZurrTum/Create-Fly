@@ -15,10 +15,6 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,11 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.PipeBlock;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,6 +36,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.ticks.TickPriority;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
 

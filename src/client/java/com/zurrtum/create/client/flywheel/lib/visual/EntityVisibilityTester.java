@@ -6,8 +6,8 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
 import org.joml.FrustumIntersection;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A helper class for testing whether an Entity is visible.

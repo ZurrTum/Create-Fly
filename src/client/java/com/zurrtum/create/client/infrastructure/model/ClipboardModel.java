@@ -17,8 +17,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Supplier;

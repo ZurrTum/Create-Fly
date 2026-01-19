@@ -13,13 +13,6 @@ import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.ponder.config.CClient;
 import com.zurrtum.create.client.ponder.enums.PonderConfig;
 import com.zurrtum.create.client.ponder.enums.PonderGuiTextures;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2f;
-import org.joml.Matrix3x2fStack;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.TextureSetup;
@@ -32,6 +25,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.zurrtum.create.catnip.math.VecHelper.getCenterOf;
 

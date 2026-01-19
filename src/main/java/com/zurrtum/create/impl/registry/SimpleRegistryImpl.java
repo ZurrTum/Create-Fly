@@ -1,13 +1,11 @@
 package com.zurrtum.create.impl.registry;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.StateHolder;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 // methods are synchronized since registrations can happen during parallel mod loading
 public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<K, V> permits SimpleRegistryImpl.MultiImpl, SimpleRegistryImpl.SingleImpl {
@@ -155,7 +153,6 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
         }
 
         @Override
-        @NotNull
         public synchronized List<V> get(K object, Level world) {
             Objects.requireNonNull(object, "object");
             if (!this.totals.containsKey(object)) {
@@ -180,7 +177,6 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
         }
 
         @Override
-        @NotNull
         public synchronized List<V> get(K object) {
             Objects.requireNonNull(object, "object");
             if (!this.totals.containsKey(object)) {

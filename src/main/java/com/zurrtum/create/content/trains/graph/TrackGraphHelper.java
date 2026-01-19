@@ -7,16 +7,15 @@ import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.Map;
 
 public class TrackGraphHelper {
 

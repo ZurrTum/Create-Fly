@@ -8,7 +8,7 @@ import com.zurrtum.create.client.model.LayerUnbakedModel;
 import com.zurrtum.create.client.model.UnbakedModelParser;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

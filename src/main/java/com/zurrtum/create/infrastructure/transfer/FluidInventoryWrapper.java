@@ -14,8 +14,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.Direction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -475,7 +474,6 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
     }
 
     @Override
-    @NotNull
     public java.util.Iterator<FluidStack> iterator() {
         return storage.supportsExtraction() ? new com.zurrtum.create.infrastructure.transfer.FluidInventoryWrapper.Iterator(storage) : Collections.emptyIterator();
     }
@@ -950,12 +948,12 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public @NotNull java.util.Iterator<FluidStack> iterator() {
+        public java.util.Iterator<FluidStack> iterator() {
             return inventory.iterator();
         }
 
         @Override
-        public @NotNull java.util.Iterator<FluidStack> iterator(Direction side) {
+        public java.util.Iterator<FluidStack> iterator(Direction side) {
             return inventory.iterator();
         }
 

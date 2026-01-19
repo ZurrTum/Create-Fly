@@ -7,10 +7,6 @@ import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.content.contraptions.minecart.CouplingHandler;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
@@ -19,6 +15,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class CapabilityMinecartController {
 

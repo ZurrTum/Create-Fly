@@ -2,31 +2,29 @@ package com.zurrtum.create.catnip.codecs.stream;
 
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.Array;
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import org.jspecify.annotations.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.List;
+import java.util.Optional;
 
 public interface CatnipStreamCodecBuilders {
     static <T extends ByteBuf, S extends Enum<S>> StreamCodec<T, S> ofEnum(Class<S> clazz) {
         return new StreamCodec<>() {
-            public @NotNull S decode(@NotNull T buffer) {
+            public S decode(T buffer) {
                 return clazz.getEnumConstants()[VarInt.read(buffer)];
             }
 
-            public void encode(@NotNull T buffer, @NotNull S value) {
+            public void encode(T buffer, S value) {
                 VarInt.write(buffer, value.ordinal());
             }
         };
@@ -35,7 +33,7 @@ public interface CatnipStreamCodecBuilders {
     static <B extends ByteBuf, L, R> StreamCodec<B, Pair<L, R>> pair(StreamCodec<B, L> codecL, StreamCodec<B, R> codecR) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull Pair<L, R> decode(B buffer) {
+            public Pair<L, R> decode(B buffer) {
                 L l = codecL.decode(buffer);
                 R r = codecR.decode(buffer);
                 return Pair.of(l, r);
@@ -56,12 +54,12 @@ public interface CatnipStreamCodecBuilders {
     static <B extends ByteBuf, V> StreamCodec<B, @Nullable V> nullable(StreamCodec<B, V> base) {
         return new StreamCodec<>() {
             @Override
-            public @Nullable V decode(@NotNull B buffer) {
+            public @Nullable V decode(B buffer) {
                 return FriendlyByteBuf.readNullable(buffer, base);
             }
 
             @Override
-            public void encode(@NotNull B buffer, @Nullable V value) {
+            public void encode(B buffer, @Nullable V value) {
                 FriendlyByteBuf.writeNullable(buffer, value, base);
             }
         };
@@ -98,7 +96,7 @@ public interface CatnipStreamCodecBuilders {
     static <B extends FriendlyByteBuf, V> StreamCodec<B, V[]> array(StreamCodec<? super B, V> base, Class<?> clazz) {
         return new StreamCodec<>() {
             @Override
-            public V @NotNull [] decode(@NotNull B buffer) {
+            public V[] decode(B buffer) {
                 int size = buffer.readVarInt();
                 @SuppressWarnings("unchecked") V[] array = (V[]) Array.newInstance(clazz, size);
                 for (int i = 0; i < size; i++) {
@@ -108,7 +106,7 @@ public interface CatnipStreamCodecBuilders {
             }
 
             @Override
-            public void encode(@NotNull B buffer, @NotNull V[] value) {
+            public void encode(B buffer, V[] value) {
                 buffer.writeVarInt(value.length);
                 for (V v : value) {
                     base.encode(buffer, v);

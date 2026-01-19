@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.backend.util;
 
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class MemoryBuffer {
     private final long stride;

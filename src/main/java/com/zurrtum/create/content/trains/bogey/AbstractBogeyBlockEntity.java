@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.NotNull;
 
 import static com.zurrtum.create.content.trains.entity.CarriageBogey.UPSIDE_DOWN_KEY;
 
@@ -34,19 +33,18 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
         return bogeyData;
     }
 
-    public void setBogeyData(@NotNull CompoundTag newData) {
+    public void setBogeyData(CompoundTag newData) {
         if (!newData.contains(BOGEY_STYLE_KEY)) {
             newData.store(BOGEY_STYLE_KEY, Identifier.CODEC, getDefaultStyle().id);
         }
         bogeyData = newData;
     }
 
-    public void setBogeyStyle(@NotNull BogeyStyle style) {
+    public void setBogeyStyle(BogeyStyle style) {
         getBogeyData().store(BOGEY_STYLE_KEY, Identifier.CODEC, style.id);
         markUpdated();
     }
 
-    @NotNull
     public BogeyStyle getStyle() {
         CompoundTag data = getBogeyData();
         Identifier currentStyle = data.read(BOGEY_STYLE_KEY, Identifier.CODEC).orElseThrow();

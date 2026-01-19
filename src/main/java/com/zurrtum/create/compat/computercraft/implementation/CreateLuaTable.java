@@ -3,8 +3,7 @@ package com.zurrtum.create.compat.computercraft.implementation;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaTable;
 import dan200.computercraft.api.lua.LuaValues;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -142,19 +141,16 @@ public class CreateLuaTable implements LuaTable<Object, Object> {
         return map.get(o);
     }
 
-    @NotNull
     @Override
     public Set<Object> keySet() {
         return map.keySet();
     }
 
-    @NotNull
     @Override
     public Collection<Object> values() {
         return map.values();
     }
 
-    @NotNull
     @Override
     public Set<Entry<Object, Object>> entrySet() {
         return map.entrySet();

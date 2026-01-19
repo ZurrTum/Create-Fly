@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultBlockEntity>, ItemInventoryProvider<ItemVaultBlockEntity> {
 

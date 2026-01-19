@@ -1,23 +1,22 @@
 package com.zurrtum.create.content.fluids;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.jetbrains.annotations.Nullable;
-
-import java.lang.ref.WeakReference;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
+
+import java.lang.ref.WeakReference;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public abstract class FlowSource {
     BlockFace location;

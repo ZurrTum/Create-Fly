@@ -5,13 +5,12 @@ import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.Span;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.StringSpan;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.IdentifierException;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
-
-import net.minecraft.IdentifierException;
-import net.minecraft.resources.Identifier;
 
 /**
  * Immutable class representing a shader file.

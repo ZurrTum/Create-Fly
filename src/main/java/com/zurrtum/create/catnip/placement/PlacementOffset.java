@@ -1,9 +1,5 @@
 package com.zurrtum.create.catnip.placement;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Function;
-
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -22,6 +18,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Function;
 
 public class PlacementOffset {
 

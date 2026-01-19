@@ -9,7 +9,6 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import org.jetbrains.annotations.NotNull;
 
 public record AirParticleData(float drag, float speed) implements ParticleOptions {
 
@@ -26,7 +25,7 @@ public record AirParticleData(float drag, float speed) implements ParticleOption
     );
 
     @Override
-    public @NotNull ParticleType<AirParticleData> getType() {
+    public ParticleType<AirParticleData> getType() {
         return AllParticleTypes.AIR;
     }
 }

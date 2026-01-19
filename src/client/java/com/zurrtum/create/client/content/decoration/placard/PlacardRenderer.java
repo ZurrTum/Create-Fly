@@ -19,8 +19,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 public class PlacardRenderer implements BlockEntityRenderer<PlacardBlockEntity, PlacardRenderer.PlacardRenderState> {
     protected final ItemModelResolver itemModelManager;

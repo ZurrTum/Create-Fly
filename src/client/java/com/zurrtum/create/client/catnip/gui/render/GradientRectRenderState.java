@@ -7,8 +7,8 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record GradientRectRenderState(
     Matrix3x2f pose, float left, float top, float right, float bottom, int startRed, int startGreen, int startBlue, int startAlpha, int endRed,

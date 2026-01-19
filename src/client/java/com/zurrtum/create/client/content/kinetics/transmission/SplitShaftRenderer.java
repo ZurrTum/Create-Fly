@@ -22,7 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class SplitShaftRenderer implements BlockEntityRenderer<SplitShaftBlockEntity, SplitShaftRenderer.SplitShaftRenderState> {
     public SplitShaftRenderer(BlockEntityRendererProvider.Context context) {

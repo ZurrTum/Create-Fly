@@ -36,7 +36,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -183,7 +182,7 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
     }
 
     @Override
-    protected @NotNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

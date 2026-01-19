@@ -9,7 +9,7 @@ import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferUsage;
 import com.zurrtum.create.client.flywheel.backend.util.ReferenceCounted;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexView;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GL32;
 
 import java.util.ArrayList;

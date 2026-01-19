@@ -33,7 +33,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -231,7 +230,7 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

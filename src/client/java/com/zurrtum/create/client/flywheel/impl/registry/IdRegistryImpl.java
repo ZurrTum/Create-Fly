@@ -2,14 +2,13 @@ package com.zurrtum.create.client.flywheel.impl.registry;
 
 import com.zurrtum.create.client.flywheel.api.registry.IdRegistry;
 import it.unimi.dsi.fastutil.objects.*;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-
-import net.minecraft.resources.Identifier;
 
 public class IdRegistryImpl<T> implements IdRegistry<T> {
     private static final ObjectList<IdRegistryImpl<?>> ALL = new ObjectArrayList<>();

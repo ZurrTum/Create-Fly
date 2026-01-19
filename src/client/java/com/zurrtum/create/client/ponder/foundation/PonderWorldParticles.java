@@ -28,9 +28,9 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.ParticleLimit;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Supplier;

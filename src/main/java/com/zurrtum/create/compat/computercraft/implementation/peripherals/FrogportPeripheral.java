@@ -7,7 +7,6 @@ import com.zurrtum.create.compat.computercraft.implementation.luaObjects.Package
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -69,13 +68,12 @@ public class FrogportPeripheral extends SyncedPeripheral<FrogportBlockEntity> {
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (event instanceof PackageEvent pe) {
             queueEvent(pe.status, new PackageLuaObject(null, pe.box));
         }
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_Frogport";

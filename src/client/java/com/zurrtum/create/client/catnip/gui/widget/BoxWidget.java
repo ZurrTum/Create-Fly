@@ -6,12 +6,11 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.element.FadableScreenElement;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Function;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Function;
 
 public class BoxWidget extends ElementWidget {
 

@@ -4,12 +4,6 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.placement.IPlacementHelper;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -17,6 +11,11 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class GirderWrenchBehavior {
     @Nullable

@@ -8,11 +8,6 @@ import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementHelpers;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -37,6 +32,9 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 public class CopycatStepBlock extends WaterloggedCopycatBlock {
 
@@ -210,12 +208,12 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
         }
 
         @Override
-        public @NotNull Predicate<ItemStack> getItemPredicate() {
+        public Predicate<ItemStack> getItemPredicate() {
             return stack -> stack.is(AllItems.COPYCAT_STEP);
         }
 
         @Override
-        public @NotNull PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
             PlacementOffset offset = super.getOffset(player, world, state, pos, ray);
 
             if (offset.isSuccessful())

@@ -24,7 +24,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.LevelAccessor;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.BitSet;

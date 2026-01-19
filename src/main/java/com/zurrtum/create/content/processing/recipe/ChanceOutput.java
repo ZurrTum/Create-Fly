@@ -7,7 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record ChanceOutput(float chance, ItemStack stack) {
     public static Codec<ChanceOutput> CODEC = RecordCodecBuilder.create(instance -> instance.group(

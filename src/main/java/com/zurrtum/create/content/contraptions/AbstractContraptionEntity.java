@@ -55,8 +55,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -235,7 +234,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     @Override
-    protected boolean canAddPassenger(@NotNull Entity pPassenger) {
+    protected boolean canAddPassenger(Entity pPassenger) {
         if (pPassenger instanceof OrientedContraptionEntity)
             return true;
         return contraption.getSeatMapping().size() < contraption.getSeats().size();

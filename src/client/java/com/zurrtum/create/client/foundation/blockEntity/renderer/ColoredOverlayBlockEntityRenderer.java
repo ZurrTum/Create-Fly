@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class ColoredOverlayBlockEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T, ColoredOverlayBlockEntityRenderer.ColoredOverlayRenderState> {
     public ColoredOverlayBlockEntityRenderer(BlockEntityRendererProvider.Context context) {

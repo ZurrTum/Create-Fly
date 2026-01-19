@@ -11,8 +11,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1357,13 +1356,11 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    @NotNull
     default java.util.Iterator<ItemStack> iterator() {
         return iterator(null);
     }
 
     @Override
-    @NotNull
     default java.util.Iterator<ItemStack> iterator(Direction side) {
         return new Iterator(this, side);
     }

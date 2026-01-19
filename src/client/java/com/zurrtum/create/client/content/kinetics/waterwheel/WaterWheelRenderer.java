@@ -12,12 +12,6 @@ import com.zurrtum.create.content.kinetics.waterwheel.LargeWaterWheelBlock;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelBlock;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelBlockEntity;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -30,12 +24,17 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends KineticBlockEntityRenderer<T, KineticRenderState> {
     public static final SuperByteBufferCache.Compartment<ModelKey> WATER_WHEEL = new SuperByteBufferCache.Compartment<>();

@@ -2,7 +2,6 @@ package com.zurrtum.create.catnip.theme;
 
 import com.google.common.hash.Hashing;
 import com.zurrtum.create.catnip.data.Couple;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.function.UnaryOperator;
@@ -53,7 +52,7 @@ public class Color {
         }
     }
 
-    public static Color mixColors(@NotNull Color c1, @NotNull Color c2, float w) {
+    public static Color mixColors(Color c1, Color c2, float w) {
         return new Color(
             (int) (c1.getRed() + (c2.getRed() - c1.getRed()) * w),
             (int) (c1.getGreen() + (c2.getGreen() - c1.getGreen()) * w),
@@ -62,7 +61,7 @@ public class Color {
         );
     }
 
-    public static Color mixColors(@NotNull Couple<Color> colors, float w) {
+    public static Color mixColors(Couple<Color> colors, float w) {
         return mixColors(colors.getFirst(), colors.getSecond(), w);
     }
 

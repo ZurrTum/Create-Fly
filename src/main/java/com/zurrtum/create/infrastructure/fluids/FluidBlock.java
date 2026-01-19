@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.redstone.Orientation;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FluidBlock extends net.minecraft.world.level.block.LiquidBlock {
     public FluidBlock(FlowingFluid fluid, Properties settings) {

@@ -4,7 +4,7 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PackagerItemHandler implements SidedItemInventory {
     private final int[] SLOTS = {0};

@@ -3,7 +3,7 @@ package com.zurrtum.create.client.model;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.util.Util;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public final class NamedBlockRenderLayer {
     private static final ImmutableMap<String, ChunkSectionLayer> RENDER_TYPES = Util.make(() -> {

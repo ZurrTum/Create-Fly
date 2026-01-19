@@ -6,7 +6,6 @@ import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ public record BookAuthorAttribute(String author) implements ItemAttribute {
 
     public static class Type implements ItemAttributeType {
         @Override
-        public @NotNull ItemAttribute createAttribute() {
+        public ItemAttribute createAttribute() {
             return new BookAuthorAttribute("dummy");
         }
 

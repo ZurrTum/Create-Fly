@@ -2,6 +2,7 @@ package com.zurrtum.create.content.fluids.tank;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
@@ -9,17 +10,11 @@ import com.zurrtum.create.content.fluids.tank.FluidTankBlock.Shape;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Objects;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
@@ -29,6 +24,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
 
 import static java.lang.Math.abs;
 

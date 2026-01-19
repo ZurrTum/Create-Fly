@@ -2,15 +2,14 @@ package com.zurrtum.create.content.kinetics.mechanicalArm;
 
 import com.zurrtum.create.api.registry.CreateRegistries;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnmodifiableView;
-
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class ArmInteractionPointType {
     private static final List<ArmInteractionPointType> SORTED_TYPES = new ReferenceArrayList<>();

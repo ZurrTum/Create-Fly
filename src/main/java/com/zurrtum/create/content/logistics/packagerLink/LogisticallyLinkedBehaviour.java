@@ -2,6 +2,7 @@ package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.google.common.cache.Cache;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.logistics.packager.IdentifiedInventory;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
@@ -9,7 +10,6 @@ import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;

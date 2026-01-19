@@ -2,12 +2,6 @@ package com.zurrtum.create.client.flywheel.backend.engine;
 
 import com.zurrtum.create.client.flywheel.impl.compat.CompatMod;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.MemoryUtil;
-
-import java.util.BitSet;
-import java.util.Objects;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -18,6 +12,11 @@ import net.minecraft.world.level.lighting.LayerLightEventListener;
 import net.minecraft.world.level.lighting.LayerLightSectionStorage;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.lighting.SkyLightSectionStorage;
+import org.jspecify.annotations.Nullable;
+import org.lwjgl.system.MemoryUtil;
+
+import java.util.BitSet;
+import java.util.Objects;
 
 import static com.zurrtum.create.client.flywheel.backend.engine.LightStorage.BLOCKS_PER_SECTION;
 import static com.zurrtum.create.client.flywheel.backend.engine.LightStorage.SOLID_SIZE_BYTES;

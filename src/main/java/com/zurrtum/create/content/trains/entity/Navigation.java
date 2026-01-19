@@ -13,12 +13,6 @@ import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.track.BezierConnection;
-import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -26,6 +20,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class Navigation {
 

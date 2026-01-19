@@ -34,7 +34,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -239,7 +238,7 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
     }
 
     @Override
-    protected @NotNull MapCodec<? extends DirectionalBlock> codec() {
+    protected MapCodec<? extends DirectionalBlock> codec() {
         return CODEC;
     }
 }

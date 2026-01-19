@@ -7,15 +7,14 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class ElevatorColumn {
 
@@ -192,8 +191,7 @@ public class ElevatorColumn {
 
     public record ColumnCoords(int x, int z, Direction side) {
         public static final Codec<ColumnCoords> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("x")
-                .forGetter(ColumnCoords::x),
+            Codec.INT.fieldOf("x").forGetter(ColumnCoords::x),
             Codec.INT.fieldOf("z").forGetter(ColumnCoords::z),
             Direction.CODEC.fieldOf("side").forGetter(ColumnCoords::side)
         ).apply(instance, ColumnCoords::new));

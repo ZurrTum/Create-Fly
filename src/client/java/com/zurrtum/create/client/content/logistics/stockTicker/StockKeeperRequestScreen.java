@@ -70,9 +70,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.ref.WeakReference;

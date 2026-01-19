@@ -21,7 +21,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -32,13 +31,11 @@ public class FanHauntingCategory extends CreateCategory<RecipeHolder<HauntingRec
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<HauntingRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_HAUNTING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_haunting");
     }

@@ -1,7 +1,6 @@
 package com.zurrtum.create.compat.computercraft.events;
 
 import com.zurrtum.create.content.trains.entity.Train;
-import org.jetbrains.annotations.NotNull;
 
 public class StationTrainPresenceEvent implements ComputerEvent {
 
@@ -18,9 +17,9 @@ public class StationTrainPresenceEvent implements ComputerEvent {
     }
 
     public Type type;
-    public @NotNull Train train;
+    public Train train;
 
-    public StationTrainPresenceEvent(Type type, @NotNull Train train) {
+    public StationTrainPresenceEvent(Type type, Train train) {
         this.type = type;
         this.train = train;
     }

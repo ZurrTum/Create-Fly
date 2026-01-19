@@ -5,7 +5,7 @@ import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.model.SimpleQuadMesh;
 import com.zurrtum.create.client.flywheel.lib.vertex.NoOverlayVertexView;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexView;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;

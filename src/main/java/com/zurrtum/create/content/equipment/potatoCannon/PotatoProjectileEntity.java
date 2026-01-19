@@ -44,8 +44,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PotatoProjectileEntity extends AbstractHurtingProjectile {
 
@@ -312,7 +311,7 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel world, @NotNull DamageSource source, float amt) {
+    public boolean hurtServer(ServerLevel world, DamageSource source, float amt) {
         if (source.is(DamageTypeTags.IS_FIRE))
             return false;
         if (isInvulnerableToBase(source))

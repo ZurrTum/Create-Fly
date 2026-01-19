@@ -23,7 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, SpoutRenderer.SpoutRenderState> {
     public SpoutRenderer(BlockEntityRendererProvider.Context context) {

@@ -5,10 +5,6 @@ import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import com.zurrtum.create.foundation.item.SwingControlItem;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.packet.s2c.ZapperBeamPacket;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -34,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Consumer;
 
 public abstract class ZapperItem extends Item implements SwingControlItem {
 
@@ -71,7 +69,6 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
     }
 
     @Override
-    @NotNull
     public InteractionResult useOn(UseOnContext context) {
         // Shift -> open GUI
         if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) {

@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.lib.vertex;
 
 import com.zurrtum.create.client.flywheel.api.vertex.MutableVertexList;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 public interface VertexView extends MutableVertexList {

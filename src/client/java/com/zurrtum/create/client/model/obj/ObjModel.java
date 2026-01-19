@@ -11,7 +11,7 @@ import com.zurrtum.create.client.model.StandardModelParameters;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.UnbakedGeometry;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A model loaded from an OBJ file.

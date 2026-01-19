@@ -4,8 +4,8 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.level.material.Fluid;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record SpoutRenderState(
     int id, Matrix3x2f pose, Fluid fluid, DataComponentPatch components, int x0, int y0, int offset, ScreenRectangle bounds

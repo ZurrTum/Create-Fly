@@ -2,7 +2,6 @@ package com.zurrtum.create.content.logistics.redstoneRequester;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -21,10 +20,10 @@ public class RedstoneRequesterBlockItem extends LogisticallyLinkedBlockItem {
 
     @Override
     public void appendHoverText(
-        @NotNull ItemStack stack,
-        @NotNull TooltipContext tooltipContext,
+        ItemStack stack,
+        TooltipContext tooltipContext,
         TooltipDisplay displayComponent,
-        @NotNull Consumer<Component> textConsumer,
+        Consumer<Component> textConsumer,
         TooltipFlag type
     ) {
         if (!isTuned(stack))

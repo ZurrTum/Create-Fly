@@ -8,7 +8,8 @@ import com.zurrtum.create.client.flywheel.backend.glsl.error.ErrorLevel;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.Span;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
@@ -17,8 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import net.minecraft.resources.Identifier;
 
 public class FailedCompilation {
     public static final Identifier GENERATED_SOURCE_NAME = ResourceUtil.rl("generated_source");

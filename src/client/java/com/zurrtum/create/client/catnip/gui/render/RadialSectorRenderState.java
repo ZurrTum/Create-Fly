@@ -3,15 +3,14 @@ package com.zurrtum.create.client.catnip.gui.render;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.theme.Color;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2f;
-
-import java.util.List;
-
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.world.phys.Vec2;
+import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.POSITION_COLOR_STRIP;
 

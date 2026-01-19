@@ -4,12 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.lang.FontHelper.Palette;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.function.Supplier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
@@ -18,6 +12,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.function.Supplier;
 
 import static net.minecraft.ChatFormatting.*;
 

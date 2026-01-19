@@ -3,13 +3,12 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 public record PackageOrderData(
     int orderId, int linkIndex, boolean isFinalLink, int fragmentIndex, boolean isFinal, @Nullable PackageOrderWithCrafts orderContext

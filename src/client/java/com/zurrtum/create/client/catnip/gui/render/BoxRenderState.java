@@ -7,8 +7,8 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record BoxRenderState(
     Matrix3x2f pose, float x, float y, float width, float height, int f, int c1Red, int c1Green, int c1Blue, int c1Alpha, int c2Red, int c2Green,

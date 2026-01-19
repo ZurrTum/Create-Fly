@@ -9,10 +9,6 @@ import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 public class DepotMountedStorage extends WrapperMountedItemStorage<DepotMountedStorage.Handler> implements SyncedMountedStorage {
     public static final MapCodec<DepotMountedStorage> CODEC = TransportedItemStack.CODEC.optionalFieldOf("value")

@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.belt.transport;
 
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
@@ -10,16 +11,7 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviou
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -29,6 +21,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
 
 public class BeltInventory {
 

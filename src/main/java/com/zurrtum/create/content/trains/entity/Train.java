@@ -29,17 +29,6 @@ import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveTrainPacket;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -57,6 +46,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -64,6 +54,16 @@ import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Train {
     public static final StreamCodec<RegistryFriendlyByteBuf, Train> STREAM_CODEC = CatnipLargerStreamCodecs.composite(
@@ -1134,9 +1134,9 @@ public class Train {
                 continue;
             }
             fuelTicks += burnTime.getValue();
-            ItemStack remainder = extract.getItem().getCraftingRemainder();
-            if (!remainder.isEmpty()) {
-                fuelItems.insertExist(remainder);
+            ItemStackTemplate remainder = extract.getItem().getCraftingRemainder();
+            if (remainder != null) {
+                fuelItems.insertExist(remainder.create());
             }
             return;
         }

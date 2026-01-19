@@ -2,13 +2,12 @@ package com.zurrtum.create.infrastructure.debugInfo.element;
 
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.infrastructure.debugInfo.DebugInformation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.entity.player.Player;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import net.minecraft.world.entity.player.Player;
 
 /**
  * A section for organizing debug information. Can contain both information and other sections.

@@ -20,7 +20,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -31,13 +30,11 @@ public class CompactingCategory extends CreateCategory<RecipeHolder<CompactingRe
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<CompactingRecipe>> getRecipeType() {
         return JeiClientPlugin.PACKING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.packing");
     }

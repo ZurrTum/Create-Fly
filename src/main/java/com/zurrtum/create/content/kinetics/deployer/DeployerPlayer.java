@@ -2,16 +2,15 @@ package com.zurrtum.create.content.kinetics.deployer;
 
 import com.mojang.authlib.GameProfile;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.world.item.ItemStack;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
 
 public interface DeployerPlayer {
     UUID FALLBACK_ID = UUID.fromString("9e2faded-cafe-4ec2-c314-dad129ae971d");

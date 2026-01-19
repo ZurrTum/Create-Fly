@@ -8,7 +8,7 @@ import com.zurrtum.create.client.flywheel.lib.model.SimpleModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.BiFunction;
 

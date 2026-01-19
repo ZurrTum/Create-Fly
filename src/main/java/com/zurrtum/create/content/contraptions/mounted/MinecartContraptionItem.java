@@ -49,7 +49,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -199,12 +199,7 @@ public class MinecartContraptionItem extends Item {
                     world,
                     mountedContraption,
                     intialOrientation
-                ) : OrientedContraptionEntity.createAtYaw(
-                    world,
-                    mountedContraption,
-                    intialOrientation,
-                    newFacing.toYRot()
-                );
+                ) : OrientedContraptionEntity.createAtYaw(world, mountedContraption, intialOrientation, newFacing.toYRot());
 
                 contraptionEntity.startRiding(cart);
                 contraptionEntity.setPos(cart.getX(), cart.getY(), cart.getZ());

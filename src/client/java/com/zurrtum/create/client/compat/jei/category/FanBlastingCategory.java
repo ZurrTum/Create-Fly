@@ -21,7 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -77,13 +76,11 @@ public class FanBlastingCategory extends CreateCategory<RecipeHolder<? extends S
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<? extends SingleItemRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_BLASTING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_blasting");
     }

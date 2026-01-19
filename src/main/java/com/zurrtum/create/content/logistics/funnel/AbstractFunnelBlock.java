@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.logistics.funnel;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import net.minecraft.core.BlockPos;
@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.redstone.Orientation;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlockEntity>, IWrenchable, ProperWaterloggedBlock, NeighborUpdateListeningBlock {
 

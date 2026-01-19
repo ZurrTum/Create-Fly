@@ -2,6 +2,7 @@ package com.zurrtum.create.content.fluids.pump;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
@@ -12,13 +13,7 @@ import com.zurrtum.create.content.fluids.PipeConnection;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -26,6 +21,10 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class PumpBlockEntity extends KineticBlockEntity {
 

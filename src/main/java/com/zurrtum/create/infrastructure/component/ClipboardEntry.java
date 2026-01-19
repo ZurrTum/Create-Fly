@@ -3,11 +3,6 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllDataComponents;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -15,6 +10,10 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClipboardEntry {
     public static final Codec<ClipboardEntry> CODEC = RecordCodecBuilder.create(i -> i.group(

@@ -3,8 +3,8 @@ package com.zurrtum.create.client.foundation.gui.render;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record BasinBlazeBurnerRenderState(
     Matrix3x2f pose, int x0, int y0, ScreenRectangle bounds, HeatLevel heat

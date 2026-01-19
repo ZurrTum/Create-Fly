@@ -2,9 +2,9 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.inventory;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
 import net.minecraft.core.BlockPos;
@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationBehaviourBase<?, ?>> extends BlockEntityBehaviour<SmartBlockEntity> {
 

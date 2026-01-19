@@ -13,8 +13,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.*;
+import org.jspecify.annotations.Nullable;
 
 public abstract class Outline {
 

@@ -4,7 +4,7 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.impl.FlwImpl;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public final class SodiumCompat {
     public static final boolean ACTIVE = CompatMod.SODIUM.isLoaded;

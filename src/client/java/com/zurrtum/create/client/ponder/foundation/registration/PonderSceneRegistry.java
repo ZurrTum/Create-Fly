@@ -22,7 +22,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;

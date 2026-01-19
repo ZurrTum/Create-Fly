@@ -10,8 +10,7 @@ import dan200.computercraft.api.lua.IArguments;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import net.minecraft.core.RegistryAccess;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -28,8 +27,7 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
         RegistryAccess registryAccess = blockEntity.getLevel().registryAccess();
         for (BigItemStack entry : blockEntity.getAccurateSummary().getStacks()) {
             i++;
-            Map<String, Object> details = new HashMap<>(detailed.isPresent() && detailed.get() ? VanillaDetailRegistries.ITEM_STACK.getDetails(
-                registryAccess,
+            Map<String, Object> details = new HashMap<>(detailed.isPresent() && detailed.get() ? VanillaDetailRegistries.ITEM_STACK.getDetails(registryAccess,
                 entry.stack
             ) : VanillaDetailRegistries.ITEM_STACK.getBasicDetails(registryAccess, entry.stack));
             details.put("count", entry.count);
@@ -106,7 +104,6 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
         return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.getReceivedPaymentsHandler(), slot);
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_StockTicker";

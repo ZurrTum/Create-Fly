@@ -26,7 +26,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -86,13 +85,11 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     }
 
     @Override
-    @NotNull
     public IRecipeType<BlockCuttingDisplay> getRecipeType() {
         return JeiClientPlugin.BLOCK_CUTTING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.block_cutting");
     }

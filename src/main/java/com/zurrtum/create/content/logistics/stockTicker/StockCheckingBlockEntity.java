@@ -1,20 +1,19 @@
 package com.zurrtum.create.content.logistics.stockTicker;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.logistics.packager.IdentifiedInventory;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticsManager;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class StockCheckingBlockEntity extends SmartBlockEntity {
 

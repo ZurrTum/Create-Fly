@@ -6,7 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface FluidInventoryProvider<T extends SmartBlockEntity> {
     default FluidInventory getFluidInventory(BlockState state, LevelAccessor world, BlockPos pos) {

@@ -23,7 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEntity, LinkBulbRenderer.LinkBulbRenderState> {
     private static final boolean IRIS = FabricLoader.getInstance().isModLoaded("iris");

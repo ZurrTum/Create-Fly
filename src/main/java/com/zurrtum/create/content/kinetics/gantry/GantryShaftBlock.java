@@ -12,13 +12,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -48,6 +41,12 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
 
 public class GantryShaftBlock extends DirectionalKineticBlock implements IBE<GantryShaftBlockEntity> {
 

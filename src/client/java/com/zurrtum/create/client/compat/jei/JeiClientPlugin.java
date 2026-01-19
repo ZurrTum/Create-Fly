@@ -54,7 +54,6 @@ import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,7 +98,6 @@ public class JeiClientPlugin implements IModPlugin {
     }
 
     @Override
-    @NotNull
     public Identifier getPluginUid() {
         return ID;
     }

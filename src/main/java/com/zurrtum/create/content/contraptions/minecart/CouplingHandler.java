@@ -9,13 +9,6 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -23,6 +16,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class CouplingHandler {
     public static boolean preventEntitiesFromMoutingOccupiedCart(Entity entityMounting, Entity entityBeingMounted) {

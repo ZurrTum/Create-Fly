@@ -4,7 +4,7 @@ import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractEntityVisual;
 import net.minecraft.util.LightCoordsUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.stream.Stream;

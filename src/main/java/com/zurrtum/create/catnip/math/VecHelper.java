@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class VecHelper {
     public static final Vec3 CENTER_OF_ORIGIN = new Vec3(.5, .5, .5);

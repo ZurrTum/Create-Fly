@@ -7,13 +7,6 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,6 +14,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class InItemGroupAttribute implements ItemAttribute {
     public static final MapCodec<InItemGroupAttribute> CODEC = BuiltInRegistries.CREATIVE_MODE_TAB.byNameCodec()
@@ -94,7 +92,7 @@ public class InItemGroupAttribute implements ItemAttribute {
 
     public static class Type implements ItemAttributeType {
         @Override
-        public @NotNull ItemAttribute createAttribute() {
+        public ItemAttribute createAttribute() {
             return new InItemGroupAttribute(null);
         }
 

@@ -3,8 +3,8 @@ package com.zurrtum.create.client.foundation.gui.render;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record FanRenderState(Matrix3x2f pose, int x0, int y0, BlockState target, ScreenRectangle bounds) implements PictureInPictureRenderState {
     public FanRenderState(Matrix3x2f pose, int x, int y, BlockState target) {

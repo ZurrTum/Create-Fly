@@ -13,7 +13,7 @@ import com.zurrtum.create.client.flywheel.api.material.WriteMask;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;

@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEntity, FlywheelRenderer.FlywheelRenderState> {
     public FlywheelRenderer(BlockEntityRendererProvider.Context context) {

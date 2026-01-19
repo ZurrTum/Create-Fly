@@ -9,12 +9,6 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayBoardTarget
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -25,6 +19,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class DisplaySource {
     public static final SimpleRegistry.Multi<Block, DisplaySource> BY_BLOCK = SimpleRegistry.Multi.create();

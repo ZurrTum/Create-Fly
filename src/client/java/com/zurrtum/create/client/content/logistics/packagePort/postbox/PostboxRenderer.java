@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, PostboxRenderer.PostboxRenderState> {
     public PostboxRenderer(BlockEntityRendererProvider.Context context) {

@@ -2,10 +2,6 @@ package com.zurrtum.create.infrastructure.items;
 
 import com.google.common.collect.MapMaker;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -14,6 +10,9 @@ import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
 
 public interface ItemInventoryProvider<T extends SmartBlockEntity> extends WorldlyContainerHolder {
     Map<Container, WorldlyContainer> WRAPPERS = new MapMaker().weakValues().makeMap();

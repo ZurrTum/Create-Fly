@@ -5,12 +5,6 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.equipment.zapper.ZapperItem;
 import com.zurrtum.create.content.equipment.zapper.terrainzapper.FlattenTool;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,6 +14,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Locale;
 
 public enum TerrainTools implements StringRepresentable {
     Fill,
@@ -38,7 +36,7 @@ public enum TerrainTools implements StringRepresentable {
     }
 
     @Override
-    public @NotNull String getSerializedName() {
+    public String getSerializedName() {
         return translationKey;
     }
 

@@ -4,7 +4,7 @@ import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.impl.extension.EntityTypeExtension;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

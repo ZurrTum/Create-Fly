@@ -20,7 +20,7 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> extends KineticBlockEntityRenderer<T, AbstractPulleyRenderer.PulleyRenderState> {
     private final PartialModel halfRope;

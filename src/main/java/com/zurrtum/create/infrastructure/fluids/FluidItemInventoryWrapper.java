@@ -1,13 +1,12 @@
 package com.zurrtum.create.infrastructure.fluids;
 
-import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
 
 public abstract class FluidItemInventoryWrapper implements FluidItemInventory {
     public Consumer<FluidItemInventoryWrapper> release;
@@ -145,7 +144,6 @@ public abstract class FluidItemInventoryWrapper implements FluidItemInventory {
         return canExtract() ? Stream.of(getStack()) : Stream.empty();
     }
 
-    @NotNull
     public java.util.Iterator<FluidStack> iterator() {
         return new com.zurrtum.create.infrastructure.fluids.FluidItemInventoryWrapper.Iterator(this);
     }

@@ -7,12 +7,11 @@ import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapp
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageWrapper;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.MountedStorageManager;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TrainCargoManager extends MountedStorageManager {
 

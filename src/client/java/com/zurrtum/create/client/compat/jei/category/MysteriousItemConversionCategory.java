@@ -15,7 +15,6 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -43,13 +42,11 @@ public class MysteriousItemConversionCategory extends CreateCategory<MysteriousI
     }
 
     @Override
-    @NotNull
     public IRecipeType<MysteriousItemConversionDisplay> getRecipeType() {
         return JeiClientPlugin.MYSTERY_CONVERSION;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.mystery_conversion");
     }

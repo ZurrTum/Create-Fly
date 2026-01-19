@@ -1,13 +1,12 @@
 package com.zurrtum.create.client.flywheel.api.registry;
 
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Set;
-
-import net.minecraft.resources.Identifier;
 
 @ApiStatus.NonExtendable
 public interface IdRegistry<T> extends Iterable<T> {

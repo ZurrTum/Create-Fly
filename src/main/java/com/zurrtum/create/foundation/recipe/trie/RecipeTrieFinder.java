@@ -3,7 +3,6 @@ package com.zurrtum.create.foundation.recipe.trie;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -18,7 +17,7 @@ public class RecipeTrieFinder {
     private static final Cache<Object, RecipeTrie<Recipe<?>>> CACHED_TRIES = CacheBuilder.newBuilder().build();
 
     public static RecipeTrie<Recipe<?>> get(
-        @NotNull Object cacheKey,
+        Object cacheKey,
         ServerLevel world,
         Predicate<RecipeHolder<? extends Recipe<?>>> conditions
     ) throws ExecutionException {

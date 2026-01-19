@@ -21,7 +21,6 @@ import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmokingRecipe;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -32,13 +31,11 @@ public class FanSmokingCategory extends CreateCategory<RecipeHolder<SmokingRecip
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<SmokingRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_SMOKING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_smoking");
     }

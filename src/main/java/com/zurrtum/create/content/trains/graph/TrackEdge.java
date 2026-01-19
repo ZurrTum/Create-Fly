@@ -9,18 +9,17 @@ import com.mojang.serialization.RecordBuilder;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class TrackEdge {
 

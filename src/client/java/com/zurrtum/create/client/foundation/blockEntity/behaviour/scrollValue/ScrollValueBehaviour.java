@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue;
 
 import com.google.common.collect.ImmutableList;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.content.logistics.depot.EjectorSlot;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsBoard;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter;
@@ -10,7 +11,6 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBulkScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
@@ -21,7 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;

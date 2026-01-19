@@ -12,7 +12,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.List;
 public class GhostIngredientHandler<T extends AbstractSimiContainerScreen<? extends GhostItemMenu<?>>> implements IGhostIngredientHandler<T> {
 
     @Override
-    @NotNull
     public <I> List<Target<I>> getTargetsTyped(T gui, ITypedIngredient<I> ingredient, boolean doStart) {
         List<Target<I>> targets = new LinkedList<>();
 
@@ -66,7 +64,6 @@ public class GhostIngredientHandler<T extends AbstractSimiContainerScreen<? exte
         }
 
         @Override
-        @NotNull
         public Rect2i getArea() {
             return area;
         }

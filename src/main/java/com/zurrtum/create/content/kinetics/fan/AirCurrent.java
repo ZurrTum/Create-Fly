@@ -3,6 +3,7 @@ package com.zurrtum.create.content.kinetics.fan;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessing;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.flywheel.backend.util;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -478,7 +477,6 @@ public class AtomicBitSet {
         return expandToFit(segmentIndex).getSegment(segmentIndex);
     }
 
-    @NotNull
     private AtomicBitSet.AtomicBitSetSegments expandToFit(int segmentIndex) {
         AtomicBitSetSegments visibleSegments = segments.get();
 

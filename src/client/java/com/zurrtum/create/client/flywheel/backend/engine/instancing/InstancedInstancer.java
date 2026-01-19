@@ -9,7 +9,7 @@ import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBuffer;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferUsage;
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

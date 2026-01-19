@@ -26,7 +26,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -37,13 +36,11 @@ public class MixingCategory extends CreateCategory<RecipeHolder<MixingRecipe>> {
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<MixingRecipe>> getRecipeType() {
         return JeiClientPlugin.MIXING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.mixing");
     }

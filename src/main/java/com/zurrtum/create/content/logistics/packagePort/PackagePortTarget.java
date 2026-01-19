@@ -15,11 +15,6 @@ import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntit
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -29,6 +24,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Optional;
 
 public abstract class PackagePortTarget {
     public static final Codec<PackagePortTarget> CODEC = CreateRegistries.PACKAGE_PORT_TARGET_TYPE.byNameCodec()

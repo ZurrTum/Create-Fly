@@ -42,8 +42,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;

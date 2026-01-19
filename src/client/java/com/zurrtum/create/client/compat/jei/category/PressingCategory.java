@@ -18,7 +18,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -29,13 +28,11 @@ public class PressingCategory extends CreateCategory<RecipeHolder<PressingRecipe
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<PressingRecipe>> getRecipeType() {
         return JeiClientPlugin.PRESSING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.pressing");
     }

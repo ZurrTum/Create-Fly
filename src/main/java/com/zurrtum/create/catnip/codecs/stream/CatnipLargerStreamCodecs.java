@@ -1,7 +1,6 @@
 package com.zurrtum.create.catnip.codecs.stream;
 
 import com.mojang.datafixers.util.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -27,7 +26,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -72,7 +71,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -121,7 +120,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -174,7 +173,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -231,7 +230,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -292,7 +291,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -357,7 +356,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -426,7 +425,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -499,7 +498,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);
@@ -576,7 +575,7 @@ public interface CatnipLargerStreamCodecs {
     ) {
         return new StreamCodec<>() {
             @Override
-            public @NotNull C decode(B buffer) {
+            public C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
                 T2 t2 = codec2.decode(buffer);
                 T3 t3 = codec3.decode(buffer);

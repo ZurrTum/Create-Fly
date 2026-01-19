@@ -22,7 +22,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -34,13 +33,11 @@ public class MechanicalCraftingCategory extends CreateCategory<RecipeHolder<Mech
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<MechanicalCraftingRecipe>> getRecipeType() {
         return JeiClientPlugin.MECHANICAL_CRAFTING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.mechanical_crafting");
     }

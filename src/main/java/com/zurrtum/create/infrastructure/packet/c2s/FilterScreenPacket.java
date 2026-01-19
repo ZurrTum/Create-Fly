@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record FilterScreenPacket(Option option, @Nullable CompoundTag data) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, FilterScreenPacket> CODEC = StreamCodec.composite(

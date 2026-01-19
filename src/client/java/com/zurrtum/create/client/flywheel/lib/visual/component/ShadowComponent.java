@@ -27,9 +27,9 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A component that uses instances to render an entity's shadow.

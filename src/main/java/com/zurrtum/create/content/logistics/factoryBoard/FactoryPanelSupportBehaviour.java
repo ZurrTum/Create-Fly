@@ -1,12 +1,12 @@
 package com.zurrtum.create.content.logistics.factoryBoard;
 
 import com.mojang.serialization.Codec;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;

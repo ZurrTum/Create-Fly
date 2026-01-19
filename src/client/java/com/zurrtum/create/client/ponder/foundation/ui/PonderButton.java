@@ -8,16 +8,15 @@ import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
-
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
 
 public class PonderButton extends BoxWidget {
 

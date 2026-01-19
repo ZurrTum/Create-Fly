@@ -22,8 +22,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.TickContainerAccess;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -175,7 +174,7 @@ public class VirtualChunk extends LevelChunk {
     }
 
     @Override
-    public void findBlocks(@NotNull Predicate<BlockState> roughFilter, @NotNull BiConsumer<BlockPos, BlockState> output) {
+    public void findBlocks(Predicate<BlockState> roughFilter, BiConsumer<BlockPos, BlockState> output) {
         world.blockStates.forEach((blockPos, state) -> {
             if (SectionPos.blockToSectionCoord(blockPos.getX()) == chunkPos.x && SectionPos.blockToSectionCoord(blockPos.getZ()) == chunkPos.z) {
                 if (roughFilter.test(state)) {

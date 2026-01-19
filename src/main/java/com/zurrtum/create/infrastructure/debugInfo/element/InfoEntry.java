@@ -1,13 +1,12 @@
 package com.zurrtum.create.infrastructure.debugInfo.element;
 
 import com.zurrtum.create.infrastructure.debugInfo.DebugInformation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.entity.player.Player;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import net.minecraft.world.entity.player.Player;
 
 public record InfoEntry(String name, InfoProvider provider) implements InfoElement {
     public InfoEntry(String name, String info) {

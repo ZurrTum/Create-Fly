@@ -1,15 +1,14 @@
 package com.zurrtum.create.foundation.utility;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class AbstractBlockBreakQueue {
     protected Consumer<BlockPos> makeCallbackFor(

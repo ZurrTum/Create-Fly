@@ -15,7 +15,7 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public final class PlayerUniforms extends UniformWriter {
     private static final int SIZE = 16 * 2 + 8 + 4 * 9;

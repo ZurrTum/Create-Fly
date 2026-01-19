@@ -5,7 +5,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

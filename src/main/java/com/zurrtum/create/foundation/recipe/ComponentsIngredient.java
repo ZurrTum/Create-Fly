@@ -2,13 +2,6 @@ package com.zurrtum.create.foundation.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
@@ -21,6 +14,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ComponentsIngredient extends Ingredient {
     public static final String TYPE_KEY = "fabric:type";

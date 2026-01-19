@@ -10,7 +10,6 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -157,7 +156,7 @@ public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<Post
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

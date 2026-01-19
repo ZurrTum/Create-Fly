@@ -6,12 +6,11 @@ import com.zurrtum.create.content.trains.graph.DiscoveredPath;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class DestinationInstruction extends TextScheduleInstruction {
     public DestinationInstruction(Identifier id) {

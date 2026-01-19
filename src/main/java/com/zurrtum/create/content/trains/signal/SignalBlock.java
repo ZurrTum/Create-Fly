@@ -5,10 +5,6 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -29,6 +25,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
 
 public class SignalBlock extends Block implements IBE<SignalBlockEntity>, IWrenchable, WeakPowerControlBlock {
 

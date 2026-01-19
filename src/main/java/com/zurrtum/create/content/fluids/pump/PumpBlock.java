@@ -35,7 +35,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.TickPriority;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PumpBlock extends DirectionalKineticBlock implements SimpleWaterloggedBlock, ICogWheel, IBE<PumpBlockEntity>, NeighborUpdateListeningBlock {
 

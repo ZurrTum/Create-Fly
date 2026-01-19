@@ -6,7 +6,6 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import dan200.computercraft.api.lua.*;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -121,7 +120,6 @@ public class DisplayLinkPeripheral extends SyncedPeripheral<DisplayLinkBlockEnti
         blockEntity.tickSource();
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_DisplayLink";

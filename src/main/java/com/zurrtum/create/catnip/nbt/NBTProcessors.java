@@ -2,14 +2,6 @@ package com.zurrtum.create.catnip.nbt;
 
 import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
 import com.zurrtum.create.catnip.components.ComponentProcessors;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.function.UnaryOperator;
-
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +13,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 public final class NBTProcessors {
 

@@ -1,11 +1,6 @@
 package com.zurrtum.create.content.redstone.nixieTube;
 
 import com.mojang.serialization.MapCodec;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
-
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -13,6 +8,9 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
 
 public class DoubleFaceAttachedBlock extends HorizontalDirectionalBlock {
 
@@ -83,7 +81,7 @@ public class DoubleFaceAttachedBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

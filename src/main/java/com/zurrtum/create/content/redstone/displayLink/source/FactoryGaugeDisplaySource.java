@@ -4,17 +4,16 @@ import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public class FactoryGaugeDisplaySource extends ValueListDisplaySource {
 

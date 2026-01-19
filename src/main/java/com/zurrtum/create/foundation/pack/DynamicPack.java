@@ -12,8 +12,7 @@ import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -64,17 +63,17 @@ public class DynamicPack implements PackResources {
     }
 
     @Override
-    public @Nullable IoSupplier<InputStream> getRootResource(String @NotNull ... elements) {
+    public @Nullable IoSupplier<InputStream> getRootResource(String... elements) {
         return files.getOrDefault(String.join("/", elements), null);
     }
 
     @Override
-    public @Nullable IoSupplier<InputStream> getResource(@NotNull PackType packType, @NotNull Identifier identifier) {
+    public @Nullable IoSupplier<InputStream> getResource(PackType packType, Identifier identifier) {
         return files.getOrDefault(getPath(packType, identifier), null);
     }
 
     @Override
-    public void listResources(@NotNull PackType packType, @NotNull String namespace, @NotNull String path, @NotNull ResourceOutput resourceOutput) {
+    public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         Identifier identifier = Identifier.fromNamespaceAndPath(namespace, path);
         String directoryAndNamespace = packType.getDirectory() + "/" + namespace + "/";
         String prefix = directoryAndNamespace + path + "/";
@@ -85,7 +84,7 @@ public class DynamicPack implements PackResources {
     }
 
     @Override
-    public @NotNull Set<String> getNamespaces(PackType packType) {
+    public Set<String> getNamespaces(PackType packType) {
         Set<String> namespaces = new HashSet<>();
         String dir = packType.getDirectory() + "/";
 
@@ -103,17 +102,17 @@ public class DynamicPack implements PackResources {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @Nullable <T> T getMetadataSection(@NotNull MetadataSectionType<T> deserializer) {
+    public @Nullable <T> T getMetadataSection(MetadataSectionType<T> deserializer) {
         return deserializer == PackMetadataSection.forPackType(packType) ? (T) metadata : null;
     }
 
     @Override
-    public @NotNull PackLocationInfo location() {
+    public PackLocationInfo location() {
         return packLocationInfo;
     }
 
     @Override
-    public @NotNull String packId() {
+    public String packId() {
         return packId;
     }
 

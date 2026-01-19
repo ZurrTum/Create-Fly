@@ -11,11 +11,11 @@ import com.zurrtum.create.client.flywheel.backend.engine.EngineImpl;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.lib.util.ExtraMemoryOps;
 import net.minecraft.core.Vec3i;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.jspecify.annotations.Nullable;
 
 public class EmbeddedEnvironment implements VisualEmbedding, Environment {
     private final EngineImpl engine;

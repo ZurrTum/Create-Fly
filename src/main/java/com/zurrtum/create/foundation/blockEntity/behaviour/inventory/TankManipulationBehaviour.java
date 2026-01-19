@@ -7,14 +7,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilte
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 public class TankManipulationBehaviour extends CapManipulationBehaviourBase<FluidInventory, TankManipulationBehaviour> {
 

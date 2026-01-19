@@ -6,7 +6,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.jetbrains.annotations.NotNull;
 
 public class Label extends AbstractSimiWidget {
 
@@ -68,7 +67,7 @@ public class Label extends AbstractSimiWidget {
     }
 
     @Override
-    protected void doRender(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if (text == null || text.getString().isEmpty())
             return;
 

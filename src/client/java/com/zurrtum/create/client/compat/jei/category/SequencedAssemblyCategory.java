@@ -33,7 +33,6 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.ChatFormatting;
-import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.component.DataComponentMap;
@@ -44,6 +43,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -56,7 +56,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 
@@ -89,13 +88,11 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<SequencedAssemblyRecipe>> getRecipeType() {
         return JeiClientPlugin.SEQUENCED_ASSEMBLY;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.sequenced_assembly");
     }

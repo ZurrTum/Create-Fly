@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.api.instance;
 
 import com.zurrtum.create.client.flywheel.api.backend.BackendImplemented;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An instancer is how you interact with an instanced model.

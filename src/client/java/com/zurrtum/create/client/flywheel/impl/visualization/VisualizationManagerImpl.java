@@ -40,9 +40,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

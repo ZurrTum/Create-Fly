@@ -5,15 +5,14 @@ import com.zurrtum.create.catnip.config.ConfigBase;
 import com.zurrtum.create.catnip.config.DoubleRawValue;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
-
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.Block;
 
 public class CStress extends ConfigBase {
     // bump this version to reset configured values.

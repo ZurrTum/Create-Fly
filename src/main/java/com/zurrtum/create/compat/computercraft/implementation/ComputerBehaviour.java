@@ -14,7 +14,6 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -115,7 +114,7 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (peripheral != null) {
             peripheral.prepareComputerEvent(event);
         }

@@ -4,7 +4,6 @@ import com.zurrtum.create.compat.computercraft.events.ComputerEvent;
 import com.zurrtum.create.compat.computercraft.events.KineticsChangeEvent;
 import com.zurrtum.create.content.kinetics.gauge.StressGaugeBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
-import org.jetbrains.annotations.NotNull;
 
 public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEntity> {
 
@@ -23,7 +22,7 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (event instanceof KineticsChangeEvent kce) {
             if (kce.overStressed)
                 queueEvent("overstressed");
@@ -32,7 +31,6 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
         }
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_Stressometer";

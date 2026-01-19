@@ -6,15 +6,14 @@ import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class HosePulleyFluidHandler implements SidedFluidInventory {
     private static final int HALF_BUCKET = BucketFluidInventory.CAPACITY / 2;

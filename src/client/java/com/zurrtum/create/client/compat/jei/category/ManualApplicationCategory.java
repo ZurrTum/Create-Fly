@@ -21,7 +21,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -32,13 +31,11 @@ public class ManualApplicationCategory extends CreateCategory<RecipeHolder<Manua
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<ManualApplicationRecipe>> getRecipeType() {
         return JeiClientPlugin.ITEM_APPLICATION;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.item_application");
     }

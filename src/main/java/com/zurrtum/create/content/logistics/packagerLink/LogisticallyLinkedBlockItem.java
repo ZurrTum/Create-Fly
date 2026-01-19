@@ -1,13 +1,7 @@
 package com.zurrtum.create.content.logistics.packagerLink;
 
-import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
-import java.util.function.Consumer;
-
+import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
@@ -28,6 +22,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class LogisticallyLinkedBlockItem extends BlockItem {
 
@@ -56,10 +54,10 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
     @Override
     @SuppressWarnings("deprecation")
     public void appendHoverText(
-        @NotNull ItemStack stack,
-        @NotNull TooltipContext tooltipContext,
+        ItemStack stack,
+        TooltipContext tooltipContext,
         TooltipDisplay displayComponent,
-        @NotNull Consumer<Component> textConsumer,
+        Consumer<Component> textConsumer,
         TooltipFlag type
     ) {
         super.appendHoverText(stack, tooltipContext, displayComponent, textConsumer, type);
@@ -90,7 +88,7 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
     }
 
     @Override
-    public @NotNull InteractionResult useOn(UseOnContext pContext) {
+    public InteractionResult useOn(UseOnContext pContext) {
         ItemStack stack = pContext.getItemInHand();
         BlockPos pos = pContext.getClickedPos();
         Level level = pContext.getLevel();

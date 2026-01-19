@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.mechanicalArm;
 
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
@@ -23,7 +24,6 @@ import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import net.minecraft.core.BlockPos;
@@ -48,7 +48,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.Create.MOD_ID;
 

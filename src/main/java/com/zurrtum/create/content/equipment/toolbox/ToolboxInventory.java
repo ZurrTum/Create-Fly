@@ -8,19 +8,17 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemSlots;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class ToolboxInventory implements ItemInventory {
     public static final int STACKS_PER_COMPARTMENT = 4;
@@ -100,7 +98,7 @@ public class ToolboxInventory implements ItemInventory {
         }
     }
 
-    public int distributeToCompartment(@NotNull ItemStack stack, int compartment, boolean simulate) {
+    public int distributeToCompartment(ItemStack stack, int compartment, boolean simulate) {
         if (stack.isEmpty() || !stack.getItem().canFitInsideContainerItems()) {
             return 0;
         }

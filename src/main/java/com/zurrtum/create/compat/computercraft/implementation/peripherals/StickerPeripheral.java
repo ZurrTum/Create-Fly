@@ -6,7 +6,6 @@ import com.zurrtum.create.content.contraptions.chassis.StickerBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 public class StickerPeripheral extends SyncedPeripheral<StickerBlockEntity> {
 
@@ -52,7 +51,6 @@ public class StickerPeripheral extends SyncedPeripheral<StickerBlockEntity> {
         return true;
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_Sticker";

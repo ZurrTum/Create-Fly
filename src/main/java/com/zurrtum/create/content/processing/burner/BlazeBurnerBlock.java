@@ -15,10 +15,6 @@ import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -31,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -46,6 +43,9 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
 
 public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<BlazeBurnerBlockEntity>, IWrenchable, SpecialBlockItemRequirement {
     public static final MapCodec<BlazeBurnerBlock> CODEC = simpleCodec(BlazeBurnerBlock::new);
@@ -179,11 +179,11 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
             return InteractionResult.FAIL;
 
         if (!doNotConsume) {
-            ItemStack container = stack.getItem().getCraftingRemainder();
+            ItemStackTemplate container = stack.getItem().getCraftingRemainder();
             if (!world.isClientSide()) {
                 stack.shrink(1);
             }
-            return InteractionResult.SUCCESS.heldItemTransformedTo(container);
+            return InteractionResult.SUCCESS.heldItemTransformedTo(container != null ? container.create() : ItemStack.EMPTY);
         }
         return InteractionResult.SUCCESS.heldItemTransformedTo(ItemStack.EMPTY);
     }

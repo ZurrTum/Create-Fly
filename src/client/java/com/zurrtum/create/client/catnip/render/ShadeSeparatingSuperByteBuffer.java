@@ -11,8 +11,8 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
-import org.jetbrains.annotations.Nullable;
 import org.joml.*;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.Math;
 

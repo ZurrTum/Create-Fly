@@ -17,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -47,7 +46,6 @@ public class JunkSlotRenderer implements IIngredientRenderer<ItemStack> {
     }
 
     @Override
-    @NotNull
     public List<Component> getTooltip(ItemStack temp, TooltipFlag tooltipFlag) {
         float chance = temp.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getFloatOr("chance", 0);
         String number = chance < 0.01 ? "<1" : chance > 0.99 ? ">99" : String.valueOf(Math.round(chance * 100));

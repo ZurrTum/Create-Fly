@@ -13,7 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.scores.PlayerTeam;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.OptionalInt;
 

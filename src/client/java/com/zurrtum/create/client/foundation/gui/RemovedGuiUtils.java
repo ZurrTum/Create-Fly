@@ -1,11 +1,6 @@
 package com.zurrtum.create.client.foundation.gui;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -16,14 +11,16 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RemovedGuiUtils {
     public static final int DEFAULT_BACKGROUND_COLOR = 0xF0100010;
     public static final int DEFAULT_BORDER_COLOR_START = 0x505000FF;
     public static final int DEFAULT_BORDER_COLOR_END = (DEFAULT_BORDER_COLOR_START & 0xFEFEFE) >> 1 | DEFAULT_BORDER_COLOR_START & 0xFF000000;
-    @NotNull
     private static ItemStack cachedTooltipStack = ItemStack.EMPTY;
 
-    public static void preItemToolTip(@NotNull ItemStack stack) {
+    public static void preItemToolTip(ItemStack stack) {
         cachedTooltipStack = stack;
     }
 
@@ -86,7 +83,7 @@ public class RemovedGuiUtils {
     }
 
     public static void drawHoveringText(
-        @NotNull final ItemStack stack,
+        final ItemStack stack,
         GuiGraphics graphics,
         List<? extends FormattedText> textLines,
         int mouseX,
@@ -113,7 +110,7 @@ public class RemovedGuiUtils {
     }
 
     public static void drawHoveringText(
-        @NotNull final ItemStack stack,
+        final ItemStack stack,
         GuiGraphics graphics,
         List<? extends FormattedText> textLines,
         int mouseX,

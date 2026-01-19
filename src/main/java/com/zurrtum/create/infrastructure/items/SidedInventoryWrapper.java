@@ -1,18 +1,16 @@
 package com.zurrtum.create.infrastructure.items;
 
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
-import java.util.function.Predicate;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Set;
+import java.util.function.Predicate;
 
 public record SidedInventoryWrapper(Container inventory, int[] slots) implements SidedItemInventory {
     public SidedInventoryWrapper(Container inventory) {
@@ -200,13 +198,11 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    @NotNull
     public java.util.Iterator<ItemStack> iterator() {
         return inventory.iterator();
     }
 
     @Override
-    @NotNull
     public java.util.Iterator<ItemStack> iterator(Direction side) {
         return inventory.iterator();
     }

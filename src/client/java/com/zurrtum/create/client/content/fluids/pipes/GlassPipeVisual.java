@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.fluids.pipes;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllFluidConfigs;
@@ -18,16 +19,14 @@ import com.zurrtum.create.client.infrastructure.fluid.FluidConfig;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.content.fluids.pipes.StraightPipeBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class GlassPipeVisual extends AbstractBlockEntityVisual<StraightPipeBlockEntity> implements SimpleDynamicVisual {
 

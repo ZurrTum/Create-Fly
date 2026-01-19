@@ -7,7 +7,6 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstr
 import dan200.computercraft.api.lua.IArguments;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
-import org.jetbrains.annotations.NotNull;
 
 public class SequencedGearshiftPeripheral extends SyncedPeripheral<SequencedGearshiftBlockEntity> {
 
@@ -41,7 +40,6 @@ public class SequencedGearshiftPeripheral extends SyncedPeripheral<SequencedGear
         this.blockEntity.run(0);
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_SequencedGearshift";

@@ -1,15 +1,14 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.ToIntFunction;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.ToIntFunction;
 
 public class EmptyVirtualBlockGetter extends VirtualBlockGetter {
     public static final EmptyVirtualBlockGetter FULL_DARK = new EmptyVirtualBlockGetter(p -> 0, p -> 0);

@@ -4,14 +4,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.redstone.diodes.BrassDiodeBlock;
 import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -29,6 +21,13 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class RoseQuartzLampBlock extends Block implements IWrenchable, WeakPowerControlBlock {
 

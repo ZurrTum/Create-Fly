@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class SmartChuteRenderer extends SmartBlockEntityRenderer<SmartChuteBlockEntity, SmartChuteRenderer.SmartChuteRenderState> {
     public SmartChuteRenderer(BlockEntityRendererProvider.Context context) {

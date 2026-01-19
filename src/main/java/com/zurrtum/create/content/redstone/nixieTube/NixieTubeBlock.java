@@ -38,8 +38,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -130,7 +129,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         return InteractionResult.SUCCESS;
     }
 
-    public static Direction getLeftNixieDirection(@NotNull BlockState state) {
+    public static Direction getLeftNixieDirection(BlockState state) {
         Direction left = state.getValue(FACING).getOpposite();
 
         if (state.getValue(FACE) == DoubleAttachFace.WALL)
@@ -140,11 +139,11 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         return left;
     }
 
-    public static Direction getRightNixieDirection(@NotNull BlockState state) {
+    public static Direction getRightNixieDirection(BlockState state) {
         return getLeftNixieDirection(state).getOpposite();
     }
 
-    public static boolean isInComputerControlledRow(@NotNull LevelAccessor world, @NotNull BlockPos pos) {
+    public static boolean isInComputerControlledRow(LevelAccessor world, BlockPos pos) {
         //        return Mods.COMPUTERCRAFT.isLoaded() && !walkNixies(world, pos, false, null);
         return false;
     }
@@ -159,8 +158,8 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
      * @return True if the row was walked, false if the walk was aborted because it is computer-controlled.
      */
     public static boolean walkNixies(
-        @NotNull LevelAccessor world,
-        @NotNull BlockPos start,
+        LevelAccessor world,
+        BlockPos start,
         boolean allowComputerControlled,
         @Nullable BiConsumer<BlockPos, Integer> callback
     ) {

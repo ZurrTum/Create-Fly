@@ -17,8 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -703,7 +702,6 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
     }
 
     @Override
-    @NotNull
     public java.util.Iterator<ItemStack> iterator() {
         return storage.supportsExtraction() ? new Iterator(storage) : Collections.emptyIterator();
     }
@@ -1377,12 +1375,12 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public @NotNull java.util.Iterator<ItemStack> iterator() {
+        public java.util.Iterator<ItemStack> iterator() {
             return inventory.iterator();
         }
 
         @Override
-        public @NotNull java.util.Iterator<ItemStack> iterator(Direction side) {
+        public java.util.Iterator<ItemStack> iterator(Direction side) {
             return inventory.iterator();
         }
 

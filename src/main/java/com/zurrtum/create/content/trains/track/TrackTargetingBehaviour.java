@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.trains.track;
 
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.trains.graph.*;
@@ -8,7 +9,6 @@ import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
@@ -24,7 +24,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;

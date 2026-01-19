@@ -2,9 +2,9 @@ package com.zurrtum.create.client.flywheel.lib.model;
 
 import com.zurrtum.create.client.flywheel.api.vertex.MutableVertexList;
 import com.zurrtum.create.client.flywheel.api.vertex.VertexList;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
+import org.jspecify.annotations.Nullable;
 
 public final class SimpleQuadMesh implements QuadMesh {
     private final VertexList vertexList;

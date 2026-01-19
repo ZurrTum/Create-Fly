@@ -5,11 +5,6 @@ import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
 import com.zurrtum.create.client.foundation.block.connected.GlassPaneCTBehaviour;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,6 +12,9 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class WeatheredIronWindowPaneCTBehaviour extends GlassPaneCTBehaviour {
 
@@ -33,7 +31,7 @@ public class WeatheredIronWindowPaneCTBehaviour extends GlassPaneCTBehaviour {
     }
 
     @Override
-    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, @NotNull TextureAtlasSprite sprite) {
+    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, TextureAtlasSprite sprite) {
         if (direction.getAxis() == Axis.Y || sprite == null)
             return null;
         CTSpriteShiftEntry entry = shifts.get(rand.nextInt(shifts.size()));

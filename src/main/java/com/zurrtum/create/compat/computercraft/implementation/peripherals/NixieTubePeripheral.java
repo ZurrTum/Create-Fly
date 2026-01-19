@@ -10,8 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -120,7 +119,7 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
             setSignal(signal().second, arguments.getTable(1));
     }
 
-    private void setSignal(NixieTubeBlockEntity.ComputerSignal.TubeDisplay display, @NotNull Map<?, ?> attrs) throws LuaException {
+    private void setSignal(NixieTubeBlockEntity.ComputerSignal.TubeDisplay display, Map<?, ?> attrs) throws LuaException {
         if (attrs.containsKey("r"))
             display.r = constrainByte("r", 0, 255, attrs.get("r"));
         if (attrs.containsKey("g"))
@@ -160,7 +159,6 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
         return blockEntity.computerSignal;
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_NixieTube";

@@ -2,12 +2,6 @@ package com.zurrtum.create.foundation.block;
 
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntityTicker;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.BlockGetter;
@@ -17,6 +11,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public interface IBE<T extends BlockEntity> extends EntityBlock {
 

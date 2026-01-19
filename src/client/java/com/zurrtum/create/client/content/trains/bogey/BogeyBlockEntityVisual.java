@@ -11,13 +11,12 @@ import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import com.zurrtum.create.content.trains.bogey.BogeySize;
 import com.zurrtum.create.content.trains.bogey.BogeyStyle;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class BogeyBlockEntityVisual extends AbstractBlockEntityVisual<AbstractBogeyBlockEntity> implements SimpleDynamicVisual {
     private final PoseStack poseStack = new PoseStack();

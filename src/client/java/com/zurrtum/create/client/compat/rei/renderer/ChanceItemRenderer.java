@@ -9,7 +9,7 @@ import me.shedaniel.rei.api.common.entry.EntryStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) implements EntryRenderer<ItemStack> {
     @Override

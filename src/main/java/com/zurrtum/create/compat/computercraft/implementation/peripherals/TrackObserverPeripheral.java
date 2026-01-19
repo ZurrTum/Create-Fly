@@ -6,8 +6,7 @@ import com.zurrtum.create.compat.computercraft.events.TrainPassEvent;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class TrackObserverPeripheral extends SyncedPeripheral<TrackObserverBlockEntity> {
 
@@ -27,13 +26,12 @@ public class TrackObserverPeripheral extends SyncedPeripheral<TrackObserverBlock
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (event instanceof TrainPassEvent tpe) {
             queueEvent(tpe.passing ? "train_passing" : "train_passed", tpe.train.name.getString());
         }
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_TrainObserver";

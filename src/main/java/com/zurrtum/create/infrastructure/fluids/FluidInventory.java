@@ -6,16 +6,14 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.world.Clearable;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import net.minecraft.core.Direction;
-import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.world.Clearable;
 
 public interface FluidInventory extends Clearable, Iterable<FluidStack> {
     Hash.Strategy<FluidStack> FLUID_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
@@ -710,12 +708,10 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return true;
     }
 
-    @NotNull
     default java.util.Iterator<FluidStack> iterator(Direction side) {
         return iterator();
     }
 
-    @NotNull
     default java.util.Iterator<FluidStack> iterator() {
         return new Iterator(this);
     }

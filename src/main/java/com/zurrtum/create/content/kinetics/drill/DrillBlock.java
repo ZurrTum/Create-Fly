@@ -6,11 +6,6 @@ import com.zurrtum.create.catnip.placement.PlacementHelpers;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -44,6 +39,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class DrillBlock extends DirectionalKineticBlock implements IBE<DrillBlockEntity>, SimpleWaterloggedBlock {
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());

@@ -29,7 +29,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -189,7 +188,6 @@ public class BoilerData {
         maxValue = Math.max(passiveHeat ? 1 : activeHeat, Math.max(maxHeatForWater, maxHeatForSize));
     }
 
-    @NotNull
     public MutableComponent getHeatLevelTextComponent() {
         int boilerLevel = Math.min(activeHeat, Math.min(maxHeatForWater, maxHeatForSize));
 

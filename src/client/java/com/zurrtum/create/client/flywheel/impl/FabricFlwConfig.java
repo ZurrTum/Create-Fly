@@ -7,7 +7,7 @@ import com.zurrtum.create.client.flywheel.backend.BackendConfig;
 import com.zurrtum.create.client.flywheel.impl.config.CClient;
 import net.minecraft.IdentifierException;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
 

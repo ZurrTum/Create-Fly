@@ -9,7 +9,7 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import net.minecraft.world.entity.Entity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ComposableEntityVisual<T extends Entity> extends AbstractVisual implements EntityVisual<T>, SimpleTickableVisual, SimpleDynamicVisual {
     private final T entity;

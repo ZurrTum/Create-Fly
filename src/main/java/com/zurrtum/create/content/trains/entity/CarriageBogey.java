@@ -13,24 +13,23 @@ import com.zurrtum.create.content.trains.bogey.BogeyStyle;
 import com.zurrtum.create.content.trains.graph.DimensionPalette;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Random;
-
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.Random;
 
 import static com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity.BOGEY_DATA_KEY;
 import static com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity.BOGEY_STYLE_KEY;

@@ -21,7 +21,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -32,13 +31,11 @@ public class FanWashingCategory extends CreateCategory<RecipeHolder<SplashingRec
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<SplashingRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_WASHING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_washing");
     }

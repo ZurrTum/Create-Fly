@@ -6,10 +6,6 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
 import com.zurrtum.create.content.contraptions.StructureTransform;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.TimeUnit;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -19,6 +15,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.jspecify.annotations.Nullable;
+
+import java.util.concurrent.TimeUnit;
 
 public class SchematicInstances {
 

@@ -7,8 +7,8 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record ItemTransformRenderState(
     TrackingItemStackRenderState state, Matrix3x2f pose, ScreenRectangle bounds, int x0, int y0, int x1, int y1, int padding, float scale, float xRot,

@@ -8,7 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public final class FakePlayerNetworkHandler extends ServerGamePacketListenerImpl {
     private static final Connection FAKE_CONNECTION = new FakeClientConnection();

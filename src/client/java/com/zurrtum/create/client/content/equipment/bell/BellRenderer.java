@@ -21,7 +21,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEntityRenderer<BE, BellRenderer.BellRenderState> {
     public BellRenderer(BlockEntityRendererProvider.Context context) {

@@ -5,7 +5,7 @@ import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ChangeThrottleInstruction extends ScheduleInstruction {
     public ChangeThrottleInstruction(Identifier id) {

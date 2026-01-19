@@ -19,7 +19,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -30,13 +29,11 @@ public class SawingCategory extends CreateCategory<RecipeHolder<CuttingRecipe>> 
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<CuttingRecipe>> getRecipeType() {
         return JeiClientPlugin.SAWING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.sawing");
     }

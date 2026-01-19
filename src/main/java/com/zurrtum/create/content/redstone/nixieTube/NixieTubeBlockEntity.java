@@ -20,8 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -58,8 +57,8 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
             }
         }
 
-        public @NotNull TubeDisplay first = new TubeDisplay();
-        public @NotNull TubeDisplay second = new TubeDisplay();
+        public TubeDisplay first = new TubeDisplay();
+        public TubeDisplay second = new TubeDisplay();
 
         public void decode(byte[] encoded) {
             first.decode(encoded, 0);

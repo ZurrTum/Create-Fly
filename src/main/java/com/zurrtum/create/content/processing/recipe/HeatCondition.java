@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -43,7 +42,7 @@ public enum HeatCondition implements StringRepresentable {
     }
 
     @Override
-    public @NotNull String getSerializedName() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 

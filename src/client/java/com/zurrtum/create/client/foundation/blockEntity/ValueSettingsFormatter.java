@@ -4,12 +4,11 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.IN
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Function;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Function;
 
 public class ValueSettingsFormatter {
 

@@ -1,14 +1,13 @@
 package com.zurrtum.create.client.vanillin.config;
 
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleEntityVisualizer;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.function.Predicate;
-
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * An object to configure the visualizer for an entity.

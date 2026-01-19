@@ -3,7 +3,7 @@ package com.zurrtum.create.client.flywheel.backend.compile;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.compile.core.Compilation;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.function.Consumer;

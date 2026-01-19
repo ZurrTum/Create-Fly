@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 

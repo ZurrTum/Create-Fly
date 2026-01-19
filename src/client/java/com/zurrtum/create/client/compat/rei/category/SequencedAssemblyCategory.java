@@ -32,9 +32,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;

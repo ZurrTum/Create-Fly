@@ -5,8 +5,8 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record BlazeBurnerRenderState(
     Matrix3x2f pose, int x, int y, Level world, BlockState block, BlazeBurnerBlock.HeatLevel heatLevel, float animation, boolean drawGoggles,

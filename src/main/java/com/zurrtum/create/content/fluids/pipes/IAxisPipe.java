@@ -2,7 +2,7 @@ package com.zurrtum.create.content.fluids.pipes;
 
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface IAxisPipe {
 

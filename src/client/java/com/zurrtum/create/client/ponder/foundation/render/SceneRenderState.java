@@ -5,8 +5,8 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record SceneRenderState(
     int id, PonderScene scene, int width, int height, double slide, boolean userViewMode, LerpedFloat finishingFlash, float partialTicks,

@@ -3,17 +3,15 @@ package com.zurrtum.create.client.ponder.foundation;
 import com.zurrtum.create.client.catnip.outliner.Outline.OutlineParams;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class SelectionImpl {
 
@@ -80,7 +78,6 @@ public class SelectionImpl {
         }
 
         @Override
-        @NotNull
         public Iterator<BlockPos> iterator() {
             return posSet.iterator();
         }
@@ -135,7 +132,6 @@ public class SelectionImpl {
         }
 
         @Override
-        @NotNull
         public Iterator<BlockPos> iterator() {
             return iterable.iterator();
         }

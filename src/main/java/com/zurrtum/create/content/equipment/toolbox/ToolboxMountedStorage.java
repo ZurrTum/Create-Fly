@@ -6,10 +6,6 @@ import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageType;
 import com.zurrtum.create.api.contraption.storage.item.WrapperMountedItemStorage;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.foundation.item.ItemHelper;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +13,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class ToolboxMountedStorage extends WrapperMountedItemStorage<ToolboxInventory> {
     public static final MapCodec<ToolboxMountedStorage> CODEC = ToolboxInventory.CODEC.xmap(ToolboxMountedStorage::new, storage -> storage.wrapped)

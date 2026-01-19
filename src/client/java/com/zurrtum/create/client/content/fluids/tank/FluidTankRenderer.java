@@ -21,7 +21,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEntity, FluidTankRenderer.FluidTankRenderState> {
     public FluidTankRenderer(BlockEntityRendererProvider.Context context) {

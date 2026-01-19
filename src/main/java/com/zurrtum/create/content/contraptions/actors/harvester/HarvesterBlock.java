@@ -6,7 +6,6 @@ import com.zurrtum.create.content.contraptions.actors.AttachedActorBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.jetbrains.annotations.NotNull;
 
 public class HarvesterBlock extends AttachedActorBlock implements IBE<HarvesterBlockEntity> {
 
@@ -27,7 +26,7 @@ public class HarvesterBlock extends AttachedActorBlock implements IBE<HarvesterB
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

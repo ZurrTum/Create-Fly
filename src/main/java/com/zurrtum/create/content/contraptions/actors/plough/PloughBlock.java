@@ -3,7 +3,6 @@ package com.zurrtum.create.content.contraptions.actors.plough;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.content.contraptions.actors.AttachedActorBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import org.jetbrains.annotations.NotNull;
 
 public class PloughBlock extends AttachedActorBlock {
 
@@ -14,7 +13,7 @@ public class PloughBlock extends AttachedActorBlock {
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

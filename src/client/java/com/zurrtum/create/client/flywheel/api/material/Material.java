@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface Material {
     MaterialShaders shaders();

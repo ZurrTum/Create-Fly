@@ -12,7 +12,6 @@ import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
@@ -280,7 +279,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void renderBackground(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         int a = ((int) (0x50 * Math.min(1, (ticksOpen + pPartialTick) / 20f))) << 24;
         graphics.fillGradient(0, 0, this.width, this.height, 0x101010 | a, 0x101010 | a);
     }

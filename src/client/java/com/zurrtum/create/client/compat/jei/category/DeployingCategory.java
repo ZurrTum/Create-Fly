@@ -28,7 +28,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -55,13 +54,11 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
     }
 
     @Override
-    @NotNull
     public IRecipeType<RecipeHolder<? extends ItemApplicationRecipe>> getRecipeType() {
         return JeiClientPlugin.DEPLOYING;
     }
 
     @Override
-    @NotNull
     public Component getTitle() {
         return CreateLang.translateDirect("recipe.deploying");
     }

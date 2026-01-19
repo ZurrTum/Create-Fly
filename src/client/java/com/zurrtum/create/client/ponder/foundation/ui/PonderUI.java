@@ -49,9 +49,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;

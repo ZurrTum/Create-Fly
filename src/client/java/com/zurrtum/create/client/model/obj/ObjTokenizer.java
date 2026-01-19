@@ -8,7 +8,7 @@ package com.zurrtum.create.client.model.obj;
 
 import com.google.common.base.Charsets;
 import joptsimple.internal.Strings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;

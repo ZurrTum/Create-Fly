@@ -6,15 +6,14 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.function.*;
-
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.function.*;
 
 public class TravellingPoint {
 

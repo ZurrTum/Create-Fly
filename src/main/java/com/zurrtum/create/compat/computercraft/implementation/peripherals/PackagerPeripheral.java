@@ -9,7 +9,6 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class PackagerPeripheral extends SyncedPeripheral<PackagerBlockEntity> {
     }
 
     @Override
-    public void attach(@NotNull IComputerAccess computer) {
+    public void attach(IComputerAccess computer) {
         super.attach(computer);
         // Ephemeral nature of address, should not be set on load until a computer
         // explicitly calls setAddress again on the BE.
@@ -29,7 +28,7 @@ public class PackagerPeripheral extends SyncedPeripheral<PackagerBlockEntity> {
     }
 
     @Override
-    public void detach(@NotNull IComputerAccess computer) {
+    public void detach(IComputerAccess computer) {
         super.detach(computer);
         // Ephemeral nature of address, should not be set on load until a computer
         // explicitly calls setAddress again on the BE.
@@ -83,13 +82,12 @@ public class PackagerPeripheral extends SyncedPeripheral<PackagerBlockEntity> {
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (event instanceof PackageEvent pe) {
             queueEvent(pe.status, new PackageLuaObject(blockEntity, pe.box));
         }
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_Packager";

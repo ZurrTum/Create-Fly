@@ -15,7 +15,7 @@ import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;

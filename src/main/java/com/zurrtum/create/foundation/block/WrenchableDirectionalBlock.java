@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import org.jetbrains.annotations.NotNull;
 
 public class WrenchableDirectionalBlock extends DirectionalBlock implements IWrenchable {
 
@@ -54,7 +53,7 @@ public class WrenchableDirectionalBlock extends DirectionalBlock implements IWre
     }
 
     @Override
-    protected @NotNull MapCodec<? extends DirectionalBlock> codec() {
+    protected MapCodec<? extends DirectionalBlock> codec() {
         return CODEC;
     }
 

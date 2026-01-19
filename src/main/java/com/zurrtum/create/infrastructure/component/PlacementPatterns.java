@@ -5,7 +5,6 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +62,7 @@ public enum PlacementPatterns implements StringRepresentable {
     }
 
     @Override
-    public @NotNull String getSerializedName() {
+    public String getSerializedName() {
         return translationKey;
     }
 }

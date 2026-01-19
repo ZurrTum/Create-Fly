@@ -3,17 +3,16 @@ package com.zurrtum.create.foundation.recipe;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.Create;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
-
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
  * Utility for searching through a level's recipe collection.

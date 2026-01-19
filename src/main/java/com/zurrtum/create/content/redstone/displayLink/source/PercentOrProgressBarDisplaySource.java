@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class PercentOrProgressBarDisplaySource extends NumericSingleLineDisplaySource {
     @Override

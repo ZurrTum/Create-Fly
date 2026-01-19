@@ -35,8 +35,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.TickPriority;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock implements IBE<SmartFluidPipeBlockEntity>, IAxisPipe, IWrenchable, ProperWaterloggedBlock, NeighborUpdateListeningBlock {
 
@@ -196,7 +195,7 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
     }
 
     @Override
-    protected @NotNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 

@@ -45,10 +45,10 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;

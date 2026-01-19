@@ -15,7 +15,7 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 

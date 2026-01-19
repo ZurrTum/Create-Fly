@@ -21,8 +21,8 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 

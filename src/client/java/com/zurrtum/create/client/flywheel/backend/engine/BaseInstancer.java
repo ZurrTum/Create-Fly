@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.backend.engine;
 
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.backend.util.AtomicBitSet;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 

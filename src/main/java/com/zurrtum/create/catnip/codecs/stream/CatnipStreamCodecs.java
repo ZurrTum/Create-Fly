@@ -1,7 +1,6 @@
 package com.zurrtum.create.catnip.codecs.stream;
 
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -27,11 +26,11 @@ import net.minecraft.world.phys.Vec3;
 
 public interface CatnipStreamCodecs {
     StreamCodec<FriendlyByteBuf, Character> CHAR = new StreamCodec<>() {
-        public @NotNull Character decode(FriendlyByteBuf buffer) {
+        public Character decode(FriendlyByteBuf buffer) {
             return buffer.readChar();
         }
 
-        public void encode(FriendlyByteBuf buffer, @NotNull Character value) {
+        public void encode(FriendlyByteBuf buffer, Character value) {
             buffer.writeChar(value);
         }
     };
@@ -40,7 +39,7 @@ public interface CatnipStreamCodecs {
     StreamCodec<ByteBuf, Tag> COMPOUND_AS_TAG = ByteBufCodecs.COMPOUND_TAG.map(Function.identity(), tag -> (CompoundTag) tag);
     StreamCodec<FriendlyByteBuf, ListTag> COMPOUND_LIST_TAG = new StreamCodec<>() {
         @Override
-        public @NotNull ListTag decode(FriendlyByteBuf buffer) {
+        public ListTag decode(FriendlyByteBuf buffer) {
             return buffer.readCollection(size -> new ListTag(), COMPOUND_AS_TAG);
         }
 

@@ -8,18 +8,17 @@ import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.LevelAccessor;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public record ShoppingList(@Unmodifiable List<IntAttached<BlockPos>> purchases, UUID shopOwner, UUID shopNetwork) {
     public static final Codec<ShoppingList> CODEC = RecordCodecBuilder.create(instance -> instance.group(

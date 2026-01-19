@@ -24,7 +24,7 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 

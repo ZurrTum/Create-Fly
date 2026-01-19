@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class StandardBogeyRenderer implements BogeyRenderer {
     public static void updateRenderState(StandardBogeyRenderState data, float wheelAngle, int light) {

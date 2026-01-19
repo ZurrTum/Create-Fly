@@ -6,16 +6,15 @@ import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.model.RetexturedMesh;
 import com.zurrtum.create.client.flywheel.lib.model.SingleMeshModel;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public final class ModelTrees {
     private static final RendererReloadCache<ModelTreeKey, ModelTree> CACHE = new RendererReloadCache<>(k -> {

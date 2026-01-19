@@ -7,13 +7,6 @@ import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -30,6 +23,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class FilterItem extends Item implements MenuProvider, SupportsItemCopying {
     public static ListFilterItem regular(Properties properties) {
@@ -48,7 +46,6 @@ public abstract class FilterItem extends Item implements MenuProvider, SupportsI
         super(properties);
     }
 
-    @NotNull
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getPlayer() == null)
@@ -108,7 +105,7 @@ public abstract class FilterItem extends Item implements MenuProvider, SupportsI
         return ItemHelper.sameItem(filter, stack);
     }
 
-    public static boolean doPackagesHaveSameData(@NotNull ItemStack a, @NotNull ItemStack b) {
+    public static boolean doPackagesHaveSameData(ItemStack a, ItemStack b) {
         if (a.isEmpty())
             return false;
         if (!ItemStack.isSameItemSameComponents(a, b))

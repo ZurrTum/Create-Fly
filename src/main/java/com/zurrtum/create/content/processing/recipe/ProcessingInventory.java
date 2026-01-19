@@ -2,17 +2,16 @@ package com.zurrtum.create.content.processing.recipe;
 
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class ProcessingInventory implements SidedItemInventory {
     private static final int[] INPUT_SLOTS = {0};

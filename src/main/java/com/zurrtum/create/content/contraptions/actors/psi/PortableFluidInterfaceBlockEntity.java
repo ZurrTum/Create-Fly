@@ -11,8 +11,7 @@ import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class PortableFluidInterfaceBlockEntity extends PortableStorageInterfaceBlockEntity {
 
@@ -121,7 +120,7 @@ public class PortableFluidInterfaceBlockEntity extends PortableStorageInterfaceB
         }
 
         @Override
-        public @NotNull java.util.Iterator<FluidStack> iterator(Direction side) {
+        public java.util.Iterator<FluidStack> iterator(Direction side) {
             return wrapped.iterator(side);
         }
     }

@@ -15,7 +15,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -55,7 +54,7 @@ public record AddedByAttribute(String modId) implements ItemAttribute {
 
     public static class Type implements ItemAttributeType {
         @Override
-        public @NotNull ItemAttribute createAttribute() {
+        public ItemAttribute createAttribute() {
             return new AddedByAttribute("dummy");
         }
 

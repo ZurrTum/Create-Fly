@@ -2,14 +2,13 @@ package com.zurrtum.create.foundation.recipe.trie;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
-import org.jetbrains.annotations.NotNull;
 
 public sealed interface AbstractVariant {
     final class AbstractItem implements AbstractVariant {
-        private final @NotNull Item item;
+        private final Item item;
         private final int hashCode;
 
-        public AbstractItem(@NotNull Item item) {
+        public AbstractItem(Item item) {
             this.item = item;
             this.hashCode = item.hashCode();
         }
@@ -29,10 +28,10 @@ public sealed interface AbstractVariant {
     }
 
     final class AbstractFluid implements AbstractVariant {
-        private final @NotNull Fluid fluid;
+        private final Fluid fluid;
         private final int hashCode;
 
-        public AbstractFluid(@NotNull Fluid fluid) {
+        public AbstractFluid(Fluid fluid) {
             this.fluid = fluid;
             this.hashCode = fluid.hashCode();
         }

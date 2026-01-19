@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.logistics.depot;
 
 import com.zurrtum.create.AllEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.EjectorItemSpawnPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class EjectorItemEntity extends ItemEntity {
     private boolean alive;

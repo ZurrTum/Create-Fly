@@ -7,9 +7,9 @@ import com.zurrtum.create.client.flywheel.backend.engine.InstanceHandleImpl;
 import com.zurrtum.create.client.flywheel.backend.engine.InstancerKey;
 import com.zurrtum.create.client.flywheel.backend.util.AtomicBitSet;
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Vector4fc;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.ArrayList;

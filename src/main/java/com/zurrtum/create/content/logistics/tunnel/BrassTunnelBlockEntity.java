@@ -2,6 +2,7 @@ package com.zurrtum.create.content.logistics.tunnel;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock.Shape;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerSidedFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
@@ -19,10 +19,6 @@ import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -36,6 +32,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
     ServerSidedFilteringBehaviour filtering;

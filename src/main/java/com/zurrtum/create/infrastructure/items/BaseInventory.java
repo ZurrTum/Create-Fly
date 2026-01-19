@@ -11,7 +11,6 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
@@ -1242,7 +1241,6 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return maxAmount - remaining;
     }
 
-    @NotNull
     default Iterator<ItemStack> iterator(Direction side) {
         return iterator();
     }

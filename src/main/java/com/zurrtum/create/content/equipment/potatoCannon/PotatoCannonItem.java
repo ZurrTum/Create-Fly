@@ -10,12 +10,6 @@ import com.zurrtum.create.foundation.item.SwingControlItem;
 import com.zurrtum.create.foundation.utility.GlobalRegistryAccess;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.s2c.PotatoCannonPacket;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
@@ -44,6 +38,11 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class PotatoCannonItem extends ProjectileWeaponItem implements SwingControlItem {
     private static final Predicate<ItemStack> AMMO_PREDICATE = s -> PotatoCannonProjectileType.getTypeForItem(

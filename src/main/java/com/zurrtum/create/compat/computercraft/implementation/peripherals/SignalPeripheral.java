@@ -14,7 +14,6 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
@@ -85,13 +84,12 @@ public class SignalPeripheral extends SyncedPeripheral<SignalBlockEntity> {
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (event instanceof SignalStateChangeEvent ssce) {
             queueEvent("train_signal_state_change", ssce.state.toString());
         }
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_Signal";

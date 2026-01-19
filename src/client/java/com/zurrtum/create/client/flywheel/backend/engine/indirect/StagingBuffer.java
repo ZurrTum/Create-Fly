@@ -8,7 +8,7 @@ import com.zurrtum.create.client.flywheel.lib.memory.FlwMemoryTracker;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import it.unimi.dsi.fastutil.PriorityQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.opengl.GL45C;
 import org.lwjgl.system.MemoryUtil;

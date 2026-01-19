@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.fluids.spout;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.behaviour.spouting.BlockSpoutingBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
@@ -27,7 +27,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

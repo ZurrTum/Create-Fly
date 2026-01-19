@@ -5,7 +5,7 @@ import com.zurrtum.create.client.flywheel.impl.compat.SodiumCompat;
 import com.zurrtum.create.client.flywheel.impl.extension.BlockEntityTypeExtension;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

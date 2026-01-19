@@ -1,11 +1,10 @@
 package com.zurrtum.create.client.flywheel.api.visual;
 
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * A visual associated with a specific block entity.

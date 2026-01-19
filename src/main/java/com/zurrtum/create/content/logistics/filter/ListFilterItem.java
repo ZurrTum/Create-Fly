@@ -5,12 +5,6 @@ import com.zurrtum.create.content.logistics.filter.FilterItemStack.ListFilterIte
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -19,6 +13,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ListFilterItem extends FilterItem {
     protected ListFilterItem(Properties properties) {

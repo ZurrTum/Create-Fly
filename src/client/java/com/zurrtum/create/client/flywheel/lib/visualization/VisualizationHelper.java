@@ -6,17 +6,16 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizerRegistry;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public final class VisualizationHelper {
     private VisualizationHelper() {

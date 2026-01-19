@@ -49,8 +49,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -201,13 +200,11 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     }
 
     @Override
-    @NotNull
     public Property<RailShape> getShapeProperty() {
         return RAIL_SHAPE;
     }
 
     @Override
-    @NotNull
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return AllShapes.CART_ASSEMBLER.get(getRailAxis(state));
     }
@@ -217,7 +214,6 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     }
 
     @Override
-    @NotNull
     public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (context instanceof EntityCollisionContext entityShapeContext) {
             Entity entity = entityShapeContext.getEntity();
@@ -253,7 +249,6 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     }
 
     @Override
-    @NotNull
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         List<ItemStack> drops = super.getDrops(state, builder);
         drops.addAll(getRailBlock(state).getDrops(builder));
@@ -311,7 +306,6 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         }
 
         @Override
-        @NotNull
         public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
             return Shapes.empty();
         }
@@ -366,7 +360,7 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     }
 
     @Override
-    protected @NotNull MapCodec<? extends BaseRailBlock> codec() {
+    protected MapCodec<? extends BaseRailBlock> codec() {
         return CODEC;
     }
 }

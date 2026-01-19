@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 
 public class StockKeeperCategoryMenu extends MenuBase<StockTickerBlockEntity> {
 
@@ -65,7 +64,7 @@ public class StockKeeperCategoryMenu extends MenuBase<StockTickerBlockEntity> {
         }
 
         @Override
-        public boolean mayPlace(@NotNull ItemStack stack) {
+        public boolean mayPlace(ItemStack stack) {
             return super.mayPlace(stack) && (stack.isEmpty() || stack.getItem() instanceof FilterItem);
         }
 

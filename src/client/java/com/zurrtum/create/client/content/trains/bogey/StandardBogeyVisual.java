@@ -12,13 +12,12 @@ import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.client.foundation.render.SpecialModels;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class StandardBogeyVisual implements BogeyVisual {
     private final TransformedInstance shaft1;

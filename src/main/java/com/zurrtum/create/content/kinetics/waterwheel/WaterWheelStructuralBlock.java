@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
 
 public class WaterWheelStructuralBlock extends DirectionalBlock implements IWrenchable, IProxyHoveringInformation, LandingEffectControlBlock {
 
@@ -168,7 +167,7 @@ public class WaterWheelStructuralBlock extends DirectionalBlock implements IWren
     }
 
     @Override
-    protected @NotNull MapCodec<? extends DirectionalBlock> codec() {
+    protected MapCodec<? extends DirectionalBlock> codec() {
         return CODEC;
     }
 }

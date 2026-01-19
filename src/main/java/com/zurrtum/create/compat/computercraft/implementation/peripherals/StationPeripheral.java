@@ -24,8 +24,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -183,7 +182,7 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
     /**
      * @return Path (if available) and boolean indicating if destination exists at all.
      */
-    private Pair<@Nullable DiscoveredPath, @NotNull Boolean> findPath(String destinationFilter) throws LuaException {
+    private Pair<@Nullable DiscoveredPath, Boolean> findPath(String destinationFilter) throws LuaException {
         Train train = getTrainOrThrow();
         String regex = Glob.toRegexPattern(destinationFilter, "");
         boolean anyMatch = false;
@@ -206,7 +205,7 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
 
     @LuaFunction
     public MethodResult canTrainReach(String destinationFilter) throws LuaException {
-        Pair<@Nullable DiscoveredPath, @NotNull Boolean> path = findPath(destinationFilter);
+        Pair<@Nullable DiscoveredPath, Boolean> path = findPath(destinationFilter);
         if (path.getFirst() != null)
             return MethodResult.of(true, null);
         return MethodResult.of(false, path.getSecond() ? "cannot-reach" : "no-target");
@@ -214,13 +213,13 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
 
     @LuaFunction
     public MethodResult distanceTo(String destinationFilter) throws LuaException {
-        Pair<@Nullable DiscoveredPath, @NotNull Boolean> path = findPath(destinationFilter);
+        Pair<@Nullable DiscoveredPath, Boolean> path = findPath(destinationFilter);
         if (path.getFirst() != null)
             return MethodResult.of(path.getFirst().distance, null);
         return MethodResult.of(null, path.getSecond() ? "cannot-reach" : "no-target");
     }
 
-    private @NotNull Train getTrainOrThrow() throws LuaException {
+    private Train getTrainOrThrow() throws LuaException {
         GlobalStation station = blockEntity.getStation();
         if (station == null)
             throw new LuaException("station is not connected to a track");
@@ -232,11 +231,11 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
         return train;
     }
 
-    private static @NotNull CreateLuaTable fromCompoundTag(CompoundTag tag) throws LuaException {
+    private static CreateLuaTable fromCompoundTag(CompoundTag tag) throws LuaException {
         return (CreateLuaTable) fromNBTTag(null, tag);
     }
 
-    private static @NotNull Object fromNBTTag(@Nullable String key, Tag tag) throws LuaException {
+    private static Object fromNBTTag(@Nullable String key, Tag tag) throws LuaException {
         byte type = tag.getId();
 
         if (type == Tag.TAG_BYTE && key != null && key.equals("Count"))
@@ -273,11 +272,11 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
         throw new LuaException("unknown tag type " + tag.getClass().getName());
     }
 
-    private static @NotNull CompoundTag toCompoundTag(CreateLuaTable table) throws LuaException {
+    private static CompoundTag toCompoundTag(CreateLuaTable table) throws LuaException {
         return (CompoundTag) toNBTTag(null, table.getMap());
     }
 
-    private static @NotNull Tag toNBTTag(@Nullable String key, Object value) throws LuaException {
+    private static Tag toNBTTag(@Nullable String key, Object value) throws LuaException {
         if (value instanceof Boolean v)
             return ByteTag.valueOf(v);
         else if (value instanceof Byte || (key != null && key.equals("count")))
@@ -322,13 +321,12 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
     }
 
     @Override
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    public void prepareComputerEvent(ComputerEvent event) {
         if (event instanceof StationTrainPresenceEvent stpe) {
             queueEvent(stpe.type.name, stpe.train.name.getString());
         }
     }
 
-    @NotNull
     @Override
     public String getType() {
         return "Create_Station";

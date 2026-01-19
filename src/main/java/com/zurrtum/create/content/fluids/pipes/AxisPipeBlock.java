@@ -3,6 +3,7 @@ package com.zurrtum.create.content.fluids.pipes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchableWithBracket;
@@ -10,12 +11,6 @@ import com.zurrtum.create.content.fluids.FluidPropagator;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -40,6 +35,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.TickPriority;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class AxisPipeBlock extends RotatedPillarBlock implements IWrenchableWithBracket, IAxisPipe, NeighborUpdateListeningBlock {
 

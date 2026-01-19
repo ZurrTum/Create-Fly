@@ -4,7 +4,7 @@ import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record PackagingRequest(
     ItemStack item, MutableInt count, String address, int linkIndex, MutableBoolean finalLink, MutableInt packageCounter, int orderId,

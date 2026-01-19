@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 public class CrateBlock extends WrenchableDirectionalBlock implements IWrenchable {
 
@@ -32,7 +31,7 @@ public class CrateBlock extends WrenchableDirectionalBlock implements IWrenchabl
     }
 
     @Override
-    protected @NotNull MapCodec<? extends DirectionalBlock> codec() {
+    protected MapCodec<? extends DirectionalBlock> codec() {
         return CODEC;
     }
 }

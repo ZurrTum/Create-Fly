@@ -6,10 +6,6 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -22,6 +18,9 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class DisplayTarget {
     public static final SimpleRegistry<Block, DisplayTarget> BY_BLOCK = SimpleRegistry.create();

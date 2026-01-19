@@ -4,14 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.data.Couple;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
@@ -20,6 +12,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class LayerPattern {
     public static final Codec<LayerPattern> CODEC = Codec.list(Layer.CODEC).xmap(LayerPattern::new, pattern -> pattern.layers);
@@ -60,7 +58,7 @@ public class LayerPattern {
             return this;
         }
 
-        public Builder layer(Consumer<Layer.@NotNull Builder> builder) {
+        public Builder layer(Consumer<Layer.Builder> builder) {
             Layer.Builder layerBuilder = new Layer.Builder();
             layerBuilder.netherMode = netherMode;
             builder.accept(layerBuilder);

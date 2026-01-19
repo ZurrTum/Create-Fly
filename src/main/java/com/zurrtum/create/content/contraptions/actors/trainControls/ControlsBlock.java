@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 public class ControlsBlock extends HorizontalDirectionalBlock implements IWrenchable, ProperWaterloggedBlock {
 
@@ -84,7 +83,7 @@ public class ControlsBlock extends HorizontalDirectionalBlock implements IWrench
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

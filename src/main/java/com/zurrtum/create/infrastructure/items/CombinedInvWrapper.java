@@ -1,17 +1,15 @@
 package com.zurrtum.create.infrastructure.items;
 
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.NoSuchElementException;
-import java.util.function.Predicate;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 public class CombinedInvWrapper implements SidedItemInventory {
     protected final Container[] itemHandler;
@@ -301,7 +299,6 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    @NotNull
     public java.util.Iterator<ItemStack> iterator(Direction side) {
         if (itemHandler.length == 0) {
             return Collections.emptyIterator();

@@ -32,8 +32,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -145,9 +144,9 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
     public static class SegmentAngles {
         public final int length;
-        public final @NotNull Pose[] tieTransform;
-        public final @NotNull Couple<Pose>[] railTransforms;
-        public final @NotNull BlockPos[] lightPosition;
+        public final Pose[] tieTransform;
+        public final Couple<Pose>[] railTransforms;
+        public final BlockPos[] lightPosition;
 
         @SuppressWarnings("unchecked")
         SegmentAngles(BezierConnection bc) {

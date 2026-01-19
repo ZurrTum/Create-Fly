@@ -8,12 +8,6 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -24,6 +18,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArrivalSoundQueue {
     public int offset;

@@ -15,7 +15,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.LightCoordsUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;

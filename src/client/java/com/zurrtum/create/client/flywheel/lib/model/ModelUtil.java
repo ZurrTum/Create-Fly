@@ -13,9 +13,9 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;

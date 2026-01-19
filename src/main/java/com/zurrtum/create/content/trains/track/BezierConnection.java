@@ -27,8 +27,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -118,10 +117,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
             this.starts,
             other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(
-            this.normals,
-            other.normals
-        ) && this.hasGirder == other.hasGirder);
+        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -269,7 +265,6 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return derivative.cross(normal);
     }
 
-    @NotNull
     private Runtime resolve() {
         var out = lazyRuntime.get();
 

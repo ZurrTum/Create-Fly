@@ -15,7 +15,6 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -26,7 +25,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.*;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -46,8 +46,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -336,7 +335,7 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
 
 
     @Override
-    public @NotNull BlockState rotate(@NotNull BlockState pState, Rotation pRotation) {
+    public BlockState rotate(BlockState pState, Rotation pRotation) {
         return switch (pRotation) {
             case COUNTERCLOCKWISE_90, CLOCKWISE_90 -> pState.cycle(AXIS);
             default -> pState;

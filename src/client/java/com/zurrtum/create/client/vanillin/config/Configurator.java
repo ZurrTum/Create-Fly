@@ -4,18 +4,17 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizerRegistry;
 import com.zurrtum.create.client.vanillin.Vanillin;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Configurator {
     public final Map<BlockEntityType<?>, ConfiguredBlockEntity<?>> blockEntities = new LinkedHashMap<>();

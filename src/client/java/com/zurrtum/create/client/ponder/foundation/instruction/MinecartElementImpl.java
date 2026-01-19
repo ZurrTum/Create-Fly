@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class MinecartElementImpl extends AnimatedSceneElementBase implements MinecartElement {
 
