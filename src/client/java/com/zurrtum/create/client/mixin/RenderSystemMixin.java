@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RenderSystem.class)
 public class RenderSystemMixin {
-    @Inject(method = "initRenderer", at = @At("RETURN"))
+    @Inject(method = "initRenderer(Lcom/mojang/blaze3d/systems/GpuDevice;)V", at = @At("RETURN"), remap = false)
     private static void flywheel$onInitRenderer(CallbackInfo ci) {
         GlCompat.init();
     }
