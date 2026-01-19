@@ -187,7 +187,9 @@ public class DeployerHandler {
                     //                    entity.captureDrops(null);
                     //                    return;
                     //                }
-                    if (cancelResult == null && serverPlayer.interactOn(entity, hand).consumesAction()) {
+                    Vec3 position = entity.position();
+                    Vec3 location = new Vec3(clickedPos.getX() - position.x, clickedPos.getY() - position.y, clickedPos.getZ() - position.z);
+                    if (cancelResult == null && serverPlayer.interactOn(entity, hand, location).consumesAction()) {
                         success = true;
                         if (entity instanceof AbstractVillager villager && villager.getTradingPlayer() == serverPlayer) {
                             villager.setTradingPlayer(null);

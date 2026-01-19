@@ -240,9 +240,9 @@ public class PackageEntity extends LivingEntity {
     }
 
     @Override
-    public InteractionResult interact(Player pPlayer, InteractionHand pHand) {
+    public InteractionResult interact(Player pPlayer, InteractionHand pHand, Vec3 location) {
         if (!pPlayer.getItemInHand(pHand).isEmpty())
-            return super.interact(pPlayer, pHand);
+            return super.interact(pPlayer, pHand, location);
         if (pPlayer.level().isClientSide())
             return InteractionResult.SUCCESS;
         pPlayer.setItemInHand(pHand, box);

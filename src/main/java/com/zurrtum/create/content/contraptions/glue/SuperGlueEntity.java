@@ -195,7 +195,7 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
         return InteractionResult.PASS;
     }
 
