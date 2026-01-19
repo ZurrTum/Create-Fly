@@ -182,7 +182,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         int[][] data = state.data = new int[length][];
         int index = 0;
         for (int location : locations) {
-            if (location == -1) {
+            if (location == -1 || location >= length) {
                 break;
             }
             int i = index;
