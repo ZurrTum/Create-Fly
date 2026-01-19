@@ -130,9 +130,9 @@ public class SandPaperItem extends Item {
             if (!polished.isEmpty()) {
                 playerInv.placeItemBackInInventory(polished);
             }
-            ItemStack recipeRemainder = toPolish.getItem().getCraftingRemainder();
-            if (!recipeRemainder.isEmpty()) {
-                playerInv.placeItemBackInInventory(recipeRemainder);
+            ItemStackTemplate recipeRemainder = toPolish.getItem().getCraftingRemainder();
+            if (recipeRemainder != null) {
+                playerInv.placeItemBackInInventory(recipeRemainder.create());
             }
         });
 
@@ -143,17 +143,13 @@ public class SandPaperItem extends Item {
     }
 
     public static void spawnParticles(Vec3 location, ItemStack polishedStack, Level world) {
+        if (polishedStack.isEmpty()) {
+            return;
+        }
+        ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(polishedStack));
         for (int i = 0; i < 20; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), 1 / 8f);
-            world.addParticle(
-                new ItemParticleOption(ParticleTypes.ITEM, polishedStack),
-                location.x,
-                location.y,
-                location.z,
-                motion.x,
-                motion.y,
-                motion.z
-            );
+            world.addParticle(option, location.x, location.y, location.z, motion.x, motion.y, motion.z);
         }
     }
 

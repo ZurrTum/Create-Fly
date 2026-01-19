@@ -31,7 +31,6 @@ import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.WiFiEffectPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -41,6 +40,7 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -386,23 +386,17 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         }
         ItemStack createdBox;
         if (stack.getItem().canFitInsideContainerItems()) {
-            List<ItemStack> list = new ArrayList<>(PackageItem.SLOTS);
-            list.add(stack);
+            List<Optional<ItemStackTemplate>> items = new ArrayList<>(PackageItem.SLOTS);
+            items.add(Optional.of(ItemStackTemplate.fromNonEmptyStack(stack)));
             for (int i = 0, size = PackageItem.SLOTS - 1; i < size; i++) {
                 stack = targetInv.extractMax(s -> s.getItem().canFitInsideContainerItems());
                 if (stack.isEmpty()) {
                     break;
                 }
-                list.add(stack);
-            }
-            int size = list.size();
-            ItemContainerContents contents = new ItemContainerContents(size);
-            NonNullList<ItemStack> items = contents.items;
-            for (int i = 0; i < size; i++) {
-                items.set(i, list.get(i));
+                items.add(Optional.of(ItemStackTemplate.fromNonEmptyStack(stack)));
             }
             createdBox = PackageStyles.getRandomBox();
-            createdBox.set(AllDataComponents.PACKAGE_CONTENTS, contents);
+            createdBox.set(AllDataComponents.PACKAGE_CONTENTS, new ItemContainerContents(items));
         } else {
             createdBox = createBox(stack);
         }
@@ -414,18 +408,15 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
             PackageItem.clearAddress(stack);
             return stack;
         }
-        ItemContainerContents contents = new ItemContainerContents(1);
-        contents.items.set(0, stack);
-        return PackageItem.containing(contents);
+        return PackageItem.containing(new ItemContainerContents(List.of(Optional.of(ItemStackTemplate.fromNonEmptyStack(stack)))));
     }
 
     private static ItemStack createBox(ItemStack[] list, int size) {
-        ItemContainerContents contents = new ItemContainerContents(size);
-        NonNullList<ItemStack> items = contents.items;
+        List<Optional<ItemStackTemplate>> items = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            items.set(i, list[i]);
+            items.add(i, Optional.of(ItemStackTemplate.fromNonEmptyStack(list[i])));
         }
-        return PackageItem.containing(contents);
+        return PackageItem.containing(new ItemContainerContents(items));
     }
 
     private void queuePackage(ItemStack createdBox, @Nullable String address) {

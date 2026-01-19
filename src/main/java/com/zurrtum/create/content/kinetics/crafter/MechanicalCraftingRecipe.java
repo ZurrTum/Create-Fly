@@ -7,19 +7,21 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Optional;
 
-public record MechanicalCraftingRecipe(ShapedRecipePattern raw, ItemStack result, boolean symmetrical) implements CreateRecipe<CraftingInput> {
+public record MechanicalCraftingRecipe(
+    ShapedRecipePattern raw, ItemStackTemplate result, boolean symmetrical
+) implements CreateRecipe<CraftingInput> {
     @Override
     public boolean matches(CraftingInput input, Level worldIn) {
         if (symmetrical)
@@ -51,8 +53,8 @@ public record MechanicalCraftingRecipe(ShapedRecipePattern raw, ItemStack result
     }
 
     @Override
-    public ItemStack assemble(CraftingInput craftingRecipeInput, HolderLookup.Provider wrapperLookup) {
-        return result.copy();
+    public ItemStack assemble(CraftingInput craftingRecipeInput) {
+        return result.create();
     }
 
     @Override
@@ -68,7 +70,8 @@ public record MechanicalCraftingRecipe(ShapedRecipePattern raw, ItemStack result
     public static class Serializer implements RecipeSerializer<MechanicalCraftingRecipe> {
         public static final MapCodec<ShapedRecipePattern.Data> DATA_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ExtraCodecs.strictUnboundedMap(Codec.STRING.xmap(key -> key.charAt(0), String::valueOf), Ingredient.CODEC).fieldOf("key")
-                .forGetter(ShapedRecipePattern.Data::key), Codec.STRING.listOf().fieldOf("pattern").forGetter(ShapedRecipePattern.Data::pattern)
+                .forGetter(ShapedRecipePattern.Data::key),
+            Codec.STRING.listOf().fieldOf("pattern").forGetter(ShapedRecipePattern.Data::pattern)
         ).apply(instance, ShapedRecipePattern.Data::new));
         public static final MapCodec<ShapedRecipePattern> RAW_CODEC = DATA_CODEC.flatXmap(
             ShapedRecipePattern::unpack,
@@ -76,14 +79,14 @@ public record MechanicalCraftingRecipe(ShapedRecipePattern raw, ItemStack result
         );
         public static final MapCodec<MechanicalCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             RAW_CODEC.forGetter(MechanicalCraftingRecipe::raw),
-            ItemStack.CODEC.fieldOf("result").forGetter(MechanicalCraftingRecipe::result),
+            ItemStackTemplate.CODEC.fieldOf("result").forGetter(MechanicalCraftingRecipe::result),
             Codec.BOOL.optionalFieldOf("accept_mirrored", false).forGetter(MechanicalCraftingRecipe::symmetrical)
         ).apply(instance, MechanicalCraftingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, MechanicalCraftingRecipe> PACKET_CODEC = StreamCodec.composite(
             ShapedRecipePattern.STREAM_CODEC,
             MechanicalCraftingRecipe::raw,
-            ItemStack.STREAM_CODEC,
+            ItemStackTemplate.STREAM_CODEC,
             MechanicalCraftingRecipe::result,
             ByteBufCodecs.BOOL,
             MechanicalCraftingRecipe::symmetrical,

@@ -30,10 +30,7 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -216,10 +213,9 @@ public class ItemHelper {
     }
 
     public static void fillItemStackHandler(ItemContainerContents contents, ItemStackHandler inv) {
-        List<ItemStack> itemStacks = contents.stream().toList();
-
-        for (int i = 0; i < itemStacks.size(); i++) {
-            inv.setItem(i, itemStacks.get(i));
+        Iterator<ItemStack> iterator = contents.nonEmptyItemCopyStream().iterator();
+        for (int i = 0, size = inv.getContainerSize(); i < size && iterator.hasNext(); i++) {
+            inv.setItem(i, iterator.next());
         }
     }
 

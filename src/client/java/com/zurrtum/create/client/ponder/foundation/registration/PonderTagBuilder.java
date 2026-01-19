@@ -2,7 +2,8 @@ package com.zurrtum.create.client.ponder.foundation.registration;
 
 import com.zurrtum.create.client.ponder.api.registration.TagBuilder;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.ItemLike;
 import org.jspecify.annotations.Nullable;
 
@@ -17,8 +18,8 @@ public class PonderTagBuilder implements TagBuilder {
     String description = "NO_DESCRIPTION";
     boolean addToIndex = false;
     @Nullable Identifier textureIconLocation;
-    ItemStack itemIcon = ItemStack.EMPTY;
-    ItemStack mainItem = ItemStack.EMPTY;
+    @Nullable ItemStackTemplate itemIcon;
+    @Nullable ItemStackTemplate mainItem;
 
     public PonderTagBuilder(Identifier id, Consumer<PonderTagBuilder> onFinish) {
         this.id = id;
@@ -62,10 +63,11 @@ public class PonderTagBuilder implements TagBuilder {
 
     @Override
     public TagBuilder item(ItemLike item, boolean useAsIcon, boolean useAsMainItem) {
+        Item renderItem = item.asItem();
         if (useAsIcon)
-            this.itemIcon = new ItemStack(item);
+            this.itemIcon = new ItemStackTemplate(renderItem);
         if (useAsMainItem)
-            this.mainItem = new ItemStack(item);
+            this.mainItem = new ItemStackTemplate(renderItem);
         return this;
     }
 

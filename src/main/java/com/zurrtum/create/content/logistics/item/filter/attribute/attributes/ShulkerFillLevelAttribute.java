@@ -7,17 +7,18 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -62,8 +63,8 @@ public record ShulkerFillLevelAttribute(@Nullable ShulkerLevels levels) implemen
 
     enum ShulkerLevels implements StringRepresentable {
         EMPTY("empty", amount -> amount == 0),
-        PARTIAL("partial", amount -> amount > 0 && amount < Integer.MAX_VALUE),
-        FULL("full", amount -> amount == Integer.MAX_VALUE);
+        PARTIAL("partial", amount -> amount > 0 && amount < ShulkerBoxBlockEntity.CONTAINER_SIZE),
+        FULL("full", amount -> amount == ShulkerBoxBlockEntity.CONTAINER_SIZE);
 
         public static final Codec<ShulkerLevels> CODEC = StringRepresentable.fromEnum(ShulkerLevels::values);
         public static final StreamCodec<ByteBuf, ShulkerLevels> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(ShulkerLevels.class);
@@ -98,18 +99,11 @@ public record ShulkerFillLevelAttribute(@Nullable ShulkerLevels levels) implemen
                 return requiredSize.test(0);
             if (testStack.has(DataComponents.CONTAINER_LOOT))
                 return false;
-            if (!contents.items.isEmpty()) {
-                int rawSize = contents.items.size();
-                if (rawSize < 27)
-                    return requiredSize.test(rawSize);
-
-                NonNullList<ItemStack> inventory = NonNullList.withSize(27, ItemStack.EMPTY);
-                contents.copyInto(inventory);
-                boolean isFull = inventory.stream()
-                    .allMatch(itemStack -> !itemStack.isEmpty() && itemStack.getCount() == itemStack.getMaxStackSize());
-                return requiredSize.test(isFull ? Integer.MAX_VALUE : rawSize);
+            int size = 0;
+            for (ItemStackTemplate _ : contents.nonEmptyItems()) {
+                size++;
             }
-            return requiredSize.test(0);
+            return requiredSize.test(size);
         }
     }
 

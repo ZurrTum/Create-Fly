@@ -10,6 +10,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
@@ -40,8 +41,13 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         if (filter == null) {
             return false;
         }
-        ItemStack result = recipe.assemble(null, world.registryAccess());
-        if (!filter.test(result)) {
+        ItemStack result;
+        try {
+            result = recipe.assemble(CraftingInput.EMPTY);
+        } catch (Exception ignore) {
+            return false;
+        }
+        if (result.isEmpty() || !filter.test(result)) {
             return false;
         }
         List<SizedIngredient> ingredients = ingredientCache.computeIfAbsent(recipe, recipeToIngredients);
@@ -66,9 +72,9 @@ public interface BasinRecipe extends Recipe<BasinInput> {
             }
             if (ingredient.test(stack)) {
                 List<ItemStack> outputs = new ArrayList<>();
-                ItemStack remainder = stack.getItem().getCraftingRemainder();
-                if (remainder != ItemStack.EMPTY) {
-                    outputs.add(remainder);
+                ItemStackTemplate remainder = stack.getItem().getCraftingRemainder();
+                if (remainder != null) {
+                    outputs.add(remainder.create());
                 }
                 return outputs;
             }
@@ -304,7 +310,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         if (outputs == null) {
             return false;
         }
-        outputs.add(recipe.assemble(null, world.registryAccess()));
+        outputs.add(recipe.assemble(CraftingInput.EMPTY));
         if (!input.acceptOutputs(outputs, List.of(), true)) {
             return false;
         }
@@ -315,9 +321,9 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     static void addRecipeRemainder(ItemStack stack, int count, List<ItemStack> outputs) {
         Item item = stack.getItem();
         for (int i = 0; i < count; i++) {
-            ItemStack remainder = item.getCraftingRemainder();
-            if (remainder != ItemStack.EMPTY) {
-                outputs.add(remainder);
+            ItemStackTemplate remainder = item.getCraftingRemainder();
+            if (remainder != null) {
+                outputs.add(remainder.create());
             }
         }
     }
@@ -346,9 +352,9 @@ public interface BasinRecipe extends Recipe<BasinInput> {
                     });
                 }
                 List<ItemStack> outputs = new ArrayList<>();
-                ItemStack remainder = stack.getItem().getCraftingRemainder();
-                if (remainder != ItemStack.EMPTY) {
-                    outputs.add(remainder);
+                ItemStackTemplate remainder = stack.getItem().getCraftingRemainder();
+                if (remainder != null) {
+                    outputs.add(remainder.create());
                 }
                 return outputs;
             }

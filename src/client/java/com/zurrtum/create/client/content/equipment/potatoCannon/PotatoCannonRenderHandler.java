@@ -13,6 +13,7 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.phys.Vec3;
 
 public class PotatoCannonRenderHandler extends ShootableGadgetRenderHandler {
@@ -36,7 +37,15 @@ public class PotatoCannonRenderHandler extends ShootableGadgetRenderHandler {
         ClientLevel world = Minecraft.getInstance().level;
         for (int i = 0; i < 2; i++) {
             Vec3 m = VecHelper.offsetRandomly(motion.scale(0.1f), world.getRandom(), .025f);
-            world.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), location.x, location.y, location.z, m.x, m.y, m.z);
+            world.addParticle(
+                new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack)),
+                location.x,
+                location.y,
+                location.z,
+                m.x,
+                m.y,
+                m.z
+            );
 
             Vec3 m2 = VecHelper.offsetRandomly(motion.scale(2f), world.getRandom(), .5f);
             world.addParticle(new AirParticleData(1, 1 / 4f), location.x, location.y, location.z, m2.x, m2.y, m2.z);

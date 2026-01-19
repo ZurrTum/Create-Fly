@@ -15,6 +15,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record CompactingRecipe(
-    ItemStack result, @Nullable FluidIngredient fluidIngredient, List<SizedIngredient> ingredients
+    ItemStackTemplate result, @Nullable FluidIngredient fluidIngredient, List<SizedIngredient> ingredients
 ) implements BasinRecipe {
     @Override
     public int getIngredientSize() {
@@ -49,7 +50,8 @@ public record CompactingRecipe(
         if (filter == null) {
             return false;
         }
-        if (!filter.test(result)) {
+        ItemStack stack = result.create();
+        if (!filter.test(stack)) {
             return false;
         }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
@@ -59,7 +61,7 @@ public record CompactingRecipe(
         if (!BasinRecipe.matchFluidIngredient(input, fluidIngredient)) {
             return false;
         }
-        outputs.add(result);
+        outputs.add(stack);
         return input.acceptOutputs(outputs, List.of(), true);
     }
 
@@ -73,7 +75,7 @@ public record CompactingRecipe(
         if (!BasinRecipe.prepareFluidCraft(input, fluidIngredient, changes)) {
             return false;
         }
-        outputs.add(result);
+        outputs.add(result.create());
         if (!input.acceptOutputs(outputs, List.of(), true)) {
             return false;
         }
@@ -93,7 +95,7 @@ public record CompactingRecipe(
 
     public static class Serializer implements RecipeSerializer<CompactingRecipe> {
         public static final MapCodec<CompactingRecipe> CODEC = RecordCodecBuilder.mapCodec((Instance<CompactingRecipe> instance) -> instance.group(
-            ItemStack.CODEC.fieldOf("result").forGetter(CompactingRecipe::result),
+            ItemStackTemplate.CODEC.fieldOf("result").forGetter(CompactingRecipe::result),
             FluidIngredient.CODEC.optionalFieldOf("fluid_ingredient").forGetter(Serializer::getOptionalFluidIngredient),
             SizedIngredient.getListCodec(1, 9).optionalFieldOf("ingredients", List.of()).forGetter(CompactingRecipe::ingredients)
         ).apply(instance, Serializer::createRecipe)).validate(recipe -> {
@@ -103,7 +105,7 @@ public record CompactingRecipe(
             return DataResult.success(recipe);
         });
         public static final StreamCodec<RegistryFriendlyByteBuf, CompactingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ItemStack.STREAM_CODEC,
+            ItemStackTemplate.STREAM_CODEC,
             CompactingRecipe::result,
             FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs::optional),
             Serializer::getOptionalFluidIngredient,
@@ -112,12 +114,16 @@ public record CompactingRecipe(
             Serializer::createRecipe
         );
 
-        private static Optional<FluidIngredient> getOptionalFluidIngredient(CompactingRecipe recipe) {
+        private static Optional<@Nullable FluidIngredient> getOptionalFluidIngredient(CompactingRecipe recipe) {
             return Optional.ofNullable(recipe.fluidIngredient);
         }
 
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private static CompactingRecipe createRecipe(ItemStack result, Optional<FluidIngredient> fluidIngredient, List<SizedIngredient> ingredients) {
+        private static CompactingRecipe createRecipe(
+            ItemStackTemplate result,
+            Optional<FluidIngredient> fluidIngredient,
+            List<SizedIngredient> ingredients
+        ) {
             return new CompactingRecipe(result, fluidIngredient.orElse(null), ingredients);
         }
 

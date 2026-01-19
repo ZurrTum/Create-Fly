@@ -4,6 +4,7 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
@@ -32,6 +32,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -233,11 +234,11 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         if (stack == null || stack.isEmpty())
             return;
 
-        ParticleOptions particleData = null;
+        ParticleOptions particleData;
         if (stack.getItem() instanceof BlockItem)
             particleData = new BlockParticleOption(ParticleTypes.BLOCK, ((BlockItem) stack.getItem()).getBlock().defaultBlockState());
         else
-            particleData = new ItemParticleOption(ParticleTypes.ITEM, stack);
+            particleData = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
 
         RandomSource r = level.getRandom();
         Vec3 v = VecHelper.getCenterOf(worldPosition).add(0, 5 / 16f, 0);
@@ -251,12 +252,12 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         if (stack == null || stack.isEmpty())
             return;
 
-        ParticleOptions particleData = null;
+        ParticleOptions particleData;
         float speed = 1;
         if (stack.getItem() instanceof BlockItem)
             particleData = new BlockParticleOption(ParticleTypes.BLOCK, ((BlockItem) stack.getItem()).getBlock().defaultBlockState());
         else {
-            particleData = new ItemParticleOption(ParticleTypes.ITEM, stack);
+            particleData = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
             speed = .125f;
         }
 
@@ -288,9 +289,12 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         ItemStack stack = inventory.getItem(0);
         if (PackageItem.isPackage(stack)) {
             inventory.clearContent();
+            ItemContainerContents contents = stack.get(AllDataComponents.PACKAGE_CONTENTS);
+            if (contents == null) {
+                return;
+            }
             inventory.outputAllowInsertion();
-            ItemContainerContents contents = stack.getOrDefault(AllDataComponents.PACKAGE_CONTENTS, ItemContainerContents.EMPTY);
-            inventory.insert(contents.stream().toList());
+            inventory.insert(contents.nonEmptyItemCopyStream().toList());
             inventory.outputForbidInsertion();
             return;
         }
@@ -309,11 +313,11 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
             output = pair.getFirst().assemble(input, level.registryAccess());
         }
         List<ItemStack> list;
-        ItemStack recipeRemainder = stack.getItem().getCraftingRemainder();
-        if (recipeRemainder.isEmpty()) {
+        ItemStackTemplate recipeRemainder = stack.getItem().getCraftingRemainder();
+        if (recipeRemainder == null) {
             list = ItemHelper.multipliedOutput(output, stack.getCount());
         } else {
-            list = ItemHelper.multipliedOutput(List.of(output, recipeRemainder), stack.getCount());
+            list = ItemHelper.multipliedOutput(List.of(output, recipeRemainder.create()), stack.getCount());
         }
         for (int slot = 1, listSize = list.size(), invSize = inventory.getContainerSize(); slot < invSize; slot++) {
             inventory.setItem(slot, slot <= listSize ? list.get(slot - 1) : ItemStack.EMPTY);

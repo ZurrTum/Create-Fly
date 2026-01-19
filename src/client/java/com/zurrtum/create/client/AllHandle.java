@@ -141,6 +141,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -626,7 +627,15 @@ public class AllHandle extends AllClientHandle {
         ClientLevel world = mc.level;
         Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), .125f);
         Vec3 pos = packet.location().add(motion.scale(4));
-        world.addParticle(new ItemParticleOption(ParticleTypes.ITEM, packet.box()), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
+        world.addParticle(
+            new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(packet.box())),
+            pos.x,
+            pos.y,
+            pos.z,
+            motion.x,
+            motion.y,
+            motion.z
+        );
     }
 
     @Override

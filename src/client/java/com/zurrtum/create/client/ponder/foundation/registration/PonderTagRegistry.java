@@ -6,12 +6,12 @@ import com.google.common.collect.Multimap;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.registration.TagRegistryAccess;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Items;
 
 public class PonderTagRegistry implements TagRegistryAccess {
 
@@ -23,8 +23,8 @@ public class PonderTagRegistry implements TagRegistryAccess {
     private final PonderTag MISSING = new PonderTag(
         Ponder.asResource("not_registered"),
         null,
-        Items.BARRIER.getDefaultInstance(),
-        Items.BARRIER.getDefaultInstance()
+        new ItemStackTemplate(Items.BARRIER),
+        new ItemStackTemplate(Items.BARRIER)
     );
 
     private boolean allowRegistration = true;

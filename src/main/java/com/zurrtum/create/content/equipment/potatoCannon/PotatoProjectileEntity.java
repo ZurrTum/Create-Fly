@@ -34,6 +34,7 @@ import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
@@ -233,7 +234,7 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
             if (random.nextDouble() <= recoveryChance) {
                 recoverItem();
             } else {
-                spawnAtLocation((ServerLevel) world, type.dropStack());
+                type.dropStack().ifPresent(template -> spawnAtLocation((ServerLevel) world, template.create()));
             }
         }
 
@@ -300,7 +301,7 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
             if (random.nextDouble() <= recoveryChance) {
                 recoverItem();
             } else {
-                spawnAtLocation((ServerLevel) world, getProjectileType().dropStack());
+                getProjectileType().dropStack().ifPresent(template -> spawnAtLocation((ServerLevel) world, template.create()));
             }
         }
 
@@ -323,9 +324,10 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
 
     private void pop(Vec3 hit) {
         if (!stack.isEmpty()) {
+            ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
             for (int i = 0; i < 7; i++) {
                 Vec3 m = VecHelper.offsetRandomly(Vec3.ZERO, this.random, .25f);
-                level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), hit.x, hit.y, hit.z, m.x, m.y, m.z);
+                level().addParticle(option, hit.x, hit.y, hit.z, m.x, m.y, m.z);
             }
         }
         if (!level().isClientSide())

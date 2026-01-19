@@ -7,14 +7,10 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.*;
 
-public record SandPaperPolishingRecipe(ItemStack result, Ingredient ingredient) implements CreateSingleStackRecipe {
+public record SandPaperPolishingRecipe(ItemStackTemplate result, Ingredient ingredient) implements CreateSingleStackRecipe {
     @Override
     public RecipeSerializer<? extends Recipe<SingleRecipeInput>> getSerializer() {
         return AllRecipeSerializers.SANDPAPER_POLISHING;
@@ -27,12 +23,12 @@ public record SandPaperPolishingRecipe(ItemStack result, Ingredient ingredient) 
 
     public static class Serializer implements RecipeSerializer<SandPaperPolishingRecipe> {
         public static final MapCodec<SandPaperPolishingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.CODEC.fieldOf("result").forGetter(SandPaperPolishingRecipe::result),
+            ItemStackTemplate.CODEC.fieldOf("result").forGetter(SandPaperPolishingRecipe::result),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(SandPaperPolishingRecipe::ingredient)
         ).apply(instance, SandPaperPolishingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, SandPaperPolishingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ItemStack.STREAM_CODEC,
+            ItemStackTemplate.STREAM_CODEC,
             SandPaperPolishingRecipe::result,
             Ingredient.CONTENTS_STREAM_CODEC,
             SandPaperPolishingRecipe::ingredient,

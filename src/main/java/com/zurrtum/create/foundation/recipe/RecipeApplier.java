@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIntPair;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -56,11 +57,11 @@ public class RecipeApplier {
         if (returnProcessingRemainder) {
             remainders = new ArrayList<>();
             for (int i = 0, size = input.size(); i < size; i++) {
-                ItemStack recipeRemainder = input.getItem(i).getItem().getCraftingRemainder();
-                if (recipeRemainder.isEmpty()) {
+                ItemStackTemplate recipeRemainder = input.getItem(i).getItem().getCraftingRemainder();
+                if (recipeRemainder == null) {
                     continue;
                 }
-                remainders.add(recipeRemainder);
+                remainders.add(recipeRemainder.create());
             }
             if (remainders.isEmpty()) {
                 remainders = null;
@@ -140,18 +141,18 @@ public class RecipeApplier {
             if (size != 1) {
                 List<ItemStack> list = new ArrayList<>();
                 for (int i = 0; i < size; i++) {
-                    ItemStack recipeRemainder = input.getItem(i).getItem().getCraftingRemainder();
-                    if (recipeRemainder.isEmpty()) {
+                    ItemStackTemplate recipeRemainder = input.getItem(i).getItem().getCraftingRemainder();
+                    if (recipeRemainder == null) {
                         continue;
                     }
-                    list.add(recipeRemainder);
+                    list.add(recipeRemainder.create());
                 }
                 list.add(result);
                 return ItemHelper.multipliedOutput(list, count);
             }
-            ItemStack recipeRemainder = input.getItem(0).getItem().getCraftingRemainder();
-            if (!recipeRemainder.isEmpty()) {
-                return ItemHelper.multipliedOutput(List.of(result, recipeRemainder), count);
+            ItemStackTemplate recipeRemainder = input.getItem(0).getItem().getCraftingRemainder();
+            if (recipeRemainder != null) {
+                return ItemHelper.multipliedOutput(List.of(result, recipeRemainder.create()), count);
             }
         }
         return ItemHelper.multipliedOutput(result, count);

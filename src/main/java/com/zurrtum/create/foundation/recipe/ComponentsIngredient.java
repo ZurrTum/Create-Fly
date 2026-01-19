@@ -11,6 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
@@ -124,8 +125,6 @@ public class ComponentsIngredient extends Ingredient {
     }
 
     private SlotDisplay createEntryDisplay(Holder<Item> entry) {
-        ItemStack stack = entry.value().getDefaultInstance();
-        stack.applyComponentsAndValidate(components);
-        return new SlotDisplay.ItemStackSlotDisplay(stack);
+        return new SlotDisplay.ItemStackSlotDisplay(new ItemStackTemplate(entry, 1, components));
     }
 }

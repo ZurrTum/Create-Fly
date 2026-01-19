@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.crafter;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.BlockFace;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.kinetics.crafter.ConnectedInputHandler.ConnectedInput;
 import com.zurrtum.create.content.kinetics.crafter.RecipeGridHandler.GroupedItems;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
@@ -27,6 +27,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -314,9 +315,9 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
                 if (result != null) {
                     List<ItemStack> containers = new ArrayList<>();
                     groupedItems.grid.values().forEach(stack -> {
-                        ItemStack remainder = stack.getItem().getCraftingRemainder();
-                        if (!remainder.isEmpty())
-                            containers.add(remainder);
+                        ItemStackTemplate remainder = stack.getItem().getCraftingRemainder();
+                        if (remainder != null)
+                            containers.add(remainder.create());
                     });
 
                     groupedItemsBeforeCraft = groupedItems;
@@ -386,23 +387,17 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
 
                 if (!groupedItemsBeforeCraft.grid.isEmpty() && progress < .5f) {
                     if (groupedItems.grid.containsKey(Pair.of(0, 0))) {
-                        ItemStack stack = groupedItems.grid.get(Pair.of(0, 0));
                         groupedItemsBeforeCraft = new GroupedItems();
-
-                        for (int i = 0; i < 10; i++) {
-                            Vec3 randVec = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .125f)
-                                .multiply(VecHelper.axisAlingedPlaneOf(facingVec)).normalize().scale(.25f);
-                            Vec3 offset2 = randVec.add(vec);
-                            randVec = randVec.scale(.35f);
-                            level.addParticle(
-                                new ItemParticleOption(ParticleTypes.ITEM, stack),
-                                offset2.x,
-                                offset2.y,
-                                offset2.z,
-                                randVec.x,
-                                randVec.y,
-                                randVec.z
-                            );
+                        ItemStack stack = groupedItems.grid.get(Pair.of(0, 0));
+                        if (!stack.isEmpty()) {
+                            ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
+                            for (int i = 0; i < 10; i++) {
+                                Vec3 randVec = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .125f)
+                                    .multiply(VecHelper.axisAlingedPlaneOf(facingVec)).normalize().scale(.25f);
+                                Vec3 offset2 = randVec.add(vec);
+                                randVec = randVec.scale(.35f);
+                                level.addParticle(option, offset2.x, offset2.y, offset2.z, randVec.x, randVec.y, randVec.z);
+                            }
                         }
                     }
                 }

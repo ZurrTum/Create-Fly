@@ -22,8 +22,11 @@ public class PotionFluidHandler {
     private static final Component NO_EFFECT = Component.translatable("effect.none").withStyle(ChatFormatting.GRAY);
 
     public static boolean isPotionItem(ItemStack stack) {
-        return stack.getItem() instanceof PotionItem && !(stack.getItem().getCraftingRemainder().getItem() instanceof BucketItem) && !stack.is(
-            AllItemTags.NOT_POTION);
+        if (stack.getItem() instanceof PotionItem item) {
+            ItemStackTemplate remainder = item.getCraftingRemainder();
+            return remainder != null && remainder.item().value() instanceof BucketItem && !stack.is(AllItemTags.NOT_POTION);
+        }
+        return false;
     }
 
     public static Pair<FluidStack, ItemStack> emptyPotion(ItemStack stack, boolean simulate) {

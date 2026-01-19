@@ -7,13 +7,13 @@ import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.IngredientText;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
 public record DeployerApplicationRecipe(
-    ItemStack result, boolean keepHeldItem, Ingredient target, Ingredient ingredient
+    ItemStackTemplate result, boolean keepHeldItem, Ingredient target, Ingredient ingredient
 ) implements ItemApplicationRecipe {
     @Override
     public RecipeSerializer<DeployerApplicationRecipe> getSerializer() {

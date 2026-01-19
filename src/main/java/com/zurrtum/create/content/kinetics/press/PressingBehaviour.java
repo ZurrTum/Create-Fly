@@ -16,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.storage.ValueInput;
@@ -266,22 +267,24 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
 
     public void makePressingParticleEffect(Vec3 pos, ItemStack stack, int amount) {
         Level level = getLevel();
-        if (level == null || !level.isClientSide())
+        if (level == null || !level.isClientSide() || stack.isEmpty())
             return;
+        ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
         for (int i = 0; i < amount; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .125f).multiply(1, 0, 1);
             motion = motion.add(0, amount != 1 ? 0.125f : 1 / 16f, 0);
-            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), pos.x, pos.y - .25f, pos.z, motion.x, motion.y, motion.z);
+            level.addParticle(option, pos.x, pos.y - .25f, pos.z, motion.x, motion.y, motion.z);
         }
     }
 
     public void makeCompactingParticleEffect(Vec3 pos, ItemStack stack) {
         Level level = getLevel();
-        if (level == null || !level.isClientSide())
+        if (level == null || !level.isClientSide() || stack.isEmpty())
             return;
+        ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
         for (int i = 0; i < 20; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .175f).multiply(1, 0, 1);
-            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), pos.x, pos.y, pos.z, motion.x, motion.y + .25f, motion.z);
+            level.addParticle(option, pos.x, pos.y, pos.z, motion.x, motion.y + .25f, motion.z);
         }
     }
 

@@ -33,6 +33,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -564,7 +565,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements Clearable {
             Vec3 p = VecHelper.getCenterOf(worldPosition);
             p = VecHelper.offsetRandomly(p, level.getRandom(), .5f);
             Vec3 m = Vec3.ZERO;
-            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, item), p.x, p.y, p.z, m.x, m.y, m.z);
+            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(item)), p.x, p.y, p.z, m.x, m.y, m.z);
         }
     }
 

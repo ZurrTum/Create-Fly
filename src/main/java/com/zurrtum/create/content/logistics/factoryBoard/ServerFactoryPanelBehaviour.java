@@ -931,48 +931,26 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
         Item item = output.getItem();
         RegistryAccess registryManager = serverWorld.registryAccess();
         CraftingRecipe availableCraftingRecipe = serverWorld.recipeAccess().recipes.byType(RecipeType.CRAFTING).parallelStream().filter(entry -> {
+            if (AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
+                return false;
+            }
             CraftingRecipe recipe = entry.value();
             List<Ingredient> ingredients;
             if (recipe instanceof ShapedRecipe shapedRecipe) {
-                ItemStack result;
-                try {
-                    result = recipe.assemble(CraftingInput.EMPTY, registryManager);
-                } catch (Exception ignore) {
-                    result = ItemStack.EMPTY;
-                }
-                if (result.isEmpty()) {
-                    result = shapedRecipe.result;
-                    if (result == null || result.isEmpty()) {
-                        return false;
-                    }
-                }
-                if (result.getItem() != item) {
-                    return false;
-                }
                 ingredients = shapedRecipe.getIngredients().stream().flatMap(Optional::stream).toList();
             } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
-                ItemStack result;
-                try {
-                    result = recipe.assemble(CraftingInput.EMPTY, registryManager);
-                } catch (Exception ignore) {
-                    result = ItemStack.EMPTY;
-                }
-                if (result.isEmpty()) {
-                    result = shapelessRecipe.result;
-                    if (result == null || result.isEmpty()) {
-                        return false;
-                    }
-                }
-                if (result.getItem() != item) {
-                    return false;
-                }
                 ingredients = shapelessRecipe.ingredients;
             } else {
                 return false;
             }
-            if (AllRecipeTypes.shouldIgnoreInAutomation(entry))
+            try {
+                ItemStack result = recipe.assemble(CraftingInput.EMPTY);
+                if (result.getItem() != item) {
+                    return false;
+                }
+            } catch (Exception ignore) {
                 return false;
-
+            }
             Set<Item> itemsUsed = new HashSet<>();
             for (Ingredient ingredient : ingredients) {
                 if (ingredient.isEmpty())

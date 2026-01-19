@@ -29,6 +29,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -264,7 +265,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
         if (stack.getItem() instanceof BlockItem)
             particleData = new BlockParticleOption(ParticleTypes.BLOCK, ((BlockItem) stack.getItem()).getBlock().defaultBlockState());
         else
-            particleData = new ItemParticleOption(ParticleTypes.ITEM, stack);
+            particleData = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack));
 
         RandomSource r = level.getRandom();
         int x = worldPosition.getX();
@@ -284,17 +285,14 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
             SingleRecipeInput input = new SingleRecipeInput(item);
             int rolls = item.getCount();
             inventory.clearContent();
-            ItemStack recipeRemainder = item.getItem().getCraftingRemainder();
-            if (recipeRemainder.isEmpty()) {
-                recipeRemainder = null;
-            }
+            ItemStackTemplate recipeRemainder = item.getItem().getCraftingRemainder();
             for (int roll = 0; roll < rolls; roll++) {
                 List<ItemStack> rolledResults = recipe.assemble(input, level.getRandom());
                 for (ItemStack stack : rolledResults) {
                     ItemHelper.addToList(stack, list);
                 }
                 if (recipeRemainder != null) {
-                    ItemHelper.addToList(recipeRemainder, list);
+                    ItemHelper.addToList(recipeRemainder.create(), list);
                 }
             }
             for (int slot = 0, max = Math.min(list.size(), inventory.getContainerSize() - 1); slot < max; slot++)

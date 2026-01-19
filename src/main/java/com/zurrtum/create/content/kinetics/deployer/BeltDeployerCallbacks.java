@@ -20,6 +20,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
@@ -134,13 +135,14 @@ public class BeltDeployerCallbacks {
             if (heldItem.getMaxDamage() > 0) {
                 heldItem.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
             } else {
-                ItemStack leftover = heldItem.getItem().getCraftingRemainder();
+                ItemStackTemplate leftover = heldItem.getItem().getCraftingRemainder();
                 heldItem.shrink(1);
-                if (!leftover.isEmpty()) {
+                if (leftover != null) {
+                    ItemStack stack = leftover.create();
                     if (heldItem.isEmpty()) {
-                        player.setItemInHand(InteractionHand.MAIN_HAND, leftover);
-                    } else if (!player.getInventory().add(leftover)) {
-                        player.drop(leftover, false);
+                        player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+                    } else if (!player.getInventory().add(stack)) {
+                        player.drop(stack, false);
                     }
                 }
             }

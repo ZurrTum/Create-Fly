@@ -19,7 +19,7 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
@@ -171,13 +171,9 @@ public class RuntimeDataGenerator {
     private static void simpleWoodRecipe(Identifier typeId, Identifier inputId, Identifier outputId, int amount) {
         if (BuiltInRegistries.ITEM.containsKey(outputId)) {
             addRecipe(
-                typeId,
-                inputId.getNamespace(),
-                inputId.getPath(),
-                outputId.getPath(),
-                new CuttingRecipe(
+                typeId, inputId.getNamespace(), inputId.getPath(), outputId.getPath(), new CuttingRecipe(
                     50,
-                    new ItemStack(BuiltInRegistries.ITEM.getValue(outputId), amount),
+                    new ItemStackTemplate(BuiltInRegistries.ITEM.getValue(outputId), amount),
                     Ingredient.of(BuiltInRegistries.ITEM.getValue(inputId))
                 )
             );
@@ -188,7 +184,7 @@ public class RuntimeDataGenerator {
         if (BuiltInRegistries.ITEM.containsKey(outputId)) {
             Recipe.CODEC.encodeStart(
                 EmptyJsonOps.INSTANCE,
-                new CuttingRecipe(50, new ItemStack(BuiltInRegistries.ITEM.getValue(outputId), amount), EmptyJsonOps.ofTag(inputTag))
+                new CuttingRecipe(50, new ItemStackTemplate(BuiltInRegistries.ITEM.getValue(outputId), amount), EmptyJsonOps.ofTag(inputTag))
             ).ifSuccess(json -> {
                 Identifier inputId = inputTag.location();
                 Identifier path = Identifier.fromNamespaceAndPath(
@@ -207,7 +203,7 @@ public class RuntimeDataGenerator {
             first.getPath(),
             second.getPath(),
             new SplashingRecipe(
-                List.of(new ChanceOutput(1, new ItemStack(BuiltInRegistries.BLOCK.getValue(second)))),
+                List.of(new ChanceOutput(1, new ItemStackTemplate(BuiltInRegistries.BLOCK.getValue(second).asItem()))),
                 Ingredient.of(BuiltInRegistries.BLOCK.getValue(first))
             )
         );

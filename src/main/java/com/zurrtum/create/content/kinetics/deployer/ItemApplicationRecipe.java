@@ -11,12 +11,13 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput> {
-    ItemStack result();
+    ItemStackTemplate result();
 
     boolean keepHeldItem();
 
@@ -35,7 +36,7 @@ public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput
         if (junk != null && junk.hasJunk()) {
             return junk.getJunk();
         }
-        return result().copy();
+        return result().create();
     }
 
     record Serializer<T extends ItemApplicationRecipe>(
@@ -44,12 +45,12 @@ public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput
         public Serializer(Factory<T> factory) {
             this(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    ItemStack.CODEC.fieldOf("result").forGetter(ItemApplicationRecipe::result),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(ItemApplicationRecipe::result),
                     Codec.BOOL.optionalFieldOf("keep_held_item", false).forGetter(ItemApplicationRecipe::keepHeldItem),
                     Ingredient.CODEC.fieldOf("target").forGetter(ItemApplicationRecipe::target),
                     Ingredient.CODEC.fieldOf("ingredient").forGetter(ItemApplicationRecipe::ingredient)
                 ).apply(instance, factory::create)), StreamCodec.composite(
-                    ItemStack.STREAM_CODEC,
+                    ItemStackTemplate.STREAM_CODEC,
                     ItemApplicationRecipe::result,
                     ByteBufCodecs.BOOL,
                     ItemApplicationRecipe::keepHeldItem,
@@ -63,7 +64,7 @@ public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput
         }
 
         public interface Factory<T extends ItemApplicationRecipe> {
-            T create(ItemStack result, boolean keepHeldItem, Ingredient block, Ingredient item);
+            T create(ItemStackTemplate result, boolean keepHeldItem, Ingredient block, Ingredient item);
         }
     }
 }

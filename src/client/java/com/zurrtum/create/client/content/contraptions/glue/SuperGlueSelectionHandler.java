@@ -264,7 +264,6 @@ public class SuperGlueSelectionHandler {
 
         float distance = fullBlock ? 1f : .25f + .25f * (world.getRandom().nextFloat() - .5f);
         plane = plane.scale(distance);
-        ItemStack stack = new ItemStack(Items.SLIME_BALL);
 
         for (int i = fullBlock ? 40 : 15; i > 0; i--) {
             Vec3 offset = VecHelper.rotate(plane, 360 * world.getRandom().nextFloat(), direction.getAxis());
@@ -273,7 +272,7 @@ public class SuperGlueSelectionHandler {
                 offset = new Vec3(Mth.clamp(offset.x, -.5, .5), Mth.clamp(offset.y, -.5, .5), Mth.clamp(offset.z, -.5, .5));
             Vec3 particlePos = facePos.add(offset);
             world.addParticle(
-                new ItemParticleOption(ParticleTypes.ITEM, stack),
+                new ItemParticleOption(ParticleTypes.ITEM, Items.SLIME_BALL),
                 particlePos.x,
                 particlePos.y,
                 particlePos.z,

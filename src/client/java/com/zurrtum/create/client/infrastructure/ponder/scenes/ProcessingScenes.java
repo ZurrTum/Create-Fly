@@ -183,7 +183,7 @@ public class ProcessingScenes {
         scene.idle(18);
         scene.world().modifyEntity(entity1, Entity::discard);
         ParticleEmitter blockSpace = scene.effects()
-            .particleEmitterWithinBlockSpace(new ItemParticleOption(ParticleTypes.ITEM, input), util.vector().of(0, 0, 0));
+            .particleEmitterWithinBlockSpace(new ItemParticleOption(ParticleTypes.ITEM, Items.GOLD_ORE), util.vector().of(0, 0, 0));
         scene.effects().emitParticles(util.vector().centerOf(center).add(0, -0.2, 0), blockSpace, 3, 40);
         scene.idle(10);
         scene.overlay().showControls(centerTop, Pointing.DOWN, 30).withItem(input);

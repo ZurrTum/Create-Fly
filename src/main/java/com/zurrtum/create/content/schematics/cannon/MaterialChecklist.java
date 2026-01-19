@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WrittenBookContent;
 
@@ -115,7 +116,7 @@ public class MaterialChecklist {
             }
 
             itemsWritten++;
-            textComponent.append(entry(new ItemStack(item), amount, true, true));
+            textComponent.append(entry(item, amount, true, true));
         }
 
         for (Item item : completed) {
@@ -127,7 +128,7 @@ public class MaterialChecklist {
             }
 
             itemsWritten++;
-            textComponent.append(entry(new ItemStack(item), getRequiredAmount(item), false, true));
+            textComponent.append(entry(item, getRequiredAmount(item), false, true));
         }
 
         pages.add(Filterable.passThrough(textComponent));
@@ -187,7 +188,7 @@ public class MaterialChecklist {
             }
 
             itemsWritten++;
-            currentPage.add(new ClipboardEntry(false, entry(new ItemStack(item), amount, true, false)).displayItem(new ItemStack(item), amount));
+            currentPage.add(new ClipboardEntry(false, entry(item, amount, true, false)).displayItem(new ItemStack(item), amount));
         }
 
         for (Item item : completed) {
@@ -199,10 +200,7 @@ public class MaterialChecklist {
             }
 
             itemsWritten++;
-            currentPage.add(new ClipboardEntry(
-                true,
-                entry(new ItemStack(item), getRequiredAmount(item), false, false)
-            ).displayItem(new ItemStack(item), 0));
+            currentPage.add(new ClipboardEntry(true, entry(item, getRequiredAmount(item), false, false)).displayItem(new ItemStack(item), 0));
         }
 
         pages.add(currentPage);
@@ -220,11 +218,12 @@ public class MaterialChecklist {
         return amount;
     }
 
-    private MutableComponent entry(ItemStack item, int amount, boolean unfinished, boolean forBook) {
+    private MutableComponent entry(Item item, int amount, boolean unfinished, boolean forBook) {
         int stacks = amount / 64;
         int remainder = amount % 64;
         MutableComponent tc = Component.empty();
-        tc.append(Component.translatable(item.getItem().getDescriptionId()).setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowItem(item))));
+        tc.append(Component.translatable(item.getDescriptionId())
+            .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowItem(new ItemStackTemplate(item)))));
 
         if (!unfinished && forBook)
             tc.append(" ✔");

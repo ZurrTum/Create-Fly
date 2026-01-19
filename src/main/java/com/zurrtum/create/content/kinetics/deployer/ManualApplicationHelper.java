@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeAccess;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -81,13 +82,14 @@ public class ManualApplicationHelper {
             if (heldItem.getMaxDamage() > 0) {
                 heldItem.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
             } else {
-                ItemStack leftover = heldItem.getItem().getCraftingRemainder();
+                ItemStackTemplate leftover = heldItem.getItem().getCraftingRemainder();
                 heldItem.shrink(1);
-                if (!leftover.isEmpty()) {
+                if (leftover != null) {
+                    ItemStack itemStack = leftover.create();
                     if (heldItem.isEmpty()) {
-                        player.setItemInHand(hand, leftover);
-                    } else if (!player.getInventory().add(leftover)) {
-                        player.drop(leftover, false);
+                        player.setItemInHand(hand, itemStack);
+                    } else if (!player.getInventory().add(itemStack)) {
+                        player.drop(itemStack, false);
                     }
                 }
             }

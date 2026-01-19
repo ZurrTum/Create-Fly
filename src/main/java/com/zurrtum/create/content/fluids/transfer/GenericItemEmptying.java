@@ -8,14 +8,13 @@ import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.Optional;
-
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+
+import java.util.Optional;
 
 public class GenericItemEmptying {
 
@@ -48,7 +47,7 @@ public class GenericItemEmptying {
                 if (!simulate)
                     stack.shrink(1);
                 EmptyingRecipe emptyingRecipe = recipe.get().value();
-                return Pair.of(emptyingRecipe.fluidResult(), emptyingRecipe.result());
+                return Pair.of(emptyingRecipe.fluidResult(), emptyingRecipe.result().create());
             }
         } else {
             //TODO

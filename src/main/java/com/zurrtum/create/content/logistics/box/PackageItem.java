@@ -314,11 +314,12 @@ public class PackageItem extends Item implements EntityItem {
         Vec3 position = playerIn.position();
         AllSoundEvents.PACKAGE_POP.playOnServer(worldIn, playerIn.blockPosition());
 
-        if (worldIn.isClientSide()) {
+        if (worldIn.isClientSide() && !particle.isEmpty()) {
+            ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(particle));
             for (int i = 0; i < 10; i++) {
                 Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, worldIn.getRandom(), .125f);
                 Vec3 pos = position.add(0, 0.5, 0).add(playerIn.getLookAngle().scale(.5)).add(motion.scale(4));
-                worldIn.addParticle(new ItemParticleOption(ParticleTypes.ITEM, particle), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
+                worldIn.addParticle(option, pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
             }
         }
 

@@ -3,11 +3,11 @@ package com.zurrtum.create.content.kinetics.millstone;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.core.BlockPos;
@@ -21,6 +21,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
@@ -124,13 +125,13 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements Clearabl
             lastRecipe = recipe.get().value();
         }
 
-        ItemStack recipeRemainder = stack.getItem().getCraftingRemainder();
+        ItemStackTemplate recipeRemainder = stack.getItem().getCraftingRemainder();
         stack.shrink(1);
         capability.setItem(0, stack);
         capability.outputAllowInsertion();
         List<ItemStack> list = lastRecipe.assemble(input, level.getRandom());
-        if (!recipeRemainder.isEmpty()) {
-            list.add(recipeRemainder);
+        if (recipeRemainder != null) {
+            list.add(recipeRemainder.create());
         }
         capability.insert(list);
         capability.outputForbidInsertion();
@@ -146,7 +147,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements Clearabl
         if (stackInSlot.isEmpty())
             return;
 
-        ItemParticleOption data = new ItemParticleOption(ParticleTypes.ITEM, stackInSlot);
+        ItemParticleOption data = new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stackInSlot));
         float angle = level.getRandom().nextFloat() * 360;
         Vec3 offset = new Vec3(0, 0, 0.5f);
         offset = VecHelper.rotate(offset, angle, Axis.Y);

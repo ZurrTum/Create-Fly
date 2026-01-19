@@ -13,8 +13,10 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilte
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -22,7 +24,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -38,7 +39,6 @@ import java.util.*;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, Ingredient ingredient) implements BasinRecipe {
-    public static final List<Item> SUPPORTED_CONTAINERS = List.of(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
     public static @Nullable ReloadData data;
 
     public static void register(Map<Identifier, Recipe<?>> map) {
@@ -48,9 +48,12 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
         PotionBrewing potionBrewing = PotionBrewing.bootstrap(data.enabledFeatures);
         int recipeIndex = 0;
         List<Item> allowedSupportedContainers = new ArrayList<>();
-        for (Item container : SUPPORTED_CONTAINERS) {
-            if (potionBrewing.isContainer(new ItemStack(container))) {
-                allowedSupportedContainers.add(container);
+        for (Ingredient container : potionBrewing.containers) {
+            if (container.values instanceof HolderSet.Direct<Item> direct) {
+                //noinspection OptionalGetWithoutIsPresent
+                for (Holder<Item> holder : direct.unwrap().right().get()) {
+                    allowedSupportedContainers.add(holder.value());
+                }
             }
         }
         for (Item container : allowedSupportedContainers) {

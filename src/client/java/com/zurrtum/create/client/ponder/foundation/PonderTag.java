@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.ponder.foundation;
 
+import com.google.common.base.Suppliers;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiItemRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
@@ -8,8 +9,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 public class PonderTag implements ScreenElement {
 
@@ -24,16 +28,20 @@ public class PonderTag implements ScreenElement {
     private final Identifier id;
     @Nullable
     private final Identifier textureIconLocation;
-    private final ItemStack mainItem;
-    private final @Nullable GuiItemRenderBuilder itemIcon;
+    private final @Nullable Supplier<ItemStack> mainItem;
+    private final @Nullable Supplier<GuiItemRenderBuilder> itemIcon;
 
-
-    public PonderTag(Identifier id, @Nullable Identifier textureIconLocation, ItemStack itemIcon, ItemStack mainItem) {
+    public PonderTag(
+        Identifier id,
+        @Nullable Identifier textureIconLocation,
+        @Nullable ItemStackTemplate itemIcon,
+        @Nullable ItemStackTemplate mainItem
+    ) {
         this.id = id;
         this.textureIconLocation = textureIconLocation;
-        this.mainItem = mainItem;
-        if (textureIconLocation == null && !itemIcon.isEmpty()) {
-            this.itemIcon = GuiGameElement.of(itemIcon).scale(1.25f).at(-2, -2);
+        this.mainItem = mainItem != null ? Suppliers.memoize(mainItem::create) : null;
+        if (textureIconLocation == null && itemIcon != null) {
+            this.itemIcon = Suppliers.memoize(() -> GuiGameElement.of(itemIcon.create()).scale(1.25f).at(-2, -2));
         } else {
             this.itemIcon = null;
         }
@@ -44,7 +52,7 @@ public class PonderTag implements ScreenElement {
     }
 
     public ItemStack getMainItem() {
-        return mainItem;
+        return mainItem != null ? mainItem.get() : ItemStack.EMPTY;
     }
 
     public String getTitle() {
@@ -64,14 +72,14 @@ public class PonderTag implements ScreenElement {
             poseStack.scale(0.25f, 0.25f);
             graphics.blit(RenderPipelines.GUI_TEXTURED, textureIconLocation, 0, 0, 0, 0, 0, 64, 64, 64, 64);
         } else if (itemIcon != null) {
-            itemIcon.render(graphics);
+            itemIcon.get().render(graphics);
         }
         poseStack.popMatrix();
     }
 
     public void clear() {
         if (itemIcon != null) {
-            itemIcon.clear();
+            itemIcon.get().clear();
         }
     }
 

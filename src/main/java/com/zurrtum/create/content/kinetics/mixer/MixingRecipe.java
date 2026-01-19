@@ -13,21 +13,23 @@ import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
+
 public record MixingRecipe(
-    ItemStack result, FluidStack fluidResult, HeatCondition heat, List<FluidIngredient> fluidIngredients, List<SizedIngredient> ingredients
+    Optional<ItemStackTemplate> result, FluidStack fluidResult, HeatCondition heat, List<FluidIngredient> fluidIngredients,
+    List<SizedIngredient> ingredients
 ) implements BasinRecipe {
     @Override
     public int getIngredientSize() {
@@ -53,12 +55,17 @@ public record MixingRecipe(
         if (filter == null) {
             return false;
         }
+        ItemStack stack;
         if (result.isEmpty()) {
             if (!filter.test(fluidResult)) {
                 return false;
             }
-        } else if (!filter.test(result)) {
-            return false;
+            stack = null;
+        } else {
+            stack = result.get().create();
+            if (!filter.test(stack)) {
+                return false;
+            }
         }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
         if (outputs == null) {
@@ -67,8 +74,8 @@ public record MixingRecipe(
         if (!BasinRecipe.matchFluidIngredient(input, fluidIngredients)) {
             return false;
         }
-        if (!result.isEmpty()) {
-            outputs.add(result);
+        if (stack != null) {
+            outputs.add(stack);
         }
         List<FluidStack> fluids = fluidResult.isEmpty() ? List.of() : List.of(fluidResult);
         return input.acceptOutputs(outputs, fluids, true);
@@ -87,9 +94,7 @@ public record MixingRecipe(
         if (!BasinRecipe.prepareFluidCraft(input, fluidIngredients, changes)) {
             return false;
         }
-        if (!result.isEmpty()) {
-            outputs.add(result);
-        }
+        result.map(ItemStackTemplate::create).ifPresent(outputs::add);
         List<FluidStack> fluids = fluidResult.isEmpty() ? List.of() : List.of(fluidResult);
         if (!input.acceptOutputs(outputs, fluids, true)) {
             return false;
@@ -110,7 +115,7 @@ public record MixingRecipe(
 
     public static class Serializer implements RecipeSerializer<MixingRecipe> {
         public static final MapCodec<MixingRecipe> CODEC = RecordCodecBuilder.mapCodec((Instance<MixingRecipe> instance) -> instance.group(
-            ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MixingRecipe::result),
+            ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(MixingRecipe::result),
             FluidStack.CODEC.optionalFieldOf("fluid_result", FluidStack.EMPTY).forGetter(MixingRecipe::fluidResult),
             HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(MixingRecipe::heat),
             FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
@@ -124,7 +129,7 @@ public record MixingRecipe(
             return DataResult.success(recipe);
         });
         private static final StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ItemStack.OPTIONAL_STREAM_CODEC,
+            ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs::optional),
             MixingRecipe::result,
             FluidStack.OPTIONAL_PACKET_CODEC,
             MixingRecipe::fluidResult,

@@ -4,12 +4,13 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 
 public interface CreateSingleStackRecipe extends CreateRecipe<SingleRecipeInput> {
-    ItemStack result();
+    ItemStackTemplate result();
 
     Ingredient ingredient();
 
@@ -24,6 +25,6 @@ public interface CreateSingleStackRecipe extends CreateRecipe<SingleRecipeInput>
         if (junk != null && junk.hasJunk()) {
             return junk.getJunk();
         }
-        return result().copy();
+        return result().create();
     }
 }

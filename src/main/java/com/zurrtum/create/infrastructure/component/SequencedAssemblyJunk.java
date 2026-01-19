@@ -3,14 +3,13 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
-
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
+import java.util.Random;
 
 public record SequencedAssemblyJunk(float chance, List<ChanceOutput> junks) {
     public static final Codec<SequencedAssemblyJunk> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -42,7 +41,7 @@ public record SequencedAssemblyJunk(float chance, List<ChanceOutput> junks) {
         for (ChanceOutput junk : junks) {
             number -= junk.chance();
             if (number < 0)
-                return junk.stack().copy();
+                return junk.stack().create();
         }
         return ItemStack.EMPTY;
     }
