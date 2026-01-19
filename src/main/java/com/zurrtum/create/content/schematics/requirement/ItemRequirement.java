@@ -105,7 +105,7 @@ public class ItemRequirement {
         //                ItemUseType.CONSUME,
         //                BuiltInRegistries.ITEM.get(Mods.FD.asResource("rich_soil"))
         //            );
-        if (block instanceof FarmBlock || block instanceof DirtPathBlock)
+        if (block instanceof FarmlandBlock || block instanceof DirtPathBlock)
             return new ItemRequirement(ItemUseType.CONSUME, Items.DIRT);
         if (block instanceof AbstractBannerBlock && be instanceof BannerBlockEntity bannerBE)
             return new ItemRequirement(new StrictNbtStackRequirement(bannerBE.getItem(), ItemUseType.CONSUME));

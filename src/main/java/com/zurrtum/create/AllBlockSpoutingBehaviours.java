@@ -4,7 +4,7 @@ import com.zurrtum.create.api.behaviour.spouting.BlockSpoutingBehaviour;
 import com.zurrtum.create.api.behaviour.spouting.CauldronSpoutingBehavior;
 import com.zurrtum.create.api.behaviour.spouting.StateChangingBehavior;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -14,7 +14,7 @@ public class AllBlockSpoutingBehaviours {
     public static final BlockSpoutingBehaviour FARMLAND = StateChangingBehavior.incrementingState(
         8100,
         AllBlockSpoutingBehaviours::isWater,
-        FarmBlock.MOISTURE
+        FarmlandBlock.MOISTURE
     );
     public static final BlockSpoutingBehaviour WATER_CAULDRON = StateChangingBehavior.incrementingState(
         27000,
