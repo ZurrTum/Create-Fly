@@ -5,12 +5,13 @@ import com.zurrtum.create.client.ponder.foundation.element.AnimatedOverlayElemen
 import com.zurrtum.create.client.ponder.foundation.element.AnimatedSceneElementBase;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class HideAllInstruction extends TickingInstruction {
 
-    private final Direction fadeOutTo;
+    private final @Nullable Direction fadeOutTo;
 
-    public HideAllInstruction(int fadeOutTicks, Direction fadeOutTo) {
+    public HideAllInstruction(int fadeOutTicks, @Nullable Direction fadeOutTo) {
         super(false, fadeOutTicks);
         this.fadeOutTo = fadeOutTo;
     }

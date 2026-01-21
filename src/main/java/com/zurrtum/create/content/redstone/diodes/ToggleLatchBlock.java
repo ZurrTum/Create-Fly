@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConnectBlock {
 
@@ -96,7 +97,7 @@ public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConn
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, Direction side) {
+    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
         if (side == null)
             return false;
         return side.getAxis() == state.getValue(FACING).getAxis();

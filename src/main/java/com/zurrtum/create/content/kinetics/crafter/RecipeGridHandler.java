@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -27,11 +28,12 @@ import java.util.function.Predicate;
 import static com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock.HORIZONTAL_FACING;
 
 public class RecipeGridHandler {
-
+    @Nullable
     public static List<MechanicalCrafterBlockEntity> getAllCraftersOfChain(MechanicalCrafterBlockEntity root) {
         return getAllCraftersOfChainIf(root, Predicates.alwaysTrue());
     }
 
+    @Nullable
     public static List<MechanicalCrafterBlockEntity> getAllCraftersOfChainIf(
         MechanicalCrafterBlockEntity root,
         Predicate<MechanicalCrafterBlockEntity> test
@@ -39,13 +41,14 @@ public class RecipeGridHandler {
         return getAllCraftersOfChainIf(root, test, false);
     }
 
+    @Nullable
     public static List<MechanicalCrafterBlockEntity> getAllCraftersOfChainIf(
         MechanicalCrafterBlockEntity root,
         Predicate<MechanicalCrafterBlockEntity> test,
         boolean poweredStart
     ) {
         List<MechanicalCrafterBlockEntity> crafters = new ArrayList<>();
-        List<Pair<MechanicalCrafterBlockEntity, MechanicalCrafterBlockEntity>> frontier = new ArrayList<>();
+        List<Pair<MechanicalCrafterBlockEntity, @Nullable MechanicalCrafterBlockEntity>> frontier = new ArrayList<>();
         Set<MechanicalCrafterBlockEntity> visited = new HashSet<>();
         frontier.add(Pair.of(root, null));
 
@@ -78,6 +81,7 @@ public class RecipeGridHandler {
         return empty && !poweredStart || allEmpty ? null : crafters;
     }
 
+    @Nullable
     public static MechanicalCrafterBlockEntity getTargetingCrafter(MechanicalCrafterBlockEntity crafter) {
         BlockState state = crafter.getBlockState();
         if (!isCrafter(state))
@@ -134,6 +138,7 @@ public class RecipeGridHandler {
         return state.is(AllBlocks.MECHANICAL_CRAFTER);
     }
 
+    @Nullable
     public static ItemStack tryToApplyRecipe(ServerLevel world, GroupedItems items) {
         items.calcStats();
         CraftingInput craftingInput = items.toCraftingInput();

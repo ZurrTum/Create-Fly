@@ -3,26 +3,26 @@ package com.zurrtum.create.content.decoration.steamWhistle;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleExtenderBlock.WhistleExtenderShape;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.lang.ref.WeakReference;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class WhistleBlockEntity extends SmartBlockEntity {
 
-    public WeakReference<FluidTankBlockEntity> source;
+    public WeakReference<@Nullable FluidTankBlockEntity> source;
     public int pitch;
 
     public WhistleBlockEntity(BlockPos pos, BlockState state) {
@@ -96,6 +96,7 @@ public class WhistleBlockEntity extends SmartBlockEntity {
         return pitch + 100 * getBlockState().getValueOrElse(WhistleBlock.SIZE, WhistleSize.MEDIUM).ordinal();
     }
 
+    @Nullable
     public FluidTankBlockEntity getTank() {
         FluidTankBlockEntity tank = source.get();
         if (tank == null || tank.isRemoved()) {

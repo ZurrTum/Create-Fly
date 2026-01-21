@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class ChainPackageInteractionHandler {
             return false;
         }
         double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
-        for (Map.Entry<Integer, ChainConveyorPackagePhysicsData> entry : ChainConveyorClientBehaviour.physicsDataCache.get(mc.level).asMap()
+        for (Map.Entry<Integer, @Nullable ChainConveyorPackagePhysicsData> entry : ChainConveyorClientBehaviour.physicsDataCache.get(mc.level).asMap()
             .entrySet()) {
             ChainConveyorPackagePhysicsData data = entry.getValue();
             if (data == null || data.targetPos == null || data.beReference == null)

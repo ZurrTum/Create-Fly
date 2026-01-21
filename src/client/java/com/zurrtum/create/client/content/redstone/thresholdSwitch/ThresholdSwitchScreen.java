@@ -31,6 +31,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ThresholdSwitchScreen extends AbstractSimiScreen {
 
     private ScrollInput offBelow;
     private ScrollInput onAbove;
-    private SelectionScrollInput inStacks;
+    private @Nullable SelectionScrollInput inStacks;
 
     private IconButton confirmButton;
     private IconButton flipSignals;

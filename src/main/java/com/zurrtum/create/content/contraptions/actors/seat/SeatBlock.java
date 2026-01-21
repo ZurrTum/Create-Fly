@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -61,6 +62,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return withWater(super.getStateForPlacement(pContext), pContext);
     }

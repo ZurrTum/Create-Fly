@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class BrassFunnelBlock extends FunnelBlock {
 
@@ -13,7 +14,7 @@ public class BrassFunnelBlock extends FunnelBlock {
     }
 
     @Override
-    public BlockState getEquivalentBeltFunnel(BlockGetter world, BlockPos pos, BlockState state) {
+    public BlockState getEquivalentBeltFunnel(@Nullable BlockGetter world, @Nullable BlockPos pos, BlockState state) {
         Direction facing = getFacing(state);
         return AllBlocks.BRASS_BELT_FUNNEL.defaultBlockState().setValue(BeltFunnelBlock.HORIZONTAL_FACING, facing)
             .setValue(POWERED, state.getValue(POWERED));

@@ -22,28 +22,28 @@ public class CreateLuaTable implements LuaTable<Object, Object> {
     public boolean getBoolean(String key) throws LuaException {
         Object value = get(key);
 
-        if (!(value instanceof Boolean))
+        if (!(value instanceof Boolean bool))
             throw LuaValues.badField(key, "boolean", LuaValues.getType(value));
 
-        return (Boolean) value;
+        return bool;
     }
 
     public String getString(String key) throws LuaException {
         Object value = get(key);
 
-        if (!(value instanceof String))
+        if (!(value instanceof String str))
             throw LuaValues.badField(key, "string", LuaValues.getType(value));
 
-        return (String) value;
+        return str;
     }
 
     public CreateLuaTable getTable(String key) throws LuaException {
         Object value = get(key);
 
-        if (!(value instanceof Map<?, ?>))
+        if (!(value instanceof Map<?, ?> m))
             throw LuaValues.badField(key, "table", LuaValues.getType(value));
 
-        return new CreateLuaTable((Map<?, ?>) value);
+        return new CreateLuaTable(m);
     }
 
     public Optional<Boolean> getOptBoolean(String key) throws LuaException {
@@ -52,20 +52,20 @@ public class CreateLuaTable implements LuaTable<Object, Object> {
         if (value == null)
             return Optional.empty();
 
-        if (!(value instanceof Boolean))
+        if (!(value instanceof Boolean bool))
             throw LuaValues.badField(key, "boolean", LuaValues.getType(value));
 
-        return Optional.of((Boolean) value);
+        return Optional.of(bool);
     }
 
     public Set<String> stringKeySet() throws LuaException {
         Set<String> stringSet = new HashSet<>();
 
         for (Object key : keySet()) {
-            if (!(key instanceof String))
+            if (!(key instanceof String str))
                 throw new LuaException("key " + key + " is not string (got " + LuaValues.getType(key) + ")");
 
-            stringSet.add((String) key);
+            stringSet.add(str);
         }
 
         return Collections.unmodifiableSet(stringSet);
@@ -77,10 +77,10 @@ public class CreateLuaTable implements LuaTable<Object, Object> {
         for (int i = 1; i <= size(); i++) {
             Object value = get((double) i);
 
-            if (!(value instanceof Map<?, ?>))
+            if (!(value instanceof Map<?, ?> m))
                 throw new LuaException("value " + value + " is not table (got " + LuaValues.getType(value) + ")");
 
-            tables.add(new CreateLuaTable((Map<?, ?>) value));
+            tables.add(new CreateLuaTable(m));
         }
 
         return Collections.unmodifiableList(tables);
@@ -137,6 +137,7 @@ public class CreateLuaTable implements LuaTable<Object, Object> {
     }
 
     @Override
+    @Nullable
     public Object get(Object o) {
         return map.get(o);
     }

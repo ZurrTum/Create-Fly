@@ -4,6 +4,7 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.WorldAttached;
+import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.content.fluids.pipes.EncasedPipeBlock;
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
@@ -185,7 +186,7 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
     }
 
     @Nullable
-    public PipeConnection.Flow getFlow(Direction side) {
+    public Flow getFlow(Direction side) {
         createConnectionData();
         if (!interfaces.containsKey(side))
             return null;

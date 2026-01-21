@@ -32,7 +32,7 @@ public class RecipeTrie<R extends Recipe<?>> {
 
     private final IntArrayTrie<R> trie;
     private final Object2IntMap<AbstractVariant> variantToId;
-    private final Int2ObjectMap<IntSet> variantToIngredients;
+    private final Int2ObjectMap<@Nullable IntSet> variantToIngredients;
     private final int universalIngredientId;
 
     private final Cache<Set<AbstractVariant>, IntSet> ingredientCache = CacheBuilder.newBuilder().maximumSize(MAX_CACHE_SIZE).build();
@@ -138,10 +138,10 @@ public class RecipeTrie<R extends Recipe<?>> {
 
         private int getOrAssignId(AbstractIngredient ingredient) {
             return ingredientToId.computeIfAbsent(
-                ingredient, $ -> {
+                ingredient, _ -> {
                     int id = nextIngredientId++;
                     for (AbstractVariant variant : ingredient.variants) {
-                        variantToIngredients.computeIfAbsent(getOrAssignId(variant), $1 -> new IntOpenHashSet()).add(id);
+                        variantToIngredients.computeIfAbsent(getOrAssignId(variant), _ -> new IntOpenHashSet()).add(id);
                     }
                     return id;
                 }
@@ -149,17 +149,17 @@ public class RecipeTrie<R extends Recipe<?>> {
         }
 
         private int getOrAssignId(AbstractVariant variant) {
-            return variantToId.computeIfAbsent(variant, $ -> nextVariantId++);
+            return variantToId.computeIfAbsent(variant, _ -> nextVariantId++);
         }
 
         private AbstractVariant getOrAssignVariant(Item item) {
-            AbstractVariant variant = variantCache.computeIfAbsent(item, $ -> new AbstractVariant.AbstractItem(item));
+            AbstractVariant variant = variantCache.computeIfAbsent(item, _ -> new AbstractVariant.AbstractItem(item));
             getOrAssignId(variant);
             return variant;
         }
 
         private AbstractVariant getOrAssignVariant(Fluid fluid) {
-            AbstractVariant variant = variantCache.computeIfAbsent(fluid, $ -> new AbstractVariant.AbstractFluid(fluid));
+            AbstractVariant variant = variantCache.computeIfAbsent(fluid, _ -> new AbstractVariant.AbstractFluid(fluid));
             getOrAssignId(variant);
             return variant;
         }

@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public interface SidedFluidInventory extends FluidInventory {
-    boolean canExtract(int slot, FluidStack stack, Direction dir);
+    boolean canExtract(int slot, FluidStack stack, @Nullable Direction dir);
 
     boolean canInsert(int slot, FluidStack stack, @Nullable Direction dir);
 
@@ -23,7 +23,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int count(FluidStack stack, Direction side) {
+    default int count(FluidStack stack, @Nullable Direction side) {
         int maxAmount = stack.getAmount();
         if (maxAmount == 0) {
             return 0;
@@ -37,7 +37,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int count(FluidStack stack, int maxAmount, Direction side) {
+    default int count(FluidStack stack, int maxAmount, @Nullable Direction side) {
         int amount = 0;
         for (int slot : getAvailableSlots(side)) {
             if (canExtract(slot, stack, side)) {
@@ -62,7 +62,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack count(Predicate<FluidStack> predicate, Direction side) {
+    default FluidStack count(Predicate<FluidStack> predicate, @Nullable Direction side) {
         for (int slot : getAvailableSlots(side)) {
             FluidStack stack = getStack(slot);
             if (stack.isEmpty()) {
@@ -81,7 +81,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack count(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+    default FluidStack count(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return FluidStack.EMPTY;
         }
@@ -123,7 +123,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack countAny(Direction side) {
+    default FluidStack countAny(@Nullable Direction side) {
         for (int slot : getAvailableSlots(side)) {
             FluidStack target = getStack(slot);
             if (target.isEmpty()) {
@@ -142,7 +142,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack countAny(int maxAmount, Direction side) {
+    default FluidStack countAny(int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return FluidStack.EMPTY;
         }
@@ -184,7 +184,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int countSpace(FluidStack stack, Direction side) {
+    default int countSpace(FluidStack stack, @Nullable Direction side) {
         int maxAmount = stack.getAmount();
         if (maxAmount == 0) {
             return 0;
@@ -198,7 +198,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int countSpace(FluidStack stack, int maxAmount, Direction side) {
+    default int countSpace(FluidStack stack, int maxAmount, @Nullable Direction side) {
         int amount = 0;
         for (int slot : getAvailableSlots(side)) {
             if (canInsert(slot, stack, side) && isValid(slot, stack)) {
@@ -225,7 +225,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default boolean countSpace(List<FluidStack> stacks, Direction side) {
+    default boolean countSpace(List<FluidStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -295,7 +295,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int extract(FluidStack stack, Direction side) {
+    default int extract(FluidStack stack, @Nullable Direction side) {
         int maxAmount = stack.getAmount();
         if (maxAmount == 0) {
             return 0;
@@ -309,7 +309,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int extract(FluidStack stack, int maxAmount, Direction side) {
+    default int extract(FluidStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         for (int slot : getAvailableSlots(side)) {
             if (canExtract(slot, stack, side)) {
@@ -346,7 +346,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack extract(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+    default FluidStack extract(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return FluidStack.EMPTY;
         }
@@ -407,7 +407,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack extract(Predicate<FluidStack> predicate, Direction side) {
+    default FluidStack extract(Predicate<FluidStack> predicate, @Nullable Direction side) {
         for (int slot : getAvailableSlots(side)) {
             FluidStack stack = getStack(slot);
             if (stack.isEmpty()) {
@@ -435,7 +435,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int insert(FluidStack stack, Direction side) {
+    default int insert(FluidStack stack, @Nullable Direction side) {
         int maxAmount = stack.getAmount();
         if (maxAmount == 0) {
             return 0;
@@ -444,7 +444,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int insert(FluidStack stack, int maxAmount, Direction side) {
+    default int insert(FluidStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         for (int slot : getAvailableSlots(side)) {
             if (canInsert(slot, stack, side) && isValid(slot, stack)) {
@@ -485,7 +485,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default List<FluidStack> insert(List<FluidStack> stacks, Direction side) {
+    default List<FluidStack> insert(List<FluidStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return stacks;
@@ -591,7 +591,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default int insertExist(FluidStack stack, Direction side) {
+    default int insertExist(FluidStack stack, @Nullable Direction side) {
         if (stack.isEmpty()) {
             return 0;
         }
@@ -640,8 +640,8 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default java.util.Iterator<FluidStack> iterator(Direction side) {
-        return new com.zurrtum.create.infrastructure.fluids.SidedFluidInventory.Iterator(this, side);
+    default java.util.Iterator<FluidStack> iterator(@Nullable Direction side) {
+        return new Iterator(this, side);
     }
 
     @Override
@@ -650,7 +650,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default boolean preciseExtract(FluidStack stack, Direction side) {
+    default boolean preciseExtract(FluidStack stack, @Nullable Direction side) {
         if (stack.isEmpty()) {
             return true;
         }
@@ -690,7 +690,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default FluidStack preciseExtract(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+    default FluidStack preciseExtract(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return FluidStack.EMPTY;
         }
@@ -752,7 +752,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default boolean preciseInsert(FluidStack stack, Direction side) {
+    default boolean preciseInsert(FluidStack stack, @Nullable Direction side) {
         int maxAmount = stack.getAmount();
         if (maxAmount == 0) {
             return true;
@@ -766,7 +766,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default boolean preciseInsert(FluidStack stack, int maxAmount, Direction side) {
+    default boolean preciseInsert(FluidStack stack, int maxAmount, @Nullable Direction side) {
         List<Runnable> changes = new ArrayList<>();
         for (int slot : getAvailableSlots(side)) {
             if (canInsert(slot, stack, side) && isValid(slot, stack)) {
@@ -807,7 +807,7 @@ public interface SidedFluidInventory extends FluidInventory {
     }
 
     @Override
-    default boolean preciseInsert(List<FluidStack> stacks, Direction side) {
+    default boolean preciseInsert(List<FluidStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -878,12 +878,12 @@ public interface SidedFluidInventory extends FluidInventory {
 
     class Iterator implements java.util.Iterator<FluidStack> {
         private final SidedFluidInventory inventory;
-        private final Direction side;
+        private final @Nullable Direction side;
         private final int[] slots;
         private int index;
         private int current = -1;
 
-        public Iterator(SidedFluidInventory inventory, Direction side) {
+        public Iterator(SidedFluidInventory inventory, @Nullable Direction side) {
             this.inventory = inventory;
             this.side = side;
             this.slots = inventory.getAvailableSlots(side);

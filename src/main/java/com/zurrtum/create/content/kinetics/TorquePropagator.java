@@ -3,11 +3,11 @@ package com.zurrtum.create.content.kinetics;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.levelWrappers.WorldHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import net.minecraft.world.level.LevelAccessor;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import net.minecraft.world.level.LevelAccessor;
 
 public class TorquePropagator {
 
@@ -23,6 +23,7 @@ public class TorquePropagator {
         Create.LOGGER.debug("Removed Kinetic Network Space for " + WorldHelper.getDimensionID(world));
     }
 
+    @Nullable
     public KineticNetwork getOrCreateNetworkFor(KineticBlockEntity be) {
         Long id = be.network;
         KineticNetwork network;
@@ -31,8 +32,7 @@ public class TorquePropagator {
             return null;
 
         if (!map.containsKey(id)) {
-            network = new KineticNetwork();
-            network.id = be.network;
+            network = new KineticNetwork(id);
             map.put(id, network);
         }
         network = map.get(id);

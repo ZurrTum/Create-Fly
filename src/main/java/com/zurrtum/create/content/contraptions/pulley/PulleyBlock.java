@@ -159,8 +159,7 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
         @Override
         public BlockState getStateForPlacement(BlockPlaceContext context) {
             FluidState FluidState = context.getLevel().getFluidState(context.getClickedPos());
-            return super.getStateForPlacement(context)
-                .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
+            return super.getStateForPlacement(context).setValue(BlockStateProperties.WATERLOGGED, FluidState.getType() == Fluids.WATER);
         }
 
     }

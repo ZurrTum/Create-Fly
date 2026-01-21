@@ -55,17 +55,18 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, PackagerBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, PackagerBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.inventory;
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferredFacing = null;
         for (Direction face : context.getNearestLookingDirections()) {

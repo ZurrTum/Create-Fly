@@ -20,12 +20,12 @@ public class ComputerScreen extends AbstractSimiScreen {
     private final AllGuiTextures background = AllGuiTextures.COMPUTER;
 
     private final Supplier<Component> displayTitle;
-    private final AdditionalRenderer additionalRenderer;
+    private final @Nullable AdditionalRenderer additionalRenderer;
     private final Screen previousScreen;
     private final Supplier<Boolean> hasAttachedComputer;
 
-    private ElementWidget computerWidget;
-    private IconButton confirmButton;
+    private @Nullable ElementWidget computerWidget;
+    private @Nullable IconButton confirmButton;
 
     public ComputerScreen(
         Component title,

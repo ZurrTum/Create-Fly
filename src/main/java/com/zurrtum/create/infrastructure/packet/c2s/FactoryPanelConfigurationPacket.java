@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.Map;
 
 public record FactoryPanelConfigurationPacket(
     FactoryPanelPosition position, String address, Map<FactoryPanelPosition, Integer> inputAmounts, List<ItemStack> craftingArrangement,
-    int outputAmount, int promiseClearingInterval, FactoryPanelPosition removeConnection, boolean clearPromises, boolean reset, boolean redstoneReset
+    int outputAmount, int promiseClearingInterval, @Nullable FactoryPanelPosition removeConnection, boolean clearPromises, boolean reset,
+    boolean redstoneReset
 ) implements Packet<ServerGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, FactoryPanelConfigurationPacket> CODEC = CatnipLargerStreamCodecs.composite(
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelConfigurationPacket::position,

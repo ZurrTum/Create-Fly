@@ -72,7 +72,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     public final Map<Entity, MutableInt> collidingEntities;
 
-    protected Contraption contraption;
+    protected @Nullable Contraption contraption;
     protected boolean initialized;
     protected boolean prevPosInvalid;
     private boolean skipActorStop;
@@ -92,7 +92,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         collidingEntities = new IdentityHashMap<>();
     }
 
-    protected void setContraption(Contraption contraption) {
+    protected void setContraption(@Nullable Contraption contraption) {
         this.contraption = contraption;
         if (contraption == null)
             return;
@@ -208,6 +208,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         );
     }
 
+    @Nullable
     public Vec3 getPassengerPosition(Entity passenger, float partialTicks) {
         if (contraption == null)
             return null;
@@ -225,12 +226,11 @@ public abstract class AbstractContraptionEntity extends Entity {
         if (seat == null)
             return null;
 
-        Vec3 transformedVector = toGlobalVector(
+        return toGlobalVector(
             Vec3.atLowerCornerOf(seat)
                 .add(.5, -passenger.getVehicleAttachmentPoint(this).y + ySize + .125 - SeatEntity.getCustomEntitySeatOffset(passenger), .5),
             partialTicks
         ).add(VecHelper.getCenterOf(BlockPos.ZERO)).subtract(0.5, ySize, 0.5);
-        return transformedVector;
     }
 
     @Override
@@ -252,7 +252,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         entityData.set(CONTROLLED_BY, player == null ? Optional.empty() : Optional.of(player.getUUID()));
     }
 
-    public boolean startControlling(BlockPos controlsLocalPos, Player player) {
+    public boolean startControlling(BlockPos controlsLocalPos, @Nullable Player player) {
         return false;
     }
 
@@ -698,6 +698,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     protected void doWaterSplashEffect() {
     }
 
+    @Nullable
     public Contraption getContraption() {
         return contraption;
     }
@@ -813,7 +814,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         public float zRotation = 0;
         public float secondYRotation = 0;
 
-        Matrix3d matrix;
+        @Nullable Matrix3d matrix;
 
         public Matrix3d asMatrix() {
             if (matrix != null)
@@ -875,7 +876,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     public boolean isAliveOrStale() {
-        return isAlive() || level().isClientSide() ? staleTicks > 0 : false;
+        return (isAlive() || level().isClientSide()) && staleTicks > 0;
     }
 
     public boolean isPrevPosInvalid() {

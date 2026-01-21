@@ -358,7 +358,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
                 groupedItems.mergeOnto(targetingCrafter.groupedItems, pointing);
                 groupedItems = new GroupedItems();
 
-                float pitch = targetingCrafter.groupedItems.grid.size() * 1 / 16f + .5f;
+                float pitch = targetingCrafter.groupedItems.grid.size() / 16f + .5f;
 
                 if (!empty)
                     AllSoundEvents.CRAFTER_CLICK.playOnServer(level, worldPosition, 1, pitch);
@@ -436,6 +436,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
         return behaviour != null && behaviour.canInsertFromSide(getTargetDirection());
     }
 
+    @Nullable
     protected DirectBeltInputBehaviour getTargetingBelt() {
         BlockPos targetPos = worldPosition.relative(getTargetDirection());
         return BlockEntityBehaviour.get(level, targetPos, DirectBeltInputBehaviour.TYPE);

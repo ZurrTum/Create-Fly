@@ -190,6 +190,7 @@ public class EjectorItemEntity extends ItemEntity {
         setDeltaMovement(ejectMotionVec);
     }
 
+    @Nullable
     private DirectBeltInputBehaviour getTargetOpenInv() {
         BlockPos targetPos = earlyTarget != null ? earlyTarget.getSecond() : blockPosition().above(launcher.getVerticalDistance())
             .relative(getNearestViewDirection(), Math.max(1, launcher.getHorizontalDistance()));

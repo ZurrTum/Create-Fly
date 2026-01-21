@@ -24,16 +24,17 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class TrackTargetingClient {
 
-    static BlockPos lastHovered;
+    static @Nullable BlockPos lastHovered;
     static boolean lastDirection;
-    static EdgePointType<?> lastType;
-    static BezierTrackPointLocation lastHoveredBezierSegment;
+    static @Nullable EdgePointType<?> lastType;
+    static @Nullable BezierTrackPointLocation lastHoveredBezierSegment;
 
-    static OverlapResult lastResult;
-    static TrackGraphLocation lastLocation;
+    static @Nullable OverlapResult lastResult;
+    static @Nullable TrackGraphLocation lastLocation;
 
     public static void clientTick(Minecraft mc) {
         LocalPlayer player = mc.player;

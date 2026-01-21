@@ -30,16 +30,16 @@ public class Navigation {
 
     public Train train;
 
-    public GlobalStation destination;
+    public @Nullable GlobalStation destination;
     public double distanceToDestination;
     public double distanceStartedAt;
     public boolean destinationBehindTrain;
     public boolean announceArrival;
     List<Couple<TrackNode>> currentPath;
 
-    private TravellingPoint signalScout;
-    public Pair<UUID, Boolean> waitingForSignal;
-    private Map<UUID, Pair<SignalBoundary, Boolean>> waitingForChainedGroups;
+    private final TravellingPoint signalScout;
+    public @Nullable Pair<@Nullable UUID, Boolean> waitingForSignal;
+    private final Map<UUID, Pair<SignalBoundary, Boolean>> waitingForChainedGroups;
     public double distanceToSignal;
     public int ticksWaitingForSignal;
 
@@ -93,7 +93,7 @@ public class Navigation {
                 waitingForSignal = null;
             }
 
-            TravellingPoint leadingPoint = !destinationBehindTrain ? train.carriages.get(0)
+            TravellingPoint leadingPoint = !destinationBehindTrain ? train.carriages.getFirst()
                 .getLeadingPoint() : train.carriages.get(train.carriages.size() - 1).getTrailingPoint();
 
             if (waitingForSignal == null) {
@@ -113,7 +113,7 @@ public class Navigation {
                 double scanDistance = Mth.clamp(brakingDistanceNoFlicker, preDepartureLookAhead, distanceToDestination);
 
                 MutableDouble crossSignalDistanceTracker = new MutableDouble(-1);
-                MutableObject<Pair<UUID, Boolean>> trackingCrossSignal = new MutableObject<>(null);
+                MutableObject<@Nullable Pair<UUID, Boolean>> trackingCrossSignal = new MutableObject<>(null);
                 waitingForChainedGroups.clear();
 
                 // Adding 50 to the distance due to unresolved inaccuracies in
@@ -121,7 +121,7 @@ public class Navigation {
                 signalScout.travel(
                     train.graph, (distanceToDestination + 50) * speedMod, controlSignalScout(), (distance, couple) -> {
                         // > scanDistance and not following down a cross signal
-                        boolean crossSignalTracked = trackingCrossSignal.getValue() != null;
+                        boolean crossSignalTracked = trackingCrossSignal.get() != null;
                         if (!crossSignalTracked && distance > scanDistance)
                             return true;
 
@@ -158,23 +158,21 @@ public class Navigation {
                             return false;
                         }
 
-                        if (crossSignalTracked) {
-                            waitingForChainedGroups.put(entering, Pair.of(signal, primary)); // Add group to chain
-                            if (occupied) { // Section is occupied, but wait at the cross signal that started the chain
-                                waitingForSignal = trackingCrossSignal.getValue();
-                                distanceToSignal = crossSignalDistanceTracker.doubleValue();
-                                if (!crossSignal)
-                                    return true; // Entry signals end a chain
-                            }
-                            if (!crossSignal) {
-                                if (distance < distanceToSignal + .25) {
-                                    // Collect and reset the signal chain because none were blocked
-                                    trackingCrossSignal.setValue(null);
-                                    reserveChain();
-                                    return false;
-                                } else
-                                    return true; // End of a blocked signal chain
-                            }
+                        waitingForChainedGroups.put(entering, Pair.of(signal, primary)); // Add group to chain
+                        if (occupied) { // Section is occupied, but wait at the cross signal that started the chain
+                            waitingForSignal = trackingCrossSignal.getValue();
+                            distanceToSignal = crossSignalDistanceTracker.doubleValue();
+                            if (!crossSignal)
+                                return true; // Entry signals end a chain
+                        }
+                        if (!crossSignal) {
+                            if (distance < distanceToSignal + .25) {
+                                // Collect and reset the signal chain because none were blocked
+                                trackingCrossSignal.setValue(null);
+                                reserveChain();
+                                return false;
+                            } else
+                                return true; // End of a blocked signal chain
                         }
 
                         return false;
@@ -196,7 +194,7 @@ public class Navigation {
                     }
                 );
 
-                if (trackingCrossSignal.getValue() != null && waitingForSignal == null)
+                if (trackingCrossSignal.get() != null && waitingForSignal == null)
                     reserveChain();
 
                 distanceToNextCurve = curveDistanceTracker.floatValue();
@@ -334,16 +332,16 @@ public class Navigation {
         List<Map.Entry<TrackNode, TrackEdge>> options
     ) {
         if (path.isEmpty())
-            return options.get(0);
-        Couple<TrackNode> nodes = path.get(0);
+            return options.getFirst();
+        Couple<TrackNode> nodes = path.getFirst();
         TrackEdge targetEdge = graph.getConnection(nodes);
         for (Map.Entry<TrackNode, TrackEdge> entry : options) {
             if (entry.getValue() != targetEdge)
                 continue;
-            path.remove(0);
+            path.removeFirst();
             return entry;
         }
-        return options.get(0);
+        return options.getFirst();
     }
 
     public void cancelNavigation() {
@@ -357,7 +355,7 @@ public class Navigation {
         train.reservedSignalBlocks.clear();
     }
 
-    public double startNavigation(DiscoveredPath pathTo) {
+    public double startNavigation(@Nullable DiscoveredPath pathTo) {
         boolean noneFound = pathTo == null;
         double distance = noneFound ? -1 : Math.abs(pathTo.distance);
         double cost = noneFound ? -1 : pathTo.cost;
@@ -425,14 +423,14 @@ public class Navigation {
         if (graph == null)
             return null;
 
-        Couple<DiscoveredPath> results = Couple.create(null, null);
+        Couple<@Nullable DiscoveredPath> results = Couple.create(null, null);
         for (boolean forward : Iterate.trueAndFalse) {
 
             // When updating destinations midtransit, avoid reversing out of path
             if (this.destination != null && destinationBehindTrain == forward)
                 continue;
 
-            TravellingPoint initialPoint = forward ? train.carriages.get(0).getLeadingPoint() : train.carriages.get(train.carriages.size() - 1)
+            TravellingPoint initialPoint = forward ? train.carriages.getFirst().getLeadingPoint() : train.carriages.get(train.carriages.size() - 1)
                 .getTrailingPoint();
             TrackEdge initialEdge = forward ? initialPoint.edge : graph.getConnectionsFrom(initialPoint.node2).get(initialPoint.node1);
 
@@ -452,7 +450,7 @@ public class Navigation {
                                 if (edgeReached == initialEdge)
                                     break;
                                 if (backTrack.getFirst())
-                                    currentPath.add(0, toReach);
+                                    currentPath.addFirst(toReach);
                                 toReach = backTrack.getSecond();
                                 edgeReached = graph.getConnection(toReach);
                                 backTrack = reachedVia.get(edgeReached);
@@ -480,18 +478,19 @@ public class Navigation {
         if (backEmpty || !canDriveBackward)
             return canDriveForward ? front : null;
         if (frontEmpty || !canDriveForward)
-            return canDriveBackward ? back : null;
+            return back;
 
         boolean frontBetter = maxCost == -1 ? -back.distance > front.distance : back.cost > front.cost;
         return frontBetter ? front : back;
     }
 
+    @Nullable
     public GlobalStation findNearestApproachable(boolean forward) {
         TrackGraph graph = train.graph;
         if (graph == null)
             return null;
 
-        MutableObject<GlobalStation> result = new MutableObject<>(null);
+        MutableObject<@Nullable GlobalStation> result = new MutableObject<>(null);
         double acceleration = train.acceleration();
         double minDistance = .75f * (train.speed * train.speed) / (2 * acceleration);
         double maxDistance = Math.max(32, 1.5f * (train.speed * train.speed) / (2 * acceleration));
@@ -513,14 +512,20 @@ public class Navigation {
             }
         );
 
-        return result.getValue();
+        return result.get();
     }
 
-    public void search(double maxDistance, boolean forward, ArrayList<GlobalStation> destinations, StationTest stationTest) {
+    public void search(double maxDistance, boolean forward, @Nullable ArrayList<GlobalStation> destinations, StationTest stationTest) {
         search(maxDistance, -1, forward, destinations, stationTest);
     }
 
-    public void search(double maxDistance, double maxCost, boolean forward, ArrayList<GlobalStation> destinations, StationTest stationTest) {
+    public void search(
+        double maxDistance,
+        double maxCost,
+        boolean forward,
+        @Nullable ArrayList<GlobalStation> destinations,
+        StationTest stationTest
+    ) {
         TrackGraph graph = train.graph;
         if (graph == null)
             return;
@@ -563,8 +568,7 @@ public class Navigation {
             }
         }
 
-        TravellingPoint startingPoint = forward ? train.carriages.get(0).getLeadingPoint() : train.carriages.get(train.carriages.size() - 1)
-            .getTrailingPoint();
+        TravellingPoint startingPoint = forward ? train.carriages.getFirst().getLeadingPoint() : train.carriages.getLast().getTrailingPoint();
 
         Set<TrackEdge> visited = new HashSet<>();
         Map<TrackEdge, Pair<Boolean, Couple<TrackNode>>> reachedVia = new IdentityHashMap<>();
@@ -785,7 +789,7 @@ public class Navigation {
         }
     }
 
-    private class FrontierEntry implements Comparable<FrontierEntry> {
+    private static class FrontierEntry implements Comparable<FrontierEntry> {
 
         double distance;
         int penalty;
@@ -895,7 +899,7 @@ public class Navigation {
         return map.build(empty);
     }
 
-    public void read(ValueInput view, TrackGraph graph, DimensionPalette dimensions) {
+    public void read(ValueInput view, @Nullable TrackGraph graph, DimensionPalette dimensions) {
         if (graph == null) {
             destination = null;
             return;
@@ -931,7 +935,7 @@ public class Navigation {
         ticksWaitingForSignal = view.getIntOr("TicksWaitingForSignal", 0);
     }
 
-    public <T> void decode(DynamicOps<T> ops, T input, TrackGraph graph, DimensionPalette dimensions) {
+    public <T> void decode(DynamicOps<T> ops, T input, @Nullable TrackGraph graph, DimensionPalette dimensions) {
         if (graph == null) {
             destination = null;
             return;
@@ -977,8 +981,8 @@ public class Navigation {
 
         boolean nullEntriesPresent = false;
 
-        for (Iterator<Couple<TrackNode>> iterator = currentPath.iterator(); iterator.hasNext(); ) {
-            Couple<TrackNode> couple = iterator.next();
+        for (Iterator<@Nullable Couple<@Nullable TrackNode>> iterator = currentPath.iterator(); iterator.hasNext(); ) {
+            Couple<@Nullable TrackNode> couple = iterator.next();
             if (couple == null || couple.getFirst() == null || couple.getSecond() == null) {
                 iterator.remove();
                 nullEntriesPresent = true;

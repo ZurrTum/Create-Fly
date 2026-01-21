@@ -18,12 +18,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 
 public class ValveHandleBlock extends HandCrankBlock {
 
-    public final DyeColor color;
+    public final @Nullable DyeColor color;
 
     public static ValveHandleBlock copper(Properties properties) {
         return new ValveHandleBlock(properties, null);
@@ -33,7 +34,7 @@ public class ValveHandleBlock extends HandCrankBlock {
         return properties -> new ValveHandleBlock(properties, color);
     }
 
-    private ValveHandleBlock(Properties properties, DyeColor color) {
+    private ValveHandleBlock(Properties properties, @Nullable DyeColor color) {
         super(properties);
         this.color = color;
     }
@@ -48,7 +49,7 @@ public class ValveHandleBlock extends HandCrankBlock {
         return AllShapes.VALVE_HANDLE.get(pState.getValue(FACING));
     }
 
-    public static ValveHandleBlock getColorBlock(DyeColor color) {
+    public static ValveHandleBlock getColorBlock(@Nullable DyeColor color) {
         return switch (color) {
             case null -> AllBlocks.COPPER_VALVE_HANDLE;
             case WHITE -> AllBlocks.WHITE_VALVE_HANDLE;
@@ -83,7 +84,7 @@ public class ValveHandleBlock extends HandCrankBlock {
         BlockPos pos,
         Player player,
         InteractionHand hand,
-        BlockHitResult hitResult
+        @Nullable BlockHitResult hitResult
     ) {
         DyeColor color = AllItemTags.getDyeColor(heldItem);
 

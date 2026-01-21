@@ -11,8 +11,8 @@ import org.joml.Matrix3x2f;
 import org.jspecify.annotations.Nullable;
 
 public record ItemTransformRenderState(
-    TrackingItemStackRenderState state, Matrix3x2f pose, ScreenRectangle bounds, int x0, int y0, int x1, int y1, int padding, float scale, float xRot,
-    float yRot, float zRot, @Nullable ScreenRectangle scissorArea
+    TrackingItemStackRenderState state, Matrix3x2f pose, @Nullable ScreenRectangle bounds, int x0, int y0, int x1, int y1, int padding, float scale,
+    float xRot, float yRot, float zRot, @Nullable ScreenRectangle scissorArea
 ) implements PictureInPictureRenderState {
     public static ItemTransformRenderState create(
         GuiGraphics graphics,

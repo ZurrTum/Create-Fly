@@ -9,6 +9,7 @@ import com.zurrtum.create.client.flywheel.api.model.Mesh;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -61,6 +62,7 @@ class MeshEmitter {
         numBufferBuildersPopulated = 0;
     }
 
+    @Nullable
     public BufferBuilder getBuffer(boolean shade, boolean ao) {
         Material material = manager.getMaterial(renderType, shade, ao);
         return material != null ? getBuffer(material) : null;

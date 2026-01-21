@@ -12,7 +12,7 @@ import com.zurrtum.create.content.contraptions.actors.contraptionControls.Contra
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -37,7 +37,7 @@ public class ContraptionControlsRenderer extends SmartBlockEntityRenderer<Contra
         ContraptionControlsRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         Direction facing = state.blockState.getValue(ContraptionControlsBlock.FACING).getOpposite();

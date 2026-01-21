@@ -42,6 +42,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Supplier;
@@ -213,7 +214,7 @@ public class FrogAndConveyorScenes {
 
     public static class ChainConveyorParrotElement extends ParrotElementImpl {
 
-        private ItemEntity wrench;
+        private @Nullable ItemEntity wrench;
 
         public ChainConveyorParrotElement(Vec3 location, Supplier<? extends ParrotPose> pose) {
             super(location, pose);
@@ -455,7 +456,7 @@ public class FrogAndConveyorScenes {
 
         scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog)).placeNearTarget();
         scene.idle(5);
-        scene.overlay().showText(55).colored(PonderPalette.OUTPUT).text("\u2192 Peter").pointAt(util.vector().centerOf(util.grid().at(0, 2, 5)))
+        scene.overlay().showText(55).colored(PonderPalette.OUTPUT).text("→ Peter").pointAt(util.vector().centerOf(util.grid().at(0, 2, 5)))
             .placeNearTarget();
 
         scene.idle(60);
@@ -520,11 +521,7 @@ public class FrogAndConveyorScenes {
         PonderHilo.packagerCreate(scene, util.grid().at(5, 1, 2), box);
         scene.idle(30);
 
-        scene.world().modifyBlockEntity(
-            util.grid().at(5, 1, 2), PackagerBlockEntity.class, be -> {
-                be.heldBox = ItemStack.EMPTY;
-            }
-        );
+        scene.world().modifyBlockEntity(util.grid().at(5, 1, 2), PackagerBlockEntity.class, be -> be.heldBox = ItemStack.EMPTY);
         scene.world().modifyBlockEntity(fromFrog, FrogportBlockEntity.class, be -> be.startAnimation(box, true));
 
         scene.idle(40);

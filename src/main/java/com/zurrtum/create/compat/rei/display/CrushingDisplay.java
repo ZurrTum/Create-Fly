@@ -15,6 +15,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs,
         )
     );
 
+    @Nullable
     public static CrushingDisplay of(RecipeHolder<?> entry) {
         Identifier id = entry.id().identifier();
         Recipe<?> recipe = entry.value();

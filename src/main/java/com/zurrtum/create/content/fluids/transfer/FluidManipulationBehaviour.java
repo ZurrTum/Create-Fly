@@ -23,6 +23,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ public abstract class FluidManipulationBehaviour extends BlockEntityBehaviour<Sm
         private static final long serialVersionUID = 1L;
     }
 
-    BoundingBox affectedArea;
-    BlockPos rootPos;
+    @Nullable BoundingBox affectedArea;
+    @Nullable BlockPos rootPos;
     boolean infinite;
     protected boolean counterpartActed;
 
@@ -139,7 +140,7 @@ public abstract class FluidManipulationBehaviour extends BlockEntityBehaviour<Sm
     }
 
     protected Fluid search(
-        Fluid fluid,
+        @Nullable Fluid fluid,
         List<BlockPosEntry> frontier,
         Set<BlockPos> visited,
         BiConsumer<BlockPos, Integer> add,
@@ -152,7 +153,7 @@ public abstract class FluidManipulationBehaviour extends BlockEntityBehaviour<Sm
         int i;
 
         for (i = 0; i < searchedPerTick && !frontier.isEmpty() && (visited.size() <= maxBlocks || !canDrainInfinitely(fluid)); i++) {
-            BlockPosEntry entry = frontier.remove(0);
+            BlockPosEntry entry = frontier.removeFirst();
             BlockPos currentPos = entry.pos;
             if (visited.contains(currentPos))
                 continue;
@@ -199,7 +200,7 @@ public abstract class FluidManipulationBehaviour extends BlockEntityBehaviour<Sm
         return fluid;
     }
 
-    protected void playEffect(Level world, BlockPos pos, Fluid fluid, boolean fillSound) {
+    protected void playEffect(Level world, @Nullable BlockPos pos, @Nullable Fluid fluid, boolean fillSound) {
         if (fluid == null)
             return;
 
@@ -221,7 +222,7 @@ public abstract class FluidManipulationBehaviour extends BlockEntityBehaviour<Sm
         }
     }
 
-    protected boolean canDrainInfinitely(Fluid fluid) {
+    protected boolean canDrainInfinitely(@Nullable Fluid fluid) {
         if (fluid == null)
             return false;
         return maxBlocks() != -1 && AllConfigs.server().fluids.bottomlessFluidMode.get().test(fluid);

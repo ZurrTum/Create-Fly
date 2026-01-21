@@ -4,9 +4,6 @@ import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -18,6 +15,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
 
 public class BeltHelper {
 
@@ -31,6 +31,7 @@ public class BeltHelper {
         );
     }
 
+    @Nullable
     public static BeltBlockEntity getSegmentBE(LevelAccessor world, BlockPos pos) {
         if (world instanceof Level l && !l.isLoaded(pos))
             return null;
@@ -40,6 +41,7 @@ public class BeltHelper {
         return (BeltBlockEntity) blockEntity;
     }
 
+    @Nullable
     public static BeltBlockEntity getControllerBE(LevelAccessor world, BlockPos pos) {
         BeltBlockEntity segment = getSegmentBE(world, pos);
         if (segment == null)
@@ -50,16 +52,18 @@ public class BeltHelper {
         return getSegmentBE(world, controllerPos);
     }
 
+    @Nullable
     public static BeltBlockEntity getBeltForOffset(BeltBlockEntity controller, float offset) {
         return getBeltAtSegment(controller, (int) Math.floor(offset));
     }
 
+    @Nullable
     public static BeltBlockEntity getBeltAtSegment(BeltBlockEntity controller, int segment) {
         BlockPos pos = getPositionForOffset(controller, segment);
         BlockEntity be = controller.getLevel().getBlockEntity(pos);
-        if (be == null || !(be instanceof BeltBlockEntity))
+        if (!(be instanceof BeltBlockEntity belt))
             return null;
-        return (BeltBlockEntity) be;
+        return belt;
     }
 
     public static BlockPos getPositionForOffset(BeltBlockEntity controller, int offset) {

@@ -69,6 +69,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -87,7 +88,8 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, BeltBlockEntity blockEntity, Direction context) {
+    @Nullable
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, BeltBlockEntity blockEntity, @Nullable Direction context) {
         if (!BeltBlock.canTransportObjects(blockEntity.getBlockState()))
             return null;
         if (!blockEntity.isRemoved() && blockEntity.itemHandler == null)
@@ -560,6 +562,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
         return positions;
     }
 
+    @Nullable
     public static BlockPos nextSegmentPosition(BlockState state, BlockPos pos, boolean forward) {
         Direction direction = state.getValue(HORIZONTAL_FACING);
         BeltSlope slope = state.getValue(SLOPE);
@@ -588,7 +591,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity be) {
         List<ItemStack> required = new ArrayList<>();
         if (state.getValue(PART) != BeltPart.MIDDLE)
             required.add(AllItems.SHAFT.getDefaultInstance());

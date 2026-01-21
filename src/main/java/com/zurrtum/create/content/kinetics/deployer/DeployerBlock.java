@@ -49,7 +49,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, DeployerBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, DeployerBlockEntity blockEntity, @Nullable Direction context) {
         if (blockEntity.invHandler == null)
             blockEntity.initHandler();
         return blockEntity.invHandler;
@@ -105,7 +105,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
     }
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
         if (placer instanceof ServerPlayer serverPlayer) {
             withBlockEntityDo(

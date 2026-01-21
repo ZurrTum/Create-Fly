@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.belt.transport;
 
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -13,13 +14,13 @@ import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlock;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.redstone.displayLink.source.AccumulatedItemCountDisplaySource;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class BeltTunnelInteractionHandler {
 
@@ -111,7 +112,7 @@ public class BeltTunnelInteractionHandler {
         if (!(belt.getLevel().getBlockState(pos).getBlock() instanceof BrassTunnelBlock))
             return false;
         BlockEntity be = belt.getLevel().getBlockEntity(pos);
-        if (be == null || !(be instanceof BrassTunnelBlockEntity tunnel))
+        if (!(be instanceof BrassTunnelBlockEntity tunnel))
             return false;
         return !tunnel.canInsert(movementDirection.getOpposite(), stack);
     }
@@ -123,6 +124,7 @@ public class BeltTunnelInteractionHandler {
         be.flap(side, inward);
     }
 
+    @Nullable
     protected static BeltTunnelBlockEntity getTunnelOnSegment(BeltInventory beltInventory, int offset) {
         BeltBlockEntity belt = beltInventory.belt;
         if (belt.getBlockState().getValue(BeltBlock.SLOPE) != BeltSlope.HORIZONTAL)
@@ -130,6 +132,7 @@ public class BeltTunnelInteractionHandler {
         return getTunnelOnPosition(belt.getLevel(), BeltHelper.getPositionForOffset(belt, offset));
     }
 
+    @Nullable
     public static BeltTunnelBlockEntity getTunnelOnPosition(Level world, BlockPos pos) {
         pos = pos.above();
         if (!(world.getBlockState(pos).getBlock() instanceof BeltTunnelBlock))

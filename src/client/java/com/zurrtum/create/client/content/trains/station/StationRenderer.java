@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -58,7 +58,7 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
         StationRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
@@ -155,15 +155,15 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
     }
 
     public static class StationRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
-        public DepotItemState[] incoming;
-        public List<DepotOutputItemState> outputs;
-        public RenderType layer;
-        public SuperByteBuffer flag;
+        public DepotItemState @Nullable [] incoming;
+        public @Nullable List<DepotOutputItemState> outputs;
+        public @Nullable RenderType layer;
+        public @Nullable SuperByteBuffer flag;
         public float flagYRot;
         public float flagOffsetZ;
         public float flagXRot;
         public float flagYRot2;
-        public TrackBlockRenderState block;
+        public @Nullable TrackBlockRenderState block;
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

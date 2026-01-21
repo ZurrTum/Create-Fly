@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -41,7 +41,7 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         FrogportRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         Level world = be.getLevel();
         String filter = be.addressFilter;
@@ -137,8 +137,8 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
     }
 
     public static class FrogportRenderState extends BlockEntityRenderState {
-        public NameplateRenderState name;
-        public FrogportRenderData data;
+        public @Nullable NameplateRenderState name;
+        public @Nullable FrogportRenderData data;
     }
 
     public static class FrogportRenderData implements SubmitNodeCollector.CustomGeometryRenderer {
@@ -150,8 +150,8 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         public float headPitch;
         public SuperByteBuffer tongue;
         public float tongueScale;
-        public SuperByteBuffer rig;
-        public SuperByteBuffer box;
+        public @Nullable SuperByteBuffer rig;
+        public @Nullable SuperByteBuffer box;
         public Vec3 boxOffset;
         public float boxScale;
         public int light;

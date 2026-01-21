@@ -5,10 +5,10 @@ import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceWriter;
 import com.zurrtum.create.client.flywheel.api.layout.Layout;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
-
-import net.minecraft.resources.Identifier;
 
 public final class SimpleInstanceType<I extends Instance> implements InstanceType<I> {
     private final Factory<I> factory;
@@ -61,10 +61,10 @@ public final class SimpleInstanceType<I extends Instance> implements InstanceTyp
 
     public static final class Builder<I extends Instance> {
         private final Factory<I> factory;
-        private Layout layout;
-        private InstanceWriter<I> writer;
-        private Identifier vertexShader;
-        private Identifier cullShader;
+        private @Nullable Layout layout;
+        private @Nullable InstanceWriter<I> writer;
+        private @Nullable Identifier vertexShader;
+        private @Nullable Identifier cullShader;
 
         public Builder(Factory<I> factory) {
             this.factory = factory;

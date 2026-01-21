@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -43,6 +44,7 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
     }
 
     @Override
+    @Nullable
     public DiscoveredPath start(ScheduleRuntime runtime, Level level) {
         MinecraftServer server = level.getServer();
         if (server == null)

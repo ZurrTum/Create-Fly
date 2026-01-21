@@ -10,6 +10,7 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -52,6 +53,7 @@ public class RepackagerPeripheral extends SyncedPeripheral<RepackagerBlockEntity
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public Map<String, ?> getItemDetail(int slot) throws LuaException {
         return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.targetInventory.getInventory(), slot);
     }
@@ -63,6 +65,7 @@ public class RepackagerPeripheral extends SyncedPeripheral<RepackagerBlockEntity
     }
 
     @LuaFunction(mainThread = true)
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public final void setAddress(Optional<String> argument) {
         if (argument.isPresent()) {
             blockEntity.customComputerAddress = argument.get();
@@ -75,6 +78,7 @@ public class RepackagerPeripheral extends SyncedPeripheral<RepackagerBlockEntity
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final PackageLuaObject getPackage() {
         ItemStack box = blockEntity.heldBox;
         if (box.isEmpty())

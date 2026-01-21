@@ -16,7 +16,7 @@ import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity.Phase;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -33,7 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmRenderer.ArmRenderState> {
-    protected static ItemModelResolver itemModelManager;
+    protected ItemModelResolver itemModelManager;
 
     public ArmRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -51,7 +51,7 @@ public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmR
         ArmRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         ItemStack item = be.heldItem;
@@ -213,7 +213,7 @@ public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmR
         public float upperArmAngle;
         public float headAngle;
         public ArmRenderData arm;
-        public ArmItemData item;
+        public @Nullable ArmItemData item;
     }
 
     public static class ArmItemData {

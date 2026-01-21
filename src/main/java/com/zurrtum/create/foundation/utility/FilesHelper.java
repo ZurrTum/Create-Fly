@@ -5,6 +5,7 @@ import com.google.gson.Strictness;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.zurrtum.create.Create;
+import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class FilesHelper {
         return name.toLowerCase(Locale.ROOT).replaceAll("\\W+", "_");
     }
 
+    @Nullable
     private static JsonElement loadJson(InputStream inputStream) {
         try {
             JsonReader reader = new JsonReader(new BufferedReader(new InputStreamReader(inputStream)));
@@ -54,6 +56,7 @@ public class FilesHelper {
         return null;
     }
 
+    @Nullable
     public static JsonElement loadJsonResource(String filepath) {
         return loadJson(ClassLoader.getSystemResourceAsStream(filepath));
     }

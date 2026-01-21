@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAttribute {
+public record ShulkerFillLevelAttribute(@Nullable ShulkerLevels levels) implements ItemAttribute {
     public static final MapCodec<ShulkerFillLevelAttribute> CODEC = ShulkerLevels.CODEC.xmap(
         ShulkerFillLevelAttribute::new,
         ShulkerFillLevelAttribute::levels
@@ -77,7 +77,7 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
         }
 
         @Nullable
-        public static ShulkerFillLevelAttribute.ShulkerLevels fromKey(String key) {
+        public static ShulkerLevels fromKey(String key) {
             return Arrays.stream(values()).filter(shulkerLevels -> shulkerLevels.key.equals(key)).findFirst().orElse(null);
         }
 

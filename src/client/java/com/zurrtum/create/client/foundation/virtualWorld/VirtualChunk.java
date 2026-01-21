@@ -92,6 +92,7 @@ public class VirtualChunk extends LevelChunk {
     }
 
     @Override
+    @Nullable
     public Heightmap getOrCreateHeightmapUnprimed(Heightmap.Types type) {
         return null;
     }

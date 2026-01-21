@@ -2,15 +2,12 @@ package com.zurrtum.create.content.contraptions.piston;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.contraptions.*;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -18,6 +15,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class LinearActuatorBlockEntity extends KineticBlockEntity implements IControlContraption {
 
@@ -25,11 +25,11 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     public boolean running;
     public boolean assembleNextTick;
     public boolean needsContraption;
-    public AbstractContraptionEntity movedContraption;
+    public @Nullable AbstractContraptionEntity movedContraption;
     protected boolean forceMove;
     protected ServerScrollOptionBehaviour<MovementMode> movementMode;
     protected boolean waitingForSpeedChange;
-    protected AssemblyException lastException;
+    protected @Nullable AssemblyException lastException;
     protected double sequencedOffsetLimit;
 
     // Custom position sync
@@ -176,8 +176,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     }
 
     public float getInterpolatedOffset(float partialTicks) {
-        float interpolatedOffset = Mth.clamp(offset + (partialTicks - .5f) * getMovementSpeed(), 0, getExtensionRange());
-        return interpolatedOffset;
+        return Mth.clamp(offset + (partialTicks - .5f) * getMovementSpeed(), 0, getExtensionRange());
     }
 
     @Override
@@ -253,6 +252,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
             movedContraption = null;
     }
 
+    @Nullable
     public AssemblyException getLastAssemblyException() {
         return lastException;
     }

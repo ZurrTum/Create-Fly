@@ -120,6 +120,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
     }
 
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
@@ -457,6 +458,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
     }
 
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public ItemStack extractAnyMax() {
         try (Transaction transaction = Transaction.openOuter()) {
             for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
@@ -475,6 +477,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
     }
 
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public ItemStack extractMax(Predicate<ItemStack> predicate) {
         try (Transaction transaction = Transaction.openOuter()) {
             for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
@@ -544,6 +547,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         return capacity;
     }
 
+    @Nullable
     protected abstract S getSlotView(int slot);
 
     @Override
@@ -695,7 +699,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
 
     @Override
     public boolean isEmpty() {
-        for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
+        for (StorageView<ItemVariant> _ : storage.nonEmptyViews()) {
             return false;
         }
         return true;
@@ -971,7 +975,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int count(ItemStack stack, Direction side) {
+        public int count(ItemStack stack, @Nullable Direction side) {
             return count(stack);
         }
 
@@ -984,7 +988,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int count(ItemStack stack, int maxAmount, Direction side) {
+        public int count(ItemStack stack, int maxAmount, @Nullable Direction side) {
             return count(stack, maxAmount);
         }
 
@@ -997,7 +1001,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack count(Predicate<ItemStack> predicate, Direction side) {
+        public ItemStack count(Predicate<ItemStack> predicate, @Nullable Direction side) {
             return count(predicate);
         }
 
@@ -1010,7 +1014,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack count(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        public ItemStack count(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
             return count(predicate, maxAmount);
         }
 
@@ -1023,7 +1027,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        public ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
             return preciseCount(predicate, maxAmount);
         }
 
@@ -1036,7 +1040,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int countAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        public int countAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
             return countAll(predicate, maxAmount);
         }
 
@@ -1049,7 +1053,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack countAny(Direction side) {
+        public ItemStack countAny(@Nullable Direction side) {
             return countAny();
         }
 
@@ -1062,7 +1066,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack countAny(int maxAmount, Direction side) {
+        public ItemStack countAny(int maxAmount, @Nullable Direction side) {
             return countAny(maxAmount);
         }
 
@@ -1075,7 +1079,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int countSpace(ItemStack stack, Direction side) {
+        public int countSpace(ItemStack stack, @Nullable Direction side) {
             return countSpace(stack);
         }
 
@@ -1088,7 +1092,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int countSpace(ItemStack stack, int maxAmount, Direction side) {
+        public int countSpace(ItemStack stack, int maxAmount, @Nullable Direction side) {
             return countSpace(stack, maxAmount);
         }
 
@@ -1101,7 +1105,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public boolean countSpace(List<ItemStack> stacks, Direction side) {
+        public boolean countSpace(List<ItemStack> stacks, @Nullable Direction side) {
             return countSpace(stacks);
         }
 
@@ -1114,7 +1118,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int extract(ItemStack stack, Direction side) {
+        public int extract(ItemStack stack, @Nullable Direction side) {
             return extract(stack);
         }
 
@@ -1127,7 +1131,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int extract(ItemStack stack, int maxAmount, Direction side) {
+        public int extract(ItemStack stack, int maxAmount, @Nullable Direction side) {
             return extract(stack, maxAmount);
         }
 
@@ -1140,7 +1144,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack extract(Predicate<ItemStack> predicate, Direction side) {
+        public ItemStack extract(Predicate<ItemStack> predicate, @Nullable Direction side) {
             return extract(predicate);
         }
 
@@ -1153,7 +1157,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        public ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
             return extract(predicate, maxAmount);
         }
 
@@ -1166,7 +1170,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public List<ItemStack> extract(List<ItemStack> stacks, Direction side) {
+        public List<ItemStack> extract(List<ItemStack> stacks, @Nullable Direction side) {
             return extract(stacks);
         }
 
@@ -1179,7 +1183,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int extractAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        public int extractAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
             return extractAll(predicate, maxAmount);
         }
 
@@ -1192,7 +1196,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack extractAny(Direction side) {
+        public ItemStack extractAny(@Nullable Direction side) {
             return extractAny();
         }
 
@@ -1205,7 +1209,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack extractAny(int maxAmount, Direction side) {
+        public ItemStack extractAny(int maxAmount, @Nullable Direction side) {
             return extractAny(maxAmount);
         }
 
@@ -1218,7 +1222,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack extractAnyMax(Direction side) {
+        public ItemStack extractAnyMax(@Nullable Direction side) {
             return extractAnyMax();
         }
 
@@ -1231,7 +1235,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+        public ItemStack extractMax(Predicate<ItemStack> predicate, @Nullable Direction side) {
             return extractMax(predicate);
         }
 
@@ -1279,7 +1283,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int insert(ItemStack stack, Direction side) {
+        public int insert(ItemStack stack, @Nullable Direction side) {
             return insert(stack);
         }
 
@@ -1292,7 +1296,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int insert(ItemStack stack, int maxAmount, Direction side) {
+        public int insert(ItemStack stack, int maxAmount, @Nullable Direction side) {
             return insert(stack, maxAmount);
         }
 
@@ -1305,7 +1309,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int insert(ItemStack stack, int maxAmount, int start, int end, Direction side) {
+        public int insert(ItemStack stack, int maxAmount, int start, int end, @Nullable Direction side) {
             return insert(stack, maxAmount);
         }
 
@@ -1318,7 +1322,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public List<ItemStack> insert(List<ItemStack> stacks, Direction side) {
+        public List<ItemStack> insert(List<ItemStack> stacks, @Nullable Direction side) {
             return insert(stacks);
         }
 
@@ -1331,7 +1335,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public List<ItemStack> insert(List<ItemStack> stacks, int start, int end, Direction side) {
+        public List<ItemStack> insert(List<ItemStack> stacks, int start, int end, @Nullable Direction side) {
             return insert(stacks, start, end);
         }
 
@@ -1344,7 +1348,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int insertExist(ItemStack stack, Direction side) {
+        public int insertExist(ItemStack stack, @Nullable Direction side) {
             return insertExist(stack);
         }
 
@@ -1357,7 +1361,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public int insertExist(ItemStack stack, int maxAmount, Direction side) {
+        public int insertExist(ItemStack stack, int maxAmount, @Nullable Direction side) {
             if (!canInsert) {
                 return 0;
             }
@@ -1380,12 +1384,12 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public java.util.Iterator<ItemStack> iterator(Direction side) {
+        public java.util.Iterator<ItemStack> iterator(@Nullable Direction side) {
             return inventory.iterator();
         }
 
         @Override
-        public boolean preciseExtract(ItemStack stack, Direction side) {
+        public boolean preciseExtract(ItemStack stack, @Nullable Direction side) {
             return preciseExtract(stack);
         }
 
@@ -1398,7 +1402,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        public ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
             return preciseExtract(predicate, maxAmount);
         }
 
@@ -1411,7 +1415,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public boolean preciseInsert(ItemStack stack, Direction side) {
+        public boolean preciseInsert(ItemStack stack, @Nullable Direction side) {
             return preciseInsert(stack);
         }
 
@@ -1424,7 +1428,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public boolean preciseInsert(ItemStack stack, int maxAmount, Direction side) {
+        public boolean preciseInsert(ItemStack stack, int maxAmount, @Nullable Direction side) {
             return preciseInsert(stack, maxAmount);
         }
 
@@ -1437,7 +1441,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public boolean preciseInsert(List<ItemStack> stacks, Direction side) {
+        public boolean preciseInsert(List<ItemStack> stacks, @Nullable Direction side) {
             return preciseInsert(stacks);
         }
 
@@ -1481,7 +1485,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        public Stream<ItemStack> stream(Direction side) {
+        public Stream<ItemStack> stream(@Nullable Direction side) {
             return inventory.stream();
         }
     }
@@ -1494,6 +1498,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
+        @Nullable
         protected StorageView<ItemVariant> getSlotView(int slot) {
             int current = 0;
             for (StorageView<ItemVariant> view : storage) {

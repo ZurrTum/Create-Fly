@@ -289,7 +289,7 @@ public class AllHandle extends AllClientHandle {
     }
 
     private <T extends ShootableGadgetRenderHandler> void onShootGadget(
-        Entity renderViewEntity,
+        @Nullable Entity renderViewEntity,
         Vec3 location,
         InteractionHand hand,
         boolean self,
@@ -702,7 +702,7 @@ public class AllHandle extends AllClientHandle {
         }
 
         for (Pair<Pair<Couple<Integer>, TrackMaterial>, BezierConnection> pair : packet.addedEdges) {
-            Couple<TrackNode> nodes = pair.getFirst().getFirst().map(graph::getNode);
+            Couple<@Nullable TrackNode> nodes = pair.getFirst().getFirst().map(graph::getNode);
             TrackNode node1 = nodes.getFirst();
             TrackNode node2 = nodes.getSecond();
             if (node1 != null && node2 != null)
@@ -727,7 +727,7 @@ public class AllHandle extends AllClientHandle {
             List<UUID> idList = entry.getValue().getSecond();
             int groupType = entry.getValue().getFirst();
 
-            Couple<TrackNode> nodes = entry.getKey().map(graph::getNode);
+            Couple<@Nullable TrackNode> nodes = entry.getKey().map(graph::getNode);
             if (nodes.either(Objects::isNull))
                 continue;
             TrackEdge edge = graph.getConnectionsFrom(nodes.getFirst()).get(nodes.getSecond());
@@ -790,6 +790,7 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
+    @Nullable
     public Player getPlayer() {
         return Minecraft.getInstance().player;
     }
@@ -1100,7 +1101,7 @@ public class AllHandle extends AllClientHandle {
     public void invalidateCarriage(CarriageContraptionEntity entity) {
         // Update the portal cutoff first to ensure it's reflected in the updated mesh.
         entity.updateRenderedPortalCutoff();
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) entity.getContraption().clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) entity.getContraption().clientContraption;
         ClientContraption maybeNullClientContraption = clientContraption.getAcquire();
         // Nothing to invalidate if it hasn't been created yet.
         if (maybeNullClientContraption != null) {
@@ -1170,7 +1171,7 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void openClipboardScreen(Player player, DataComponentMap components, BlockPos pos) {
+    public void openClipboardScreen(Player player, DataComponentMap components, @Nullable BlockPos pos) {
         if (Minecraft.getInstance().player == player)
             ScreenOpener.open(new ClipboardScreen(player.getInventory().getSelectedSlot(), components, pos));
     }

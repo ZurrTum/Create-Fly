@@ -6,12 +6,12 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.stockTicker.PackageOrder;
-
-import java.util.List;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Package ordering context containing additional information of package orders.
@@ -69,7 +69,7 @@ public record PackageOrderWithCrafts(PackageOrder orderedStacks, List<CraftingEn
 
     }
 
-    public static boolean hasCraftingInformation(PackageOrderWithCrafts context) {
+    public static boolean hasCraftingInformation(@Nullable PackageOrderWithCrafts context) {
         if (context == null)
             return false;
         // Only a valid crafting packet if it contains exactly one recipe
@@ -77,7 +77,7 @@ public record PackageOrderWithCrafts(PackageOrder orderedStacks, List<CraftingEn
     }
 
     public List<BigItemStack> getCraftingInformation() {
-        return orderedCrafts.get(0).pattern.stacks();
+        return orderedCrafts.getFirst().pattern.stacks();
     }
 
     public List<BigItemStack> stacks() {

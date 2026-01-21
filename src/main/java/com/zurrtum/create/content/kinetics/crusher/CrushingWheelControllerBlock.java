@@ -34,6 +34,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
         BlockPos pos,
         BlockState state,
         CrushingWheelControllerBlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         return blockEntity.inventory;
     }

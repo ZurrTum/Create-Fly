@@ -27,6 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +66,7 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
         super(menu, inv, title, AllGuiTextures.ATTRIBUTE_FILTER);
     }
 
+    @Nullable
     public static AttributeFilterScreen create(
         Minecraft mc,
         MenuType<ItemStack> type,

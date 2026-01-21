@@ -11,6 +11,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jspecify.annotations.Nullable;
 
 public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
 
@@ -33,18 +34,18 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
     }
 
     public AABB getMultiblockBounds(LevelAccessor level, BlockPos pos) {
-        MutableObject<BlockPos> start = new MutableObject<>(null);
-        MutableObject<BlockPos> end = new MutableObject<>(null);
+        MutableObject<@Nullable BlockPos> start = new MutableObject<>(null);
+        MutableObject<@Nullable BlockPos> end = new MutableObject<>(null);
         NixieTubeBlock.walkNixies(
             level, pos, true, (currentPos, rowPosition) -> {
                 end.setValue(currentPos);
-                if (start.getValue() == null)
+                if (start.get() == null)
                     start.setValue(currentPos);
             }
         );
 
-        BlockPos diffToCurrent = start.getValue().subtract(pos);
-        BlockPos diff = end.getValue().subtract(start.getValue());
+        BlockPos diffToCurrent = start.get().subtract(pos);
+        BlockPos diff = end.get().subtract(start.get());
 
         return super.getMultiblockBounds(level, pos).move(diffToCurrent).expandTowards(Vec3.atLowerCornerOf(diff));
     }

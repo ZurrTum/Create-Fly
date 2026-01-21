@@ -24,17 +24,11 @@ public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
         float stateAngle = AngleHelper.horizontalAngle(funnelFacing);
 
         if (state.getBlock() instanceof BeltFunnelBlock) {
-            switch (state.getValue(BeltFunnelBlock.SHAPE)) {
-
-                case EXTENDED:
-                    return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 15.5f, 13), stateAngle, Axis.Y);
-                case PULLING:
-                case PUSHING:
-                    return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.0f, 8.675f), horizontalAngle, Axis.Y);
-                default:
-                case RETRACTED:
-                    return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 13, 7.5f), horizontalAngle, Axis.Y);
-            }
+            return switch (state.getValue(BeltFunnelBlock.SHAPE)) {
+                case EXTENDED -> VecHelper.rotateCentered(VecHelper.voxelSpace(8, 15.5f, 13), stateAngle, Axis.Y);
+                case PULLING, PUSHING -> VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.0f, 8.675f), horizontalAngle, Axis.Y);
+                default -> VecHelper.rotateCentered(VecHelper.voxelSpace(8, 13, 7.5f), horizontalAngle, Axis.Y);
+            };
         }
 
         if (!funnelFacing.getAxis().isHorizontal()) {

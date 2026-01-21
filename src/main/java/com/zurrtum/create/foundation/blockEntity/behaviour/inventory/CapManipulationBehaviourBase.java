@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationBehaviourBase<?, ?>> extends BlockEntityBehaviour<SmartBlockEntity> {
 
     protected InterfaceProvider target;
-    protected T targetCapability;
+    protected @Nullable T targetCapability;
     protected Predicate<BlockEntity> filter;
     protected boolean simulateNext;
     protected boolean bypassSided;
@@ -34,7 +34,8 @@ public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationB
         filter = Predicates.alwaysTrue();
     }
 
-    protected abstract T getCapability(Level world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side);
+    @Nullable
+    protected abstract T getCapability(Level world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Direction side);
 
     @Override
     public void initialize() {

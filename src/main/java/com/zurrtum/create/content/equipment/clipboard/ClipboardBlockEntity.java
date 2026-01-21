@@ -4,13 +4,9 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
-
-import java.util.List;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentMap;
@@ -18,9 +14,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.UUID;
 
 public class ClipboardBlockEntity extends SmartBlockEntity {
-    private UUID lastEdit;
+    private @Nullable UUID lastEdit;
 
     public ClipboardBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.CLIPBOARD, pos, state);

@@ -4,12 +4,12 @@ import com.zurrtum.create.client.catnip.lang.LangBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Implement this interface on the {@link BlockEntity} that wants to add info to the goggle overlay
@@ -25,7 +25,7 @@ public non-sealed interface IHaveGoggleInformation extends IHaveCustomOverlayIco
         return false;
     }
 
-    default boolean containedFluidTooltip(List<Component> tooltip, boolean isPlayerSneaking, FluidInventory handler) {
+    default boolean containedFluidTooltip(List<Component> tooltip, boolean isPlayerSneaking, @Nullable FluidInventory handler) {
         if (handler == null)
             return false;
 

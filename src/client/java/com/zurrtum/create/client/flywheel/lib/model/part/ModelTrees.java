@@ -96,7 +96,7 @@ public final class ModelTrees {
     }
 
     private record ModelTreeKey(
-        ModelLayerLocation layer, Set<String> pathsToPrune, @Nullable net.minecraft.client.resources.model.Material texture, Material material
+        ModelLayerLocation layer, Set<String> pathsToPrune, net.minecraft.client.resources.model.@Nullable Material texture, Material material
     ) {
     }
 }

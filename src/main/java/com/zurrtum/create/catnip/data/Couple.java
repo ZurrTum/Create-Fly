@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import java.util.function.*;
 import java.util.stream.Stream;
 
-public class Couple<T> extends Pair<T, T> implements Iterable<T> {
+public class Couple<T extends @Nullable Object> extends Pair<T, T> implements Iterable<T> {
 
     private static final Couple<Boolean> TRUE_AND_FALSE = Couple.create(true, false);
 
@@ -21,7 +22,7 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         super(first, second);
     }
 
-    public static <T> Couple<T> create(T first, T second) {
+    public static <T extends @Nullable Object> Couple<T> create(T first, T second) {
         return new Couple<>(first, second);
     }
 
@@ -120,23 +121,23 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         return create(first, second);
     }
 
-    public <S> Couple<S> map(Function<T, S> function) {
+    public <S extends @Nullable Object> Couple<S> map(Function<T, S> function) {
         return Couple.create(function.apply(first), function.apply(second));
     }
 
-    public <S> Couple<S> mapNotNull(Function<T, S> function) {
+    public <S extends @Nullable Object> Couple<S> mapNotNull(Function<T, S> function) {
         return Couple.create(first != null ? function.apply(first) : null, second != null ? function.apply(second) : null);
     }
 
-    public <S> Couple<S> mapWithContext(BiFunction<T, Boolean, S> function) {
+    public <S extends @Nullable Object> Couple<S> mapWithContext(BiFunction<T, Boolean, S> function) {
         return Couple.create(function.apply(first, true), function.apply(second, false));
     }
 
-    public <S, R> Couple<S> mapWithParams(BiFunction<T, R, S> function, Couple<R> values) {
+    public <S, R extends @Nullable Object> Couple<S> mapWithParams(BiFunction<T, R, S> function, Couple<R> values) {
         return Couple.create(function.apply(first, values.first), function.apply(second, values.second));
     }
 
-    public <S, R> Couple<S> mapNotNullWithParam(BiFunction<T, R, S> function, R value) {
+    public <S extends @Nullable Object, R> Couple<S> mapNotNullWithParam(BiFunction<T, R, S> function, R value) {
         return Couple.create(first != null ? function.apply(first, value) : null, second != null ? function.apply(second, value) : null);
     }
 
@@ -210,6 +211,7 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         }
 
         @Override
+        @Nullable
         public T next() {
             state++;
             if (state == 1)

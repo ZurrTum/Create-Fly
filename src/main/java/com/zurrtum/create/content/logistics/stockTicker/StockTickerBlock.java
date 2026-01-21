@@ -34,6 +34,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class StockTickerBlock extends HorizontalDirectionalBlock implements IBE<StockTickerBlockEntity>, IWrenchable, ItemInventoryProvider<StockTickerBlockEntity> {
 
@@ -44,7 +45,13 @@ public class StockTickerBlock extends HorizontalDirectionalBlock implements IBE<
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, StockTickerBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        StockTickerBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         return blockEntity.receivedPayments;
     }
 

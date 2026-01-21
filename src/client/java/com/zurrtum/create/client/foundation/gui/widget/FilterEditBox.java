@@ -4,12 +4,13 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringUtil;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 
 public class FilterEditBox extends EditBox {
-    private Predicate<String> filter;
+    private Predicate<@Nullable String> filter;
 
     public FilterEditBox(Font font, int x, int y, int width, int height, Component narration) {
         super(font, x, y, width, height, null, narration);

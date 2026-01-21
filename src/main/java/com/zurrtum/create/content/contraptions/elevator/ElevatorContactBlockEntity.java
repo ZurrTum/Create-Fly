@@ -1,31 +1,31 @@
 package com.zurrtum.create.content.contraptions.elevator;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn.ColumnCoords;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControlBehaviour;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 public class ElevatorContactBlockEntity extends SmartBlockEntity {
 
     public DoorControlBehaviour doorControls;
-    public ColumnCoords columnCoords;
+    public @Nullable ColumnCoords columnCoords;
     public boolean activateBlock;
 
     public String shortName;
     public String longName;
 
-    public String lastReportedCurrentFloor = "";
+    public @Nullable String lastReportedCurrentFloor = "";
 
     private int yTargetFromNBT = Integer.MIN_VALUE;
     private boolean deferNameGenerator;

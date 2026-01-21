@@ -38,7 +38,8 @@ public class SchematicInstances {
         return loadWorld;
     }
 
-    private static SchematicLevel loadWorld(Level wrapped, ItemStack schematic) {
+    @Nullable
+    private static SchematicLevel loadWorld(Level wrapped, @Nullable ItemStack schematic) {
         if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
             return null;
         if (!schematic.has(AllDataComponents.SCHEMATIC_DEPLOYED))
@@ -66,13 +67,13 @@ public class SchematicInstances {
         return world;
     }
 
-    public static void clearHash(ItemStack schematic) {
+    public static void clearHash(@Nullable ItemStack schematic) {
         if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
             return;
         schematic.remove(AllDataComponents.SCHEMATIC_HASH);
     }
 
-    public static int getHash(ItemStack schematic) {
+    public static int getHash(@Nullable ItemStack schematic) {
         if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
             return -1;
         if (!schematic.has(AllDataComponents.SCHEMATIC_HASH))

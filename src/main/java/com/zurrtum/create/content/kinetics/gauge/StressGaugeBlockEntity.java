@@ -9,12 +9,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public class StressGaugeBlockEntity extends GaugeBlockEntity {
 
-    public static BlockPos lastSent;
+    public static @Nullable BlockPos lastSent;
 
     public StressGaugeBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.STRESSOMETER, pos, state);

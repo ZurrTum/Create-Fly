@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import org.jspecify.annotations.Nullable;
 
 public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBlock implements TransformableBlock {
 
@@ -41,6 +42,7 @@ public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBloc
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = getFacingForPlacement(context);
         BlockPos pos = context.getClickedPos();

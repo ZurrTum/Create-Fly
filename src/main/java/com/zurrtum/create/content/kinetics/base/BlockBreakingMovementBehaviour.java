@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
@@ -86,6 +87,7 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
         entity.hurtMarked = true;
     }
 
+    @Nullable
     protected DamageSource getDamageSource(Level level) {
         return null;
     }

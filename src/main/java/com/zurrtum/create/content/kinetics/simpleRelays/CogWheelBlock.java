@@ -28,6 +28,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class CogWheelBlock extends AbstractSimpleShaftBlock implements ICogWheel, EncasableBlock {
     boolean isLarge;
@@ -67,13 +68,13 @@ public class CogWheelBlock extends AbstractSimpleShaftBlock implements ICogWheel
     }
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
         if (placer instanceof Player player)
             triggerShiftingGearsAdvancement(worldIn, pos, state, player);
     }
 
-    protected void triggerShiftingGearsAdvancement(Level world, BlockPos pos, BlockState state, Player player) {
+    protected void triggerShiftingGearsAdvancement(Level world, BlockPos pos, BlockState state, @Nullable Player player) {
         if (world.isClientSide() || player == null)
             return;
 

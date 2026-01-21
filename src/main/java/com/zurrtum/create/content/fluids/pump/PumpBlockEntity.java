@@ -132,7 +132,7 @@ public class PumpBlockEntity extends KineticBlockEntity {
             frontier.add(Pair.of(1, start.getConnectedPos()));
 
             while (!frontier.isEmpty()) {
-                Pair<Integer, BlockPos> entry = frontier.remove(0);
+                Pair<Integer, BlockPos> entry = frontier.removeFirst();
                 int distance = entry.getFirst();
                 BlockPos currentPos = entry.getSecond();
 
@@ -300,9 +300,7 @@ public class PumpBlockEntity extends KineticBlockEntity {
         BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof PumpBlock))
             return false;
-        Direction front = blockState.getValue(PumpBlock.FACING);
-        boolean isFront = side == front;
-        return isFront;
+        return side == blockState.getValue(PumpBlock.FACING);
     }
 
     @Nullable

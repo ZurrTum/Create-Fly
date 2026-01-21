@@ -24,6 +24,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,15 +37,16 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
     protected AllGuiTextures background;
     private List<Rect2i> extraAreas = Collections.emptyList();
 
-    private IconButton resetButton;
-    private IconButton confirmButton;
-    private ElementWidget renderedItem;
+    private @Nullable IconButton resetButton;
+    private @Nullable IconButton confirmButton;
+    private @Nullable ElementWidget renderedItem;
 
     public BlueprintScreen(BlueprintMenu menu, Inventory inv, Component title) {
         super(menu, inv, title, AllGuiTextures.BLUEPRINT.getWidth(), AllGuiTextures.BLUEPRINT.getHeight() + 4 + PLAYER_INVENTORY.getHeight());
         this.background = AllGuiTextures.BLUEPRINT;
     }
 
+    @Nullable
     public static BlueprintScreen create(
         Minecraft mc,
         MenuType<BlueprintSection> type,

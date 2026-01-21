@@ -1,20 +1,14 @@
 package com.zurrtum.create.content.processing.basin;
 
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.simple.DeferralBehaviour;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.foundation.recipe.trie.AbstractVariant;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrie;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrieFinder;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.Recipe;
@@ -24,12 +18,18 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
 
     public DeferralBehaviour basinChecker;
     public boolean basinRemoved;
-    protected Recipe<?> currentRecipe;
+    protected @Nullable Recipe<?> currentRecipe;
     private final BasinRecipeFinder finder;
 
     public BasinOperatingBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -144,6 +144,7 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
         basin.notifyChangeOfContents();
     }
 
+    @Nullable
     protected Recipe<?> getMatchingRecipes() {
         Optional<BasinBlockEntity> $basin = getBasin();
         BasinBlockEntity basin;
@@ -188,7 +189,7 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
     private class BasinRecipeFinder {
         private BasinInput basinInput;
         private Consumer<Recipe<?>> matchingStrategy;
-        private Recipe<?> matchedRecipe;
+        private @Nullable Recipe<?> matchedRecipe;
         private int ingredientCount;
 
         public Recipe<?> match(BasinBlockEntity basin, List<Recipe<?>> recipes) {

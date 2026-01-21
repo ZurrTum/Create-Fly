@@ -15,6 +15,7 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,8 +69,8 @@ public class IngredientTextContent implements ComponentContents {
         ComponentSerialization.CODEC.optionalFieldOf("name").forGetter(i -> Optional.ofNullable(i.name))
     ).apply(instance, IngredientTextContent::new));
 
-    public Ingredient ingredient;
-    public Component name;
+    public @Nullable Ingredient ingredient;
+    public @Nullable Component name;
 
     @Override
     public MapCodec<? extends ComponentContents> codec() {

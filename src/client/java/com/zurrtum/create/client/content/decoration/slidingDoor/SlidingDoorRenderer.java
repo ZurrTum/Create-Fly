@@ -20,10 +20,11 @@ import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector.CustomGeometryRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -59,7 +60,7 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
         DoorRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         state.blockState = be.getBlockState();
         if (!be.shouldRenderSpecial(state.blockState)) {
@@ -146,11 +147,11 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
     }
 
     public static class DoorRenderState extends BlockEntityRenderState {
-        public SubmitNodeCollector.CustomGeometryRenderer renderer;
+        public @Nullable CustomGeometryRenderer renderer;
         public RenderType layer;
     }
 
-    public static class FoldingDoorRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+    public static class FoldingDoorRenderState implements CustomGeometryRenderer {
         public float offsetY;
         public Vec3 offset;
         public float angle;
@@ -185,7 +186,7 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
         }
     }
 
-    public static class SlidingDoorRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+    public static class SlidingDoorRenderState implements CustomGeometryRenderer {
         public SuperByteBuffer upper;
         public SuperByteBuffer lower;
         public float upperOffset;

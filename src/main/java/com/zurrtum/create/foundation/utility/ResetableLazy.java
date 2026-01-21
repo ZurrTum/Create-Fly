@@ -1,12 +1,14 @@
 package com.zurrtum.create.foundation.utility;
 
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.function.Supplier;
 
 public class ResetableLazy<T> implements Supplier<T> {
 
     private final Supplier<T> supplier;
-    private T value;
+    private @Nullable T value;
 
     public ResetableLazy(Supplier<T> supplier) {
         this.supplier = supplier;

@@ -32,6 +32,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,6 +93,7 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         placementSettingWidgets = new ArrayList<>();
     }
 
+    @Nullable
     public static SchematicannonScreen create(
         Minecraft mc,
         MenuType<SchematicannonBlockEntity> type,

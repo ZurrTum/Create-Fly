@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface BaseSidedInventory extends Container {
-    default int[] create$getAvailableSlots(Direction side) {
+    default int[] create$getAvailableSlots(@Nullable Direction side) {
         throw new RuntimeException("Implemented via Mixin");
     }
 
@@ -29,7 +29,7 @@ public interface BaseSidedInventory extends Container {
     }
 
 
-    default boolean create$canExtract(int slot, ItemStack stack, Direction dir) {
+    default boolean create$canExtract(int slot, ItemStack stack, @Nullable Direction dir) {
         throw new RuntimeException("Implemented via Mixin");
     }
 
@@ -39,7 +39,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int count(ItemStack stack, Direction side) {
+    default int count(ItemStack stack, @Nullable Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
@@ -53,7 +53,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int count(ItemStack stack, int maxAmount, Direction side) {
+    default int count(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int count = 0;
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canExtract(slot, stack, side)) {
@@ -78,7 +78,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack count(Predicate<ItemStack> predicate, Direction side) {
+    default ItemStack count(Predicate<ItemStack> predicate, @Nullable Direction side) {
         for (int slot : create$getAvailableSlots(side)) {
             ItemStack stack = getItem(slot);
             if (stack.isEmpty()) {
@@ -97,7 +97,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -139,7 +139,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -182,7 +182,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int countAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default int countAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return 0;
         }
@@ -208,7 +208,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack countAny(Direction side) {
+    default ItemStack countAny(@Nullable Direction side) {
         for (int slot : create$getAvailableSlots(side)) {
             ItemStack target = getItem(slot);
             if (target.isEmpty()) {
@@ -227,7 +227,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack countAny(int maxAmount, Direction side) {
+    default ItemStack countAny(int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -269,7 +269,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int countSpace(ItemStack stack, Direction side) {
+    default int countSpace(ItemStack stack, @Nullable Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
@@ -283,7 +283,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int countSpace(ItemStack stack, int maxAmount, Direction side) {
+    default int countSpace(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int count = 0;
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canInsert(slot, stack, side) && canPlaceItem(slot, stack)) {
@@ -310,7 +310,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int countSpace(ItemStack stack, int maxAmount, int start, int end, Direction side) {
+    default int countSpace(ItemStack stack, int maxAmount, int start, int end, @Nullable Direction side) {
         int count = 0;
         int[] slots = create$getAvailableSlots(side);
         start = findStartIndex(slots, start);
@@ -347,7 +347,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean countSpace(List<ItemStack> stacks, Direction side) {
+    default boolean countSpace(List<ItemStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -417,7 +417,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean countSpace(List<ItemStack> stacks, int start, int end, Direction side) {
+    default boolean countSpace(List<ItemStack> stacks, int start, int end, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -497,7 +497,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int extract(ItemStack stack, Direction side) {
+    default int extract(ItemStack stack, @Nullable Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
@@ -511,7 +511,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int extract(ItemStack stack, int maxAmount, Direction side) {
+    default int extract(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canExtract(slot, stack, side)) {
@@ -548,7 +548,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -609,7 +609,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack extract(Predicate<ItemStack> predicate, Direction side) {
+    default ItemStack extract(Predicate<ItemStack> predicate, @Nullable Direction side) {
         for (int slot : create$getAvailableSlots(side)) {
             ItemStack stack = getItem(slot);
             if (stack.isEmpty()) {
@@ -630,7 +630,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default List<ItemStack> extract(List<ItemStack> stacks, Direction side) {
+    default List<ItemStack> extract(List<ItemStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return stacks;
@@ -724,7 +724,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int extractAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default int extractAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return 0;
         }
@@ -763,7 +763,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack extractAny(Direction side) {
+    default ItemStack extractAny(@Nullable Direction side) {
         for (int slot : create$getAvailableSlots(side)) {
             ItemStack target = getItem(slot);
             if (target.isEmpty()) {
@@ -784,7 +784,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack extractAny(int maxAmount, Direction side) {
+    default ItemStack extractAny(int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -846,7 +846,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack extractAnyMax(Direction side) {
+    default ItemStack extractAnyMax(@Nullable Direction side) {
         int[] slots = create$getAvailableSlots(side);
         int size = slots.length;
         for (int i = 0; i < size; i++) {
@@ -901,7 +901,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+    default ItemStack extractMax(Predicate<ItemStack> predicate, @Nullable Direction side) {
         int[] slots = create$getAvailableSlots(side);
         int size = slots.length;
         for (int i = 0; i < size; i++) {
@@ -979,7 +979,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int insert(ItemStack stack, Direction side) {
+    default int insert(ItemStack stack, @Nullable Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
@@ -988,7 +988,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int insert(ItemStack stack, int maxAmount, Direction side) {
+    default int insert(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canInsert(slot, stack, side) && canPlaceItem(slot, stack)) {
@@ -1029,7 +1029,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int insert(ItemStack stack, int maxAmount, int start, int end, Direction side) {
+    default int insert(ItemStack stack, int maxAmount, int start, int end, @Nullable Direction side) {
         int remaining = maxAmount;
         int[] slots = create$getAvailableSlots(side);
         start = findStartIndex(slots, start);
@@ -1080,7 +1080,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default List<ItemStack> insert(List<ItemStack> stacks, Direction side) {
+    default List<ItemStack> insert(List<ItemStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return stacks;
@@ -1186,7 +1186,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end, Direction side) {
+    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return stacks;
@@ -1307,7 +1307,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int insertExist(ItemStack stack, Direction side) {
+    default int insertExist(ItemStack stack, @Nullable Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
@@ -1316,7 +1316,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default int insertExist(ItemStack stack, int maxAmount, Direction side) {
+    default int insertExist(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         IntList emptys = new IntArrayList();
         for (int slot : create$getAvailableSlots(side)) {
@@ -1361,7 +1361,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default java.util.Iterator<ItemStack> iterator(Direction side) {
+    default java.util.Iterator<ItemStack> iterator(@Nullable Direction side) {
         return new Iterator(this, side);
     }
 
@@ -1371,7 +1371,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean preciseExtract(ItemStack stack, Direction side) {
+    default boolean preciseExtract(ItemStack stack, @Nullable Direction side) {
         if (stack.isEmpty()) {
             return true;
         }
@@ -1415,7 +1415,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -1482,7 +1482,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean preciseInsert(ItemStack stack, Direction side) {
+    default boolean preciseInsert(ItemStack stack, @Nullable Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return true;
@@ -1496,7 +1496,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean preciseInsert(ItemStack stack, int maxAmount, Direction side) {
+    default boolean preciseInsert(ItemStack stack, int maxAmount, @Nullable Direction side) {
         List<Runnable> changes = new ArrayList<>();
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canInsert(slot, stack, side) && canPlaceItem(slot, stack)) {
@@ -1537,7 +1537,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean preciseInsert(List<ItemStack> stacks, Direction side) {
+    default boolean preciseInsert(List<ItemStack> stacks, @Nullable Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -1612,7 +1612,7 @@ public interface BaseSidedInventory extends Container {
     }
 
     @Override
-    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update, Direction side) {
+    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update, @Nullable Direction side) {
         for (int slot : create$getAvailableSlots(side)) {
             ItemStack stack = getItem(slot);
             if (stack.isEmpty()) {
@@ -1632,12 +1632,12 @@ public interface BaseSidedInventory extends Container {
 
     class Iterator implements java.util.Iterator<ItemStack> {
         private final BaseSidedInventory inventory;
-        private final Direction side;
+        private final @Nullable Direction side;
         private final int[] slots;
         private int index;
         private int current = -1;
 
-        public Iterator(BaseSidedInventory inventory, Direction side) {
+        public Iterator(BaseSidedInventory inventory, @Nullable Direction side) {
             this.inventory = inventory;
             this.side = side;
             this.slots = inventory.create$getAvailableSlots(side);

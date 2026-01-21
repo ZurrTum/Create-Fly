@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.logistics.funnel;
 
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.logistics.FlapStuffs;
+import com.zurrtum.create.client.content.logistics.FlapStuffs.Visual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -11,12 +12,13 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 public class FunnelVisual extends AbstractBlockEntityVisual<FunnelBlockEntity> implements SimpleDynamicVisual {
 
-    private final FlapStuffs.Visual flaps;
+    private final @Nullable Visual flaps;
 
     public FunnelVisual(VisualizationContext context, FunnelBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
@@ -30,7 +32,7 @@ public class FunnelVisual extends AbstractBlockEntityVisual<FunnelBlockEntity> i
         PartialModel flapPartial = (blockState.getBlock() instanceof FunnelBlock ? AllPartialModels.FUNNEL_FLAP : AllPartialModels.BELT_FUNNEL_FLAP);
 
         var commonTransform = FlapStuffs.commonTransform(getVisualPosition(), funnelFacing, -blockEntity.getFlapOffset());
-        flaps = new FlapStuffs.Visual(instancerProvider(), commonTransform, FlapStuffs.FUNNEL_PIVOT, Models.partial(flapPartial));
+        flaps = new Visual(instancerProvider(), commonTransform, FlapStuffs.FUNNEL_PIVOT, Models.partial(flapPartial));
 
         flaps.update(blockEntity.flap.getValue(partialTick));
     }

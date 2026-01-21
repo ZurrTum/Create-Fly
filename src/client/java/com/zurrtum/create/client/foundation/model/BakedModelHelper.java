@@ -11,6 +11,7 @@ import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +93,7 @@ public class BakedModelHelper {
         return newQuad;
     }
 
-    public static SimpleModelWrapper generateModel(SimpleModelWrapper template, UnaryOperator<TextureAtlasSprite> spriteSwapper) {
+    public static SimpleModelWrapper generateModel(SimpleModelWrapper template, UnaryOperator<@Nullable TextureAtlasSprite> spriteSwapper) {
         QuadCollection.Builder builder = new QuadCollection.Builder();
         for (Direction cullFace : Iterate.directions) {
             List<BakedQuad> quads = template.getQuads(cullFace);
@@ -116,7 +117,7 @@ public class BakedModelHelper {
         return UVPair.pack(u, v);
     }
 
-    public static List<BakedQuad> swapSprites(List<BakedQuad> quads, UnaryOperator<TextureAtlasSprite> spriteSwapper) {
+    public static List<BakedQuad> swapSprites(List<BakedQuad> quads, UnaryOperator<@Nullable TextureAtlasSprite> spriteSwapper) {
         List<BakedQuad> newQuads = new ArrayList<>(quads);
         int size = quads.size();
         for (int i = 0; i < size; i++) {

@@ -32,6 +32,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -39,9 +40,9 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
     public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT.listOf());
 
     // Player-interface Feature
-    public List<List<BigItemStack>> lastClientsideStockSnapshot;
-    protected InventorySummary lastClientsideStockSnapshotAsSummary;
-    protected List<BigItemStack> newlyReceivedStockSnapshot;
+    public @Nullable List<List<BigItemStack>> lastClientsideStockSnapshot;
+    protected @Nullable InventorySummary lastClientsideStockSnapshotAsSummary;
+    protected @Nullable List<BigItemStack> newlyReceivedStockSnapshot;
     public String previouslyUsedAddress;
     public int activeLinks;
     public int ticksSinceLastUpdate;
@@ -67,10 +68,12 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
         return receivedPayments;
     }
 
+    @Nullable
     public List<List<BigItemStack>> getClientStockSnapshot() {
         return lastClientsideStockSnapshot;
     }
 
+    @Nullable
     public InventorySummary getLastClientsideStockSnapshotAsSummary() {
         return lastClientsideStockSnapshotAsSummary;
     }
@@ -80,7 +83,12 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
     }
 
     @Override
-    public boolean broadcastPackageRequest(RequestType type, PackageOrderWithCrafts order, IdentifiedInventory ignoredHandler, String address) {
+    public boolean broadcastPackageRequest(
+        RequestType type,
+        PackageOrderWithCrafts order,
+        @Nullable IdentifiedInventory ignoredHandler,
+        String address
+    ) {
         boolean result = super.broadcastPackageRequest(type, order, ignoredHandler, address);
         previouslyUsedAddress = address;
         notifyUpdate();

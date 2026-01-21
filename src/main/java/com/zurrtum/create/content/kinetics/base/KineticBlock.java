@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public abstract class KineticBlock extends Block implements IRotate {
 
@@ -71,7 +72,7 @@ public abstract class KineticBlock extends Block implements IRotate {
     }
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         AdvancementBehaviour.setPlacedBy(worldIn, pos, placer);
         if (worldIn.isClientSide())
             return;

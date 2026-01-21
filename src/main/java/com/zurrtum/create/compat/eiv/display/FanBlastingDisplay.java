@@ -36,7 +36,7 @@ public class FanBlastingDisplay extends CreateDisplay {
     public static FanBlastingDisplay of(
         RecipeHolder<? extends AbstractCookingRecipe> entry,
         RegistryAccess registryManager,
-        Collection<RecipeHolder<SmeltingRecipe>> smeltingRecipes,
+        @Nullable Collection<RecipeHolder<SmeltingRecipe>> smeltingRecipes,
         Collection<RecipeHolder<SmokingRecipe>> smokingRecipes
     ) {
         if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {

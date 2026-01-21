@@ -4,7 +4,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * A consumer like interface for use with {@link dev.engine_room.flywheel.api.task.Plan Plans} and their contexts.
+ * A consumer like interface for use with {@link com.zurrtum.create.client.flywheel.api.task.Plan Plans} and their contexts.
  * <br>
  * The subinterface {@link Ignored} is provided for consumers that do not need the context object.
  *

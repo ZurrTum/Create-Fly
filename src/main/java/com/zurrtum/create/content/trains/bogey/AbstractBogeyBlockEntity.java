@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.content.trains.entity.CarriageBogey.UPSIDE_DOWN_KEY;
 
@@ -19,7 +20,7 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
     public static final String BOGEY_STYLE_KEY = "BogeyStyle";
     public static final String BOGEY_DATA_KEY = "BogeyData";
 
-    private CompoundTag bogeyData;
+    private @Nullable CompoundTag bogeyData;
 
     public AbstractBogeyBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

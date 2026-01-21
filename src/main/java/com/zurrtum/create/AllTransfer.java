@@ -44,11 +44,12 @@ public class AllTransfer {
     private static final Map<Storage<ItemVariant>, Container> WRAPPERS_ITEM = new MapMaker().weakValues().makeMap();
     private static final Map<Storage<FluidVariant>, FluidInventory> WRAPPERS_FLUID = new MapMaker().weakValues().makeMap();
 
-    public static Supplier<Container> getCacheInventory(
+    @Nullable
+    public static Supplier<@Nullable Container> getCacheInventory(
         ServerLevel world,
         BlockPos pos,
         Direction direction,
-        BiPredicate<BlockEntity, Direction> filter
+        @Nullable BiPredicate<@Nullable BlockEntity, Direction> filter
     ) {
         if (DISABLE) {
             return null;
@@ -63,12 +64,13 @@ public class AllTransfer {
         };
     }
 
+    @Nullable
     public static Container getInventory(
         Level world,
         BlockPos pos,
         @Nullable BlockState state,
         @Nullable BlockEntity blockEntity,
-        Direction direction
+        @Nullable Direction direction
     ) {
         if (DISABLE) {
             return null;
@@ -85,7 +87,7 @@ public class AllTransfer {
         BlockPos pos,
         @Nullable BlockState state,
         @Nullable BlockEntity blockEntity,
-        Direction direction
+        @Nullable Direction direction
     ) {
         if (DISABLE) {
             return false;
@@ -93,7 +95,8 @@ public class AllTransfer {
         return FluidStorage.SIDED.find(world, pos, state, blockEntity, direction) != null;
     }
 
-    public static Supplier<FluidInventory> getCacheFluidInventory(ServerLevel world, BlockPos pos, Direction direction) {
+    @Nullable
+    public static Supplier<@Nullable FluidInventory> getCacheFluidInventory(ServerLevel world, BlockPos pos, Direction direction) {
         if (DISABLE) {
             return null;
         }
@@ -107,12 +110,13 @@ public class AllTransfer {
         };
     }
 
+    @Nullable
     public static FluidInventory getFluidInventory(
         Level world,
         BlockPos pos,
         @Nullable BlockState state,
         @Nullable BlockEntity blockEntity,
-        Direction direction
+        @Nullable Direction direction
     ) {
         if (DISABLE) {
             return null;
@@ -134,6 +138,7 @@ public class AllTransfer {
         return result;
     }
 
+    @Nullable
     public static FluidItemInventory getFluidInventory(ItemStack stack) {
         if (DISABLE) {
             return null;
@@ -147,17 +152,20 @@ public class AllTransfer {
         return FluidItemInventoryWrapper.of(inventory, context);
     }
 
-    private static <T extends SmartBlockEntity> void registerItemSide(BlockEntityType<T> type, Function<T, Container> factory) {
+    private static <T extends SmartBlockEntity> void registerItemSide(BlockEntityType<T> type, Function<T, @Nullable Container> factory) {
         BlockEntityBehaviour.add(type, (T be) -> new CachedInventoryBehaviour<>(be, factory));
         ItemStorage.SIDED.registerForBlockEntity(CachedInventoryBehaviour::get, type);
     }
 
-    private static <T extends SmartBlockEntity> void registerItemSide(BlockEntityType<T> type, BiFunction<T, Direction, Container> factory) {
+    private static <T extends SmartBlockEntity> void registerItemSide(
+        BlockEntityType<T> type,
+        BiFunction<T, @Nullable Direction, @Nullable Container> factory
+    ) {
         BlockEntityBehaviour.add(type, (T be) -> new CachedDirectionInventoryBehaviour<>(be, factory));
         ItemStorage.SIDED.registerForBlockEntity(CachedDirectionInventoryBehaviour::get, type);
     }
 
-    private static <T extends SmartBlockEntity> void registerFluidSide(BlockEntityType<T> type, Function<T, FluidInventory> factory) {
+    private static <T extends SmartBlockEntity> void registerFluidSide(BlockEntityType<T> type, Function<T, @Nullable FluidInventory> factory) {
         BlockEntityBehaviour.add(type, (T be) -> new CachedFluidInventoryBehaviour<>(be, factory));
         FluidStorage.SIDED.registerForBlockEntity(CachedFluidInventoryBehaviour::get, type);
     }

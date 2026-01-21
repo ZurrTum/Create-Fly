@@ -3,9 +3,11 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 public class FillLevelDisplaySource extends PercentOrProgressBarDisplaySource {
     @Override
+    @Nullable
     protected Float getProgress(DisplayLinkContext context) {
         BlockEntity be = context.getSourceBlockEntity();
         if (!(be instanceof ThresholdSwitchBlockEntity tsbe))

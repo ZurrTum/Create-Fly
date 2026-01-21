@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.Slot;
 import org.jspecify.annotations.Nullable;
 
 public class RecipeButton extends Button.Plain {
-    private IntSet missingIndices;
+    private @Nullable IntSet missingIndices;
 
     public RecipeButton(int x, int y, int width, int height, Component message, OnPress onPress, CreateNarration narrationSupplier) {
         super(x, y, width, height, message, onPress, narrationSupplier);

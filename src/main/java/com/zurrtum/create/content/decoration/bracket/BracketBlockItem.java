@@ -1,9 +1,6 @@
 package com.zurrtum.create.content.decoration.bracket;
 
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -15,6 +12,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Optional;
 
 public class BracketBlockItem extends BlockItem {
 
@@ -40,9 +39,9 @@ public class BracketBlockItem extends BlockItem {
             return InteractionResult.SUCCESS;
 
         Optional<BlockState> suitableBracket = bracketBlock.getSuitableBracket(state, context.getClickedFace());
-        if (!suitableBracket.isPresent() && player != null)
+        if (suitableBracket.isEmpty() && player != null)
             suitableBracket = bracketBlock.getSuitableBracket(state, Direction.orderedByNearest(player)[0].getOpposite());
-        if (!suitableBracket.isPresent())
+        if (suitableBracket.isEmpty())
             return InteractionResult.SUCCESS;
 
         BlockState bracket = behaviour.getBracket();

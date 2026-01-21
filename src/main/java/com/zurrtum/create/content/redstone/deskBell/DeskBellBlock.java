@@ -37,6 +37,7 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return withWater(defaultBlockState().setValue(FACING, context.getClickedFace()), context);
     }

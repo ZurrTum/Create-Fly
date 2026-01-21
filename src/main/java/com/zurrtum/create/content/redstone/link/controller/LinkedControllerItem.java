@@ -34,6 +34,7 @@ public class LinkedControllerItem extends Item implements MenuProvider {
         super(properties);
     }
 
+    @Nullable
     public static InteractionResult onItemUseFirst(
         Level world,
         Player player,

@@ -12,6 +12,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class RedstoneContactItem extends BlockItem {
 
@@ -20,6 +21,7 @@ public class RedstoneContactItem extends BlockItem {
     }
 
     @Override
+    @Nullable
     protected BlockState getPlacementState(BlockPlaceContext ctx) {
         Level world = ctx.getLevel();
         BlockPos pos = ctx.getClickedPos();

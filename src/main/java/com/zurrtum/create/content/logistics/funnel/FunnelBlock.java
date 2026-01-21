@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
 
@@ -52,7 +53,7 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
         return AllBlockEntityTypes.FUNNEL.isValid(blockState);
     }
 
-    public abstract BlockState getEquivalentBeltFunnel(BlockGetter world, BlockPos pos, BlockState state);
+    public abstract BlockState getEquivalentBeltFunnel(@Nullable BlockGetter world, @Nullable BlockPos pos, BlockState state);
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -76,7 +77,7 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }

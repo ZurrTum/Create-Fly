@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.ticks.LevelTickAccess;
+import org.jspecify.annotations.Nullable;
 
 public class ConnectedPillarBlock extends LayeredBlock {
 
@@ -142,6 +143,7 @@ public class ConnectedPillarBlock extends LayeredBlock {
         return state;
     }
 
+    @Nullable
     public static BooleanProperty connection(Axis axis, Direction side) {
         if (side.getAxis() == axis)
             return null;

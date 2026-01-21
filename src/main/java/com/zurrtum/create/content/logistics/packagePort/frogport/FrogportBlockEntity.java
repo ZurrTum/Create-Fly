@@ -31,12 +31,13 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public class FrogportBlockEntity extends PackagePortBlockEntity {
 
-    public ItemStack animatedPackage;
+    public @Nullable ItemStack animatedPackage;
     public LerpedFloat manualOpenAnimationProgress;
     public LerpedFloat animationProgress;
     public LerpedFloat anticipationProgress;
@@ -49,7 +50,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
 
     public boolean failedLastExport;
 
-    private ItemStack deferAnimationStart;
+    private @Nullable ItemStack deferAnimationStart;
     private boolean deferAnimationInward;
 
     public FrogportBlockEntity(BlockPos pos, BlockState state) {
@@ -299,6 +300,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
 
     }
 
+    @Nullable
     protected Container getAdjacentInventory(Direction side) {
         BlockPos pos = this.worldPosition.relative(side);
         BlockEntity blockEntity = level.getBlockEntity(pos);
@@ -355,7 +357,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
     }
 
     @Override
-    public InteractionResult use(Player player) {
+    public InteractionResult use(@Nullable Player player) {
         if (player == null)
             return InteractionResult.TRY_WITH_EMPTY_HAND;
 

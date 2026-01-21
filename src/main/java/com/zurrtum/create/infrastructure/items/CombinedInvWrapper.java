@@ -60,7 +60,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public int[] getSlotsForFace(Direction side) {
+    public int[] getSlotsForFace(@Nullable Direction side) {
         return slots;
     }
 
@@ -121,7 +121,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public int insert(ItemStack stack, int maxAmount, Direction side) {
+    public int insert(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         for (Container handler : itemHandler) {
             int insert = handler.insert(stack, remaining, side);
@@ -142,7 +142,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public int extract(ItemStack stack, int maxAmount, Direction side) {
+    public int extract(ItemStack stack, int maxAmount, @Nullable Direction side) {
         int remaining = maxAmount;
         for (Container handler : itemHandler) {
             int extract = handler.extract(stack, remaining, side);
@@ -163,7 +163,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    public ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -203,7 +203,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    public ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
@@ -251,7 +251,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public int countAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    public int countAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return 0;
         }
@@ -266,7 +266,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public int extractAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    public int extractAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         if (maxAmount == 0) {
             return 0;
         }
@@ -299,7 +299,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public java.util.Iterator<ItemStack> iterator(Direction side) {
+    public java.util.Iterator<ItemStack> iterator(@Nullable Direction side) {
         if (itemHandler.length == 0) {
             return Collections.emptyIterator();
         } else {
@@ -309,10 +309,10 @@ public class CombinedInvWrapper implements SidedItemInventory {
 
     class Iterator implements java.util.Iterator<ItemStack> {
         private int index;
-        private final Direction side;
+        private final @Nullable Direction side;
         private java.util.Iterator<ItemStack> iterator;
 
-        public Iterator(Direction side) {
+        public Iterator(@Nullable Direction side) {
             this.side = side;
             this.iterator = itemHandler[index].iterator(side);
         }

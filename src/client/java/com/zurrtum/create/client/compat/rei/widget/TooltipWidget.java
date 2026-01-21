@@ -7,13 +7,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
 
 public class TooltipWidget extends Widget {
     private final Rectangle bounds;
-    private final Function<Minecraft, Tooltip> tooltip;
+    private final Function<Minecraft, @Nullable Tooltip> tooltip;
 
     public TooltipWidget(int x, int y, int width, int height, Component... text) {
         this(x, y, width, height, mc -> Tooltip.create(text));

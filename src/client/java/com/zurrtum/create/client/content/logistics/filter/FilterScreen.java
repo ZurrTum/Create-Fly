@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,7 @@ public class FilterScreen extends AbstractFilterScreen<FilterMenu> {
         super(menu, inv, title, AllGuiTextures.FILTER);
     }
 
+    @Nullable
     public static FilterScreen create(
         Minecraft mc,
         MenuType<ItemStack> type,

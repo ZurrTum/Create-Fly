@@ -12,11 +12,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class WrenchEventHandler {
+    @Nullable
     public static InteractionResult useOwnWrenchLogicForCreateBlocks(
-        Level world,
-        Player player,
+        @Nullable Level world,
+        @Nullable Player player,
         ItemStack itemStack,
         InteractionHand hand,
         BlockHitResult hitVec,

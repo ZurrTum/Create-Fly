@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -64,7 +64,7 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         MechanicalCrafterRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         Level world = be.getLevel();
@@ -105,10 +105,11 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         }
     }
 
+    @Nullable
     public static MechanicalCrafterItemRenderState createItemState(
         ItemModelResolver itemModelManager,
         MechanicalCrafterBlockEntity be,
-        Level world,
+        @Nullable Level world,
         BlockState blockState,
         Phase phase,
         float tickProgress
@@ -145,13 +146,13 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
     public static class MechanicalCrafterRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public Vec3 offset;
         public float yRot;
-        public MechanicalCrafterItemRenderState item;
+        public @Nullable MechanicalCrafterItemRenderState item;
         public RenderType layer;
-        public CogwheelRenderState cogwheel;
+        public @Nullable CogwheelRenderState cogwheel;
         public float upRot;
         public float eastRot;
-        public SuperByteBuffer lid;
-        public SuperByteBuffer belt;
+        public @Nullable SuperByteBuffer lid;
+        public @Nullable SuperByteBuffer belt;
         public SuperByteBuffer frame;
         public float beltScroll;
         public SuperByteBuffer arrow;
@@ -206,10 +207,11 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
     public record MechanicalCrafterSingleItemRenderState(
         float offset, float yRot, ItemStackRenderState state
     ) implements MechanicalCrafterItemRenderState {
+        @Nullable
         public static MechanicalCrafterSingleItemRenderState create(
             ItemModelResolver itemModelManager,
             MechanicalCrafterBlockEntity be,
-            Level world
+            @Nullable Level world
         ) {
             ItemStack stack = be.getInventory().getStack();
             if (stack.isEmpty()) {
@@ -234,13 +236,14 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
     }
 
     public record MechanicalCrafterCraftingItemRenderState(
-        float scale, Vec3 centering, List<GridItemRenderState> before, float yRot, float zRot, float upScaling, float downScaling,
-        List<ItemStackRenderState> states
+        float scale, @Nullable Vec3 centering, @Nullable List<GridItemRenderState> before, float yRot, float zRot, float upScaling, float downScaling,
+        @Nullable List<ItemStackRenderState> states
     ) implements MechanicalCrafterItemRenderState {
+        @Nullable
         public static MechanicalCrafterCraftingItemRenderState create(
             ItemModelResolver itemModelManager,
             MechanicalCrafterBlockEntity be,
-            Level world,
+            @Nullable Level world,
             float tickProgress
         ) {
             GroupedItems items = be.groupedItemsBeforeCraft;
@@ -335,10 +338,11 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
     }
 
     public record MechanicalCrafterPhaseItemRenderState(List<GridItemRenderState> states, float yRot) implements MechanicalCrafterItemRenderState {
+        @Nullable
         public static MechanicalCrafterPhaseItemRenderState create(
             ItemModelResolver itemModelManager,
             MechanicalCrafterBlockEntity be,
-            Level world,
+            @Nullable Level world,
             BlockState blockState,
             Phase phase
         ) {

@@ -10,6 +10,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public interface TrackBlockRenderer {
     <Self extends Affine<Self>> void prepareTrackOverlay(
@@ -22,15 +23,15 @@ public interface TrackBlockRenderer {
         RenderedTrackOverlayType type
     );
 
-    TrackBlockRenderState getAssemblyRenderState(StationBlockEntity be, Vec3 offset, Level world, BlockPos pos, BlockState state);
+    @Nullable TrackBlockRenderState getAssemblyRenderState(StationBlockEntity be, Vec3 offset, Level world, BlockPos pos, BlockState state);
 
-    TrackBlockRenderState getRenderState(
+    @Nullable TrackBlockRenderState getRenderState(
         Level world,
         Vec3 offset,
         BlockState trackState,
         BlockPos pos,
         AxisDirection direction,
-        BezierTrackPointLocation bezier,
+        @Nullable BezierTrackPointLocation bezier,
         RenderedTrackOverlayType type,
         float scale
     );

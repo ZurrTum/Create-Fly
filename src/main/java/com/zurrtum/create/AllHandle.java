@@ -176,7 +176,7 @@ public class AllHandle {
         ServerGamePacketListenerImpl listener,
         BlockPos pos,
         int distance,
-        Predicate<BlockEntity> predicate
+        Predicate<@Nullable BlockEntity> predicate
     ) {
         ServerPlayer player = listener.player;
         if (player.isSpectator() || !player.mayBuild()) {
@@ -191,6 +191,7 @@ public class AllHandle {
         }
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (predicate.test(blockEntity)) {
+            assert blockEntity != null;
             world.getChunkSource().blockChanged(pos);
             blockEntity.setChanged();
         }
@@ -404,7 +405,7 @@ public class AllHandle {
                     }
 
                     EdgePointType<?> type = stack.is(AllItems.TRACK_SIGNAL) ? EdgePointType.SIGNAL : EdgePointType.STATION;
-                    MutableObject<OverlapResult> result = new MutableObject<>(null);
+                    MutableObject<@Nullable OverlapResult> result = new MutableObject<>(null);
                     BezierTrackPointLocation bezierTrackPointLocation = new BezierTrackPointLocation(packet.targetPos(), packet.segment());
                     TrackTargetingBlockItem.withGraphLocation(
                         world,
@@ -415,11 +416,8 @@ public class AllHandle {
                         (overlap, location) -> result.setValue(overlap)
                     );
 
-                    if (result.getValue().feedback != null) {
-                        player.displayClientMessage(
-                            Component.translatable("create." + result.getValue().feedback).withStyle(ChatFormatting.RED),
-                            true
-                        );
+                    if (result.get().feedback != null) {
+                        player.displayClientMessage(Component.translatable("create." + result.get().feedback).withStyle(ChatFormatting.RED), true);
                         AllSoundEvents.DENY.play(world, null, pos, .5f, 1);
                         return true;
                     }
@@ -502,7 +500,7 @@ public class AllHandle {
         );
     }
 
-    private static boolean handleValueSettings(ServerPlayer player, ValueSettingsHandleBehaviour handle, ValueSettingsPacket packet) {
+    private static boolean handleValueSettings(ServerPlayer player, @Nullable ValueSettingsHandleBehaviour handle, ValueSettingsPacket packet) {
         if (handle == null || !handle.acceptsValueSettings() || packet.behaviourIndex() != handle.netId()) {
             return false;
         }
@@ -922,6 +920,7 @@ public class AllHandle {
             BlockPos pos = ((SchematicTableMenu) player.containerMenu).contentHolder.getBlockPos();
             Create.SCHEMATIC_RECEIVER.handleNewUpload(player, schematic, packet.size(), pos);
         } else if (packet.code() == SchematicUploadPacket.WRITE) {
+            assert packet.data() != null;
             Create.SCHEMATIC_RECEIVER.handleWriteRequest(player, schematic, packet.data());
         } else {
             Create.SCHEMATIC_RECEIVER.handleFinishedUpload(player, schematic);
@@ -1097,7 +1096,12 @@ public class AllHandle {
             ejector.deployElytra(listener.player);
     }
 
-    private static void onLinkedController(ServerPlayer player, BlockPos pos, Consumer<BlockEntity> onLectern, Consumer<ItemStack> onStack) {
+    private static void onLinkedController(
+        ServerPlayer player,
+        @Nullable BlockPos pos,
+        @Nullable Consumer<@Nullable BlockEntity> onLectern,
+        @Nullable Consumer<ItemStack> onStack
+    ) {
         if (pos != null) {
             if (onLectern != null) {
                 onLectern.accept(player.level().getBlockEntity(pos));
@@ -1573,6 +1577,7 @@ public class AllHandle {
         }
     }
 
+    @Nullable
     private static ClipboardContent clipboardProcessor(@Nullable ClipboardContent content) {
         if (content == null)
             return null;

@@ -41,6 +41,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
     protected final List<ActorVisual> actors = new ArrayList<>();
     protected final PlanMap<DynamicVisual, DynamicVisual.Context> dynamicVisuals = new PlanMap<>();
     protected final PlanMap<TickableVisual, TickableVisual.Context> tickableVisuals = new PlanMap<>();
-    protected TransformedInstance structure;
+    protected @Nullable TransformedInstance structure;
     protected SectionCollector sectionCollector;
     protected long minSection, maxSection;
     /// The number of blocks around the contraption's bounding box to include when capturing sections for shader light.
@@ -120,7 +121,7 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
 
     @SuppressWarnings("unchecked")
     public ClientContraption getOrCreateClientContraptionLazy(Contraption contraption) {
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
         var out = clientContraption.getAcquire();
         if (out == null) {
             // Another thread may hit this block in the same moment.
@@ -182,7 +183,7 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
         }
     }
 
-    protected void setupActor(MutablePair<StructureTemplate.StructureBlockInfo, MovementContext> actor, VirtualRenderWorld renderLevel) {
+    protected void setupActor(MutablePair<StructureTemplate.StructureBlockInfo, @Nullable MovementContext> actor, VirtualRenderWorld renderLevel) {
         MovementContext context = actor.getRight();
         if (context == null) {
             return;

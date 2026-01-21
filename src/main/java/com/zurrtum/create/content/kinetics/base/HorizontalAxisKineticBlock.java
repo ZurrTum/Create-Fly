@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import org.jspecify.annotations.Nullable;
 
 public class HorizontalAxisKineticBlock extends KineticBlock {
     public static final EnumProperty<Direction.Axis> HORIZONTAL_AXIS = BlockStateProperties.HORIZONTAL_AXIS;
@@ -36,6 +37,7 @@ public class HorizontalAxisKineticBlock extends KineticBlock {
         return this.defaultBlockState().setValue(HORIZONTAL_AXIS, context.getHorizontalDirection().getClockWise().getAxis());
     }
 
+    @Nullable
     public static Axis getPreferredHorizontalAxis(BlockPlaceContext context) {
         Direction prefferedSide = null;
         for (Direction side : Iterate.horizontalDirections) {

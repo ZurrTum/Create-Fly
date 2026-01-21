@@ -6,11 +6,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import org.jspecify.annotations.Nullable;
 
 public class Label extends AbstractSimiWidget {
 
-    public Component text;
-    public String suffix;
+    public @Nullable Component text;
+    public @Nullable String suffix;
     protected boolean hasShadow;
     protected int color;
     protected Font font;
@@ -34,7 +35,7 @@ public class Label extends AbstractSimiWidget {
         return this;
     }
 
-    public Label withSuffix(String s) {
+    public Label withSuffix(@Nullable String s) {
         suffix = s;
         return this;
     }

@@ -59,7 +59,7 @@ public final class LightLut {
     public static final class Layer<T> {
         private boolean hasBase = false;
         private int base = 0;
-        private Object[] nextLayer = new Object[0];
+        private @Nullable Object[] nextLayer = new Object[0];
 
         public void fillLut(IntArrayList lut, BiConsumer<T, IntArrayList> inner) {
             lut.add(base);

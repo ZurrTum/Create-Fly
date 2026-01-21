@@ -170,6 +170,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
             keepAlive(this);
     }
 
+    @Nullable
     public Pair<PackagerBlockEntity, PackagingRequest> processRequest(
         ItemStack stack,
         int amount,
@@ -222,7 +223,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
         return Create.LOGISTICS.mayAdministrate(freqId, player);
     }
 
-    public static boolean isValidLink(LogisticallyLinkedBehaviour link) {
+    public static boolean isValidLink(@Nullable LogisticallyLinkedBehaviour link) {
         return link != null && !link.blockEntity.isRemoved() && !link.blockEntity.isChunkUnloaded();
     }
 

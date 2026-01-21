@@ -12,10 +12,6 @@ import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.ConnectingFrom;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
@@ -33,6 +29,10 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class TrackPlacement {
     public static class PlacementInfo {
@@ -41,11 +41,11 @@ public class TrackPlacement {
             this.trackMaterial = material;
         }
 
-        public BezierConnection curve = null;
+        public @Nullable BezierConnection curve = null;
         public boolean valid = false;
         public int end1Extent = 0;
         public int end2Extent = 0;
-        public String message = null;
+        public @Nullable String message = null;
 
         public int requiredTracks = 0;
         public boolean hasRequiredTracks = false;
@@ -75,9 +75,9 @@ public class TrackPlacement {
         }
     }
 
-    public static PlacementInfo cached;
+    public static @Nullable PlacementInfo cached;
 
-    public static BlockPos hoveringPos;
+    public static @Nullable BlockPos hoveringPos;
     public static boolean hoveringMaxed;
     static int hoveringAngle;
     static ItemStack lastItem;

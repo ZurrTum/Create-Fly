@@ -11,10 +11,14 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
-public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double speed, int fuelTicks) implements Packet<ClientGamePacketListener> {
+public record TrainHUDControlUpdatePacket(
+    UUID trainId, @Nullable Double throttle, double speed, int fuelTicks
+) implements Packet<ClientGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, TrainHUDControlUpdatePacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainHUDControlUpdatePacket::trainId,

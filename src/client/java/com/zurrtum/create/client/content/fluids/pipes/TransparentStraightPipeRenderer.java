@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -40,7 +40,7 @@ public class TransparentStraightPipeRenderer implements BlockEntityRenderer<Stra
         TransparentStraightPipeRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         FluidTransportBehaviour pipe = be.getBehaviour(FluidTransportBehaviour.TYPE);
         if (pipe == null)
@@ -98,7 +98,7 @@ public class TransparentStraightPipeRenderer implements BlockEntityRenderer<Stra
     public static class TransparentStraightPipeRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public RenderType layer;
         public float radius;
-        public FluidRenderData[] data;
+        public @Nullable FluidRenderData @Nullable [] data;
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

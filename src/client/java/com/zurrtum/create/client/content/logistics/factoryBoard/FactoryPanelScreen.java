@@ -41,17 +41,17 @@ import static com.zurrtum.create.client.foundation.gui.AllGuiTextures.*;
 
 public class FactoryPanelScreen extends AbstractSimiScreen {
     private ElementWidget renderedBlock;
-    private ElementWidget renderedItem;
+    private @Nullable ElementWidget renderedItem;
 
-    private AddressEditBox addressBox;
+    private @Nullable AddressEditBox addressBox;
     private IconButton confirmButton;
     private IconButton deleteButton;
     private IconButton newInputButton;
     private IconButton relocateButton;
-    private IconButton activateCraftingButton;
+    private @Nullable IconButton activateCraftingButton;
     private ScrollInput promiseExpiration;
-    private ServerFactoryPanelBehaviour behaviour;
-    private boolean restocker;
+    private final ServerFactoryPanelBehaviour behaviour;
+    private final boolean restocker;
     private boolean sendReset;
     private boolean sendRedstoneReset;
 

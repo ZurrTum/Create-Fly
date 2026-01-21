@@ -24,6 +24,7 @@ import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.*;
@@ -72,7 +73,12 @@ public class AllSynchedDatas {
         return register(type, handler, def, null);
     }
 
-    private static <E extends SyncedDataHolder, T> Entry<T> register(Class<E> type, EntityDataSerializer<T> handler, T def, BiConsumer<E, T> onData) {
+    private static <E extends SyncedDataHolder, T> Entry<T> register(
+        Class<E> type,
+        EntityDataSerializer<T> handler,
+        T def,
+        @Nullable BiConsumer<E, T> onData
+    ) {
         return ALL.computeIfAbsent(type, SynchedData::new).add(handler, def, onData);
     }
 
@@ -114,20 +120,20 @@ public class AllSynchedDatas {
         private final Class<?> type;
         private final Deque<Entry<?>> datas = new ArrayDeque<>();
         private List<Consumer<SynchedEntityData.DataItem<?>[]>> actions;
-        private Int2ObjectMap<BiConsumer<? extends SyncedDataHolder, ?>> listeners;
+        private @Nullable Int2ObjectMap<@Nullable BiConsumer<? extends SyncedDataHolder, ?>> listeners;
         private int size;
 
         public SynchedData(Class<?> type) {
             this.type = type;
         }
 
-        public <E extends SyncedDataHolder, T> Entry<T> add(EntityDataSerializer<T> handler, T def, BiConsumer<E, T> onData) {
+        public <E extends SyncedDataHolder, T> Entry<T> add(EntityDataSerializer<T> handler, T def, @Nullable BiConsumer<E, T> onData) {
             Entry<T> entry = new Entry<>(handler, def, onData);
             datas.add(entry);
             return entry;
         }
 
-        private void preparse(int index, SynchedData parent) {
+        private void preparse(int index, @Nullable SynchedData parent) {
             if (parent != null) {
                 if (datas.isEmpty()) {
                     datas.addAll(parent.datas);
@@ -198,13 +204,13 @@ public class AllSynchedDatas {
     public static class Entry<T> {
         private final EntityDataSerializer<T> handler;
         private final Supplier<T> def;
-        private final BiConsumer<? extends SyncedDataHolder, T> listener;
+        private final @Nullable BiConsumer<? extends SyncedDataHolder, T> listener;
         private BiFunction<Class<?>, Integer, Consumer<SynchedEntityData.DataItem<?>[]>> add = this::firstAdd;
         private Function<Entity, T> get;
         private TriConsumer<Entity, T, Boolean> set;
 
         @SuppressWarnings("unchecked")
-        private Entry(EntityDataSerializer<T> handler, T def, BiConsumer<? extends SyncedDataHolder, T> listener) {
+        private Entry(EntityDataSerializer<T> handler, T def, @Nullable BiConsumer<? extends SyncedDataHolder, T> listener) {
             this.handler = handler;
             if (def instanceof CompoundTag nbt) {
                 this.def = () -> (T) nbt.copy();

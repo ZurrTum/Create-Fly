@@ -6,10 +6,6 @@ import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
-
-import java.util.Locale;
-import java.util.Optional;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.StringRepresentable;
@@ -19,6 +15,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
+import java.util.Optional;
 
 public class BracketBlock extends WrenchableDirectionalBlock {
 
@@ -56,7 +56,7 @@ public class BracketBlock extends WrenchableDirectionalBlock {
         return getSuitableBracket(FluidPropagator.getStraightPipeAxis(blockState), direction, BracketType.PIPE);
     }
 
-    private Optional<BlockState> getSuitableBracket(Axis targetBlockAxis, Direction direction, BracketType type) {
+    private Optional<BlockState> getSuitableBracket(@Nullable Axis targetBlockAxis, Direction direction, BracketType type) {
         Axis axis = direction.getAxis();
         if (targetBlockAxis == null || targetBlockAxis == axis)
             return Optional.empty();

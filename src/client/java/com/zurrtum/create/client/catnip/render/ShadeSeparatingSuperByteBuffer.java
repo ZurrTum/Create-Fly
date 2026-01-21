@@ -45,7 +45,7 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
     private BlockAndTintGetter levelWithLight;
     @Nullable
     private Matrix4f lightTransform;
-    private boolean invertFakeDiffuseNormal;
+    private final boolean invertFakeDiffuseNormal;
 
     // Reused objects
     private final Matrix4f modelMat = new Matrix4f();
@@ -72,6 +72,7 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         this(template, new int[0]);
     }
 
+    @Override
     public void renderInto(PoseStack.Pose entry, VertexConsumer builder) {
         if (isEmpty()) {
             return;
@@ -184,6 +185,8 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         reset();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer reset() {
         while (!transforms.isEmpty())
             transforms.popPose();
@@ -205,10 +208,12 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         return this;
     }
 
+    @Override
     public boolean isEmpty() {
         return template.isEmpty();
     }
 
+    @Override
     public PoseStack getTransforms() {
         return transforms;
     }
@@ -265,25 +270,35 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer color(int r, int g, int b, int a) {
         color(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer color(int color) {
         color((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer color(Color c) {
         return color(c.getRGB());
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer disableDiffuse() {
         disableDiffuse = true;
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer shiftUV(SpriteShiftEntry entry) {
         spriteShiftFunc = (u, v, output) -> {
             output.accept(entry.getTargetU(u), entry.getTargetV(v));
@@ -291,10 +306,14 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer shiftUVScrolling(SpriteShiftEntry entry, float scrollV) {
         return shiftUVScrolling(entry, 0, scrollV);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer shiftUVScrolling(SpriteShiftEntry entry, float scrollU, float scrollV) {
         spriteShiftFunc = (u, v, output) -> {
             float targetU = u - entry.getOriginal().getU0() + entry.getTarget().getU0() + scrollU;
@@ -304,6 +323,8 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer shiftUVtoSheet(SpriteShiftEntry entry, float uTarget, float vTarget, int sheetSize) {
         spriteShiftFunc = (u, v, output) -> {
             float targetU = entry.getTarget().getU((SpriteShiftEntry.getUnInterpolatedU(entry.getOriginal(), u) / sheetSize) + uTarget);
@@ -313,18 +334,23 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer overlay(int overlay) {
         hasCustomOverlay = true;
         this.overlay = overlay;
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public SuperByteBuffer light(int packedLight) {
         hasCustomLight = true;
         this.packedLight = packedLight;
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public SuperByteBuffer useLevelLight(BlockAndTintGetter level) {
         useLevelLight = true;
@@ -332,6 +358,7 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public SuperByteBuffer useLevelLight(BlockAndTintGetter level, Matrix4f lightTransform) {
         useLevelLight = true;

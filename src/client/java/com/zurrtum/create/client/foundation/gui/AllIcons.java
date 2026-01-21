@@ -22,8 +22,8 @@ public class AllIcons implements ScreenElement {
     public static final int ICON_ATLAS_SIZE = 256;
 
     private static int x = 0, y = -1;
-    private int iconX;
-    private int iconY;
+    private final int iconX;
+    private final int iconY;
 
     public static final AllIcons I_ADD = newRow(), I_TRASH = next(), I_3x3 = next(), I_TARGET = next(), I_PRIORITY_VERY_LOW = next(), I_PRIORITY_LOW = next(), I_PRIORITY_HIGH = next(), I_PRIORITY_VERY_HIGH = next(), I_BLACKLIST = next(), I_WHITELIST = next(), I_WHITELIST_OR = next(), I_WHITELIST_AND = next(), I_WHITELIST_NOT = next(), I_RESPECT_NBT = next(), I_IGNORE_NBT = next();
 

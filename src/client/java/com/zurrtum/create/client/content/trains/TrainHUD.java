@@ -26,17 +26,18 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 public class TrainHUD {
     static LerpedFloat displayedSpeed = LerpedFloat.linear();
     static LerpedFloat displayedThrottle = LerpedFloat.linear();
     static LerpedFloat displayedPromptSize = LerpedFloat.linear();
 
-    static Double editedThrottle = null;
+    static @Nullable Double editedThrottle = null;
     static int hudPacketCooldown = 5;
     static int honkPacketCooldown = 5;
 
-    public static Component currentPrompt;
+    public static @Nullable Component currentPrompt;
     public static boolean currentPromptShadow;
     public static int promptKeepAlive = 0;
 
@@ -95,6 +96,7 @@ public class TrainHUD {
         }
     }
 
+    @Nullable
     private static Carriage getCarriage() {
         if (!(ControlsHandler.getContraption() instanceof CarriageContraptionEntity cce))
             return null;

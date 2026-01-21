@@ -25,7 +25,7 @@ public class BasicParticleFactory implements ParticleProvider<SimpleParticleType
     }
 
     private final Factory factory;
-    private SpriteSet spriteSet;
+    private final SpriteSet spriteSet;
 
     private BasicParticleFactory(Factory factory, SpriteSet spriteSet) {
         this.factory = factory;

@@ -5,12 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class CreativeFluidTankBlockEntity extends FluidTankBlockEntity {
 
@@ -29,7 +29,7 @@ public class CreativeFluidTankBlockEntity extends FluidTankBlockEntity {
             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("capacity").forGetter(FluidTank::getMaxAmountPerStack)
         ).apply(i, CreativeFluidTankInventory::new));
 
-        private final Consumer<FluidStack> updateCallback;
+        private final @Nullable Consumer<FluidStack> updateCallback;
 
         public CreativeFluidTankInventory(int capacity, Consumer<FluidStack> updateCallback) {
             super(capacity);

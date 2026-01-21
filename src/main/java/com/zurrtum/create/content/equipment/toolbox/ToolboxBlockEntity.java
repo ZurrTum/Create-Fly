@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 
     Map<Integer, WeakHashMap<Player, Integer>> connectedPlayers;
 
-    private Component customName;
+    private @Nullable Component customName;
 
     private AnimatedContainerBehaviour<ToolboxMenu> openTracker;
 
@@ -336,7 +337,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
         map.put(player, hotbarSlot);
     }
 
-    public void readInventory(ToolboxInventory inv) {
+    public void readInventory(@Nullable ToolboxInventory inv) {
         if (inv != null) {
             NonNullList<ItemStack> filters = inv.filters;
             for (int i = 0, size = filters.size(); i < size; i++) {
@@ -370,6 +371,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     }
 
     @Override
+    @Nullable
     public Component getCustomName() {
         return customName;
     }

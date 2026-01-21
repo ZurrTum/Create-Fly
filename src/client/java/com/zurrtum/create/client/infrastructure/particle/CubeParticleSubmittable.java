@@ -10,12 +10,14 @@ import net.minecraft.client.renderer.feature.ParticleFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.state.ParticleGroupRenderState;
 import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.client.renderer.state.QuadParticleRenderState.PreparedBuffers;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.LightCoordsUtil;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -55,7 +57,8 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
     }
 
     @Override
-    public QuadParticleRenderState.PreparedBuffers prepare(ParticleFeatureRenderer.ParticleBufferCache cache) {
+    @Nullable
+    public PreparedBuffers prepare(ParticleFeatureRenderer.ParticleBufferCache cache) {
         int i = particles * 24;
         try (ByteBufferBuilder bufferAllocator = ByteBufferBuilder.exactlySized(i * DefaultVertexFormat.PARTICLE.getVertexSize())) {
             BufferBuilder bufferBuilder = new BufferBuilder(bufferAllocator, VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
@@ -67,11 +70,7 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
                 RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS).getBuffer(builtBuffer.drawState().indexCount());
                 GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms()
                     .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(), new Matrix4f());
-                return new QuadParticleRenderState.PreparedBuffers(
-                    builtBuffer.drawState().indexCount(),
-                    gpuBufferSlice,
-                    Map.of(CubeParticleRenderer.RENDER_TYPE, layer)
-                );
+                return new PreparedBuffers(builtBuffer.drawState().indexCount(), gpuBufferSlice, Map.of(CubeParticleRenderer.RENDER_TYPE, layer));
             }
         }
         return null;
@@ -91,7 +90,7 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
 
     @Override
     public void render(
-        QuadParticleRenderState.PreparedBuffers buffers,
+        PreparedBuffers buffers,
         ParticleFeatureRenderer.ParticleBufferCache cache,
         RenderPass renderPass,
         TextureManager manager,

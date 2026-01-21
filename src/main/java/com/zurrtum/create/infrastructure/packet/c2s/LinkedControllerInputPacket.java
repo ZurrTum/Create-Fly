@@ -11,13 +11,15 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 
 public record LinkedControllerInputPacket(
-    List<Integer> activatedButtons, boolean press, BlockPos lecternPos
+    List<Integer> activatedButtons, boolean press, @Nullable BlockPos lecternPos
 ) implements Packet<ServerGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<ByteBuf, LinkedControllerInputPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT.apply(ByteBufCodecs.list()),
         LinkedControllerInputPacket::activatedButtons,
@@ -32,7 +34,7 @@ public record LinkedControllerInputPacket(
         this(activatedButtons, press, null);
     }
 
-    public LinkedControllerInputPacket(Collection<Integer> activatedButtons, boolean press, BlockPos lecternPos) {
+    public LinkedControllerInputPacket(Collection<Integer> activatedButtons, boolean press, @Nullable BlockPos lecternPos) {
         this(List.copyOf(activatedButtons), press, lecternPos);
     }
 

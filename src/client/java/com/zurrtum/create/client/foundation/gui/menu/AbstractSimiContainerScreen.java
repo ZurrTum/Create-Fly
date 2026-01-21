@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Collection;
@@ -174,6 +175,7 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
     }
 
     @Override
+    @Nullable
     public GuiEventListener getFocused() {
         GuiEventListener focused = super.getFocused();
         if (focused instanceof AbstractWidget && !focused.isFocused())
@@ -213,6 +215,7 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public static <T extends BlockEntity> T getBlockEntity(Minecraft mc, RegistryFriendlyByteBuf extraData) {
         ClientLevel world = mc.level;
         if (world == null) {

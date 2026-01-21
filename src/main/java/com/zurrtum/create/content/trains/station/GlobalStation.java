@@ -30,7 +30,7 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
     public static final Codec<Map<BlockPos, GlobalPackagePort>> PORTS_CODEC = CreateCodecs.getCodecMap(BlockPos.CODEC, GlobalPackagePort.CODEC);
 
     public String name;
-    public WeakReference<Train> nearestTrain;
+    public WeakReference<@Nullable Train> nearestTrain;
     public boolean assembling;
 
     public Map<BlockPos, GlobalPackagePort> connectedPorts;

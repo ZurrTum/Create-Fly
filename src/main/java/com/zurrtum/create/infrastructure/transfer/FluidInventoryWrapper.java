@@ -332,6 +332,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         return capacity;
     }
 
+    @Nullable
     protected abstract S getSlot(int slot);
 
     @Override
@@ -467,7 +468,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
 
     @Override
     public boolean isEmpty() {
-        for (StorageView<FluidVariant> view : storage.nonEmptyViews()) {
+        for (StorageView<FluidVariant> _ : storage.nonEmptyViews()) {
             return false;
         }
         return true;
@@ -475,7 +476,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
 
     @Override
     public java.util.Iterator<FluidStack> iterator() {
-        return storage.supportsExtraction() ? new com.zurrtum.create.infrastructure.transfer.FluidInventoryWrapper.Iterator(storage) : Collections.emptyIterator();
+        return storage.supportsExtraction() ? new Iterator(storage) : Collections.emptyIterator();
     }
 
     @Override
@@ -676,7 +677,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public boolean canExtract(int slot, FluidStack stack, Direction dir) {
+        public boolean canExtract(int slot, FluidStack stack, @Nullable Direction side) {
             return canExtract;
         }
 
@@ -694,7 +695,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int count(FluidStack stack, Direction side) {
+        public int count(FluidStack stack, @Nullable Direction side) {
             return count(stack);
         }
 
@@ -707,7 +708,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int count(FluidStack stack, int maxAmount, Direction side) {
+        public int count(FluidStack stack, int maxAmount, @Nullable Direction side) {
             return count(stack, maxAmount);
         }
 
@@ -720,7 +721,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack count(Predicate<FluidStack> predicate, Direction side) {
+        public FluidStack count(Predicate<FluidStack> predicate, @Nullable Direction side) {
             return count(predicate);
         }
 
@@ -733,7 +734,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack count(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+        public FluidStack count(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
             return count(predicate, maxAmount);
         }
 
@@ -746,7 +747,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack countAny(Direction side) {
+        public FluidStack countAny(@Nullable Direction side) {
             return countAny();
         }
 
@@ -759,7 +760,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack countAny(int maxAmount, Direction side) {
+        public FluidStack countAny(int maxAmount, @Nullable Direction side) {
             return countAny(maxAmount);
         }
 
@@ -772,7 +773,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int countSpace(FluidStack stack, Direction side) {
+        public int countSpace(FluidStack stack, @Nullable Direction side) {
             return countSpace(stack);
         }
 
@@ -785,7 +786,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int countSpace(FluidStack stack, int maxAmount, Direction side) {
+        public int countSpace(FluidStack stack, int maxAmount, @Nullable Direction side) {
             return countSpace(stack, maxAmount);
         }
 
@@ -798,7 +799,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int extract(FluidStack stack, Direction side) {
+        public int extract(FluidStack stack, @Nullable Direction side) {
             return extract(stack);
         }
 
@@ -811,7 +812,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int extract(FluidStack stack, int maxAmount, Direction side) {
+        public int extract(FluidStack stack, int maxAmount, @Nullable Direction side) {
             return extract(stack, maxAmount);
         }
 
@@ -824,7 +825,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack extract(Predicate<FluidStack> predicate, Direction side) {
+        public FluidStack extract(Predicate<FluidStack> predicate, @Nullable Direction side) {
             return extract(predicate);
         }
 
@@ -837,7 +838,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack extract(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+        public FluidStack extract(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
             return extract(predicate, maxAmount);
         }
 
@@ -850,7 +851,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack extractAny(Direction side) {
+        public FluidStack extractAny(@Nullable Direction side) {
             return extractAny();
         }
 
@@ -863,7 +864,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack extractAny(int maxAmount, Direction side) {
+        public FluidStack extractAny(int maxAmount, @Nullable Direction side) {
             return extractAny(maxAmount);
         }
 
@@ -876,7 +877,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int[] getAvailableSlots(Direction side) {
+        public int[] getAvailableSlots(@Nullable Direction side) {
             return slots;
         }
 
@@ -891,7 +892,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int insert(FluidStack stack, Direction side) {
+        public int insert(FluidStack stack, @Nullable Direction side) {
             return insert(stack);
         }
 
@@ -904,7 +905,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int insert(FluidStack stack, int maxAmount, Direction side) {
+        public int insert(FluidStack stack, int maxAmount, @Nullable Direction side) {
             return insert(stack, maxAmount);
         }
 
@@ -917,7 +918,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public List<FluidStack> insert(List<FluidStack> stacks, Direction side) {
+        public List<FluidStack> insert(List<FluidStack> stacks, @Nullable Direction side) {
             return insert(stacks);
         }
 
@@ -930,7 +931,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public int insertExist(FluidStack stack, Direction side) {
+        public int insertExist(FluidStack stack, @Nullable Direction side) {
             return insertExist(stack);
         }
 
@@ -953,12 +954,12 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public java.util.Iterator<FluidStack> iterator(Direction side) {
+        public java.util.Iterator<FluidStack> iterator(@Nullable Direction side) {
             return inventory.iterator();
         }
 
         @Override
-        public boolean preciseExtract(FluidStack stack, Direction side) {
+        public boolean preciseExtract(FluidStack stack, @Nullable Direction side) {
             return preciseExtract(stack);
         }
 
@@ -971,7 +972,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public FluidStack preciseExtract(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+        public FluidStack preciseExtract(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
             return preciseExtract(predicate, maxAmount);
         }
 
@@ -984,7 +985,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public boolean preciseInsert(FluidStack stack, Direction side) {
+        public boolean preciseInsert(FluidStack stack, @Nullable Direction side) {
             return preciseInsert(stack);
         }
 
@@ -997,7 +998,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public boolean preciseInsert(FluidStack stack, int maxAmount, Direction side) {
+        public boolean preciseInsert(FluidStack stack, int maxAmount, @Nullable Direction side) {
             return preciseInsert(stack, maxAmount);
         }
 
@@ -1010,7 +1011,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public boolean preciseInsert(List<FluidStack> stacks, Direction side) {
+        public boolean preciseInsert(List<FluidStack> stacks, @Nullable Direction side) {
             return preciseInsert(stacks);
         }
 
@@ -1054,7 +1055,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public Stream<FluidStack> stream(Direction side) {
+        public Stream<FluidStack> stream(@Nullable Direction side) {
             return inventory.stream();
         }
     }
@@ -1067,6 +1068,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
+        @Nullable
         protected StorageView<FluidVariant> getSlot(int slot) {
             int current = 0;
             for (StorageView<FluidVariant> view : storage) {

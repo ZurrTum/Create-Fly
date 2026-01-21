@@ -57,8 +57,8 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
         BlockPos pos,
         BlockPos otherPos,
         Direction face,
-        Direction primaryOffset,
-        Direction secondaryOffset
+        @Nullable Direction primaryOffset,
+        @Nullable Direction secondaryOffset
     ) {
 
         if (connects(reader, pos, state, other) || connectsHigh(reader, pos, state, other, reader.getBlockState(otherPos.above())))

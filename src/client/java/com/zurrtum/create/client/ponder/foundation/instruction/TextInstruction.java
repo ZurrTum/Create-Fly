@@ -4,11 +4,12 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.OutlinerElement;
 import com.zurrtum.create.client.ponder.foundation.element.TextWindowElement;
+import org.jspecify.annotations.Nullable;
 
 public class TextInstruction extends FadeInOutInstruction {
 
     private final TextWindowElement element;
-    private OutlinerElement outline;
+    private @Nullable OutlinerElement outline;
 
     public TextInstruction(TextWindowElement element, int duration) {
         super(duration);

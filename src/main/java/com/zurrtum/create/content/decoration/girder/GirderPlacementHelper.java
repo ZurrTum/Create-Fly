@@ -6,10 +6,6 @@ import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -21,6 +17,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class GirderPlacementHelper implements IPlacementHelper {
 
@@ -73,7 +73,7 @@ public class GirderPlacementHelper implements IPlacementHelper {
     }
 
     @Override
-    public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+    public PlacementOffset getOffset(@Nullable Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
         List<Direction> directions = IPlacementHelper.orderedByDistance(pos, ray.getLocation(), dir -> canExtendToward(state, dir));
         for (Direction dir : directions) {
             int range = AllConfigs.server().equipment.placementAssistRange.get();

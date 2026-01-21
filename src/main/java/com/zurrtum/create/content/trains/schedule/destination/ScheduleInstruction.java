@@ -87,7 +87,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
 
     private static ScheduleInstruction fallback(Identifier location) {
         Create.LOGGER.warn("Could not parse schedule instruction type: {}", location);
-        return AllSchedules.createScheduleInstruction(AllSchedules.DESTINATION);
+        return new DestinationInstruction(AllSchedules.DESTINATION);
     }
 
     private static void encode(RegistryFriendlyByteBuf buf, ScheduleInstruction value) {

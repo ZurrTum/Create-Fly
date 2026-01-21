@@ -11,7 +11,7 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
@@ -43,13 +43,7 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
     }
 
     @Override
-    public void extractRenderState(
-        T be,
-        PulleyRenderState state,
-        float tickProgress,
-        Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
-    ) {
+    public void extractRenderState(T be, PulleyRenderState state, float tickProgress, Vec3 cameraPos, @Nullable CrumblingOverlay crumblingOverlay) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
             return;
@@ -140,13 +134,13 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
         public SuperByteBuffer coil;
         public SpriteShiftEntry coilShift;
         public float coilScroll;
-        public SuperByteBuffer magnet;
+        public @Nullable SuperByteBuffer magnet;
         public float magnetOffset;
         public int magnetLight;
-        public SuperByteBuffer halfRope;
+        public @Nullable SuperByteBuffer halfRope;
         public float halfRopeOffset;
         public int halfRopeLight;
-        public SuperByteBuffer rope;
+        public @Nullable SuperByteBuffer rope;
         public float[] offsets;
         public int[] lights;
 

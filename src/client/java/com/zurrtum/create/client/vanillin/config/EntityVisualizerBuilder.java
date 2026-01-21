@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.vanillin.config;
 
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleEntityVisualizer;
+import com.zurrtum.create.client.flywheel.lib.visualization.SimpleEntityVisualizer.Factory;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -18,7 +19,7 @@ public final class EntityVisualizerBuilder<T extends Entity> {
     private final Configurator configurator;
     private final EntityType<T> type;
     @Nullable
-    private SimpleEntityVisualizer.Factory<T> visualFactory;
+    private Factory<T> visualFactory;
     @Nullable
     private Predicate<T> skipVanillaRender;
 
@@ -33,7 +34,7 @@ public final class EntityVisualizerBuilder<T extends Entity> {
      * @param visualFactory The visual factory.
      * @return {@code this}
      */
-    public EntityVisualizerBuilder<T> factory(SimpleEntityVisualizer.Factory<T> visualFactory) {
+    public EntityVisualizerBuilder<T> factory(Factory<T> visualFactory) {
         this.visualFactory = visualFactory;
         return this;
     }

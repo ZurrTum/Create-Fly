@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -28,10 +29,10 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
 
     public BlockPos targetOffset;
 
-    public DisplaySource activeSource;
+    public @Nullable DisplaySource activeSource;
     private CompoundTag sourceConfig;
 
-    public DisplayTarget activeTarget;
+    public @Nullable DisplayTarget activeTarget;
     public int targetLine;
 
     public int refreshTicks;

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.LightCoordsUtil;
 import org.joml.Matrix4f;
+import org.jspecify.annotations.Nullable;
 
 import java.text.BreakIterator;
 import java.util.LinkedList;
@@ -70,7 +71,7 @@ public class ClientFontHelper {
         }
     }
 
-    private static void draw(GuiGraphics graphics, Font font, String text, int x, int y, int color) {
+    private static void draw(GuiGraphics graphics, Font font, @Nullable String text, int x, int y, int color) {
         if (text != null) {
             graphics.drawString(font, text, x, y, color, false);
         }

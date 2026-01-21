@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -38,7 +38,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
         FluidTankRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         if (!be.isController()) {
             return;
@@ -54,7 +54,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
         FluidTankBlockEntity be,
         FluidTankRenderState state,
         float tickProgress,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         LerpedFloat fluidLevel = be.getFluidLevel();
         if (fluidLevel == null) {
@@ -106,7 +106,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
         FluidTankBlockEntity be,
         FluidTankRenderState state,
         float tickProgress,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         boolean[] occludedDirections = be.boiler.occludedDirections;
         if (occludedDirections[0] && occludedDirections[1] && occludedDirections[2] && occludedDirections[3]) {
@@ -147,7 +147,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
 
     public static class FluidTankRenderState extends BlockEntityRenderState {
         public RenderType layer;
-        public RenderData data;
+        public @Nullable RenderData data;
     }
 
     public interface RenderData extends SubmitNodeCollector.CustomGeometryRenderer {

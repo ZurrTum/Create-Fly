@@ -366,6 +366,7 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         return getStateToPaveWith(filter);
     }
 
+    @Nullable
     protected BlockState getStateToPaveWithAsSlab(MovementContext context) {
         BlockState stateToPaveWith = getStateToPaveWith(context);
         if (stateToPaveWith.hasProperty(SlabBlock.TYPE))

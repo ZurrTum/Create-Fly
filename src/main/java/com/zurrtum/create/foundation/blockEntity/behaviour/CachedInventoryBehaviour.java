@@ -14,10 +14,10 @@ import java.util.function.Function;
 
 public class CachedInventoryBehaviour<T extends SmartBlockEntity> extends BlockEntityBehaviour<T> {
     public static final BehaviourType<CachedInventoryBehaviour<?>> TYPE = new BehaviourType<>();
-    private final Function<T, Container> factory;
-    private Function<Direction, Storage<ItemVariant>> getter;
+    private final Function<T, @Nullable Container> factory;
+    private Function<@Nullable Direction, @Nullable Storage<ItemVariant>> getter;
 
-    public CachedInventoryBehaviour(T be, Function<T, Container> factory) {
+    public CachedInventoryBehaviour(T be, Function<T, @Nullable Container> factory) {
         super(be);
         this.factory = factory;
         reset();
@@ -27,19 +27,21 @@ public class CachedInventoryBehaviour<T extends SmartBlockEntity> extends BlockE
         return be.getBehaviour(TYPE).get(side);
     }
 
-    public Storage<ItemVariant> get(Direction side) {
+    @Nullable
+    public Storage<ItemVariant> get(@Nullable Direction side) {
         return getter.apply(side);
     }
 
     @SuppressWarnings("unchecked")
-    private Storage<ItemVariant> firstGet(Direction direction) {
+    @Nullable
+    private Storage<ItemVariant> firstGet(@Nullable Direction direction) {
         Container inventory = factory.apply(blockEntity);
         if (inventory == null) {
             return null;
         }
         Storage<ItemVariant> storage = InventoryStorage.of(inventory, null);
         if (inventory instanceof WorldlyContainer) {
-            Storage<ItemVariant>[] sides = new Storage[6];
+            @Nullable Storage<ItemVariant>[] sides = new Storage[6];
             getter = side -> {
                 if (side == null) {
                     return storage;
@@ -53,7 +55,7 @@ public class CachedInventoryBehaviour<T extends SmartBlockEntity> extends BlockE
                 }
             };
         } else {
-            getter = side -> storage;
+            getter = _ -> storage;
         }
         return getter.apply(direction);
     }

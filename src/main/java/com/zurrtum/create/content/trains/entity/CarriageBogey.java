@@ -61,7 +61,7 @@ public class CarriageBogey {
     public LerpedFloat yaw;
     public LerpedFloat pitch;
 
-    public Couple<Vec3> couplingAnchors;
+    public Couple<@Nullable Vec3> couplingAnchors;
 
     int derailAngle;
 
@@ -69,7 +69,13 @@ public class CarriageBogey {
         this(type, upsideDown, bogeyData, new TravellingPoint(), new TravellingPoint());
     }
 
-    public CarriageBogey(AbstractBogeyBlock<?> type, boolean upsideDown, CompoundTag bogeyData, TravellingPoint point, TravellingPoint point2) {
+    public CarriageBogey(
+        AbstractBogeyBlock<?> type,
+        boolean upsideDown,
+        @Nullable CompoundTag bogeyData,
+        TravellingPoint point,
+        TravellingPoint point2
+    ) {
         this.type = type;
         this.upsideDown = type.canBeUpsideDown() && upsideDown;
         point.upsideDown = this.upsideDown;
@@ -86,6 +92,7 @@ public class CarriageBogey {
         couplingAnchors = Couple.create(null, null);
     }
 
+    @Nullable
     public ResourceKey<Level> getDimension() {
         TravellingPoint leading = leading();
         TravellingPoint trailing = trailing();

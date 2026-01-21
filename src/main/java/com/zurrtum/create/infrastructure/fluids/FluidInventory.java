@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.Clearable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -17,7 +18,7 @@ import java.util.stream.StreamSupport;
 
 public interface FluidInventory extends Clearable, Iterable<FluidStack> {
     Hash.Strategy<FluidStack> FLUID_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
-        public boolean equals(FluidStack stack, FluidStack other) {
+        public boolean equals(@Nullable FluidStack stack, @Nullable FluidStack other) {
             return stack == other || stack != null && other != null && FluidStack.areFluidsAndComponentsEqual(stack, other);
         }
 
@@ -34,7 +35,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         markDirty();
     }
 
-    default int count(FluidStack stack, Direction side) {
+    default int count(FluidStack stack, @Nullable Direction side) {
         return count(stack);
     }
 
@@ -46,7 +47,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return count(stack, maxAmount);
     }
 
-    default int count(FluidStack stack, int maxAmount, Direction side) {
+    default int count(FluidStack stack, int maxAmount, @Nullable Direction side) {
         return count(stack, maxAmount);
     }
 
@@ -67,7 +68,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return amount;
     }
 
-    default FluidStack count(Predicate<FluidStack> predicate, Direction side) {
+    default FluidStack count(Predicate<FluidStack> predicate, @Nullable Direction side) {
         return count(predicate);
     }
 
@@ -84,7 +85,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default FluidStack count(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+    default FluidStack count(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
         return count(predicate, maxAmount);
     }
 
@@ -121,7 +122,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default FluidStack countAny(Direction side) {
+    default FluidStack countAny(@Nullable Direction side) {
         return countAny();
     }
 
@@ -136,7 +137,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default FluidStack countAny(int maxAmount, Direction side) {
+    default FluidStack countAny(int maxAmount, @Nullable Direction side) {
         return extractAny(maxAmount);
     }
 
@@ -171,7 +172,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default int countSpace(FluidStack stack, Direction side) {
+    default int countSpace(FluidStack stack, @Nullable Direction side) {
         return countSpace(stack);
     }
 
@@ -183,7 +184,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return countSpace(stack, maxAmount);
     }
 
-    default int countSpace(FluidStack stack, int maxAmount, Direction side) {
+    default int countSpace(FluidStack stack, int maxAmount, @Nullable Direction side) {
         return countSpace(stack, maxAmount);
     }
 
@@ -208,7 +209,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return amount;
     }
 
-    default boolean countSpace(List<FluidStack> stacks, Direction side) {
+    default boolean countSpace(List<FluidStack> stacks, @Nullable Direction side) {
         return countSpace(stacks);
     }
 
@@ -276,7 +277,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return false;
     }
 
-    default int extract(FluidStack stack, Direction side) {
+    default int extract(FluidStack stack, @Nullable Direction side) {
         return extract(stack);
     }
 
@@ -288,7 +289,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return extract(stack, maxAmount);
     }
 
-    default int extract(FluidStack stack, int maxAmount, Direction side) {
+    default int extract(FluidStack stack, int maxAmount, @Nullable Direction side) {
         return extract(stack, maxAmount);
     }
 
@@ -321,7 +322,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return maxAmount - remaining;
     }
 
-    default FluidStack extract(Predicate<FluidStack> predicate, Direction side) {
+    default FluidStack extract(Predicate<FluidStack> predicate, @Nullable Direction side) {
         return extract(predicate);
     }
 
@@ -340,7 +341,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default FluidStack extract(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+    default FluidStack extract(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
         return extract(predicate, maxAmount);
     }
 
@@ -396,7 +397,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default FluidStack extractAny(Direction side) {
+    default FluidStack extractAny(@Nullable Direction side) {
         return extractAny();
     }
 
@@ -413,7 +414,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default FluidStack extractAny(int maxAmount, Direction side) {
+    default FluidStack extractAny(int maxAmount, @Nullable Direction side) {
         return extractAny(maxAmount);
     }
 
@@ -493,7 +494,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
 
     FluidStack getStack(int slot);
 
-    default int insert(FluidStack stack, Direction side) {
+    default int insert(FluidStack stack, @Nullable Direction side) {
         return insert(stack);
     }
 
@@ -505,7 +506,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return insert(stack, maxAmount);
     }
 
-    default int insert(FluidStack stack, int maxAmount, Direction side) {
+    default int insert(FluidStack stack, int maxAmount, @Nullable Direction side) {
         return insert(stack, maxAmount);
     }
 
@@ -544,7 +545,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return maxAmount - remaining;
     }
 
-    default List<FluidStack> insert(List<FluidStack> stacks, Direction side) {
+    default List<FluidStack> insert(List<FluidStack> stacks, @Nullable Direction side) {
         return insert(stacks);
     }
 
@@ -648,7 +649,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         }
     }
 
-    default int insertExist(FluidStack stack, Direction side) {
+    default int insertExist(FluidStack stack, @Nullable Direction side) {
         return insertExist(stack);
     }
 
@@ -708,7 +709,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return true;
     }
 
-    default java.util.Iterator<FluidStack> iterator(Direction side) {
+    default java.util.Iterator<FluidStack> iterator(@Nullable Direction side) {
         return iterator();
     }
 
@@ -727,7 +728,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return stack;
     }
 
-    default boolean preciseExtract(FluidStack stack, Direction side) {
+    default boolean preciseExtract(FluidStack stack, @Nullable Direction side) {
         return preciseExtract(stack);
     }
 
@@ -764,7 +765,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return false;
     }
 
-    default FluidStack preciseExtract(Predicate<FluidStack> predicate, int maxAmount, Direction side) {
+    default FluidStack preciseExtract(Predicate<FluidStack> predicate, int maxAmount, @Nullable Direction side) {
         return preciseExtract(predicate, maxAmount);
     }
 
@@ -821,7 +822,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return FluidStack.EMPTY;
     }
 
-    default boolean preciseInsert(FluidStack stack, Direction side) {
+    default boolean preciseInsert(FluidStack stack, @Nullable Direction side) {
         return preciseInsert(stack);
     }
 
@@ -833,7 +834,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return preciseInsert(stack, maxAmount);
     }
 
-    default boolean preciseInsert(FluidStack stack, int maxAmount, Direction side) {
+    default boolean preciseInsert(FluidStack stack, int maxAmount, @Nullable Direction side) {
         return preciseInsert(stack, maxAmount);
     }
 
@@ -873,7 +874,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         return false;
     }
 
-    default boolean preciseInsert(List<FluidStack> stacks, Direction side) {
+    default boolean preciseInsert(List<FluidStack> stacks, @Nullable Direction side) {
         return preciseInsert(stacks);
     }
 
@@ -995,7 +996,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
 
     int size();
 
-    default Stream<FluidStack> stream(Direction side) {
+    default Stream<FluidStack> stream(@Nullable Direction side) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(side), Spliterator.ORDERED), false);
     }
 

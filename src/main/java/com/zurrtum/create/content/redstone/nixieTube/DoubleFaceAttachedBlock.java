@@ -70,14 +70,11 @@ public class DoubleFaceAttachedBlock extends HorizontalDirectionalBlock {
     }
 
     protected static Direction getConnectedDirection(BlockState pState) {
-        switch ((DoubleAttachFace) pState.getValue(FACE)) {
-            case CEILING:
-                return Direction.DOWN;
-            case FLOOR:
-                return Direction.UP;
-            default:
-                return pState.getValue(FACING);
-        }
+        return switch (pState.getValue(FACE)) {
+            case CEILING -> Direction.DOWN;
+            case FLOOR -> Direction.UP;
+            default -> pState.getValue(FACING);
+        };
     }
 
     @Override

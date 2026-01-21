@@ -53,6 +53,7 @@ public class TableClothShopPeripheral extends SyncedPeripheral<TableClothBlockEn
     }
 
     @LuaFunction(mainThread = true)
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public final void setPriceTagItem(Optional<String> itemName) throws LuaException {
         assertShop();
         Identifier resourceLocation = Identifier.tryParse("minecraft:air");
@@ -69,12 +70,10 @@ public class TableClothShopPeripheral extends SyncedPeripheral<TableClothBlockEn
     }
 
     @LuaFunction(mainThread = true)
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public final void setPriceTagCount(Optional<Double> argument) throws LuaException {
         assertShop();
-        if (argument.isPresent())
-            blockEntity.priceTag.count = (Math.max(1, Math.min(100, argument.get().intValue())));
-        else
-            blockEntity.priceTag.count = 1;
+        blockEntity.priceTag.count = argument.map(arg -> (Math.max(1, Math.min(100, arg.intValue())))).orElse(1);
         this.blockEntity.notifyUpdate();
     }
 

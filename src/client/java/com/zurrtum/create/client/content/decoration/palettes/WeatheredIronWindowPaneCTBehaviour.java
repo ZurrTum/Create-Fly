@@ -18,7 +18,7 @@ import java.util.List;
 
 public class WeatheredIronWindowPaneCTBehaviour extends GlassPaneCTBehaviour {
 
-    private List<CTSpriteShiftEntry> shifts;
+    private final List<CTSpriteShiftEntry> shifts;
 
     public WeatheredIronWindowPaneCTBehaviour() {
         super(null);
@@ -31,7 +31,7 @@ public class WeatheredIronWindowPaneCTBehaviour extends GlassPaneCTBehaviour {
     }
 
     @Override
-    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, TextureAtlasSprite sprite) {
+    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, @Nullable TextureAtlasSprite sprite) {
         if (direction.getAxis() == Axis.Y || sprite == null)
             return null;
         CTSpriteShiftEntry entry = shifts.get(rand.nextInt(shifts.size()));

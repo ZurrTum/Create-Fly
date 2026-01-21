@@ -54,8 +54,8 @@ public class ArmInteractionPoint {
     protected Mode mode = Mode.DEPOSIT;
 
     protected BlockState cachedState;
-    protected Supplier<Container> cachedHandler;
-    protected ArmAngleTarget cachedAngles;
+    protected @Nullable Supplier<Container> cachedHandler;
+    protected @Nullable ArmAngleTarget cachedAngles;
 
     public ArmInteractionPoint(ArmInteractionPointType type, Level level, BlockPos pos, BlockState state) {
         this.type = type;

@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -166,6 +167,7 @@ public class FluidItemInventoryWrapper extends FluidInventoryWrapper<Storage<Flu
     }
 
     @Override
+    @Nullable
     protected StorageView<FluidVariant> getSlot(int slot) {
         if (storage instanceof SlottedStorage<FluidVariant> slottedStorage) {
             return slottedStorage.getSlot(slot);

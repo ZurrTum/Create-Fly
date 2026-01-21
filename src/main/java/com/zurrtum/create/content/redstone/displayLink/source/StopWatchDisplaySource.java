@@ -27,9 +27,7 @@ public class StopWatchDisplaySource extends SingleLineDisplaySource {
         int minutes = (diff / 60 / 20) % 60;
         int seconds = (diff / 20) % 60;
 
-        MutableComponent component = Component.literal((hours == 0 ? "" : (hours < 10 ? " " : "") + hours + ":") + (minutes < 10 ? hours == 0 ? " " : "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
-
-        return component;
+        return Component.literal((hours == 0 ? "" : (hours < 10 ? " " : "") + hours + ":") + (minutes < 10 ? hours == 0 ? " " : "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
     }
 
     @Override

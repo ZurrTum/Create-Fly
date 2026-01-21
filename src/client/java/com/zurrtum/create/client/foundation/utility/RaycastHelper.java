@@ -1,7 +1,5 @@
 package com.zurrtum.create.client.foundation.utility;
 
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -13,6 +11,9 @@ import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 public class RaycastHelper {
 
@@ -23,6 +24,7 @@ public class RaycastHelper {
         return level.clip(context);
     }
 
+    @Nullable
     public static PredicateTraceResult rayTraceUntil(Player player, double range, Predicate<BlockPos> predicate) {
         Vec3 origin = player.getEyePosition();
         Vec3 target = getTraceTarget(player, range, origin);
@@ -43,6 +45,7 @@ public class RaycastHelper {
         return origin.add((double) f6 * range, (double) f5 * range, (double) f7 * range);
     }
 
+    @Nullable
     public static PredicateTraceResult rayTraceUntil(Vec3 start, Vec3 end, Predicate<BlockPos> predicate) {
         if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z))
             return null;

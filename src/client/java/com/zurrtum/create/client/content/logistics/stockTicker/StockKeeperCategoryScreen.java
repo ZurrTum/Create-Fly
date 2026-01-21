@@ -22,7 +22,6 @@ import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryEditPacke
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryRefundPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -59,10 +58,10 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
 
     private final List<ItemStack> schedule;
     private IconButton confirmButton;
-    private ItemStack editingItem;
+    private @Nullable ItemStack editingItem;
     private int editingIndex;
-    private IconButton editorConfirm;
-    private EditBox editorEditBox;
+    private @Nullable IconButton editorConfirm;
+    private @Nullable EditBox editorEditBox;
     private ElementWidget renderedItem;
 
     final int slices = 4;
@@ -79,6 +78,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
         menu.slotsActive = false;
     }
 
+    @Nullable
     public static StockKeeperCategoryScreen create(
         Minecraft mc,
         MenuType<StockTickerBlockEntity> type,
@@ -521,10 +521,6 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
     @Override
     public List<Rect2i> getExtraAreas() {
         return extraAreas;
-    }
-
-    public Font getFont() {
-        return font;
     }
 
 }

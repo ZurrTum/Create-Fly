@@ -45,7 +45,7 @@ import java.util.function.Predicate;
 
 public class WrappedLevel extends Level {
     protected Level level;
-    protected ChunkSource chunkSource;
+    protected @Nullable ChunkSource chunkSource;
     protected LevelEntityGetter<Entity> entityGetter = new DummyLevelEntityGetter<>();
 
     public WrappedLevel(Level level) {
@@ -102,7 +102,7 @@ public class WrappedLevel extends Level {
     }
 
     @Override
-    public BlockState getBlockState(@Nullable BlockPos pos) {
+    public BlockState getBlockState(BlockPos pos) {
         return level.getBlockState(pos);
     }
 
@@ -162,7 +162,7 @@ public class WrappedLevel extends Level {
 
     @Override
     public void playSeededSound(
-        Entity pPlayer,
+        @Nullable Entity pPlayer,
         double pX,
         double pY,
         double pZ,
@@ -176,7 +176,7 @@ public class WrappedLevel extends Level {
 
     @Override
     public void playSeededSound(
-        Entity pPlayer,
+        @Nullable Entity pPlayer,
         Entity pEntity,
         Holder<SoundEvent> pSound,
         SoundSource pCategory,
@@ -244,6 +244,7 @@ public class WrappedLevel extends Level {
     }
 
     @Override
+    @Nullable
     public Entity getEntity(int id) {
         return null;
     }

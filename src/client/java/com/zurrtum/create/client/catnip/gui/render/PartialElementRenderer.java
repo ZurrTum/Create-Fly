@@ -41,6 +41,9 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
 
     @Override
     public void prepare(PartialRenderState partial, GuiRenderState state, int windowScaleFactor) {
+        if (partial.model == null) {
+            return;
+        }
         if (this.windowScaleFactor != windowScaleFactor) {
             this.windowScaleFactor = windowScaleFactor;
             TEXTURES.values().forEach(GpuTexture::close);
@@ -89,7 +92,7 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
-            partial.IDENTITY_POSE,
+            partial.pose,
             partial.x1,
             partial.y1,
             partial.x2,

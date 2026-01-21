@@ -12,10 +12,6 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.content.logistics.tableCloth.ShoppingListItem;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,8 +27,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StockTickerInteractionHandler {
+    @Nullable
     public static InteractionResult interactWithLogisticsManager(Entity entity, Player player, InteractionHand hand) {
         BlockPos targetPos = getStockTickerPosition(entity);
         if (targetPos == null)
@@ -162,6 +163,7 @@ public class StockTickerInteractionHandler {
             AllSoundEvents.STOCK_TICKER_TRADE.playOnServer(level, tickerBE.getBlockPos());
     }
 
+    @Nullable
     public static BlockPos getStockTickerPosition(Entity entity) {
         Entity rootVehicle = entity.getRootVehicle();
         if (!(rootVehicle instanceof SeatEntity))

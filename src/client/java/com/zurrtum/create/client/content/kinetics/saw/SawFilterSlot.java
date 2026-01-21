@@ -8,9 +8,11 @@ import com.zurrtum.create.content.kinetics.saw.SawBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class SawFilterSlot extends ValueBoxTransform {
     @Override
+    @Nullable
     public Vec3 getLocalOffset(BlockState state) {
         if (state.getValue(SawBlock.FACING) != Direction.UP)
             return null;

@@ -6,14 +6,15 @@ import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.ElementLinkImpl;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public abstract class FadeIntoSceneInstruction<T extends AnimatedSceneElement> extends TickingInstruction {
 
-    protected Direction fadeInFrom;
+    protected @Nullable Direction fadeInFrom;
     protected T element;
-    private ElementLink<T> elementLink;
+    private @Nullable ElementLink<T> elementLink;
 
-    public FadeIntoSceneInstruction(int fadeInTicks, Direction fadeInFrom, T element) {
+    public FadeIntoSceneInstruction(int fadeInTicks, @Nullable Direction fadeInFrom, T element) {
         super(false, fadeInTicks);
         this.fadeInFrom = fadeInFrom;
         this.element = element;

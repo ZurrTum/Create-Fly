@@ -12,6 +12,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
 public class AABBOutline extends Outline {
 
@@ -43,10 +44,9 @@ public class AABBOutline extends Outline {
     @Override
     public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         params.loadColor(colorTemp);
-        Vector4f color = colorTemp;
         int lightmap = params.lightmap;
         boolean disableLineNormals = params.disableLineNormals;
-        renderBox(ms, buffer, camera, bb, color, lightmap, disableLineNormals);
+        renderBox(ms, buffer, camera, bb, colorTemp, lightmap, disableLineNormals);
     }
 
     protected void renderBox(
@@ -83,7 +83,7 @@ public class AABBOutline extends Outline {
         PoseStack ms,
         SuperRenderTypeBuffer buffer,
         boolean cull,
-        Direction highlightedFace,
+        @Nullable Direction highlightedFace,
         Vector3f minPos,
         Vector3f maxPos,
         Vector4f color,
@@ -102,7 +102,7 @@ public class AABBOutline extends Outline {
         PoseStack.Pose pose,
         SuperRenderTypeBuffer buffer,
         boolean cull,
-        Direction highlightedFace,
+        @Nullable Direction highlightedFace,
         Vector3f minPos,
         Vector3f maxPos,
         Direction face,

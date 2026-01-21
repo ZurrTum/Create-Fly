@@ -29,6 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.jspecify.annotations.Nullable;
 
 public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehaviour {
     public void tick(MovementContext context) {
@@ -100,6 +101,7 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
     }
 
     @Override
+    @Nullable
     public MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,

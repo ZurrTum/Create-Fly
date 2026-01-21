@@ -229,7 +229,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         Containers.dropContents(level, worldPosition, inventory);
     }
 
-    public void spawnEventParticles(ItemStack stack) {
+    public void spawnEventParticles(@Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty())
             return;
 
@@ -247,7 +247,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         }
     }
 
-    protected void spawnParticles(ItemStack stack) {
+    protected void spawnParticles(@Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty())
             return;
 
@@ -296,7 +296,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         }
 
         SingleRecipeInput input = new SingleRecipeInput(stack);
-        Pair<Recipe<SingleRecipeInput>, ItemStack> pair = updateRecipe(input, false);
+        Pair<Recipe<SingleRecipeInput>, @Nullable ItemStack> pair = updateRecipe(input, false);
         if (pair == null)
             return;
 
@@ -332,7 +332,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
 
     @Nullable
     @SuppressWarnings("unchecked")
-    private Pair<Recipe<SingleRecipeInput>, ItemStack> updateRecipe(SingleRecipeInput input, boolean plus) {
+    private Pair<Recipe<SingleRecipeInput>, @Nullable ItemStack> updateRecipe(SingleRecipeInput input, boolean plus) {
         List<RecipeHolder<?>> startedSearch = RecipeFinder.get(
             cuttingRecipesKey,
             (ServerLevel) level,

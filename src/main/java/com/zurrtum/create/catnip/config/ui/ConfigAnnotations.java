@@ -1,5 +1,7 @@
 package com.zurrtum.create.catnip.config.ui;
 
+import org.jspecify.annotations.Nullable;
+
 public class ConfigAnnotations {
 
 
@@ -68,6 +70,7 @@ public class ConfigAnnotations {
     public interface ConfigAnnotation {
         String getName();
 
+        @Nullable
         default String getValue() {
             return null;
         }

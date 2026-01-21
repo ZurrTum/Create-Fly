@@ -5,9 +5,11 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 
 public class EntityStorage extends Storage<Entity> {
     @Override
+    @Nullable
     protected EntityVisual<?> createRaw(VisualizationContext context, Entity obj, float partialTick) {
         var visualizer = VisualizationHelper.getVisualizer(obj);
         if (visualizer == null) {

@@ -17,10 +17,12 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 public class ContraptionControlsMovement extends MovementBehaviour {
 
     @Override
+    @Nullable
     public ItemStack canBeDisabledVia(MovementContext context) {
         return null;
     }
@@ -47,6 +49,7 @@ public class ContraptionControlsMovement extends MovementBehaviour {
         return ItemStack.isSameItemSameComponents(stack1, stack2);
     }
 
+    @Nullable
     public static ItemStack getFilter(MovementContext ctx) {
         CompoundTag blockEntityData = ctx.blockEntityData;
         if (blockEntityData == null)

@@ -40,9 +40,9 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     protected int initialOffset;
     private float prevAnimatedOffset;
 
-    protected BlockPos mirrorParent;
-    protected List<BlockPos> mirrorChildren;
-    public WeakReference<AbstractContraptionEntity> sharedMirrorContraption;
+    protected @Nullable BlockPos mirrorParent;
+    protected @Nullable List<BlockPos> mirrorChildren;
+    public @Nullable WeakReference<AbstractContraptionEntity> sharedMirrorContraption;
 
     public PulleyBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -195,7 +195,7 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
                         level.setBlock(
                             magnetPos,
                             AllBlocks.PULLEY_MAGNET.defaultBlockState()
-                                .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER)),
+                                .setValue(BlockStateProperties.WATERLOGGED, ifluidstate.getType() == Fluids.WATER),
                             Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON
                         );
                     }
@@ -367,6 +367,7 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         offset = forcedOffset;
     }
 
+    @Nullable
     public BlockPos getMirrorParent() {
         return mirrorParent;
     }

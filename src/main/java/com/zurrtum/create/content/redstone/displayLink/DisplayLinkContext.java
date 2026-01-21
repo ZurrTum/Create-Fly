@@ -4,13 +4,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 public class DisplayLinkContext {
 
     private final Level level;
     private final DisplayLinkBlockEntity blockEntity;
 
-    public Object flapDisplayContext;
+    public @Nullable Object flapDisplayContext;
 
     public DisplayLinkContext(Level level, DisplayLinkBlockEntity blockEntity) {
         this.level = level;
@@ -25,6 +26,7 @@ public class DisplayLinkContext {
         return blockEntity;
     }
 
+    @Nullable
     public BlockEntity getSourceBlockEntity() {
         return level.getBlockEntity(getSourcePos());
     }
@@ -33,6 +35,7 @@ public class DisplayLinkContext {
         return blockEntity.getSourcePosition();
     }
 
+    @Nullable
     public BlockEntity getTargetBlockEntity() {
         return level.getBlockEntity(getTargetPos());
     }

@@ -36,8 +36,8 @@ public class DirectBeltInputBehaviour extends BlockEntityBehaviour<SmartBlockEnt
     public DirectBeltInputBehaviour(SmartBlockEntity be) {
         super(be);
         tryInsert = this::defaultInsertionCallback;
-        canInsert = d -> true;
-        isOccupied = d -> false;
+        canInsert = _ -> true;
+        isOccupied = _ -> false;
         supportsBeltFunnels = () -> false;
     }
 

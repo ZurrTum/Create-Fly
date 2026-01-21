@@ -2,17 +2,17 @@ package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.AxisDirection;
-import net.minecraft.world.phys.Vec3;
 
 public class CylinderBrush extends ShapedBrush {
 
@@ -65,6 +65,7 @@ public class CylinderBrush extends ShapedBrush {
     }
 
     @Override
+    @Nullable
     public List<BlockPos> getIncludedPositions() {
         return cachedBrushes.get(Pair.of(param0, param1));
     }

@@ -4,6 +4,7 @@ import com.google.common.base.Supplier;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import org.jspecify.annotations.Nullable;
 
 public interface LayerBakedModel {
     static ChunkSectionLayer getBlockRenderLayer(SimpleModelWrapper model, Supplier<ChunkSectionLayer> defaultLayer) {
@@ -24,6 +25,7 @@ public interface LayerBakedModel {
         return defaultLayer.get();
     }
 
+    @Nullable
     default ChunkSectionLayer create$getBlockRenderLayer() {
         return null;
     }

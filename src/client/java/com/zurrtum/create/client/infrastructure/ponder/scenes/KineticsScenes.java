@@ -868,7 +868,7 @@ public class KineticsScenes {
         scene.overlay().showControls(topOf, Pointing.DOWN, 40).rightClick().withItem(new ItemStack(Items.BLUE_DYE));
         scene.idle(7);
         scene.world()
-            .modifyBlock(valvePos, s -> AllBlocks.BLUE_VALVE_HANDLE.defaultBlockState().setValue(ValveHandleBlock.FACING, Direction.NORTH), true);
+            .modifyBlock(valvePos, _ -> AllBlocks.BLUE_VALVE_HANDLE.defaultBlockState().setValue(ValveHandleBlock.FACING, Direction.NORTH), true);
         scene.idle(10);
         scene.overlay().showText(70).text("Valve handles can be dyed for aesthetic purposes").placeNearTarget().colored(PonderPalette.BLUE)
             .pointAt(sideOf);

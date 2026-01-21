@@ -123,7 +123,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public int insert(ItemStack stack, Direction side) {
+    public int insert(ItemStack stack, @Nullable Direction side) {
         return inventory.insert(stack);
     }
 
@@ -133,7 +133,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public boolean preciseInsert(ItemStack stack, Direction side) {
+    public boolean preciseInsert(ItemStack stack, @Nullable Direction side) {
         return inventory.preciseInsert(stack);
     }
 
@@ -143,7 +143,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public int count(ItemStack stack, Direction side) {
+    public int count(ItemStack stack, @Nullable Direction side) {
         return inventory.count(stack);
     }
 
@@ -153,7 +153,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public int count(ItemStack stack, int maxAmount, Direction side) {
+    public int count(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return inventory.count(stack, maxAmount);
     }
 
@@ -163,7 +163,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public int countSpace(ItemStack stack, Direction side) {
+    public int countSpace(ItemStack stack, @Nullable Direction side) {
         return inventory.countSpace(stack);
     }
 
@@ -173,7 +173,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public int countSpace(ItemStack stack, int maxAmount, Direction side) {
+    public int countSpace(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return inventory.countSpace(stack, maxAmount);
     }
 
@@ -183,7 +183,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public int extract(ItemStack stack, Direction side) {
+    public int extract(ItemStack stack, @Nullable Direction side) {
         return inventory.extract(stack);
     }
 
@@ -193,7 +193,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public boolean preciseExtract(ItemStack stack, Direction side) {
+    public boolean preciseExtract(ItemStack stack, @Nullable Direction side) {
         return inventory.preciseExtract(stack);
     }
 
@@ -203,7 +203,7 @@ public record SidedInventoryWrapper(Container inventory, int[] slots) implements
     }
 
     @Override
-    public java.util.Iterator<ItemStack> iterator(Direction side) {
+    public java.util.Iterator<ItemStack> iterator(@Nullable Direction side) {
         return inventory.iterator();
     }
 }

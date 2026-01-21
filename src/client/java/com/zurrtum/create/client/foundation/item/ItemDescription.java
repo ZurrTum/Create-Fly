@@ -206,8 +206,8 @@ public record ItemDescription(
     public static class Modifier implements TooltipModifier {
         protected final Item item;
         protected final Palette palette;
-        protected String cachedLanguage;
-        protected ItemDescription description;
+        protected @Nullable String cachedLanguage;
+        protected @Nullable ItemDescription description;
 
         public Modifier(Item item, Palette palette) {
             this.item = item;

@@ -23,7 +23,7 @@ public record ServerConfigPacket(byte[] data) implements Packet<ClientConfigurat
     public static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
     public static final StreamCodec<ByteBuf, ServerConfigPacket> CODEC = ByteBufCodecs.byteArray(Integer.MAX_VALUE)
         .map(ServerConfigPacket::new, ServerConfigPacket::data);
-    public static byte[] CACHE;
+    public static byte @Nullable [] CACHE;
 
     @Nullable
     public static Packet<?> create() {

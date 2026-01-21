@@ -5,13 +5,13 @@ import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.Create;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.UUIDUtil;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
-
-import net.minecraft.core.GlobalPos;
-import net.minecraft.core.UUIDUtil;
 
 public class LogisticsNetwork {
     public static final Codec<LogisticsNetwork> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -28,7 +28,7 @@ public class LogisticsNetwork {
     public HashSet<GlobalPos> totalLinks;
     public HashSet<GlobalPos> loadedLinks;
 
-    public UUID owner;
+    public @Nullable UUID owner;
     public boolean locked;
 
     public LogisticsNetwork(UUID networkId) {

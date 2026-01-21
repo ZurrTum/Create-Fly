@@ -3,11 +3,6 @@ package com.zurrtum.create.client.catnip.gui;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
-import org.joml.Matrix3x2fStack;
-
-import java.util.Collection;
-import java.util.List;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -17,6 +12,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 public abstract class AbstractSimiScreen extends Screen {
 
@@ -166,6 +166,7 @@ public abstract class AbstractSimiScreen extends Screen {
         return this.renderables;
     }
 
+    @Nullable
     @Override
     public GuiEventListener getFocused() {
         GuiEventListener focused = super.getFocused();

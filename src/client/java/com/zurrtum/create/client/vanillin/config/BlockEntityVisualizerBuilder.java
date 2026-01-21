@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.vanillin.config;
 
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
+import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer.Factory;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -13,7 +14,7 @@ public class BlockEntityVisualizerBuilder<T extends BlockEntity> {
     private final Configurator configurator;
     private final BlockEntityType<T> type;
     @Nullable
-    private SimpleBlockEntityVisualizer.Factory<T> visualFactory;
+    private Factory<T> visualFactory;
     @Nullable
     private Predicate<T> skipVanillaRender;
 
@@ -28,7 +29,7 @@ public class BlockEntityVisualizerBuilder<T extends BlockEntity> {
      * @param visualFactory The visual factory.
      * @return {@code this}
      */
-    public BlockEntityVisualizerBuilder<T> factory(SimpleBlockEntityVisualizer.Factory<T> visualFactory) {
+    public BlockEntityVisualizerBuilder<T> factory(Factory<T> visualFactory) {
         this.visualFactory = visualFactory;
         return this;
     }

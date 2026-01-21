@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -103,7 +104,7 @@ public record CraftableInput(Object2ObjectMap<List<ItemStack>, IntList> data, bo
         }
 
         @Override
-        public boolean equals(List<ItemStack> a, List<ItemStack> b) {
+        public boolean equals(@Nullable List<ItemStack> a, @Nullable List<ItemStack> b) {
             if (a == b) {
                 return true;
             }

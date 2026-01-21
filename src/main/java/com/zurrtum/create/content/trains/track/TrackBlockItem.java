@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class TrackBlockItem extends BlockItem {
 
@@ -138,6 +139,7 @@ public class TrackBlockItem extends BlockItem {
         return InteractionResult.SUCCESS.heldItemTransformedTo(stack);
     }
 
+    @Nullable
     public BlockState getPlacementState(UseOnContext pContext) {
         return getPlacementState(updatePlacementContext(new BlockPlaceContext(pContext)));
     }

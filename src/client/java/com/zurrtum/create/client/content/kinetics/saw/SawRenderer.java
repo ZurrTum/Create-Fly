@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -67,7 +67,7 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
         SawRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         state.layer = RenderTypes.cutoutMovingBlock();
@@ -140,7 +140,7 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
         }
     }
 
-    public void updateItems(ProcessingInventory inventory, Level world, SawRenderState state) {
+    public void updateItems(ProcessingInventory inventory, @Nullable Level world, SawRenderState state) {
         if (state.blockState.getValue(SawBlock.FACING) != Direction.UP) {
             return;
         }
@@ -254,15 +254,15 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
         public float partialTicks;
         public SuperByteBuffer blade;
         public float bladeAngle;
-        public List<ItemStackRenderState> items;
+        public @Nullable List<ItemStackRenderState> items;
         public BooleanList box;
         public int outputs;
         public boolean alongZ;
         public float duration;
         public float remainingTime;
         public boolean appliedRecipe;
-        public FilterRenderState filter;
-        public SuperByteBuffer shaft;
+        public @Nullable FilterRenderState filter;
+        public @Nullable SuperByteBuffer shaft;
         public float angle;
         public Direction direction;
         public Color color;

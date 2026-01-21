@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import org.jspecify.annotations.Nullable;
 
 public class LinearChassisBlock extends AbstractChassisBlock {
 
@@ -61,6 +62,7 @@ public class LinearChassisBlock extends AbstractChassisBlock {
     }
 
     @Override
+    @Nullable
     public BooleanProperty getGlueableSide(BlockState state, Direction face) {
         if (face.getAxis() != state.getValue(AXIS))
             return null;

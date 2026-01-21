@@ -9,14 +9,13 @@ import com.zurrtum.create.infrastructure.component.PackageOrderData;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts.CraftingEntry;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 
 public class PackageRepackageHelper {
 
@@ -84,7 +83,7 @@ public class PackageRepackageHelper {
 
             BigItemStack targetedEntry = null;
             if (!orderedStacks.isEmpty())
-                targetedEntry = orderedStacks.remove(0);
+                targetedEntry = orderedStacks.removeFirst();
 
             ItemSearch:
             for (BigItemStack entry : allItems) {

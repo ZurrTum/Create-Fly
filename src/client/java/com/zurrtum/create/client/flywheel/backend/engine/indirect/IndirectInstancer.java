@@ -86,9 +86,9 @@ public class IndirectInstancer<I extends Instance> extends AbstractInstancer<I> 
     private static final class InstancePage<I extends Instance> implements InstanceHandleImpl.State<I> {
         private final IndirectInstancer<I> parent;
         private final int pageNo;
-        private final I[] instances;
+        private final @Nullable I[] instances;
         // Handles are only read in #takeFrom. It would be nice to avoid tracking these at all.
-        private final InstanceHandleImpl<I>[] handles;
+        private final @Nullable InstanceHandleImpl<I>[] handles;
         /**
          * A bitset describing which indices in the instances/handles arrays contain live instances.
          */
@@ -328,7 +328,7 @@ public class IndirectInstancer<I extends Instance> extends AbstractInstancer<I> 
 
         var pages = this.pages.get();
         for (int page = contentsChanged.nextSetBit(0); page >= 0 && page < pages.length; page = contentsChanged.nextSetBit(page + 1)) {
-            var instances = pages[page].instances;
+            @Nullable I[] instances = pages[page].instances;
 
             long baseByte = mapping.page2ByteOffset(page);
 

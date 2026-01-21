@@ -86,8 +86,7 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
         if (!blockState.is(AllBlocks.ELEVATOR_CONTACT) && !blockState.is(AllBlocks.REDSTONE_CONTACT))
             return null;
         Direction facing = blockState.getValue(FACING);
-        BlockPos target = pos;
-        return new ColumnCoords(target.getX(), target.getZ(), facing);
+        return new ColumnCoords(pos.getX(), pos.getZ(), facing);
     }
 
     @Override
@@ -113,7 +112,11 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
         if (pState.getValue(CALLING))
             return;
 
-        ElevatorColumn elevatorColumn = ElevatorColumn.getOrCreate(pLevel, getColumnCoords(pLevel, pPos));
+        ColumnCoords coords = getColumnCoords(pLevel, pPos);
+        if (coords == null) {
+            return;
+        }
+        ElevatorColumn elevatorColumn = ElevatorColumn.getOrCreate(pLevel, coords);
         callToContactAndUpdate(elevatorColumn, pState, pLevel, pPos, true);
     }
 
@@ -206,7 +209,7 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
     }
 
     @Override
-    public int getSignal(BlockState state, BlockGetter blockAccess, BlockPos pos, Direction side) {
+    public int getSignal(BlockState state, BlockGetter blockAccess, BlockPos pos, @Nullable Direction side) {
         if (side == null)
             return 0;
         BlockState toState = blockAccess.getBlockState(pos.relative(side.getOpposite()));

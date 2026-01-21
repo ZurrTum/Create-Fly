@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 
 public class TrackObserverVisual extends AbstractBlockEntityVisual<TrackObserverBlockEntity> implements SimpleTickableVisual {
     private final TransformedInstance overlay;
-    private BlockPos oldTargetPos;
+    private @Nullable BlockPos oldTargetPos;
 
     public TrackObserverVisual(VisualizationContext ctx, TrackObserverBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);

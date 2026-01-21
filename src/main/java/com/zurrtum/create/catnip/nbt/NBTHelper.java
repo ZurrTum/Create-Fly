@@ -45,7 +45,7 @@ public class NBTHelper {
         nbt.putString(key, enumConstant.name());
     }
 
-    public static <T> ListTag writeCompoundList(Iterable<T> list, Function<T, CompoundTag> serializer) {
+    public static <T> ListTag writeCompoundList(Iterable<T> list, Function<T, @Nullable CompoundTag> serializer) {
         ListTag listNBT = new ListTag();
         list.forEach(t -> {
             CompoundTag apply = serializer.apply(t);

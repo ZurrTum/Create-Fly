@@ -22,7 +22,7 @@ public record NestedPlan<C>(List<Plan<C>> parallelPlans) implements SimplyCompos
         var size = parallelPlans.size();
 
         if (size == 1) {
-            parallelPlans.get(0).execute(taskExecutor, context, onCompletion);
+            parallelPlans.getFirst().execute(taskExecutor, context, onCompletion);
             return;
         }
 

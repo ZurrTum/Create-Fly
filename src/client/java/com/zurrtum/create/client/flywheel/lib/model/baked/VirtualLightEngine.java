@@ -84,6 +84,7 @@ public final class VirtualLightEngine extends LevelLightEngine {
         }
 
         @Override
+        @Nullable
         public DataLayer getDataLayerData(SectionPos pos) {
             return null;
         }

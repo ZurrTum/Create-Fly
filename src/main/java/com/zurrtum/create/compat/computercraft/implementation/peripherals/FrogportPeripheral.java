@@ -7,6 +7,7 @@ import com.zurrtum.create.compat.computercraft.implementation.luaObjects.Package
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -29,6 +30,7 @@ public class FrogportPeripheral extends SyncedPeripheral<FrogportBlockEntity> {
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final String getConfiguration() throws LuaException {
         if (blockEntity.target == null)
             return null;
@@ -63,6 +65,7 @@ public class FrogportPeripheral extends SyncedPeripheral<FrogportBlockEntity> {
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public Map<String, ?> getItemDetail(int slot) throws LuaException {
         return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.inventory, slot);
     }

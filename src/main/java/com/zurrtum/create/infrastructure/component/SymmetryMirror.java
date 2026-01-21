@@ -7,9 +7,6 @@ import com.zurrtum.create.content.equipment.symmetryWand.mirror.CrossPlaneMirror
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.EmptyMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.PlaneMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.TriplePlaneMirror;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,6 +17,8 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public abstract class SymmetryMirror {
     public static final String EMPTY = "empty";
@@ -131,12 +130,10 @@ public abstract class SymmetryMirror {
         return in.mirror(Mirror.LEFT_RIGHT);
     }
 
-    @SuppressWarnings("deprecation")
     protected BlockState flipD1(BlockState in) {
         return in.rotate(Rotation.COUNTERCLOCKWISE_90).mirror(Mirror.FRONT_BACK);
     }
 
-    @SuppressWarnings("deprecation")
     protected BlockState flipD2(BlockState in) {
         return in.rotate(Rotation.COUNTERCLOCKWISE_90).mirror(Mirror.LEFT_RIGHT);
     }

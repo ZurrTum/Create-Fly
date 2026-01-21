@@ -54,7 +54,7 @@ public class FluidPropagator {
 
         // Visit all connected pumps to update their network
         while (!frontier.isEmpty()) {
-            Pair<Integer, BlockPos> pair = frontier.remove(0);
+            Pair<Integer, BlockPos> pair = frontier.removeFirst();
             BlockPos currentPos = pair.getSecond();
             if (visited.contains(currentPos))
                 continue;
@@ -83,7 +83,7 @@ public class FluidPropagator {
                 FluidTransportBehaviour targetPipe = getPipe(world, target);
                 if (targetPipe == null)
                     continue;
-                Integer distance = pair.getFirst();
+                int distance = pair.getFirst();
                 if (distance >= getPumpRange() && !targetPipe.hasAnyPressure())
                     continue;
                 if (targetPipe.canHaveFlowToward(targetState, direction.getOpposite()))
@@ -100,7 +100,7 @@ public class FluidPropagator {
         frontier.add(start);
 
         while (!frontier.isEmpty()) {
-            BlockPos pos = frontier.remove(0);
+            BlockPos pos = frontier.removeFirst();
             if (visited.contains(pos))
                 continue;
             visited.add(pos);
@@ -131,6 +131,7 @@ public class FluidPropagator {
         }
     }
 
+    @Nullable
     public static Direction validateNeighbourChange(
         BlockState state,
         Level world,
@@ -162,6 +163,7 @@ public class FluidPropagator {
         return null;
     }
 
+    @Nullable
     public static FluidTransportBehaviour getPipe(BlockGetter reader, BlockPos pos) {
         return BlockEntityBehaviour.get(reader, pos, FluidTransportBehaviour.TYPE);
     }

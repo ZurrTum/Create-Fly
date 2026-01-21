@@ -21,6 +21,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AttachedActorBlock extends HorizontalDirectionalBlock implements IWrenchable, ProperWaterloggedBlock {
 
@@ -54,6 +55,7 @@ public abstract class AttachedActorBlock extends HorizontalDirectionalBlock impl
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing;
         if (context.getClickedFace().getAxis().isVertical())

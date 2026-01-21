@@ -1,16 +1,17 @@
 package com.zurrtum.create.content.redstone.displayLink.source;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jspecify.annotations.Nullable;
 
 public class ItemNameDisplaySource extends SingleLineDisplaySource {
     @Override
@@ -32,7 +33,7 @@ public class ItemNameDisplaySource extends SingleLineDisplaySource {
             if (behaviour == null)
                 break;
 
-            MutableObject<ItemStack> stackHolder = new MutableObject<>();
+            MutableObject<@Nullable ItemStack> stackHolder = new MutableObject<>();
             behaviour.handleCenteredProcessingOnAllItems(
                 .25f, tis -> {
                     stackHolder.setValue(tis.stack);
@@ -40,9 +41,9 @@ public class ItemNameDisplaySource extends SingleLineDisplaySource {
                 }
             );
 
-            ItemStack stack = stackHolder.getValue();
+            ItemStack stack = stackHolder.get();
             if (stack != null && !stack.isEmpty())
-                combined = combined.append(stack.getHoverName());
+                combined.append(stack.getHoverName());
         }
 
         return combined;

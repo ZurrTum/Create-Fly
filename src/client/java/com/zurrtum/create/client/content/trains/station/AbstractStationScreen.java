@@ -26,6 +26,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -38,7 +39,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
     private GuiBlockStateRenderBuilder renderedItem;
     private GuiPartialRenderBuilder renderedFlag;
 
-    protected WeakReference<Train> displayedTrain;
+    protected WeakReference<@Nullable Train> displayedTrain;
 
     private IconButton confirmButton;
 
@@ -147,6 +148,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
 
     protected abstract PartialModel getFlag(float partialTicks);
 
+    @Nullable
     protected Train getImminent() {
         return blockEntity.imminentTrain == null ? null : Create.RAILWAYS.trains.get(blockEntity.imminentTrain);
     }

@@ -35,7 +35,7 @@ import java.util.Optional;
 public class MillstoneBlockEntity extends KineticBlockEntity implements Clearable {
     public MillstoneInventoryHandler capability;
     public int timer;
-    private MillingRecipe lastRecipe;
+    private @Nullable MillingRecipe lastRecipe;
 
     public MillstoneBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.MILLSTONE, pos, state);

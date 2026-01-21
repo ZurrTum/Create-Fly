@@ -22,6 +22,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -72,6 +73,7 @@ public class AllFluidConfigs {
         ALL.put(fluid.getFlowing(), config);
     }
 
+    @Nullable
     public static FluidConfig get(Fluid fluid) {
         FluidConfig config = ALL.get(fluid);
         if (config != null) {

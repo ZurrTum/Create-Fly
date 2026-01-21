@@ -70,7 +70,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
     public float earlyTargetTime;
     // runtime stuff
     int scanCooldown;
-    ItemStack trackedItem;
+    @Nullable ItemStack trackedItem;
 
     public enum State implements StringRepresentable {
         CHARGED,
@@ -195,24 +195,24 @@ public class EjectorBlockEntity extends KineticBlockEntity {
 
             if (depotBehaviour.heldItem != null) {
                 ItemStack remainder = directOutput.tryExportingToBeltFunnel(heldItemStack, funnelFacing, false);
-                if (remainder == null)
-                    ;
-                else if (remainder.isEmpty())
-                    depotBehaviour.removeHeldItem();
-                else if (remainder.getCount() != heldItemStack.getCount())
-                    depotBehaviour.heldItem.stack = remainder;
+                if (remainder != null) {
+                    if (remainder.isEmpty())
+                        depotBehaviour.removeHeldItem();
+                    else if (remainder.getCount() != heldItemStack.getCount())
+                        depotBehaviour.heldItem.stack = remainder;
+                }
             }
 
             for (Iterator<TransportedItemStack> iterator = depotBehaviour.incoming.iterator(); iterator.hasNext(); ) {
                 TransportedItemStack transportedItemStack = iterator.next();
                 ItemStack stack = transportedItemStack.stack;
                 ItemStack remainder = directOutput.tryExportingToBeltFunnel(stack, funnelFacing, false);
-                if (remainder == null)
-                    ;
-                else if (remainder.isEmpty())
-                    iterator.remove();
-                else if (!ItemStack.isSameItem(remainder, stack))
-                    transportedItemStack.stack = remainder;
+                if (remainder != null) {
+                    if (remainder.isEmpty())
+                        iterator.remove();
+                    else if (!ItemStack.isSameItem(remainder, stack))
+                        transportedItemStack.stack = remainder;
+                }
             }
 
             boolean change = false;
@@ -278,8 +278,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
         BlockState blockState = getBlockState();
         if (!blockState.is(AllBlocks.WEIGHTED_EJECTOR))
             return Direction.UP;
-        Direction facing = blockState.getValue(EjectorBlock.HORIZONTAL_FACING);
-        return facing;
+        return blockState.getValue(EjectorBlock.HORIZONTAL_FACING);
     }
 
     @Override
@@ -415,6 +414,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
         notifyUpdate();
     }
 
+    @Nullable
     public DirectBeltInputBehaviour getTargetOpenInv() {
         BlockPos targetPos = earlyTarget != null ? earlyTarget.getSecond() : worldPosition.above(launcher.getVerticalDistance())
             .relative(getFacing(), Math.max(1, launcher.getHorizontalDistance()));

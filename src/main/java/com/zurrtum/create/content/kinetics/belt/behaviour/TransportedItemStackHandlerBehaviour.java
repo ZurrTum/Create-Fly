@@ -17,12 +17,12 @@ public class TransportedItemStackHandlerBehaviour extends BlockEntityBehaviour<S
 
     public static final BehaviourType<TransportedItemStackHandlerBehaviour> TYPE = new BehaviourType<>();
 
-    private ProcessingCallback processingCallback;
+    private final ProcessingCallback processingCallback;
     private PositionGetter positionGetter;
 
     public static class TransportedResult {
-        List<TransportedItemStack> outputs;
-        TransportedItemStack heldOutput;
+        @Nullable List<TransportedItemStack> outputs;
+        @Nullable TransportedItemStack heldOutput;
 
         private static final TransportedResult DO_NOTHING = new TransportedResult(null, null);
         private static final TransportedResult REMOVE_ITEM = new TransportedResult(ImmutableList.of(), null);
@@ -47,7 +47,7 @@ public class TransportedItemStackHandlerBehaviour extends BlockEntityBehaviour<S
             return new TransportedResult(outputs, heldOutput);
         }
 
-        private TransportedResult(List<TransportedItemStack> outputs, TransportedItemStack heldOutput) {
+        private TransportedResult(@Nullable List<TransportedItemStack> outputs, @Nullable TransportedItemStack heldOutput) {
             this.outputs = outputs;
             this.heldOutput = heldOutput;
         }
@@ -57,7 +57,7 @@ public class TransportedItemStackHandlerBehaviour extends BlockEntityBehaviour<S
         }
 
         public boolean didntChangeFrom(ItemStack stackBefore) {
-            return doesNothing() || outputs.size() == 1 && ItemStack.matches(outputs.get(0).stack, stackBefore) && !hasHeldOutput();
+            return doesNothing() || outputs.size() == 1 && ItemStack.matches(outputs.getFirst().stack, stackBefore) && !hasHeldOutput();
         }
 
         public List<TransportedItemStack> getOutputs() {
@@ -104,7 +104,10 @@ public class TransportedItemStackHandlerBehaviour extends BlockEntityBehaviour<S
         );
     }
 
-    public void handleCenteredProcessingOnAllItems(float maxDistanceFromCenter, Function<TransportedItemStack, TransportedResult> processFunction) {
+    public void handleCenteredProcessingOnAllItems(
+        float maxDistanceFromCenter,
+        Function<TransportedItemStack, @Nullable TransportedResult> processFunction
+    ) {
         this.processingCallback.applyToAllItems(maxDistanceFromCenter, processFunction);
     }
 

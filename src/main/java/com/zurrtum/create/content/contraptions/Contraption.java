@@ -113,7 +113,7 @@ public abstract class Contraption {
     public final CollisionList simplifiedEntityColliders = new CollisionList();
     public AbstractContraptionEntity entity;
 
-    public AABB bounds;
+    public @Nullable AABB bounds;
     public BlockPos anchor;
     public boolean stalled;
     public boolean hasUniversalCreativeCrate;
@@ -155,7 +155,7 @@ public abstract class Contraption {
      */
     public final AtomicReference<?> clientContraption = new AtomicReference<>();
     // Thin server and client side level used for generating optimized collision shapes.
-    protected ContraptionWorld collisionLevel;
+    protected @Nullable ContraptionWorld collisionLevel;
 
     public Contraption() {
         blocks = new HashMap<>();
@@ -195,7 +195,12 @@ public abstract class Contraption {
         return false;
     }
 
-    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction forcedDirection, Queue<BlockPos> frontier) throws AssemblyException {
+    protected boolean addToInitialFrontier(
+        Level world,
+        BlockPos pos,
+        @Nullable Direction forcedDirection,
+        Queue<BlockPos> frontier
+    ) throws AssemblyException {
         return true;
     }
 
@@ -579,7 +584,7 @@ public abstract class Contraption {
         return true;
     }
 
-    private boolean moveChassis(Level world, BlockPos pos, Direction movementDirection, Queue<BlockPos> frontier, Set<BlockPos> visited) {
+    private boolean moveChassis(Level world, BlockPos pos, @Nullable Direction movementDirection, Queue<BlockPos> frontier, Set<BlockPos> visited) {
         BlockEntity be = world.getBlockEntity(pos);
         if (!(be instanceof ChassisBlockEntity chassis))
             return false;
@@ -624,7 +629,7 @@ public abstract class Contraption {
         return Pair.of(new StructureBlockInfo(pos, blockstate, compoundnbt), blockEntity);
     }
 
-    protected void addBlock(Level level, BlockPos pos, Pair<StructureBlockInfo, BlockEntity> pair) {
+    protected void addBlock(Level level, BlockPos pos, Pair<StructureBlockInfo, @Nullable BlockEntity> pair) {
         StructureBlockInfo captured = pair.getKey();
         BlockPos localPos = pos.subtract(anchor);
         BlockState state = captured.state();
@@ -918,7 +923,7 @@ public abstract class Contraption {
             glue.discard();
         });
 
-        List<BoundingBox> minimisedGlue = new ArrayList<>();
+        List<@Nullable BoundingBox> minimisedGlue = new ArrayList<>();
         for (int i = 0; i < superglue.size(); i++)
             minimisedGlue.add(null);
 
@@ -1285,6 +1290,7 @@ public abstract class Contraption {
         return seatMapping;
     }
 
+    @Nullable
     public BlockPos getSeatOf(UUID entityId) {
         if (!getSeatMapping().containsKey(entityId))
             return null;
@@ -1294,6 +1300,7 @@ public abstract class Contraption {
         return getSeats().get(seatIndex);
     }
 
+    @Nullable
     public BlockPos getBearingPosOf(UUID subContraptionEntityId) {
         if (stabilizedSubContraptions.containsKey(subContraptionEntityId))
             return stabilizedSubContraptions.get(subContraptionEntityId).getConnectedPos();
@@ -1394,6 +1401,7 @@ public abstract class Contraption {
         return false;
     }
 
+    @Nullable
     public CollisionList getSimplifiedEntityColliders() {
         return simplifiedEntityColliders;
     }

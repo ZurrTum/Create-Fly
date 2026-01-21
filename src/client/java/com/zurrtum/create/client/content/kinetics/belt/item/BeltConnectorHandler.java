@@ -5,10 +5,6 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
@@ -23,6 +19,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class BeltConnectorHandler {
     private static final int CONNECT_COLOR = ARGB.colorFromFloat(1, .3f, .9f, .5f);
@@ -54,7 +53,7 @@ public class BeltConnectorHandler {
             Axis axis = world.getBlockState(first).getValue(BlockStateProperties.AXIS);
 
             HitResult rayTrace = mc.hitResult;
-            if (rayTrace == null || !(rayTrace instanceof BlockHitResult)) {
+            if (!(rayTrace instanceof BlockHitResult)) {
                 if (random.nextInt(50) == 0) {
                     world.addParticle(
                         new DustParticleOptions(CONNECT_COLOR, 1),

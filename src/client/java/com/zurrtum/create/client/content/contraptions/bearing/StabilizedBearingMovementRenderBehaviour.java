@@ -39,6 +39,7 @@ public class StabilizedBearingMovementRenderBehaviour implements MovementRenderB
     }
 
     @Override
+    @Nullable
     public MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,

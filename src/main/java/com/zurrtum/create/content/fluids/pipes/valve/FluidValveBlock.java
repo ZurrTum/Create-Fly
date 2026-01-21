@@ -145,6 +145,7 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return withWater(super.getStateForPlacement(context), context);
     }

@@ -54,7 +54,7 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
                     if (worldIn.getBlockState(e.blockPosition()) != state) {
                         Vec3 origin = VecHelper.getCenterOf(pos);
                         Vec3 offset = e.position().subtract(origin);
-                        offset = VecHelper.rotate(offset, Mth.clamp(speed, -16, 16) / 1f, Axis.Y);
+                        offset = VecHelper.rotate(offset, Mth.clamp(speed, -16, 16), Axis.Y);
                         Vec3 movement = origin.add(offset).subtract(e.position());
                         e.setDeltaMovement(e.getDeltaMovement().add(movement));
                         e.hurtMarked = true;

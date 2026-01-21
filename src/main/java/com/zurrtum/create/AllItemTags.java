@@ -1,16 +1,17 @@
 package com.zurrtum.create;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.minecraft.util.Util;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -89,6 +90,7 @@ public class AllItemTags {
         }
     );
 
+    @Nullable
     public static DyeColor getDyeColor(ItemStack stack) {
         if (stack.getItem() instanceof DyeItem dyeItem) {
             return dyeItem.getDyeColor();

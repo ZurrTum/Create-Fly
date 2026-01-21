@@ -57,7 +57,7 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
     public BasinFluidHandler fluidCapability;
 
     List<Direction> disabledSpoutputs;
-    Direction preferredSpoutput;
+    @Nullable Direction preferredSpoutput;
     protected List<ItemStack> spoutputBuffer;
     protected List<FluidStack> spoutputFluidBuffer;
     int recipeBackupCheck;
@@ -201,7 +201,7 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             return;
         }
 
-        //        setAreFluidsMoving(mixer.running && mixer.runningTicks <= 20);
+        setAreFluidsMoving(mixer.running && mixer.runningTicks <= 20);
     }
 
     public boolean isEmpty() {

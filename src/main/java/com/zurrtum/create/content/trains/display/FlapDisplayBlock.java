@@ -11,10 +11,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -50,6 +46,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.LevelTickAccess;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
@@ -199,11 +198,6 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
     @Override
     public float getParticleTargetRadius() {
         return .85f;
-    }
-
-    @Override
-    public float getParticleInitialRadius() {
-        return .75f;
     }
 
     private BlockState updateColumn(Level level, BlockPos pos, BlockState state, boolean present) {

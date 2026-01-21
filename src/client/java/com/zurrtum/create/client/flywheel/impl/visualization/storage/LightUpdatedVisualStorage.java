@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class LightUpdatedVisualStorage {
     private static final long INITIAL_UPDATE_ID = NEVER_UPDATED + 1;
 
     private final Map<LightUpdatedVisual, LongSet> visual2Sections = new WeakHashMap<>();
-    private final Long2ObjectMap<List<Updater>> section2Updaters = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectMap<@Nullable List<Updater>> section2Updaters = new Long2ObjectOpenHashMap<>();
 
     private final LongSet sectionsUpdatedThisFrame = new LongOpenHashSet();
     private final Queue<MovedVisual> movedVisuals = new ConcurrentLinkedQueue<>();

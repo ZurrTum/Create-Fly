@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -149,13 +150,21 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         return InteractionResult.SUCCESS;
     }
 
+    @Nullable
     public Component validateUsage(ItemStack item) {
         if (!canActivateWithoutSelectedBlock(item) && !item.has(AllDataComponents.SHAPER_BLOCK_USED))
             return Component.translatable("create.terrainzapper.leftClickToSet");
         return null;
     }
 
-    protected abstract boolean activate(Level world, Player player, ItemStack item, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data);
+    protected abstract boolean activate(
+        Level world,
+        Player player,
+        ItemStack item,
+        BlockState stateToUse,
+        BlockHitResult raytrace,
+        @Nullable CompoundTag data
+    );
 
     protected abstract void openHandgunGUI(ItemStack item, InteractionHand hand);
 
@@ -177,7 +186,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         return false;
     }
 
-    public static void setBlockEntityData(Level world, BlockPos pos, BlockState state, CompoundTag data, Player player) {
+    public static void setBlockEntityData(Level world, BlockPos pos, BlockState state, @Nullable CompoundTag data, Player player) {
         if (data != null && state.is(AllBlockTags.SAFE_NBT)) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity != null) {

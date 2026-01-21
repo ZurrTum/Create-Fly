@@ -8,6 +8,7 @@ import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
 
 public class ControlledContraptionEntityRenderer extends ContraptionEntityRenderer<ControlledContraptionEntity, ControlledContraptionEntityRenderer.ControlledContraptionState> {
     public ControlledContraptionEntityRenderer(EntityRendererProvider.Context context) {
@@ -38,6 +39,6 @@ public class ControlledContraptionEntityRenderer extends ContraptionEntityRender
     public static class ControlledContraptionState extends AbstractContraptionState {
         float angle;
         int seed;
-        Axis axis;
+        @Nullable Axis axis;
     }
 }

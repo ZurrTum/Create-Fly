@@ -18,7 +18,7 @@ import java.util.List;
 
 public class WeatheredIronWindowCTBehaviour extends ConnectedTextureBehaviour.Base {
 
-    private List<CTSpriteShiftEntry> shifts;
+    private final List<CTSpriteShiftEntry> shifts;
 
     public WeatheredIronWindowCTBehaviour() {
         this.shifts = List.of(
@@ -30,7 +30,7 @@ public class WeatheredIronWindowCTBehaviour extends ConnectedTextureBehaviour.Ba
     }
 
     @Override
-    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, TextureAtlasSprite sprite) {
+    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, @Nullable TextureAtlasSprite sprite) {
         if (direction.getAxis() == Axis.Y || sprite == null)
             return null;
         CTSpriteShiftEntry entry = shifts.get(rand.nextInt(shifts.size()));

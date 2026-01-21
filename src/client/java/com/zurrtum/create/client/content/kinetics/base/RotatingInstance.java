@@ -40,7 +40,7 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
     }
 
     public static int colorFromBE(KineticBlockEntity be) {
-        if (be.hasNetwork())
+        if (be.network != null)
             return Color.generateFromLong(be.network).getRGB();
         return 0xFFFFFF;
     }

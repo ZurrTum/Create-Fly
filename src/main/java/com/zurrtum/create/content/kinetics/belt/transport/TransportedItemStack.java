@@ -6,15 +6,15 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-
-import java.util.Optional;
-import java.util.Random;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.Random;
 
 public class TransportedItemStack implements Comparable<TransportedItemStack> {
     public static final Codec<TransportedItemStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -46,7 +46,7 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
     public float prevBeltPosition;
     public float prevSideOffset;
 
-    public FanProcessingType processedBy;
+    public @Nullable FanProcessingType processedBy;
     public int processingTime;
 
     public TransportedItemStack(ItemStack stack) {
@@ -96,7 +96,7 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
 
     @Override
     public int compareTo(TransportedItemStack o) {
-        return beltPosition < o.beltPosition ? 1 : beltPosition > o.beltPosition ? -1 : 0;
+        return Float.compare(o.beltPosition, beltPosition);
     }
 
     public TransportedItemStack getSimilar() {

@@ -216,9 +216,9 @@ public class PotatoCannonItem extends ProjectileWeaponItem implements SwingContr
         MutableComponent reloadTicks = Component.literal("" + type.reloadTicks());
         MutableComponent knockback = Component.literal("" + (type.knockback() + additionalKnockback));
 
-        damage = damage.withStyle(additionalDamageMult > 1 ? green : darkGreen);
-        knockback = knockback.withStyle(additionalKnockback > 0 ? green : darkGreen);
-        reloadTicks = reloadTicks.withStyle(darkGreen);
+        damage.withStyle(additionalDamageMult > 1 ? green : darkGreen);
+        knockback.withStyle(additionalKnockback > 0 ? green : darkGreen);
+        reloadTicks.withStyle(darkGreen);
 
         tooltip.accept(spacing.plainCopy().append(Component.translatable(_attack, damage).withStyle(darkGreen)));
         tooltip.accept(spacing.plainCopy().append(Component.translatable(_reload, reloadTicks).withStyle(darkGreen)));

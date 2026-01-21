@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.depot;
 
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.funnel.AbstractFunnelBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +42,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> imple
 
     public static final BehaviourType<DepotBehaviour> TYPE = new BehaviourType<>();
 
-    public TransportedItemStack heldItem;
+    public @Nullable TransportedItemStack heldItem;
     public List<TransportedItemStack> incoming;
     public DepotOutputHandler processingOutputBuffer;
     public DepotItemHandler itemHandler;
@@ -371,7 +372,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> imple
         return remainder;
     }
 
-    private void applyToAllItems(float maxDistanceFromCentre, Function<TransportedItemStack, TransportedResult> processFunction) {
+    private void applyToAllItems(float maxDistanceFromCentre, Function<TransportedItemStack, @Nullable TransportedResult> processFunction) {
         if (heldItem == null)
             return;
         if (.5f - heldItem.beltPosition > maxDistanceFromCentre)

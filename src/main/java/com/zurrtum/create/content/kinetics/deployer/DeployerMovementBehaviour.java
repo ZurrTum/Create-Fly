@@ -45,6 +45,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -275,6 +276,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         context.data.store("HeldItem", ItemStack.CODEC, ops, stack);
     }
 
+    @Nullable
     private DeployerPlayer getPlayer(MovementContext context) {
         if (!(context.temporaryData instanceof DeployerPlayer) && context.world instanceof ServerLevel) {
             RegistryAccess registryManager = context.world.registryAccess();

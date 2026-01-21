@@ -4,6 +4,7 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.AssemblyException;
@@ -11,11 +12,7 @@ import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -24,16 +21,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity implements IBearingBlockEntity {
 
     protected ServerScrollOptionBehaviour<RotationMode> movementMode;
-    protected ControlledContraptionEntity movedContraption;
+    protected @Nullable ControlledContraptionEntity movedContraption;
     protected float angle;
     protected boolean running;
     protected boolean assembleNextTick;
     protected float clientAngleDiff;
-    public AssemblyException lastException;
+    public @Nullable AssemblyException lastException;
     protected double sequencedAngleLimit;
 
     private float prevAngle;
@@ -154,6 +154,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         return speed;
     }
 
+    @Nullable
     public AssemblyException getLastAssemblyException() {
         return lastException;
     }
@@ -323,6 +324,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         angle = forcedAngle;
     }
 
+    @Nullable
     public ControlledContraptionEntity getMovedContraption() {
         return movedContraption;
     }

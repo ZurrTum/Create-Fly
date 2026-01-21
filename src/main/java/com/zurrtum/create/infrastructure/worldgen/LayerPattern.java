@@ -28,6 +28,7 @@ public class LayerPattern {
         this.layers = layers;
     }
 
+    @Nullable
     public Layer rollNext(@Nullable Layer previous, RandomSource random) {
         int totalWeight = 0;
         for (Layer layer : layers)

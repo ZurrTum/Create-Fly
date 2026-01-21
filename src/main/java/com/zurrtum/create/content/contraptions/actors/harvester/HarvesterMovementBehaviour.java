@@ -66,7 +66,7 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         BlockState state = stateVisited;
         BlockHelper.destroyBlockAs(
             world, pos, null, item, effectChance, stack -> {
-                if (AllConfigs.server().kinetics.harvesterReplants.get() && !seedSubtracted.getValue() && ItemHelper.sameItem(
+                if (AllConfigs.server().kinetics.harvesterReplants.get() && !seedSubtracted.get() && ItemHelper.sameItem(
                     stack,
                     new ItemStack(state.getBlock())
                 )) {

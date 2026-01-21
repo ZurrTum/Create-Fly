@@ -2,17 +2,17 @@ package com.zurrtum.create.client.foundation.utility;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.client.AllKeys;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
-
 public class ControlsUtil {
 
-    private static List<KeyMapping> standardControls;
+    private static @Nullable List<KeyMapping> standardControls;
 
     public static List<KeyMapping> getControls() {
         if (standardControls == null) {

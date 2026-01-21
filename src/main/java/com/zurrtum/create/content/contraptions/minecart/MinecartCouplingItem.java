@@ -5,9 +5,6 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
-
-import java.util.Optional;
-
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -16,6 +13,9 @@ import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 public class MinecartCouplingItem extends Item {
 
@@ -23,6 +23,7 @@ public class MinecartCouplingItem extends Item {
         super(p_i48487_1_);
     }
 
+    @Nullable
     public static InteractionResult handleInteractionWithMinecart(Player player, InteractionHand hand, Entity interacted) {
         if (!(interacted instanceof AbstractMinecart minecart))
             return null;

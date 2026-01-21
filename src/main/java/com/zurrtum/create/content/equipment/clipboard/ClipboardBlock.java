@@ -36,6 +36,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
         if (stateForPlacement == null)
@@ -143,7 +145,7 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
         return ImmutableList.of(drop);
     }
 
-    private ItemStack applyComponentsToDropStack(ItemStack stack, BlockEntity blockEntity) {
+    private ItemStack applyComponentsToDropStack(ItemStack stack, @Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof ClipboardBlockEntity cbe) {
             stack.applyComponents(cbe.components());
             return stack;

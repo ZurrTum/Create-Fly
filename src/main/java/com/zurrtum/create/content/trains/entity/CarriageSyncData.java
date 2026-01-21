@@ -10,25 +10,25 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint.ITrackSelector;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.graph.TrackNode;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-
-import java.util.*;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class CarriageSyncData {
 
-    public List<Pair<Couple<Integer>, Float>> wheelLocations;
-    public Pair<Vec3, Couple<Vec3>> fallbackLocations;
+    public List<@Nullable Pair<Couple<Integer>, Float>> wheelLocations;
+    public @Nullable Pair<Vec3, Couple<Vec3>> fallbackLocations;
     public float distanceToDestination;
     public boolean leadingCarriage;
 
     // For Client interpolation
-    private Pair<Vec3, Couple<Vec3>> fallbackPointSnapshot;
-    private TravellingPoint[] pointsToApproach;
-    private float[] pointDistanceSnapshot;
+    private @Nullable Pair<Vec3, Couple<Vec3>> fallbackPointSnapshot;
+    private final TravellingPoint[] pointsToApproach;
+    private final float[] pointDistanceSnapshot;
     private float destinationDistanceSnapshot;
     private int ticksSince;
 
@@ -125,7 +125,7 @@ public class CarriageSyncData {
             for (boolean firstPoint : Iterate.trueAndFalse) {
                 TravellingPoint point = bogey.points.get(firstPoint);
                 int index = (first ? 0 : 2) + (firstPoint ? 0 : 1);
-                Couple<TrackNode> nodes = Couple.create(point.node1, point.node2);
+                Couple<@Nullable TrackNode> nodes = Couple.create(point.node1, point.node2);
 
                 if (nodes.either(Objects::isNull)) {
                     updateFallbackLocations(dce);
@@ -169,7 +169,7 @@ public class CarriageSyncData {
             TravellingPoint bogeyPoint = bogey.points.get(i % 2 == 0);
             TravellingPoint point = dce.pointsInitialised ? pointsToApproach[i] : bogeyPoint;
 
-            Couple<TrackNode> nodes = pair.getFirst().map(graph::getNode);
+            Couple<@Nullable TrackNode> nodes = pair.getFirst().map(graph::getNode);
             if (nodes.either(Objects::isNull))
                 continue;
             TrackEdge edge = graph.getConnectionsFrom(nodes.getFirst()).get(nodes.getSecond());
@@ -274,7 +274,7 @@ public class CarriageSyncData {
         }
     }
 
-    private Vec3 approachVector(float partial, Vec3 current, Vec3 target, Vec3 snapshot) {
+    private Vec3 approachVector(float partial, @Nullable Vec3 current, Vec3 target, @Nullable Vec3 snapshot) {
         if (current == null || snapshot == null)
             return target;
         return current.add(target.subtract(snapshot).scale(partial));
@@ -286,10 +286,7 @@ public class CarriageSyncData {
 
         Set<TrackEdge> visited = new HashSet<>();
         Map<TrackEdge, Pair<Boolean, TrackEdge>> reachedVia = new IdentityHashMap<>();
-        PriorityQueue<Pair<Double, Pair<Couple<TrackNode>, TrackEdge>>> frontier = new PriorityQueue<>((p1, p2) -> Double.compare(
-            p1.getFirst(),
-            p2.getFirst()
-        ));
+        PriorityQueue<Pair<Double, Pair<Couple<TrackNode>, TrackEdge>>> frontier = new PriorityQueue<>(Comparator.comparingDouble(Pair::getFirst));
 
         TrackNode initialNode1 = forward ? current.node1 : current.node2;
         TrackNode initialNode2 = forward ? current.node2 : current.node1;

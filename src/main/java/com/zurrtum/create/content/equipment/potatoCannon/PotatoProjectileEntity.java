@@ -51,7 +51,7 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
     protected PotatoCannonProjectileType type;
     protected ItemStack stack = ItemStack.EMPTY;
 
-    protected Entity stuckEntity;
+    protected @Nullable Entity stuckEntity;
     protected Vec3 stuckOffset;
     protected PotatoProjectileRenderMode stuckRenderer;
     protected double stuckFallSpeed;

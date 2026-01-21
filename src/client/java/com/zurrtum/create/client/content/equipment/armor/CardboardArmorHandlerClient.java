@@ -8,10 +8,6 @@ import com.zurrtum.create.client.content.logistics.box.PackageRenderer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
-
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
@@ -19,6 +15,9 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 public class CardboardArmorHandlerClient {
     private static final Cache<Integer, Integer> BOXES_PLAYERS_ARE_HIDING_AS = new TickBasedCache<>(20, true);
@@ -73,9 +72,7 @@ public class CardboardArmorHandlerClient {
 
         try {
             PartialModel model = AllPartialModels.PACKAGES_TO_HIDE_AS.get(getCurrentBoxIndex(state.id));
-            if (model != null) {
-                PackageRenderer.getBoxRenderState(state.id, renderState.create$getInterpolatedYaw(), state.lightCoords, model).render(ms, queue);
-            }
+            PackageRenderer.getBoxRenderState(state.id, renderState.create$getInterpolatedYaw(), state.lightCoords, model).render(ms, queue);
         } catch (ExecutionException e) {
             e.printStackTrace();
         }

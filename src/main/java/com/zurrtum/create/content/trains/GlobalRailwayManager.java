@@ -29,7 +29,7 @@ public class GlobalRailwayManager {
     private List<Train> movingTrains;
     private List<Train> waitingTrains;
 
-    private RailwaySavedData savedData;
+    private @Nullable RailwaySavedData savedData;
 
     public int version;
 
@@ -238,7 +238,7 @@ public class GlobalRailwayManager {
 
     }
 
-    public GlobalRailwayManager sided(LevelAccessor level) {
+    public GlobalRailwayManager sided(@Nullable LevelAccessor level) {
         if (level != null && !level.isClientSide())
             return this;
         return AllClientHandle.INSTANCE.getGlobalRailwayManager();

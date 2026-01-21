@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class EncasedShaftBlock extends AbstractEncasedShaftBlock implements IBE<KineticBlockEntity>, SpecialBlockItemRequirement, EncasedBlock {
 
@@ -60,7 +61,7 @@ public class EncasedShaftBlock extends AbstractEncasedShaftBlock implements IBE<
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity be) {
         return ItemRequirement.of(AllBlocks.SHAFT.defaultBlockState(), be);
     }
 

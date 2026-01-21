@@ -35,8 +35,6 @@ public abstract class ChainConveyorShape {
         final double radius = 0.175;
         VoxelShape voxelShape;
 
-        Vec3[] linePoints;
-
         public ChainConveyorOBB(BlockPos connection, Vec3 start, Vec3 end) {
             this.connection = connection;
             Vec3 diff = end.subtract(start);
@@ -122,6 +120,7 @@ public abstract class ChainConveyorShape {
         }
 
         @Override
+        @Nullable
         public Vec3 intersect(Vec3 from, Vec3 to) {
             return bounds.clip(from, to).orElse(null);
         }
@@ -135,8 +134,7 @@ public abstract class ChainConveyorShape {
         public float getChainPosition(Vec3 intersection) {
             Vec3 diff = bounds.getCenter().subtract(intersection);
             float angle = (float) (Mth.RAD_TO_DEG * Mth.atan2(diff.x, diff.z) + 360 + 180) % 360;
-            float rounded = Math.round(angle / 45) * 45f;
-            return rounded;
+            return Math.round(angle / 45) * 45f;
         }
 
         @Override

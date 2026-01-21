@@ -28,6 +28,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEntity>, ICogWheel, ItemInventoryProvider<MillstoneBlockEntity> {
 
@@ -36,7 +37,13 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, MillstoneBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        MillstoneBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         return blockEntity.capability;
     }
 

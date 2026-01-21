@@ -153,6 +153,7 @@ public class VanillaVisuals {
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public EntityVisualizerBuilder<T> build() {
             var elementsArray = elements.toArray(new ConfiguredElement[0]);
 
@@ -162,7 +163,7 @@ public class VanillaVisuals {
 
             var controller = new ComposableEntityVisual.Controller<T>(elementsArray, predicate);
 
-            return builder(entityType).factory((ctx, entity, partialTick) -> new ComposableEntityVisual<T>(ctx, entity, partialTick, controller));
+            return builder(entityType).factory((ctx, entity, partialTick) -> new ComposableEntityVisual<>(ctx, entity, partialTick, controller));
         }
     }
 

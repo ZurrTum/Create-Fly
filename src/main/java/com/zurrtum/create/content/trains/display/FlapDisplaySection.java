@@ -1,17 +1,17 @@
 package com.zurrtum.create.content.trains.display;
 
 import com.google.common.base.Strings;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class FlapDisplaySection {
     static final Map<String, String[]> LOADED_FLAP_CYCLES = new HashMap<>();
@@ -26,10 +26,10 @@ public class FlapDisplaySection {
     public boolean wideFlaps;
     boolean sendTransition;
     String cycle;
-    Component component;
+    @Nullable Component component;
 
     // Client
-    public String[] cyclingOptions;
+    public String @Nullable [] cyclingOptions;
     public boolean[] spinning;
     public int spinningTicks;
     public String text;
@@ -54,7 +54,7 @@ public class FlapDisplaySection {
         return this;
     }
 
-    public void setText(Component component) {
+    public void setText(@Nullable Component component) {
         this.component = component;
         sendTransition = true;
     }
@@ -165,6 +165,7 @@ public class FlapDisplaySection {
         return !singleFlap;
     }
 
+    @Nullable
     public Component getText() {
         return component;
     }

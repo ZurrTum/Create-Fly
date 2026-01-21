@@ -32,11 +32,11 @@ import org.jspecify.annotations.Nullable;
 
 public class FactoryPanelConnectionHandler {
 
-    static FactoryPanelPosition connectingFrom;
-    static AABB connectingFromBox;
+    static @Nullable FactoryPanelPosition connectingFrom;
+    static @Nullable AABB connectingFromBox;
 
     static boolean relocating;
-    static FactoryPanelPosition validRelocationTarget;
+    static @Nullable FactoryPanelPosition validRelocationTarget;
 
     public static boolean panelClicked(LevelAccessor level, Player player, ServerFactoryPanelBehaviour panel) {
         if (connectingFrom == null)
@@ -65,11 +65,8 @@ public class FactoryPanelConnectionHandler {
         ((LocalPlayer) player).connection.send(new FactoryPanelConnectionPacket(panel.getPanelPosition(), connectingFrom, false));
 
         player.displayClientMessage(
-            CreateLang.translate(
-                "factory_panel.panels_connected",
-                filterFrom.getHoverName().getString(),
-                filterTo.getHoverName().getString()
-            ).style(ChatFormatting.GREEN).component(), true
+            CreateLang.translate("factory_panel.panels_connected", filterFrom.getHoverName().getString(), filterTo.getHoverName().getString())
+                .style(ChatFormatting.GREEN).component(), true
         );
 
         connectingFrom = null;
@@ -80,7 +77,7 @@ public class FactoryPanelConnectionHandler {
     }
 
     @Nullable
-    private static String checkForIssues(ServerFactoryPanelBehaviour from, ServerFactoryPanelBehaviour to) {
+    private static String checkForIssues(@Nullable ServerFactoryPanelBehaviour from, ServerFactoryPanelBehaviour to) {
         if (from == null)
             return "factory_panel.connection_aborted";
         if (from.targetedBy.containsKey(to.getPanelPosition()))
@@ -113,7 +110,7 @@ public class FactoryPanelConnectionHandler {
     }
 
     @Nullable
-    private static String checkForIssues(ServerFactoryPanelBehaviour from, FactoryPanelSupportBehaviour to) {
+    private static String checkForIssues(@Nullable ServerFactoryPanelBehaviour from, FactoryPanelSupportBehaviour to) {
         if (from == null)
             return "factory_panel.connection_aborted";
 

@@ -13,11 +13,6 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -40,6 +35,11 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 public class SchematicPrinter {
 
@@ -58,10 +58,10 @@ public class SchematicPrinter {
 
     private boolean schematicLoaded;
     private boolean isErrored;
-    private SchematicLevel blockReader;
-    private BlockPos schematicAnchor;
+    private @Nullable SchematicLevel blockReader;
+    private @Nullable BlockPos schematicAnchor;
 
-    private BlockPos currentPos;
+    private @Nullable BlockPos currentPos;
     private int printingEntityIndex;
     private PrintStage printStage;
     private List<BlockPos> deferredBlocks;
@@ -156,6 +156,7 @@ public class SchematicPrinter {
         return isErrored;
     }
 
+    @Nullable
     public BlockPos getCurrentTarget() {
         if (!isLoaded() || isErrored())
             return null;
@@ -166,6 +167,7 @@ public class SchematicPrinter {
         return printStage;
     }
 
+    @Nullable
     public BlockPos getAnchor() {
         return schematicAnchor;
     }
@@ -177,7 +179,7 @@ public class SchematicPrinter {
 
     @FunctionalInterface
     public interface BlockTargetHandler {
-        void handle(BlockPos target, BlockState blockState, BlockEntity blockEntity);
+        void handle(BlockPos target, BlockState blockState, @Nullable BlockEntity blockEntity);
     }
 
     @FunctionalInterface
@@ -203,9 +205,9 @@ public class SchematicPrinter {
         boolean shouldPlace(
             BlockPos target,
             BlockState blockState,
-            BlockEntity blockEntity,
+            @Nullable BlockEntity blockEntity,
             BlockState toReplace,
-            BlockState toReplaceOther,
+            @Nullable BlockState toReplaceOther,
             boolean isNormalCube
         );
     }
@@ -214,7 +216,7 @@ public class SchematicPrinter {
         return shouldPlaceCurrent(world, (a, b, c, d, e, f) -> true);
     }
 
-    public boolean shouldPlaceCurrent(Level world, PlacementPredicate predicate) {
+    public boolean shouldPlaceCurrent(@Nullable Level world, PlacementPredicate predicate) {
         if (world == null)
             return false;
 
@@ -321,7 +323,7 @@ public class SchematicPrinter {
                 if (deferredBlocks.isEmpty()) {
                     printStage = PrintStage.ENTITIES;
                 } else {
-                    currentPos = deferredBlocks.remove(0);
+                    currentPos = deferredBlocks.removeFirst();
                 }
             }
 

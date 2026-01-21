@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 public class WrappedClientLevel extends ClientLevel {
     private static final Minecraft mc = Minecraft.getInstance();
     protected Level level;
@@ -24,8 +26,8 @@ public class WrappedClientLevel extends ClientLevel {
         Level level
     ) {
         super(
-            mc.getConnection(),
-            mc.level.getLevelData(),
+            Objects.requireNonNull(mc.getConnection()),
+            Objects.requireNonNull(mc.level).getLevelData(),
             level.dimension(),
             level.dimensionTypeRegistration(),
             mc.getConnection().serverChunkRadius,
@@ -58,6 +60,7 @@ public class WrappedClientLevel extends ClientLevel {
         return level.getBlockState(pos);
     }
 
+    @Nullable
     @Override
     public BlockGetter getChunkForCollisions(int x, int z) {
         return level.getChunkForCollisions(x, z);

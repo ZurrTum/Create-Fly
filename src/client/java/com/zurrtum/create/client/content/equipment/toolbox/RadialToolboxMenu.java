@@ -39,7 +39,7 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
     private boolean scrollMode;
     private int scrollSlot = 0;
     private final List<ToolboxBlockEntity> toolboxes;
-    private ToolboxBlockEntity selectedBox;
+    private @Nullable ToolboxBlockEntity selectedBox;
 
     private static final int DEPOSIT = -7;
     private static final int UNEQUIP = -5;

@@ -218,8 +218,7 @@ public class ContraptionHandlerClient {
         if (predicateResult == null || predicateResult.missed())
             return null;
 
-        BlockHitResult rayTraceResult = mutableResult.getValue();
-        return rayTraceResult;
+        return mutableResult.get();
     }
 
 }

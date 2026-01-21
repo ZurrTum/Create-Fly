@@ -4,6 +4,7 @@ import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStora
 import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 public class FallbackMountedStorageType extends SimpleMountedStorageType<FallbackMountedStorage> {
     public FallbackMountedStorageType() {
@@ -16,6 +17,7 @@ public class FallbackMountedStorageType extends SimpleMountedStorageType<Fallbac
     }
 
     @Override
+    @Nullable
     protected Container getHandler(Level level, BlockEntity be) {
         Container handler = super.getHandler(level, be);
         return handler != null && FallbackMountedStorage.isValid(handler) ? handler : null;

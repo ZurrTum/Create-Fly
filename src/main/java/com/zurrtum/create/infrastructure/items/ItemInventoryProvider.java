@@ -18,6 +18,7 @@ public interface ItemInventoryProvider<T extends SmartBlockEntity> extends World
     Map<Container, WorldlyContainer> WRAPPERS = new MapMaker().weakValues().makeMap();
 
     @Override
+    @Nullable
     default WorldlyContainer getContainer(BlockState state, LevelAccessor world, BlockPos pos) {
         Container inventory = getInventory(state, world, pos, null, null);
         if (inventory == null) {
@@ -30,12 +31,13 @@ public interface ItemInventoryProvider<T extends SmartBlockEntity> extends World
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     default Container getInventory(
         @Nullable BlockState state,
         LevelAccessor world,
         BlockPos pos,
         @Nullable BlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         if (blockEntity == null) {
             if (state == null) {
@@ -60,5 +62,5 @@ public interface ItemInventoryProvider<T extends SmartBlockEntity> extends World
 
     Class<T> getBlockEntityClass();
 
-    Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, T blockEntity, Direction context);
+    @Nullable Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, T blockEntity, @Nullable Direction context);
 }

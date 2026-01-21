@@ -34,6 +34,7 @@ import com.zurrtum.create.infrastructure.worldgen.AllPlacementModifiers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class Create implements ModInitializer {
@@ -45,7 +46,7 @@ public class Create implements ModInitializer {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static boolean Lazy = false;
 
-    public static MinecraftServer SERVER;
+    public static @Nullable MinecraftServer SERVER;
     public static TorquePropagator TORQUE_PROPAGATOR;
     public static GlobalRailwayManager RAILWAYS;
     public static RedstoneLinkNetworkHandler REDSTONE_LINK_NETWORK_HANDLER;

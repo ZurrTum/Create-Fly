@@ -22,12 +22,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public abstract class SchematicToolBase implements ISchematicTool {
 
     protected SchematicHandler schematicHandler;
 
-    protected BlockPos selectedPos;
+    protected @Nullable BlockPos selectedPos;
     protected Vec3 chasingSelectedPos;
     protected Vec3 lastChasingSelectedPos;
 
@@ -35,7 +36,7 @@ public abstract class SchematicToolBase implements ISchematicTool {
     protected int selectionRange;
     protected boolean schematicSelected;
     protected boolean renderSelectedFace;
-    protected Direction selectedFace;
+    protected @Nullable Direction selectedFace;
 
     @Override
     public void init() {

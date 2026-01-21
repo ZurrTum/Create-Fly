@@ -6,15 +6,15 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 public class PortableStorageInterfaceMovement extends MovementBehaviour {
 
@@ -99,7 +99,7 @@ public class PortableStorageInterfaceMovement extends MovementBehaviour {
         if (context.contraption instanceof CarriageContraption cc && !cc.notInPortal())
             return false;
         Optional<Direction> currentFacingIfValid = getCurrentFacingIfValid(context);
-        if (!currentFacingIfValid.isPresent())
+        if (currentFacingIfValid.isEmpty())
             return false;
 
         Direction currentFacing = currentFacingIfValid.get();
@@ -142,6 +142,7 @@ public class PortableStorageInterfaceMovement extends MovementBehaviour {
         getAnimation(context).chase(0, 0.25f, Chaser.LINEAR);
     }
 
+    @Nullable
     private PortableStorageInterfaceBlockEntity findStationaryInterface(Level world, BlockPos pos, BlockState state, Direction facing) {
         for (int i = 0; i < 2; i++) {
             PortableStorageInterfaceBlockEntity interfaceAt = getStationaryInterfaceAt(world, pos.relative(facing, i), state, facing);
@@ -152,6 +153,7 @@ public class PortableStorageInterfaceMovement extends MovementBehaviour {
         return null;
     }
 
+    @Nullable
     private PortableStorageInterfaceBlockEntity getStationaryInterfaceAt(Level world, BlockPos pos, BlockState state, Direction facing) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof PortableStorageInterfaceBlockEntity psi))

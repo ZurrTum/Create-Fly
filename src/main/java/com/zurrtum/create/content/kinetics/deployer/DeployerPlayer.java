@@ -24,13 +24,13 @@ public interface DeployerPlayer {
         }
     }
 
-    Pair<BlockPos, Float> getBlockBreakingProgress();
+    @Nullable Pair<BlockPos, Float> getBlockBreakingProgress();
 
-    void setBlockBreakingProgress(Pair<BlockPos, Float> blockBreakingProgress);
+    void setBlockBreakingProgress(@Nullable Pair<BlockPos, Float> blockBreakingProgress);
 
-    ItemStack getSpawnedItemEffects();
+    @Nullable ItemStack getSpawnedItemEffects();
 
-    void setSpawnedItemEffects(ItemStack spawnedItemEffects);
+    void setSpawnedItemEffects(@Nullable ItemStack spawnedItemEffects);
 
     ServerPlayerGameMode getInteractionManager();
 

@@ -21,10 +21,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 public class BasinFluidParticle extends FluidParticle {
     BlockPos basinPos;
-    Vec3 targetPos;
+    @Nullable Vec3 targetPos;
     Vec3 centerOfBasin;
     float yOffset;
 
@@ -125,6 +126,7 @@ public class BasinFluidParticle extends FluidParticle {
 
     public static class Factory implements ParticleProvider<FluidParticleData> {
         @Override
+        @Nullable
         public Particle createParticle(
             FluidParticleData data,
             ClientLevel world,

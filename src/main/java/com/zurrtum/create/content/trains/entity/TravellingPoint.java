@@ -17,8 +17,8 @@ import java.util.function.*;
 
 public class TravellingPoint {
 
-    public TrackNode node1, node2;
-    public TrackEdge edge;
+    public @Nullable TrackNode node1, node2;
+    public @Nullable TrackEdge edge;
     public double position;
     public boolean blocked;
     public boolean upsideDown;
@@ -58,7 +58,7 @@ public class TravellingPoint {
     public TravellingPoint() {
     }
 
-    public TravellingPoint(TrackNode node1, TrackNode node2, TrackEdge edge, double position, boolean upsideDown) {
+    public TravellingPoint(@Nullable TrackNode node1, @Nullable TrackNode node2, @Nullable TrackEdge edge, double position, boolean upsideDown) {
         this.node1 = node1;
         this.node2 = node2;
         this.edge = edge;
@@ -116,7 +116,7 @@ public class TravellingPoint {
                     if (frontier.isEmpty())
                         continue;
 
-                    Map.Entry<TrackNode, TrackEdge> currentEntry = frontier.remove(0);
+                    Map.Entry<TrackNode, TrackEdge> currentEntry = frontier.removeFirst();
                     for (Map.Entry<TrackNode, TrackEdge> nextEntry : graph.getConnectionsFrom(currentEntry.getKey()).entrySet()) {
                         TrackEdge nextEdge = nextEntry.getValue();
                         if (!visiteds.get(j).add(nextEdge))
@@ -138,7 +138,7 @@ public class TravellingPoint {
 
             if (success != null)
                 success.accept(false);
-            return validTargets.get(0);
+            return validTargets.getFirst();
         };
     }
 
@@ -253,7 +253,7 @@ public class TravellingPoint {
                     break;
                 }
 
-                Map.Entry<TrackNode, TrackEdge> entry = validTargets.size() == 1 ? validTargets.get(0) : trackSelector.apply(
+                Map.Entry<TrackNode, TrackEdge> entry = validTargets.size() == 1 ? validTargets.getFirst() : trackSelector.apply(
                     graph,
                     Pair.of(true, validTargets)
                 );
@@ -309,7 +309,7 @@ public class TravellingPoint {
                     break;
                 }
 
-                Map.Entry<TrackNode, TrackEdge> entry = validTargets.size() == 1 ? validTargets.get(0) : trackSelector.apply(
+                Map.Entry<TrackNode, TrackEdge> entry = validTargets.size() == 1 ? validTargets.getFirst() : trackSelector.apply(
                     graph,
                     Pair.of(false, validTargets)
                 );
@@ -343,6 +343,7 @@ public class TravellingPoint {
         return traveled;
     }
 
+    @Nullable
     protected Double edgeTraversedFrom(
         TrackGraph graph,
         boolean forward,
@@ -429,11 +430,11 @@ public class TravellingPoint {
         return map.build(empty);
     }
 
-    public static TravellingPoint read(ValueInput view, TrackGraph graph, DimensionPalette dimensions) {
+    public static TravellingPoint read(ValueInput view, @Nullable TrackGraph graph, DimensionPalette dimensions) {
         if (graph == null)
             return new TravellingPoint(null, null, null, 0, false);
 
-        Couple<TrackNode> locs = view.childrenList("Nodes").map(list -> {
+        Couple<@Nullable TrackNode> locs = view.childrenList("Nodes").map(list -> {
             Iterator<ValueInput> iterator = list.iterator();
             return Couple.create(
                 graph.locateNode(TrackNodeLocation.read(iterator.next(), dimensions)),
@@ -454,12 +455,12 @@ public class TravellingPoint {
         );
     }
 
-    public static <T> TravellingPoint decode(DynamicOps<T> ops, T input, TrackGraph graph, DimensionPalette dimensions) {
+    public static <T> TravellingPoint decode(DynamicOps<T> ops, T input, @Nullable TrackGraph graph, DimensionPalette dimensions) {
         if (graph == null)
             return new TravellingPoint(null, null, null, 0, false);
 
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        Couple<TrackNode> locs = ops.getStream(map.get("Nodes")).result().map(stream -> {
+        Couple<@Nullable TrackNode> locs = ops.getStream(map.get("Nodes")).result().map(stream -> {
             Iterator<T> iterator = stream.iterator();
             return Couple.create(
                 graph.locateNode(TrackNodeLocation.decode(ops, iterator.next(), dimensions)),

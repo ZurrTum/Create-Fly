@@ -263,11 +263,19 @@ public class ItemHelper {
         return stacks;
     }
 
-    public static Container getInventory(Level world, BlockPos pos, Direction direction) {
+    @Nullable
+    public static Container getInventory(Level world, BlockPos pos, @Nullable Direction direction) {
         return getInventory(world, pos, null, null, direction);
     }
 
-    public static Container getInventory(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    @Nullable
+    public static Container getInventory(
+        Level world,
+        BlockPos pos,
+        @Nullable BlockState state,
+        @Nullable BlockEntity blockEntity,
+        @Nullable Direction direction
+    ) {
         if (state == null) {
             state = blockEntity != null ? blockEntity.getBlockState() : world.getBlockState(pos);
         }
@@ -283,14 +291,14 @@ public class ItemHelper {
         }
         if (blockEntity instanceof Container inventory) {
             if (inventory instanceof ChestBlockEntity && block instanceof ChestBlock chestBlock) {
-                inventory = ChestBlock.getContainer(chestBlock, state, world, pos, true);
+                return ChestBlock.getContainer(chestBlock, state, world, pos, true);
             }
             return inventory;
         }
         return AllTransfer.getInventory(world, pos, state, blockEntity, direction);
     }
 
-    public static Supplier<Container> getInventoryCache(
+    public static Supplier<@Nullable Container> getInventoryCache(
         ServerLevel world,
         BlockPos pos,
         Direction direction,

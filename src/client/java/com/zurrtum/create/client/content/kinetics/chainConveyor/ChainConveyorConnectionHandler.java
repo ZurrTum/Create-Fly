@@ -35,11 +35,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class ChainConveyorConnectionHandler {
 
-    private static BlockPos firstPos;
-    private static ResourceKey<Level> firstDim;
+    private static @Nullable BlockPos firstPos;
+    private static @Nullable ResourceKey<Level> firstDim;
 
     public static boolean onRightClick(Minecraft mc) {
         if (!isChain(mc.player.getMainHandItem()))
@@ -57,6 +58,7 @@ public class ChainConveyorConnectionHandler {
         return true;
     }
 
+    @Nullable
     public static InteractionResult onItemUsedOnBlock(Level level, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
         ItemStack itemStack = player.getItemInHand(hand);
         BlockPos pos = ray.getBlockPos();
@@ -209,12 +211,12 @@ public class ChainConveyorConnectionHandler {
         ChainConveyorBlockEntity sourceLift = chainConveyorBlock.getBlockEntity(level, firstPos);
         ChainConveyorBlockEntity targetLift = chainConveyorBlock.getBlockEntity(level, pos);
 
+        if (sourceLift == null || targetLift == null)
+            return fail("chain_conveyor.blocks_invalid", player);
         if (targetLift.connections.size() >= AllConfigs.server().kinetics.maxChainConveyorConnections.get())
             return fail("chain_conveyor.cannot_add_more_connections", player);
         if (targetLift.connections.contains(firstPos.subtract(pos)))
             return fail("chain_conveyor.already_connected", player);
-        if (sourceLift == null || targetLift == null)
-            return fail("chain_conveyor.blocks_invalid", player);
 
         if (!player.isCreative()) {
             int chainCost = ChainConveyorBlockEntity.getChainCost(pos.subtract(firstPos));

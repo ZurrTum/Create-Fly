@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class FluidTankItem extends BlockItem {
 
@@ -41,7 +42,13 @@ public class FluidTankItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos blockPos, Level level, Player player, ItemStack itemStack, BlockState blockState) {
+    protected boolean updateCustomBlockEntityTag(
+        BlockPos blockPos,
+        Level level,
+        @Nullable Player player,
+        ItemStack itemStack,
+        BlockState blockState
+    ) {
         MinecraftServer minecraftserver = level.getServer();
         if (minecraftserver == null)
             return false;

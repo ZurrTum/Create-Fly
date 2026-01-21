@@ -11,7 +11,7 @@ import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.UnbakedModel.GuiLight;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import org.jspecify.annotations.Nullable;
@@ -26,8 +26,7 @@ import java.util.Map;
  */
 public record StandardModelParameters(
     @Nullable Identifier parent, TextureSlots.Data textures, @Nullable ItemTransforms itemTransforms, @Nullable Boolean ambientOcclusion,
-    @Nullable UnbakedModel.GuiLight guiLight, @Nullable Transformation rootTransform, @Nullable ChunkSectionLayer layer,
-    Map<String, Boolean> partVisibility
+    @Nullable GuiLight guiLight, @Nullable Transformation rootTransform, @Nullable ChunkSectionLayer layer, Map<String, Boolean> partVisibility
 ) {
     public static StandardModelParameters parse(JsonObject jsonObject, JsonDeserializationContext context) {
         String parentName = GsonHelper.getAsString(jsonObject, "parent", "");
@@ -50,9 +49,9 @@ public record StandardModelParameters(
             ambientOcclusion = GsonHelper.getAsBoolean(jsonObject, "ambientocclusion");
         }
 
-        UnbakedModel.GuiLight guiLight = null;
+        GuiLight guiLight = null;
         if (jsonObject.has("gui_light")) {
-            guiLight = UnbakedModel.GuiLight.getByName(GsonHelper.getAsString(jsonObject, "gui_light"));
+            guiLight = GuiLight.getByName(GsonHelper.getAsString(jsonObject, "gui_light"));
         }
 
         Transformation rootTransform = NeoForgeModelProperties.deserializeRootTransform(jsonObject, context);

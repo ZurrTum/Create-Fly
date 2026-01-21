@@ -25,11 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,6 +37,7 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class StationBlock extends Block implements IBE<StationBlockEntity>, ItemInventoryProvider<StationBlockEntity>, IWrenchable, ProperWaterloggedBlock {
 
@@ -52,7 +49,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, StationBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, StationBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.depotBehaviour.itemHandler;
     }
 
@@ -62,6 +59,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return withWater(super.getStateForPlacement(pContext), pContext);
     }
@@ -82,7 +80,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }

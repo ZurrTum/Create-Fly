@@ -45,7 +45,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClipboardScreen extends AbstractSimiScreen {
+    @Nullable
     public ClipboardContent content;
+    @Nullable
     public BlockPos targetedBlock;
 
     List<List<ClipboardEntry>> pages;
@@ -62,11 +64,11 @@ public class ClipboardScreen extends AbstractSimiScreen {
     boolean hoveredCheck;
     boolean readonly;
 
-    DisplayCache displayCache = DisplayCache.EMPTY;
+    @Nullable DisplayCache displayCache = DisplayCache.EMPTY;
     TextFieldHelper editContext;
 
     IconButton closeBtn;
-    IconButton clearBtn;
+    @Nullable IconButton clearBtn;
 
     private final int targetSlot;
 
@@ -76,7 +78,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
         reopenWith(components.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY));
     }
 
-    public void reopenWith(ClipboardContent content) {
+    public void reopenWith(@Nullable ClipboardContent content) {
         this.content = content;
         pages = ClipboardEntry.readAll(content);
         if (pages.isEmpty())
@@ -353,11 +355,6 @@ public class ClipboardScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
-    @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
         changePage(pScrollY < 0);
         return true;
@@ -554,7 +551,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                 editingIndex = -1;
                 if (hoveredEntry < currentEntries.size()) {
                     currentEntries.get(hoveredEntry).checked ^= true;
-                    if (currentEntries.get(hoveredEntry).checked == true)
+                    if (currentEntries.get(hoveredEntry).checked)
                         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(
                             AllSoundEvents.CLIPBOARD_CHECKMARK.getMainEvent(),
                             0.95f + (float) Math.random() * 0.05f

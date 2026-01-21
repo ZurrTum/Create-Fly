@@ -25,12 +25,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class CurvedTrackInteraction {
     static int breakTicks;
     static int breakTimeout;
     static float breakProgress;
-    static BlockPos breakPos;
+    static @Nullable BlockPos breakPos;
 
     public static void clientTick(Minecraft mc) {
         BezierPointSelection result = TrackBlockOutline.result;
@@ -89,7 +90,7 @@ public class CurvedTrackInteraction {
         resetBreakProgress(level, player);
     }
 
-    private static void resetBreakProgress(ClientLevel level, LocalPlayer player) {
+    private static void resetBreakProgress(@Nullable ClientLevel level, LocalPlayer player) {
         if (breakPos != null && level != null)
             level.destroyBlockProgress(player.getId(), breakPos, -1);
 

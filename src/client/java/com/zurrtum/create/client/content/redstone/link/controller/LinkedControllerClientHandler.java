@@ -29,6 +29,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class LinkedControllerClientHandler {
     public static Mode MODE = Mode.IDLE;
     public static int PACKET_RATE = 5;
     public static Collection<Integer> currentlyPressed = new HashSet<>();
-    private static BlockPos lecternPos;
+    private static @Nullable BlockPos lecternPos;
     private static BlockPos selectedLocation = BlockPos.ZERO;
     private static int packetCooldown;
 
@@ -90,7 +91,7 @@ public class LinkedControllerClientHandler {
         packetCooldown = 0;
         selectedLocation = BlockPos.ZERO;
 
-        if (inLectern())
+        if (lecternPos != null)
             player.connection.send(new LinkedControllerStopLecternPacket(lecternPos));
         lecternPos = null;
 

@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +64,12 @@ public class RotationPropagator {
             from.getBlockPos(),
             stateFrom,
             direction
-        ) && definitionTo.hasShaftTowards(world, to.getBlockPos(), stateTo, direction.getOpposite());
+        ) && definitionTo.hasShaftTowards(
+            world,
+            to.getBlockPos(),
+            stateTo,
+            direction.getOpposite()
+        );
 
         boolean connectedByGears = ICogWheel.isSmallCog(stateFrom) && ICogWheel.isSmallCog(stateTo);
 
@@ -300,7 +306,7 @@ public class RotationPropagator {
      * @param pos
      * @param removedBE
      */
-    public static void handleRemoved(Level worldIn, BlockPos pos, KineticBlockEntity removedBE) {
+    public static void handleRemoved(Level worldIn, BlockPos pos, @Nullable KineticBlockEntity removedBE) {
         if (worldIn.isClientSide())
             return;
         if (removedBE == null)
@@ -339,7 +345,7 @@ public class RotationPropagator {
         BlockPos missingSource = updateTE.hasSource() ? updateTE.source : null;
 
         while (!frontier.isEmpty()) {
-            final BlockPos pos = frontier.remove(0);
+            final BlockPos pos = frontier.removeFirst();
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (!(blockEntity instanceof KineticBlockEntity currentBE))
                 continue;
@@ -373,6 +379,7 @@ public class RotationPropagator {
         }
     }
 
+    @Nullable
     private static KineticBlockEntity findConnectedNeighbour(KineticBlockEntity currentTE, BlockPos neighbourPos) {
         BlockState neighbourState = currentTE.getLevel().getBlockState(neighbourPos);
         if (!(neighbourState.getBlock() instanceof IRotate))

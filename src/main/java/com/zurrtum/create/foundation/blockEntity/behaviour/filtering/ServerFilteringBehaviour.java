@@ -343,7 +343,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
     public static class CustomInteract extends ServerFilteringBehaviour {
         private final @Nullable List<Item> blackList;
 
-        public CustomInteract(SmartBlockEntity be, List<Item> blackList) {
+        public CustomInteract(SmartBlockEntity be, @Nullable List<Item> blackList) {
             super(be);
             this.blackList = blackList;
         }

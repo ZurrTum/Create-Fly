@@ -35,6 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
 
@@ -42,6 +43,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
     private static final ThreadLocal<Random> RANDOM = ThreadLocal.withInitial(Random::new);
 
     @Override
+    @Nullable
     public MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,
@@ -114,8 +116,8 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         public float upAngle;
         public float westAngle;
         public float offsetZ;
-        public FormattedCharSequence text;
-        public FormattedCharSequence description;
+        public @Nullable FormattedCharSequence text;
+        public @Nullable FormattedCharSequence description;
         public float textScale;
         public float textX;
         public float textY;

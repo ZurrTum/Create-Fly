@@ -7,7 +7,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public interface ServerRightClickHandle {
-    InteractionResult onRightClickBlock(Level world, ServerPlayer player, ItemStack stack, InteractionHand hand, BlockHitResult hit, BlockPos pos);
+    @Nullable InteractionResult onRightClickBlock(
+        Level world,
+        ServerPlayer player,
+        ItemStack stack,
+        InteractionHand hand,
+        BlockHitResult hit,
+        BlockPos pos
+    );
 }

@@ -2,16 +2,13 @@ package com.zurrtum.create.content.contraptions.chassis;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.BlockMovementChecks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerChassisScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -19,7 +16,11 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class ChassisBlockEntity extends SmartBlockEntity {
 
@@ -52,7 +53,8 @@ public class ChassisBlockEntity extends SmartBlockEntity {
         return range.getValue();
     }
 
-    public List<BlockPos> getIncludedBlockPositions(Direction forcedMovement, boolean visualize) {
+    @Nullable
+    public List<BlockPos> getIncludedBlockPositions(@Nullable Direction forcedMovement, boolean visualize) {
         if (!(getBlockState().getBlock() instanceof AbstractChassisBlock))
             return Collections.emptyList();
         return isRadial() ? getIncludedBlockPositionsRadial(forcedMovement, visualize) : getIncludedBlockPositionsLinear(forcedMovement, visualize);
@@ -62,6 +64,7 @@ public class ChassisBlockEntity extends SmartBlockEntity {
         return level.getBlockState(worldPosition).getBlock() instanceof RadialChassisBlock;
     }
 
+    @Nullable
     public List<ChassisBlockEntity> collectChassisGroup() {
         Queue<BlockPos> frontier = new LinkedList<>();
         List<ChassisBlockEntity> collected = new ArrayList<>();
@@ -130,7 +133,7 @@ public class ChassisBlockEntity extends SmartBlockEntity {
         return true;
     }
 
-    private List<BlockPos> getIncludedBlockPositionsLinear(Direction forcedMovement, boolean visualize) {
+    private List<BlockPos> getIncludedBlockPositionsLinear(@Nullable Direction forcedMovement, boolean visualize) {
         List<BlockPos> positions = new ArrayList<>();
         BlockState state = getBlockState();
         AbstractChassisBlock block = (AbstractChassisBlock) state.getBlock();
@@ -141,7 +144,8 @@ public class ChassisBlockEntity extends SmartBlockEntity {
         for (int offset : new int[]{1, -1}) {
             if (offset == -1)
                 facing = facing.getOpposite();
-            boolean sticky = state.getValue(block.getGlueableSide(state, facing));
+            BooleanProperty property = block.getGlueableSide(state, facing);
+            boolean sticky = property != null && state.getValue(property);
             for (int i = 1; i <= chassisRange; i++) {
                 BlockPos current = worldPosition.relative(facing, i);
                 BlockState currentState = level.getBlockState(current);
@@ -165,7 +169,7 @@ public class ChassisBlockEntity extends SmartBlockEntity {
         return positions;
     }
 
-    private List<BlockPos> getIncludedBlockPositionsRadial(Direction forcedMovement, boolean visualize) {
+    private List<BlockPos> getIncludedBlockPositionsRadial(@Nullable Direction forcedMovement, boolean visualize) {
         List<BlockPos> positions = new ArrayList<>();
         BlockState state = level.getBlockState(worldPosition);
         Axis axis = state.getValue(AbstractChassisBlock.AXIS);
@@ -175,7 +179,8 @@ public class ChassisBlockEntity extends SmartBlockEntity {
         for (Direction facing : Iterate.directions) {
             if (facing.getAxis() == axis)
                 continue;
-            if (!state.getValue(block.getGlueableSide(state, facing)))
+            BooleanProperty property = block.getGlueableSide(state, facing);
+            if (property != null && !state.getValue(property))
                 continue;
 
             BlockPos startPos = worldPosition.relative(facing);
@@ -184,7 +189,7 @@ public class ChassisBlockEntity extends SmartBlockEntity {
             localFrontier.add(startPos);
 
             while (!localFrontier.isEmpty()) {
-                BlockPos searchPos = localFrontier.remove(0);
+                BlockPos searchPos = localFrontier.removeFirst();
                 BlockState searchedState = level.getBlockState(searchPos);
 
                 if (localVisited.contains(searchPos))

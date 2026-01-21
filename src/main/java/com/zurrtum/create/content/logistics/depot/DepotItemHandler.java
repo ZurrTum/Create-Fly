@@ -19,7 +19,7 @@ public class DepotItemHandler implements ItemInventory {
             return false;
         }
         if (behaviour.canMergeItems()) {
-            Integer max = behaviour.maxStackSize.get();
+            int max = behaviour.maxStackSize.get();
             if (max == 0) {
                 return true;
             }

@@ -12,7 +12,7 @@ import com.zurrtum.create.content.kinetics.gauge.GaugeBlock;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock.Type;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlockEntity;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -50,7 +50,7 @@ public class GaugeRenderer extends ShaftRenderer<GaugeBlockEntity, GaugeRenderer
         GaugeRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
@@ -83,7 +83,7 @@ public class GaugeRenderer extends ShaftRenderer<GaugeBlockEntity, GaugeRenderer
     }
 
     public static class GaugeRenderState extends KineticRenderState {
-        public float[] angles;
+        public float @Nullable [] angles;
         public SuperByteBuffer head;
         public SuperByteBuffer dial;
         public float dialPivot;

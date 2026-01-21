@@ -9,6 +9,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class CreativeCrateBlock extends CrateBlock implements IBE<CreativeCrateBlockEntity>, ItemInventoryProvider<CreativeCrateBlockEntity> {
 
@@ -17,7 +18,13 @@ public class CreativeCrateBlock extends CrateBlock implements IBE<CreativeCrateB
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, CreativeCrateBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        CreativeCrateBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         return blockEntity.inv;
     }
 

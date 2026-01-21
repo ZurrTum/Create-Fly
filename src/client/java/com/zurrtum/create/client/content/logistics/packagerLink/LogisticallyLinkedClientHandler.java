@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 public class LogisticallyLinkedClientHandler {
 
-    private static UUID previouslyHeldFrequency;
+    private static @Nullable UUID previouslyHeldFrequency;
 
     public static void tick(Minecraft mc) {
         previouslyHeldFrequency = null;

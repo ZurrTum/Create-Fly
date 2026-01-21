@@ -1,12 +1,12 @@
 package com.zurrtum.create.content.redstone.link;
 
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.equipment.clipboard.ClipboardCloneable;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.IntConsumer;
@@ -34,8 +35,8 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
 
     public boolean newPosition;
     private Mode mode;
-    private IntSupplier transmission;
-    private IntConsumer signalCallback;
+    private @Nullable IntSupplier transmission;
+    private @Nullable IntConsumer signalCallback;
 
     protected ServerLinkBehaviour(SmartBlockEntity be) {
         super(be);
@@ -64,7 +65,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
         return this;
     }
 
-    public void copyItemsFrom(ServerLinkBehaviour behaviour) {
+    public void copyItemsFrom(@Nullable ServerLinkBehaviour behaviour) {
         if (behaviour == null)
             return;
         frequencyFirst = behaviour.frequencyFirst;

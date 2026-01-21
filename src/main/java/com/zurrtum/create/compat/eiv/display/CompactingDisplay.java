@@ -10,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 public class CompactingDisplay extends CreateDisplay {
     public ItemStack result;
     public List<List<ItemStack>> ingredients;
-    public FluidIngredient fluidIngredient;
+    public @Nullable FluidIngredient fluidIngredient;
 
     public CompactingDisplay() {
     }

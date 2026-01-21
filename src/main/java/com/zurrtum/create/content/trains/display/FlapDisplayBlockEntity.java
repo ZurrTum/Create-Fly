@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +28,14 @@ import java.util.List;
 
 public class FlapDisplayBlockEntity extends KineticBlockEntity implements DisplayHolder {
 
-    public List<FlapDisplayLayout> lines;
+    public @Nullable List<FlapDisplayLayout> lines;
     public boolean isController;
     public boolean isRunning;
     public int xSize, ySize;
-    public DyeColor[] colour;
+    public @Nullable DyeColor[] colour;
     public boolean[] glowingLines;
     public boolean[] manualLines;
-    private CompoundTag displayLink;
+    private @Nullable CompoundTag displayLink;
 
     public FlapDisplayBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.FLAP_DISPLAY, pos, state);
@@ -48,12 +49,13 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     }
 
     @Override
+    @Nullable
     public CompoundTag getDisplayLinkData() {
         return displayLink;
     }
 
     @Override
-    public void setDisplayLinkData(CompoundTag data) {
+    public void setDisplayLinkData(@Nullable CompoundTag data) {
         displayLink = data;
     }
 
@@ -139,7 +141,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
         return isRunning;
     }
 
-    public void applyTextManually(int lineIndex, Component componentText) {
+    public void applyTextManually(int lineIndex, @Nullable Component componentText) {
         List<FlapDisplayLayout> lines = getLines();
         if (lineIndex >= lines.size())
             return;
@@ -260,6 +262,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
         return (int) Mth.clamp(Math.floor(2 * (worldPosition.getY() - yCoord + 1)), 0, ySize * 2);
     }
 
+    @Nullable
     public FlapDisplayBlockEntity getController() {
         if (isController)
             return this;

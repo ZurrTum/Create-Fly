@@ -45,12 +45,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class ArmBlockEntity extends KineticBlockEntity implements TransformableBlockEntity {
-    public Codec<ArmInteractionPoint> pointCodec;
+    public @Nullable Codec<ArmInteractionPoint> pointCodec;
 
     // Server
     public List<ArmInteractionPoint> inputs;
     public List<ArmInteractionPoint> outputs;
-    public ListTag interactionPointTag;
+    public @Nullable ListTag interactionPointTag;
 
     // Both
     float chasedPointProgress;
@@ -549,6 +549,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         }
     }
 
+    @Nullable
     public ArmInteractionPoint decodePoint(Tag tag) {
         return switch (pointCodec.parse(NbtOps.INSTANCE, tag)) {
             case DataResult.Success<ArmInteractionPoint> success -> success.value();

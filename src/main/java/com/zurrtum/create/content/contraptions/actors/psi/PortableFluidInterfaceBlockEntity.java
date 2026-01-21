@@ -41,7 +41,7 @@ public class PortableFluidInterfaceBlockEntity extends PortableStorageInterfaceB
         private FluidInventory wrapped = EMPTY;
 
         @Override
-        public int[] getAvailableSlots(Direction side) {
+        public int[] getAvailableSlots(@Nullable Direction side) {
             return slots;
         }
 

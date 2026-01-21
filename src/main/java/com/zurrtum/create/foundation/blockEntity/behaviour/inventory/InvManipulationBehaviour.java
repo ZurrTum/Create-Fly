@@ -55,7 +55,8 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
     }
 
     @Override
-    protected Container getCapability(Level world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side) {
+    @Nullable
+    protected Container getCapability(Level world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Direction side) {
         return ItemHelper.getInventory(world, pos, null, blockEntity, side);
     }
 

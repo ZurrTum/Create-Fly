@@ -1,8 +1,5 @@
 package com.zurrtum.create;
 
-import static com.zurrtum.create.Create.MOD_ID;
-import static net.minecraft.sounds.SoundSource.*;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,6 +10,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import static com.zurrtum.create.Create.MOD_ID;
+import static net.minecraft.sounds.SoundSource.*;
 
 public class AllSoundEvents {
     public static final SoundEntry SCHEMATICANNON_LAUNCH_BLOCK = register("schematicannon_launch_block", BLOCKS, .1f, 1.1f);
@@ -104,7 +105,7 @@ public class AllSoundEvents {
             return sounds[0].event();
         }
 
-        public void play(Level world, Player entity, double x, double y, double z, float volume, float pitch) {
+        public void play(Level world, @Nullable Player entity, double x, double y, double z, float volume, float pitch) {
             for (CompiledSoundEvent sound : sounds) {
                 sound.play(world, entity, x, y, z, category, volume, pitch);
             }
@@ -124,7 +125,7 @@ public class AllSoundEvents {
             play(world, null, pos, volume, pitch);
         }
 
-        public void play(Level world, Player entity, Vec3i pos) {
+        public void play(Level world, @Nullable Player entity, Vec3i pos) {
             play(world, entity, pos, 1, 1);
         }
 
@@ -137,7 +138,7 @@ public class AllSoundEvents {
                 play(entity.level(), null, entity.blockPosition(), volume, pitch);
         }
 
-        public void play(Level world, Player entity, Vec3i pos, float volume, float pitch) {
+        public void play(Level world, @Nullable Player entity, Vec3i pos, float volume, float pitch) {
             play(world, entity, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, volume, pitch);
         }
 
@@ -155,7 +156,7 @@ public class AllSoundEvents {
     }
 
     private record CompiledSoundEvent(SoundEvent event, float volume, float pitch) {
-        public void play(Level world, Player entity, double x, double y, double z, SoundSource category, float volume, float pitch) {
+        public void play(Level world, @Nullable Player entity, double x, double y, double z, SoundSource category, float volume, float pitch) {
             world.playSound(entity, x, y, z, event(), category, volume() * volume, pitch() * pitch);
         }
 

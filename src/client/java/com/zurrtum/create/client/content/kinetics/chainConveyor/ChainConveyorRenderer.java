@@ -17,7 +17,7 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -58,7 +58,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         ChainConveyorRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         Level world = be.getLevel();
@@ -110,6 +110,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         }
     }
 
+    @Nullable
     public ChainConveyorPackagePhysicsData getPhysicsData(Level world, ChainConveyorPackage box) {
         if (box.worldPosition == null || box.item == null || box.item.isEmpty()) {
             return null;
@@ -287,10 +288,10 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
 
     public static class ChainConveyorRenderState extends KineticRenderState {
         public SuperByteBuffer wheel;
-        public SuperByteBuffer guard;
+        public @Nullable SuperByteBuffer guard;
         public RenderType chain;
-        public List<ChainRenderState> chains;
-        public List<BoxRenderState> boxes;
+        public @Nullable List<ChainRenderState> chains;
+        public @Nullable List<BoxRenderState> boxes;
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

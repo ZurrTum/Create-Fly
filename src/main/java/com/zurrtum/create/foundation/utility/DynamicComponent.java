@@ -12,10 +12,12 @@ import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class DynamicComponent {
+    @Nullable
     public static Component parseCustomText(Level level, BlockPos pos, Component customText) {
         if (!(level instanceof ServerLevel serverLevel))
             return null;

@@ -1,12 +1,6 @@
 package com.zurrtum.create.infrastructure.worldgen;
 
 import com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -20,6 +14,11 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
 
 public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
     public LayeredOreFeature() {
@@ -70,7 +69,7 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
         List<ResolvedLayerEntry> resolvedLayers = new ArrayList<>(tempLayers.size());
         float cumulativeLayerSize = -(layerSizeTotal - size) * random.nextFloat();
         for (TemporaryLayerEntry tempLayerEntry : tempLayers) {
-            float rampStartValue = resolvedLayers.size() == 0 ? Float.NEGATIVE_INFINITY : cumulativeLayerSize * (2.0f / size) - 1.0f;
+            float rampStartValue = resolvedLayers.isEmpty() ? Float.NEGATIVE_INFINITY : cumulativeLayerSize * (2.0f / size) - 1.0f;
             cumulativeLayerSize += tempLayerEntry.size();
             if (cumulativeLayerSize < 0)
                 continue;

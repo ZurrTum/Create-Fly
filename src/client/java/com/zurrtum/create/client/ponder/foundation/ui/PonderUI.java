@@ -126,7 +126,7 @@ public class PonderUI extends AbstractPonderScreen {
     }
 
     protected PonderUI(List<PonderScene> scenes) {
-        Identifier location = scenes.get(0).getLocation();
+        Identifier location = scenes.getFirst().getLocation();
         stack = new ItemStack(RegisteredObjectsHelper.getItemOrBlock(location));
         itemRender = GuiGameElement.of(stack).scale(2).at(-35, 1);
 
@@ -244,6 +244,7 @@ public class PonderUI extends AbstractPonderScreen {
 		return sceneList;*/
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private static List<PonderScene> topologicalSort(MutableGraph<PonderScene> graph) {
         List<PonderScene> result = new ArrayList<>();
         Set<PonderScene> visited = new HashSet<>();
@@ -261,6 +262,7 @@ public class PonderUI extends AbstractPonderScreen {
         return result;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private static boolean dfs(
         PonderScene node,
         MutableGraph<PonderScene> graph,

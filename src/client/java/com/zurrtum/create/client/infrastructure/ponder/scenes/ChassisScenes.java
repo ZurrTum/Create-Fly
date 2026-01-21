@@ -356,12 +356,12 @@ public class ChassisScenes {
         MutableObject<Selection> obj = new MutableObject<>(growing);
         r2.forEach(pos -> {
             scene.idle(1);
-            Selection add = obj.getValue().copy().add(util.select().position(pos));
+            Selection add = obj.get().copy().add(util.select().position(pos));
             scene.overlay().showOutline(PonderPalette.WHITE, s, add, 3);
             obj.setValue(add);
         });
 
-        scene.overlay().showOutlineWithText(obj.getValue(), 60).colored(PonderPalette.GREEN)
+        scene.overlay().showOutlineWithText(obj.get(), 60).colored(PonderPalette.GREEN)
             .text("...it will attach all reachable blocks within a radius on that layer");
         scene.idle(70);
 

@@ -50,14 +50,14 @@ import java.util.List;
 
 public class PackageEntity extends LivingEntity {
 
-    private Entity originalEntity;
+    private @Nullable Entity originalEntity;
     public ItemStack box;
 
     public int insertionDelay;
 
     public Vec3 vec2 = Vec3.ZERO, vec3 = Vec3.ZERO;
 
-    public WeakReference<Player> tossedBy = new WeakReference<>(null);
+    public WeakReference<@Nullable Player> tossedBy = new WeakReference<>(null);
 
     public PackageEntity(EntityType<? extends PackageEntity> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
@@ -362,11 +362,13 @@ public class PackageEntity extends LivingEntity {
         for (int i = 0, size = contents.getContainerSize(); i < size; i++) {
             ItemStack itemstack = contents.getItem(i);
 
-            if (itemstack.getItem() instanceof SpawnEggItem sei) {
-                EntityType<?> entitytype = sei.getType(itemstack);
-                Entity entity = entitytype.spawn(level, itemstack, null, blockPosition(), EntitySpawnReason.SPAWN_ITEM_USE, false, false);
-                if (entity != null)
-                    itemstack.shrink(1);
+            if (itemstack.getItem() instanceof SpawnEggItem) {
+                EntityType<?> entitytype = SpawnEggItem.getType(itemstack);
+                if (entitytype != null) {
+                    Entity entity = entitytype.spawn(level, itemstack, null, blockPosition(), EntitySpawnReason.SPAWN_ITEM_USE, false, false);
+                    if (entity != null)
+                        itemstack.shrink(1);
+                }
             }
 
             if (itemstack.isEmpty())

@@ -44,7 +44,7 @@ public final class BackendManagerImpl {
             return OFF_BACKEND;
         }
 
-        return backendsByPriority.get(0);
+        return backendsByPriority.getFirst();
     }
 
     private static void chooseBackend() {

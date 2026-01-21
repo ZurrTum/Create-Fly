@@ -30,7 +30,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class ElevatorContactScreen extends AbstractSimiScreen {
 
-    private AllGuiTextures background;
+    private final AllGuiTextures background;
 
     private EditBox shortNameInput;
     private EditBox longNameInput;
@@ -41,7 +41,7 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
     private String longName;
     private DoorControl doorControl;
 
-    private BlockPos pos;
+    private final BlockPos pos;
 
     public ElevatorContactScreen(BlockPos pos, String prevShortName, String prevLongName, DoorControl prevDoorControl) {
         super(CreateLang.translateDirect("elevator_contact.title"));

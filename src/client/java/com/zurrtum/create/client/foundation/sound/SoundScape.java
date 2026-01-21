@@ -5,16 +5,16 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.AmbienceGroup;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.PitchGroup;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoundScape {
     private final float pitch;
@@ -22,7 +22,7 @@ public class SoundScape {
     private final PitchGroup pitchGroup;
     List<ContinuousSound> continuous;
     List<RepeatingSound> repeating;
-    private Vec3 meanPos;
+    private @Nullable Vec3 meanPos;
 
     public SoundScape(float pitch, AmbienceGroup group) {
         this.pitchGroup = SoundScapes.getGroupFromPitch(pitch);

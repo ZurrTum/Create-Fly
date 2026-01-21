@@ -13,6 +13,7 @@ import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 public class ItemMeshEmitter implements VertexConsumer {
     private final RenderType renderType;
@@ -85,8 +86,8 @@ public class ItemMeshEmitter implements VertexConsumer {
     public void emit(
         ModelPart part,
         PoseStack stack,
-        TextureAtlasSprite meshSprite,
-        ItemMeshEmitter glintEmitter,
+        @Nullable TextureAtlasSprite meshSprite,
+        @Nullable ItemMeshEmitter glintEmitter,
         int light,
         int overlay,
         int color
@@ -108,7 +109,7 @@ public class ItemMeshEmitter implements VertexConsumer {
         stack.popPose();
     }
 
-    private Mesh compile(ModelPart part, PoseStack stack, TextureAtlasSprite meshSprite, int light, int overlay, int color, float alpha) {
+    private Mesh compile(ModelPart part, PoseStack stack, @Nullable TextureAtlasSprite meshSprite, int light, int overlay, int color, float alpha) {
         int vertexCount = 0;
         for (ModelPart.Cube cuboid : part.cubes) {
             vertexCount += cuboid.polygons.length * 4;

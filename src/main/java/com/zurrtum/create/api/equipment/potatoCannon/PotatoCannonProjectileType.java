@@ -7,11 +7,6 @@ import com.zurrtum.create.api.registry.CreateRegistryKeys;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.Billboard;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.TowardMotion;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.Tumble;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderSet;
@@ -24,6 +19,11 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 // TODO: 1.21.7 - Move into api package
 public record PotatoCannonProjectileType(
@@ -88,9 +88,9 @@ public record PotatoCannonProjectileType(
         private boolean sticky = false;
         private ItemStack dropStack = ItemStack.EMPTY;
         private PotatoProjectileRenderMode renderMode = Billboard.INSTANCE;
-        private PotatoProjectileEntityHitAction preEntityHit = null;
-        private PotatoProjectileEntityHitAction onEntityHit = null;
-        private PotatoProjectileBlockHitAction onBlockHit = null;
+        private @Nullable PotatoProjectileEntityHitAction preEntityHit = null;
+        private @Nullable PotatoProjectileEntityHitAction onEntityHit = null;
+        private @Nullable PotatoProjectileBlockHitAction onBlockHit = null;
 
         public Builder reloadTicks(int reload) {
             this.reloadTicks = reload;

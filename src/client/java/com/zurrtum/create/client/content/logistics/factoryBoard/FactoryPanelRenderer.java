@@ -15,7 +15,7 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -48,7 +48,7 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
         FactoryPanelRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         List<SingleFactoryPanelRenderState> panels = new ArrayList<>();
@@ -223,13 +223,13 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
     }
 
     public static class FactoryPanelRenderState extends SmartRenderState {
-        public RenderType cutout;
-        public RenderType translucent1;
+        public @Nullable RenderType cutout;
+        public @Nullable RenderType translucent1;
         public RenderType translucent2;
-        public RenderType additive;
+        public @Nullable RenderType additive;
         public float xRot;
         public float yRot;
-        public List<SingleFactoryPanelRenderState> panels;
+        public @Nullable List<SingleFactoryPanelRenderState> panels;
 
         public void renderCutout(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             for (SingleFactoryPanelRenderState panel : panels) {
@@ -259,8 +259,8 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
     public static class SingleFactoryPanelRenderState {
         public float offsetX;
         public float offsetY;
-        public List<PathRenderState> paths;
-        public BulbRenderState bulb;
+        public @Nullable List<PathRenderState> paths;
+        public @Nullable BulbRenderState bulb;
 
         public void renderPaths(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer, float xRot, float yRot, int light) {
             if (paths != null) {

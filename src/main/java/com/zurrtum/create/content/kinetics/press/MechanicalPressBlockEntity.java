@@ -4,6 +4,7 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.press.PressingBehaviour.Mode;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.processing.basin.BasinInventory;
 import com.zurrtum.create.content.processing.basin.BasinOperatingBlockEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
@@ -27,6 +27,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +140,7 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
     }
 
     @Override
-    public boolean tryProcessOnBelt(TransportedItemStack input, List<ItemStack> outputList, boolean simulate) {
+    public boolean tryProcessOnBelt(TransportedItemStack input, @Nullable List<ItemStack> outputList, boolean simulate) {
         SingleRecipeInput recipeInput = new SingleRecipeInput(input.stack);
         Optional<RecipeHolder<PressingRecipe>> recipe = getRecipe(recipeInput);
         if (recipe.isEmpty())

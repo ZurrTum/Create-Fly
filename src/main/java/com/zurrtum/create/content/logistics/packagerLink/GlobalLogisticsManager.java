@@ -14,7 +14,7 @@ public class GlobalLogisticsManager {
 
     public Map<UUID, LogisticsNetwork> logisticsNetworks;
 
-    private LogisticsNetworkSavedData savedData;
+    private @Nullable LogisticsNetworkSavedData savedData;
 
     public GlobalLogisticsManager() {
         logisticsNetworks = new HashMap<>();
@@ -46,7 +46,7 @@ public class GlobalLogisticsManager {
         return network != null && network.locked;
     }
 
-    public void linkAdded(UUID networkId, GlobalPos pos, UUID ownedBy) {
+    public void linkAdded(UUID networkId, GlobalPos pos, @Nullable UUID ownedBy) {
         LogisticsNetwork network = logisticsNetworks.computeIfAbsent(networkId, $ -> new LogisticsNetwork(networkId));
         network.totalLinks.add(pos);
         if (ownedBy != null && network.owner == null)

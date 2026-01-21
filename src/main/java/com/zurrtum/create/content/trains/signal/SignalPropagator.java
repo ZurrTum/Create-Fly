@@ -8,6 +8,7 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.graph.*;
 import net.minecraft.server.MinecraftServer;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -43,7 +44,7 @@ public class SignalPropagator {
     }
 
     public static void notifySignalsOfNewNode(MinecraftServer server, TrackGraph graph, TrackNode node) {
-        List<Couple<TrackNode>> frontier = new ArrayList<>();
+        List<Couple<@Nullable TrackNode>> frontier = new ArrayList<>();
         frontier.add(Couple.create(node, null));
         walkSignals(
             server, graph, frontier, pair -> {
@@ -164,7 +165,7 @@ public class SignalPropagator {
     ) {
         Set<TrackEdge> visited = new HashSet<>();
         while (!frontier.isEmpty()) {
-            Couple<TrackNode> couple = frontier.remove(0);
+            Couple<TrackNode> couple = frontier.removeFirst();
             TrackNode currentNode = couple.getFirst();
             TrackNode prevNode = couple.getSecond();
 

@@ -72,7 +72,7 @@ public class ItemRequirement {
             } else if (be instanceof SpecialBlockEntityItemRequirement specialBE) {
                 requirement = requirement.union(specialBE.getRequiredItems(state));
                 //TODO
-                //            } else if (com.simibubi.create.compat.Mods.FRAMEDBLOCKS.contains(block)) {
+                //            } else if (Mods.FRAMEDBLOCKS.contains(block)) {
                 //                requirement = requirement.union(FramedBlocksInSchematics.getRequiredItems(state, be));
             }
         }
@@ -80,7 +80,7 @@ public class ItemRequirement {
         return requirement;
     }
 
-    private static ItemRequirement defaultOf(BlockState state, BlockEntity be) {
+    private static ItemRequirement defaultOf(BlockState state, @Nullable BlockEntity be) {
         Block block = state.getBlock();
         if (block == Blocks.AIR)
             return NONE;

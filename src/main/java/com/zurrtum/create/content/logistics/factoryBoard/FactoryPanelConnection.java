@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class FactoryPanelConnection {
     public int arrowBendMode;
     public boolean success;
 
-    public WeakReference<Object> cachedSource;
+    public WeakReference<@Nullable Object> cachedSource;
 
     private int arrowBendModeCurrentPathUses;
 

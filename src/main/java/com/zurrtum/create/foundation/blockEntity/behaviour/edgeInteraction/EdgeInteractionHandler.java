@@ -1,7 +1,7 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction;
 
-import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,11 +16,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EdgeInteractionHandler {
+    @Nullable
     public static InteractionResult onBlockActivated(
         Level world,
         Player player,
@@ -72,6 +74,7 @@ public class EdgeInteractionHandler {
         return sides;
     }
 
+    @Nullable
     public static Direction getActivatedDirection(Level world, BlockPos pos, Direction face, Vec3 hit, EdgeInteractionBehaviour behaviour) {
         for (Direction facing : getConnectiveSides(world, pos, face, behaviour)) {
             AABB bb = getBB(pos, facing);

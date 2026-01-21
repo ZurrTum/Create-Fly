@@ -7,14 +7,7 @@ import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.TranslatingContraption;
-import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.PistonState;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -30,6 +23,12 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 import static com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.*;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
@@ -153,7 +152,12 @@ public class PistonContraption extends TranslatingContraption {
     }
 
     @Override
-    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) throws AssemblyException {
+    protected boolean addToInitialFrontier(
+        Level world,
+        BlockPos pos,
+        @Nullable Direction direction,
+        Queue<BlockPos> frontier
+    ) throws AssemblyException {
         frontier.clear();
         boolean sticky = isStickyPiston(world.getBlockState(pos.relative(orientation, -1)));
         boolean retracting = direction != orientation;

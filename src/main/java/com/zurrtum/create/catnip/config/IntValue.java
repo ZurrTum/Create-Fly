@@ -20,7 +20,7 @@ public class IntValue extends ConfigValue<Integer> {
     }
 
     public void setMaxmin(int max, int min) {
-        Integer value = get();
+        int value = get();
         if (value < min) {
             set(min);
         } else if (value > max) {

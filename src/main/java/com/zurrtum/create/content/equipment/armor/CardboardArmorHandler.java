@@ -8,8 +8,10 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 public class CardboardArmorHandler {
+    @Nullable
     public static EntityDimensions playerHitboxChangesWhenHidingAsBox(Entity entity) {
         if (!testForStealth(entity))
             return null;
@@ -65,7 +67,7 @@ public class CardboardArmorHandler {
         }
     }
 
-    public static boolean testForStealth(Entity entityIn) {
+    public static boolean testForStealth(@Nullable Entity entityIn) {
         if (!(entityIn instanceof LivingEntity entity))
             return false;
         if (entity.getPose() != Pose.CROUCHING)

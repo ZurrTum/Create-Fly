@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 public class CarriageContraptionVisual extends OrientedContraptionVisual<CarriageContraptionEntity> {
     public static final int MAX_NUM_BOGEYS = 2;
@@ -30,7 +31,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
     // The number of bogeys actually populated in the below arrays.
     private int numBogeys;
     private final CarriageBogey[] bogeys = new CarriageBogey[MAX_NUM_BOGEYS];
-    private final BogeyVisual[] visuals = new BogeyVisual[MAX_NUM_BOGEYS];
+    private final @Nullable BogeyVisual[] visuals = new BogeyVisual[MAX_NUM_BOGEYS];
     // The position (in blocks) of each bogey along the carriage, relative to the carriage's origin.
     // Used to check if a bogey is hidden in a portal.
     private final int[] bogeyPos = new int[MAX_NUM_BOGEYS];

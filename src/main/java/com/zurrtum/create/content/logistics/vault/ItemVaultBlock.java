@@ -41,7 +41,15 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
         registerDefaultState(defaultBlockState().setValue(LARGE, false));
     }
 
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ItemVaultBlockEntity blockEntity, Direction context) {
+    @Override
+    @Nullable
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        ItemVaultBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         if (blockEntity.itemCapability != null) {
             Container inventory = blockEntity.itemCapability.get();
             if (inventory != null) {

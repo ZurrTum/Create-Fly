@@ -13,9 +13,6 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -44,6 +41,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock implements ProperWaterloggedBlock, IBE<PlacardBlockEntity>, SpecialBlockItemRequirement, IWrenchable {
 
@@ -72,6 +72,7 @@ public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock impleme
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
         if (stateForPlacement == null)
@@ -210,7 +211,7 @@ public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock impleme
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity be) {
         ItemStack placardStack = AllItems.PLACARD.getDefaultInstance();
         if (be instanceof PlacardBlockEntity pbe) {
             ItemStack heldItem = pbe.getHeldItem();

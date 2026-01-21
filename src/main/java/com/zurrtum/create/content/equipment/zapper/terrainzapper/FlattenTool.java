@@ -1,19 +1,18 @@
 package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.infrastructure.component.TerrainTools;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FlattenTool {
 
@@ -162,15 +161,11 @@ public class FlattenTool {
     }
 
     private static Pair<Integer, Integer> getCoords(BlockPos pos, Direction facing) {
-        switch (facing.getAxis()) {
-            case X:
-                return Pair.of(pos.getZ(), pos.getY());
-            case Y:
-                return Pair.of(pos.getX(), pos.getZ());
-            case Z:
-                return Pair.of(pos.getX(), pos.getY());
-        }
-        return null;
+        return switch (facing.getAxis()) {
+            case X -> Pair.of(pos.getZ(), pos.getY());
+            case Y -> Pair.of(pos.getX(), pos.getZ());
+            case Z -> Pair.of(pos.getX(), pos.getY());
+        };
     }
 
 }

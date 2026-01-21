@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -33,13 +33,7 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
     }
 
     @Override
-    public void extractRenderState(
-        BE be,
-        BellRenderState state,
-        float tickProgress,
-        Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
-    ) {
+    public void extractRenderState(BE be, BellRenderState state, float tickProgress, Vec3 cameraPos, @Nullable CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         state.layer = RenderTypes.cutoutMovingBlock();
         state.model = CachedBuffers.partial(
@@ -72,7 +66,7 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
         public RenderType layer;
         public SuperByteBuffer model;
         public float upAngle;
-        public Direction direction;
+        public @Nullable Direction direction;
         public float angle;
 
         @Override

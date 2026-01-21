@@ -1,16 +1,13 @@
 package com.zurrtum.create.content.contraptions.actors.psi;
 
 import com.zurrtum.create.AllAdvancements;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class PortableStorageInterfaceBlockEntity extends SmartBlockEntity {
 
@@ -27,7 +27,7 @@ public abstract class PortableStorageInterfaceBlockEntity extends SmartBlockEnti
     protected float distance;
     protected LerpedFloat connectionAnimation;
     protected boolean powered;
-    protected Entity connectedEntity;
+    protected @Nullable Entity connectedEntity;
 
     public int keepAlive = 0;
 

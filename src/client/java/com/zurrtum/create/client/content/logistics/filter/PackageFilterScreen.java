@@ -16,6 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 public class PackageFilterScreen extends AbstractFilterScreen<PackageFilterMenu> {
@@ -27,6 +28,7 @@ public class PackageFilterScreen extends AbstractFilterScreen<PackageFilterMenu>
         super(menu, inv, title, AllGuiTextures.PACKAGE_FILTER);
     }
 
+    @Nullable
     public static PackageFilterScreen create(
         Minecraft mc,
         MenuType<ItemStack> type,

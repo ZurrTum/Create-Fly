@@ -39,6 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements ICogWheel, IBE<SimpleKineticBlockEntity>, SpecialBlockItemRequirement, TransformableBlock, EncasedBlock {
 
@@ -228,7 +229,7 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity be) {
         return ItemRequirement.of(isLarge ? AllBlocks.LARGE_COGWHEEL.defaultBlockState() : AllBlocks.COGWHEEL.defaultBlockState(), be);
     }
 

@@ -46,7 +46,7 @@ public class TableClothBlock extends Block implements IWrenchable, IBE<TableClot
 
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
 
-    private DyeColor colour;
+    private @Nullable DyeColor colour;
 
     public TableClothBlock(Properties pProperties, DyeColor colour) {
         super(pProperties);
@@ -72,7 +72,7 @@ public class TableClothBlock extends Block implements IWrenchable, IBE<TableClot
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         if (!(pPlacer instanceof Player player))
             return;
@@ -177,6 +177,7 @@ public class TableClothBlock extends Block implements IWrenchable, IBE<TableClot
     }
 
     @Override
+    @Nullable
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return state.getValue(HAS_BE) ? IBE.super.newBlockEntity(pos, state) : null;
     }

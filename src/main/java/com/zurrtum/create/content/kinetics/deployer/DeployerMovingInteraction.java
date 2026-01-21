@@ -24,6 +24,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
         BlockPos localPos,
         AbstractContraptionEntity contraptionEntity
     ) {
-        MutablePair<StructureBlockInfo, MovementContext> actor = contraptionEntity.getContraption().getActorAt(localPos);
+        MutablePair<StructureBlockInfo, @Nullable MovementContext> actor = contraptionEntity.getContraption().getActorAt(localPos);
         if (actor == null || actor.right == null)
             return false;
 

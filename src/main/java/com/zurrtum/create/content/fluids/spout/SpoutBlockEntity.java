@@ -43,7 +43,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
 
     public int processingTicks;
     public boolean sendSplash;
-    public BlockSpoutingBehaviour customProcess;
+    public @Nullable BlockSpoutingBehaviour customProcess;
 
     public SmartFluidTankBehaviour tank;
 

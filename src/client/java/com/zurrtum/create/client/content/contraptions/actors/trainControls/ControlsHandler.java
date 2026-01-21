@@ -24,8 +24,8 @@ public class ControlsHandler {
     public static int PACKET_RATE = 5;
     private static int packetCooldown;
 
-    private static WeakReference<AbstractContraptionEntity> entityRef = new WeakReference<>(null);
-    private static BlockPos controlsPos;
+    private static WeakReference<@Nullable AbstractContraptionEntity> entityRef = new WeakReference<>(null);
+    private static @Nullable BlockPos controlsPos;
 
     public static void levelUnloaded() {
         packetCooldown = 0;
@@ -45,7 +45,7 @@ public class ControlsHandler {
         ControlsUtil.getControls().forEach(kb -> kb.setDown(ControlsUtil.isActuallyPressed(kb)));
         AbstractContraptionEntity abstractContraptionEntity = entityRef.get();
 
-        if (!currentlyPressed.isEmpty() && abstractContraptionEntity != null)
+        if (!currentlyPressed.isEmpty() && abstractContraptionEntity != null && controlsPos != null)
             player.connection.send(new ControlsInputPacket(currentlyPressed, false, abstractContraptionEntity.getId(), controlsPos, false));
 
         packetCooldown = 0;
@@ -63,7 +63,7 @@ public class ControlsHandler {
         if (packetCooldown > 0)
             packetCooldown--;
 
-        if (entity.isRemoved() || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
+        if (controlsPos != null && (entity.isRemoved() || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE))) {
             BlockPos pos = controlsPos;
             stopControlling(mc.player);
             mc.player.connection.send(new ControlsInputPacket(currentlyPressed, false, entity.getId(), pos, true));

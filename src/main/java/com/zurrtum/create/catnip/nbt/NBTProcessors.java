@@ -23,10 +23,10 @@ import java.util.function.UnaryOperator;
 
 public final class NBTProcessors {
 
-    private static final Map<BlockEntityType<?>, UnaryOperator<CompoundTag>> processors = new HashMap<>();
-    private static final Map<BlockEntityType<?>, UnaryOperator<CompoundTag>> survivalProcessors = new HashMap<>();
+    private static final Map<BlockEntityType<?>, UnaryOperator<@Nullable CompoundTag>> processors = new HashMap<>();
+    private static final Map<BlockEntityType<?>, UnaryOperator<@Nullable CompoundTag>> survivalProcessors = new HashMap<>();
 
-    public static synchronized void addProcessor(BlockEntityType<?> type, UnaryOperator<CompoundTag> processor) {
+    public static synchronized void addProcessor(BlockEntityType<?> type, UnaryOperator<@Nullable CompoundTag> processor) {
         processors.put(type, processor);
     }
 
@@ -35,7 +35,7 @@ public final class NBTProcessors {
     }
 
     // Triggered by block tag, not BE type
-    private static final UnaryOperator<CompoundTag> signProcessor = data -> {
+    private static final UnaryOperator<@Nullable CompoundTag> signProcessor = data -> {
         for (String key : List.of("front_text", "back_text")) {
             SignText text = data.getCompound(key).flatMap(k -> CatnipCodecUtils.decode(SignText.DIRECT_CODEC, k)).orElse(null);
             if (text != null) {

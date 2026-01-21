@@ -64,6 +64,7 @@ public abstract class PackagePortTarget {
 
     protected abstract PackagePortTargetType getType();
 
+    @Nullable
     public BlockEntity be(LevelAccessor level, BlockPos portPos) {
         if (level instanceof Level l && !l.isLoaded(portPos.offset(relativePos)))
             return null;
@@ -78,6 +79,7 @@ public abstract class PackagePortTarget {
             Codec.BOOL.fieldOf("flipped").forGetter(i -> i.flipped)
         ).apply(instance, ChainConveyorFrogportTarget::new));
 
+        @SuppressWarnings("DataFlowIssue")
         public static final StreamCodec<ByteBuf, ChainConveyorFrogportTarget> PACKET_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC,
             i -> i.relativePos,
@@ -95,6 +97,7 @@ public abstract class PackagePortTarget {
         public BlockPos connection;
         public boolean flipped;
 
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         public ChainConveyorFrogportTarget(BlockPos relativePos, float chainPos, Optional<BlockPos> connection, boolean flipped) {
             this(relativePos, chainPos, connection.orElse(null), flipped);
         }

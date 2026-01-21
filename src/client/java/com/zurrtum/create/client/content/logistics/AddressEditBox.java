@@ -14,6 +14,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class AddressEditBox extends EditBox {
         this(screen, pFont, pX, pY, pWidth, pHeight, anchorToBottom, null);
     }
 
-    public AddressEditBox(Screen screen, Font pFont, int pX, int pY, int pWidth, int pHeight, boolean anchorToBottom, String localAddress) {
+    public AddressEditBox(Screen screen, Font pFont, int pX, int pY, int pWidth, int pHeight, boolean anchorToBottom, @Nullable String localAddress) {
         super(pFont, pX, pY, pWidth, pHeight, Component.empty());
         destinationSuggestions = AddressEditBoxHelper.createSuggestions(screen, this, anchorToBottom, localAddress);
         destinationSuggestions.setAllowSuggestions(true);

@@ -168,6 +168,6 @@ public interface SimpleRegistry<K, V> {
          * Never returns null, will return an empty list if no registrations are present
          */
         @Override
-        List<V> get(StateHolder<K, ?> state);
+        @Nullable List<V> get(StateHolder<K, ?> state);
     }
 }

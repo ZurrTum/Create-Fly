@@ -12,6 +12,9 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.TankManipul
 import com.zurrtum.create.foundation.utility.FluidFormatter;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Comparator;
@@ -19,10 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.material.Fluid;
 
 public class FluidListDisplaySource extends ValueListDisplaySource {
     @Override
@@ -68,7 +67,7 @@ public class FluidListDisplaySource extends ValueListDisplaySource {
 
     @Override
     public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
-        Integer max = ((MutableInt) context.flapDisplayContext).getValue();
+        long max = ((MutableInt) context.flapDisplayContext).longValue();
         boolean shorten = shortenNumbers(context);
         int length = FluidFormatter.asString(max, shorten).length();
         String layoutKey = "FluidList_" + length;

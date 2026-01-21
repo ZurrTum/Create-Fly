@@ -13,7 +13,7 @@ import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
@@ -36,7 +36,7 @@ public class FunnelRenderer extends SmartBlockEntityRenderer<FunnelBlockEntity, 
         FunnelRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (!be.hasFlap() || VisualizationManager.supportsVisualization(be.getLevel())) {
@@ -61,6 +61,6 @@ public class FunnelRenderer extends SmartBlockEntityRenderer<FunnelBlockEntity, 
     }
 
     public static class FunnelRenderState extends SmartRenderState {
-        public FlapsRenderState flap;
+        public @Nullable FlapsRenderState flap;
     }
 }

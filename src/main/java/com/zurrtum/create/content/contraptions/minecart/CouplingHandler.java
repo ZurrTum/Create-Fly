@@ -34,7 +34,7 @@ public class CouplingHandler {
         return false;
     }
 
-    public static void forEachLoadedCoupling(Level world, Consumer<Couple<MinecartController>> consumer) {
+    public static void forEachLoadedCoupling(@Nullable Level world, Consumer<Couple<MinecartController>> consumer) {
         if (world == null)
             return;
         Set<UUID> cartsWithCoupling = CapabilityMinecartController.loadedMinecartsWithCoupling.get(world);
@@ -161,14 +161,14 @@ public class CouplingHandler {
         return coupledController == null ? null : Optional.of(coupledController);
     }
 
-    public static Optional<MinecartController> getNextInCouplingChain(Level world, MinecartController controller, boolean forward) {
+    public static Optional<@Nullable MinecartController> getNextInCouplingChain(Level world, MinecartController controller, boolean forward) {
         UUID coupledCart = controller.getCoupledCart(forward);
         if (coupledCart == null)
             return Optional.empty();
         return Optional.ofNullable(CapabilityMinecartController.getIfPresent(world, coupledCart));
     }
 
-    public static void status(Player player, String key) {
+    public static void status(@Nullable Player player, String key) {
         if (player == null)
             return;
         player.displayClientMessage(Component.translatable("create.minecart_coupling." + key), true);

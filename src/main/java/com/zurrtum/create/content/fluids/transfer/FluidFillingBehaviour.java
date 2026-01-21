@@ -246,7 +246,7 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
         blockEntity.sendData();
     }
 
-    enum SpaceType {
+    protected enum SpaceType {
         FILLABLE,
         FILLED,
         BLOCKING

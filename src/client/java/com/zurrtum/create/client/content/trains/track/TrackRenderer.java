@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -54,7 +54,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
         TrackRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         Level world = be.getLevel();
         if (VisualizationManager.supportsVisualization(world)) {
@@ -208,8 +208,8 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
     public static class GirderAngles {
         public final int length;
-        public final Couple<Pose>[] beams;
-        public final Couple<Couple<Pose>>[] beamCaps;
+        public final Couple<@Nullable Pose>[] beams;
+        public final Couple<Couple<@Nullable Pose>>[] beamCaps;
         public final BlockPos[] lightPosition;
 
         @SuppressWarnings("unchecked")
@@ -287,8 +287,8 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
     public static class TrackRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public RenderType layer;
-        public GirderRenderState girder;
-        public Map<TrackMaterial, TrackSegmentRenderState> tracks;
+        public @Nullable GirderRenderState girder;
+        public @Nullable Map<TrackMaterial, TrackSegmentRenderState> tracks;
 
         @Override
         public void render(Pose matricesEntry, VertexConsumer vertexConsumer) {

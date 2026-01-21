@@ -43,8 +43,8 @@ public class KineticScrollValueBehaviour extends ScrollValueBehaviour<SmartBlock
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
         ImmutableList<Component> rows = ImmutableList.of(
-            Component.literal("\u27f3").withStyle(ChatFormatting.BOLD),
-            Component.literal("\u27f2").withStyle(ChatFormatting.BOLD)
+            Component.literal("⟳").withStyle(ChatFormatting.BOLD),
+            Component.literal("⟲").withStyle(ChatFormatting.BOLD)
         );
         ValueSettingsFormatter formatter = new ValueSettingsFormatter(this::formatSettings);
         return new ValueSettingsBoard(label, 256, 32, rows, formatter);
@@ -52,6 +52,6 @@ public class KineticScrollValueBehaviour extends ScrollValueBehaviour<SmartBlock
 
     public MutableComponent formatSettings(ValueSettings settings) {
         return CreateLang.number(Math.max(1, Math.abs(settings.value())))
-            .add(CreateLang.text(settings.row() == 0 ? "\u27f3" : "\u27f2").style(ChatFormatting.BOLD)).component();
+            .add(CreateLang.text(settings.row() == 0 ? "⟳" : "⟲").style(ChatFormatting.BOLD)).component();
     }
 }

@@ -5,19 +5,19 @@ import com.zurrtum.create.AllContraptionTypes;
 import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Queue;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Queue;
+import java.util.Set;
 
 public class ClockworkContraption extends Contraption {
 
@@ -41,6 +41,7 @@ public class ClockworkContraption extends Contraption {
         return pos.equals(anchor.relative(facing.getOpposite(), offset + 1));
     }
 
+    @Nullable
     public static Pair<ClockworkContraption, ClockworkContraption> assembleClockworkAt(
         Level world,
         BlockPos pos,
@@ -90,12 +91,17 @@ public class ClockworkContraption extends Contraption {
     }
 
     @Override
-    public boolean searchMovedStructure(Level world, BlockPos pos, Direction direction) throws AssemblyException {
+    public boolean searchMovedStructure(Level world, BlockPos pos, @Nullable Direction direction) throws AssemblyException {
         return super.searchMovedStructure(world, pos.relative(direction, offset + 1), null);
     }
 
     @Override
-    protected boolean moveBlock(Level world, Direction direction, Queue<BlockPos> frontier, Set<BlockPos> visited) throws AssemblyException {
+    protected boolean moveBlock(
+        Level world,
+        @Nullable Direction direction,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited
+    ) throws AssemblyException {
         if (ignoreBlocks.contains(frontier.peek())) {
             frontier.poll();
             return true;

@@ -13,13 +13,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
 public class ChassisRangeDisplay {
 
     private static final int DISPLAY_TIME = 200;
-    private static GroupEntry lastHoveredGroup = null;
+    private static @Nullable GroupEntry lastHoveredGroup = null;
 
     private static class Entry {
         ChassisBlockEntity be;
@@ -127,8 +128,7 @@ public class ChassisRangeDisplay {
         if (!entries.containsKey(pos) || ctrl)
             display(chassisBlockEntity);
         else {
-            if (!ctrl)
-                entries.get(pos).timer = DISPLAY_TIME;
+            entries.get(pos).timer = DISPLAY_TIME;
         }
     }
 
@@ -146,9 +146,7 @@ public class ChassisRangeDisplay {
         }
 
         entry.timer--;
-        if (entry.timer == 0)
-            return true;
-        return false;
+        return entry.timer == 0;
     }
 
     public static void display(ChassisBlockEntity chassis) {
@@ -179,6 +177,7 @@ public class ChassisRangeDisplay {
 
     }
 
+    @Nullable
     private static GroupEntry getExistingGroupForPos(BlockPos pos) {
         for (GroupEntry groupEntry : groupEntries)
             for (ChassisBlockEntity chassis : groupEntry.includedBEs)

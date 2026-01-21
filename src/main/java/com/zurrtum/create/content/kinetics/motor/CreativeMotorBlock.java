@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class CreativeMotorBlock extends DirectionalKineticBlock implements IBE<CreativeMotorBlockEntity> {
 
@@ -28,6 +29,7 @@ public class CreativeMotorBlock extends DirectionalKineticBlock implements IBE<C
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredFacing(context);
         if ((context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) || preferred == null)

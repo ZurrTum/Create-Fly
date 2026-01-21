@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity> {
 
@@ -40,6 +41,7 @@ public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         BlockState newState = super.getStateForPlacement(ctx);
         if (newState == null)

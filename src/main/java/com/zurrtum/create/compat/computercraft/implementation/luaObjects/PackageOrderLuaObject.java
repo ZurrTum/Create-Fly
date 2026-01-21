@@ -9,6 +9,7 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public class PackageOrderLuaObject implements LuaComparable {
     private final PackageLuaObject parent;
-    private final PackageOrderWithCrafts context;
+    private final @Nullable PackageOrderWithCrafts context;
 
     public PackageOrderLuaObject(PackageLuaObject packageLuaObject) {
         this.parent = packageLuaObject;
@@ -52,6 +53,7 @@ public class PackageOrderLuaObject implements LuaComparable {
     // the list  and getItemDetail functions here are hard coded because it's for BigItemStacks. Every other implementation should use ComputerUtils functions.
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final CreateLuaTable list() throws LuaException {
         if (context == null) {
             return null;
@@ -72,6 +74,7 @@ public class PackageOrderLuaObject implements LuaComparable {
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final CreateLuaTable getItemDetail(int slot) throws LuaException {
         if (context == null) {
             return null;
@@ -95,6 +98,7 @@ public class PackageOrderLuaObject implements LuaComparable {
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final CreateLuaTable getCrafts() throws LuaException {
         if (context == null) {
             return null;
@@ -138,6 +142,7 @@ public class PackageOrderLuaObject implements LuaComparable {
     }
 
     @Override
+    @Nullable
     public Map<?, ?> getTableRepresentation() {
         try {
             Map<String, Object> result = new HashMap<>();

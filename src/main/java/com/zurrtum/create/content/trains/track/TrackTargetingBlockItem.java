@@ -9,11 +9,6 @@ import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.apache.commons.lang3.mutable.MutableObject;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.AxisDirection;
@@ -31,6 +26,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class TrackTargetingBlockItem extends BlockItem {
 
@@ -83,11 +83,11 @@ public class TrackTargetingBlockItem extends BlockItem {
             boolean front = track.getNearestTrackAxis(level, pos, state, lookAngle).getSecond() == AxisDirection.POSITIVE;
             EdgePointType<?> type = getType(stack);
 
-            MutableObject<OverlapResult> result = new MutableObject<>(null);
+            MutableObject<@Nullable OverlapResult> result = new MutableObject<>(null);
             withGraphLocation(level, pos, front, null, type, (overlap, location) -> result.setValue(overlap));
 
-            if (result.getValue().feedback != null) {
-                player.displayClientMessage(Component.translatable("create." + result.getValue().feedback).withStyle(ChatFormatting.RED), true);
+            if (result.get().feedback != null) {
+                player.displayClientMessage(Component.translatable("create." + result.get().feedback).withStyle(ChatFormatting.RED), true);
                 AllSoundEvents.DENY.play(level, null, pos, .5f, 1);
                 return InteractionResult.FAIL;
             }
@@ -164,7 +164,7 @@ public class TrackTargetingBlockItem extends BlockItem {
         JUNCTION("track_target.no_junctions"),
         NO_TRACK("track_target.invalid");
 
-        public String feedback;
+        public @Nullable String feedback;
 
         OverlapResult() {
         }
@@ -179,9 +179,9 @@ public class TrackTargetingBlockItem extends BlockItem {
         Level level,
         BlockPos pos,
         boolean front,
-        BezierTrackPointLocation targetBezier,
+        @Nullable BezierTrackPointLocation targetBezier,
         EdgePointType<?> type,
-        BiConsumer<OverlapResult, TrackGraphLocation> callback
+        BiConsumer<OverlapResult, @Nullable TrackGraphLocation> callback
     ) {
 
         BlockState state = level.getBlockState(pos);
@@ -210,7 +210,7 @@ public class TrackTargetingBlockItem extends BlockItem {
             return;
         }
 
-        Couple<TrackNode> nodes = location.edge.map(location.graph::locateNode);
+        Couple<@Nullable TrackNode> nodes = location.edge.map(location.graph::locateNode);
         TrackEdge edge = location.graph.getConnection(nodes);
         if (edge == null)
             return;

@@ -5,11 +5,6 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponents;
@@ -25,6 +20,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
 
@@ -46,7 +46,7 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, Player player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, @Nullable Player player, ItemStack stack, BlockState state) {
         return super.updateCustomBlockEntityTag(pos, level, player, fixCtrlCopiedStack(stack), state);
     }
 

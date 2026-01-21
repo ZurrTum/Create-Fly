@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -72,7 +72,7 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         BeltRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         Level world = be.getLevel();
@@ -208,7 +208,7 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         return true;
     }
 
-    public static SpriteShiftEntry getSpriteShiftEntry(DyeColor color, boolean diagonal, boolean bottom) {
+    public static SpriteShiftEntry getSpriteShiftEntry(@Nullable DyeColor color, boolean diagonal, boolean bottom) {
         if (color != null) {
             return (diagonal ? AllSpriteShifts.DYED_DIAGONAL_BELTS : bottom ? AllSpriteShifts.DYED_OFFSET_BELTS : AllSpriteShifts.DYED_BELTS).get(
                 color);
@@ -353,12 +353,12 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         public RenderType layer;
         public PoseStack localTransforms;
         public SuperByteBuffer top;
-        public SpriteShiftEntry topShift;
+        public @Nullable SpriteShiftEntry topShift;
         public float topScroll;
-        public SuperByteBuffer bottom;
-        public SpriteShiftEntry bottomShift;
+        public @Nullable SuperByteBuffer bottom;
+        public @Nullable SpriteShiftEntry bottomShift;
         public float bottomScroll;
-        public SuperByteBuffer pulley;
+        public @Nullable SuperByteBuffer pulley;
         public float pulleyAngle;
         public Direction pulleyDirection;
         public Color pulleyColor;
@@ -401,14 +401,14 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     public record BeltItemState(
-        ItemStackRenderState state, float offset, float sideOffset, Integer light, boolean upright, boolean box, int angle, int count
+        ItemStackRenderState state, float offset, float sideOffset, @Nullable Integer light, boolean upright, boolean box, int angle, int count
     ) {
         public static BeltItemState create(
             ItemModelResolver itemModelManager,
             TransportedItemStack transported,
             BeltRenderState state,
             boolean stopped,
-            Level world,
+            @Nullable Level world,
             BlockPos.MutableBlockPos mutablePos
         ) {
             float offset, sideOffset;

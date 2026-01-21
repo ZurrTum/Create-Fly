@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 public class SoulParticle extends CustomRotationParticle {
 
@@ -27,7 +28,7 @@ public class SoulParticle extends CustomRotationParticle {
     protected int firstEndFrame = 33;
     protected int endFrames = 20;
 
-    protected AnimationStage animationStage;
+    protected @Nullable AnimationStage animationStage;
 
     protected int totalFrames = 53;
     protected int ticksPerFrame = 2;
@@ -131,6 +132,7 @@ public class SoulParticle extends CustomRotationParticle {
             return (float) animAge;
         }
 
+        @Nullable
         public abstract AnimationStage getNext();
     }
 
@@ -206,6 +208,7 @@ public class SoulParticle extends CustomRotationParticle {
         }
 
         @Override
+        @Nullable
         public AnimationStage getNext() {
             if (animAge < particle.endTicks)
                 return this;
@@ -227,6 +230,7 @@ public class SoulParticle extends CustomRotationParticle {
         }
 
         @Override
+        @Nullable
         public AnimationStage getNext() {
             if (animAge < (particle.isExpandingPerimeter ? 8 : particle.startTicks + particle.endTicks + particle.numLoops * particle.loopLength))
                 return this;

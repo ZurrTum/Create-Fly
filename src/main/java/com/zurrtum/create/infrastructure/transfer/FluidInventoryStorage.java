@@ -65,7 +65,7 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    static String toString(FluidInventory inventory) {
+    static String toString(@Nullable FluidInventory inventory) {
         if (inventory == null) {
             return "~~NULL~~";
         } else {

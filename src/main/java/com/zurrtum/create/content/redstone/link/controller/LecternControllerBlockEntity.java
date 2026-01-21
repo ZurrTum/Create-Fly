@@ -1,12 +1,8 @@
 package com.zurrtum.create.content.redstone.link.controller;
 
 import com.zurrtum.create.*;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.UUID;
-
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.UUIDUtil;
@@ -23,11 +19,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.UUID;
 
 public class LecternControllerBlockEntity extends SmartBlockEntity {
     private ItemContainerContents controllerData = ItemContainerContents.EMPTY;
-    public UUID user;
-    public UUID prevUser;    // used only on client
+    public @Nullable UUID user;
+    public @Nullable UUID prevUser;    // used only on client
     private boolean deactivatedThisTick;    // used only on server
 
     public LecternControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -94,7 +94,7 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
         sendData();
     }
 
-    private void stopUsing(Player player) {
+    private void stopUsing(@Nullable Player player) {
         user = null;
         if (player != null)
             AllSynchedDatas.IS_USING_LECTERN_CONTROLLER.set(player, false);
@@ -134,7 +134,7 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
         }
     }
 
-    public void setController(ItemStack newController) {
+    public void setController(@Nullable ItemStack newController) {
         if (newController != null) {
             controllerData = newController.getOrDefault(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemContainerContents.EMPTY);
             AllSoundEvents.CONTROLLER_PUT.playOnServer(level, worldPosition);

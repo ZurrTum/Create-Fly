@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 public class GirderCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     @Override
+    @Nullable
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         if (!state.hasProperty(GirderBlock.X))
             return null;

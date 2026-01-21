@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
 
 public class MovementContext {
 
-    public Vec3 position;
+    public @Nullable Vec3 position;
     public Vec3 motion;
     public Vec3 relativeMotion;
     public UnaryOperator<Vec3> rotation;
@@ -31,16 +31,16 @@ public class MovementContext {
     public Level world;
     public BlockState state;
     public BlockPos localPos;
-    public CompoundTag blockEntityData;
+    public @Nullable CompoundTag blockEntityData;
 
     public boolean stall;
     public boolean disabled;
     public boolean firstMovement;
     public CompoundTag data;
     public Contraption contraption;
-    public Object temporaryData;
+    public @Nullable Object temporaryData;
 
-    private FilterItemStack filter;
+    private @Nullable FilterItemStack filter;
 
     private final Supplier<MountedItemStorage> itemStorage;
     private final Supplier<MountedFluidStorage> fluidStorage;
@@ -101,6 +101,8 @@ public class MovementContext {
     public FilterItemStack getFilterFromBE() {
         if (filter != null)
             return filter;
+        if (blockEntityData == null)
+            return filter = FilterItemStack.empty();
         RegistryOps<Tag> ops = world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         return filter = blockEntityData.read("Filter", FilterItemStack.CODEC, ops).orElseGet(FilterItemStack::empty);
     }

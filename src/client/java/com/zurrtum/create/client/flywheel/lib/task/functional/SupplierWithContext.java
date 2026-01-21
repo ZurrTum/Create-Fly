@@ -4,7 +4,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A supplier like interface for use with {@link dev.engine_room.flywheel.api.task.Plan Plans} and their contexts.
+ * A supplier like interface for use with {@link com.zurrtum.create.client.flywheel.api.task.Plan Plans} and their contexts.
  * <br>
  * The subinterface {@link Ignored} is provided for suppliers that do not need the context object.
  *

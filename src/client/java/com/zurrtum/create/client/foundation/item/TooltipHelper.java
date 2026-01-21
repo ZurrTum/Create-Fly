@@ -4,19 +4,18 @@ import com.google.common.base.Strings;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.catnip.lang.FontHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-
-import java.text.BreakIterator;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+
+import java.text.BreakIterator;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 public class TooltipHelper {
 
@@ -28,13 +27,8 @@ public class TooltipHelper {
     }
 
     public static String makeProgressBar(int length, int filledLength) {
-        String bar = " ";
         int emptySpaces = length - filledLength;
-        for (int i = 0; i < filledLength; i++)
-            bar += "\u2588";
-        for (int i = 0; i < emptySpaces; i++)
-            bar += "\u2592";
-        return bar + " ";
+        return " " + "█".repeat(Math.max(0, filledLength)) + "▒".repeat(Math.max(0, emptySpaces)) + " ";
     }
 
     public static Style styleFromColor(ChatFormatting color) {

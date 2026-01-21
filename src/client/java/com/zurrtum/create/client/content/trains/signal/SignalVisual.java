@@ -33,7 +33,7 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
     private final TransformedInstance signalOverlay;
 
     private boolean previousIsRedLight;
-    private OverlayState previousOverlayState;
+    private @Nullable OverlayState previousOverlayState;
 
     public SignalVisual(VisualizationContext ctx, SignalBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);

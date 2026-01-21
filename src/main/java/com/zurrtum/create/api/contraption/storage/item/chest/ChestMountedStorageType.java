@@ -4,6 +4,7 @@ import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStora
 import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 public class ChestMountedStorageType extends SimpleMountedStorageType<ChestMountedStorage> {
     public ChestMountedStorageType() {
@@ -11,6 +12,7 @@ public class ChestMountedStorageType extends SimpleMountedStorageType<ChestMount
     }
 
     @Override
+    @Nullable
     protected Container getHandler(Level level, BlockEntity be) {
         return be instanceof Container container ? container : null;
     }

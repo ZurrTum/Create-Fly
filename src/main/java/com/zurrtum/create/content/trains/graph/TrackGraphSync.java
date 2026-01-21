@@ -80,7 +80,7 @@ public class TrackGraphSync {
             currentGraphSyncPacket.removedNodes.add(nodeId);
         currentGraphSyncPacket.addedEdges.removeIf(pair -> {
             Couple<Integer> ids = pair.getFirst().getFirst();
-            return ids.getFirst().intValue() == nodeId || ids.getSecond().intValue() == nodeId;
+            return ids.getFirst() == nodeId || ids.getSecond() == nodeId;
         });
     }
 
@@ -205,7 +205,7 @@ public class TrackGraphSync {
 
     //
 
-    private TrackGraphSyncPacket currentGraphSyncPacket;
+    private @Nullable TrackGraphSyncPacket currentGraphSyncPacket;
     private int currentPayload;
 
     private void flushGraphPacket() {

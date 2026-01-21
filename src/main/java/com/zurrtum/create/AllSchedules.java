@@ -3,12 +3,12 @@ package com.zurrtum.create;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.schedule.condition.*;
 import com.zurrtum.create.content.trains.schedule.destination.*;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -30,6 +30,7 @@ public class AllSchedules {
     public static final Identifier UNLOADED = registerCondition("unloaded", StationUnloadedCondition::new);
     public static final Identifier POWERED = registerCondition("powered", StationPoweredCondition::new);
 
+    @Nullable
     public static ScheduleInstruction createScheduleInstruction(Identifier location) {
         for (Pair<Identifier, Function<Identifier, ? extends ScheduleInstruction>> type : INSTRUCTION_TYPES) {
             if (type.getFirst().equals(location)) {
@@ -39,6 +40,7 @@ public class AllSchedules {
         return null;
     }
 
+    @Nullable
     public static ScheduleWaitCondition createScheduleWaitCondition(Identifier location) {
         for (Pair<Identifier, Function<Identifier, ? extends ScheduleWaitCondition>> type : CONDITION_TYPES) {
             if (type.getFirst().equals(location)) {

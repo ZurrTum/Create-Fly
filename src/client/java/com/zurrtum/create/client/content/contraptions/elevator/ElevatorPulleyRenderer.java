@@ -17,7 +17,7 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -44,7 +44,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
         ElevatorPulleyRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         Level world = be.getLevel();
@@ -126,18 +126,18 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
 
     public static class ElevatorPulleyRenderState extends KineticRenderState {
         public float yRot;
-        public SuperByteBuffer magnet;
+        public @Nullable SuperByteBuffer magnet;
         public float magnetOffset;
         public int magnetLight;
         public SuperByteBuffer rotatedCoil;
         public SpriteShiftEntry coilShift;
         public float coilScroll;
-        public SuperByteBuffer halfRope;
+        public @Nullable SuperByteBuffer halfRope;
         public SpriteShiftEntry halfShift;
         public float halfScroll;
         public float halfRopeOffset;
         public int halfRopeLight;
-        public SuperByteBuffer rope;
+        public @Nullable SuperByteBuffer rope;
         public float[] offsets;
         public int[] lights;
 

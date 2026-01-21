@@ -66,6 +66,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Train {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, Train> STREAM_CODEC = CatnipLargerStreamCodecs.composite(
         UUIDUtil.STREAM_CODEC,
         train -> train.id,
@@ -89,7 +90,7 @@ public class Train {
 
     public double speed = 0;
     public double targetSpeed = 0;
-    public Double speedBeforeStall = null;
+    public @Nullable Double speedBeforeStall = null;
     public int carriageWaitingForChunks = -1;
 
     public double throttle = 1;
@@ -98,7 +99,7 @@ public class Train {
     public UUID id;
     @Nullable
     public UUID owner;
-    public TrackGraph graph;
+    public @Nullable TrackGraph graph;
     public Navigation navigation;
     public ScheduleRuntime runtime;
     public TrainIconType icon;
@@ -111,7 +112,7 @@ public class Train {
     public SteerDirection manualSteer;
     public boolean manualTick;
 
-    public UUID currentStation;
+    public @Nullable UUID currentStation;
     public boolean currentlyBackwards;
 
     public boolean doubleEnded;
@@ -119,7 +120,7 @@ public class Train {
     public List<Integer> carriageSpacing;
 
     public boolean updateSignalBlocks;
-    public Map<UUID, UUID> occupiedSignalBlocks;
+    public Map<UUID, @Nullable UUID> occupiedSignalBlocks;
     public Set<UUID> reservedSignalBlocks;
 
     public Set<UUID> occupiedObservers;
@@ -132,7 +133,7 @@ public class Train {
     public int fuelTicks;
     public int honkTicks;
 
-    public Boolean lowHonk;
+    public @Nullable Boolean lowHonk;
     public int honkPitch;
 
     public float accumulatedSteamRelease;
@@ -142,7 +143,7 @@ public class Train {
     double[] stress;
 
     // advancements
-    public Player backwardsDriver;
+    public @Nullable Player backwardsDriver;
 
     private Train(
         UUID id,
@@ -160,7 +161,7 @@ public class Train {
     public Train(
         UUID id,
         UUID owner,
-        TrackGraph graph,
+        @Nullable TrackGraph graph,
         List<Carriage> carriages,
         List<Integer> carriageSpacing,
         boolean doubleEnded,
@@ -182,7 +183,7 @@ public class Train {
     public Train(
         UUID id,
         UUID owner,
-        TrackGraph graph,
+        @Nullable TrackGraph graph,
         List<Carriage> carriages,
         List<Integer> carriageSpacing,
         boolean doubleEnded,
@@ -657,6 +658,7 @@ public class Train {
         train.crash();
     }
 
+    @Nullable
     public Pair<Train, Vec3> findCollidingTrain(Level level, Vec3 start, Vec3 end, ResourceKey<Level> dimension) {
         Vec3 diff = end.subtract(start);
         double maxDistanceSqr = Math.pow(AllConfigs.server().trains.maxAssemblyLength.get(), 2.0);
@@ -844,9 +846,9 @@ public class Train {
 
     public void forEachTravellingPoint(Consumer<TravellingPoint> callback) {
         for (Carriage c : carriages) {
-            c.leadingBogey().points.forEach(callback::accept);
+            c.leadingBogey().points.forEach(callback);
             if (c.isOnTwoBogeys())
-                c.trailingBogey().points.forEach(callback::accept);
+                c.trailingBogey().points.forEach(callback);
         }
     }
 
@@ -963,6 +965,7 @@ public class Train {
         currentStation = station.id;
     }
 
+    @Nullable
     public GlobalStation getCurrentStation() {
         if (currentStation == null)
             return null;
@@ -1015,7 +1018,7 @@ public class Train {
 
         TravellingPoint signalScout = new TravellingPoint(node1, node2, edge, position, false);
         Map<UUID, SignalEdgeGroup> allGroups = Create.RAILWAYS.signalEdgeGroups;
-        MutableObject<UUID> prevGroup = new MutableObject<>(null);
+        MutableObject<@Nullable UUID> prevGroup = new MutableObject<>(null);
 
         if (signalData.hasSignalBoundaries()) {
             SignalBoundary nextBoundary = signalData.next(EdgePointType.SIGNAL, position);
@@ -1064,7 +1067,7 @@ public class Train {
                     couple.getSecond().map(signal::getGroup).forEach(id -> {
                         if (!Create.RAILWAYS.signalEdgeGroups.containsKey(id))
                             return;
-                        if (id.equals(prevGroup.getValue()))
+                        if (id.equals(prevGroup.get()))
                             return;
                         occupy(id, null);
                         prevGroup.setValue(id);
@@ -1080,8 +1083,8 @@ public class Train {
         return (gameTicks + tickOffset) % updateInterval == 0;
     }
 
-    public Couple<Couple<TrackNode>> getEndpointEdges() {
-        return Couple.create(carriages.get(0).getLeadingPoint(), carriages.get(carriages.size() - 1).getTrailingPoint())
+    public Couple<Couple<@Nullable TrackNode>> getEndpointEdges() {
+        return Couple.create(carriages.getFirst().getLeadingPoint(), carriages.getLast().getTrailingPoint())
             .map(tp -> Couple.create(tp.node1, tp.node2));
     }
 
@@ -1133,7 +1136,7 @@ public class Train {
             if (extract.isEmpty()) {
                 continue;
             }
-            fuelTicks += burnTime.getValue();
+            fuelTicks += burnTime.intValue();
             ItemStackTemplate remainder = extract.getItem().getCraftingRemainder();
             if (remainder != null) {
                 fuelItems.insertExist(remainder.create());

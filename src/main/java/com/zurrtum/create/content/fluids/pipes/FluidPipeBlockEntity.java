@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.fluids.pipes;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
@@ -8,16 +9,14 @@ import com.zurrtum.create.content.fluids.FluidPropagator;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public class FluidPipeBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
@@ -56,7 +55,7 @@ public class FluidPipeBlockEntity extends SmartBlockEntity implements Transforma
         return !(state.getBlock() instanceof EncasedPipeBlock);
     }
 
-    class StandardPipeFluidTransportBehaviour extends FluidTransportBehaviour {
+    static class StandardPipeFluidTransportBehaviour extends FluidTransportBehaviour {
 
         public StandardPipeFluidTransportBehaviour(SmartBlockEntity be) {
             super(be);

@@ -30,10 +30,7 @@ public class RollerValueBox extends ValueBoxTransform {
 
     @Override
     public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
-        Vec3 offset = getLocalOffset(state);
-        if (offset == null)
-            return false;
-        return localHit.distanceTo(offset) < scale / 3;
+        return localHit.distanceTo(getLocalOffset(state)) < scale / 3;
     }
 
     @Override

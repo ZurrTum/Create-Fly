@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.fluids;
 
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class PipeConnection {
 
     public Direction side;
@@ -73,7 +74,7 @@ public class PipeConnection {
     }
 
     public void manageSource(Level world, BlockPos pos, BlockEntity blockEntity) {
-        if (!source.isPresent() && !determineSource(world, pos))
+        if (source.isEmpty() && !determineSource(world, pos))
             return;
         FlowSource flowSource = source.get();
         flowSource.manageSource(world, blockEntity);
@@ -86,7 +87,7 @@ public class PipeConnection {
         network = Optional.empty();
 
         // chunk border
-        if (!source.isPresent() && !determineSource(world, pos))
+        if (source.isEmpty() && !determineSource(world, pos))
             return false;
         FlowSource flowSource = source.get();
 
@@ -181,7 +182,7 @@ public class PipeConnection {
             return;
 
         if (world.isClientSide()) {
-            if (!source.isPresent())
+            if (source.isEmpty())
                 determineSource(world, pos);
 
             boolean openEnd = hasOpenEnd();
@@ -320,7 +321,7 @@ public class PipeConnection {
         network.ifPresent(FluidNetwork::reset);
     }
 
-    public class Flow {
+    public static class Flow {
 
         public boolean complete;
         public boolean inbound;

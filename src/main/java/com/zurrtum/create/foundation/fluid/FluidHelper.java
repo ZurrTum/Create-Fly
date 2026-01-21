@@ -12,10 +12,6 @@ import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
-
-import java.util.Map;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -34,6 +30,10 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class FluidHelper {
     private static final Map<BlockPos, FluidInventoryCache> INV_CACHE = new Object2ReferenceOpenHashMap<>();
@@ -115,11 +115,19 @@ public class FluidHelper {
         return fluid;
     }
 
+    @Nullable
     public static FluidInventory getFluidInventory(Level world, BlockPos pos, Direction direction) {
         return getFluidInventory(world, pos, null, null, direction);
     }
 
-    public static FluidInventory getFluidInventory(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    @Nullable
+    public static FluidInventory getFluidInventory(
+        Level world,
+        BlockPos pos,
+        @Nullable BlockState state,
+        @Nullable BlockEntity blockEntity,
+        @Nullable Direction direction
+    ) {
         if (state == null) {
             state = blockEntity != null ? blockEntity.getBlockState() : world.getBlockState(pos);
         }
@@ -129,7 +137,13 @@ public class FluidHelper {
         return AllTransfer.getFluidInventory(world, pos, state, blockEntity, direction);
     }
 
-    public static boolean hasFluidInventory(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    public static boolean hasFluidInventory(
+        Level world,
+        BlockPos pos,
+        @Nullable BlockState state,
+        @Nullable BlockEntity blockEntity,
+        @Nullable Direction direction
+    ) {
         if (state == null) {
             state = blockEntity != null ? blockEntity.getBlockState() : world.getBlockState(pos);
         }
@@ -139,6 +153,7 @@ public class FluidHelper {
         return AllTransfer.hasFluidInventory(world, pos, state, blockEntity, direction);
     }
 
+    @Nullable
     public static FluidItemInventory getFluidInventory(ItemStack stack) {
         FluidItemInventory inventory = AllFluidItemInventory.of(stack);
         if (inventory != null) {
@@ -218,85 +233,6 @@ public class FluidHelper {
 
         return false;
     }
-
-    //TODO
-    //    @Nullable
-    //    public static FluidExchange exchange(IFluidHandler fluidTank, IFluidHandlerItem fluidItem, FluidExchange preferred, int maxAmount) {
-    //        return exchange(fluidTank, fluidItem, preferred, true, maxAmount);
-    //    }
-    //
-    //    @Nullable
-    //    public static FluidExchange exchangeAll(IFluidHandler fluidTank, IFluidHandlerItem fluidItem, FluidExchange preferred) {
-    //        return exchange(fluidTank, fluidItem, preferred, false, Integer.MAX_VALUE);
-    //    }
-    //
-    //    @Nullable
-    //    private static FluidExchange exchange(
-    //        IFluidHandler fluidTank,
-    //        IFluidHandlerItem fluidItem,
-    //        FluidExchange preferred,
-    //        boolean singleOp,
-    //        int maxTransferAmountPerTank
-    //    ) {
-    //
-    //        // Locks in the transfer direction of this operation
-    //        FluidExchange lockedExchange = null;
-    //
-    //        for (int tankSlot = 0; tankSlot < fluidTank.getTanks(); tankSlot++) {
-    //            for (int slot = 0; slot < fluidItem.getTanks(); slot++) {
-    //
-    //                FluidStack fluidInTank = fluidTank.getFluidInTank(tankSlot);
-    //                int tankCapacity = fluidTank.getTankCapacity(tankSlot) - fluidInTank.getAmount();
-    //                boolean tankEmpty = fluidInTank.isEmpty();
-    //
-    //                FluidStack fluidInItem = fluidItem.getFluidInTank(tankSlot);
-    //                int itemCapacity = fluidItem.getTankCapacity(tankSlot) - fluidInItem.getAmount();
-    //                boolean itemEmpty = fluidInItem.isEmpty();
-    //
-    //                boolean undecided = lockedExchange == null;
-    //                boolean canMoveToTank = (undecided || lockedExchange == FluidExchange.ITEM_TO_TANK) && tankCapacity > 0;
-    //                boolean canMoveToItem = (undecided || lockedExchange == FluidExchange.TANK_TO_ITEM) && itemCapacity > 0;
-    //
-    //                // Incompatible Liquids
-    //                if (!tankEmpty && !itemEmpty && !FluidStack.isSameFluidSameComponents(fluidInItem, fluidInTank))
-    //                    continue;
-    //
-    //                // Transfer liquid to tank
-    //                if (((tankEmpty || itemCapacity <= 0) && canMoveToTank) || undecided && preferred == FluidExchange.ITEM_TO_TANK) {
-    //
-    //                    int amount = fluidTank.fill(
-    //                        fluidItem.drain(Math.min(maxTransferAmountPerTank, tankCapacity), FluidAction.EXECUTE),
-    //                        FluidAction.EXECUTE
-    //                    );
-    //                    if (amount > 0) {
-    //                        lockedExchange = FluidExchange.ITEM_TO_TANK;
-    //                        if (singleOp)
-    //                            return lockedExchange;
-    //                        continue;
-    //                    }
-    //                }
-    //
-    //                // Transfer liquid from tank
-    //                if (((itemEmpty || tankCapacity <= 0) && canMoveToItem) || undecided && preferred == FluidExchange.TANK_TO_ITEM) {
-    //
-    //                    int amount = fluidItem.fill(
-    //                        fluidTank.drain(Math.min(maxTransferAmountPerTank, itemCapacity), FluidAction.EXECUTE),
-    //                        FluidAction.EXECUTE
-    //                    );
-    //                    if (amount > 0) {
-    //                        lockedExchange = FluidExchange.TANK_TO_ITEM;
-    //                        if (singleOp)
-    //                            return lockedExchange;
-    //                        continue;
-    //                    }
-    //
-    //                }
-    //
-    //            }
-    //        }
-    //
-    //        return null;
-    //    }
 
     public static Supplier<FluidInventory> getFluidInventoryCache(ServerLevel world, BlockPos pos, Direction direction) {
         FluidInventoryCache cache = new FluidInventoryCache(world, pos, direction);

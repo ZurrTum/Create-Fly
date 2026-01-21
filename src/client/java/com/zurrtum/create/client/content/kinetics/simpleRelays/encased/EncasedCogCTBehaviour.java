@@ -19,10 +19,10 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 
 public class EncasedCogCTBehaviour extends EncasedCTBehaviour {
 
-    private Couple<CTSpriteShiftEntry> sideShifts;
-    private boolean large;
+    private final @Nullable Couple<CTSpriteShiftEntry> sideShifts;
+    private final boolean large;
 
-    public EncasedCogCTBehaviour(CTSpriteShiftEntry shift, Couple<CTSpriteShiftEntry> sideShifts) {
+    public EncasedCogCTBehaviour(CTSpriteShiftEntry shift, @Nullable Couple<CTSpriteShiftEntry> sideShifts) {
         super(shift);
         large = sideShifts == null;
         this.sideShifts = sideShifts;
@@ -71,6 +71,7 @@ public class EncasedCogCTBehaviour extends EncasedCTBehaviour {
     }
 
     @Override
+    @Nullable
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         Axis axis = state.getValue(AXIS);
         if (large || axis == direction.getAxis()) {

@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 public class LogisticsManager {
 
-    private static Random r = new Random();
+    private static final Random r = new Random();
 
     public static final Cache<UUID, InventorySummary> ACCURATE_SUMMARIES = new TickBasedCache<>(1, false);
     public static final Cache<UUID, InventorySummary> SUMMARIES = new TickBasedCache<>(20, false);

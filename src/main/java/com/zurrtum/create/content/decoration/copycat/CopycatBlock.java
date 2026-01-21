@@ -120,7 +120,7 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         if (pPlacer == null)
             return;
         ItemStack offhandItem = pPlacer.getItemInHand(InteractionHand.OFF_HAND);
@@ -146,7 +146,7 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
     }
 
     @Nullable
-    public BlockState getAcceptedBlockState(Level pLevel, BlockPos pPos, ItemStack item, Direction face) {
+    public BlockState getAcceptedBlockState(@Nullable Level pLevel, BlockPos pPos, ItemStack item, @Nullable Direction face) {
         if (!(item.getItem() instanceof BlockItem bi))
             return null;
 

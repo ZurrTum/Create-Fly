@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +35,7 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
         BogeyBlockEntityRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         state.blockState = be.getBlockState();
         if (!(state.blockState.getBlock() instanceof AbstractBogeyBlock<?> bogey)) {
@@ -79,8 +79,8 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
 
     public static class BogeyBlockEntityRenderState extends BlockEntityRenderState {
         public float yRot;
-        public CompoundTag bogeyData;
-        public BogeyRenderState data;
+        public @Nullable CompoundTag bogeyData;
+        public @Nullable BogeyRenderState data;
     }
 
     public interface BogeyRenderState {

@@ -7,15 +7,15 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.source.SingleLineDisplaySource;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class DisplayBoardTarget extends DisplayTarget {
 
@@ -78,6 +78,7 @@ public class DisplayBoardTarget extends DisplayTarget {
         return new DisplayTargetStats(controller.ySize * 2, controller.getMaxCharCount(), this);
     }
 
+    @Nullable
     private FlapDisplayBlockEntity getController(DisplayLinkContext context) {
         BlockEntity teIn = context.getTargetBlockEntity();
         if (!(teIn instanceof FlapDisplayBlockEntity be))

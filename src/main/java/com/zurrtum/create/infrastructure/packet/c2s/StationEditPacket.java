@@ -12,10 +12,12 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import org.jspecify.annotations.Nullable;
 
 public record StationEditPacket(
-    BlockPos pos, boolean dropSchedule, boolean assemblyMode, Boolean tryAssemble, DoorControl doorControl, String name
+    BlockPos pos, boolean dropSchedule, boolean assemblyMode, @Nullable Boolean tryAssemble, @Nullable DoorControl doorControl, @Nullable String name
 ) implements Packet<ServerGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<ByteBuf, StationEditPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         StationEditPacket::pos,
@@ -44,7 +46,7 @@ public record StationEditPacket(
         return new StationEditPacket(pos, false, false, false, null, null);
     }
 
-    public static StationEditPacket configure(BlockPos pos, boolean assemble, String name, DoorControl doorControl) {
+    public static StationEditPacket configure(BlockPos pos, boolean assemble, String name, @Nullable DoorControl doorControl) {
         return new StationEditPacket(pos, false, assemble, null, doorControl, name);
     }
 

@@ -10,7 +10,7 @@ import com.zurrtum.create.client.content.kinetics.simpleRelays.BracketedKineticB
 import com.zurrtum.create.content.kinetics.simpleRelays.SimpleKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedCogwheelBlock;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
@@ -45,7 +45,7 @@ public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKinetic
         EncasedCogRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         state.shaftAngle = large ? BracketedKineticBlockEntityRenderer.getAngleForLargeCogShaft(be, state.axis) : state.angle;
@@ -85,8 +85,8 @@ public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKinetic
 
     public static class EncasedCogRenderState extends KineticRenderState {
         public float shaftAngle;
-        public SuperByteBuffer top;
-        public SuperByteBuffer bottom;
+        public @Nullable SuperByteBuffer top;
+        public @Nullable SuperByteBuffer bottom;
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

@@ -235,7 +235,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
         if (history.isEmpty())
             return;
 
-        history.add(0, minecraft.screen);
+        history.addFirst(minecraft.screen);
         int spacing = 20;
 
         List<String> names = new ArrayList<>();
@@ -251,7 +251,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
         MutableInt y = new MutableInt(height - 18);
         MutableBoolean first = new MutableBoolean(true);
 
-        if (x.getValue() < 25)
+        if (x.intValue() < 25)
             x.setValue(25);
 
         Matrix3x2fStack poseStack = graphics.pose();
@@ -261,15 +261,15 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
             int sWidth = font.width(s);
             UIRenderHelper.breadcrumbArrow(
                 graphics,
-                x.getValue(),
-                y.getValue(),
+                x.intValue(),
+                y.intValue(),
                 sWidth + spacing,
                 14,
                 spacing / 2,
                 new Color(0xdd101010),
                 new Color(0x44101010)
             );
-            graphics.drawString(font, s, x.getValue() + 5, y.getValue() + 3, first.getValue() ? 0xffeeffee : 0xffddeeff, true);
+            graphics.drawString(font, s, x.intValue() + 5, y.intValue() + 3, first.isTrue() ? 0xffeeffee : 0xffddeeff, true);
             first.setFalse();
 
             x.add(sWidth + spacing);

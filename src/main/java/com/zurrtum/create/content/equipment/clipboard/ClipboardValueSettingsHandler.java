@@ -2,8 +2,8 @@ package com.zurrtum.create.content.equipment.clipboard;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
@@ -25,6 +25,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
 import static com.zurrtum.create.Create.LOGGER;
 
 public class ClipboardValueSettingsHandler {
-
+    @Nullable
     public static InteractionResult rightClickToCopy(
         Level world,
         Player player,
@@ -48,6 +49,7 @@ public class ClipboardValueSettingsHandler {
         return interact(world, player, itemStack, side, pos, true) == InteractionResult.SUCCESS;
     }
 
+    @Nullable
     private static InteractionResult interact(Level world, Player player, ItemStack itemStack, Direction side, BlockPos pos, boolean paste) {
         if (!itemStack.is(AllItems.CLIPBOARD) || player.isSpectator() || player.isShiftKeyDown())
             return null;

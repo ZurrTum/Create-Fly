@@ -107,7 +107,7 @@ public abstract class AbstractFilterScreen<F extends AbstractFilterMenu> extends
 
         for (IconButton button : tooltipButtons) {
             if (!button.getToolTip().isEmpty()) {
-                button.setToolTip(button.getToolTip().get(0));
+                button.setToolTip(button.getToolTip().getFirst());
                 button.getToolTip().add(TooltipHelper.holdShift(Palette.YELLOW, AllKeys.hasShiftDown()));
             }
         }

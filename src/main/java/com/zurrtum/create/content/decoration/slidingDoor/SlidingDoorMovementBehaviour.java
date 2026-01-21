@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.decoration.slidingDoor;
 
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.content.contraptions.Contraption;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorContraption;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 
@@ -157,6 +158,7 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
         return controller.mode.matches(getDoorFacing(context));
     }
 
+    @Nullable
     protected DoorControlBehaviour getElevatorDoorControl(ElevatorContraption ec, MovementContext context) {
         Integer currentTargetY = ec.getCurrentTargetY(context.world);
         if (currentTargetY == null)
@@ -170,6 +172,7 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
         return BlockEntityBehaviour.get(context.world, elevatorColumn.contactAt(currentTargetY), DoorControlBehaviour.TYPE);
     }
 
+    @Nullable
     protected DoorControlBehaviour getTrainStationDoorControl(CarriageContraptionEntity cce, MovementContext context) {
         Carriage carriage = cce.getCarriage();
         if (carriage == null || carriage.train == null)

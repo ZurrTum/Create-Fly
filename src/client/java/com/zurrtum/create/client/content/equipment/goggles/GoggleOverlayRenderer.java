@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class GoggleOverlayRenderer {
     private static final Map<Object, OutlineEntry> outlines = Outliner.getInstance().getOutlines();
 
     public static int hoverTicks = 0;
-    public static BlockPos lastHovered = null;
+    public static @Nullable BlockPos lastHovered = null;
 
     public static void renderOverlay(Minecraft mc, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         HitResult objectMouseOver = mc.hitResult;
@@ -109,7 +110,7 @@ public class GoggleOverlayRenderer {
             hoverAddedInformation = hte.addToTooltip(tooltip, isShifting);
 
             if (goggleAddedInformation && !hoverAddedInformation)
-                tooltip.remove(tooltip.size() - 1);
+                tooltip.removeLast();
         }
 
         if (be instanceof IDisplayAssemblyExceptions) {

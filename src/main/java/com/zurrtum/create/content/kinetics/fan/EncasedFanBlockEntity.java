@@ -64,6 +64,7 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     }
 
     @Override
+    @Nullable
     public Direction getAirFlowDirection() {
         float speed = getSpeed();
         if (speed == 0)

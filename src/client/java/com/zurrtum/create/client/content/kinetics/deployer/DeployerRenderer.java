@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -63,7 +63,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         DeployerRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         Level world = be.getLevel();
@@ -180,10 +180,10 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
     }
 
     public static class DeployerRenderState extends BlockEntityRenderState {
-        public Vec3 offset;
-        public DeployerItemRenderState item;
-        public FilterRenderState filter;
-        public ComponentsRenderState components;
+        public @Nullable Vec3 offset;
+        public @Nullable DeployerItemRenderState item;
+        public @Nullable FilterRenderState filter;
+        public @Nullable ComponentsRenderState components;
     }
 
     public static abstract class DeployerItemRenderState {
@@ -263,7 +263,6 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
 
     public static class DeployerItemPunchRenderState extends DeployerItemRenderState {
         public float xRot;
-        public Vec3 translate;
         public boolean isSpears;
 
         public DeployerItemPunchRenderState(ItemModelResolver itemModelManager, Level world, ItemStack heldItem, Vec3 offset, Direction facing) {

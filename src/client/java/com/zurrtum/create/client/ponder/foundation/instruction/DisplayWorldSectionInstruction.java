@@ -20,7 +20,7 @@ public class DisplayWorldSectionInstruction extends FadeIntoSceneInstruction<Wor
 
     public DisplayWorldSectionInstruction(
         int fadeInTicks,
-        Direction fadeInFrom,
+        @Nullable Direction fadeInFrom,
         Selection selection,
         @Nullable Supplier<WorldSectionElement> mergeOnto
     ) {
@@ -29,7 +29,7 @@ public class DisplayWorldSectionInstruction extends FadeIntoSceneInstruction<Wor
 
     public DisplayWorldSectionInstruction(
         int fadeInTicks,
-        Direction fadeInFrom,
+        @Nullable Direction fadeInFrom,
         Selection selection,
         @Nullable Supplier<WorldSectionElement> mergeOnto,
         @Nullable BlockPos glue

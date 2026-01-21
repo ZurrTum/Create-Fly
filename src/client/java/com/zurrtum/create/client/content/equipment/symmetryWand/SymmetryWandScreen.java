@@ -20,16 +20,16 @@ import com.zurrtum.create.content.equipment.symmetryWand.mirror.PlaneMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.TriplePlaneMirror;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSymmetryWandPacket;
-import org.joml.Vector3f;
-
-import java.util.List;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class SymmetryWandScreen extends AbstractSimiScreen {
 
@@ -37,7 +37,7 @@ public class SymmetryWandScreen extends AbstractSimiScreen {
 
     private ScrollInput areaType;
     private Label labelType;
-    private ScrollInput areaAlign;
+    private @Nullable ScrollInput areaAlign;
     private Label labelAlign;
     private IconButton confirmButton;
     private ElementWidget renderedItem;

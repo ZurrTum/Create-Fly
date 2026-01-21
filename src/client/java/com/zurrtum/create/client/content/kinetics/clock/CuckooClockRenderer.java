@@ -16,7 +16,7 @@ import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity.Animatio
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -44,7 +44,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         CuckooClockRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
@@ -93,7 +93,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         CuckooClockBlockEntity be,
         CuckooClockRenderState state,
         Level world,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.updateBaseRenderState(be, state, world, crumblingOverlay);
         state.facing = state.blockState.getValue(CuckooClockBlock.HORIZONTAL_FACING);
@@ -124,7 +124,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         public SuperByteBuffer leftDoor;
         public SuperByteBuffer rightDoor;
         public float doorAngle;
-        public SuperByteBuffer figure;
+        public @Nullable SuperByteBuffer figure;
         public float offset;
 
         @Override

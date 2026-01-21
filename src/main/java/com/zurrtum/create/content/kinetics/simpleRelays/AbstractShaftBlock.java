@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractShaftBlock extends RotatedPillarKineticBlock implements IBE<KineticBlockEntity>, ProperWaterloggedBlock {
 
@@ -71,6 +72,7 @@ public abstract class AbstractShaftBlock extends RotatedPillarKineticBlock imple
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return withWater(super.getStateForPlacement(context), context);
     }

@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Ex: Pistons, bearings <br>
@@ -26,8 +27,8 @@ import net.minecraft.world.phys.Vec3;
  */
 public class ControlledContraptionEntity extends AbstractContraptionEntity {
 
-    protected BlockPos controllerPos;
-    protected Axis rotationAxis;
+    protected @Nullable BlockPos controllerPos;
+    protected @Nullable Axis rotationAxis;
     public float prevAngle;
     public float angle;
     protected float angleDelta;
@@ -60,7 +61,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     }
 
     @Override
-    protected void setContraption(Contraption contraption) {
+    protected void setContraption(@Nullable Contraption contraption) {
         super.setContraption(contraption);
         if (contraption instanceof BearingContraption)
             rotationAxis = ((BearingContraption) contraption).getFacing().getAxis();
@@ -124,6 +125,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         this.rotationAxis = rotationAxis;
     }
 
+    @Nullable
     public Axis getRotationAxis() {
         return rotationAxis;
     }
@@ -190,6 +192,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         return true;
     }
 
+    @Nullable
     protected IControlContraption getController() {
         if (controllerPos == null)
             return null;

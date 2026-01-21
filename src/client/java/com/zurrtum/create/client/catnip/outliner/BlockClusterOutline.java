@@ -6,14 +6,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.catnip.render.BindableTexture;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
@@ -21,6 +13,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class BlockClusterOutline extends Outline {
 
@@ -174,24 +174,16 @@ public class BlockClusterOutline extends Outline {
         Vector3f normal = normalTemp;
 
         loadFaceData(face, pos0, pos1, pos2, pos3, normal);
-        addPos(
-            pos.getX() + face.getStepX() * 1 / 128f,
-            pos.getY() + face.getStepY() * 1 / 128f,
-            pos.getZ() + face.getStepZ() * 1 / 128f,
-            pos0,
-            pos1,
-            pos2,
-            pos3
-        );
+        addPos(pos.getX() + face.getStepX() / 128f, pos.getY() + face.getStepY() / 128f, pos.getZ() + face.getStepZ() / 128f, pos0, pos1, pos2, pos3);
 
         bufferQuad(pose, consumer, pos0, pos1, pos2, pos3, color, lightmap, normal);
     }
 
     private static class Cluster {
 
-        private BlockPos anchor;
-        private Map<MergeEntry, AxisDirection> visibleFaces;
-        private Set<MergeEntry> visibleEdges;
+        private @Nullable BlockPos anchor;
+        private final Map<MergeEntry, AxisDirection> visibleFaces;
+        private final Set<MergeEntry> visibleEdges;
 
         public Cluster() {
             visibleEdges = new HashSet<>();
@@ -253,8 +245,8 @@ public class BlockClusterOutline extends Outline {
 
     private static class MergeEntry {
 
-        private Axis axis;
-        private BlockPos pos;
+        private final Axis axis;
+        private final BlockPos pos;
 
         public MergeEntry(Axis axis, BlockPos pos) {
             this.axis = axis;
@@ -265,10 +257,9 @@ public class BlockClusterOutline extends Outline {
         public boolean equals(Object o) {
             if (this == o)
                 return true;
-            if (!(o instanceof MergeEntry))
+            if (!(o instanceof MergeEntry other))
                 return false;
 
-            MergeEntry other = (MergeEntry) o;
             return this.axis == other.axis && this.pos.equals(other.pos);
         }
 

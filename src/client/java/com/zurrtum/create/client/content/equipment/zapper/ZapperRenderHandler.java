@@ -5,11 +5,6 @@ import com.mojang.math.Axis;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.content.equipment.zapper.ZapperItem;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,10 +12,15 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class ZapperRenderHandler extends ShootableGadgetRenderHandler {
 
-    public List<LaserBeam> cachedBeams;
+    public @Nullable List<LaserBeam> cachedBeams;
 
     @Override
     protected boolean appliesTo(ItemStack stack) {

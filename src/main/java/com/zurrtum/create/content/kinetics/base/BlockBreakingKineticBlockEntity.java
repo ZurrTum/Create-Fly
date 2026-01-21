@@ -15,6 +15,7 @@ import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,7 +25,7 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     protected int ticksUntilNextProgress;
     protected int destroyProgress;
     protected int breakerId = -NEXT_BREAKER_ID.incrementAndGet();
-    protected BlockPos breakingPos;
+    protected @Nullable BlockPos breakingPos;
 
     public BlockBreakingKineticBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -127,6 +128,7 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
         return isBreakable(stateToBreak, blockHardness);
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isBreakable(BlockState stateToBreak, float blockHardness) {
         return !(stateToBreak.liquid() || stateToBreak.getBlock() instanceof AirBlock || blockHardness == -1 || stateToBreak.is(AllBlockTags.NON_BREAKABLE));
     }

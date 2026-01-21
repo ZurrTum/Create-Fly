@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 @SuppressWarnings("unchecked")
+@Deprecated(forRemoval = true)
 public class DefaultSuperByteBuffer implements SuperByteBuffer {
 
     protected ByteBuffer template;
@@ -63,7 +64,6 @@ public class DefaultSuperByteBuffer implements SuperByteBuffer {
         // Vanilla issue, endianness does not carry over into sliced buffers - fixed by forge only
         rendered.order(ByteOrder.nativeOrder());
 
-        drawState.format().getVertexSize();
         formatSize = drawState.format().getVertexSize();
         int size = drawState.vertexCount() * formatSize;
 
@@ -402,6 +402,7 @@ public class DefaultSuperByteBuffer implements SuperByteBuffer {
         return WORLD_LIGHT_CACHE.computeIfAbsent(pos.asLong(), $ -> LevelRenderer.getLightCoords(world, pos));
     }
 
+    @Nullable
     @Override
     public SuperByteBuffer rotate(Quaternionfc quaternionfc) {
         return null;

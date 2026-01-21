@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.content.contraptions.actors.contraptionControls.ControlsSlot;
 import com.zurrtum.create.client.content.contraptions.actors.roller.RollerValueBox;
 import com.zurrtum.create.client.content.fluids.pipes.SmartPipeFilterSlot;
@@ -33,7 +34,6 @@ import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockE
 import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.core.Direction;
@@ -45,13 +45,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends BlockEntityBehaviour<SmartBlockEntity> implements ValueSettingsBehaviour {
     public static final BehaviourType<FilteringBehaviour<?>> TYPE = new BehaviourType<>();
     protected T behaviour;
     protected ValueBoxTransform slotPositioning;
 
-    public MutableComponent customLabel;
+    public @Nullable MutableComponent customLabel;
 
     @SuppressWarnings("unchecked")
     public FilteringBehaviour(SmartBlockEntity be, ValueBoxTransform slot) {

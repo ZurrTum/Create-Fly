@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -41,9 +42,10 @@ public class CogwheelBlockItem extends BlockItem {
         integratedCogHelperId = PlacementHelpers.register(large ? new IntegratedLargeCogHelper() : new IntegratedSmallCogHelper());
     }
 
+    @Nullable
     public static InteractionResult onItemUseFirst(
         Level world,
-        Player player,
+        @Nullable Player player,
         ItemStack stack,
         InteractionHand hand,
         BlockHitResult ray,

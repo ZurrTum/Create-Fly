@@ -31,6 +31,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -41,10 +42,10 @@ public class SchematicAndQuillHandler {
 
     private final Object outlineSlot = new Object();
 
-    public BlockPos firstPos;
-    public BlockPos secondPos;
-    private BlockPos selectedPos;
-    private Direction selectedFace;
+    public @Nullable BlockPos firstPos;
+    public @Nullable BlockPos secondPos;
+    private @Nullable BlockPos selectedPos;
+    private @Nullable Direction selectedFace;
     private int range = 10;
 
     public boolean mouseScrolled(Minecraft mc, double delta) {
@@ -180,7 +181,7 @@ public class SchematicAndQuillHandler {
         return new AABB(Vec3.atLowerCornerOf(firstPos), Vec3.atLowerCornerOf(secondPos)).expandTowards(1, 1, 1);
     }
 
-    private boolean isActive(Minecraft mc) {
+    private boolean isActive(@Nullable Minecraft mc) {
         return mc != null && mc.level != null && mc.screen == null && mc.player.getMainHandItem().is(AllItems.SCHEMATIC_AND_QUILL);
     }
 

@@ -24,7 +24,7 @@ public class FluidNetwork {
     Level world;
     BlockFace start;
 
-    Supplier<FluidInventory> sourceSupplier;
+    Supplier<@Nullable FluidInventory> sourceSupplier;
     @Nullable FluidInventory source = null;
     int transferSpeed;
 
@@ -36,7 +36,7 @@ public class FluidNetwork {
     List<Pair<BlockFace, FlowSource>> targets;
     Map<BlockPos, WeakReference<FluidTransportBehaviour>> cache;
 
-    public FluidNetwork(Level world, BlockFace location, Supplier<FluidInventory> sourceSupplier) {
+    public FluidNetwork(Level world, BlockFace location, Supplier<@Nullable FluidInventory> sourceSupplier) {
         this.world = world;
         this.start = location;
         this.sourceSupplier = sourceSupplier;
@@ -122,7 +122,7 @@ public class FluidNetwork {
                     }
 
                     // Give pipe end a chance to init connections
-                    if (!adjacent.source.isPresent() && !adjacent.determineSource(world, blockFace.getPos())) {
+                    if (adjacent.source.isEmpty() && !adjacent.determineSource(world, blockFace.getPos())) {
                         canRemove = false;
                         continue;
                     }
@@ -155,7 +155,7 @@ public class FluidNetwork {
 
         if (targets.isEmpty())
             return;
-        for (Pair<BlockFace, FlowSource> pair : targets) {
+        for (Pair<BlockFace, @Nullable FlowSource> pair : targets) {
             if (pair.getSecond() != null && world.getGameTime() % 40 != 0)
                 continue;
             PipeConnection pipeConnection = get(pair.getFirst());
@@ -183,7 +183,7 @@ public class FluidNetwork {
                     toTransfer++;
                     remainder--;
                 }
-                @Nullable FluidInventory targetHandlerProvider = pair.getSecond().provideHandler();
+                FluidInventory targetHandlerProvider = pair.getSecond().provideHandler();
                 if (targetHandlerProvider == null) {
                     iterator.remove();
                     continue;

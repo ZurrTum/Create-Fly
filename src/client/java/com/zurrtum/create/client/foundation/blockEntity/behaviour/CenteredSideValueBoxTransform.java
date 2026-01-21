@@ -1,16 +1,15 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
 import com.zurrtum.create.catnip.math.VecHelper;
-
-import java.util.function.BiPredicate;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.function.BiPredicate;
+
 public class CenteredSideValueBoxTransform extends ValueBoxTransform.Sided {
 
-    private BiPredicate<BlockState, Direction> allowedDirections;
+    private final BiPredicate<BlockState, Direction> allowedDirections;
 
     public CenteredSideValueBoxTransform() {
         this((b, d) -> true);

@@ -35,11 +35,11 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     private static final int MAX_SIZE = 3;
 
-    public FluidInventory fluidCapability;
+    public @Nullable FluidInventory fluidCapability;
     protected boolean forceFluidLevelUpdate;
     protected FluidTank tankInventory;
-    protected BlockPos controller;
-    protected BlockPos lastKnownPos;
+    protected @Nullable BlockPos controller;
+    protected @Nullable BlockPos lastKnownPos;
     protected boolean updateConnectivity;
     protected boolean updateCapability;
     public boolean window;
@@ -54,7 +54,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     protected boolean queuedSync;
 
     // For rendering purposes only
-    private LerpedFloat fluidLevel;
+    private @Nullable LerpedFloat fluidLevel;
 
     public FluidTankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -129,6 +129,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     @Override
+    @Nullable
     public BlockPos getLastKnownPos() {
         return lastKnownPos;
     }
@@ -215,6 +216,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @SuppressWarnings("unchecked")
     @Override
+    @Nullable
     public FluidTankBlockEntity getControllerBE() {
         if (isController() || !hasLevel())
             return this;
@@ -524,6 +526,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
         return AllConfigs.server().fluids.fluidTankMaxHeight.get();
     }
 
+    @Nullable
     public LerpedFloat getFluidLevel() {
         return fluidLevel;
     }
@@ -565,7 +568,8 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     @Override
-    public Object modifyExtraData(Object data) {
+    @Nullable
+    public Object modifyExtraData(@Nullable Object data) {
         if (data instanceof Boolean windows) {
             windows |= window;
             return windows;

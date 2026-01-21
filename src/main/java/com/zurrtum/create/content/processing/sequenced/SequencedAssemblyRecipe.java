@@ -30,6 +30,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -190,6 +191,7 @@ public record SequencedAssemblyRecipe(
                 }
             }
 
+            @Nullable
             private static Consumer<JsonElement> getReplace(JsonObject target, String id) {
                 for (Map.Entry<String, JsonElement> entry : target.entrySet()) {
                     JsonElement value = entry.getValue();
@@ -204,6 +206,7 @@ public record SequencedAssemblyRecipe(
                 return null;
             }
 
+            @Nullable
             private static Consumer<JsonElement> getReplace(JsonArray target, String id) {
                 for (int i = 0, size = target.size(); i < size; i++) {
                     JsonElement value = target.get(i);
@@ -218,6 +221,7 @@ public record SequencedAssemblyRecipe(
                 return null;
             }
 
+            @Nullable
             private static Consumer<JsonElement> getReplace(JsonElement target, String id) {
                 if (target instanceof JsonObject object) {
                     return getReplace(object, id);

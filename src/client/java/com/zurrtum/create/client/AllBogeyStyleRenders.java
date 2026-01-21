@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 public class AllBogeyStyleRenders {
     public static final Map<Identifier, Map<BogeySize, SizeRenderer>> ALL = new HashMap<>();
 
+    @Nullable
     public static BogeyRenderState getRenderData(
         BogeyStyle style,
         BogeySize size,

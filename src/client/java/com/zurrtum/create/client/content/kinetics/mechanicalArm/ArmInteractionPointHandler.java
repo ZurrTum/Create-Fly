@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,12 +32,17 @@ import java.util.List;
 public class ArmInteractionPointHandler {
 
     static List<ArmInteractionPoint> currentSelection = new ArrayList<>();
-    static ItemStack currentItem;
+    static @Nullable ItemStack currentItem;
 
     static long lastBlockPos = -1;
 
-
-    public static InteractionResult rightClickingBlocksSelectsThem(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult hit) {
+    @Nullable
+    public static InteractionResult rightClickingBlocksSelectsThem(
+        Level world,
+        @Nullable LocalPlayer player,
+        InteractionHand hand,
+        BlockHitResult hit
+    ) {
         if (currentItem == null)
             return null;
         if (player != null && player.isSpectator())
@@ -72,9 +78,6 @@ public class ArmInteractionPointHandler {
     }
 
     public static void flushSettings(LocalPlayer player, BlockPos pos) {
-        if (currentSelection == null)
-            return;
-
         int removed = 0;
         for (Iterator<ArmInteractionPoint> iterator = currentSelection.iterator(); iterator.hasNext(); ) {
             ArmInteractionPoint point = iterator.next();
@@ -138,7 +141,7 @@ public class ArmInteractionPointHandler {
         BlockPos pos = result.getBlockPos();
 
         BlockEntity be = mc.level.getBlockEntity(pos);
-        if (!(be instanceof ArmBlockEntity)) {
+        if (!(be instanceof ArmBlockEntity arm)) {
             lastBlockPos = -1;
             currentSelection.clear();
             return;
@@ -146,7 +149,6 @@ public class ArmInteractionPointHandler {
 
         if (lastBlockPos == -1 || lastBlockPos != pos.asLong()) {
             currentSelection.clear();
-            ArmBlockEntity arm = (ArmBlockEntity) be;
             arm.inputs.forEach(ArmInteractionPointHandler::put);
             arm.outputs.forEach(ArmInteractionPointHandler::put);
             lastBlockPos = pos.asLong();
@@ -191,6 +193,7 @@ public class ArmInteractionPointHandler {
         return false;
     }
 
+    @Nullable
     private static ArmInteractionPoint getSelected(BlockPos pos) {
         for (ArmInteractionPoint point : currentSelection)
             if (point.getPos().equals(pos))

@@ -1,10 +1,10 @@
 package com.zurrtum.create.foundation.advancement;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.foundation.advancement.CreateTrigger.Conditions;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.CriterionTrigger.Listener;
 import net.minecraft.core.BlockPos;
@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.UUID;
 public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     public static final BehaviourType<AdvancementBehaviour> TYPE = new BehaviourType<>();
 
-    private UUID playerId;
+    private @Nullable UUID playerId;
     private final Set<CreateTrigger> advancements;
 
     public AdvancementBehaviour(SmartBlockEntity be, ServerPlayer player, CreateTrigger... advancements) {
@@ -95,6 +96,7 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
         }
     }
 
+    @Nullable
     private ServerPlayer getPlayer() {
         if (playerId == null)
             return null;
@@ -125,7 +127,7 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
             behaviour.awardPlayer(advancement);
     }
 
-    public static void setPlacedBy(Level worldIn, BlockPos pos, LivingEntity placer) {
+    public static void setPlacedBy(Level worldIn, BlockPos pos, @Nullable LivingEntity placer) {
         if (worldIn.isClientSide())
             return;
         if (!(worldIn.getBlockEntity(pos) instanceof SmartBlockEntity blockEntity)) {

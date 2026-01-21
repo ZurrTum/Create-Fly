@@ -412,7 +412,8 @@ public class BlockHelper {
         }
     }
 
-    public static CompoundTag prepareBlockEntityData(Level level, BlockState blockState, BlockEntity blockEntity) {
+    @Nullable
+    public static CompoundTag prepareBlockEntityData(Level level, BlockState blockState, @Nullable BlockEntity blockEntity) {
         CompoundTag data = null;
         if (blockEntity == null)
             return null;
@@ -437,7 +438,7 @@ public class BlockHelper {
         return NBTProcessors.process(blockState, blockEntity, data, true);
     }
 
-    public static void placeSchematicBlock(Level world, BlockState state, BlockPos target, ItemStack stack, @Nullable CompoundTag data) {
+    public static void placeSchematicBlock(Level world, BlockState state, BlockPos target, @Nullable ItemStack stack, @Nullable CompoundTag data) {
         Block block = state.getBlock();
         BlockEntity existingBlockEntity = world.getBlockEntity(target);
         boolean alreadyPlaced = false;

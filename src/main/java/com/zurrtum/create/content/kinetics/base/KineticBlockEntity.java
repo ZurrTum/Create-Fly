@@ -36,7 +36,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
     public boolean networkDirty;
     public boolean updateSpeed;
     public int preventSpeedUpdate;
-    public SequenceContext sequenceContext;
+    public @Nullable SequenceContext sequenceContext;
     public KineticEffectHandler effects;
     protected float speed;
     protected float capacity;

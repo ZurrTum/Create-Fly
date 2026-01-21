@@ -22,6 +22,7 @@ public class BrassTunnelCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
+    @Nullable
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         return direction == Direction.UP ? AllSpriteShifts.BRASS_TUNNEL_TOP : null;
     }

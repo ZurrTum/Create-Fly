@@ -10,6 +10,7 @@ import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 public interface MovementRenderBehaviour {
+    @Nullable
     default MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,

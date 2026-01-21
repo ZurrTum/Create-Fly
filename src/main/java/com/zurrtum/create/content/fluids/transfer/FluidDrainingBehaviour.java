@@ -22,6 +22,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 
     public static final BehaviourType<FluidDrainingBehaviour> TYPE = new BehaviourType<>();
 
-    Fluid fluid;
+    @Nullable Fluid fluid;
 
     // Execution
     Set<BlockPos> validationSet;
@@ -96,7 +97,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             Fluid fluid = Fluids.EMPTY;
 
             if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED)) {
-                emptied = blockState.setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false));
+                emptied = blockState.setValue(BlockStateProperties.WATERLOGGED, Boolean.FALSE);
                 fluid = Fluids.WATER;
             } else if (blockState.getBlock() instanceof LiquidBlock flowingFluid) {
                 emptied = Blocks.AIR.defaultBlockState();

@@ -1,12 +1,12 @@
 package com.zurrtum.create.content.logistics.vault;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.api.packager.InventoryIdentifier;
 import com.zurrtum.create.foundation.block.NeighborChangeListeningBlock;
 import com.zurrtum.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventory;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.BitSet;
 import java.util.List;
@@ -35,12 +36,12 @@ import java.util.function.Supplier;
 
 public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBlockEntityContainer.Inventory, Clearable {
 
-    protected Supplier<ItemInventory> itemCapability = null;
+    protected @Nullable Supplier<@Nullable ItemInventory> itemCapability = null;
     protected InventoryIdentifier invId;
 
     protected ItemVaultHandler inventory;
-    protected BlockPos controller;
-    protected BlockPos lastKnownPos;
+    protected @Nullable BlockPos controller;
+    protected @Nullable BlockPos lastKnownPos;
     protected boolean updateConnectivity;
     protected int radius;
     protected int length;
@@ -191,6 +192,7 @@ public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     @Override
+    @Nullable
     public BlockPos getLastKnownPos() {
         return lastKnownPos;
     }
@@ -207,6 +209,7 @@ public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @SuppressWarnings("unchecked")
     @Override
+    @Nullable
     public ItemVaultBlockEntity getControllerBE() {
         if (isController())
             return this;

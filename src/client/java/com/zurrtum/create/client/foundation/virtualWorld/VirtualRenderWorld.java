@@ -515,6 +515,7 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 
     // Override Starlight's ExtendedWorld interface methods:
 
+    @Nullable
     public LevelChunk getChunkAtImmediately(final int chunkX, final int chunkZ) {
         return chunkSource.getChunk(chunkX, chunkZ, false);
     }

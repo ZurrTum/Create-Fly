@@ -37,6 +37,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +46,8 @@ import java.util.UUID;
 
 public class CrushingWheelControllerBlockEntity extends SmartBlockEntity implements Clearable {
 
-    public Entity processingEntity;
-    public UUID entityUUID;
+    public @Nullable Entity processingEntity;
+    public @Nullable UUID entityUUID;
     protected boolean searchForEntity;
 
     public ProcessingInventory inventory;
@@ -54,7 +55,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
 
     public CrushingWheelControllerBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.CRUSHING_WHEEL_CONTROLLER, pos, state);
-        inventory = new ProcessingInventory(this::itemInserted, d -> processingEntity == null);
+        inventory = new ProcessingInventory(this::itemInserted, _ -> processingEntity == null);
     }
 
     @Override
@@ -255,7 +256,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2 | 16);
     }
 
-    protected void spawnParticles(ItemStack stack) {
+    protected void spawnParticles(@Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty())
             return;
 
@@ -304,6 +305,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
 
     }
 
+    @Nullable
     public AbstractCrushingRecipe findRecipe() {
         RecipeManager recipeManager = ((ServerLevel) level).recipeAccess();
         SingleRecipeInput input = new SingleRecipeInput(inventory.getItem(0));

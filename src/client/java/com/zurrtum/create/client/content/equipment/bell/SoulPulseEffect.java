@@ -3,12 +3,6 @@ package com.zurrtum.create.client.content.equipment.bell;
 import com.google.common.collect.Streams;
 import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.catnip.math.VecHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnPlacementTypes;
@@ -17,6 +11,12 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SoulPulseEffect {
 
@@ -28,7 +28,7 @@ public class SoulPulseEffect {
     private int ticks;
     public final BlockPos pos;
     public final int distance;
-    public final List<BlockPos> added;
+    public final @Nullable List<BlockPos> added;
 
     public SoulPulseEffect(BlockPos pos, int distance, boolean canOverlap) {
         this.ticks = TICKS_PER_LAYER * distance;
@@ -45,6 +45,7 @@ public class SoulPulseEffect {
         return added == null;
     }
 
+    @Nullable
     public List<BlockPos> tick(Level world) {
         if (finished())
             return null;
@@ -65,7 +66,7 @@ public class SoulPulseEffect {
         return distance - ticks / TICKS_PER_LAYER - 1;
     }
 
-    public List<BlockPos> getPotentialSoulSpawns(Level world) {
+    public List<BlockPos> getPotentialSoulSpawns(@Nullable Level world) {
         if (world == null)
             return new ArrayList<>();
 
@@ -76,7 +77,7 @@ public class SoulPulseEffect {
         return world.getBrightness(LightLayer.BLOCK, at) < 1;
     }
 
-    public static boolean canSpawnSoulAt(Level world, BlockPos at, boolean ignoreLight) {
+    public static boolean canSpawnSoulAt(@Nullable Level world, BlockPos at, boolean ignoreLight) {
         EntityType<?> dummy = EntityType.ZOMBIE;
         double dummyWidth = 0.2, dummyHeight = 0.75;
         double w2 = dummyWidth / 2;
@@ -90,7 +91,7 @@ public class SoulPulseEffect {
         )).allMatch(VoxelShape::isEmpty);
     }
 
-    public void spawnParticles(Level world, BlockPos at) {
+    public void spawnParticles(@Nullable Level world, BlockPos at) {
         if (world == null || !world.isClientSide())
             return;
 

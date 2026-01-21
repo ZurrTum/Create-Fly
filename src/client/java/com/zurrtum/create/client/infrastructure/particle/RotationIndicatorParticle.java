@@ -16,6 +16,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class RotationIndicatorParticle extends SimpleAnimatedParticle {
 
@@ -87,6 +88,7 @@ public class RotationIndicatorParticle extends SimpleAnimatedParticle {
             this.spriteSet = animatedSprite;
         }
 
+        @Nullable
         public Particle createParticle(
             RotationIndicatorParticleData data,
             ClientLevel worldIn,

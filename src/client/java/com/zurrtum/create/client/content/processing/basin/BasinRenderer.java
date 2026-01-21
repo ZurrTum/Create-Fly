@@ -18,7 +18,7 @@ import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -55,7 +55,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         BasinRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         float fluidLevel = updateFluids(be, state, tickProgress);
@@ -233,11 +233,11 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
     public static class BasinRenderState extends SmartRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public RenderType layer;
         public float yMin, yMax, zMin, zMax;
-        public List<FluidRenderData> fluids;
+        public @Nullable List<FluidRenderData> fluids;
         public float ingredientYRot, ingredientXRot;
-        public IngredientRenderData[] ingredients;
+        public IngredientRenderData @Nullable [] ingredients;
         public float outputYRot;
-        public List<OutputItemRenderData> outputs;
+        public @Nullable List<OutputItemRenderData> outputs;
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

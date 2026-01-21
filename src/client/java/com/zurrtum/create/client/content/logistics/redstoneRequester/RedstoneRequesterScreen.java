@@ -26,6 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,10 +34,10 @@ import java.util.List;
 
 public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<RedstoneRequesterMenu> {
 
-    private AddressEditBox addressBox;
+    private @Nullable AddressEditBox addressBox;
     private IconButton confirmButton;
     private List<Rect2i> extraAreas = Collections.emptyList();
-    private List<Integer> amounts = new ArrayList<>();
+    private final List<Integer> amounts = new ArrayList<>();
 
     private IconButton dontAllowPartial;
     private IconButton allowPartial;
@@ -59,6 +60,7 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
             amounts.set(i, Math.max(1, stacks.get(i).count));
     }
 
+    @Nullable
     public static RedstoneRequesterScreen create(
         Minecraft mc,
         MenuType<RedstoneRequesterBlockEntity> type,

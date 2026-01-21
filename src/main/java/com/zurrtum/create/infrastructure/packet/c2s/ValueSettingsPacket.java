@@ -16,10 +16,13 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public record ValueSettingsPacket(
-    BlockPos pos, int row, int value, InteractionHand interactHand, BlockHitResult hitResult, Direction side, boolean ctrlDown, int behaviourIndex
+    BlockPos pos, int row, int value, @Nullable InteractionHand interactHand, @Nullable BlockHitResult hitResult, Direction side, boolean ctrlDown,
+    int behaviourIndex
 ) implements Packet<ServerGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, ValueSettingsPacket> CODEC = CatnipLargerStreamCodecs.composite(
         BlockPos.STREAM_CODEC,
         ValueSettingsPacket::pos,

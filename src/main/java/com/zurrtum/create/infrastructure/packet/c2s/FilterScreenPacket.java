@@ -15,6 +15,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jspecify.annotations.Nullable;
 
 public record FilterScreenPacket(Option option, @Nullable CompoundTag data) implements Packet<ServerGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, FilterScreenPacket> CODEC = StreamCodec.composite(
         Option.STREAM_CODEC,
         FilterScreenPacket::option,

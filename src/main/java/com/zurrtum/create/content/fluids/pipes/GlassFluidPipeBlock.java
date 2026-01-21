@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import org.jspecify.annotations.Nullable;
 
 public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPipeBlockEntity>, SimpleWaterloggedBlock, SpecialBlockItemRequirement {
 
@@ -64,7 +65,7 @@ public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPi
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity be) {
         return ItemRequirement.of(AllBlocks.FLUID_PIPE.defaultBlockState(), be);
     }
 

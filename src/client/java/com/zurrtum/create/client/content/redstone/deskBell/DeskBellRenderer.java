@@ -11,7 +11,7 @@ import com.zurrtum.create.content.redstone.deskBell.DeskBellBlock;
 import com.zurrtum.create.content.redstone.deskBell.DeskBellBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -37,7 +37,7 @@ public class DeskBellRenderer extends SmartBlockEntityRenderer<DeskBellBlockEnti
         DeskBellRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         float p = be.animation.getValue(tickProgress);
@@ -68,7 +68,7 @@ public class DeskBellRenderer extends SmartBlockEntityRenderer<DeskBellBlockEnti
     }
 
     public static class DeskBellRenderState extends SmartRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
-        public RenderType layer;
+        public @Nullable RenderType layer;
         public float yRot;
         public float xRot;
         public SuperByteBuffer plunger;

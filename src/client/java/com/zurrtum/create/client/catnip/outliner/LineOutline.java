@@ -35,10 +35,9 @@ public class LineOutline extends Outline {
 
         VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
         params.loadColor(colorTemp);
-        Vector4f color = colorTemp;
         int lightmap = params.lightmap;
         boolean disableLineNormals = params.disableLineNormals;
-        renderInner(ms, consumer, camera, pt, width, color, lightmap, disableLineNormals);
+        renderInner(ms, consumer, camera, pt, width, colorTemp, lightmap, disableLineNormals);
     }
 
     protected void renderInner(
@@ -57,7 +56,7 @@ public class LineOutline extends Outline {
     public static class EndChasingLineOutline extends LineOutline {
         private float progress = 0;
         private float prevProgress = 0;
-        private boolean lockStart;
+        private final boolean lockStart;
 
         private final Vector3d startTemp = new Vector3d(0, 0, 0);
 

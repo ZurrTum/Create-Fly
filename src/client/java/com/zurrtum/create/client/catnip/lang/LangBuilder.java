@@ -15,6 +15,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -197,6 +198,7 @@ public class LangBuilder {
         tooltip.accept(component());
     }
 
+    @Contract(" -> fail")
     private void assertComponent() {
         if (component == null)
             throw new IllegalStateException("No components were added to builder");

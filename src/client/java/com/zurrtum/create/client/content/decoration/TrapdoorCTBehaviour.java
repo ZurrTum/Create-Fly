@@ -26,7 +26,7 @@ public class TrapdoorCTBehaviour extends ConnectedTextureBehaviour.Base {
         BlockPos pos,
         BlockPos otherPos,
         Direction face,
-        Direction primaryOffset,
+        @Nullable Direction primaryOffset,
         Direction secondaryOffset
     ) {
         return state.getBlock() == other.getBlock() && TrainTrapdoorBlock.isConnected(

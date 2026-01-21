@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class PotatoProjectileRenderer extends EntityRenderer<PotatoProjectileEntity, PotatoProjectileRenderer.PotatoProjectileState> {
     protected final ItemModelResolver itemModelManager;
@@ -70,7 +71,7 @@ public class PotatoProjectileRenderer extends EntityRenderer<PotatoProjectileEnt
         public ItemStackRenderState item;
         public float translateY;
         public PotatoProjectileRenderMode mode;
-        public PotatoProjectileTransform<PotatoProjectileRenderMode> transformer;
+        public @Nullable PotatoProjectileTransform<PotatoProjectileRenderMode> transformer;
         public float pt;
         public AABB box;
         public Entity camera;

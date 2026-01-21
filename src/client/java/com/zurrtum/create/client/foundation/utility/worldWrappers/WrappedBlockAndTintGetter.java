@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
+import org.jspecify.annotations.Nullable;
 
 public class WrappedBlockAndTintGetter implements BlockAndTintGetter {
     protected final BlockAndTintGetter wrapped;
@@ -17,6 +18,7 @@ public class WrappedBlockAndTintGetter implements BlockAndTintGetter {
     }
 
     @Override
+    @Nullable
     public BlockEntity getBlockEntity(BlockPos pos) {
         return wrapped.getBlockEntity(pos);
     }

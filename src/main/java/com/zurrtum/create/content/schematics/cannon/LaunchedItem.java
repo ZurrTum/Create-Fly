@@ -11,10 +11,6 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.HolderGetter;
@@ -33,6 +29,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public abstract class LaunchedItem {
 
@@ -105,12 +105,12 @@ public abstract class LaunchedItem {
 
     public static class ForBlockState extends LaunchedItem {
         public BlockState state;
-        public CompoundTag data;
+        public @Nullable CompoundTag data;
 
         ForBlockState() {
         }
 
-        public ForBlockState(BlockPos start, BlockPos target, ItemStack stack, BlockState state, CompoundTag data) {
+        public ForBlockState(BlockPos start, BlockPos target, ItemStack stack, BlockState state, @Nullable CompoundTag data) {
             super(start, target, stack);
             this.state = state;
             this.data = data;
@@ -129,7 +129,7 @@ public abstract class LaunchedItem {
             }
         }
 
-        public static LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
+        public static @Nullable LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
             return view.read("BlockState", BlockState.CODEC).map(state -> {
                 ForBlockState result = new ForBlockState();
                 result.read(view, holderGetter, state);
@@ -169,7 +169,7 @@ public abstract class LaunchedItem {
             view.putIntArray("Casing", Arrays.stream(casings).mapToInt(CasingType::ordinal).toArray());
         }
 
-        public static LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
+        public static @Nullable LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
             return view.read("Length", Codec.INT).map(length -> {
                 ForBelt result = new ForBelt();
                 result.read(view, holderGetter, length);
@@ -219,8 +219,8 @@ public abstract class LaunchedItem {
     }
 
     public static class ForEntity extends LaunchedItem {
-        public Entity entity;
-        private CompoundTag deferredTag;
+        public @Nullable Entity entity;
+        private @Nullable CompoundTag deferredTag;
 
         ForEntity() {
         }

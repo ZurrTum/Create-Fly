@@ -8,10 +8,6 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlockEntity.CartMovementMode;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.Queue;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -28,13 +24,17 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Queue;
 
 import static com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlock.RAIL_SHAPE;
 
 public class MountedContraption extends Contraption {
 
     public CartMovementMode rotationMode;
-    public AbstractMinecart connectedCart;
+    public @Nullable AbstractMinecart connectedCart;
 
     public MountedContraption() {
         this(CartMovementMode.ROTATE);
@@ -59,9 +59,7 @@ public class MountedContraption extends Contraption {
 
         Axis axis = state.getValue(RAIL_SHAPE) == RailShape.EAST_WEST ? Axis.X : Axis.Z;
         addBlock(
-            world,
-            pos,
-            Pair.of(
+            world, pos, Pair.of(
                 new StructureBlockInfo(pos, AllBlocks.MINECART_ANCHOR.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_AXIS, axis), null),
                 null
             )
@@ -71,7 +69,7 @@ public class MountedContraption extends Contraption {
     }
 
     @Override
-    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) {
+    protected boolean addToInitialFrontier(Level world, BlockPos pos, @Nullable Direction direction, Queue<BlockPos> frontier) {
         frontier.clear();
         frontier.add(pos.above());
         return true;

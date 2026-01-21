@@ -55,6 +55,7 @@ public class ArrivalSoundQueue {
         return backwards ? tick > min : tick < max;
     }
 
+    @Nullable
     public Pair<Boolean, Integer> getFirstWhistle(CarriageContraptionEntity entity) {
         Integer firstTick = firstTick();
         Integer lastTick = lastTick();
@@ -111,7 +112,7 @@ public class ArrivalSoundQueue {
         return state.getBlock() instanceof WhistleBlock;
     }
 
-    public static void play(CarriageContraptionEntity entity, StructureBlockInfo info) {
+    public static void play(CarriageContraptionEntity entity, @Nullable StructureBlockInfo info) {
         if (info == null)
             return;
         BlockState state = info.state();

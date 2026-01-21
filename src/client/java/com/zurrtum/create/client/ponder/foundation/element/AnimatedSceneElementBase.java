@@ -16,10 +16,11 @@ import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AnimatedSceneElementBase extends PonderElementBase implements AnimatedSceneElement {
 
-    protected Vec3 fadeVec;
+    protected @Nullable Vec3 fadeVec;
     protected LerpedFloat fade;
 
     public AnimatedSceneElementBase() {
@@ -37,7 +38,7 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     }
 
     @Override
-    public void setFadeVec(Vec3 fadeVec) {
+    public void setFadeVec(@Nullable Vec3 fadeVec) {
         this.fadeVec = fadeVec;
     }
 

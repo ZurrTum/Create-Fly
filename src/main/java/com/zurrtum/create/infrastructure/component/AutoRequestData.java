@@ -13,6 +13,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 
 public record AutoRequestData(
     PackageOrderWithCrafts encodedRequest, String encodedTargetAddress, BlockPos targetOffset, String targetDim, boolean isValid
@@ -50,7 +51,8 @@ public record AutoRequestData(
         itemStack.set(AllDataComponents.AUTO_REQUEST_DATA, mutable.toImmutable());
     }
 
-    public static AutoRequestData readFromItem(Level level, Player player, BlockPos position, ItemStack itemStack) {
+    @Nullable
+    public static AutoRequestData readFromItem(Level level, @Nullable Player player, BlockPos position, ItemStack itemStack) {
         AutoRequestData requestData = itemStack.get(AllDataComponents.AUTO_REQUEST_DATA);
         if (requestData == null)
             return null;

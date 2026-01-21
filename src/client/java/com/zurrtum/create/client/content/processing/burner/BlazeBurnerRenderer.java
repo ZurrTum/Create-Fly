@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -48,7 +48,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         BlazeBurnerRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         HeatLevel heatLevel = be.getHeatLevelForRender();
         if (heatLevel == HeatLevel.NONE)
@@ -202,14 +202,14 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         public float headY;
         public float horizontalAngle;
         public SuperByteBuffer blaze;
-        public SuperByteBuffer goggles;
+        public @Nullable SuperByteBuffer goggles;
         public float gogglesHeadY;
-        public HatRenderState hat;
-        public SuperByteBuffer rods;
+        public @Nullable HatRenderState hat;
+        public @Nullable SuperByteBuffer rods;
         public float rodsY;
         public SuperByteBuffer rods2;
         public float rods2Y;
-        public FlameRenderState flame;
+        public @Nullable FlameRenderState flame;
 
         public void render(PoseStack matrices, SubmitNodeCollector queue) {
             queue.submitCustomGeometry(matrices, layer, this);

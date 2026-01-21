@@ -4,6 +4,7 @@ import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -11,8 +12,8 @@ import java.util.function.Consumer;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class EivExclusionZoneHelper {
-    private static Consumer<List<Rect2i>> setExclusionZone;
-    private static Runnable removeExclusionZone;
+    private static @Nullable Consumer<List<Rect2i>> setExclusionZone;
+    private static @Nullable Runnable removeExclusionZone;
 
     public static void setExclusionZone(List<Rect2i> extraAreas) {
         if (setExclusionZone != null) {

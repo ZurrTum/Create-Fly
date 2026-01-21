@@ -14,10 +14,10 @@ import java.util.function.Function;
 
 public class CachedFluidInventoryBehaviour<T extends SmartBlockEntity> extends BlockEntityBehaviour<T> {
     public static final BehaviourType<CachedFluidInventoryBehaviour<?>> TYPE = new BehaviourType<>();
-    private final Function<T, FluidInventory> factory;
-    private Function<Direction, Storage<FluidVariant>> getter;
+    private final Function<T, @Nullable FluidInventory> factory;
+    private Function<@Nullable Direction, @Nullable Storage<FluidVariant>> getter;
 
-    public CachedFluidInventoryBehaviour(T be, Function<T, FluidInventory> factory) {
+    public CachedFluidInventoryBehaviour(T be, Function<T, @Nullable FluidInventory> factory) {
         super(be);
         this.factory = factory;
         reset();
@@ -27,16 +27,21 @@ public class CachedFluidInventoryBehaviour<T extends SmartBlockEntity> extends B
         return be.getBehaviour(TYPE).get(side);
     }
 
-    public Storage<FluidVariant> get(Direction side) {
+    @Nullable
+    public Storage<FluidVariant> get(@Nullable Direction side) {
         return getter.apply(side);
     }
 
     @SuppressWarnings("unchecked")
-    private Storage<FluidVariant> firstGet(Direction direction) {
+    @Nullable
+    private Storage<FluidVariant> firstGet(@Nullable Direction direction) {
         FluidInventory inventory = factory.apply(blockEntity);
+        if (inventory == null) {
+            return null;
+        }
         Storage<FluidVariant> storage = FluidInventoryStorage.of(inventory, null);
         if (inventory instanceof SidedFluidInventory) {
-            Storage<FluidVariant>[] sides = new Storage[6];
+            @Nullable Storage<FluidVariant>[] sides = new Storage[6];
             getter = side -> {
                 if (side == null) {
                     return storage;
@@ -50,7 +55,7 @@ public class CachedFluidInventoryBehaviour<T extends SmartBlockEntity> extends B
                 }
             };
         } else {
-            getter = side -> storage;
+            getter = _ -> storage;
         }
         return getter.apply(direction);
     }

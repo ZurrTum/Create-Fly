@@ -2,16 +2,16 @@ package com.zurrtum.create.content.logistics;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class BigItemStack {
     public static final Codec<BigItemStack> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -67,7 +67,7 @@ public class BigItemStack {
         return (nullHash(stack) * 31) ^ Integer.hashCode(count);
     }
 
-    int nullHash(Object o) {
+    int nullHash(@Nullable Object o) {
         return o == null ? 0 : o.hashCode();
     }
 

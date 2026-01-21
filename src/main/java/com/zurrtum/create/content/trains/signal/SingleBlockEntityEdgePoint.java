@@ -13,12 +13,14 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
 
     public ResourceKey<Level> blockEntityDimension;
-    public BlockPos blockEntityPos;
+    public @Nullable BlockPos blockEntityPos;
 
+    @Nullable
     public BlockPos getBlockEntityPos() {
         return blockEntityPos;
     }

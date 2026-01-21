@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import org.jspecify.annotations.Nullable;
 
 public class WrenchableDirectionalBlock extends DirectionalBlock implements IWrenchable {
 
@@ -38,6 +39,7 @@ public class WrenchableDirectionalBlock extends DirectionalBlock implements IWre
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
     }

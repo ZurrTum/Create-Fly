@@ -26,11 +26,11 @@ public class TableClothModel extends WrapperBlockStateModel {
     private static final int NORTH_EAST = 0b1100;
     private static final int SOUTH_EAST = 0b1001;
 
-    private final BakedCorner[] corner = new BakedCorner[16];
-    private List<BakedQuad> south;
-    private List<BakedQuad> west;
-    private List<BakedQuad> north;
-    private List<BakedQuad> east;
+    private final @Nullable BakedCorner[] corner = new BakedCorner[16];
+    private @Nullable List<BakedQuad> south;
+    private @Nullable List<BakedQuad> west;
+    private @Nullable List<BakedQuad> north;
+    private @Nullable List<BakedQuad> east;
 
     public TableClothModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked);

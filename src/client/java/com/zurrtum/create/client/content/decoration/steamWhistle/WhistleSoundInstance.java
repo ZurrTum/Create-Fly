@@ -12,7 +12,7 @@ public class WhistleSoundInstance extends AbstractTickableSoundInstance {
 
     private boolean active;
     private int keepAlive;
-    private WhistleSize size;
+    private final WhistleSize size;
 
     public WhistleSoundInstance(WhistleSize size, BlockPos worldPosition) {
         super(

@@ -51,7 +51,7 @@ public class OpenEndedPipe extends FlowSource {
         return CODEC.apply(pos);
     }
 
-    private Level world;
+    private @Nullable Level world;
     private final BlockPos pos;
     private AABB aoe;
 
@@ -245,7 +245,7 @@ public class OpenEndedPipe extends FlowSource {
         }
 
         @Override
-        public int[] getAvailableSlots(Direction side) {
+        public int[] getAvailableSlots(@Nullable Direction side) {
             return SLOTS;
         }
 

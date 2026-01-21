@@ -55,8 +55,8 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     public record ConnectedPort(float chainPosition, @Nullable BlockPos connection, String filter) {
     }
 
-    public Set<BlockPos> connections = new HashSet<>();
-    public Map<BlockPos, ConnectionStats> connectionStats;
+    public @Nullable Set<BlockPos> connections = new HashSet<>();
+    public @Nullable Map<BlockPos, ConnectionStats> connectionStats;
 
     public Map<BlockPos, ConnectedPort> loopPorts = new HashMap<>();
     public Map<BlockPos, ConnectedPort> travelPorts = new HashMap<>();
@@ -69,7 +69,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     public boolean cancelDrops;
     public boolean checkInvalid;
 
-    BlockPos chainDestroyedEffectToSend;
+    @Nullable BlockPos chainDestroyedEffectToSend;
 
     public ChainConveyorBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.CHAIN_CONVEYOR, pos, state);

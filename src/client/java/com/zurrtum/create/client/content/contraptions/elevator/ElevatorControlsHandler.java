@@ -11,11 +11,6 @@ import com.zurrtum.create.content.contraptions.actors.contraptionControls.Contra
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsMovement.ElevatorFloorSelection;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorContraption;
-import org.apache.commons.lang3.tuple.MutablePair;
-
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -27,6 +22,10 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.MutablePair;
+
+import java.lang.ref.WeakReference;
+import java.util.Collection;
 
 public class ElevatorControlsHandler {
 
@@ -36,10 +35,7 @@ public class ElevatorControlsHandler {
 
         @Override
         public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
-            Vec3 offset = getLocalOffset(state);
-            if (offset == null)
-                return false;
-            return localHit.distanceTo(offset) < scale * .85;
+            return localHit.distanceTo(getLocalOffset(state)) < scale * .85;
         }
 
     }

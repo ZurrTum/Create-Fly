@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -61,7 +61,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         NixieTubeRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         state.blockPos = be.getBlockPos();
         state.blockState = be.getBlockState();
@@ -303,8 +303,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public float yRot;
         public float zRot;
         public float zRot2;
-        public TextDrawableState left;
-        public TextDrawableState right;
+        public @Nullable TextDrawableState left;
+        public @Nullable TextDrawableState right;
         public SuperByteBuffer tube;
         public int light;
 
@@ -402,14 +402,14 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public SuperByteBuffer signal;
         public int light;
         public RenderType cubeLayer;
-        public SuperByteBuffer cube;
+        public @Nullable SuperByteBuffer cube;
         public float cubeX;
         public float cubeY;
-        public SuperByteBuffer glow;
+        public @Nullable SuperByteBuffer glow;
         public float glowX;
         public float glowY;
-        public Color signalColor;
-        public Color glowColor;
+        public @Nullable Color signalColor;
+        public @Nullable Color glowColor;
         public boolean additive;
 
         public void render(PoseStack matrices, SubmitNodeCollector queue) {

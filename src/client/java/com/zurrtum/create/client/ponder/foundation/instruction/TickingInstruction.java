@@ -4,7 +4,7 @@ import com.zurrtum.create.client.ponder.foundation.PonderScene;
 
 public abstract class TickingInstruction extends PonderInstruction {
 
-    private boolean blocking;
+    private final boolean blocking;
     protected int totalTicks;
     protected int remainingTicks;
 

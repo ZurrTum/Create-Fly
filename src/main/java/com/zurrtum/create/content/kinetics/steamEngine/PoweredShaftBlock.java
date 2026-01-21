@@ -91,7 +91,7 @@ public class PoweredShaftBlock extends AbstractShaftBlock {
                 continue;
             BlockPos enginePos = pPos.relative(d, 2);
             BlockState engineState = pLevel.getBlockState(enginePos);
-            if (!(engineState.getBlock() instanceof SteamEngineBlock engine))
+            if (!(engineState.getBlock() instanceof SteamEngineBlock))
                 continue;
             if (!SteamEngineBlock.getShaftPos(engineState, enginePos).equals(pPos))
                 continue;

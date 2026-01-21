@@ -8,11 +8,6 @@ import com.zurrtum.create.content.equipment.zapper.terrainzapper.Brush;
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Supplier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -24,10 +19,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Supplier;
 
 public class WorldshaperRenderHandler {
 
-    private static Supplier<Collection<BlockPos>> renderedPositions;
+    private static @Nullable Supplier<Collection<BlockPos>> renderedPositions;
 
     public static void tick(Minecraft mc) {
         gatherSelectedBlocks(mc);

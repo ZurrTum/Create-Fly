@@ -34,6 +34,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,16 +46,16 @@ public class SuperGlueSelectionHandler {
     private static final int HIGHLIGHT = 0x68c586;
     private static final int FAIL = 0xc5b548;
 
-    private Object clusterOutlineSlot = new Object();
-    private Object bbOutlineSlot = new Object();
+    private final Object clusterOutlineSlot = new Object();
+    private final Object bbOutlineSlot = new Object();
     private int clusterCooldown;
 
-    private BlockPos firstPos;
-    private BlockPos hoveredPos;
-    private Set<BlockPos> currentCluster;
+    private @Nullable BlockPos firstPos;
+    private @Nullable BlockPos hoveredPos;
+    private @Nullable Set<BlockPos> currentCluster;
     private int glueRequired;
 
-    private SuperGlueEntity selected;
+    private @Nullable SuperGlueEntity selected;
     private BlockPos soundSourceForRemoval;
 
     public void tick(Minecraft mc) {
@@ -161,8 +162,7 @@ public class SuperGlueSelectionHandler {
 
         hoveredPos = hovered;
 
-        Set<BlockPos> cluster = SuperGlueSelectionHelper.searchGlueGroup(mc.level, firstPos, hoveredPos, true);
-        currentCluster = cluster;
+        currentCluster = SuperGlueSelectionHelper.searchGlueGroup(mc.level, firstPos, hoveredPos, true);
         glueRequired = 1;
     }
 
@@ -170,6 +170,7 @@ public class SuperGlueSelectionHandler {
         return stack.getItem() instanceof SuperGlueItem;
     }
 
+    @Nullable
     private AABB getCurrentSelectionBox() {
         return firstPos == null || hoveredPos == null ? null : new AABB(
             Vec3.atLowerCornerOf(firstPos),

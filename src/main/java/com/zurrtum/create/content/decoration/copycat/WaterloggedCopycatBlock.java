@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FluidState;
+import org.jspecify.annotations.Nullable;
 
 public abstract class WaterloggedCopycatBlock extends CopycatBlock implements ProperWaterloggedBlock {
 
@@ -30,6 +31,7 @@ public abstract class WaterloggedCopycatBlock extends CopycatBlock implements Pr
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return withWater(super.getStateForPlacement(pContext), pContext);
     }

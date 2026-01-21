@@ -68,15 +68,15 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 
     // Printer
     public SchematicPrinter printer;
-    public ItemStack missingItem;
+    public @Nullable ItemStack missingItem;
     public boolean positionNotLoaded;
     public boolean hasCreativeCrate;
     private int printerCooldown;
     private int skipsLeft;
     private boolean blockSkipped;
 
-    public BlockPos previousTarget;
-    public LinkedHashSet<Container> attachedInventories;
+    public @Nullable BlockPos previousTarget;
+    public LinkedHashSet<@Nullable Container> attachedInventories;
     public List<LaunchedItem> flyingBlocks;
     public MaterialChecklist checklist;
 
@@ -581,9 +581,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
     protected boolean shouldPlace(
         BlockPos pos,
         BlockState state,
-        BlockEntity be,
+        @Nullable BlockEntity be,
         BlockState toReplace,
-        BlockState toReplaceOther,
+        @Nullable BlockState toReplaceOther,
         boolean isNormalCube
     ) {
         if (pos.closerThan(getBlockPos(), 2f))
@@ -611,7 +611,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         )) && !placingAir;
     }
 
-    protected boolean shouldIgnoreBlockState(BlockState state, BlockEntity be) {
+    protected boolean shouldIgnoreBlockState(BlockState state, @Nullable BlockEntity be) {
         // Block doesn't have a mapping (Water, lava, etc)
         if (state.getBlock() == Blocks.STRUCTURE_VOID)
             return true;
@@ -734,23 +734,14 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
             return Blocks.AIR.defaultBlockState();
 
         // is highest belt?
-        boolean isLastSegment = false;
         Direction facing = blockState.getValue(BeltBlock.HORIZONTAL_FACING);
         BeltSlope slope = blockState.getValue(BeltBlock.SLOPE);
-        boolean positive = facing.getAxisDirection() == AxisDirection.POSITIVE;
-        boolean start = part == BeltPart.START;
-        boolean end = part == BeltPart.END;
 
-        switch (slope) {
-            case DOWNWARD:
-                isLastSegment = start;
-                break;
-            case UPWARD:
-                isLastSegment = end;
-                break;
-            default:
-                isLastSegment = positive && end || !positive && start;
-        }
+        boolean isLastSegment = switch (slope) {
+            case DOWNWARD -> part == BeltPart.START;
+            case UPWARD -> part == BeltPart.END;
+            default -> facing.getAxisDirection() == AxisDirection.POSITIVE ? part == BeltPart.END : part == BeltPart.START;
+        };
         if (isLastSegment)
             return blockState;
 
@@ -758,7 +749,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
             .setValue(AbstractSimpleShaftBlock.AXIS, slope == BeltSlope.SIDEWAYS ? Axis.Y : facing.getClockWise().getAxis());
     }
 
-    protected void launchBlockOrBelt(BlockPos target, ItemStack icon, BlockState blockState, BlockEntity blockEntity) {
+    protected void launchBlockOrBelt(BlockPos target, ItemStack icon, BlockState blockState, @Nullable BlockEntity blockEntity) {
         if (blockState.is(AllBlocks.BELT)) {
             blockState = stripBeltIfNotLast(blockState);
             if (blockEntity instanceof BeltBlockEntity bbe && blockState.is(AllBlocks.BELT)) {

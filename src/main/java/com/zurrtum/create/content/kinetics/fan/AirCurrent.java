@@ -62,7 +62,7 @@ public class AirCurrent {
         tickAffectedHandlers();
     }
 
-    protected void tickAffectedEntities(Level world) {
+    protected void tickAffectedEntities(@Nullable Level world) {
         for (Iterator<Entity> iterator = caughtEntities.iterator(); iterator.hasNext(); ) {
             Entity entity = iterator.next();
             if (!entity.isAlive() || !entity.getBoundingBox().intersects(bounds) || isPlayerCreativeFlying(entity)) {
@@ -123,7 +123,7 @@ public class AirCurrent {
     }
 
     public void tickAffectedHandlers() {
-        for (Pair<TransportedItemStackHandlerBehaviour, FanProcessingType> pair : affectedItemHandlers) {
+        for (Pair<TransportedItemStackHandlerBehaviour, @Nullable FanProcessingType> pair : affectedItemHandlers) {
             TransportedItemStackHandlerBehaviour handler = pair.getKey();
             Level world = handler.getLevel();
             FanProcessingType processingType = pair.getRight();

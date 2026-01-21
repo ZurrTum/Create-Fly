@@ -145,9 +145,9 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
     }
 
     private byte constrainByte(String name, int min, int max, Object rawValue) throws LuaException {
-        if (!(rawValue instanceof Number))
+        if (!(rawValue instanceof Number num))
             throw LuaValues.badField(name, "number", LuaValues.getType(rawValue));
-        int value = ((Number) rawValue).intValue();
+        int value = num.intValue();
         if (value < min || value > max)
             throw new LuaException("field " + name + " must be in range " + min + "-" + max);
         return (byte) value;

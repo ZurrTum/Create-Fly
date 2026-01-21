@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -53,7 +53,7 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         DepotRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
@@ -64,12 +64,11 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         state.outputs = createOutputStateList(depotBehaviour, itemModelManager, world);
     }
 
-    @Nullable
-    public static DepotItemState[] createIncomingStateList(
+    public static DepotItemState @Nullable [] createIncomingStateList(
         DepotBehaviour depotBehaviour,
         ItemModelResolver itemModelManager,
         float tickProgress,
-        Level world
+        @Nullable Level world
     ) {
         List<TransportedItemStack> incomingList = depotBehaviour.incoming;
         int incomingSize = incomingList.size();
@@ -89,7 +88,11 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
     }
 
     @Nullable
-    public static List<DepotOutputItemState> createOutputStateList(DepotBehaviour depotBehaviour, ItemModelResolver itemModelManager, Level world) {
+    public static List<DepotOutputItemState> createOutputStateList(
+        DepotBehaviour depotBehaviour,
+        ItemModelResolver itemModelManager,
+        @Nullable Level world
+    ) {
         List<DepotOutputItemState> outputs = null;
         for (ItemStack stack : depotBehaviour.processingOutputBuffer) {
             if (stack.isEmpty()) {
@@ -111,8 +114,8 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
     }
 
     public static void renderItemsOf(
-        DepotItemState[] incoming,
-        List<DepotOutputItemState> outputs,
+        DepotItemState @Nullable [] incoming,
+        @Nullable List<DepotOutputItemState> outputs,
         BlockPos pos,
         Vec3 cameraPos,
         SubmitNodeCollector queue,
@@ -199,11 +202,11 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         boolean upright,
         boolean box,
         int count,
-        Random r,
+        @Nullable Random r,
         Vec3 itemPosition,
         Vec3 cameraPos,
         boolean alwaysUpright,
-        BiConsumer<PoseTransformStack, Boolean> transform
+        @Nullable BiConsumer<PoseTransformStack, Boolean> transform
     ) {
         boolean blockItem = state.usesBlockLight();
         var msr = TransformStack.of(ms);
@@ -255,12 +258,12 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
     }
 
     public static class DepotRenderState extends BlockEntityRenderState {
-        public DepotItemState[] incoming;
-        public List<DepotOutputItemState> outputs;
+        public DepotItemState @Nullable [] incoming;
+        public @Nullable List<DepotOutputItemState> outputs;
     }
 
-    public record DepotItemState(ItemStackRenderState state, int angle, Vec3 offset, boolean upright, boolean box, int count) {
-        public static DepotItemState create(ItemModelResolver itemModelManager, TransportedItemStack tis, float partialTicks, Level world) {
+    public record DepotItemState(ItemStackRenderState state, int angle, @Nullable Vec3 offset, boolean upright, boolean box, int count) {
+        public static DepotItemState create(ItemModelResolver itemModelManager, TransportedItemStack tis, float partialTicks, @Nullable Level world) {
             Vec3 offsetVec;
             if (tis.insertedFrom.getAxis().isHorizontal()) {
                 float offset = Mth.lerp(partialTicks, tis.prevBeltPosition, tis.beltPosition);
@@ -285,7 +288,7 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
     }
 
     public record DepotOutputItemState(ItemStackRenderState state, boolean upright, boolean box, int count) {
-        public static DepotOutputItemState create(ItemModelResolver itemModelManager, ItemStack stack, Level world) {
+        public static DepotOutputItemState create(ItemModelResolver itemModelManager, ItemStack stack, @Nullable Level world) {
             ItemStackRenderState state = new ItemStackRenderState();
             state.displayContext = ItemDisplayContext.FIXED;
             itemModelManager.appendItemLayers(state, stack, state.displayContext, world, null, 0);

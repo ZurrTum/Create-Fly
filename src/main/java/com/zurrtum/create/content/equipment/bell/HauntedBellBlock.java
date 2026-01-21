@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class HauntedBellBlock extends AbstractBellBlock<HauntedBellBlockEntity> {
 
@@ -23,7 +24,7 @@ public class HauntedBellBlock extends AbstractBellBlock<HauntedBellBlockEntity> 
     }
 
     @Override
-    protected boolean ring(Level world, BlockPos pos, Direction direction, Player player) {
+    protected boolean ring(Level world, BlockPos pos, Direction direction, @Nullable Player player) {
         boolean ring = super.ring(world, pos, direction, player);
         if (ring && player instanceof ServerPlayer serverPlayer)
             AllAdvancements.HAUNTED_BELL.trigger(serverPlayer);

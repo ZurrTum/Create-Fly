@@ -12,7 +12,7 @@ import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntit
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -43,7 +43,7 @@ public class TableClothRenderer extends SmartBlockEntityRenderer<TableClothBlock
         TableClothRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         state.radians = Mth.DEG_TO_RAD * (180 - be.facing.toYRot());
@@ -113,9 +113,9 @@ public class TableClothRenderer extends SmartBlockEntityRenderer<TableClothBlock
 
     public static class TableClothRenderState extends SmartRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public RenderType layer;
-        public SuperByteBuffer shop;
+        public @Nullable SuperByteBuffer shop;
         public float radians;
-        public DepotOutputItemState[] items;
+        public DepotOutputItemState @Nullable [] items;
         public Vec3 itemPosition;
 
         @Override

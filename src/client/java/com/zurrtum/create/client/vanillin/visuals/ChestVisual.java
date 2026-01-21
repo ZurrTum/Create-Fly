@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.AbstractChestBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.DoubleBlockCombiner;
+import net.minecraft.world.level.block.DoubleBlockCombiner.NeighborCombineResult;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
@@ -61,7 +62,7 @@ public class ChestVisual<T extends BlockEntity & LidBlockEntity> extends Abstrac
     private final Matrix4fc initialPose;
     private final BrightnessCombiner brightnessCombiner = new BrightnessCombiner();
     @Nullable
-    private final DoubleBlockCombiner.NeighborCombineResult<? extends ChestBlockEntity> neighborCombineResult;
+    private final NeighborCombineResult<? extends ChestBlockEntity> neighborCombineResult;
     @Nullable
     private final Float2FloatFunction lidProgress;
 

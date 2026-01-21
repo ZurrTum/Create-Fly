@@ -19,7 +19,8 @@ public class KineticNetwork {
     private float unloadedStress;
     private int unloadedMembers;
 
-    public KineticNetwork() {
+    public KineticNetwork(Long id) {
+        this.id = id;
         sources = new HashMap<>();
         members = new HashMap<>();
     }
@@ -136,8 +137,7 @@ public class KineticNetwork {
             }
             presentCapacity += getActualCapacityOf(be);
         }
-        float newMaxStress = presentCapacity + unloadedCapacity;
-        return newMaxStress;
+        return presentCapacity + unloadedCapacity;
     }
 
     public float calculateStress() {
@@ -150,8 +150,7 @@ public class KineticNetwork {
             }
             presentStress += getActualStressOf(be);
         }
-        float newStress = presentStress + unloadedStress;
-        return newStress;
+        return presentStress + unloadedStress;
     }
 
     public float getActualCapacityOf(KineticBlockEntity be) {

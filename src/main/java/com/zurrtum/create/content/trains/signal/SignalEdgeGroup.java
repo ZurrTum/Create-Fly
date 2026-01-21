@@ -8,6 +8,7 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,7 +26,7 @@ public class SignalEdgeGroup {
     public EdgeGroupColor color;
 
     public Set<Train> trains;
-    public SignalBoundary reserved;
+    public @Nullable SignalBoundary reserved;
 
     public Map<UUID, UUID> intersecting;
     public Set<SignalEdgeGroup> intersectingResolved;
@@ -114,9 +115,9 @@ public class SignalEdgeGroup {
 
         MutableInt mask = new MutableInt(0);
         intersectingResolved.forEach(group -> group.adjacent.stream().map(Create.RAILWAYS.signalEdgeGroups::get).filter(Objects::nonNull)
-            .filter(Predicates.not(intersectingResolved::contains)).forEach(adjacent -> mask.setValue(adjacent.color.strikeFrom(mask.getValue()))));
+            .filter(Predicates.not(intersectingResolved::contains)).forEach(adjacent -> mask.setValue(adjacent.color.strikeFrom(mask.intValue()))));
 
-        EdgeGroupColor newColour = EdgeGroupColor.findNextAvailable(mask.getValue());
+        EdgeGroupColor newColour = EdgeGroupColor.findNextAvailable(mask.intValue());
         if (newColour == color)
             return;
 

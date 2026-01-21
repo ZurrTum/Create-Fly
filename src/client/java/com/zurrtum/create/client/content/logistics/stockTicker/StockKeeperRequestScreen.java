@@ -99,7 +99,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private static final AllGuiTextures HEADER = AllGuiTextures.STOCK_KEEPER_REQUEST_HEADER;
     private static final AllGuiTextures BODY = AllGuiTextures.STOCK_KEEPER_REQUEST_BODY;
     private static final AllGuiTextures FOOTER = AllGuiTextures.STOCK_KEEPER_REQUEST_FOOTER;
-    private static Consumer<String> searchConsumer;
+    private static @Nullable Consumer<String> searchConsumer;
 
     StockTickerBlockEntity blockEntity;
     public LerpedFloat itemScroll = LerpedFloat.linear().startWithValue(0);
@@ -116,25 +116,25 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     int lockY;
 
     public EditBox searchBox;
-    public AddressEditBox addressBox;
+    public @Nullable AddressEditBox addressBox;
 
     int emptyTicks = 0;
     int successTicks = 0;
 
-    public List<List<BigItemStack>> currentItemSource;
+    public @Nullable List<List<BigItemStack>> currentItemSource;
     public List<List<BigItemStack>> displayedItems = new ArrayList<>();
     public List<CategoryEntry> categories = new ArrayList<>();
 
     public List<BigItemStack> itemsToOrder = new ArrayList<>();
     public List<CraftableBigItemStack> recipesToOrder = new ArrayList<>();
 
-    WeakReference<LivingEntity> stockKeeper = new WeakReference<>(null);
-    WeakReference<BlazeBurnerBlockEntity> blaze = new WeakReference<>(null);
+    WeakReference<@Nullable LivingEntity> stockKeeper = new WeakReference<>(null);
+    WeakReference<@Nullable BlazeBurnerBlockEntity> blaze = new WeakReference<>(null);
 
 
     boolean encodeRequester; // Redstone requesters
     ItemStack itemToProgram;
-    List<List<ClipboardEntry>> clipboardItem;
+    @Nullable List<List<ClipboardEntry>> clipboardItem;
 
     private boolean isAdmin;
     private boolean isLocked;
@@ -149,7 +149,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private InventorySummary forcedEntries = new InventorySummary();
     private boolean canRequestCraftingPackage = false;
 
-    private Slot cursorSlot;
+    private @Nullable Slot cursorSlot;
 
     public StockKeeperRequestScreen(StockKeeperRequestMenu container, Inventory inv, Component title) {
         super(container, inv, title, 226, getAppropriateHeight());
@@ -198,6 +198,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         }
     }
 
+    @Nullable
     public static StockKeeperRequestScreen create(
         Minecraft mc,
         MenuType<StockTickerBlockEntity> type,

@@ -11,6 +11,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,12 +52,13 @@ public abstract class MapItemSavedDataMixin implements StationMapData {
     }
 
     @Override
+    @NonNull
     public Map<String, StationMarker> create$getStationMarkers() {
         return create$stationMarkers;
     }
 
     @Override
-    public void create$addStationMarker(StationMarker marker) {
+    public void create$addStationMarker(@NonNull StationMarker marker) {
         create$stationMarkers.put(marker.getId(), marker);
 
         int scaleMultiplier = 1 << scale;
@@ -96,7 +98,7 @@ public abstract class MapItemSavedDataMixin implements StationMapData {
     public abstract boolean isTrackedCountOverLimit(int trackedCount);
 
     @Override
-    public boolean create$toggleStation(LevelAccessor level, BlockPos pos, StationBlockEntity stationBlockEntity) {
+    public boolean create$toggleStation(@NonNull LevelAccessor level, @NonNull BlockPos pos, @NonNull StationBlockEntity stationBlockEntity) {
         double xCenter = pos.getX() + 0.5D;
         double zCenter = pos.getZ() + 0.5D;
         int scaleMultiplier = 1 << scale;

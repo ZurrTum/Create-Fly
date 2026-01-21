@@ -35,16 +35,18 @@ public interface IBE<T extends BlockEntity> extends EntityBlock {
         return getBlockEntityOptional(world, pos).map(action).orElse(InteractionResult.TRY_WITH_EMPTY_HAND);
     }
 
-    default Optional<T> getBlockEntityOptional(BlockGetter world, BlockPos pos) {
+    default Optional<@Nullable T> getBlockEntityOptional(BlockGetter world, BlockPos pos) {
         return Optional.ofNullable(getBlockEntity(world, pos));
     }
 
     @Override
+    @Nullable
     default BlockEntity newBlockEntity(BlockPos p_153215_, BlockState p_153216_) {
         return getBlockEntityType().create(p_153215_, p_153216_);
     }
 
     @Override
+    @Nullable
     default <S extends BlockEntity> BlockEntityTicker<S> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<S> p_153214_) {
         if (SmartBlockEntity.class.isAssignableFrom(getBlockEntityClass()))
             return new SmartBlockEntityTicker<>();

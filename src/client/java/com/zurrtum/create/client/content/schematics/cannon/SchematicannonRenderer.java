@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -56,7 +56,7 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
         SchematicannonRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         Level world = be.getLevel();
         boolean support = VisualizationManager.supportsVisualization(world);
@@ -96,7 +96,7 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     }
 
     @Nullable
-    public List<LaunchedRenderState> getFlyBlocksRenderState(SchematicannonBlockEntity be, Level world, BlockPos pos, float partialTicks) {
+    public List<LaunchedRenderState> getFlyBlocksRenderState(SchematicannonBlockEntity be, @Nullable Level world, BlockPos pos, float partialTicks) {
         List<LaunchedRenderState> blocks = new ArrayList<>();
         Vec3 position = Vec3.atCenterOf(pos.above());
         for (LaunchedItem launched : be.flyingBlocks) {
@@ -214,8 +214,8 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     }
 
     public static class SchematicannonRenderState extends BlockEntityRenderState {
-        public List<LaunchedRenderState> blocks;
-        public SchematicannonRenderData data;
+        public @Nullable List<LaunchedRenderState> blocks;
+        public @Nullable SchematicannonRenderData data;
     }
 
     public static class SchematicannonRenderData implements SubmitNodeCollector.CustomGeometryRenderer {

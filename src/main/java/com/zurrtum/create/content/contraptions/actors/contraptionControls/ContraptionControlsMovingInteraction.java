@@ -14,11 +14,6 @@ import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.infrastructure.packet.c2s.ElevatorTargetFloorPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.ContraptionDisableActorPacket;
-import org.apache.commons.lang3.tuple.MutablePair;
-
-import java.util.Iterator;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
@@ -28,6 +23,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class ContraptionControlsMovingInteraction extends MovingInteractionBehaviour {
     @Override
@@ -39,7 +39,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
     ) {
         Contraption contraption = contraptionEntity.getContraption();
 
-        MutablePair<StructureBlockInfo, MovementContext> actor = contraption.getActorAt(localPos);
+        MutablePair<StructureBlockInfo, @Nullable MovementContext> actor = contraption.getActorAt(localPos);
         if (actor == null)
             return false;
         MovementContext ctx = actor.right;

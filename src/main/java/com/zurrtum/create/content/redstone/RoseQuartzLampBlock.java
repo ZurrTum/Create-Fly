@@ -122,7 +122,7 @@ public class RoseQuartzLampBlock extends Block implements IWrenchable, WeakPower
     }
 
     @Override
-    public int getSignal(BlockState pState, BlockGetter pLevel, BlockPos pPos, Direction pDirection) {
+    public int getSignal(BlockState pState, BlockGetter pLevel, BlockPos pPos, @Nullable Direction pDirection) {
         if (pDirection == null)
             return 0;
         BlockState toState = pLevel.getBlockState(pPos.relative(pDirection.getOpposite()));

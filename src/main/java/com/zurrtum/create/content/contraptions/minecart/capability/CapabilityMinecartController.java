@@ -122,7 +122,7 @@ public class CapabilityMinecartController {
         handleKilledMinecart(world, carts.get(uniqueID), entity.position());
     }
 
-    protected static void handleKilledMinecart(Level world, MinecartController controller, Vec3 removedPos) {
+    protected static void handleKilledMinecart(Level world, @Nullable MinecartController controller, Vec3 removedPos) {
         if (controller == null)
             return;
         for (boolean forward : Iterate.trueAndFalse) {

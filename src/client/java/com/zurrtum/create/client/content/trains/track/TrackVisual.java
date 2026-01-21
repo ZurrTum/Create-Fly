@@ -142,7 +142,7 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
         private final TransformedInstance[] left;
         private final TransformedInstance[] right;
 
-        private @Nullable GirderVisual girder;
+        private final @Nullable GirderVisual girder;
 
         private BezierTrackVisual(BezierConnection bc) {
             girder = bc.hasGirder ? new GirderVisual(bc) : null;

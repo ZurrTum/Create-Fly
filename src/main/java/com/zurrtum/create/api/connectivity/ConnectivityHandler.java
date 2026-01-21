@@ -33,7 +33,7 @@ public class ConnectivityHandler {
     ) {
         PriorityQueue<Pair<Integer, T>> creationQueue = makeCreationQueue();
         Set<BlockPos> visited = new HashSet<>();
-        Direction.Axis mainAxis = frontier.get(0).getMainConnectionAxis();
+        Direction.Axis mainAxis = frontier.getFirst().getMainConnectionAxis();
 
         // essentially, if it's a vertical multi then the search won't be restricted by
         // Y
@@ -49,14 +49,14 @@ public class ConnectivityHandler {
             minZ = Math.min(pos.getZ(), minZ);
         }
         if (mainAxis == Direction.Axis.Y)
-            minX -= frontier.get(0).getMaxWidth();
+            minX -= frontier.getFirst().getMaxWidth();
         if (mainAxis != Direction.Axis.Y)
-            minY -= frontier.get(0).getMaxWidth();
+            minY -= frontier.getFirst().getMaxWidth();
         if (mainAxis == Direction.Axis.Y)
-            minZ -= frontier.get(0).getMaxWidth();
+            minZ -= frontier.getFirst().getMaxWidth();
 
         while (!frontier.isEmpty()) {
-            T part = frontier.remove(0);
+            T part = frontier.removeFirst();
             BlockPos partPos = part.getBlockPos();
             if (visited.contains(partPos))
                 continue;
@@ -377,7 +377,7 @@ public class ConnectivityHandler {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    private static <T extends BlockEntity & IMultiBlockEntityContainer> T checked(BlockEntity be) {
+    private static <T extends BlockEntity & IMultiBlockEntityContainer> T checked(@Nullable BlockEntity be) {
         if (be instanceof IMultiBlockEntityContainer)
             return (T) be;
         return null;

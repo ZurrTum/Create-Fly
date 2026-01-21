@@ -4,9 +4,10 @@ import com.zurrtum.create.content.kinetics.crafter.ConnectedInputHandler.Connect
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 public class CrafterHelper {
-
+    @Nullable
     public static MechanicalCrafterBlockEntity getCrafter(BlockAndTintGetter reader, BlockPos pos) {
         BlockEntity blockEntity = reader.getBlockEntity(pos);
         if (blockEntity instanceof MechanicalCrafterBlockEntity mechanicalCrafterBlockEntity) {
@@ -15,6 +16,7 @@ public class CrafterHelper {
         return null;
     }
 
+    @Nullable
     public static ConnectedInput getInput(BlockAndTintGetter reader, BlockPos pos) {
         MechanicalCrafterBlockEntity crafter = getCrafter(reader, pos);
         return crafter == null ? null : crafter.input;

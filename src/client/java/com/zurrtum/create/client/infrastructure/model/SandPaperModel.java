@@ -103,7 +103,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
 
     @Override
     public void submit(
-        RenderData data,
+        @Nullable RenderData data,
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,
@@ -166,7 +166,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
 
     public static class RenderData {
         LayerRenderState state;
-        ItemStackRenderState item;
+        @Nullable ItemStackRenderState item;
         int itemInUseCount;
         boolean reverseBobbing;
         float bobbing;

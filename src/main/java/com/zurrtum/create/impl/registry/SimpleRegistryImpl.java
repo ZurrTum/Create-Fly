@@ -47,13 +47,12 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
         }
 
         // add to start of list so it's queried first
-        this.providers.add(0, provider);
+        this.providers.addFirst(provider);
         provider.onRegister(this::invalidate);
     }
 
     @Override
     @Nullable
-    @SuppressWarnings("unchecked")
     public synchronized V get(StateHolder<K, ?> state) {
         Objects.requireNonNull(state, "state");
         return this.get(state.owner);
@@ -202,12 +201,14 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
 
         // remove nullable
         @Override
+        @Nullable
         public synchronized List<V> get(StateHolder<K, ?> state) {
             return super.get(state);
         }
 
         private record ProviderWrapper<K, V>(Provider<K, V> wrapped) implements Provider<K, List<V>> {
             @Override
+            @Nullable
             public List<V> get(K object) {
                 V value = this.wrapped.get(object);
                 return value == null ? null : List.of(value);

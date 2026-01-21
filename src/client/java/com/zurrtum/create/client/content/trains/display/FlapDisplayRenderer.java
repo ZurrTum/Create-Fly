@@ -22,7 +22,7 @@ import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Style;
@@ -62,7 +62,7 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         FlapDisplayRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (!be.isController) {
@@ -272,7 +272,7 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
     }
 
     public static class FlapDisplayRenderState extends KineticRenderState {
-        public FlapDisplayData display;
+        public @Nullable FlapDisplayData display;
     }
 
     public static class FlapDisplayData {

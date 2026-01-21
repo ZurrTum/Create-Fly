@@ -18,12 +18,12 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
 
     public static final BehaviourType<FactoryPanelSupportBehaviour> TYPE = new BehaviourType<>();
 
-    private List<FactoryPanelPosition> linkedPanels;
+    private final List<FactoryPanelPosition> linkedPanels;
     private boolean changed;
 
-    private Supplier<Boolean> outputPower;
-    private Supplier<Boolean> isOutput;
-    private Runnable onNotify;
+    private final Supplier<Boolean> outputPower;
+    private final Supplier<Boolean> isOutput;
+    private final Runnable onNotify;
 
     public FactoryPanelSupportBehaviour(SmartBlockEntity be, Supplier<Boolean> isOutput, Supplier<Boolean> outputPower, Runnable onNotify) {
         super(be);

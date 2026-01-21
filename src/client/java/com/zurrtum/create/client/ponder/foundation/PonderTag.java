@@ -25,7 +25,7 @@ public class PonderTag implements ScreenElement {
     @Nullable
     private final Identifier textureIconLocation;
     private final ItemStack mainItem;
-    private final GuiItemRenderBuilder itemIcon;
+    private final @Nullable GuiItemRenderBuilder itemIcon;
 
 
     public PonderTag(Identifier id, @Nullable Identifier textureIconLocation, ItemStack itemIcon, ItemStack mainItem) {

@@ -52,6 +52,7 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         BlockState stateForPlacement = super.getStateForPlacement(ctx);
         Axis prefferedAxis = null;
@@ -149,7 +150,7 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }

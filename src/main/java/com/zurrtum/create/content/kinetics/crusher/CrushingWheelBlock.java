@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlock.VALID;
 
@@ -52,7 +53,7 @@ public class CrushingWheelBlock extends RotatedPillarKineticBlock implements IBE
         super.affectNeighborsAfterRemoval(state, worldIn, pos, isMoving);
     }
 
-    public void updateControllers(BlockState state, Level world, BlockPos pos, Direction side) {
+    public void updateControllers(BlockState state, @Nullable Level world, BlockPos pos, Direction side) {
         if (side.getAxis() == state.getValue(AXIS))
             return;
         if (world == null)
@@ -84,11 +85,7 @@ public class CrushingWheelBlock extends RotatedPillarKineticBlock implements IBE
                     wheelAxis == Axis.X ? 1 : 0,
                     wheelAxis == Axis.Y ? 1 : 0,
                     wheelAxis == Axis.Z ? 1 : 0
-                ).cross(new Vec3(
-                    sideAxis == Axis.X ? 1 : 0,
-                    sideAxis == Axis.Y ? 1 : 0,
-                    sideAxis == Axis.Z ? 1 : 0
-                ));
+                ).cross(new Vec3(sideAxis == Axis.X ? 1 : 0, sideAxis == Axis.Y ? 1 : 0, sideAxis == Axis.Z ? 1 : 0));
 
                 controllerNewDirection = Direction.getApproximateNearest(
                     controllerDirVec.x * controllerADO,

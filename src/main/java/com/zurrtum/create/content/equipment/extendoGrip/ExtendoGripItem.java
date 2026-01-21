@@ -67,19 +67,19 @@ public class ExtendoGripItem extends Item {
                     }
                 }
             } else {
-                applyAttributeModifiers(stack, modifiers, rangeModifier);
+                applyAttributeModifiers(stack, modifiers);
                 if (entity instanceof ServerPlayer serverPlayer) {
                     AllAdvancements.EXTENDO_GRIP.trigger(serverPlayer);
                 }
             }
         } else {
-            applyAttributeModifiers(stack, modifiers, rangeModifier);
+            applyAttributeModifiers(stack, modifiers);
         }
     }
 
-    private static void applyAttributeModifiers(ItemStack stack, ItemAttributeModifiers oldComponent, ItemAttributeModifiers newComponent) {
-        if (oldComponent != newComponent) {
-            stack.set(DataComponents.ATTRIBUTE_MODIFIERS, newComponent);
+    private static void applyAttributeModifiers(ItemStack stack, @Nullable ItemAttributeModifiers oldComponent) {
+        if (oldComponent != rangeModifier) {
+            stack.set(DataComponents.ATTRIBUTE_MODIFIERS, rangeModifier);
         }
     }
 

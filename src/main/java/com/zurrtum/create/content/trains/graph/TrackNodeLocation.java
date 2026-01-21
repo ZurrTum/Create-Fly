@@ -5,11 +5,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
 import io.netty.buffer.ByteBuf;
-
-import java.util.*;
-import java.util.stream.IntStream;
-
-import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,10 +12,15 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class TrackNodeLocation extends Vec3i {
     private static final Codec<TrackNodeLocation> POS_CODEC = Codec.INT_STREAM.comapFlatMap(
@@ -91,7 +91,7 @@ public class TrackNodeLocation extends Vec3i {
         return (getY() + ((getZ() + yOffsetPixels * 31) * 31 + dimension.hashCode()) * 31) * 31 + getX();
     }
 
-    public void write(ValueOutput view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, @Nullable DimensionPalette dimensions) {
         view.store("Pos", POS_CODEC, this);
         if (dimensions != null)
             view.store("D", dimensions, dimension);
@@ -99,7 +99,12 @@ public class TrackNodeLocation extends Vec3i {
             view.putInt("YO", yOffsetPixels);
     }
 
-    public static <T> DataResult<T> encode(final TrackNodeLocation input, final DynamicOps<T> ops, final T empty, DimensionPalette dimensions) {
+    public static <T> DataResult<T> encode(
+        final TrackNodeLocation input,
+        final DynamicOps<T> ops,
+        final T empty,
+        @Nullable DimensionPalette dimensions
+    ) {
         RecordBuilder<T> builder = ops.mapBuilder();
         builder.add("Pos", input, POS_CODEC);
         if (dimensions != null)
@@ -109,19 +114,19 @@ public class TrackNodeLocation extends Vec3i {
         return builder.build(empty);
     }
 
-    public static TrackNodeLocation read(ValueInput view, DimensionPalette dimensions) {
+    public static TrackNodeLocation read(ValueInput view, @Nullable DimensionPalette dimensions) {
         TrackNodeLocation location = view.read("Pos", POS_CODEC).orElseThrow();
         if (dimensions != null)
-            location.dimension = view.read("D", dimensions).orElse(null);
+            location.dimension = view.read("D", dimensions).orElse(Level.OVERWORLD);
         location.yOffsetPixels = view.getIntOr("YO", 0);
         return location;
     }
 
-    public static <T> TrackNodeLocation decode(final DynamicOps<T> ops, final T input, DimensionPalette dimensions) {
+    public static <T> TrackNodeLocation decode(final DynamicOps<T> ops, final T input, @Nullable DimensionPalette dimensions) {
         MapLike<T> map = ops.getMap(input).getOrThrow();
         TrackNodeLocation location = POS_CODEC.decode(ops, map.get("Pos")).getOrThrow().getFirst();
         if (dimensions != null)
-            location.dimension = dimensions.parse(ops, map.get("D")).result().orElse(null);
+            location.dimension = dimensions.parse(ops, map.get("D")).result().orElse(Level.OVERWORLD);
         location.yOffsetPixels = Optional.ofNullable(map.get("YO")).map(value -> ops.getNumberValue(value).getOrThrow().intValue()).orElse(0);
         return location;
     }
@@ -154,9 +159,9 @@ public class TrackNodeLocation extends Vec3i {
 
     public static class DiscoveredLocation extends TrackNodeLocation {
 
-        BezierConnection turn = null;
+        @Nullable BezierConnection turn = null;
         boolean forceNode = false;
-        Vec3 direction;
+        @Nullable Vec3 direction;
         Vec3 normal;
         TrackMaterial materialA;
         TrackMaterial materialB;
@@ -191,7 +196,7 @@ public class TrackNodeLocation extends Vec3i {
             return this;
         }
 
-        public DiscoveredLocation viaTurn(BezierConnection turn) {
+        public DiscoveredLocation viaTurn(@Nullable BezierConnection turn) {
             this.turn = turn;
             if (turn != null)
                 forceNode();
@@ -213,7 +218,7 @@ public class TrackNodeLocation extends Vec3i {
             return this;
         }
 
-        public DiscoveredLocation withDirection(Vec3 direction) {
+        public DiscoveredLocation withDirection(@Nullable Vec3 direction) {
             this.direction = direction == null ? null : direction.normalize();
             return this;
         }
@@ -222,6 +227,7 @@ public class TrackNodeLocation extends Vec3i {
             return turn != null;
         }
 
+        @Nullable
         public BezierConnection getTurn() {
             return turn;
         }
@@ -238,6 +244,7 @@ public class TrackNodeLocation extends Vec3i {
             return this.direction != null && Math.max(direction.dot(this.direction), direction.dot(this.direction.scale(-1))) < 7 / 8f;
         }
 
+        @Nullable
         public Vec3 getDirection() {
             return direction;
         }

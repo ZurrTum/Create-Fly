@@ -90,7 +90,7 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
 
     @Override
     public void submit(
-        LayerRenderState layer,
+        @Nullable LayerRenderState layer,
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,

@@ -43,13 +43,13 @@ public class CarriageContraption extends Contraption {
     public Map<BlockPos, Couple<Boolean>> conductorSeats;
     public ArrivalSoundQueue soundQueue;
 
-    protected MountedStorageManager storageProxy;
+    protected @Nullable MountedStorageManager storageProxy;
 
     // during assembly only
     private int bogeys;
     private boolean sidewaysControls;
-    private BlockPos secondBogeyPos;
-    private List<BlockPos> assembledBlockConductors;
+    private @Nullable BlockPos secondBogeyPos;
+    private final List<BlockPos> assembledBlockConductors;
 
     // render
     public int portalCutoffMin;
@@ -232,6 +232,7 @@ public class CarriageContraption extends Contraption {
         return backwardControls;
     }
 
+    @Nullable
     public BlockPos getSecondBogeyPos() {
         return secondBogeyPos;
     }

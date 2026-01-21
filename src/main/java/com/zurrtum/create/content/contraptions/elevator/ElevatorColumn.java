@@ -60,6 +60,7 @@ public class ElevatorColumn {
 
     public int namesListVersion;
 
+    @SuppressWarnings("NullableProblems")
     public List<IntAttached<Couple<String>>> compileNamesList() {
         return getContacts().stream().map(p -> {
             if (level.getBlockEntity(p) instanceof ElevatorContactBlockEntity ecbe)
@@ -158,6 +159,7 @@ public class ElevatorColumn {
 
     }
 
+    @Nullable
     private static Integer tryValueOf(String floorName) {
         try {
             return Integer.valueOf(floorName, 10);

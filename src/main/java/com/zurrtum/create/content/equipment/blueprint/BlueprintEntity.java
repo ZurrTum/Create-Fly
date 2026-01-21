@@ -490,7 +490,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         Inventory playerInv = player.getInventory();
         int size = playerInv.getContainerSize();
         int[] stacksTaken = new int[size];
-        List<FilterItemStack> requestedItems = new ArrayList<>(9);
+        List<@Nullable FilterItemStack> requestedItems = new ArrayList<>(9);
         List<ItemStack> craftingStacks = new ArrayList<>(9);
         Object2IntLinkedOpenCustomHashMap<ItemStack> missingStacks = BlueprintPreviewPacket.createMap();
         Object2IntLinkedOpenCustomHashMap<ItemStack> availableStacks = BlueprintPreviewPacket.createMap();
@@ -603,7 +603,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
     public class BlueprintSection implements MenuProvider, IInteractionChecker {
         private static final Couple<ItemStack> EMPTY_DISPLAY = Couple.create(ItemStack.EMPTY, ItemStack.EMPTY);
         public int index;
-        Couple<ItemStack> cachedDisplayItems;
+        @Nullable Couple<ItemStack> cachedDisplayItems;
         public boolean inferredIcon = false;
 
         public BlueprintSection(int index) {

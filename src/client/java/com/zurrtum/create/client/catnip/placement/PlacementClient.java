@@ -32,6 +32,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.zurrtum.create.catnip.math.VecHelper.CENTER_OF_ORIGIN;
 import static com.zurrtum.create.catnip.math.VecHelper.getCenterOf;
 
 public class PlacementClient {
@@ -158,7 +159,7 @@ public class PlacementClient {
         float b = .8f;
         float a = progress * progress;
 
-        Vec3 projTarget = VecHelper.projectToPlayerView(getCenterOf(lastTarget), partialTicks);
+        Vec3 projTarget = VecHelper.projectToPlayerView(lastTarget != null ? getCenterOf(lastTarget) : CENTER_OF_ORIGIN, partialTicks);
 
         Vec3 target = new Vec3(projTarget.x, projTarget.y, 0);
         if (projTarget.z > 0)
@@ -256,9 +257,9 @@ public class PlacementClient {
     }
 
     public static void displayGhost(Object slot, PlacementOffset offset) {
-        if (!offset.hasGhostState())
-            return;
-
-        GhostBlocks.getInstance().showGhostState(slot, offset.getTransform().apply(offset.getGhostState())).at(offset.getBlockPos()).breathingAlpha();
+        BlockState ghostState = offset.getGhostState();
+        if (ghostState != null) {
+            GhostBlocks.getInstance().showGhostState(slot, offset.getTransform().apply(ghostState)).at(offset.getBlockPos()).breathingAlpha();
+        }
     }
 }

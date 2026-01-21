@@ -28,6 +28,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE<RedstoneLinkBlockEntity>, RedStoneConnectBlock, NeighborUpdateListeningBlock {
 
@@ -177,7 +178,7 @@ public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, Direction side) {
+    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
         return side != null;
     }
 

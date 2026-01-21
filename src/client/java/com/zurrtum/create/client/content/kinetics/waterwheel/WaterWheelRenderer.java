@@ -140,8 +140,6 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
 
     private static TextureAtlasSprite getSpriteOnSide(BlockState state, Direction side) {
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        if (model == null)
-            return null;
         RandomSource random = RandomSource.create();
         random.setSeed(42L);
         List<BlockModelPart> parts = model.collectParts(random);

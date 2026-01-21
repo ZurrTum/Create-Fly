@@ -4,15 +4,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-
-import java.util.List;
-import java.util.Vector;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+
+import java.util.List;
+import java.util.Vector;
 
 public class Instruction {
     public static final Codec<Instruction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -53,65 +52,33 @@ public class Instruction {
         speed = Math.abs(speed);
         double target = value - currentProgress;
 
-        switch (instruction) {
+        return switch (instruction) {
 
             // Always overshoot, target will stop early
-            case TURN_ANGLE:
-                double degreesPerTick = KineticBlockEntity.convertToAngular(speed);
-                return (int) Math.ceil(target / degreesPerTick) + 2;
-            case TURN_DISTANCE:
-                double metersPerTick = KineticBlockEntity.convertToLinear(speed);
-                return (int) Math.ceil(target / metersPerTick) + 2;
+            case TURN_ANGLE -> (int) Math.ceil(target / KineticBlockEntity.convertToAngular(speed)) + 2;
+            case TURN_DISTANCE -> (int) Math.ceil(target / KineticBlockEntity.convertToLinear(speed)) + 2;
 
             // Timing instructions
-            case DELAY:
-                return (int) target;
-            case AWAIT:
-                return -1;
-            case END:
-            default:
-                break;
-
-        }
-        return 0;
+            case DELAY -> (int) target;
+            case AWAIT -> -1;
+            default -> 0;
+        };
     }
 
     float getTickProgress(float speed) {
-        switch (instruction) {
-
-            case TURN_ANGLE:
-                return KineticBlockEntity.convertToAngular(speed);
-
-            case TURN_DISTANCE:
-                return KineticBlockEntity.convertToLinear(speed);
-
-            case DELAY:
-                return 1;
-
-            case AWAIT:
-            case END:
-            default:
-                break;
-
-        }
-        return 0;
+        return switch (instruction) {
+            case TURN_ANGLE -> KineticBlockEntity.convertToAngular(speed);
+            case TURN_DISTANCE -> KineticBlockEntity.convertToLinear(speed);
+            case DELAY -> 1;
+            default -> 0;
+        };
     }
 
     int getSpeedModifier() {
-        switch (instruction) {
-
-            case TURN_ANGLE:
-            case TURN_DISTANCE:
-                return speedModifier.value;
-
-            case END:
-            case DELAY:
-            case AWAIT:
-            default:
-                break;
-
-        }
-        return 0;
+        return switch (instruction) {
+            case TURN_ANGLE, TURN_DISTANCE -> speedModifier.value;
+            default -> 0;
+        };
     }
 
     OnIsPoweredResult onRedstonePulse() {

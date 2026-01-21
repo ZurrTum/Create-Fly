@@ -71,11 +71,11 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
     public LerpedFloat flag;
 
     public int failedCarriageIndex;
-    public AssemblyException lastException;
+    public @Nullable AssemblyException lastException;
     public DepotBehaviour depotBehaviour;
 
     // for display
-    public UUID imminentTrain;
+    public @Nullable UUID imminentTrain;
     public boolean trainPresent;
     public boolean trainBackwards;
     public boolean trainCanDisassemble;
@@ -85,7 +85,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
     public int flagYRot = -1;
     public boolean flagFlipped;
 
-    public Component lastDisassembledTrainName;
+    public @Nullable Component lastDisassembledTrainName;
     public int lastDisassembledMapColorIndex;
 
     public StationBlockEntity(BlockPos pos, BlockState state) {
@@ -179,11 +179,11 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
 
     public static WorldAttached<Map<BlockPos, BoundingBox>> assemblyAreas = new WorldAttached<>(w -> new HashMap<>());
 
-    public Direction assemblyDirection;
+    public @Nullable Direction assemblyDirection;
     public int assemblyLength;
-    public int[] bogeyLocations;
-    AbstractBogeyBlock<?>[] bogeyTypes;
-    boolean[] upsideDownBogeys;
+    public int @Nullable [] bogeyLocations;
+    AbstractBogeyBlock<?> @Nullable [] bogeyTypes;
+    boolean @Nullable [] upsideDownBogeys;
     public int bogeyCount;
 
     @Override
@@ -408,7 +408,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         BlockPos targetPosition = edgePoint.getGlobalPosition();
         BlockState trackState = edgePoint.getTrackBlockState();
         ITrackBlock track = edgePoint.getTrack();
-        Vec3 trackAxis = track.getTrackAxes(level, targetPosition, trackState).get(0);
+        Vec3 trackAxis = track.getTrackAxes(level, targetPosition, trackState).getFirst();
 
         boolean axisFound = false;
         for (Axis axis : Iterate.axes) {
@@ -567,6 +567,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         return true;
     }
 
+    @Nullable
     public Direction getAssemblyDirection() {
         if (assemblyDirection != null)
             return assemblyDirection;
@@ -696,7 +697,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
             return;
         }
 
-        if (points.size() == 0) {
+        if (points.isEmpty()) {
             exception(new AssemblyException(Component.translatable("create.train_assembly.no_bogeys")), -1);
             return;
         }
@@ -837,7 +838,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         exception(null, -1);
     }
 
-    private void exception(AssemblyException exception, int carriage) {
+    private void exception(@Nullable AssemblyException exception, int carriage) {
         failedCarriageIndex = carriage;
         lastException = exception;
         sendData();

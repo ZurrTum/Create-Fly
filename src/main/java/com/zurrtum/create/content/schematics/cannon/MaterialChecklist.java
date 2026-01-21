@@ -23,7 +23,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WrittenBookContent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -84,19 +83,17 @@ public class MaterialChecklist {
 
         if (blocksNotLoaded) {
             textComponent = Component.literal("\n" + ChatFormatting.RED);
-            textComponent = textComponent.append(Component.translatable("create.materialChecklist.blocksNotLoaded"));
+            textComponent.append(Component.translatable("create.materialChecklist.blocksNotLoaded"));
             pages.add(Filterable.passThrough(textComponent));
         }
 
         List<Item> keys = new ArrayList<>(Sets.union(required.keySet(), damageRequired.keySet()));
-        Collections.sort(
-            keys, (item1, item2) -> {
-                Locale locale = Locale.ENGLISH;
-                String name1 = item1.getName().getString().toLowerCase(locale);
-                String name2 = item2.getName().getString().toLowerCase(locale);
-                return name1.compareTo(name2);
-            }
-        );
+        keys.sort((item1, item2) -> {
+            Locale locale = Locale.ENGLISH;
+            String name1 = item1.getName().getString().toLowerCase(locale);
+            String name2 = item2.getName().getString().toLowerCase(locale);
+            return name1.compareTo(name2);
+        });
 
         textComponent = Component.empty();
         List<Item> completed = new ArrayList<>();

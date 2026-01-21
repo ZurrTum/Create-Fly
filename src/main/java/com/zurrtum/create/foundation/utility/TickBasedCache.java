@@ -29,12 +29,12 @@ public class TickBasedCache<K, V> implements Cache<K, V> {
 
     //
 
-    private Map<K, MutableInt> timestamps = new HashMap<>();
-    private ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
+    private final Map<K, MutableInt> timestamps = new HashMap<>();
+    private final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
 
-    private int ticksUntilTimeout;
-    private boolean resetTimerOnAccess;
-    private boolean clientSide;
+    private final int ticksUntilTimeout;
+    private final boolean resetTimerOnAccess;
+    private final boolean clientSide;
 
     public TickBasedCache(int ticksUntilTimeout, boolean resetTimerOnAccess) {
         this(ticksUntilTimeout, resetTimerOnAccess, false);

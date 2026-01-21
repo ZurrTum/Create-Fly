@@ -50,7 +50,8 @@ public class TankManipulationBehaviour extends CapManipulationBehaviourBase<Flui
     }
 
     @Override
-    protected FluidInventory getCapability(Level world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side) {
+    @Nullable
+    protected FluidInventory getCapability(Level world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Direction side) {
         return FluidHelper.getFluidInventory(world, pos, null, blockEntity, side);
     }
 

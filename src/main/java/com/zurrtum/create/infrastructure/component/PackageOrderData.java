@@ -13,6 +13,7 @@ import java.util.Optional;
 public record PackageOrderData(
     int orderId, int linkIndex, boolean isFinalLink, int fragmentIndex, boolean isFinal, @Nullable PackageOrderWithCrafts orderContext
 ) {
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public PackageOrderData(
         int orderId,
         int linkIndex,
@@ -33,6 +34,7 @@ public record PackageOrderData(
         PackageOrderWithCrafts.CODEC.optionalFieldOf("order_context").forGetter(i -> Optional.ofNullable(i.orderContext))
     ).apply(instance, PackageOrderData::new));
 
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderData> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         PackageOrderData::orderId,

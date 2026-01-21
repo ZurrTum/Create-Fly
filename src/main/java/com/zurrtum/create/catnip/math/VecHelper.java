@@ -30,7 +30,7 @@ public class VecHelper {
         return VecHelper.rotate(vec.subtract(shift), deg, axis).add(shift);
     }
 
-    public static Vec3 rotate(Vec3 vec, double deg, Axis axis) {
+    public static Vec3 rotate(Vec3 vec, double deg, @Nullable Axis axis) {
         if (deg == 0)
             return vec;
         if (vec == Vec3.ZERO)

@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -192,6 +193,7 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T extends BlockEntityBehaviour<?>> T getBehaviour(BehaviourType<T> type) {
         return (T) behaviours.get(type);
     }
@@ -265,6 +267,7 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
         }
     }
 
+    @Nullable
     public List<CreateTrigger> getAwardables() {
         return null;
     }

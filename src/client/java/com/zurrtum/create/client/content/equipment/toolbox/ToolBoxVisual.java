@@ -13,10 +13,9 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
+import net.minecraft.core.Direction;
 
 import java.util.function.Consumer;
-
-import net.minecraft.core.Direction;
 
 public class ToolBoxVisual extends AbstractBlockEntityVisual<ToolboxBlockEntity> implements SimpleDynamicVisual {
 
@@ -70,7 +69,7 @@ public class ToolBoxVisual extends AbstractBlockEntityVisual<ToolboxBlockEntity>
         if (drawerOffset != lastDrawerOffset) {
             for (int offset : Iterate.zeroAndOne) {
                 drawers[offset].setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(-facing.toYRot()).uncenter()
-                    .translate(0, offset * 1 / 8f, -drawerOffset * .175f * (2 - offset)).setChanged();
+                    .translate(0, offset / 8f, -drawerOffset * .175f * (2 - offset)).setChanged();
             }
         }
 

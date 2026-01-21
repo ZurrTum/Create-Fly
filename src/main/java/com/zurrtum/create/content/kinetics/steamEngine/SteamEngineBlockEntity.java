@@ -4,18 +4,14 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.contraptions.bearing.WindmillBearingBlockEntity.RotationDirection;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-
-import java.lang.ref.WeakReference;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -24,13 +20,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class SteamEngineBlockEntity extends SmartBlockEntity {
 
     protected ServerScrollOptionBehaviour<RotationDirection> movementDirection;
 
-    public WeakReference<PoweredShaftBlockEntity> target;
-    public WeakReference<FluidTankBlockEntity> source;
+    public WeakReference<@Nullable PoweredShaftBlockEntity> target;
+    public WeakReference<@Nullable FluidTankBlockEntity> source;
 
     public float prevAngle = 0;
 
@@ -126,6 +126,7 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
         return super.createRenderBoundingBox().inflate(2);
     }
 
+    @Nullable
     public PoweredShaftBlockEntity getShaft() {
         PoweredShaftBlockEntity shaft = target.get();
         if (shaft == null || shaft.isRemoved() || !shaft.canBePoweredBy(worldPosition)) {
@@ -139,6 +140,7 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
         return shaft;
     }
 
+    @Nullable
     public FluidTankBlockEntity getTank() {
         FluidTankBlockEntity tank = source.get();
         if (tank == null || tank.isRemoved()) {

@@ -72,12 +72,12 @@ public abstract class ConfigBase {
     }
 
     public class CValue<V> {
-        private final Function<Builder, ConfigValue<V>> provider;
+        private final Function<Builder, @Nullable ConfigValue<V>> provider;
         @Nullable
         protected ConfigValue<V> value;
         protected String name;
 
-        public CValue(String name, Function<Builder, ConfigValue<V>> provider, String... comment) {
+        public CValue(String name, Function<Builder, @Nullable ConfigValue<V>> provider, String... comment) {
             this.name = name;
             this.provider = builder -> {
                 addComments(builder, comment);

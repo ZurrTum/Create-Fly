@@ -39,6 +39,7 @@ public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlo
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return withWater(defaultBlockState().setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos())), context);
     }

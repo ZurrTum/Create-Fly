@@ -8,6 +8,7 @@ import dan200.computercraft.api.detail.VanillaDetailRegistries;
 import dan200.computercraft.api.lua.LuaException;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.Container;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ public class ComputerUtil {
         return entry.count;
     }
 
-    private static boolean deepEquals(Object fVal, Object iVal) throws LuaException {
+    private static boolean deepEquals(Object fVal, @Nullable Object iVal) throws LuaException {
         // Checks all String, Number, Boolean and null values
         if (Objects.equals(iVal, fVal))
             return true;
@@ -218,6 +219,7 @@ public class ComputerUtil {
         }
 
         // Returns null if not a list or map
+        @Nullable
         static Collection of(Object o) throws LuaException {
             if (o instanceof Map<?, ?> m) {
                 MatchMode mode = MatchMode.parse(m.get("_mode"));
@@ -280,6 +282,7 @@ public class ComputerUtil {
         return true;
     }
 
+    @Nullable
     private static List<Object> toOrderedList(Map<?, ?> m) {
         if (!isArrayLike(m)) {
             return null;
@@ -303,6 +306,7 @@ public class ComputerUtil {
         return result;
     }
 
+    @Nullable
     public static Map<String, ?> getItemDetail(RegistryAccess registryAccess, Container inventory, int slot) throws LuaException {
 
         int maxSlots = inventory.getContainerSize();
@@ -312,6 +316,7 @@ public class ComputerUtil {
         return stack.isEmpty() ? null : VanillaDetailRegistries.ITEM_STACK.getDetails(registryAccess, stack);
     }
 
+    @Nullable
     public static Map<String, ?> getItemDetail(RegistryAccess registryAccess, InventorySummary itemStacks, int slot) throws LuaException {
         List<BigItemStack> stacks = itemStacks.getStacks();
         int maxSlots = stacks.size();

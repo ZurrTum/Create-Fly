@@ -12,8 +12,8 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 public record BlockTransformRenderState(
-    BlockState state, List<BlockModelPart> parts, Matrix3x2f pose, ScreenRectangle bounds, int x0, int y0, int x1, int y1, int padding, float scale,
-    float xRot, float yRot, float zRot, @Nullable ScreenRectangle scissorArea
+    BlockState state, List<BlockModelPart> parts, Matrix3x2f pose, @Nullable ScreenRectangle bounds, int x0, int y0, int x1, int y1, int padding,
+    float scale, float xRot, float yRot, float zRot, @Nullable ScreenRectangle scissorArea
 ) implements PictureInPictureRenderState {
     public static BlockTransformRenderState create(
         GuiGraphics graphics,

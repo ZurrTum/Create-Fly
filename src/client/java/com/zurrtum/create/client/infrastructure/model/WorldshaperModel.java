@@ -14,7 +14,11 @@ import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -138,7 +142,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
 
     @Override
     public void submit(
-        RenderData data,
+        @Nullable RenderData data,
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,
@@ -207,10 +211,10 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
 
     public static class RenderData {
         public ItemTransform transform;
-        public BlockState state;
+        public @Nullable BlockState state;
         public boolean rightHand;
         public boolean inHand;
-        public UsedRenderState used;
+        public @Nullable UsedRenderState used;
 
         @Override
         public boolean equals(Object o) {
@@ -268,9 +272,10 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     }
 
     public interface UsedRenderState {
+        @Nullable
         static UsedRenderState create(
             Minecraft mc,
-            BlockState state,
+            @Nullable BlockState state,
             ItemDisplayContext displayContext,
             @Nullable ClientLevel world,
             @Nullable ItemOwner user,
@@ -289,7 +294,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     }
 
     public record UsedItemRenderState(
-        Lighting diffuseLighting, MultiBufferSource.BufferSource entityVertexConsumers, FeatureRenderDispatcher entityRenderDispatcher,
+        @Nullable Lighting diffuseLighting, @Nullable BufferSource entityVertexConsumers, @Nullable FeatureRenderDispatcher entityRenderDispatcher,
         ItemStackRenderState state
     ) implements UsedRenderState {
         public static UsedItemRenderState create(

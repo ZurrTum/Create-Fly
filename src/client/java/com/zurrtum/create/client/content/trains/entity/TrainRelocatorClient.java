@@ -40,14 +40,14 @@ import java.util.UUID;
 
 public class TrainRelocatorClient {
 
-    static WeakReference<CarriageContraptionEntity> hoveredEntity = new WeakReference<>(null);
-    static UUID relocatingTrain;
+    static WeakReference<@Nullable CarriageContraptionEntity> hoveredEntity = new WeakReference<>(null);
+    static @Nullable UUID relocatingTrain;
     static Vec3 relocatingOrigin;
     static int relocatingEntityId;
 
-    static BlockPos lastHoveredPos;
-    static BezierTrackPointLocation lastHoveredBezierSegment;
-    static Boolean lastHoveredResult;
+    static @Nullable BlockPos lastHoveredPos;
+    static @Nullable BezierTrackPointLocation lastHoveredBezierSegment;
+    static @Nullable Boolean lastHoveredResult;
     static List<Vec3> toVisualise = new ArrayList<>();
 
     public static boolean onClicked(Minecraft mc) {
@@ -220,11 +220,13 @@ public class TrainRelocatorClient {
         return false;
     }
 
+    @Nullable
     private static Train getRelocating() {
         return relocatingTrain == null ? null : Create.RAILWAYS.trains.get(relocatingTrain);
     }
 
-    private static Train getTrainFromEntity(CarriageContraptionEntity carriageContraptionEntity) {
+    @Nullable
+    private static Train getTrainFromEntity(@Nullable CarriageContraptionEntity carriageContraptionEntity) {
         if (carriageContraptionEntity == null)
             return null;
         Carriage carriage = carriageContraptionEntity.getCarriage();

@@ -35,6 +35,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -46,8 +47,8 @@ public class BlueprintOverlayRenderer {
     static boolean empty;
     static boolean noOutput;
     static boolean lastSneakState;
-    static BlueprintSection lastTargetedSection;
-    static BlueprintOverlayShopContext shopContext;
+    static @Nullable BlueprintSection lastTargetedSection;
+    static @Nullable BlueprintOverlayShopContext shopContext;
 
     static Map<ItemStack, ItemStack[]> cachedRenderedFilters = new IdentityHashMap<>();
     static List<Pair<ItemStack, Boolean>> ingredients = new ArrayList<>();
@@ -133,7 +134,7 @@ public class BlueprintOverlayRenderer {
             results.add(entry.stack.copyWithCount(entry.count));
     }
 
-    public static void displayShoppingList(LocalPlayer player, Couple<InventorySummary> bakedList) {
+    public static void displayShoppingList(LocalPlayer player, @Nullable Couple<InventorySummary> bakedList) {
         if (active || bakedList == null)
             return;
         prepareCustomOverlay();
@@ -299,7 +300,7 @@ public class BlueprintOverlayRenderer {
         }
     }
 
-    public static void drawItemStack(GuiGraphics graphics, Minecraft mc, int x, int y, ItemStack itemStack, String count) {
+    public static void drawItemStack(GuiGraphics graphics, Minecraft mc, int x, int y, ItemStack itemStack, @Nullable String count) {
         if (itemStack.getItem() instanceof FilterItem) {
             int step = AnimationTickHolder.getTicks(mc.level) / 10;
             ItemStack[] itemsMatchingFilter = getItemsMatchingFilter(itemStack);

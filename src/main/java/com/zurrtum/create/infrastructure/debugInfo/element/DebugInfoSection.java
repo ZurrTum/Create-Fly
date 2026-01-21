@@ -34,11 +34,11 @@ public record DebugInfoSection(String name, ImmutableList<InfoElement> elements)
     }
 
     public static class Builder {
-        private final Builder parent;
+        private final @Nullable Builder parent;
         private final String name;
         private final ImmutableList.Builder<InfoElement> elements;
 
-        public Builder(Builder parent, String name) {
+        public Builder(@Nullable Builder parent, String name) {
             this.parent = parent;
             this.name = name;
             this.elements = ImmutableList.builder();

@@ -11,9 +11,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class BigOutlines {
-    static BlockHitResult result = null;
+    static @Nullable BlockHitResult result = null;
 
     public static void pick(Minecraft mc) {
         if (!(mc.getCameraEntity() instanceof LocalPlayer player))

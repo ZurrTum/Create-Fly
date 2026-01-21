@@ -16,9 +16,7 @@ public enum PonderPalette {
     FAST(0xff55ff),
 
     INPUT(0x7fcde0),
-    OUTPUT(0xddc166),
-
-    ;
+    OUTPUT(0xddc166);
 
     private final Color color;
 

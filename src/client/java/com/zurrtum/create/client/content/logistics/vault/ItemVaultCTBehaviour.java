@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 public class ItemVaultCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     @Override
+    @Nullable
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         Axis vaultBlockAxis = ItemVaultBlock.getVaultBlockAxis(state);
         boolean small = !ItemVaultBlock.isLarge(state);

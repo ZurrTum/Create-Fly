@@ -8,10 +8,11 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 public record TexturedQuadRenderState(
     Matrix3x2f pose, float left, float right, float top, float bot, int red, int green, int blue, int alpha, float u1, float u2, float v1, float v2,
-    TextureSetup textureSetup, ScreenRectangle bounds, ScreenRectangle scissorArea
+    TextureSetup textureSetup, ScreenRectangle bounds, @Nullable ScreenRectangle scissorArea
 ) implements GuiElementRenderState {
     public TexturedQuadRenderState(
         Matrix3x2f pose,
@@ -25,7 +26,7 @@ public record TexturedQuadRenderState(
         float u2,
         float v1,
         float v2,
-        ScreenRectangle scissorArea
+        @Nullable ScreenRectangle scissorArea
     ) {
         this(
             pose,

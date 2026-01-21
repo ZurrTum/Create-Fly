@@ -44,6 +44,7 @@ public class PackagerLinkBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         BlockState placed = super.getStateForPlacement(context);
@@ -112,7 +113,7 @@ public class PackagerLinkBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         withBlockEntityDo(
             pLevel, pPos, plbe -> {

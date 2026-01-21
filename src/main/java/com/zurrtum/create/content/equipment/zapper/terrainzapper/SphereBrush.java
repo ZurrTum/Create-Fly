@@ -2,15 +2,15 @@ package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
 
 public class SphereBrush extends ShapedBrush {
 
@@ -49,7 +49,7 @@ public class SphereBrush extends ShapedBrush {
     }
 
     @Override
-    List<BlockPos> getIncludedPositions() {
+    @Nullable List<BlockPos> getIncludedPositions() {
         return cachedBrushes.get(param0);
     }
 

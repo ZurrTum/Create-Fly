@@ -102,8 +102,8 @@ public class SchematicChunkSource extends ChunkSource {
 
         private static final class DummyLevel extends Level {
             private DummyLevel(
-                WritableLevelData pLevelData,
-                ResourceKey<Level> pDimension,
+                @Nullable WritableLevelData pLevelData,
+                @Nullable ResourceKey<Level> pDimension,
                 RegistryAccess pRegistryAccess,
                 Holder<DimensionType> pDimensionTypeRegistration,
                 EnvironmentAttributeSystem pEnvironmentAttributes,
@@ -159,7 +159,7 @@ public class SchematicChunkSource extends ChunkSource {
             }
 
             @Override
-            public void levelEvent(Entity pPlayer, int pType, BlockPos pPos, int pData) {
+            public void levelEvent(@Nullable Entity pPlayer, int pType, BlockPos pPos, int pData) {
             }
 
             @Override
@@ -211,7 +211,7 @@ public class SchematicChunkSource extends ChunkSource {
 
             @Override
             public void playSound(
-                Entity pPlayer,
+                @Nullable Entity pPlayer,
                 double pX,
                 double pY,
                 double pZ,
@@ -223,7 +223,7 @@ public class SchematicChunkSource extends ChunkSource {
             }
 
             @Override
-            public void playSound(Entity pPlayer, Entity pEntity, SoundEvent pEvent, SoundSource pCategory, float pVolume, float pPitch) {
+            public void playSound(@Nullable Entity pPlayer, Entity pEntity, SoundEvent pEvent, SoundSource pCategory, float pVolume, float pPitch) {
             }
 
             @Override
@@ -246,7 +246,7 @@ public class SchematicChunkSource extends ChunkSource {
 
             @Override
             public void playSeededSound(
-                Entity pPlayer,
+                @Nullable Entity pPlayer,
                 double pX,
                 double pY,
                 double pZ,
@@ -260,7 +260,7 @@ public class SchematicChunkSource extends ChunkSource {
 
             @Override
             public void playSeededSound(
-                Entity p_220363_,
+                @Nullable Entity p_220363_,
                 double p_220364_,
                 double p_220365_,
                 double p_220366_,
@@ -274,7 +274,7 @@ public class SchematicChunkSource extends ChunkSource {
 
             @Override
             public void playSeededSound(
-                Entity p_220372_,
+                @Nullable Entity p_220372_,
                 Entity p_220373_,
                 Holder<SoundEvent> p_220374_,
                 SoundSource p_220375_,

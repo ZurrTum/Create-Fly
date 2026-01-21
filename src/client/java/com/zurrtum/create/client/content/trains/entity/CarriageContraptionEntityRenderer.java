@@ -60,7 +60,7 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
             return;
         }
         Level level = entity.level();
-        Couple<CarriageBogey> bogeys = carriage.bogeys;
+        Couple<@Nullable CarriageBogey> bogeys = carriage.bogeys;
         CarriageBogey first = bogeys.getFirst();
         CarriageBogey second = bogeys.getSecond();
         Vec3 position = entity.getPosition(tickProgress);
@@ -150,8 +150,8 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     public static class CarriageContraptionState extends OrientedContraptionState {
-        public CarriageBogeyRenderState firstBogey;
-        public CarriageBogeyRenderState secondBogey;
+        public @Nullable CarriageBogeyRenderState firstBogey;
+        public @Nullable CarriageBogeyRenderState secondBogey;
     }
 
     public static class CarriageBogeyRenderState {

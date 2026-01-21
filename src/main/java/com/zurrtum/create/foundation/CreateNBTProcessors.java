@@ -6,9 +6,6 @@ import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
 import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
-
-import java.util.List;
-
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +15,9 @@ import net.minecraft.server.network.Filterable;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class CreateNBTProcessors {
     public static void register() {
@@ -51,6 +51,7 @@ public class CreateNBTProcessors {
         NBTProcessors.addProcessor(AllBlockEntityTypes.CREATIVE_CRATE, NBTProcessors.itemProcessor("Filter"));
     }
 
+    @Nullable
     public static CompoundTag clipboardProcessor(CompoundTag data) {
         DataComponentMap components = data.getCompound("components").flatMap(c -> CatnipCodecUtils.decode(DataComponentMap.CODEC, c)).orElse(null);
         if (components == null)

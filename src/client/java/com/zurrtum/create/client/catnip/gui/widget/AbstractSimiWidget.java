@@ -3,17 +3,16 @@ package com.zurrtum.create.client.catnip.gui.widget;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.TickableGuiEventListener;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public abstract class AbstractSimiWidget extends AbstractWidget implements TickableGuiEventListener {
 
@@ -70,6 +69,7 @@ public abstract class AbstractSimiWidget extends AbstractWidget implements Ticka
 
     public <T extends AbstractSimiWidget> T setActive(boolean active) {
         this.active = active;
+        //noinspection unchecked
         return (T) this;
     }
 
@@ -133,9 +133,5 @@ public abstract class AbstractSimiWidget extends AbstractWidget implements Ticka
     @Override
     public void updateWidgetNarration(NarrationElementOutput pNarrationElementOutput) {
         defaultButtonNarrationText(pNarrationElementOutput);
-    }
-
-    public void setHeight(int value) {
-        this.height = value;
     }
 }

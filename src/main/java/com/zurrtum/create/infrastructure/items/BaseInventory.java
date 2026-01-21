@@ -11,6 +11,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -20,7 +21,7 @@ import java.util.stream.StreamSupport;
 
 public interface BaseInventory extends Iterable<ItemStack> {
     Hash.Strategy<ItemStack> ITEM_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
-        public boolean equals(ItemStack stack, ItemStack other) {
+        public boolean equals(@Nullable ItemStack stack, @Nullable ItemStack other) {
             return stack == other || stack != null && other != null && ItemStack.isSameItemSameComponents(stack, other);
         }
 
@@ -53,7 +54,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         throw new RuntimeException("Implemented via Mixin");
     }
 
-    default int count(ItemStack stack, Direction side) {
+    default int count(ItemStack stack, @Nullable Direction side) {
         return count(stack);
     }
 
@@ -65,7 +66,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count(stack, maxAmount);
     }
 
-    default int count(ItemStack stack, int maxAmount, Direction side) {
+    default int count(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return count(stack, maxAmount);
     }
 
@@ -86,7 +87,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default ItemStack count(Predicate<ItemStack> predicate, Direction side) {
+    default ItemStack count(Predicate<ItemStack> predicate, @Nullable Direction side) {
         return count(predicate);
     }
 
@@ -103,7 +104,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         return count(predicate, maxAmount);
     }
 
@@ -140,7 +141,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         return preciseCount(predicate, maxAmount);
     }
 
@@ -178,7 +179,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default int countAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default int countAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         return countAll(predicate, maxAmount);
     }
 
@@ -202,7 +203,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default ItemStack countAny(Direction side) {
+    default ItemStack countAny(@Nullable Direction side) {
         return countAny();
     }
 
@@ -217,7 +218,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack countAny(int maxAmount, Direction side) {
+    default ItemStack countAny(int maxAmount, @Nullable Direction side) {
         return extractAny(maxAmount);
     }
 
@@ -252,7 +253,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default int countSpace(ItemStack stack, Direction side) {
+    default int countSpace(ItemStack stack, @Nullable Direction side) {
         return countSpace(stack);
     }
 
@@ -264,7 +265,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return countSpace(stack, maxAmount);
     }
 
-    default int countSpace(ItemStack stack, int maxAmount, Direction side) {
+    default int countSpace(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return countSpace(stack, maxAmount);
     }
 
@@ -289,7 +290,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default int countSpace(ItemStack stack, int maxAmount, int start, int end, Direction side) {
+    default int countSpace(ItemStack stack, int maxAmount, int start, int end, @Nullable Direction side) {
         return countSpace(stack, maxAmount, start, end);
     }
 
@@ -314,7 +315,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default boolean countSpace(List<ItemStack> stacks, Direction side) {
+    default boolean countSpace(List<ItemStack> stacks, @Nullable Direction side) {
         return countSpace(stacks);
     }
 
@@ -382,7 +383,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default boolean countSpace(List<ItemStack> stacks, int start, int end, Direction side) {
+    default boolean countSpace(List<ItemStack> stacks, int start, int end, @Nullable Direction side) {
         return countSpace(stacks, start, end);
     }
 
@@ -458,7 +459,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return copy;
     }
 
-    default int extract(ItemStack stack, Direction side) {
+    default int extract(ItemStack stack, @Nullable Direction side) {
         return extract(stack);
     }
 
@@ -470,7 +471,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return extract(stack, maxAmount);
     }
 
-    default int extract(ItemStack stack, int maxAmount, Direction side) {
+    default int extract(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return extract(stack, maxAmount);
     }
 
@@ -503,7 +504,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return maxAmount - remaining;
     }
 
-    default ItemStack extract(Predicate<ItemStack> predicate, Direction side) {
+    default ItemStack extract(Predicate<ItemStack> predicate, @Nullable Direction side) {
         return extract(predicate);
     }
 
@@ -522,7 +523,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         return extract(predicate, maxAmount);
     }
 
@@ -578,7 +579,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default List<ItemStack> extract(List<ItemStack> stacks, Direction side) {
+    default List<ItemStack> extract(List<ItemStack> stacks, @Nullable Direction side) {
         return extract(stacks);
     }
 
@@ -668,7 +669,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         }
     }
 
-    default int extractAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default int extractAll(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         return extractAll(predicate, maxAmount);
     }
 
@@ -705,7 +706,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return maxAmount - remaining;
     }
 
-    default ItemStack extractAny(Direction side) {
+    default ItemStack extractAny(@Nullable Direction side) {
         return extractAny();
     }
 
@@ -722,7 +723,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack extractAny(int maxAmount, Direction side) {
+    default ItemStack extractAny(int maxAmount, @Nullable Direction side) {
         return extractAny(maxAmount);
     }
 
@@ -776,7 +777,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack extractAnyMax(Direction side) {
+    default ItemStack extractAnyMax(@Nullable Direction side) {
         return extractAnyMax();
     }
 
@@ -823,7 +824,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+    default ItemStack extractMax(Predicate<ItemStack> predicate, @Nullable Direction side) {
         return extractMax(predicate);
     }
 
@@ -888,7 +889,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return BaseInventory.this.preciseInsert(stack, maxAmount);
     }
 
-    default int insert(ItemStack stack, Direction side) {
+    default int insert(ItemStack stack, @Nullable Direction side) {
         return insert(stack);
     }
 
@@ -900,7 +901,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return insert(stack, maxAmount);
     }
 
-    default int insert(ItemStack stack, int maxAmount, Direction side) {
+    default int insert(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return insert(stack, maxAmount);
     }
 
@@ -939,7 +940,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return maxAmount - remaining;
     }
 
-    default int insert(ItemStack stack, int maxAmount, int start, int end, Direction side) {
+    default int insert(ItemStack stack, int maxAmount, int start, int end, @Nullable Direction side) {
         return insert(stack, maxAmount, start, end);
     }
 
@@ -978,7 +979,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return maxAmount - remaining;
     }
 
-    default List<ItemStack> insert(List<ItemStack> stacks, Direction side) {
+    default List<ItemStack> insert(List<ItemStack> stacks, @Nullable Direction side) {
         return insert(stacks);
     }
 
@@ -1082,7 +1083,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         }
     }
 
-    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end, Direction side) {
+    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end, @Nullable Direction side) {
         return insert(stacks, start, end);
     }
 
@@ -1186,11 +1187,11 @@ public interface BaseInventory extends Iterable<ItemStack> {
         }
     }
 
-    default int insertExist(ItemStack stack, Direction side) {
+    default int insertExist(ItemStack stack, @Nullable Direction side) {
         return insertExist(stack);
     }
 
-    default int insertExist(ItemStack stack, int maxAmount, Direction side) {
+    default int insertExist(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return insertExist(stack, maxAmount);
     }
 
@@ -1241,7 +1242,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return maxAmount - remaining;
     }
 
-    default Iterator<ItemStack> iterator(Direction side) {
+    default Iterator<ItemStack> iterator(@Nullable Direction side) {
         return iterator();
     }
 
@@ -1288,7 +1289,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return stack;
     }
 
-    default boolean preciseExtract(ItemStack stack, Direction side) {
+    default boolean preciseExtract(ItemStack stack, @Nullable Direction side) {
         return preciseExtract(stack);
     }
 
@@ -1329,7 +1330,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, @Nullable Direction side) {
         return preciseExtract(predicate, maxAmount);
     }
 
@@ -1391,7 +1392,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default boolean preciseInsert(ItemStack stack, Direction side) {
+    default boolean preciseInsert(ItemStack stack, @Nullable Direction side) {
         return preciseInsert(stack);
     }
 
@@ -1403,7 +1404,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return preciseInsert(stack, maxAmount);
     }
 
-    default boolean preciseInsert(ItemStack stack, int maxAmount, Direction side) {
+    default boolean preciseInsert(ItemStack stack, int maxAmount, @Nullable Direction side) {
         return preciseInsert(stack, maxAmount);
     }
 
@@ -1443,7 +1444,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default boolean preciseInsert(List<ItemStack> stacks, Direction side) {
+    default boolean preciseInsert(List<ItemStack> stacks, @Nullable Direction side) {
         return preciseInsert(stacks);
     }
 
@@ -1517,7 +1518,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update, Direction side) {
+    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update, @Nullable Direction side) {
         return update(predicate, update);
     }
 
@@ -1554,7 +1555,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         components.patch.put(DataComponents.MAX_STACK_SIZE, max);
     }
 
-    default Stream<ItemStack> stream(Direction side) {
+    default Stream<ItemStack> stream(@Nullable Direction side) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(side), Spliterator.ORDERED), false);
     }
 

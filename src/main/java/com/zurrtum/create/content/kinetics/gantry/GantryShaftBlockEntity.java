@@ -91,17 +91,12 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
             return false;
         float speed = getPinionMovementSpeed();
 
-        switch (blockState.getValue(GantryShaftBlock.PART)) {
-            case END:
-                return speed < 0;
-            case MIDDLE:
-                return speed != 0;
-            case START:
-                return speed > 0;
-            case SINGLE:
-            default:
-                return false;
-        }
+        return switch (blockState.getValue(GantryShaftBlock.PART)) {
+            case END -> speed < 0;
+            case MIDDLE -> speed != 0;
+            case START -> speed > 0;
+            default -> false;
+        };
     }
 
     public float getPinionMovementSpeed() {

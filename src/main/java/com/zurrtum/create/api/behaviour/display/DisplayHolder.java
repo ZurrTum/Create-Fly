@@ -7,9 +7,9 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 public interface DisplayHolder {
-    CompoundTag getDisplayLinkData();
+    @Nullable CompoundTag getDisplayLinkData();
 
-    void setDisplayLinkData(CompoundTag data);
+    void setDisplayLinkData(@Nullable CompoundTag data);
 
     default void updateLine(int line, BlockPos pos) {
         CompoundTag data = getDisplayLinkData();

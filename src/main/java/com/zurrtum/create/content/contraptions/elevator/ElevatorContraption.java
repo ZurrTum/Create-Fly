@@ -14,11 +14,6 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn.ColumnCoo
 import com.zurrtum.create.content.contraptions.pulley.PulleyContraption;
 import com.zurrtum.create.content.redstone.contact.RedstoneContactBlock;
 import com.zurrtum.create.infrastructure.packet.s2c.ElevatorFloorListPacket;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -30,6 +25,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class ElevatorContraption extends PulleyContraption {
 
@@ -85,6 +85,7 @@ public class ElevatorContraption extends PulleyContraption {
         return column.relative(anchor);
     }
 
+    @Nullable
     public Integer getCurrentTargetY(Level level) {
         ColumnCoords coords = getGlobalColumn();
         ElevatorColumn column = ElevatorColumn.get(level, coords);
@@ -192,7 +193,7 @@ public class ElevatorContraption extends PulleyContraption {
     }
 
     public void setAllControlsToFloor(int floorIndex) {
-        for (MutablePair<StructureBlockInfo, MovementContext> pair : actors)
+        for (MutablePair<StructureBlockInfo, @Nullable MovementContext> pair : actors)
             if (pair.right != null && pair.right.temporaryData instanceof ElevatorFloorSelection efs)
                 efs.currentIndex = floorIndex;
     }

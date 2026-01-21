@@ -24,7 +24,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class TrackGraph {
 
@@ -69,6 +68,7 @@ public class TrackGraph {
         markDirty();
     }
 
+    @Nullable
     public <T extends TrackEdgePoint> T getPoint(EdgePointType<T> type, UUID id) {
         return edgePoints.get(type, id);
     }
@@ -77,6 +77,7 @@ public class TrackGraph {
         return edgePoints.values(type);
     }
 
+    @Nullable
     public <T extends TrackEdgePoint> T removePoint(MinecraftServer server, EdgePointType<T> type, UUID id) {
         T removed = edgePoints.remove(type, id);
         if (removed == null)
@@ -108,14 +109,17 @@ public class TrackGraph {
         return nodes.keySet();
     }
 
+    @Nullable
     public TrackNode locateNode(Level level, Vec3 position) {
         return locateNode(new TrackNodeLocation(position).in(level));
     }
 
+    @Nullable
     public TrackNode locateNode(TrackNodeLocation position) {
         return nodes.get(position);
     }
 
+    @Nullable
     public TrackNode getNode(int netId) {
         return nodesById.get(netId);
     }
@@ -271,7 +275,7 @@ public class TrackGraph {
             vertices.remove(start);
 
             while (!frontier.isEmpty()) {
-                TrackNodeLocation current = frontier.remove(0);
+                TrackNodeLocation current = frontier.removeFirst();
                 TrackNode currentNode = locateNode(current);
 
                 Map<TrackNode, TrackEdge> connections = getConnectionsFrom(currentNode);
@@ -307,11 +311,11 @@ public class TrackGraph {
 
     public int getChecksum() {
         if (checksum == 0)
-            checksum = nodes.values().stream().collect(Collectors.summingInt(TrackNode::getNetId));
+            checksum = nodes.values().stream().mapToInt(TrackNode::getNetId).sum();
         return checksum;
     }
 
-    public void transfer(LevelAccessor level, TrackNode node, TrackGraph target) {
+    public void transfer(@Nullable LevelAccessor level, TrackNode node, TrackGraph target) {
         target.addNode(node);
         target.invalidateBounds();
 
@@ -350,13 +354,15 @@ public class TrackGraph {
         return nodes.isEmpty();
     }
 
-    public Map<TrackNode, TrackEdge> getConnectionsFrom(TrackNode node) {
+    @Nullable
+    public Map<TrackNode, TrackEdge> getConnectionsFrom(@Nullable TrackNode node) {
         if (node == null)
             return null;
         return connectionsByNode.getOrDefault(node, new HashMap<>());
     }
 
-    public TrackEdge getConnection(Couple<TrackNode> nodes) {
+    @Nullable
+    public TrackEdge getConnection(Couple<@Nullable TrackNode> nodes) {
         Map<TrackNode, TrackEdge> connectionsFrom = getConnectionsFrom(nodes.getFirst());
         if (connectionsFrom == null)
             return null;

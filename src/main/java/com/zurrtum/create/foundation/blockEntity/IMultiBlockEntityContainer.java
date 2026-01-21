@@ -13,7 +13,7 @@ public interface IMultiBlockEntityContainer {
 
     BlockPos getController();
 
-    <T extends BlockEntity & IMultiBlockEntityContainer> T getControllerBE();
+    @Nullable <T extends BlockEntity & IMultiBlockEntityContainer> T getControllerBE();
 
     boolean isController();
 
@@ -21,7 +21,7 @@ public interface IMultiBlockEntityContainer {
 
     void removeController(boolean keepContents);
 
-    BlockPos getLastKnownPos();
+    @Nullable BlockPos getLastKnownPos();
 
     void preventConnectivityUpdate();
 
@@ -36,7 +36,8 @@ public interface IMultiBlockEntityContainer {
         return null;
     }
 
-    default Object modifyExtraData(Object data) {
+    @Nullable
+    default Object modifyExtraData(@Nullable Object data) {
         return data;
     }
 
@@ -90,6 +91,7 @@ public interface IMultiBlockEntityContainer {
         default void setTankSize(int tank, int blocks) {
         }
 
+        @Nullable
         default FluidTank getTank(int tank) {
             return null;
         }

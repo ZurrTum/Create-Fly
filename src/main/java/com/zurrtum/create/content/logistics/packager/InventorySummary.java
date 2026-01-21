@@ -4,15 +4,15 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.infrastructure.packet.s2c.LogisticalStockResponsePacket;
-import org.apache.commons.lang3.mutable.MutableInt;
-
-import java.util.*;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 public class InventorySummary {
     public static Codec<InventorySummary> CODEC = BigItemStack.CODEC.listOf().xmap(
@@ -29,8 +29,8 @@ public class InventorySummary {
 
     public static final InventorySummary EMPTY = new InventorySummary();
 
-    private Map<Item, List<BigItemStack>> items = new IdentityHashMap<>();
-    private List<BigItemStack> stacksByCount;
+    private final Map<Item, List<BigItemStack>> items = new IdentityHashMap<>();
+    private @Nullable List<BigItemStack> stacksByCount;
     private int totalCount;
 
     public int contributingLinks;
@@ -120,18 +120,18 @@ public class InventorySummary {
 
     public int getTotalOfMatching(Predicate<ItemStack> filter) {
         MutableInt sum = new MutableInt();
-        items.forEach(($, list) -> {
+        items.forEach((_, list) -> {
             for (BigItemStack entry : list)
                 if (filter.test(entry.stack))
                     sum.add(entry.count);
         });
-        return sum.getValue();
+        return sum.intValue();
     }
 
     public List<BigItemStack> getStacks() {
         if (stacksByCount == null) {
             List<BigItemStack> stacks = new ArrayList<>();
-            items.forEach((i, list) -> stacks.addAll(list));
+            items.forEach((_, list) -> stacks.addAll(list));
             return stacks;
         }
         return stacksByCount;

@@ -50,13 +50,13 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
 
     public AutoRequestData requestData;
     public List<ItemStack> manuallyAddedItems;
-    public UUID owner;
+    public @Nullable UUID owner;
 
     public Direction facing;
     public boolean sideOccluded;
     public ServerFilteringBehaviour priceTag;
 
-    private List<ItemStack> renderedItemsForShop;
+    private @Nullable List<ItemStack> renderedItemsForShop;
 
     public TableClothBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.TABLE_CLOTH, pos, state);

@@ -7,19 +7,20 @@ import org.jspecify.annotations.Nullable;
 
 public class HorizontalCTBehaviour extends ConnectedTextureBehaviour.Base {
 
-    protected CTSpriteShiftEntry topShift;
+    protected @Nullable CTSpriteShiftEntry topShift;
     protected CTSpriteShiftEntry layerShift;
 
     public HorizontalCTBehaviour(CTSpriteShiftEntry layerShift) {
         this(layerShift, null);
     }
 
-    public HorizontalCTBehaviour(CTSpriteShiftEntry layerShift, CTSpriteShiftEntry topShift) {
+    public HorizontalCTBehaviour(CTSpriteShiftEntry layerShift, @Nullable CTSpriteShiftEntry topShift) {
         this.layerShift = layerShift;
         this.topShift = topShift;
     }
 
     @Override
+    @Nullable
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         return direction.getAxis().isHorizontal() ? layerShift : topShift;
     }

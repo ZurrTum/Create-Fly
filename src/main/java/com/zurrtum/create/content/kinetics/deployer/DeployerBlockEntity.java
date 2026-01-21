@@ -54,17 +54,17 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     public State state;
     public Mode mode;
     public ItemStack heldItem;
-    protected DeployerPlayer player;
+    protected @Nullable DeployerPlayer player;
     public int timer;
     public float reach;
     public boolean fistBump = false;
     public List<ItemStack> overflowItems = new ArrayList<>();
     protected ServerFilteringBehaviour filtering;
     protected boolean redstoneLocked;
-    protected UUID owner;
-    protected String ownerName;
-    public Container invHandler;
-    private CompoundTag deferredInventoryList;
+    protected @Nullable UUID owner;
+    protected @Nullable String ownerName;
+    public @Nullable Container invHandler;
+    private @Nullable CompoundTag deferredInventoryList;
 
     public LerpedFloat animatedOffset;
 
@@ -498,6 +498,7 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
             .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeHolder::value).findFirst().orElse(null);
     }
 
+    @Nullable
     public DeployerPlayer getPlayer() {
         return player;
     }

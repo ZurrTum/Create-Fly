@@ -36,6 +36,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -43,8 +44,8 @@ import java.util.function.Consumer;
 
 public class StationScreen extends AbstractStationScreen {
 
-    private EditBox nameBox;
-    private EditBox trainNameBox;
+    private @Nullable EditBox nameBox;
+    private @Nullable EditBox trainNameBox;
     private IconButton newTrainButton;
     private IconButton disassembleTrainButton;
     private IconButton dropScheduleButton;
@@ -151,7 +152,7 @@ public class StationScreen extends AbstractStationScreen {
             nameBox.setCursorPosition(nameBox.getValue().length());
             nameBox.setHighlightPos(nameBox.getCursorPosition());
         }
-        if (getFocused() != trainNameBox || trainNameBox.active == false) {
+        if (getFocused() != trainNameBox || !trainNameBox.active) {
             trainNameBox.setCursorPosition(trainNameBox.getValue().length());
             trainNameBox.setHighlightPos(trainNameBox.getCursorPosition());
         }
@@ -257,7 +258,7 @@ public class StationScreen extends AbstractStationScreen {
         return guiLeft + background.getWidth() / 2 - (Math.min(font.width(s), nameBox.getWidth()) + 10) / 2;
     }
 
-    private void updateAssemblyTooltip(String key) {
+    private void updateAssemblyTooltip(@Nullable String key) {
         if (key == null) {
             disassembleTrainButton.setToolTip(CreateLang.translateDirect("station.disassemble_train"));
             newTrainButton.setToolTip(CreateLang.translateDirect("station.create_train"));

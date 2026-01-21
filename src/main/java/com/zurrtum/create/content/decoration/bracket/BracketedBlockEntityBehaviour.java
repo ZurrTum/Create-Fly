@@ -19,10 +19,10 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
 
     public static final BehaviourType<BracketedBlockEntityBehaviour> TYPE = new BehaviourType<>();
 
-    private BlockState bracket;
+    private @Nullable BlockState bracket;
     private boolean reRender;
 
-    private Predicate<BlockState> pred;
+    private final Predicate<BlockState> pred;
 
     public BracketedBlockEntityBehaviour(SmartBlockEntity be) {
         this(be, state -> true);

@@ -34,6 +34,7 @@ import java.util.Optional;
 
 public interface AutoMixingDisplay {
     @SuppressWarnings("unchecked")
+    @Nullable
     static Display of(RecipeHolder<?> entry) {
         Recipe<?> recipe = entry.value();
         if (MechanicalPressBlockEntity.canCompress(recipe) || AllRecipeTypes.shouldIgnoreInAutomation(entry)) {

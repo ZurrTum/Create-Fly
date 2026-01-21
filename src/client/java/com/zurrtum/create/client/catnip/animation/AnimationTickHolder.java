@@ -6,6 +6,7 @@ import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.LevelAccessor;
+import org.jspecify.annotations.Nullable;
 
 public class AnimationTickHolder {
 
@@ -33,7 +34,7 @@ public class AnimationTickHolder {
         return includePaused ? ticks + pausedTicks : ticks;
     }
 
-    public static int getTicks(LevelAccessor level) {
+    public static int getTicks(@Nullable LevelAccessor level) {
         if (level instanceof WrappedClientLevel wrappedLevel) {
             return getTicks(wrappedLevel.getWrappedLevel());
         } else if (level instanceof PonderLevel) {
@@ -42,7 +43,7 @@ public class AnimationTickHolder {
         return getTicks();
     }
 
-    public static float getPartialTicks(LevelAccessor level) {
+    public static float getPartialTicks(@Nullable LevelAccessor level) {
         if (level instanceof PonderLevel) {
             return PonderUI.getPartialTicks();
         }
@@ -53,7 +54,7 @@ public class AnimationTickHolder {
         return getTicks() + getPartialTicks();
     }
 
-    public static float getRenderTime(LevelAccessor level) {
+    public static float getRenderTime(@Nullable LevelAccessor level) {
         return getTicks(level) + getPartialTicks(level);
     }
 

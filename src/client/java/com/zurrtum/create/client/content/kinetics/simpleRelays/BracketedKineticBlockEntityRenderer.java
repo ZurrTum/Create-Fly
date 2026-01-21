@@ -12,7 +12,7 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
 import com.zurrtum.create.content.kinetics.simpleRelays.BracketedKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.SimpleKineticBlockEntity;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
@@ -37,7 +37,7 @@ public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRende
         BracketedKineticRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         state.large = be.getBlockState().is(AllBlocks.LARGE_COGWHEEL);
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
@@ -77,7 +77,7 @@ public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRende
 
     public static class BracketedKineticRenderState extends KineticRenderState {
         public boolean large;
-        public SuperByteBuffer shaft;
+        public @Nullable SuperByteBuffer shaft;
         public float shaftAngle;
 
         @Override

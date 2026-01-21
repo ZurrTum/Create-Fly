@@ -14,10 +14,11 @@ import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class CouplingHandlerClient {
 
-    static AbstractMinecart selectedCart;
+    static @Nullable AbstractMinecart selectedCart;
     static RandomSource r = RandomSource.create();
 
     public static void tick(Minecraft mc) {

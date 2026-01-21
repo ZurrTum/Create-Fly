@@ -38,6 +38,7 @@ public class RollerMovementRenderBehaviour implements MovementRenderBehaviour {
     }
 
     @Override
+    @Nullable
     public MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,

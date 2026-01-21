@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,11 @@ public class ChainConveyorInteractionHandler {
 
     public static WorldAttached<Cache<BlockPos, List<ChainConveyorShape>>> loadedChains = new WorldAttached<>($ -> new TickBasedCache<>(60, true));
 
-    public static BlockPos selectedLift;
+    public static @Nullable BlockPos selectedLift;
     public static float selectedChainPosition;
-    public static BlockPos selectedConnection;
+    public static @Nullable BlockPos selectedConnection;
     public static Vec3 selectedBakedPosition;
-    public static ChainConveyorShape selectedShape;
+    public static @Nullable ChainConveyorShape selectedShape;
 
     public static void clientTick(Minecraft mc) {
         if (!isActive(mc)) {

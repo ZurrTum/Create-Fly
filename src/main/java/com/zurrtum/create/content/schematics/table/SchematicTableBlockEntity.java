@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.schematics.table;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class SchematicTableBlockEntity extends SmartBlockEntity implements MenuP
 
     public SchematicTableInventory inventory;
     public boolean isUploading;
-    public String uploadingSchematic;
+    public @Nullable String uploadingSchematic;
     public float uploadingProgress;
     public boolean sendUpdate;
 

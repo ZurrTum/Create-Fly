@@ -171,13 +171,13 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         state.appendModelIdentityElement(data.active);
     }
 
-    private static boolean canUse(Player player, HumanoidArm arm) {
+    private static boolean canUse(@Nullable Player player, HumanoidArm arm) {
         return player != null && player.getItemHeldByArm(arm).getItem() != AllItems.LINKED_CONTROLLER;
     }
 
     @Override
     public void submit(
-        LinkedControllerModel.RenderData data,
+        @Nullable RenderData data,
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,

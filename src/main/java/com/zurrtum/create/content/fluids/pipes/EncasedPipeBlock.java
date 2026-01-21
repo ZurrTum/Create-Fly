@@ -65,7 +65,7 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
@@ -148,7 +148,7 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity be) {
         return ItemRequirement.of(AllBlocks.FLUID_PIPE.defaultBlockState(), be);
     }
 

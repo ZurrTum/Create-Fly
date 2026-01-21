@@ -2,6 +2,7 @@ package com.zurrtum.create.content.contraptions.mounted;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.contraptions.minecart.capability.MinecartContr
 import com.zurrtum.create.content.redstone.rail.ControllerRailBlock;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,6 +33,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
@@ -44,8 +45,8 @@ public class CartAssemblerBlockEntity extends SmartBlockEntity {
 
     protected ServerScrollOptionBehaviour<CartMovementMode> movementMode;
     private int ticksSinceMinecartUpdate;
-    protected AssemblyException lastException;
-    protected AbstractMinecart cartToAssemble;
+    protected @Nullable AssemblyException lastException;
+    protected @Nullable AbstractMinecart cartToAssemble;
 
     public CartAssemblerBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.CART_ASSEMBLER, pos, state);
@@ -63,7 +64,7 @@ public class CartAssemblerBlockEntity extends SmartBlockEntity {
         cartToAssemble = null;
     }
 
-    public void tryAssemble(AbstractMinecart cart) {
+    public void tryAssemble(@Nullable AbstractMinecart cart) {
         if (cart == null)
             return;
 

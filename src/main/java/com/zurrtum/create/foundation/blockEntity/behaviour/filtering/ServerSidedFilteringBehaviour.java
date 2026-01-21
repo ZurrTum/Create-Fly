@@ -3,6 +3,11 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.filtering;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -12,17 +17,12 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-
 public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
 
     Map<Direction, ServerFilteringBehaviour> sidedFilters;
     private final BiFunction<Direction, ServerFilteringBehaviour, ServerFilteringBehaviour> filterFactory;
     private final Predicate<Direction> validDirections;
-    private Consumer<Direction> removeListener;
+    private @Nullable Consumer<Direction> removeListener;
 
     public ServerSidedFilteringBehaviour(
         SmartBlockEntity be,
@@ -36,6 +36,7 @@ public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
         updateFilterPresence();
     }
 
+    @Nullable
     public ServerFilteringBehaviour get(Direction side) {
         return sidedFilters.get(side);
     }

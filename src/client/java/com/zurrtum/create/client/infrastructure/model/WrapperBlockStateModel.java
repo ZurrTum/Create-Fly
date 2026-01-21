@@ -10,13 +10,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public abstract class WrapperBlockStateModel implements BlockStateModel, BlockStateModel.UnbakedRoot {
     private static final boolean FABRIC = FabricLoader.getInstance().isModLoaded("fabric-model-loading-api-v1");
     protected BlockStateModel model;
-    protected Entry entry;
+    protected @Nullable Entry entry;
 
     public WrapperBlockStateModel() {
     }

@@ -28,11 +28,7 @@ public class DeployerFilterSlot extends ValueBoxTransform.Sided {
     @Override
     protected boolean isSideActive(BlockState state, Direction direction) {
         Direction facing = state.getValue(DeployerBlock.FACING);
-        if (direction.getAxis() == facing.getAxis())
-            return false;
-        if (((DeployerBlock) state.getBlock()).getRotationAxis(state) == direction.getAxis())
-            return false;
-        return true;
+        return direction.getAxis() != facing.getAxis() && ((DeployerBlock) state.getBlock()).getRotationAxis(state) != direction.getAxis();
     }
 
     @Override

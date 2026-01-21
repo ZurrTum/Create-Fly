@@ -41,6 +41,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,14 +55,14 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
     private IconButton confirmButton;
     private ElementWidget renderedItem;
 
-    BlockState sourceState;
-    BlockState targetState;
+    @Nullable BlockState sourceState;
+    @Nullable BlockState targetState;
     List<DisplaySource> sources;
-    DisplayTarget target;
+    @Nullable DisplayTarget target;
 
-    ScrollInput sourceTypeSelector;
+    @Nullable ScrollInput sourceTypeSelector;
     Label sourceTypeLabel;
-    ScrollInput targetLineSelector;
+    @Nullable ScrollInput targetLineSelector;
     Label targetLineLabel;
     AbstractSimiWidget sourceWidget;
     AbstractSimiWidget targetWidget;
@@ -273,7 +274,7 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void removeWidget(GuiEventListener p_169412_) {
+    protected void removeWidget(@Nullable GuiEventListener p_169412_) {
         if (p_169412_ != null)
             super.removeWidget(p_169412_);
     }

@@ -7,6 +7,7 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerSidedFilteringBehaviour;
 import net.minecraft.core.Direction;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class SidedFilteringBehaviour extends FilteringBehaviour<ServerSidedFilte
         }
     }
 
+    @Nullable
     public FilteringBehaviour<ServerFilteringBehaviour> get(Direction side) {
         FilteringBehaviour<ServerFilteringBehaviour> sidedFilter = sidedFilters.get(side);
         if (sidedFilter != null && sidedFilter.behaviour != null) {

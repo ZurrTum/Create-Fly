@@ -74,14 +74,15 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     }
 
     private int redstoneStrength;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Component> customText;
     private int nixieIndex;
-    private Couple<String> displayedStrings;
+    private @Nullable Couple<String> displayedStrings;
 
     public @Nullable ComputerSignal computerSignal;
 
-    private WeakReference<SignalBlockEntity> cachedSignalTE;
-    public SignalState signalState;
+    private WeakReference<@Nullable SignalBlockEntity> cachedSignalTE;
+    public @Nullable SignalState signalState;
 
     public NixieTubeBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.NIXIE_TUBE, pos, state);
@@ -152,7 +153,7 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
         notifyUpdate();
     }
 
-    public void displayCustomText(Component text, int nixiePositionInRow) {
+    public void displayCustomText(@Nullable Component text, int nixiePositionInRow) {
         if (text == null)
             return;
         if (customText.filter(d -> d.equals(text)).isPresent())

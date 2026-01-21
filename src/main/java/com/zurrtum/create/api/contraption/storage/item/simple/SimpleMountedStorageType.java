@@ -23,6 +23,7 @@ public abstract class SimpleMountedStorageType<T extends SimpleMountedStorage> e
         return Optional.ofNullable(be).map(b -> getHandler(level, b)).map(this::createStorage).orElse(null);
     }
 
+    @Nullable
     protected Container getHandler(Level level, BlockEntity be) {
         return ItemHelper.getInventory(level, be.getBlockPos(), null, be, null);
     }

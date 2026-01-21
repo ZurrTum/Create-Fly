@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 
 public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
 
-    private LerpedFloat glow;
+    private final LerpedFloat glow;
     private boolean sendPulse;
 
     public LinkWithBulbBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

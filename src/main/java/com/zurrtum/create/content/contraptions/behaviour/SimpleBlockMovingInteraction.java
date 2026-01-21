@@ -10,12 +10,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import org.jspecify.annotations.Nullable;
 
 public abstract class SimpleBlockMovingInteraction extends MovingInteractionBehaviour {
 
     @Override
     public boolean handlePlayerInteraction(
-        Player player,
+        @Nullable Player player,
         InteractionHand activeHand,
         BlockPos localPos,
         AbstractContraptionEntity contraptionEntity

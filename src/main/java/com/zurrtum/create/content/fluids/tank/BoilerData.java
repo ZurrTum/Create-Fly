@@ -176,8 +176,7 @@ public class BoilerData {
     private int getActualHeat(int boilerSize) {
         int forBoilerSize = getMaxHeatLevelForBoilerSize(boilerSize);
         int forWaterSupply = getMaxHeatLevelForWaterSupply();
-        int actualHeat = Math.min(activeHeat, Math.min(forWaterSupply, forBoilerSize));
-        return actualHeat;
+        return Math.min(activeHeat, Math.min(forWaterSupply, forBoilerSize));
     }
 
     public void calcMinMaxForSize(int boilerSize) {

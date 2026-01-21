@@ -3,6 +3,7 @@ package com.zurrtum.create.content.contraptions.bearing;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.AssemblyException;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import com.zurrtum.create.content.contraptions.bearing.ClockworkContraption.HandType;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,13 +21,14 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public class ClockworkBearingBlockEntity extends KineticBlockEntity implements IBearingBlockEntity {
 
-    protected ControlledContraptionEntity hourHand;
-    protected ControlledContraptionEntity minuteHand;
+    protected @Nullable ControlledContraptionEntity hourHand;
+    protected @Nullable ControlledContraptionEntity minuteHand;
     protected float hourAngle;
     protected float minuteAngle;
     protected float clientHourAngleDiff;
@@ -35,7 +36,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
 
     protected boolean running;
     protected boolean assembleNextTick;
-    protected AssemblyException lastException;
+    protected @Nullable AssemblyException lastException;
     protected ServerScrollOptionBehaviour<ClockHands> operationMode;
 
     private float prevForcedAngle;
@@ -196,7 +197,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
         Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
 
         // Collect Construct
-        Pair<ClockworkContraption, ClockworkContraption> contraption;
+        Pair<@Nullable ClockworkContraption, @Nullable ClockworkContraption> contraption;
         try {
             contraption = ClockworkContraption.assembleClockworkAt(level, worldPosition, direction);
             lastException = null;

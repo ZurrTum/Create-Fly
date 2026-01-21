@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Waterlog checklist: <br>
@@ -32,11 +33,13 @@ public interface ProperWaterloggedBlock extends SimpleWaterloggedBlock {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
     }
 
-    default BlockState withWater(BlockState placementState, BlockPlaceContext ctx) {
+    @Nullable
+    default BlockState withWater(@Nullable BlockState placementState, BlockPlaceContext ctx) {
         return withWater(ctx.getLevel(), placementState, ctx.getClickedPos());
     }
 
-    static BlockState withWater(LevelReader level, BlockState placementState, BlockPos pos) {
+    @Nullable
+    static BlockState withWater(LevelReader level, @Nullable BlockState placementState, BlockPos pos) {
         if (placementState == null)
             return null;
         FluidState ifluidstate = level.getFluidState(pos);

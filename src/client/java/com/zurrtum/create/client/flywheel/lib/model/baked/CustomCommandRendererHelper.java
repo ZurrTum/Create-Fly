@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource.EntityOutlineGenerator;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.OutlineBufferSource.EntityOutlineGenerator;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 
 public class CustomCommandRendererHelper {
     public static void render(SubmitNodeCollection queue, MultiBufferSource vertexConsumers) {
@@ -27,6 +27,7 @@ public class CustomCommandRendererHelper {
 
     }
 
+    @Nullable
     public static VertexConsumer getOutlineBuffer(MultiBufferSource vertexConsumers, RenderType layer, int color) {
         if (layer.isOutline()) {
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(layer);

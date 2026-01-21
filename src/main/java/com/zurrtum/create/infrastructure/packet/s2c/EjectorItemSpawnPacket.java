@@ -11,13 +11,14 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerEntity;
+import org.jspecify.annotations.Nullable;
 
 public class EjectorItemSpawnPacket extends ClientboundAddEntityPacket {
     private final boolean alive;
     private final int progress;
     private final boolean hasLauncher;
-    private final EntityLauncher launcher;
-    private final Direction direction;
+    private final @Nullable EntityLauncher launcher;
+    private final @Nullable Direction direction;
     public static final StreamCodec<RegistryFriendlyByteBuf, EjectorItemSpawnPacket> CODEC = Packet.codec(
         EjectorItemSpawnPacket::write,
         EjectorItemSpawnPacket::new
@@ -78,10 +79,12 @@ public class EjectorItemSpawnPacket extends ClientboundAddEntityPacket {
         return progress;
     }
 
+    @Nullable
     public EntityLauncher getLauncher() {
         return launcher;
     }
 
+    @Nullable
     public Direction getDirection() {
         return direction;
     }

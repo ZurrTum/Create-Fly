@@ -21,6 +21,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleWaitCondition> STREAM_CODEC = StreamCodec.of(
@@ -59,6 +60,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
         return map.build(empty);
     }
 
+    @Nullable
     public static ScheduleWaitCondition read(ValueInput view) {
         Identifier location = view.read("Id", Identifier.CODEC).orElse(null);
         ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(location);
@@ -71,6 +73,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
         return condition;
     }
 
+    @Nullable
     public static <T> ScheduleWaitCondition decode(DynamicOps<T> ops, T input) {
         MapLike<T> map = ops.getMap(input).getOrThrow();
         Identifier location = Identifier.CODEC.parse(ops, map.get("Id")).result().orElse(null);
@@ -86,6 +89,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
         return condition;
     }
 
+    @Nullable
     private static ScheduleWaitCondition fallback(Identifier location) {
         Create.LOGGER.warn("Could not parse waiting condition type: {}", location);
         return null;
@@ -99,6 +103,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
         }
     }
 
+    @Nullable
     private static ScheduleWaitCondition decode(RegistryFriendlyByteBuf buf) {
         try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
             ValueInput view = TagValueInput.create(logging, buf.registryAccess(), buf.readNbt());

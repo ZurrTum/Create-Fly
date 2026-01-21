@@ -36,6 +36,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -47,7 +48,7 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
     private VersionedInventoryTrackerBehaviour invVersionTracker;
     private int extractionCooldown;
 
-    private WeakReference<Entity> lastObserved; // In-world Extractors only
+    private @Nullable WeakReference<Entity> lastObserved; // In-world Extractors only
 
     public LerpedFloat flap;
 

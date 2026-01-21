@@ -16,11 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,6 +26,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class DepotBlock extends Block implements IBE<DepotBlockEntity>, IWrenchable, ProperWaterloggedBlock, ItemInventoryProvider<DepotBlockEntity> {
 
@@ -44,7 +41,7 @@ public class DepotBlock extends Block implements IBE<DepotBlockEntity>, IWrencha
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, DepotBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, DepotBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.depotBehaviour.itemHandler;
     }
 
@@ -69,6 +66,7 @@ public class DepotBlock extends Block implements IBE<DepotBlockEntity>, IWrencha
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return withWater(super.getStateForPlacement(pContext), pContext);
     }

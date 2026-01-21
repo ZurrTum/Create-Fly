@@ -2,12 +2,12 @@ package com.zurrtum.create.catnip.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
-import net.minecraft.network.codec.StreamCodec;
-
-public class Pair<F, S> {
+public class Pair<F extends @Nullable Object, S extends @Nullable Object> {
 
     F first;
     S second;
@@ -17,7 +17,7 @@ public class Pair<F, S> {
         this.second = second;
     }
 
-    public static <F, S> Pair<F, S> of(F first, S second) {
+    public static <F extends @Nullable Object, S extends @Nullable Object> Pair<F, S> of(F first, S second) {
         return new Pair<>(first, second);
     }
 
@@ -67,7 +67,7 @@ public class Pair<F, S> {
         return (nullHash(first) * 31) ^ nullHash(second);
     }
 
-    int nullHash(Object o) {
+    int nullHash(@Nullable Object o) {
         return o == null ? 0 : o.hashCode();
     }
 

@@ -27,7 +27,7 @@ public class NixieTubeDisplaySource extends SingleLineDisplaySource {
             String line = text.getString();
             Integer.valueOf(line);
             context.flapDisplayContext = Boolean.TRUE;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
         }
 
         return text;

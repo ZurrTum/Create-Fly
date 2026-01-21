@@ -26,6 +26,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,7 @@ public class ItemModels {
                 return ItemStack.hashItemAndComponents(itemStack);
             }
 
-            public boolean equals(ItemStack itemStack, ItemStack itemStack2) {
+            public boolean equals(@Nullable ItemStack itemStack, @Nullable ItemStack itemStack2) {
                 return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.isSameItemSameComponents(
                     itemStack,
                     itemStack2

@@ -28,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IWrenchable, ItemInventoryProvider<FrogportBlockEntity> {
 
@@ -36,7 +37,7 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, FrogportBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, FrogportBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.inventory;
     }
 
@@ -46,7 +47,7 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         if (pPlacer == null)
             return;

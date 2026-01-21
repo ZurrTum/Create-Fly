@@ -37,6 +37,7 @@ import java.util.Optional;
 
 public interface AutoCompactingDisplay {
     @SuppressWarnings("unchecked")
+    @Nullable
     static Display of(RecipeHolder<?> entry) {
         Recipe<?> recipe = entry.value();
         if (!MechanicalPressBlockEntity.canCompress(recipe) || AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
@@ -137,6 +138,7 @@ public interface AutoCompactingDisplay {
             );
         }
 
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         public ShapedDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<Identifier> location, int width, int height) {
             super(input, output, location, width, height);
         }

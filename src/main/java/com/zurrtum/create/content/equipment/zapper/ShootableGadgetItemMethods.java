@@ -54,8 +54,7 @@ public class ShootableGadgetItemMethods {
         float pitch = (float) ((player.getXRot()) / -180 * Math.PI);
         int flip = mainHand == (player.getMainArm() == HumanoidArm.RIGHT) ? -1 : 1;
         Vec3 barrelPosNoTransform = new Vec3(flip * rightHandForward.x, rightHandForward.y, rightHandForward.z);
-        Vec3 barrelPos = start.add(barrelPosNoTransform.xRot(pitch).yRot(yaw));
-        return barrelPos;
+        return start.add(barrelPosNoTransform.xRot(pitch).yRot(yaw));
     }
 
 }

@@ -33,6 +33,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -57,7 +58,7 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ToolboxBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ToolboxBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.inventory;
     }
 
@@ -97,7 +98,7 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     }
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
         if (worldIn.isClientSide())
             return;
@@ -202,7 +203,7 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
         return super.getStateForPlacement(context).setValue(FACING, context.getHorizontalDirection().getOpposite())
-            .setValue(WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER));
+            .setValue(WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
     }
 
     @Override

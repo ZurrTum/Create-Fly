@@ -25,12 +25,12 @@ public class TrackEdge {
 
     public TrackNode node1;
     public TrackNode node2;
-    BezierConnection turn;
+    @Nullable BezierConnection turn;
     public EdgeData edgeData;
     boolean interDimensional;
     TrackMaterial trackMaterial;
 
-    public TrackEdge(TrackNode node1, TrackNode node2, BezierConnection turn, TrackMaterial trackMaterial) {
+    public TrackEdge(TrackNode node1, TrackNode node2, @Nullable BezierConnection turn, TrackMaterial trackMaterial) {
         this.interDimensional = !node1.location.dimension.equals(node2.location.dimension);
         this.edgeData = new EdgeData(this);
         this.node1 = node1;
@@ -55,6 +55,7 @@ public class TrackEdge {
         return edgeData;
     }
 
+    @Nullable
     public BezierConnection getTurn() {
         return turn;
     }

@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides several interfaces that can define the behavior of blocks when mounting onto contraptions:
@@ -75,7 +76,7 @@ public class BlockMovementChecks {
             return b ? SUCCESS : FAIL;
         }
 
-        public static CheckResult of(Boolean b) {
+        public static CheckResult of(@Nullable Boolean b) {
             return b == null ? PASS : (b ? SUCCESS : FAIL);
         }
 

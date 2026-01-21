@@ -22,6 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import org.jspecify.annotations.Nullable;
 
 public class PackageRenderer extends EntityRenderer<PackageEntity, PackageRenderer.PackageState> {
     public PackageRenderer(EntityRendererProvider.Context pContext) {
@@ -72,7 +73,7 @@ public class PackageRenderer extends EntityRenderer<PackageEntity, PackageRender
     }
 
     public static class PackageState extends EntityRenderState {
-        public BoxRenderState box;
+        public @Nullable BoxRenderState box;
     }
 
     public static class BoxRenderState implements SubmitNodeCollector.CustomGeometryRenderer {

@@ -48,7 +48,7 @@ public abstract class FlowSource {
     }
 
     public static class FluidHandler extends FlowSource {
-        @Nullable Supplier<FluidInventory> fluidHandlerCache;
+        @Nullable Supplier<@Nullable FluidInventory> fluidHandlerCache;
 
         public FluidHandler(BlockFace location) {
             super(location);
@@ -82,7 +82,7 @@ public abstract class FlowSource {
     }
 
     public static class OtherPipe extends FlowSource {
-        WeakReference<FluidTransportBehaviour> cached;
+        @Nullable WeakReference<FluidTransportBehaviour> cached;
 
         public OtherPipe(BlockFace location) {
             super(location);

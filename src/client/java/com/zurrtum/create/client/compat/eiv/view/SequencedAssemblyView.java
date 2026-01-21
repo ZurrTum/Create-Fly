@@ -63,6 +63,7 @@ public class SequencedAssemblyView extends CreateView {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public static <T extends Recipe<?>> SequencedRenderer<T> getRenderer(T recipe) {
         return (SequencedRenderer<T>) RENDER.get(recipe.getType());
     }

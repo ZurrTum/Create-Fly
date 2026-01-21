@@ -20,6 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class KineticDebugger {
     public static boolean rainbowDebug = false;
@@ -63,6 +64,7 @@ public class KineticDebugger {
         return Minecraft.getInstance().getDebugOverlay().showDebugScreen();
     }
 
+    @Nullable
     public static KineticBlockEntity getSelectedBE(Minecraft mc) {
         HitResult obj = mc.hitResult;
         if (obj == null)

@@ -3,13 +3,13 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 import com.zurrtum.create.content.kinetics.gauge.StressGaugeBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
-
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class KineticStressDisplaySource extends PercentOrProgressBarDisplaySource {
     private final NumberFormat format = NumberFormat.getNumberInstance(Locale.ROOT);
@@ -33,6 +33,7 @@ public class KineticStressDisplaySource extends PercentOrProgressBarDisplaySourc
     }
 
     @Override
+    @Nullable
     protected Float getProgress(DisplayLinkContext context) {
         if (!(context.getSourceBlockEntity() instanceof StressGaugeBlockEntity stressGauge))
             return null;

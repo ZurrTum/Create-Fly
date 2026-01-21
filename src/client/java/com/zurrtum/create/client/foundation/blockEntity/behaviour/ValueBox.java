@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class ValueBox extends ChasingAABBOutline {
     protected Component label;
@@ -106,7 +107,7 @@ public class ValueBox extends ChasingAABBOutline {
 
     public static class ItemValueBox extends ValueBox {
         ItemStack stack;
-        MutableComponent count;
+        @Nullable MutableComponent count;
 
         public ItemValueBox(Component label, AABB bb, BlockPos pos, ItemStack stack, MutableComponent count) {
             super(label, bb, pos);

@@ -33,9 +33,9 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
     private final AllGuiTextures background = AllGuiTextures.SEQUENCER;
     private IconButton confirmButton;
     private GuiItemRenderBuilder renderedItem;
-    private SequencedGearshiftBlockEntity be;
+    private final SequencedGearshiftBlockEntity be;
 
-    private Vector<Instruction> instructions;
+    private final Vector<Instruction> instructions;
 
     private Vector<Vector<ScrollInput>> inputs;
 

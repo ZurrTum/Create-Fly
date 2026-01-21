@@ -51,7 +51,7 @@ public class AllDamageSources {
         return registry.get(type).map(DamageSource::new).orElse(null);
     }
 
-    public DamageSource potatoCannon(Entity causingEntity, Entity directEntity) {
+    public DamageSource potatoCannon(Entity causingEntity, @Nullable Entity directEntity) {
         return new DamageSource(registry.getOrThrow(AllDamageTypes.POTATO_CANNON), causingEntity, directEntity);
     }
 

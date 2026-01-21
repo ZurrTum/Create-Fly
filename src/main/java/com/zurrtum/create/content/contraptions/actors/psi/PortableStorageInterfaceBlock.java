@@ -28,23 +28,25 @@ import org.jspecify.annotations.Nullable;
 
 public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock implements IBE<PortableStorageInterfaceBlockEntity>, ItemInventoryProvider<PortableStorageInterfaceBlockEntity>, FluidInventoryProvider<PortableStorageInterfaceBlockEntity> {
     @Override
+    @Nullable
     public Container getInventory(
         LevelAccessor world,
         BlockPos pos,
         BlockState state,
         PortableStorageInterfaceBlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         return getInventory(blockEntity);
     }
 
     @Override
+    @Nullable
     public Container getInventory(
         @Nullable BlockState state,
         LevelAccessor world,
         BlockPos pos,
         @Nullable BlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         if (blockEntity == null) {
             blockEntity = world.getBlockEntity(pos);
@@ -52,7 +54,8 @@ public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock im
         return getInventory(blockEntity);
     }
 
-    private Container getInventory(BlockEntity blockEntity) {
+    @Nullable
+    private Container getInventory(@Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof PortableItemInterfaceBlockEntity be) {
             return be.capability;
         }
@@ -60,23 +63,25 @@ public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock im
     }
 
     @Override
+    @Nullable
     public FluidInventory getFluidInventory(
         LevelAccessor world,
         BlockPos pos,
         BlockState state,
         PortableStorageInterfaceBlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         return getFluidInventory(blockEntity);
     }
 
     @Override
+    @Nullable
     public FluidInventory getFluidInventory(
         @Nullable BlockState state,
         LevelAccessor world,
         BlockPos pos,
         @Nullable BlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         if (blockEntity == null) {
             blockEntity = world.getBlockEntity(pos);
@@ -84,7 +89,8 @@ public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock im
         return getFluidInventory(blockEntity);
     }
 
-    private FluidInventory getFluidInventory(BlockEntity blockEntity) {
+    @Nullable
+    private FluidInventory getFluidInventory(@Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof PortableFluidInterfaceBlockEntity be) {
             return be.capability;
         }
@@ -119,7 +125,7 @@ public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock im
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }

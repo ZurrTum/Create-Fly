@@ -210,7 +210,7 @@ public class ClientContraption {
      */
     @SuppressWarnings("unchecked")
     public static void resetClientContraption(Contraption contraption) {
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
         var maybeNullClientContraption = clientContraption.getAcquire();
 
         // Nothing to invalidate if it hasn't been created yet.
@@ -224,7 +224,7 @@ public class ClientContraption {
      */
     @SuppressWarnings("unchecked")
     public static void invalidateClientContraptionStructure(Contraption contraption) {
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
         var maybeNullClientContraption = clientContraption.getAcquire();
 
         // Nothing to invalidate if it hasn't been created yet.
@@ -238,7 +238,7 @@ public class ClientContraption {
      */
     @SuppressWarnings("unchecked")
     public static void invalidateClientContraptionChildren(Contraption contraption) {
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
         var maybeNullClientContraption = clientContraption.getAcquire();
 
         // Nothing to invalidate if it hasn't been created yet.
@@ -250,7 +250,7 @@ public class ClientContraption {
     @SuppressWarnings("unchecked")
     @Nullable
     public static BlockEntity getBlockEntityClientSide(Contraption contraption, BlockPos localPos) {
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
         var maybeNullClientContraption = clientContraption.getAcquire();
 
         if (maybeNullClientContraption == null) {

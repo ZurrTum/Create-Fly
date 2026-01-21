@@ -31,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class TrackBlockOutline {
 
     public static WorldAttached<Map<BlockPos, TrackBlockEntity>> TRACKS_WITH_TURNS = new WorldAttached<>(w -> new HashMap<>());
 
-    public static BezierPointSelection result;
+    public static @Nullable BezierPointSelection result;
 
     public static void pickCurves(Minecraft mc) {
         if (!(mc.getCameraEntity() instanceof LocalPlayer player))
@@ -176,7 +177,7 @@ public class TrackBlockOutline {
         return cancel.isTrue();
     }
 
-    public static void renderShape(VoxelShape s, PoseStack ms, VertexConsumer vb, Boolean valid) {
+    public static void renderShape(VoxelShape s, PoseStack ms, VertexConsumer vb, @Nullable Boolean valid) {
         PoseStack.Pose transform = ms.last();
         s.forAllEdges((x1, y1, z1, x2, y2, z2) -> {
             float xDiff = (float) (x2 - x1);

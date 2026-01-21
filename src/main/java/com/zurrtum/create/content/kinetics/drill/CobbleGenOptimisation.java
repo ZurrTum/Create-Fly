@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CobbleGenOptimisation {
-    static CobbleGenLevel cachedLevel;
+    static @Nullable CobbleGenLevel cachedLevel;
 
     public record CobbleGenBlockConfiguration(List<BlockState> statesAroundDrill) {
     }

@@ -12,9 +12,6 @@ import com.zurrtum.create.content.decoration.girder.GirderEncasedShaftBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlock;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +26,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 public class ShaftBlock extends AbstractSimpleShaftBlock implements EncasableBlock {
 
@@ -131,7 +131,7 @@ public class ShaftBlock extends AbstractSimpleShaftBlock implements EncasableBlo
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(@Nullable Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
             PlacementOffset offset = super.getOffset(player, world, state, pos, ray);
             if (offset.isSuccessful())
                 offset.withTransform(offset.getTransform()

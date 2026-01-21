@@ -96,7 +96,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     @Override
     public void update(
         ItemStackRenderState state,
-        ItemStack stack,
+        @Nullable ItemStack stack,
         ItemModelResolver resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientLevel world,
@@ -152,7 +152,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
 
     @Override
     public void submit(
-        RenderData data,
+        @Nullable RenderData data,
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,
@@ -248,7 +248,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     }
 
     public static class RenderData {
-        ItemStackRenderState item;
+        @Nullable ItemStackRenderState item;
         LayerRenderState state;
         List<BakedQuad> hand;
         float halfAngle;

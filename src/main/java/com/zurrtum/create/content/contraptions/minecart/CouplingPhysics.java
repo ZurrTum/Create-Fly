@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class CouplingPhysics {
 
@@ -42,7 +43,7 @@ public class CouplingPhysics {
         if (!MinecartSim2020.canAddMotion(carts.get(false)) && MinecartSim2020.canAddMotion(carts.get(true)))
             carts = carts.swap();
 
-        Couple<Vec3> corrections = Couple.create(null, null);
+        Couple<@Nullable Vec3> corrections = Couple.create(null, null);
         Couple<Double> maxSpeed = carts.map(cart -> cart.getMaxSpeed(world));
         boolean firstLoop = true;
         for (boolean current : new boolean[]{true, false, true}) {
@@ -84,7 +85,7 @@ public class CouplingPhysics {
         motions.replaceWithParams(VecHelper::clamp, Couple.create(1f, 1f));
         Couple<Vec3> nextPositions = carts.map(MinecartSim2020::predictNextPositionOf);
 
-        Couple<RailShape> shapes = carts.mapWithContext((minecart, current) -> {
+        Couple<@Nullable RailShape> shapes = carts.mapWithContext((minecart, current) -> {
             Vec3 vec = nextPositions.get(current);
             int x = Mth.floor(vec.x());
             int y = Mth.floor(vec.y());

@@ -8,19 +8,19 @@ import com.mojang.serialization.RecordBuilder;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllMapDecorationTypes;
-import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class StationMarker {
     public static final Codec<StationMarker> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -42,6 +42,7 @@ public class StationMarker {
         id = "create:station-" + target.getX() + "," + target.getY() + "," + target.getZ();
     }
 
+    @Nullable
     public static StationMarker fromWorld(BlockGetter level, BlockPos pos) {
         Optional<StationBlockEntity> stationOption = level.getBlockEntity(pos, AllBlockEntityTypes.TRACK_STATION);
 
@@ -91,13 +92,14 @@ public class StationMarker {
         return Objects.hash(target, name);
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static MapDecoration createStationDecoration(byte x, byte y, Optional<Component> name) {
         return new MapDecoration(AllMapDecorationTypes.STATION_MAP_DECORATION, x, y, (byte) 0, name);
     }
 
     public record WrapperCodec(Codec<MapItemSavedData> codec) implements Codec<MapItemSavedData> {
         private static final String STATION_MARKERS_KEY = "create:stations";
-        private static WrapperCodec CODEC;
+        private static @Nullable WrapperCodec CODEC;
 
         public static WrapperCodec get(Codec<MapItemSavedData> codec) {
             if (CODEC == null) {

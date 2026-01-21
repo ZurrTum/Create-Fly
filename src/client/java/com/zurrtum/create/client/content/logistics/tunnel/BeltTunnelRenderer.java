@@ -12,7 +12,7 @@ import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntit
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -39,7 +39,7 @@ public class BeltTunnelRenderer extends SmartBlockEntityRenderer<BeltTunnelBlock
         BeltTunnelRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (VisualizationManager.supportsVisualization(be.getLevel())) {
@@ -69,6 +69,6 @@ public class BeltTunnelRenderer extends SmartBlockEntityRenderer<BeltTunnelBlock
     }
 
     public static class BeltTunnelRenderState extends SmartRenderState {
-        public List<FlapsRenderState> flaps;
+        public @Nullable List<FlapsRenderState> flaps;
     }
 }

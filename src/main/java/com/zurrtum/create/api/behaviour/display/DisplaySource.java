@@ -32,9 +32,10 @@ public abstract class DisplaySource {
     public static final List<MutableComponent> EMPTY = ImmutableList.of(Component.empty());
     public static final MutableComponent EMPTY_LINE = Component.empty();
     public static final MutableComponent WHITESPACE = CommonComponents.space();
-    public Object attachRender;
+    public @Nullable Object attachRender;
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T getAttachRender() {
         return (T) attachRender;
     }

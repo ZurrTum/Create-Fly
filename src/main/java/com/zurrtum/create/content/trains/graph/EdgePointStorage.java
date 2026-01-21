@@ -6,6 +6,7 @@ import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 public class EdgePointStorage {
 
-    private Map<EdgePointType<?>, Map<UUID, TrackEdgePoint>> pointsByType;
+    private final Map<EdgePointType<?>, Map<UUID, TrackEdgePoint>> pointsByType;
 
     public EdgePointStorage() {
         pointsByType = new HashMap<>();
@@ -25,11 +26,13 @@ public class EdgePointStorage {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T extends TrackEdgePoint> T get(EdgePointType<T> type, UUID id) {
         return (T) getMap(type).get(id);
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T extends TrackEdgePoint> T remove(EdgePointType<T> type, UUID id) {
         return (T) getMap(type).remove(id);
     }

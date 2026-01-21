@@ -2,6 +2,7 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.content.logistics.factoryBoard.FactoryPanelBehaviour;
@@ -11,7 +12,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.Sc
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -21,8 +21,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class ValueSettingsInputHandler {
+    @Nullable
     public static InteractionResult onBlockActivated(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
         if (!canInteract(player))
             return null;
@@ -63,6 +65,7 @@ public class ValueSettingsInputHandler {
         return null;
     }
 
+    @Nullable
     private static InteractionResult handleInteraction(
         BlockEntityBehaviour<?> behaviour,
         BehaviourType<? extends BlockEntityBehaviour<?>> type,
@@ -103,7 +106,7 @@ public class ValueSettingsInputHandler {
         return InteractionResult.SUCCESS;
     }
 
-    public static boolean canInteract(Player player) {
+    public static boolean canInteract(@Nullable Player player) {
         return player != null && !player.isSpectator() && !player.isShiftKeyDown() && player.mayBuild();
     }
 }

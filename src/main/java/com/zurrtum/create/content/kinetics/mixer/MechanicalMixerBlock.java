@@ -54,11 +54,6 @@ public class MechanicalMixerBlock extends KineticBlock implements IBE<Mechanical
     }
 
     @Override
-    public float getParticleInitialRadius() {
-        return .75f;
-    }
-
-    @Override
     public SpeedLevel getMinimumRequiredSpeedLevel() {
         return SpeedLevel.MEDIUM;
     }

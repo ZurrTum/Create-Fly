@@ -56,7 +56,7 @@ public class CombinedTankWrapper implements SidedFluidInventory {
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getAvailableSlots(@Nullable Direction side) {
         return slots;
     }
 

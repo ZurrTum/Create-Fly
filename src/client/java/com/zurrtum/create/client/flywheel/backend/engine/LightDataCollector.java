@@ -49,6 +49,7 @@ public abstract class LightDataCollector {
         }
     }
 
+    @Nullable
     private static DataLayer getSkyDataLayer(SkyLightSectionStorage skyStorage, long section) {
         long l = section;
         int i = SectionPos.y(l);

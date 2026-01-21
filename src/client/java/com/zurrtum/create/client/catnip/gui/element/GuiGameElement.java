@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
@@ -60,7 +61,7 @@ public class GuiGameElement {
 
     public static class GuiItemRenderBuilder extends GuiRenderBuilder<GuiItemRenderBuilder> {
         private final ItemStack stack;
-        private Object key;
+        private @Nullable Object key;
 
         public GuiItemRenderBuilder(ItemStack stack) {
             this.stack = stack;
@@ -175,9 +176,9 @@ public class GuiGameElement {
 
     public static class GuiPartialRenderBuilder extends AbstractRenderElement {
         private final PartialRenderState state = new PartialRenderState();
-        private PartialModel model;
+        private @Nullable PartialModel model;
         private float scale = 1;
-        private BiConsumer<PoseStack, Float> transform;
+        private @Nullable BiConsumer<PoseStack, Float> transform;
         private float partialTicks;
         private int padding;
         private float xLocal, yLocal;
@@ -208,7 +209,7 @@ public class GuiGameElement {
             return this;
         }
 
-        public GuiPartialRenderBuilder partial(PartialModel model) {
+        public GuiPartialRenderBuilder partial(@Nullable PartialModel model) {
             this.model = model;
             return this;
         }

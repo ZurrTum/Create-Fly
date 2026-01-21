@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class AddressEditBoxHelper {
         NEARBY_CLIPBOARDS.put(blockPos, new WeakReference<>(blockEntity));
     }
 
-    public static DestinationSuggestions createSuggestions(Screen screen, EditBox pInput, boolean anchorToBottom, String localAddress) {
+    public static DestinationSuggestions createSuggestions(Screen screen, EditBox pInput, boolean anchorToBottom, @Nullable String localAddress) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         List<IntAttached<String>> options = new ArrayList<>();
@@ -76,7 +77,7 @@ public class AddressEditBoxHelper {
         return destinationSuggestions;
     }
 
-    private static void appendAddresses(List<IntAttached<String>> options, Set<String> alreadyAdded, ItemStack item) {
+    private static void appendAddresses(List<IntAttached<String>> options, Set<String> alreadyAdded, @Nullable ItemStack item) {
         if (item == null || !item.is(AllItems.CLIPBOARD))
             return;
 

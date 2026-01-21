@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -40,7 +40,7 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
         SpoutRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         SmartFluidTankBehaviour tank = be.tank;
         if (tank == null) {
@@ -117,8 +117,8 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
     }
 
     public static class SpoutRenderState extends BlockEntityRenderState {
-        public FluidRenderState fluid;
-        public ProcessRenderState process;
+        public @Nullable FluidRenderState fluid;
+        public @Nullable ProcessRenderState process;
         public BitsRenderState bits;
     }
 

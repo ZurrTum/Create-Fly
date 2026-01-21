@@ -35,7 +35,7 @@ import java.util.UUID;
 public class PackagerLinkBlockEntity extends LinkWithBulbBlockEntity {
 
     public LogisticallyLinkedBehaviour behaviour;
-    public UUID placedBy;
+    public @Nullable UUID placedBy;
 
     public PackagerLinkBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.PACKAGER_LINK, pos, state);
@@ -71,6 +71,7 @@ public class PackagerLinkBlockEntity extends LinkWithBulbBlockEntity {
         level.addParticle(AllParticleTypes.WIFI, vec3.x, vec3.y, vec3.z, 1, face == AttachFace.CEILING ? -1 : 1, 1);
     }
 
+    @Nullable
     public Pair<PackagerBlockEntity, PackagingRequest> processRequest(
         ItemStack stack,
         int amount,

@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 public class ItemPlacementSoundContext extends BlockPlaceContext {
     private final float volume;
     private final float pitch;
-    private final SoundEvent sound;
+    private final @Nullable SoundEvent sound;
 
     public ItemPlacementSoundContext(
         Level world,
@@ -25,7 +25,7 @@ public class ItemPlacementSoundContext extends BlockPlaceContext {
         BlockHitResult blockHitResult,
         float volume,
         float pitch,
-        SoundEvent sound
+        @Nullable SoundEvent sound
     ) {
         super(world, playerEntity, hand, itemStack, blockHitResult);
         this.volume = volume;
@@ -33,7 +33,7 @@ public class ItemPlacementSoundContext extends BlockPlaceContext {
         this.sound = sound;
     }
 
-    public ItemPlacementSoundContext(BlockPlaceContext context, float volume, float pitch, SoundEvent sound) {
+    public ItemPlacementSoundContext(BlockPlaceContext context, float volume, float pitch, @Nullable SoundEvent sound) {
         super(context);
         this.volume = volume;
         this.pitch = pitch;
@@ -48,6 +48,7 @@ public class ItemPlacementSoundContext extends BlockPlaceContext {
         return pitch;
     }
 
+    @Nullable
     public SoundEvent getSound() {
         return sound;
     }

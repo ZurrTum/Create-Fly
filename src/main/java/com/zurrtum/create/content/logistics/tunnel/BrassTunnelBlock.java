@@ -1,9 +1,6 @@
 package com.zurrtum.create.content.logistics.tunnel;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -17,6 +14,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class BrassTunnelBlock extends BeltTunnelBlock {
 
@@ -25,7 +25,13 @@ public class BrassTunnelBlock extends BeltTunnelBlock {
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, BeltTunnelBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        BeltTunnelBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         if (blockEntity instanceof BrassTunnelBlockEntity brassTunnelBlockEntity) {
             return brassTunnelBlockEntity.tunnelCapability;
         }

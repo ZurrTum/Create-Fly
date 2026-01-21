@@ -12,10 +12,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class ClickToLinkHandler {
-    private static BlockPos lastShownPos = null;
-    private static AABB lastShownAABB = null;
+    private static @Nullable BlockPos lastShownPos = null;
+    private static @Nullable AABB lastShownAABB = null;
 
     public static void clientTick(Minecraft mc) {
         Player player = mc.player;

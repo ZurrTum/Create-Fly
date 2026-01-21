@@ -106,6 +106,7 @@ public class ChainConveyorBlock extends KineticBlock implements IBE<ChainConveyo
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         for (int x = -1; x <= 1; x++)
             for (int z = -1; z <= 1; z++)

@@ -215,8 +215,7 @@ public class TrackGraphVisualizer {
             Vec3 yOffset = new Vec3(0, 3 / 16f, 0);
             Vec3 v1 = location.add(yOffset);
             Vec3 v2 = v1.add(node.getNormal().scale(3 / 16f));
-            Outliner.getInstance().showLine(Integer.valueOf(node.getNetId()), v1, v2).colored(Color.mixColors(Color.WHITE, graph.color, 1))
-                .lineWidth(1 / 8f);
+            Outliner.getInstance().showLine(node.getNetId(), v1, v2).colored(Color.mixColors(Color.WHITE, graph.color, 1)).lineWidth(1 / 8f);
 
             Map<TrackNode, TrackEdge> map = graph.connectionsByNode.get(node);
             if (map == null)
@@ -230,8 +229,7 @@ public class TrackGraphVisualizer {
                 if (!edge.node1.getLocation().dimension.equals(edge.node2.getLocation().dimension)) {
                     v1 = location.add(yOffset);
                     v2 = v1.add(node.getNormal().scale(3 / 16f));
-                    Outliner.getInstance().showLine(Integer.valueOf(node.getNetId()), v1, v2).colored(Color.mixColors(Color.WHITE, graph.color, 1))
-                        .lineWidth(1 / 4f);
+                    Outliner.getInstance().showLine(node.getNetId(), v1, v2).colored(Color.mixColors(Color.WHITE, graph.color, 1)).lineWidth(1 / 4f);
                     continue;
                 }
                 if (other.hashCode() > hashCode && !AllKeys.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))

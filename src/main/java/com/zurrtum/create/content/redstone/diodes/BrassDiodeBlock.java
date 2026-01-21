@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiodeBlockEntity>, RedStoneConnectBlock {
 
@@ -85,7 +86,7 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, Direction side) {
+    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
         if (side == null)
             return false;
         return side.getAxis() == state.getValue(FACING).getAxis();

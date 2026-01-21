@@ -14,6 +14,7 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -95,7 +96,7 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     }
 
     @Override
-    public void queueStationTrain(Train imminentTrain, boolean newlyArrived, boolean trainPresent) {
+    public void queueStationTrain(@Nullable Train imminentTrain, boolean newlyArrived, boolean trainPresent) {
         StationBlockEntity be = (StationBlockEntity) blockEntity;
         UUID trainId = be.imminentTrain;
         if (trainId == null && imminentTrain != null) {

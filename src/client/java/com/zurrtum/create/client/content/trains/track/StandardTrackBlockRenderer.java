@@ -28,6 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.Nullable;
 
 public class StandardTrackBlockRenderer implements TrackBlockRenderer {
     @Override
@@ -36,7 +37,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         BlockGetter world,
         BlockPos pos,
         BlockState state,
-        BezierTrackPointLocation bezierPoint,
+        @Nullable BezierTrackPointLocation bezierPoint,
         AxisDirection direction,
         RenderedTrackOverlayType type
     ) {
@@ -63,7 +64,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         }
 
         if (normal == null) {
-            axis = state.getValue(TrackBlock.SHAPE).getAxes().get(0);
+            axis = state.getValue(TrackBlock.SHAPE).getAxes().getFirst();
             diff = axis.scale(direction.getStep()).normalize();
             normal = state.getValue(TrackBlock.SHAPE).getNormal();
         }
@@ -90,13 +91,14 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
     }
 
     @Override
+    @Nullable
     public TrackBlockRenderState getRenderState(
         Level world,
         Vec3 offset,
         BlockState trackState,
         BlockPos pos,
         AxisDirection direction,
-        BezierTrackPointLocation bezier,
+        @Nullable BezierTrackPointLocation bezier,
         RenderedTrackOverlayType type,
         float scale
     ) {
@@ -158,6 +160,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
     }
 
     @Override
+    @Nullable
     public TrackBlockRenderState getAssemblyRenderState(StationBlockEntity be, Vec3 offset, Level world, BlockPos pos, BlockState blockState) {
         Direction direction = be.assemblyDirection;
         if (direction == null) {
@@ -207,9 +210,9 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         public Vec3 offset;
         public float yRot;
         public float xRot;
-        public Vec3 offset2;
+        public @Nullable Vec3 offset2;
         public float xRot2;
-        public Float offset3;
+        public @Nullable Float offset3;
         public boolean negative;
         public SuperByteBuffer model;
         public int light;

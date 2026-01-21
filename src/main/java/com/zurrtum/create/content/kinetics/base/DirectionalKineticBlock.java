@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import org.jspecify.annotations.Nullable;
 
 public abstract class DirectionalKineticBlock extends KineticBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
@@ -24,6 +25,7 @@ public abstract class DirectionalKineticBlock extends KineticBlock {
         super.createBlockStateDefinition(builder);
     }
 
+    @Nullable
     public Direction getPreferredFacing(BlockPlaceContext context) {
         Direction prefferedSide = null;
         for (Direction side : Iterate.directions) {
@@ -47,6 +49,7 @@ public abstract class DirectionalKineticBlock extends KineticBlock {
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredFacing(context);
         if (preferred == null || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {

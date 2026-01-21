@@ -21,8 +21,6 @@ import java.util.function.Consumer;
 
 public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntity> {
 
-    private final boolean large;
-
     protected final RotatingInstance rotatingModel;
     @Nullable
     protected final RotatingInstance rotatingTopShaft;
@@ -39,7 +37,6 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
 
     public EncasedCogVisual(VisualizationContext modelManager, KineticBlockEntity blockEntity, boolean large, float partialTick, Model model) {
         super(modelManager, blockEntity, partialTick);
-        this.large = large;
 
         rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, model).createInstance();
 

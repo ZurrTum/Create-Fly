@@ -50,7 +50,7 @@ public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorB
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, EjectorBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, EjectorBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.depotBehaviour.itemHandler;
     }
 
@@ -75,6 +75,7 @@ public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorB
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return withWater(super.getStateForPlacement(pContext), pContext);
     }
@@ -127,7 +128,7 @@ public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorB
         }
 
         Optional<EjectorBlockEntity> teProvider = getBlockEntityOptional(worldIn, position);
-        if (!teProvider.isPresent())
+        if (teProvider.isEmpty())
             return;
 
         EjectorBlockEntity ejectorBlockEntity = teProvider.get();

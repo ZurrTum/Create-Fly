@@ -27,13 +27,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 public class BeltTunnelBlockEntity extends SmartBlockEntity {
 
     public Map<Direction, LerpedFloat> flaps;
     public Set<Direction> sides;
 
-    public Container cap = null;
+    public @Nullable Container cap = null;
     protected List<Pair<Direction, Boolean>> flapsToSend;
 
     public BeltTunnelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

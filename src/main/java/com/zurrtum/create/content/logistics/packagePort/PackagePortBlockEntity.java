@@ -42,7 +42,7 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
 
     public boolean acceptsPackages;
     public String addressFilter;
-    public PackagePortTarget target;
+    public @Nullable PackagePortTarget target;
     public PackagePortInventory inventory;
 
     protected AnimatedContainerBehaviour<PackagePortMenu> openTracker;
@@ -75,6 +75,7 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
             target.register(this, level, worldPosition);
     }
 
+    @Nullable
     public String getFilterString() {
         return acceptsPackages ? addressFilter : null;
     }
@@ -133,7 +134,7 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
 
     protected abstract void onOpenChange(boolean open);
 
-    public InteractionResult use(Player player) {
+    public InteractionResult use(@Nullable Player player) {
         if (player == null || player.isCrouching())
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (FakePlayerHandler.has(player))
@@ -233,7 +234,7 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         }
 
         @Override
-        public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
+        public boolean canTakeItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
             String filterString = getFilterString();
             if (receive) {
                 return filterString != null && PackageItem.matchAddress(stack, filterString);

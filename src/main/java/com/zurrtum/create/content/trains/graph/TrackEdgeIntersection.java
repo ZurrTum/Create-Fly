@@ -3,20 +3,20 @@ package com.zurrtum.create.content.trains.graph;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.data.Couple;
-
-import java.util.Iterator;
-import java.util.UUID;
-
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.UUID;
 
 public class TrackEdgeIntersection {
 
     public double location;
     public Couple<TrackNodeLocation> target;
     public double targetLocation;
-    public UUID groupId;
+    public @Nullable UUID groupId;
     public UUID id;
 
     public TrackEdgeIntersection() {

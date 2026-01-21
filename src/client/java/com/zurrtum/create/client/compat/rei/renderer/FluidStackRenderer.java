@@ -20,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluid;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
     }
 
     @Override
+    @Nullable
     public Tooltip getTooltip(EntryStack<FluidStack> entry, TooltipContext context) {
         Tooltip tooltip = origin.getTooltip(entry, context);
         if (tooltip == null) {

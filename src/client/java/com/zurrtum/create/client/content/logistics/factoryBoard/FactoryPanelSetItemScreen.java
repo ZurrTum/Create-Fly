@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,7 @@ public class FactoryPanelSetItemScreen extends AbstractSimiContainerScreen<Facto
         );
     }
 
+    @Nullable
     public static FactoryPanelSetItemScreen create(
         Minecraft mc,
         MenuType<ServerFactoryPanelBehaviour> type,

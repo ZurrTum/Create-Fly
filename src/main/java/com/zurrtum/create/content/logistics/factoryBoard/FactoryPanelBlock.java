@@ -52,6 +52,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -81,6 +82,7 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
         if (stateForPlacement == null)
@@ -155,7 +157,7 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         if (pPlacer == null)
             return;
@@ -349,7 +351,7 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity blockEntity) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity blockEntity) {
         return ItemRequirement.NONE;
     }
 

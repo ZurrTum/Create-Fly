@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.ResolvedModel;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +24,7 @@ public class SimpleModelWrapperMixin implements LayerBakedModel {
     }
 
     @Override
-    public void create$setBlockRenderLayer(ChunkSectionLayer blockRenderLayer) {
+    public void create$setBlockRenderLayer(@NonNull ChunkSectionLayer blockRenderLayer) {
         this.blockRenderLayer = blockRenderLayer;
     }
 

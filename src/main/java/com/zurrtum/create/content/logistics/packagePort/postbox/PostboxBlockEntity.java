@@ -14,12 +14,13 @@ import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 
 public class PostboxBlockEntity extends PackagePortBlockEntity {
 
-    public WeakReference<GlobalStation> trackedGlobalStation;
+    public WeakReference<@Nullable GlobalStation> trackedGlobalStation;
 
     public LerpedFloat flag;
     public boolean forceFlag;

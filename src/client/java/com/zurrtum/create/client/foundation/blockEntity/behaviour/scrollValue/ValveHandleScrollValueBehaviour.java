@@ -26,8 +26,8 @@ public class ValveHandleScrollValueBehaviour extends ScrollValueBehaviour<ValveH
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
         ImmutableList<Component> rows = ImmutableList.of(
-            Component.literal("\u27f3").withStyle(ChatFormatting.BOLD),
-            Component.literal("\u27f2").withStyle(ChatFormatting.BOLD)
+            Component.literal("⟳").withStyle(ChatFormatting.BOLD),
+            Component.literal("⟲").withStyle(ChatFormatting.BOLD)
         );
         return new ValueSettingsBoard(label, 180, 45, rows, new ValueSettingsFormatter(this::formatValue));
     }

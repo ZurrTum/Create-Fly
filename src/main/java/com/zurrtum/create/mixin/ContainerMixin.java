@@ -3,6 +3,7 @@ package com.zurrtum.create.mixin;
 import com.zurrtum.create.infrastructure.items.BaseInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -27,7 +28,7 @@ public interface ContainerMixin extends BaseInventory {
     void setChanged();
 
     @Override
-    default void create$setStack(int slot, ItemStack stack) {
+    default void create$setStack(int slot, @NonNull ItemStack stack) {
         setItem(slot, stack);
     }
 
@@ -37,17 +38,18 @@ public interface ContainerMixin extends BaseInventory {
     }
 
     @Override
-    default int create$getMaxCount(ItemStack stack) {
+    default int create$getMaxCount(@NonNull ItemStack stack) {
         return getMaxStackSize(stack);
     }
 
     @Override
+    @NonNull
     default ItemStack create$getStack(int slot) {
         return getItem(slot);
     }
 
     @Override
-    default boolean create$isValid(int slot, ItemStack stack) {
+    default boolean create$isValid(int slot, @NonNull ItemStack stack) {
         return canPlaceItem(slot, stack);
     }
 

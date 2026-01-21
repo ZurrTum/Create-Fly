@@ -113,7 +113,7 @@ public final class GlCompat {
         if (CAPABILITIES == null) {
             return false;
         } else {
-            return CAPABILITIES.OpenGL33 ? true : CAPABILITIES.GL_ARB_shader_bit_encoding;
+            return CAPABILITIES.OpenGL33 || CAPABILITIES.GL_ARB_shader_bit_encoding;
         }
     }
 
@@ -128,7 +128,7 @@ public final class GlCompat {
     }
 
     private static boolean isDsaSupported() {
-        return CAPABILITIES == null ? false : CAPABILITIES.GL_ARB_direct_state_access;
+        return CAPABILITIES != null && CAPABILITIES.GL_ARB_direct_state_access;
     }
 
     private static GlslVersion maxGlslVersion() {

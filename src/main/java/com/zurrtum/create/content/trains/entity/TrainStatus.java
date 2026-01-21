@@ -158,7 +158,7 @@ public class TrainStatus {
         queued.add(message);
 
         if (queued.size() > 3)
-            queued.remove(0);
+            queued.removeFirst();
     }
 
     public void newSchedule() {

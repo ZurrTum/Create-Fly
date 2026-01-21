@@ -9,17 +9,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public interface FluidInventoryProvider<T extends SmartBlockEntity> {
+    @Nullable
     default FluidInventory getFluidInventory(BlockState state, LevelAccessor world, BlockPos pos) {
         return getFluidInventory(state, world, pos, null, null);
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     default FluidInventory getFluidInventory(
         @Nullable BlockState state,
         LevelAccessor world,
         BlockPos pos,
         @Nullable BlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         if (blockEntity == null) {
             if (state == null) {
@@ -44,5 +46,5 @@ public interface FluidInventoryProvider<T extends SmartBlockEntity> {
 
     Class<T> getBlockEntityClass();
 
-    FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, T blockEntity, Direction context);
+    @Nullable FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, T blockEntity, @Nullable Direction context);
 }

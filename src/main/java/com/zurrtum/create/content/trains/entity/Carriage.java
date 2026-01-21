@@ -49,6 +49,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Carriage {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, Carriage> STREAM_CODEC = StreamCodec.composite(
         CarriageBogey.STREAM_CODEC,
         carriage -> carriage.bogeys.getFirst(),
@@ -68,13 +69,13 @@ public class Carriage {
     public Couple<Boolean> presentConductors;
 
     public int bogeySpacing;
-    public Couple<CarriageBogey> bogeys;
-    public TrainCargoManager storage;
+    public Couple<@Nullable CarriageBogey> bogeys;
+    public @Nullable TrainCargoManager storage;
 
     CompoundTag serialisedEntity;
     Map<Integer, CompoundTag> serialisedPassengers;
 
-    private Map<ResourceKey<Level>, DimensionalCarriageEntity> entities;
+    private final Map<ResourceKey<Level>, DimensionalCarriageEntity> entities;
 
     static final int FIRST = 0, MIDDLE = 1, LAST = 2, BOTH = 3;
 
@@ -144,8 +145,8 @@ public class Carriage {
         Level level,
         TrackGraph graph,
         double distance,
-        TravellingPoint toFollowForward,
-        TravellingPoint toFollowBackward,
+        @Nullable TravellingPoint toFollowForward,
+        @Nullable TravellingPoint toFollowBackward,
         int type
     ) {
 
@@ -177,7 +178,7 @@ public class Carriage {
                 TravellingPoint nextPoint = actuallyFirstWheel ? bogey.points.getSecond() : actuallyFirstBogey && onTwoBogeys ? bogeys.getSecond().points.getFirst() : null;
 
                 double correction = bogeyStress * (actuallyFirstWheel ? 0.5d : -0.5d);
-                double toMove = distanceMoved.getValue();
+                double toMove = distanceMoved.doubleValue();
 
                 ITrackSelector frontTrackSelector = prevPoint == null ? forwardControl.apply(point) : point.follow(prevPoint);
                 ITrackSelector backTrackSelector = nextPoint == null ? backwardControl.apply(point) : point.follow(nextPoint);
@@ -215,7 +216,7 @@ public class Carriage {
 
         updateContraptionAnchors();
         manageEntities(level);
-        return distanceMoved.getValue();
+        return distanceMoved.doubleValue();
     }
 
     public double getAnchorDiff() {
@@ -240,7 +241,7 @@ public class Carriage {
     }
 
     public void updateConductors() {
-        if (anyAvailableEntity() == null || entities.size() > 1 || serialisedPassengers.size() > 0)
+        if (anyAvailableEntity() == null || entities.size() > 1 || !serialisedPassengers.isEmpty())
             return;
         presentConductors.replace($ -> false);
         for (DimensionalCarriageEntity dimensionalCarriageEntity : entities.values()) {
@@ -250,7 +251,7 @@ public class Carriage {
         }
     }
 
-    private Set<ResourceKey<Level>> currentlyTraversedDimensions = new HashSet<>();
+    private final Set<ResourceKey<Level>> currentlyTraversedDimensions = new HashSet<>();
 
     public void manageEntities(Level level) {
         currentlyTraversedDimensions.clear();
@@ -408,6 +409,7 @@ public class Carriage {
 
     }
 
+    @Nullable
     private Vec3 pivoted(
         DimensionalCarriageEntity dce,
         ResourceKey<Level> dimension,
@@ -456,6 +458,7 @@ public class Carriage {
         return bogeys.getSecond() != null;
     }
 
+    @Nullable
     public CarriageContraptionEntity anyAvailableEntity() {
         for (DimensionalCarriageEntity dimensionalCarriageEntity : entities.values()) {
             CarriageContraptionEntity entity = dimensionalCarriageEntity.entity.get();
@@ -465,6 +468,7 @@ public class Carriage {
         return null;
     }
 
+    @Nullable
     public Pair<ResourceKey<Level>, DimensionalCarriageEntity> anyAvailableDimensionalCarriage() {
         for (Map.Entry<ResourceKey<Level>, DimensionalCarriageEntity> entry : entities.entrySet())
             if (entry.getValue().entity.get() != null)
@@ -630,14 +634,14 @@ public class Carriage {
         return carriage;
     }
 
-    private TravellingPoint portalScout = new TravellingPoint();
+    private final TravellingPoint portalScout = new TravellingPoint();
 
     public class DimensionalCarriageEntity {
-        public Vec3 positionAnchor;
-        public Couple<Vec3> rotationAnchors;
-        public WeakReference<CarriageContraptionEntity> entity;
+        public @Nullable Vec3 positionAnchor;
+        public Couple<@Nullable Vec3> rotationAnchors;
+        public WeakReference<@Nullable CarriageContraptionEntity> entity;
 
-        public TrackNodeLocation pivot;
+        public @Nullable TrackNodeLocation pivot;
         int discardTicks;
 
         // 0 == whole, 0..1 = fading out, -1..0 = fading in
@@ -706,6 +710,7 @@ public class Carriage {
                 cutoff = (float) Mth.clamp(1 - (leadingIsCurrent ? leadingDiff : trailingDiff), 0, 1) * (leadingIsCurrent ? 1 : -1);
         }
 
+        @Nullable
         public TrackNodeLocation findPivot(ResourceKey<Level> dimension, boolean leading) {
             if (pivot != null)
                 return pivot;
@@ -796,10 +801,12 @@ public class Carriage {
             });
         }
 
+        @Nullable
         public Vec3 leadingAnchor() {
             return isOnTwoBogeys() ? rotationAnchors.getFirst() : positionAnchor;
         }
 
+        @Nullable
         public Vec3 trailingAnchor() {
             return isOnTwoBogeys() ? rotationAnchors.getSecond() : positionAnchor;
         }
@@ -832,7 +839,7 @@ public class Carriage {
             int max = maxAllowedLocalCoord();
 
             for (Map.Entry<Integer, CompoundTag> entry : serialisedPassengers.entrySet()) {
-                Integer seatId = entry.getKey();
+                int seatId = entry.getKey();
                 List<BlockPos> seats = cce.getContraption().getSeats();
                 if (seatId >= seats.size())
                     continue;

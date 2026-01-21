@@ -56,9 +56,9 @@ public class SailBlock extends WrenchableDirectionalBlock {
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
 
     protected final boolean frame;
-    protected final DyeColor color;
+    protected final @Nullable DyeColor color;
 
-    protected SailBlock(Properties properties, boolean frame, DyeColor color) {
+    protected SailBlock(Properties properties, boolean frame, @Nullable DyeColor color) {
         super(properties);
         this.frame = frame;
         this.color = color;
@@ -166,7 +166,7 @@ public class SailBlock extends WrenchableDirectionalBlock {
             if (timeout-- < 0)
                 break;
 
-            BlockPos currentPos = frontier.remove(0);
+            BlockPos currentPos = frontier.removeFirst();
             visited.add(currentPos);
 
             for (Direction d : Iterate.directions) {
@@ -241,6 +241,7 @@ public class SailBlock extends WrenchableDirectionalBlock {
         return frame;
     }
 
+    @Nullable
     public DyeColor getColor() {
         return color;
     }
@@ -268,7 +269,7 @@ public class SailBlock extends WrenchableDirectionalBlock {
             if (directions.isEmpty())
                 return PlacementOffset.fail();
             else {
-                return PlacementOffset.success(pos.relative(directions.get(0)), s -> s.setValue(FACING, state.getValue(FACING)));
+                return PlacementOffset.success(pos.relative(directions.getFirst()), s -> s.setValue(FACING, state.getValue(FACING)));
             }
         }
     }

@@ -15,7 +15,7 @@ public interface InfoProvider {
      */
     @Nullable String getInfo(@Nullable Player player);
 
-    default String getInfoSafe(Player player) {
+    default String getInfoSafe(@Nullable Player player) {
         try {
             return Objects.toString(getInfo(player));
         } catch (Throwable t) {

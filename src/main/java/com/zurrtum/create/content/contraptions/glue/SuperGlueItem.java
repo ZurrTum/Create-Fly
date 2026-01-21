@@ -12,12 +12,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class SuperGlueItem extends Item {
     public SuperGlueItem(Properties settings) {
         super(settings);
     }
 
+    @Nullable
     public static InteractionResult glueItemAlwaysPlacesWhenUsed(Level world, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockState blockState = world.getBlockState(hit.getBlockPos());
         if (blockState.getBlock() instanceof AbstractChassisBlock cb) {

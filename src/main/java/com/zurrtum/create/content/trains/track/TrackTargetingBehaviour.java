@@ -34,16 +34,16 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
     public static final BehaviourType<TrackTargetingBehaviour<?>> TYPE = new BehaviourType<>();
 
     private BlockPos targetTrack;
-    private BezierTrackPointLocation targetBezier;
+    private @Nullable BezierTrackPointLocation targetBezier;
     private AxisDirection targetDirection;
     private UUID id;
 
-    private Vec3 prevDirection;
-    private Vec3 rotatedDirection;
+    private @Nullable Vec3 prevDirection;
+    private @Nullable Vec3 rotatedDirection;
 
-    private CompoundTag migrationData;
+    private @Nullable CompoundTag migrationData;
     private EdgePointType<T> edgePointType;
-    private T edgePoint;
+    private @Nullable T edgePoint;
     private boolean orthogonal;
 
     public TrackTargetingBehaviour(SmartBlockEntity be, EdgePointType<T> edgePointType) {
@@ -118,6 +118,7 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public T createEdgePoint() {
         Level level = getLevel();
         boolean isClientSide = level.isClientSide();
@@ -268,10 +269,12 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         return targetDirection;
     }
 
+    @Nullable
     public BezierTrackPointLocation getTargetBezier() {
         return targetBezier;
     }
 
+    @Nullable
     public TrackGraphLocation determineGraphLocation() {
         Level level = getLevel();
         BlockPos pos = getGlobalPosition();

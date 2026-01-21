@@ -2,6 +2,7 @@ package com.zurrtum.create.content.redstone.smartObserver;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import org.jspecify.annotations.Nullable;
 
 public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<SmartObserverBlockEntity>, RedStoneConnectBlock, NeighborUpdateListeningBlock {
 
@@ -68,7 +69,13 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
                 null,
                 blockEntity,
                 null
-            ) != null || FluidHelper.hasFluidInventory(context.getLevel(), offsetPos, null, blockEntity, null)))
+            ) != null || FluidHelper.hasFluidInventory(
+                context.getLevel(),
+                offsetPos,
+                null,
+                blockEntity,
+                null
+            )))
                 canDetect = true;
             else if (blockEntity instanceof FunnelBlockEntity)
                 canDetect = true;
@@ -98,7 +105,7 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
     }
 
     @Override
-    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, @Nullable Direction side) {
         return isSignalSource(blockState) && (side == null || side != getTargetDirection(blockState).getOpposite()) ? 15 : 0;
     }
 
@@ -109,7 +116,7 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, Direction side) {
+    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
         return side != state.getValue(FACING).getOpposite();
     }
 

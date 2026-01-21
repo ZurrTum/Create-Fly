@@ -27,16 +27,6 @@ public record BlazeBurnerRenderState(
     }
 
     @Override
-    public @Nullable ScreenRectangle bounds() {
-        return bounds;
-    }
-
-    @Override
-    public Matrix3x2f pose() {
-        return IDENTITY_POSE;
-    }
-
-    @Override
     public float scale() {
         return 48;
     }

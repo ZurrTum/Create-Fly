@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -39,7 +39,7 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         GearboxRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         state.layer = RenderTypes.solidMovingBlock();
@@ -78,7 +78,7 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         }
     }
 
-    private static float getAngle(float angle, float offset, Direction direction, BlockPos source, Direction sourceFacing) {
+    private static float getAngle(float angle, float offset, Direction direction, @Nullable BlockPos source, Direction sourceFacing) {
         if (source != null) {
             if (sourceFacing.getAxis() == direction.getAxis())
                 angle *= sourceFacing == direction ? 1 : -1;
@@ -97,15 +97,15 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
     public static class GearboxRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public RenderType layer;
         public Color color;
-        public SuperByteBuffer down;
+        public @Nullable SuperByteBuffer down;
         public float downAngle;
         public SuperByteBuffer up;
         public float upAngle;
-        public SuperByteBuffer north;
+        public @Nullable SuperByteBuffer north;
         public float northAngle;
         public SuperByteBuffer south;
         public float southAngle;
-        public SuperByteBuffer west;
+        public @Nullable SuperByteBuffer west;
         public float westAngle;
         public SuperByteBuffer east;
         public float eastAngle;

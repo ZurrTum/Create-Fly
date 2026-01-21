@@ -11,9 +11,6 @@ import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlock;
 import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -21,11 +18,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class GantryCarriageBlockEntity extends KineticBlockEntity {
 
     boolean assembleNextTick;
-    protected AssemblyException lastException;
+    protected @Nullable AssemblyException lastException;
 
     public GantryCarriageBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.GANTRY_PINION, pos, state);
@@ -70,6 +70,7 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
         }
     }
 
+    @Nullable
     public AssemblyException getLastAssemblyException() {
         return lastException;
     }

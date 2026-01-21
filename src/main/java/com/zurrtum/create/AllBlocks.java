@@ -260,7 +260,7 @@ public class AllBlocks {
     public static final CasingBlock REFINED_RADIANCE_CASING = register(
         "refined_radiance_casing",
         CasingBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.SNOW).sound(SoundType.WOOD).lightLevel($ -> 12)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.SNOW).sound(SoundType.WOOD).lightLevel(_ -> 12)
     );
     public static final CasingBlock RAILWAY_CASING = register(
         "railway_casing",
@@ -606,7 +606,7 @@ public class AllBlocks {
     public static final FluidTankBlock FLUID_TANK = register(
         "fluid_tank",
         FluidTankBlock::regular,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).noOcclusion().isRedstoneConductor((p1, p2, p3) -> true)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).noOcclusion().isRedstoneConductor((_, _, _) -> true)
             .lightLevel(FluidTankBlock::getLight)
     );
     public static final FluidTankBlock CREATIVE_FLUID_TANK = register(
@@ -910,82 +910,82 @@ public class AllBlocks {
     public static final NixieTubeBlock ORANGE_NIXIE_TUBE = register(
         "nixie_tube",
         NixieTubeBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_ORANGE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_ORANGE).forceSolidOn()
     );
     public static final NixieTubeBlock WHITE_NIXIE_TUBE = register(
         "white_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.WHITE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.SNOW).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.SNOW).forceSolidOn()
     );
     public static final NixieTubeBlock MAGENTA_NIXIE_TUBE = register(
         "magenta_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.MAGENTA),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_MAGENTA).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_MAGENTA).forceSolidOn()
     );
     public static final NixieTubeBlock LIGHT_BLUE_NIXIE_TUBE = register(
         "light_blue_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.LIGHT_BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_BLUE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_LIGHT_BLUE).forceSolidOn()
     );
     public static final NixieTubeBlock YELLOW_NIXIE_TUBE = register(
         "yellow_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.YELLOW),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_YELLOW).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_YELLOW).forceSolidOn()
     );
     public static final NixieTubeBlock LIME_NIXIE_TUBE = register(
         "lime_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.LIME),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_GREEN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_LIGHT_GREEN).forceSolidOn()
     );
     public static final NixieTubeBlock PINK_NIXIE_TUBE = register(
         "pink_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.PINK),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_PINK).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_PINK).forceSolidOn()
     );
     public static final NixieTubeBlock GRAY_NIXIE_TUBE = register(
         "gray_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_GRAY).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_GRAY).forceSolidOn()
     );
     public static final NixieTubeBlock LIGHT_GRAY_NIXIE_TUBE = register(
         "light_gray_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.LIGHT_GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_GRAY).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_LIGHT_GRAY).forceSolidOn()
     );
     public static final NixieTubeBlock CYAN_NIXIE_TUBE = register(
         "cyan_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.CYAN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_CYAN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_CYAN).forceSolidOn()
     );
     public static final NixieTubeBlock PURPLE_NIXIE_TUBE = register(
         "purple_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.PURPLE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_PURPLE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_PURPLE).forceSolidOn()
     );
     public static final NixieTubeBlock BLUE_NIXIE_TUBE = register(
         "blue_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BLUE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_BLUE).forceSolidOn()
     );
     public static final NixieTubeBlock BROWN_NIXIE_TUBE = register(
         "brown_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.BROWN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BROWN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_BROWN).forceSolidOn()
     );
     public static final NixieTubeBlock GREEN_NIXIE_TUBE = register(
         "green_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.GREEN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_GREEN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_GREEN).forceSolidOn()
     );
     public static final NixieTubeBlock RED_NIXIE_TUBE = register(
         "red_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.RED),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_RED).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_RED).forceSolidOn()
     );
     public static final NixieTubeBlock BLACK_NIXIE_TUBE = register(
         "black_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.BLACK),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BLACK).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel(_ -> 5).mapColor(MapColor.COLOR_BLACK).forceSolidOn()
     );
     public static final BracketBlock WOODEN_BRACKET = register(
         "wooden_bracket",
@@ -1667,7 +1667,7 @@ public class AllBlocks {
         "experience_block",
         ExperienceBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PLANT).sound(ExperienceBlock.SOUND).requiresCorrectToolForDrops()
-            .lightLevel(s -> 15)
+            .lightLevel(_ -> 15)
     );
     public static final RotatedPillarBlock ROSE_QUARTZ_BLOCK = register(
         "rose_quartz_block",

@@ -14,12 +14,14 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
 public record TrainRelocationPacket(
-    UUID trainId, BlockPos pos, Vec3 lookAngle, int entityId, boolean direction, BezierTrackPointLocation hoveredBezier
+    UUID trainId, BlockPos pos, Vec3 lookAngle, int entityId, boolean direction, @Nullable BezierTrackPointLocation hoveredBezier
 ) implements Packet<ServerGamePacketListener> {
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<RegistryFriendlyByteBuf, TrainRelocationPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainRelocationPacket::trainId,

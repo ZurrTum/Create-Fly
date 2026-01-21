@@ -243,6 +243,7 @@ public class AllClientHandle {
         warn();
     }
 
+    @Nullable
     public Player getPlayer() {
         warn();
         return null;
@@ -379,7 +380,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void openClipboardScreen(Player player, DataComponentMap components, BlockPos pos) {
+    public void openClipboardScreen(Player player, DataComponentMap components, @Nullable BlockPos pos) {
         warn();
     }
 

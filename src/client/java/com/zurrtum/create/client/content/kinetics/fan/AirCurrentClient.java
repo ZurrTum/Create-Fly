@@ -4,11 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import org.jspecify.annotations.Nullable;
 
 public class AirCurrentClient {
     private static boolean isClientPlayerInAirCurrent;
 
-    private static AirCurrentSound flyingSound;
+    private static @Nullable AirCurrentSound flyingSound;
 
     public static void enableClientPlayerSound(Entity e, float maxVolume) {
         if (e != Minecraft.getInstance().getCameraEntity())

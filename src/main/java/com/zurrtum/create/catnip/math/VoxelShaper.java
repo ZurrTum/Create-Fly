@@ -1,13 +1,6 @@
 package com.zurrtum.create.catnip.math;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import org.apache.commons.lang3.mutable.MutableObject;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
@@ -15,6 +8,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class VoxelShaper {
     private final Map<Direction, VoxelShape> shapes = new HashMap<>();
@@ -88,10 +87,10 @@ public class VoxelShaper {
             v2 = VecHelper.rotate(v2, (float) rotation.z, Axis.Z).add(center);
 
             VoxelShape rotated = blockBox(v1, v2);
-            result.setValue(Shapes.or(result.getValue(), rotated));
+            result.setValue(Shapes.or(result.get(), rotated));
         });
 
-        return result.getValue();
+        return result.get();
     }
 
     protected static VoxelShape blockBox(Vec3 v1, Vec3 v2) {

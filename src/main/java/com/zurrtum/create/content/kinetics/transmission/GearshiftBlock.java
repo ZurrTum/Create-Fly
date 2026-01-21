@@ -72,7 +72,7 @@ public class GearshiftBlock extends AbstractEncasedShaftBlock implements IBE<Spl
 
     public void detachKinetics(Level worldIn, BlockPos pos, boolean reAttachNextTick) {
         BlockEntity be = worldIn.getBlockEntity(pos);
-        if (be == null || !(be instanceof KineticBlockEntity))
+        if (!(be instanceof KineticBlockEntity))
             return;
         RotationPropagator.handleRemoved(worldIn, pos, (KineticBlockEntity) be);
 

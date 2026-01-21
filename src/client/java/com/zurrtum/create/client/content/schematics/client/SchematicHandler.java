@@ -43,12 +43,13 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public class SchematicHandler {
 
-    private String displayedSchematic;
+    private @Nullable String displayedSchematic;
     private SchematicTransformation transformation;
     private AABB bounds;
     private boolean deployed;
@@ -58,7 +59,7 @@ public class SchematicHandler {
     private static final int SYNC_DELAY = 10;
     private int syncCooldown;
     private int activeHotbarSlot;
-    private ItemStack activeSchematicItem;
+    private @Nullable ItemStack activeSchematicItem;
     private AABBOutline outline;
 
     private final SchematicRenderer[] renderers = new SchematicRenderer[3];
@@ -292,6 +293,7 @@ public class SchematicHandler {
         return false;
     }
 
+    @Nullable
     private ItemStack findBlueprintInHand(Player player) {
         ItemStack stack = player.getMainHandItem();
         if (!stack.is(AllItems.SCHEMATIC))
@@ -386,6 +388,7 @@ public class SchematicHandler {
         return deployed;
     }
 
+    @Nullable
     public ItemStack getActiveSchematicItem() {
         return activeSchematicItem;
     }

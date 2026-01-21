@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class SpoutBlock extends Block implements IWrenchable, IBE<SpoutBlockEntity>, FluidInventoryProvider<SpoutBlockEntity> {
 
@@ -29,7 +30,13 @@ public class SpoutBlock extends Block implements IWrenchable, IBE<SpoutBlockEnti
     }
 
     @Override
-    public FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, SpoutBlockEntity blockEntity, Direction context) {
+    public FluidInventory getFluidInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        SpoutBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         return blockEntity.tank.getCapability();
     }
 
@@ -39,7 +46,7 @@ public class SpoutBlock extends Block implements IWrenchable, IBE<SpoutBlockEnti
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }

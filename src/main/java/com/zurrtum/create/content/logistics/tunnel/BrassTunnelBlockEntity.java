@@ -43,7 +43,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
     boolean connectedRight;
 
     ItemStack stackToDistribute;
-    Direction stackEnteredFrom;
+    @Nullable Direction stackEnteredFrom;
 
     float distributionProgress;
     int distributionDistanceLeft;
@@ -55,10 +55,10 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
 
     private boolean newItemArrived;
     private boolean syncedOutputActive;
-    private Set<BrassTunnelBlockEntity> syncSet;
+    private final Set<BrassTunnelBlockEntity> syncSet;
 
     protected ServerScrollOptionBehaviour<SelectionMode> selectionMode;
-    private Container beltCapability;
+    private @Nullable Container beltCapability;
     public Container tunnelCapability;
 
     public BrassTunnelBlockEntity(BlockPos pos, BlockState state) {
@@ -179,8 +179,8 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
         });
     }
 
-    private static Map<Pair<BrassTunnelBlockEntity, Direction>, ItemStack> distributed = new IdentityHashMap<>();
-    private static Set<Pair<BrassTunnelBlockEntity, Direction>> full = new HashSet<>();
+    private static final Map<Pair<BrassTunnelBlockEntity, Direction>, ItemStack> distributed = new IdentityHashMap<>();
+    private static final Set<Pair<BrassTunnelBlockEntity, Direction>> full = new HashSet<>();
 
     private void distribute(List<Pair<BrassTunnelBlockEntity, Direction>> validTargets) {
         int amountTargets = validTargets.size();
@@ -311,6 +311,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
         return stackToDistribute;
     }
 
+    @Nullable
     public List<ItemStack> grabAllStacksOfGroup(boolean simulate) {
         List<ItemStack> list = new ArrayList<>();
 
@@ -371,14 +372,13 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
 
                 if (!simulate) {
                     tunnel.flap(side, true);
-                    ItemStack ejected = stack;
                     float beltMovementSpeed = below.getDirectionAwareBeltMovementSpeed();
                     float movementSpeed = Math.max(Math.abs(beltMovementSpeed), 1 / 8f);
                     int additionalOffset = beltMovementSpeed > 0 ? 1 : 0;
                     Vec3 outPos = BeltHelper.getVectorForOffset(controllerBE, below.index + additionalOffset);
                     Vec3 outMotion = Vec3.atLowerCornerOf(side.getUnitVec3i()).scale(movementSpeed).add(0, 1 / 8f, 0);
                     outPos.add(outMotion.normalize());
-                    ItemEntity entity = new ItemEntity(level, outPos.x, outPos.y + 6 / 16f, outPos.z, ejected);
+                    ItemEntity entity = new ItemEntity(level, outPos.x, outPos.y + 6 / 16f, outPos.z, stack);
                     entity.setDeltaMovement(outMotion);
                     entity.setDefaultPickUpDelay();
                     entity.hurtMarked = true;
@@ -447,6 +447,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
         return false;
     }
 
+    @Nullable
     private List<Pair<BrassTunnelBlockEntity, Direction>> gatherValidOutputs() {
         List<Pair<BrassTunnelBlockEntity, Direction>> validOutputs = new ArrayList<>();
         boolean synchronize = selectionMode.get() == SelectionMode.SYNCHRONIZE;
@@ -668,6 +669,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
         stackEnteredFrom = null;
     }
 
+    @Nullable
     public Container getBeltCapability() {
         if (beltCapability == null) {
             BlockPos down = worldPosition.below();

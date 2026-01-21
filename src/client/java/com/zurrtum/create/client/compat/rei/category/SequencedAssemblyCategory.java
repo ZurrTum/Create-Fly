@@ -154,7 +154,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 AllGuiTextures.JEI_SLOT.render(graphics, point.x - 1, point.y - 1);
             }
         }));
-        List<Slot> slots = new ArrayList<>();
+        List<@Nullable Slot> slots = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Point point = points.get(i);
             List<Component> step = tooltips.get(i);

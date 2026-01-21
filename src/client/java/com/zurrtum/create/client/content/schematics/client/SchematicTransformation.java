@@ -22,8 +22,9 @@ public class SchematicTransformation {
     private Vec3 prevChasingPos;
     private BlockPos target;
 
-    private LerpedFloat scaleFrontBack, scaleLeftRight;
-    private LerpedFloat rotation;
+    private final LerpedFloat scaleFrontBack;
+    private final LerpedFloat scaleLeftRight;
+    private final LerpedFloat rotation;
     private double xOrigin;
     private double zOrigin;
 

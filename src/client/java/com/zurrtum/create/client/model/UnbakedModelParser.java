@@ -14,6 +14,7 @@ import com.zurrtum.create.client.model.obj.ObjLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
@@ -27,7 +28,7 @@ public class UnbakedModelParser {
         private static final TypeToken<? extends UnbakedModel> NEXT_TYPE = FabricLoader.getInstance()
             .isModLoaded("fabric-model-loading-api-v1") ? TypeToken.get(UnbakedModel.class) : TypeToken.get(BlockModel.class);
         private final Gson gson;
-        private TypeAdapter<?> cached;
+        private @Nullable TypeAdapter<?> cached;
 
         public Deserializer(Gson gson) {
             this.gson = gson;

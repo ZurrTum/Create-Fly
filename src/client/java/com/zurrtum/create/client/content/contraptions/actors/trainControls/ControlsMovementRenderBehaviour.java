@@ -28,11 +28,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 
 public class ControlsMovementRenderBehaviour implements MovementRenderBehaviour {
     @Override
+    @Nullable
     public MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,

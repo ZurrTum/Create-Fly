@@ -4,14 +4,14 @@ import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.trains.graph.*;
-
-import java.util.Iterator;
-import java.util.Map;
-
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public class TrainMigration {
 
@@ -31,6 +31,7 @@ public class TrainMigration {
         locations = Couple.create(point.node1.getLocation(), point.node2.getLocation());
     }
 
+    @Nullable
     public TrackGraphLocation tryMigratingTo(TrackGraph graph) {
         TrackNode node1 = graph.locateNode(locations.getFirst());
         TrackNode node2 = graph.locateNode(locations.getSecond());

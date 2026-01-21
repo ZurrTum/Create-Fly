@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
@@ -47,13 +47,7 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
     }
 
     @Override
-    public void extractRenderState(
-        T be,
-        S state,
-        float tickProgress,
-        Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
-    ) {
+    public void extractRenderState(T be, S state, float tickProgress, Vec3 cameraPos, @Nullable CrumblingOverlay crumblingOverlay) {
         Level world = be.getLevel();
         state.support = VisualizationManager.supportsVisualization(world);
         if (state.support) {
@@ -64,7 +58,7 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         state.angle = getAngleForBe(be, state.blockPos, state.axis);
     }
 
-    public void updateBaseRenderState(T be, S state, Level world, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void updateBaseRenderState(T be, S state, @Nullable Level world, @Nullable CrumblingOverlay crumblingOverlay) {
         state.blockPos = be.getBlockPos();
         state.blockState = getRenderedBlockState(be);
         state.blockEntityType = be.getType();

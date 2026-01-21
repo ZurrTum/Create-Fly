@@ -15,9 +15,6 @@ import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruc
 import com.zurrtum.create.content.trains.schedule.destination.ScheduleInstruction;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-
-import java.util.*;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
@@ -31,6 +28,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 public class ScheduleRuntime {
 
@@ -51,7 +51,7 @@ public class ScheduleRuntime {
     }
 
     public Train train;
-    public Schedule schedule;
+    public @Nullable Schedule schedule;
 
     public boolean isAutoSchedule;
     public boolean paused;
@@ -201,6 +201,7 @@ public class ScheduleRuntime {
             carriage.storage.tickIdleCargoTracker();
     }
 
+    @Nullable
     public DiscoveredPath startCurrentInstruction(Level level) {
         if (checkEndOfScheduleReached())
             return null;
@@ -222,6 +223,7 @@ public class ScheduleRuntime {
         displayLinkUpdateRequested = true;
     }
 
+    @Nullable
     public Schedule getSchedule() {
         return schedule;
     }
@@ -244,8 +246,9 @@ public class ScheduleRuntime {
         predictionTicks = new ArrayList<>();
     }
 
+    @SuppressWarnings("NullableProblems")
     public Collection<TrainDeparturePrediction> submitPredictions() {
-        Collection<TrainDeparturePrediction> predictions = new ArrayList<>();
+        Collection<@Nullable TrainDeparturePrediction> predictions = new ArrayList<>();
         int entryCount = schedule.entries.size();
         int accumulatedTime = 0;
         int current = currentEntry;
@@ -307,7 +310,7 @@ public class ScheduleRuntime {
         return predictions;
     }
 
-    private int predictForEntry(int index, String currentTitle, int accumulatedTime, Collection<TrainDeparturePrediction> predictions) {
+    private int predictForEntry(int index, String currentTitle, int accumulatedTime, Collection<@Nullable TrainDeparturePrediction> predictions) {
         ScheduleEntry entry = schedule.entries.get(index);
         if (!(entry.instruction instanceof DestinationInstruction filter))
             return accumulatedTime;
@@ -360,6 +363,7 @@ public class ScheduleRuntime {
         return INVALID;
     }
 
+    @Nullable
     private TrainDeparturePrediction createPrediction(int index, String destination, String currentTitle, int time) {
         if (time == INVALID)
             return null;

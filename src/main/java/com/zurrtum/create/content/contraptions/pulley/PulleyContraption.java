@@ -38,9 +38,7 @@ public class PulleyContraption extends TranslatingContraption {
         if (pos.getX() != anchor.getX() || pos.getZ() != anchor.getZ())
             return false;
         int y = pos.getY();
-        if (y <= anchor.getY() || y > anchor.getY() + initialOffset + 1)
-            return false;
-        return true;
+        return y > anchor.getY() && y <= anchor.getY() + initialOffset + 1;
     }
 
     @Override

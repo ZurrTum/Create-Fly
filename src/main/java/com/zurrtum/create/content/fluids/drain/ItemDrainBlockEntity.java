@@ -36,7 +36,7 @@ public class ItemDrainBlockEntity extends SmartBlockEntity {
     public static final int FILLING_TIME = 20;
 
     public SmartFluidTankBehaviour internalTank;
-    public TransportedItemStack heldItem;
+    public @Nullable TransportedItemStack heldItem;
     public int processingTicks;
     public Map<Direction, ItemDrainItemHandler> itemHandlers;
 

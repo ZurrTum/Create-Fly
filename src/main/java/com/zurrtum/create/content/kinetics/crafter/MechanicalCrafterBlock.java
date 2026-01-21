@@ -3,6 +3,7 @@ package com.zurrtum.create.content.kinetics.crafter;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.Pointing;
@@ -15,7 +16,6 @@ import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.core.BlockPos;
@@ -40,6 +40,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IBE<MechanicalCrafterBlockEntity>, ICogWheel, ItemInventoryProvider<MechanicalCrafterBlockEntity>, NeighborUpdateListeningBlock {
 
@@ -51,7 +52,13 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, MechanicalCrafterBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        MechanicalCrafterBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         return blockEntity.getInvCapability();
     }
 
@@ -248,11 +255,6 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
     @Override
     public float getParticleTargetRadius() {
         return .85f;
-    }
-
-    @Override
-    public float getParticleInitialRadius() {
-        return .75f;
     }
 
     public static Direction getTargetDirection(BlockState state) {

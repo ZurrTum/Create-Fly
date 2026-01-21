@@ -115,7 +115,7 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
         public float xRot;
         public float zRot;
         public int light;
-        public SuperByteBuffer shaft;
+        public @Nullable SuperByteBuffer shaft;
         public float angle;
         public Direction direction;
 

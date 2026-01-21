@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 public class DeployerItemHandler implements SidedItemInventory {
     private final DeployerBlockEntity be;
-    private final DeployerPlayer player;
+    private final @Nullable DeployerPlayer player;
 
     public DeployerItemHandler(DeployerBlockEntity be) {
         this.be = be;

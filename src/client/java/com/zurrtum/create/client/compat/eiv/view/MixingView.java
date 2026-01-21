@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,8 @@ public class MixingView extends CreateView {
     private final SlotContent result;
     private final List<SlotContent> ingredients;
     private final HeatCondition heat;
-    private final SlotContent burner;
-    private final SlotContent cake;
+    private final @Nullable SlotContent burner;
+    private final @Nullable SlotContent cake;
 
 
     public MixingView(MixingDisplay display) {

@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -41,7 +41,7 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
         ChuteRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         ItemStack item = be.getItem();
@@ -70,7 +70,7 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
     }
 
     public static class ChuteRenderState extends BlockEntityRenderState {
-        public ChuteItemRenderState item;
+        public @Nullable ChuteItemRenderState item;
     }
 
     public record ChuteItemRenderState(ItemStackRenderState item, float offset, float rotate) {

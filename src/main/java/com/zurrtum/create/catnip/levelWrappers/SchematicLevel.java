@@ -38,6 +38,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.LevelTickAccess;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -107,6 +108,7 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
     }
 
     @Override
+    @Nullable
     public BlockEntity getBlockEntity(BlockPos pos) {
         if (isOutsideBuildHeight(pos))
             return null;
@@ -184,7 +186,7 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
     }
 
     @Override
-    public List<Entity> getEntities(Entity arg0, AABB arg1, Predicate<? super Entity> arg2) {
+    public List<Entity> getEntities(@Nullable Entity arg0, AABB arg1, Predicate<? super Entity> arg2) {
         return Collections.emptyList();
     }
 

@@ -172,7 +172,7 @@ public final class VisualizationHelper {
 
     public static class EntitySkipIterator implements Iterator<Entity> {
         private final Iterator<Entity> iterator;
-        private Entity next;
+        private @Nullable Entity next;
 
         public EntitySkipIterator(Iterator<Entity> iterator) {
             this.iterator = iterator;
@@ -197,6 +197,7 @@ public final class VisualizationHelper {
         @Override
         public Entity next() {
             if (hasNext()) {
+                assert next != null;
                 Entity entity = next;
                 next = null;
                 return entity;

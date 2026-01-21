@@ -8,10 +8,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.content.kinetics.drill.DrillBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -43,6 +39,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBlockEntity>, ItemInventoryProvider<SawBlockEntity> {
     public static final BooleanProperty FLIPPED = BooleanProperty.create("flipped");
@@ -54,7 +54,7 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, SawBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, SawBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.inventory;
     }
 

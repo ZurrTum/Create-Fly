@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IBE<ThresholdSwitchBlockEntity>, RedStoneConnectBlock {
 
@@ -48,7 +49,7 @@ public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IB
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, Direction side) {
+    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
         return side != null && side.getOpposite() != getTargetDirection(state);
     }
 
@@ -103,13 +104,13 @@ public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IB
         Direction preferredFacing = null;
         for (Direction face : context.getNearestLookingDirections()) {
             BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos().relative(face));
-            if (be != null && (ItemHelper.getInventory(be.getLevel(), be.getBlockPos(), null, be, null) != null || FluidHelper.hasFluidInventory(
+            if (be != null && (ItemHelper.getInventory(
                 be.getLevel(),
                 be.getBlockPos(),
                 null,
                 be,
                 null
-            ))) {
+            ) != null || FluidHelper.hasFluidInventory(be.getLevel(), be.getBlockPos(), null, be, null))) {
                 preferredFacing = face;
                 break;
             }

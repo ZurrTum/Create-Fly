@@ -22,10 +22,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class PackagePortTargetSelectionHandler {
 
-    public static PackagePortTarget activePackageTarget;
+    public static @Nullable PackagePortTarget activePackageTarget;
     public static Vec3 exactPositionOfTarget;
     public static boolean isPostbox;
 
@@ -146,6 +147,7 @@ public class PackagePortTargetSelectionHandler {
 
     }
 
+    @Nullable
     public static String validateDiff(Vec3 target, BlockPos placedPos) {
         Vec3 source = Vec3.atBottomCenterOf(placedPos);
         Vec3 diff = target.subtract(source);

@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import org.jspecify.annotations.Nullable;
 
 public abstract class RotatedPillarKineticBlock extends KineticBlock {
 
@@ -22,22 +23,17 @@ public abstract class RotatedPillarKineticBlock extends KineticBlock {
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
-        switch (rot) {
-            case COUNTERCLOCKWISE_90:
-            case CLOCKWISE_90:
-                switch (state.getValue(AXIS)) {
-                    case X:
-                        return state.setValue(AXIS, Direction.Axis.Z);
-                    case Z:
-                        return state.setValue(AXIS, Direction.Axis.X);
-                    default:
-                        return state;
-                }
-            default:
-                return state;
-        }
+        return switch (rot) {
+            case COUNTERCLOCKWISE_90, CLOCKWISE_90 -> switch (state.getValue(AXIS)) {
+                case X -> state.setValue(AXIS, Axis.Z);
+                case Z -> state.setValue(AXIS, Axis.X);
+                default -> state;
+            };
+            default -> state;
+        };
     }
 
+    @Nullable
     public static Axis getPreferredAxis(BlockPlaceContext context) {
         Axis prefferedAxis = null;
         for (Direction side : Iterate.directions) {
@@ -66,6 +62,7 @@ public abstract class RotatedPillarKineticBlock extends KineticBlock {
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Axis preferredAxis = getPreferredAxis(context);
         if (preferredAxis != null && (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()))

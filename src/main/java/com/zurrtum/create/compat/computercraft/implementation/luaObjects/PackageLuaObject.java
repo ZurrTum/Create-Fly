@@ -8,6 +8,7 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,14 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 public class PackageLuaObject implements LuaComparable {
-    public final PackagerBlockEntity blockEntity;
+    public final @Nullable PackagerBlockEntity blockEntity;
     public final ItemStack box;
     public String address;
     // address is the only mutable data of the package.
     // we update this along with .setAddress().
     // if the package changes address for any other reason, we don't know that.
 
-    public PackageLuaObject(PackagerBlockEntity blockEntity, ItemStack box) {
+    public PackageLuaObject(@Nullable PackagerBlockEntity blockEntity, ItemStack box) {
         this.blockEntity = blockEntity;
         this.box = box;
         this.address = PackageItem.getAddress(box);
@@ -63,6 +64,7 @@ public class PackageLuaObject implements LuaComparable {
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final PackageOrderLuaObject getOrderData() throws LuaException {
 
         if (!hasOrderData())
@@ -87,6 +89,7 @@ public class PackageLuaObject implements LuaComparable {
     }
 
     @Override
+    @Nullable
     public Map<?, ?> getTableRepresentation() {
         try {
             Map<String, Object> map = new HashMap<>();

@@ -31,6 +31,7 @@ import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,11 +51,11 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
 
     protected AllGuiTextures background;
 
-    private ScrollInput schematicsArea;
+    private @Nullable ScrollInput schematicsArea;
     private IconButton confirmButton;
     private IconButton folderButton;
     private IconButton refreshButton;
-    private Label schematicsLabel;
+    private @Nullable Label schematicsLabel;
     private ElementWidget renderedItem;
 
     private float progress;
@@ -74,6 +75,7 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
         background = AllGuiTextures.SCHEMATIC_TABLE;
     }
 
+    @Nullable
     public static SchematicTableScreen create(
         Minecraft mc,
         MenuType<SchematicTableBlockEntity> type,

@@ -11,19 +11,19 @@ import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.gearbox.GearboxBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-
 public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> {
 
     protected final EnumMap<Direction, RotatingInstance> keys = new EnumMap<>(Direction.class);
-    protected Direction sourceFacing;
+    protected @Nullable Direction sourceFacing;
 
     public GearboxVisual(VisualizationContext context, GearboxBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);

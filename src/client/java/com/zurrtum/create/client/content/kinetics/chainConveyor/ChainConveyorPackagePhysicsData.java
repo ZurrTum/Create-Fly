@@ -3,26 +3,26 @@ package com.zurrtum.create.client.content.kinetics.chainConveyor;
 
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.phys.Vec3;
-
 public class ChainConveyorPackagePhysicsData {
-    public Vec3 targetPos;
-    public Vec3 prevTargetPos;
-    public Vec3 prevPos;
-    public Vec3 pos;
+    public @Nullable Vec3 targetPos;
+    public @Nullable Vec3 prevTargetPos;
+    public @Nullable Vec3 prevPos;
+    public @Nullable Vec3 pos;
 
     public Vec3 motion;
     public int lastTick;
     public float yaw;
     public float prevYaw;
     public boolean flipped;
-    public Identifier modelKey;
+    public @Nullable Identifier modelKey;
 
-    public WeakReference<ChainConveyorBlockEntity> beReference;
+    public @Nullable WeakReference<ChainConveyorBlockEntity> beReference;
 
     public ChainConveyorPackagePhysicsData() {
         this.targetPos = null;

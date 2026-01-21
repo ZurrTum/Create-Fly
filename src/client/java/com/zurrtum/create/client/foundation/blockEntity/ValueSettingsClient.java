@@ -1,16 +1,13 @@
 package com.zurrtum.create.client.foundation.blockEntity;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsBehaviour;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsInputHandler;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
-
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,15 +17,18 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public class ValueSettingsClient {
     public int interactHeldTicks = -1;
-    public BlockPos interactHeldPos = null;
-    public BehaviourType<? extends BlockEntityBehaviour<?>> interactHeldBehaviour = null;
-    public InteractionHand interactHeldHand = null;
-    public Direction interactHeldFace = null;
+    public @Nullable BlockPos interactHeldPos = null;
+    public @Nullable BehaviourType<? extends BlockEntityBehaviour<?>> interactHeldBehaviour = null;
+    public @Nullable InteractionHand interactHeldHand = null;
+    public @Nullable Direction interactHeldFace = null;
 
-    public List<MutableComponent> lastHoverTip;
+    public @Nullable List<MutableComponent> lastHoverTip;
     public int hoverTicks;
     public int hoverWarmup;
 

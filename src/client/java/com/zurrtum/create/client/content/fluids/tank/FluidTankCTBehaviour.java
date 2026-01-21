@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 public class FluidTankCTBehaviour extends HorizontalCTBehaviour {
 
-    private CTSpriteShiftEntry innerShift;
+    private final CTSpriteShiftEntry innerShift;
 
     public FluidTankCTBehaviour(CTSpriteShiftEntry layerShift, CTSpriteShiftEntry topShift, CTSpriteShiftEntry innerShift) {
         super(layerShift, topShift);

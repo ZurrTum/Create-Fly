@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.transport.*;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltMovementHandler.TransportedEntityInfo;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,6 +33,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -43,7 +44,7 @@ import static net.minecraft.core.Direction.AxisDirection.NEGATIVE;
 import static net.minecraft.core.Direction.AxisDirection.POSITIVE;
 
 public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
-    public Map<Entity, TransportedEntityInfo> passengers;
+    public @Nullable Map<Entity, TransportedEntityInfo> passengers;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public Optional<DyeColor> color;
     public int beltLength;
@@ -51,9 +52,9 @@ public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
     public CasingType casing;
     public boolean covered;
 
-    protected BlockPos controller;
-    protected BeltInventory inventory;
-    public ItemHandlerBeltSegment itemHandler;
+    protected @Nullable BlockPos controller;
+    protected @Nullable BeltInventory inventory;
+    public @Nullable ItemHandlerBeltSegment itemHandler;
     public VersionedInventoryTrackerBehaviour invVersionTracker;
 
     public CompoundTag trackerUpdateTag;
@@ -154,9 +155,9 @@ public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
         if (!level.isLoaded(controller))
             return;
         BlockEntity be = level.getBlockEntity(controller);
-        if (be == null || !(be instanceof BeltBlockEntity))
+        if (!(be instanceof BeltBlockEntity belt))
             return;
-        BeltInventory inventory = ((BeltBlockEntity) be).getInventory();
+        BeltInventory inventory = belt.getInventory();
         if (inventory == null)
             return;
         itemHandler = new ItemHandlerBeltSegment(inventory, index);
@@ -240,7 +241,7 @@ public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
         trackerUpdateTag = new CompoundTag();
     }
 
-    public boolean applyColor(DyeColor colorIn) {
+    public boolean applyColor(@Nullable DyeColor colorIn) {
         if (colorIn == null) {
             if (!color.isPresent())
                 return false;
@@ -261,15 +262,16 @@ public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
         return true;
     }
 
+    @Nullable
     public BeltBlockEntity getControllerBE() {
         if (controller == null)
             return null;
         if (!level.isLoaded(controller))
             return null;
         BlockEntity be = level.getBlockEntity(controller);
-        if (be == null || !(be instanceof BeltBlockEntity))
+        if (!(be instanceof BeltBlockEntity belt))
             return null;
-        return (BeltBlockEntity) be;
+        return belt;
     }
 
     public void setController(BlockPos controller) {
@@ -360,6 +362,7 @@ public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
         return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
+    @Nullable
     public BeltInventory getInventory() {
         if (!isController()) {
             BeltBlockEntity controllerBE = getControllerBE();

@@ -4,6 +4,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public interface MinecartElement extends AnimatedSceneElement {
     void setPositionOffset(Vec3 position, boolean immediate);
@@ -15,12 +16,15 @@ public interface MinecartElement extends AnimatedSceneElement {
     Vec3 getRotation();
 
     interface MinecartConstructor {
+        @Nullable
         default AbstractMinecart create(Level w, double x, double y, double z) {
             AbstractMinecart minecart = create(w, EntitySpawnReason.LOAD);
-            minecart.setInitialPos(x, y, z);
+            if (minecart != null) {
+                minecart.setInitialPos(x, y, z);
+            }
             return minecart;
         }
 
-        AbstractMinecart create(Level w, EntitySpawnReason reason);
+        @Nullable AbstractMinecart create(Level w, EntitySpawnReason reason);
     }
 }

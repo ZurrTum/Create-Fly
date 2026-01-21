@@ -12,13 +12,13 @@ import org.jspecify.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 public class PartialRenderState implements PictureInPictureRenderState {
-    public SimpleModelWrapper model;
+    public @Nullable SimpleModelWrapper model;
     public boolean dirty;
-    public Matrix3x2f IDENTITY_POSE;
-    public ScreenRectangle bounds;
+    public Matrix3x2f pose = IDENTITY_POSE;
+    public @Nullable ScreenRectangle bounds;
     public int x1, y1, x2, y2, padding;
     public float size;
-    private BiConsumer<PoseStack, Float> transform;
+    private @Nullable BiConsumer<PoseStack, Float> transform;
     private float partialTicks;
     public @Nullable ScreenRectangle scissor;
 
@@ -38,7 +38,7 @@ public class PartialRenderState implements PictureInPictureRenderState {
         float scale,
         int padding,
         float partialTicks,
-        BiConsumer<PoseStack, Float> transform
+        @Nullable BiConsumer<PoseStack, Float> transform
     ) {
         float size = scale * 16 + padding;
         if (model != partial.get()) {
@@ -47,13 +47,13 @@ public class PartialRenderState implements PictureInPictureRenderState {
         } else if (size != this.size || partialTicks != this.partialTicks) {
             dirty = true;
         }
-        IDENTITY_POSE = new Matrix3x2f(graphics.pose());
-        IDENTITY_POSE.translate(xLocal, yLocal);
+        pose = new Matrix3x2f(graphics.pose());
+        pose.translate(xLocal, yLocal);
         x1 = (int) x;
         y1 = (int) y;
         x2 = (int) (x + size);
         y2 = (int) (y + size);
-        bounds = new ScreenRectangle(x1, y1, (int) size, (int) size).transformMaxBounds(IDENTITY_POSE);
+        bounds = new ScreenRectangle(x1, y1, (int) size, (int) size).transformMaxBounds(pose);
         scissor = graphics.scissorStack.peek();
         if (scissor != null) {
             bounds = bounds.intersection(scissor);
@@ -90,7 +90,7 @@ public class PartialRenderState implements PictureInPictureRenderState {
 
     @Override
     public Matrix3x2f pose() {
-        return IDENTITY_POSE;
+        return pose;
     }
 
     @Override

@@ -7,12 +7,6 @@ import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.logistics.vault.ItemVaultBlockEntity;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
@@ -23,6 +17,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class AllInventoryIdentifiers {
     public static void registerDefaults() {
@@ -102,6 +102,7 @@ public class AllInventoryIdentifiers {
     // called manually when no other Finder is found.
     // currently just checks for WorldlyContainer BlockEntities, which would
     // fill the registry with Finders pointlessly if done through a provider.
+    @Nullable
     public static InventoryIdentifier fallback(Level level, BlockState state, BlockFace face) {
         BlockEntity be = level.getBlockEntity(face.getPos());
         if (be instanceof WorldlyContainer container) {

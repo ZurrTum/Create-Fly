@@ -45,6 +45,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
         return new AABB(Vec3.atLowerCornerOf(startPos), Vec3.atLowerCornerOf(endPos)).expandTowards(1, 1, 1);
     }
 
-    public static boolean isGlued(LevelAccessor level, BlockPos blockPos, Direction direction, Set<SuperGlueEntity> cached) {
+    public static boolean isGlued(LevelAccessor level, BlockPos blockPos, Direction direction, @Nullable Set<SuperGlueEntity> cached) {
         BlockPos targetPos = blockPos.relative(direction);
         if (cached != null)
             for (SuperGlueEntity glueEntity : cached)

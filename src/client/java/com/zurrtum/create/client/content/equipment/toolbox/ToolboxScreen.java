@@ -31,6 +31,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,7 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
     protected static final AllGuiTextures BG = AllGuiTextures.TOOLBOX;
     protected static final AllGuiTextures PLAYER = AllGuiTextures.PLAYER_INVENTORY;
 
-    protected Slot hoveredToolboxSlot;
+    protected @Nullable Slot hoveredToolboxSlot;
     private IconButton confirmButton;
     private IconButton disposeButton;
     private ElementWidget renderedItem;
@@ -58,6 +59,7 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
         init();
     }
 
+    @Nullable
     public static ToolboxScreen create(
         Minecraft mc,
         MenuType<ToolboxBlockEntity> type,

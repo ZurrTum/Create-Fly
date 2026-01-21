@@ -62,6 +62,7 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
         if (stateForPlacement == null)
@@ -137,7 +138,7 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos requesterPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos requesterPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         Player player = pPlacer instanceof Player ? (Player) pPlacer : null;
         withBlockEntityDo(
             pLevel, requesterPos, rrbe -> {

@@ -74,7 +74,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
 
     @SuppressWarnings("unchecked")
     public ClientContraption getOrCreateClientContraptionLazy(Contraption contraption) {
-        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        AtomicReference<@Nullable ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
         var out = clientContraption.getAcquire();
         if (out == null) {
             // Another thread may hit this block in the same moment.
@@ -233,10 +233,10 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
     }
 
     public static class AbstractContraptionState extends EntityRenderState {
-        public Contraption contraption;
+        public @Nullable Contraption contraption;
         public PoseStack.Pose modelEntry;
-        public List<ContraptionBlockLayer> layers;
-        public BlockEntityListRenderState blockEntity;
+        public @Nullable List<ContraptionBlockLayer> layers;
+        public @Nullable BlockEntityListRenderState blockEntity;
         public @Nullable List<MovementRenderState> actors;
     }
 

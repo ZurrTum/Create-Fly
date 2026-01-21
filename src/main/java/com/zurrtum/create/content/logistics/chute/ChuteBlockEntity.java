@@ -60,7 +60,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements Clearable {
 
     public float bottomPullDistance;
     float beltBelowOffset;
-    TransportedItemStackHandlerBehaviour beltBelow;
+    @Nullable TransportedItemStackHandlerBehaviour beltBelow;
     boolean updateAirFlow;
     int airCurrentUpdateCooldown;
     int entitySearchCooldown;
@@ -486,7 +486,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements Clearable {
         return true;
     }
 
-    private boolean canAcceptBlockEntity(BlockEntity be, @Nullable Direction opposite) {
+    private boolean canAcceptBlockEntity(@Nullable BlockEntity be, @Nullable Direction opposite) {
         if (be instanceof ChuteBlockEntity) {
             return opposite == Direction.UP && be instanceof SmartChuteBlockEntity && !(getItemMotion() > 0);
         }

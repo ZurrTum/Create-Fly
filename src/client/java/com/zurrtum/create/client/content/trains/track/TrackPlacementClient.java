@@ -34,6 +34,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,9 +44,9 @@ public class TrackPlacementClient {
     static LerpedFloat animation = LerpedFloat.linear().startWithValue(0);
     static int lastLineCount = 0;
 
-    static BlockPos hintPos;
+    static @Nullable BlockPos hintPos;
     static int hintAngle;
-    static Couple<List<BlockPos>> hints;
+    static @Nullable Couple<List<BlockPos>> hints;
 
     static int extraTipWarmup;
 
@@ -212,6 +213,7 @@ public class TrackPlacementClient {
         Outliner.getInstance().showLine(Pair.of("start", id), v1.subtract(o1), v1.add(ex)).lineWidth(1 / 8f).disableLineNormals().colored(color);
     }
 
+    @Nullable
     public static InteractionResult sendExtenderPacket(LocalPlayer player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!stack.is(AllItemTags.TRACKS))

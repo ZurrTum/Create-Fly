@@ -22,6 +22,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.material.Fluids;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +48,7 @@ public class FanBlastingCategory extends CreateCategory<RecipeHolder<? extends S
         List<RecipeHolder<? extends SingleItemRecipe>> list,
         RecipeHolder<? extends SingleItemRecipe> entry,
         ClientLevel world,
-        Collection<RecipeHolder<BlastingRecipe>> blastingRecipes,
+        @Nullable Collection<RecipeHolder<BlastingRecipe>> blastingRecipes,
         Collection<RecipeHolder<SmokingRecipe>> smokingRecipes
     ) {
         if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {

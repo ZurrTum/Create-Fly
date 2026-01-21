@@ -1,20 +1,20 @@
 package com.zurrtum.create.content.contraptions;
 
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
-
 public abstract class TranslatingContraption extends Contraption {
 
-    protected Set<BlockPos> cachedColliders;
-    protected Direction cachedColliderDirection;
+    protected @Nullable Set<BlockPos> cachedColliders;
+    protected @Nullable Direction cachedColliderDirection;
 
     public Set<BlockPos> getOrCreateColliders(Level world, Direction movementDirection) {
         if (getBlocks() == null)

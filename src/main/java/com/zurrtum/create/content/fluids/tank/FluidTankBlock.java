@@ -47,6 +47,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -56,7 +57,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     public static final EnumProperty<Shape> SHAPE = EnumProperty.create("shape", Shape.class);
     public static final IntegerProperty LIGHT_LEVEL = BlockStateProperties.LEVEL;
 
-    private boolean creative;
+    private final boolean creative;
 
     public static FluidTankBlock regular(Properties p_i48440_1_) {
         return new FluidTankBlock(p_i48440_1_, false);
@@ -67,7 +68,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
@@ -149,7 +150,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         BlockPos pos,
         BlockState state,
         FluidTankBlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         if (blockEntity.fluidCapability == null) {
             blockEntity.refreshCapability();

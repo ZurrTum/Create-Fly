@@ -58,7 +58,7 @@ public abstract class AbstractComputerBehaviour extends BlockEntityBehaviour<Sma
 
     public abstract void queueSignalState(SignalBlockEntity.SignalState state);
 
-    public abstract void queueStationTrain(Train imminentTrain, boolean newlyArrived, boolean trainPresent);
+    public abstract void queueStationTrain(@Nullable Train imminentTrain, boolean newlyArrived, boolean trainPresent);
 
     public abstract void prepareComputerEvent(ComputerEvent event);
 

@@ -18,8 +18,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 
 public class ScheduleItemEntityInteraction {
+    @Nullable
     public static InteractionResult interactWithConductor(Entity entity, Player player, InteractionHand hand) {
         Entity rootVehicle = entity.getRootVehicle();
         if (!(rootVehicle instanceof CarriageContraptionEntity cce))

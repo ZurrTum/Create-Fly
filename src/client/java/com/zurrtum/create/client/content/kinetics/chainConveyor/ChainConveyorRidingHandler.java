@@ -16,12 +16,13 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class ChainConveyorRidingHandler {
 
-    public static BlockPos ridingChainConveyor;
+    public static @Nullable BlockPos ridingChainConveyor;
     public static float chainPosition;
-    public static BlockPos ridingConnection;
+    public static @Nullable BlockPos ridingConnection;
     public static boolean flipped;
     public static int catchingUp;
 

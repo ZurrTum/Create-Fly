@@ -23,7 +23,7 @@ public class TrainRelocator {
         Train train,
         Level level,
         BlockPos pos,
-        BezierTrackPointLocation bezier,
+        @Nullable BezierTrackPointLocation bezier,
         boolean bezierDirection,
         Vec3 lookAngle,
         @Nullable List<Vec3> toVisualise
@@ -53,7 +53,7 @@ public class TrainRelocator {
         TravellingPoint probe = new TravellingPoint(node1, node2, edge, graphLocation.position, false);
         TravellingPoint.IEdgePointListener ignoreSignals = probe.ignoreEdgePoints();
         TravellingPoint.ITurnListener ignoreTurns = probe.ignoreTurns();
-        List<Pair<Couple<TrackNode>, Double>> recordedLocations = new ArrayList<>();
+        List<Pair<Couple<@Nullable TrackNode>, Double>> recordedLocations = new ArrayList<>();
         List<Vec3> recordedVecs = new ArrayList<>();
         Consumer<TravellingPoint> recorder = tp -> {
             recordedLocations.add(Pair.of(Couple.create(tp.node1, tp.node2), tp.position));
@@ -116,7 +116,7 @@ public class TrainRelocator {
             train.navigation.cancelNavigation();
 
         train.forEachTravellingPoint(tp -> {
-            Pair<Couple<TrackNode>, Double> last = recordedLocations.removeLast();
+            Pair<Couple<@Nullable TrackNode>, Double> last = recordedLocations.removeLast();
             tp.node1 = last.getFirst().getFirst();
             tp.node2 = last.getFirst().getSecond();
             tp.position = last.getSecond();

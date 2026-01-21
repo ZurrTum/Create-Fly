@@ -16,6 +16,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.jspecify.annotations.Nullable;
 
 public class SchematicProcessor extends StructureProcessor implements EntityControlStructureProcessor {
@@ -27,12 +28,12 @@ public class SchematicProcessor extends StructureProcessor implements EntityCont
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo processBlock(
+    public StructureBlockInfo processBlock(
         LevelReader world,
         BlockPos pos,
         BlockPos anotherPos,
-        StructureTemplate.StructureBlockInfo rawInfo,
-        StructureTemplate.StructureBlockInfo info,
+        StructureBlockInfo rawInfo,
+        StructureBlockInfo info,
         StructurePlaceSettings settings
     ) {
         if (info.nbt() != null && info.state().hasBlockEntity()) {
@@ -40,7 +41,7 @@ public class SchematicProcessor extends StructureProcessor implements EntityCont
             if (be != null) {
                 CompoundTag nbt = NBTProcessors.process(info.state(), be, info.nbt(), false);
                 if (nbt != info.nbt())
-                    return new StructureTemplate.StructureBlockInfo(info.pos(), info.state(), nbt);
+                    return new StructureBlockInfo(info.pos(), info.state(), nbt);
             }
         }
         return info;

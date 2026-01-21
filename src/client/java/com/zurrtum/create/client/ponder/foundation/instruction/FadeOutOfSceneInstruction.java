@@ -5,14 +5,15 @@ import com.zurrtum.create.client.ponder.api.element.ElementLink;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class FadeOutOfSceneInstruction<T extends AnimatedSceneElement> extends TickingInstruction {
 
-    private final Direction fadeOutTo;
+    private final @Nullable Direction fadeOutTo;
     private final ElementLink<T> link;
-    private T element;
+    private @Nullable T element;
 
-    public FadeOutOfSceneInstruction(int fadeOutTicks, Direction fadeOutTo, ElementLink<T> link) {
+    public FadeOutOfSceneInstruction(int fadeOutTicks, @Nullable Direction fadeOutTo, ElementLink<T> link) {
         super(false, fadeOutTicks);
         this.fadeOutTo = fadeOutTo == null ? null : fadeOutTo.getOpposite();
         this.link = link;

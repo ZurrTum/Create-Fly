@@ -24,17 +24,18 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
 public class SignalBoundary extends TrackEdgePoint {
     public Couple<Map<BlockPos, Boolean>> blockEntities;
     public Couple<SignalType> types;
-    public Couple<UUID> groups;
+    public Couple<@Nullable UUID> groups;
     public Couple<Boolean> sidesToUpdate;
     public Couple<SignalState> cachedStates;
 
-    private final Couple<Map<UUID, Boolean>> chainedSignals;
+    private final Couple<@Nullable Map<UUID, Boolean>> chainedSignals;
 
     public SignalBoundary() {
         blockEntities = Couple.create(HashMap::new);
@@ -45,7 +46,7 @@ public class SignalBoundary extends TrackEdgePoint {
         cachedStates = Couple.create(() -> SignalState.INVALID);
     }
 
-    public void setGroup(boolean primary, UUID groupId) {
+    public void setGroup(boolean primary, @Nullable UUID groupId) {
         UUID previous = groups.get(primary);
 
         groups.set(primary, groupId);
@@ -125,6 +126,7 @@ public class SignalBoundary extends TrackEdgePoint {
         sidesToUpdate.set(isPrimary(side), true);
     }
 
+    @Nullable
     public UUID getGroup(TrackNode side) {
         return groups.get(isPrimary(side));
     }

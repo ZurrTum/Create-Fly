@@ -2,6 +2,7 @@ package com.zurrtum.create.content.logistics.tunnel;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
@@ -11,11 +12,7 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -26,11 +23,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,6 +34,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
 
 public class BeltTunnelBlock extends Block implements IBE<BeltTunnelBlockEntity>, ItemInventoryProvider<BeltTunnelBlockEntity>, NeighborUpdateListeningBlock, IWrenchable {
 
@@ -53,7 +49,13 @@ public class BeltTunnelBlock extends Block implements IBE<BeltTunnelBlockEntity>
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, BeltTunnelBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        BeltTunnelBlockEntity blockEntity,
+        @Nullable Direction context
+    ) {
         if (blockEntity.cap == null) {
             BlockState downState = world.getBlockState(pos.below());
             if (downState.is(AllBlocks.BELT)) {
@@ -202,8 +204,7 @@ public class BeltTunnelBlock extends Block implements IBE<BeltTunnelBlockEntity>
 
         boolean valid1 = blockState1.getBlock() instanceof BeltTunnelBlock || funnel1;
         boolean valid2 = blockState2.getBlock() instanceof BeltTunnelBlock || funnel2;
-        boolean canHaveWindow = valid1 && valid2 && !(funnel1 && funnel2);
-        return canHaveWindow;
+        return valid1 && valid2 && !(funnel1 && funnel2);
     }
 
     private boolean hasValidOutput(BlockGetter world, BlockPos pos, Direction side) {

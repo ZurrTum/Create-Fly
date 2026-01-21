@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -50,7 +50,7 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
         PackagerRenderState state,
         float tickProgress,
         Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+        @Nullable CrumblingOverlay crumblingOverlay
     ) {
         Level world = be.getLevel();
         boolean support = VisualizationManager.supportsVisualization(world);
@@ -110,13 +110,13 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
     public static class PackagerRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public Vec3 trayOffset;
         public float trayYRot;
-        public RenderType layer;
+        public @Nullable RenderType layer;
         public SuperByteBuffer hatch;
         public Vec3 hatchOffset;
         public float hatchYRot;
         public float hatchXRot;
         public SuperByteBuffer tray;
-        public ItemStackRenderState item;
+        public @Nullable ItemStackRenderState item;
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

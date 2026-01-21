@@ -5,25 +5,25 @@ import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour.StepContext;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ScrollInput extends AbstractSimiWidget {
 
-    protected Consumer<Integer> onScroll;
+    protected @Nullable Consumer<Integer> onScroll;
     protected int state;
-    protected Component title = CreateLang.translateDirect("gui.scrollInput.defaultTitle");
+    protected @Nullable Component title = CreateLang.translateDirect("gui.scrollInput.defaultTitle");
     protected final Component scrollToModify = CreateLang.translateDirect("gui.scrollInput.scrollToModify");
     protected final Component shiftScrollsFaster = CreateLang.translateDirect("gui.scrollInput.shiftScrollsFaster");
-    protected Component hint = null;
-    protected Label displayLabel;
+    protected @Nullable Component hint = null;
+    protected @Nullable Label displayLabel;
     protected boolean inverted;
     protected boolean soundPlayed;
     protected Function<Integer, Component> formatter;
@@ -75,7 +75,7 @@ public class ScrollInput extends AbstractSimiWidget {
         return this;
     }
 
-    public ScrollInput titled(MutableComponent title) {
+    public ScrollInput titled(@Nullable MutableComponent title) {
         this.title = title;
         updateTooltip();
         return this;
@@ -92,7 +92,7 @@ public class ScrollInput extends AbstractSimiWidget {
         return this;
     }
 
-    public ScrollInput writingTo(Label label) {
+    public ScrollInput writingTo(@Nullable Label label) {
         this.displayLabel = label;
         if (label != null)
             writeToLabel();

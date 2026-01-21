@@ -24,6 +24,7 @@ public class InItemGroupAttribute implements ItemAttribute {
     public static final MapCodec<InItemGroupAttribute> CODEC = BuiltInRegistries.CREATIVE_MODE_TAB.byNameCodec()
         .xmap(InItemGroupAttribute::new, i -> i.group).fieldOf("value");
 
+    @SuppressWarnings("DataFlowIssue")
     public static final StreamCodec<ByteBuf, InItemGroupAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(Identifier.STREAM_CODEC).map(
         i -> new InItemGroupAttribute(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(i)),
         i -> i.group == null ? null : BuiltInRegistries.CREATIVE_MODE_TAB.getKey(i.group)

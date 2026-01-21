@@ -12,10 +12,6 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruction;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
-
-import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -39,6 +35,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopying {
 
@@ -63,7 +63,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
         return InteractionResult.PASS;
     }
 
-    public InteractionResult handScheduleTo(ItemStack pStack, Player pPlayer, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult handScheduleTo(ItemStack pStack, Player pPlayer, @Nullable LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         InteractionResult pass = InteractionResult.PASS;
 
         Schedule schedule = getSchedule(pPlayer.registryAccess(), pStack);
@@ -119,6 +119,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void appendHoverText(
         ItemStack stack,
         TooltipContext context,
@@ -145,6 +146,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
         }
     }
 
+    @Nullable
     public static Schedule getSchedule(HolderLookup.Provider registries, ItemStack pStack) {
         if (!pStack.has(AllDataComponents.TRAIN_SCHEDULE))
             return null;

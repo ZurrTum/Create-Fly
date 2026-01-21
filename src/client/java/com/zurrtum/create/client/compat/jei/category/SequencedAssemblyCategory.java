@@ -58,6 +58,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -75,6 +76,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public static <T extends Recipe<?>> SequencedRenderer<T> getRenderer(T recipe) {
         return (SequencedRenderer<T>) RENDER.get(recipe.getType());
     }
@@ -227,6 +229,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
             return CommonComponents.EMPTY;
         }
 
+        @Nullable
         default IRecipeSlotBuilder addSlot(IRecipeLayoutBuilder builder, int x, int y, T recipe) {
             return null;
         }

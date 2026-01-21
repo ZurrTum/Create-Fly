@@ -5,14 +5,13 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.levelWrappers.WorldHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RedstoneLinkNetworkHandler {
 
@@ -24,9 +23,9 @@ public class RedstoneLinkNetworkHandler {
         public static final Codec<Frequency> CODEC = ItemStack.OPTIONAL_CODEC.xmap(Frequency::of, Frequency::getStack);
         public static final Frequency EMPTY = new Frequency(ItemStack.EMPTY);
         private static final Map<Item, Frequency> simpleFrequencies = new IdentityHashMap<>();
-        private ItemStack stack;
-        private Item item;
-        private int color;
+        private final ItemStack stack;
+        private final Item item;
+        private final int color;
 
         public static Frequency of(ItemStack stack) {
             if (stack.isEmpty())
@@ -55,7 +54,7 @@ public class RedstoneLinkNetworkHandler {
         public boolean equals(Object obj) {
             if (this == obj)
                 return true;
-            return obj instanceof Frequency ? ((Frequency) obj).item == item && ((Frequency) obj).color == color : false;
+            return obj instanceof Frequency frequency && frequency.item == item && frequency.color == color;
         }
 
     }

@@ -18,6 +18,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -126,7 +127,7 @@ public abstract class CopycatModel extends WrapperBlockStateModel {
             occluded[face.get3DDataValue()] = true;
         }
 
-        public boolean isOccluded(Direction face) {
+        public boolean isOccluded(@Nullable Direction face) {
             return face != null && occluded[face.get3DDataValue()];
         }
     }

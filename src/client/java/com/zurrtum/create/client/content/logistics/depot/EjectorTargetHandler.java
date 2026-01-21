@@ -30,14 +30,16 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 public class EjectorTargetHandler {
 
-    static BlockPos currentSelection;
-    static ItemStack currentItem;
+    static @Nullable BlockPos currentSelection;
+    static @Nullable ItemStack currentItem;
     static long lastHoveredBlockPos = -1;
-    static EntityLauncher launcher;
+    static @Nullable EntityLauncher launcher;
 
+    @Nullable
     public static InteractionResult rightClickingBlocksSelectsThem(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
         if (currentItem == null)
             return null;
@@ -99,6 +101,7 @@ public class EjectorTargetHandler {
 
     }
 
+    @Nullable
     public static Direction getValidTargetDirection(BlockPos pos) {
         if (currentSelection == null)
             return null;
@@ -195,14 +198,13 @@ public class EjectorTargetHandler {
         BlockPos pos = result.getBlockPos();
 
         BlockEntity be = mc.level.getBlockEntity(pos);
-        if (!(be instanceof EjectorBlockEntity)) {
+        if (!(be instanceof EjectorBlockEntity ejector)) {
             lastHoveredBlockPos = -1;
             currentSelection = null;
             return;
         }
 
         if (lastHoveredBlockPos == -1 || lastHoveredBlockPos != pos.asLong()) {
-            EjectorBlockEntity ejector = (EjectorBlockEntity) be;
             if (!ejector.getTargetPosition().equals(ejector.getBlockPos()))
                 currentSelection = ejector.getTargetPosition();
             lastHoveredBlockPos = pos.asLong();
@@ -213,7 +215,7 @@ public class EjectorTargetHandler {
             drawOutline(mc.level, currentSelection);
     }
 
-    public static void drawOutline(ClientLevel world, BlockPos pos) {
+    public static void drawOutline(ClientLevel world, @Nullable BlockPos pos) {
         if (pos == null)
             return;
         BlockState state = world.getBlockState(pos);

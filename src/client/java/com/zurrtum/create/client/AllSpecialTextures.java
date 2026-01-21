@@ -10,9 +10,7 @@ public enum AllSpecialTextures implements BindableTexture {
     CUTOUT_CHECKERED("cutout_checkerboard.png"),
     HIGHLIGHT_CHECKERED("highlighted_checkerboard.png"),
     SELECTION("selection.png"),
-    GLUE("glue.png"),
-
-    ;
+    GLUE("glue.png");
 
     public static final String ASSET_PATH = "textures/special/";
     private final Identifier location;

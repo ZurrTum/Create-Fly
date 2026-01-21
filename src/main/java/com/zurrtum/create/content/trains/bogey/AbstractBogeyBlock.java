@@ -343,7 +343,7 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
     }
 
     @Override
-    public ItemRequirement getRequiredItems(BlockState state, BlockEntity te) {
+    public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity te) {
         return new ItemRequirement(ItemRequirement.ItemUseType.CONSUME, AllItems.RAILWAY_CASING.getDefaultInstance());
     }
 

@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ConcurrentModificationException;
 import java.util.function.Function;
@@ -45,6 +46,7 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
         setLazyTickRate(10);
     }
 
+    @Nullable
     public static <T extends BlockEntityBehaviour<?>> T get(BlockGetter reader, BlockPos pos, BehaviourType<T> type) {
         BlockEntity be;
         try {
@@ -55,7 +57,8 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
         return get(be, type);
     }
 
-    public static <T extends BlockEntityBehaviour<?>> T get(BlockEntity be, BehaviourType<T> type) {
+    @Nullable
+    public static <T extends BlockEntityBehaviour<?>> T get(@Nullable BlockEntity be, BehaviourType<T> type) {
         if (be == null)
             return null;
         if (!(be instanceof SmartBlockEntity ste))
@@ -136,6 +139,7 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
         return blockEntity.getBlockPos();
     }
 
+    @Nullable
     public Level getLevel() {
         return blockEntity.getLevel();
     }

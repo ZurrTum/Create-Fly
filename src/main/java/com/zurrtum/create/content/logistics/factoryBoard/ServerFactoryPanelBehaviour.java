@@ -75,7 +75,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
     public Map<BlockPos, FactoryPanelConnection> targetedByLinks;
     public Set<FactoryPanelPosition> targeting;
     public List<ItemStack> activeCraftingArrangement;
-    public List<BigItemStack> craftingList;
+    public @Nullable List<BigItemStack> craftingList;
 
     public boolean satisfied;
     public boolean promisedSatisfied;
@@ -1005,7 +1005,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
         List<BigItemStack> inputs,
         boolean respectAmounts
     ) {
-        List<Ingredient> ingredients;
+        List<@Nullable Ingredient> ingredients;
         if (availableCraftingRecipe instanceof ShapedRecipe shapedRecipe) {
             ingredients = shapedRecipe.getIngredients().stream().map(o -> o.orElse(null)).toList();
         } else if (availableCraftingRecipe instanceof ShapelessRecipe shapelessRecipe) {
@@ -1148,13 +1148,14 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
         return blockEntity.getBlockState().getBlock().getName();
     }
 
+    @Nullable
     public String getFrogAddress() {
         PackagerBlockEntity packager = panelBE().getRestockedPackager();
         if (packager == null)
             return null;
         if (packager.getLevel().getBlockEntity(packager.getBlockPos().above()) instanceof FrogportBlockEntity fpbe)
             if (fpbe.addressFilter != null && !fpbe.addressFilter.isBlank())
-                return fpbe.addressFilter + "";
+                return fpbe.addressFilter;
         return null;
     }
 

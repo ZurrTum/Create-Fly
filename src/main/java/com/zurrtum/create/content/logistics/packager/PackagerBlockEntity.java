@@ -75,7 +75,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     public Boolean hasCustomComputerAddress;
     public String customComputerAddress;
 
-    private InventorySummary availableItems;
+    private @Nullable InventorySummary availableItems;
     private VersionedInventoryTrackerBehaviour invVersionTracker;
 
     public PackagerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -111,7 +111,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         return List.of(AllAdvancements.PACKAGER);
     }
 
-    private boolean supportsBlockEntity(BlockEntity target) {
+    private boolean supportsBlockEntity(@Nullable BlockEntity target) {
         return target != null && !(target instanceof PortableStorageInterfaceBlockEntity);
     }
 
@@ -194,7 +194,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         return availableItems;
     }
 
-    private void submitNewArrivals(InventorySummary before, InventorySummary after) {
+    private void submitNewArrivals(@Nullable InventorySummary before, InventorySummary after) {
         if (before == null || after.isEmpty())
             return;
 
@@ -274,6 +274,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         return !getBlockState().getValueOrElse(PackagerBlock.LINKED, false);
     }
 
+    @Nullable
     private BlockPos getLinkPos() {
         for (Direction d : Iterate.directions) {
             BlockState adjacentState = level.getBlockState(worldPosition.relative(d));
@@ -427,7 +428,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         return PackageItem.containing(contents);
     }
 
-    private void queuePackage(ItemStack createdBox, String address) {
+    private void queuePackage(ItemStack createdBox, @Nullable String address) {
         if (address != null && !address.isBlank()) {
             PackageItem.addAddress(createdBox, address);
         }
@@ -447,7 +448,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         notifyUpdate();
     }
 
-    public void attemptToSend(Collection<PackagingRequest> queuedRequests) {
+    public void attemptToSend(@Nullable Collection<PackagingRequest> queuedRequests) {
         if (queuedRequests == null) {
             attemptToSend();
             return;
@@ -585,6 +586,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         }
     }
 
+    @Nullable
     protected String getSign(Direction side) {
         BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(side));
         if (!(blockEntity instanceof SignBlockEntity sign))

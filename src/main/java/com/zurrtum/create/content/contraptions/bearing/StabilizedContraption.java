@@ -27,9 +27,7 @@ public class StabilizedContraption extends Contraption {
         if (!searchMovedStructure(world, offset, null))
             return false;
         startMoving(world);
-        if (blocks.isEmpty())
-            return false;
-        return true;
+        return !blocks.isEmpty();
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.redstone.link;
 
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkSettingsPacket;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -13,8 +13,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jspecify.annotations.Nullable;
 
 public class LinkHandler {
+    @Nullable
     public static InteractionResult onBlockActivated(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
         if (player.isShiftKeyDown() || player.isSpectator())
             return null;

@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -365,7 +366,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public <T extends AnimatedSceneElement> void hideElement(ElementLink<T> link, Direction direction) {
+        public <T extends AnimatedSceneElement> void hideElement(ElementLink<T> link, @Nullable Direction direction) {
             addInstruction(new FadeOutOfSceneInstruction<>(15, direction, link));
         }
 
@@ -393,7 +394,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public void showSection(Selection selection, Direction fadeInDirection) {
+        public void showSection(Selection selection, @Nullable Direction fadeInDirection) {
             addInstruction(new DisplayWorldSectionInstruction(15, fadeInDirection, selection, scene::getBaseWorldSection));
         }
 
@@ -414,7 +415,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public ElementLink<WorldSectionElement> showIndependentSection(Selection selection, Direction fadeInDirection) {
+        public ElementLink<WorldSectionElement> showIndependentSection(Selection selection, @Nullable Direction fadeInDirection) {
             DisplayWorldSectionInstruction instruction = new DisplayWorldSectionInstruction(15, fadeInDirection, selection, null);
             addInstruction(instruction);
             return instruction.createLink(scene);
@@ -443,7 +444,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public void hideIndependentSection(ElementLink<WorldSectionElement> link, Direction fadeOutDirection) {
+        public void hideIndependentSection(ElementLink<WorldSectionElement> link, @Nullable Direction fadeOutDirection) {
             addInstruction(new FadeOutOfSceneInstruction<>(15, fadeOutDirection, link));
         }
 

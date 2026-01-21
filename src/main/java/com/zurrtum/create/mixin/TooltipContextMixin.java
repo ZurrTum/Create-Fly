@@ -2,6 +2,7 @@ package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.foundation.item.TooltipWorldContext;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,6 +14,7 @@ public class TooltipContextMixin implements TooltipWorldContext {
     Level val$level;
 
     @Override
+    @NonNull
     public Level create$getWorld() {
         return val$level;
     }

@@ -11,14 +11,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
 
 public class PoweredShaftBlockEntity extends GeneratingKineticBlockEntity {
 
-    public BlockPos enginePos;
+    public @Nullable BlockPos enginePos;
     public float engineEfficiency;
     public int movementDirection;
     public int initialTicks;
-    public Block capacityKey;
+    public @Nullable Block capacityKey;
 
     public PoweredShaftBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.POWERED_SHAFT, pos, state);
@@ -34,8 +35,7 @@ public class PoweredShaftBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     public void update(BlockPos sourcePos, int direction, float efficiency) {
-        BlockPos key = worldPosition.subtract(sourcePos);
-        enginePos = key;
+        enginePos = worldPosition.subtract(sourcePos);
         float prev = engineEfficiency;
         engineEfficiency = efficiency;
         int prevDirection = this.movementDirection;

@@ -78,7 +78,7 @@ public class TreeCutter {
 
             frontier.add(pos.above());
             while (!frontier.isEmpty()) {
-                BlockPos current = frontier.remove(0);
+                BlockPos current = frontier.removeFirst();
                 visited.add(current);
                 logs.add(current);
                 for (Direction direction : Iterate.directions) {
@@ -104,7 +104,7 @@ public class TreeCutter {
         // Find all logs & roots
         boolean hasRoots = false;
         while (!frontier.isEmpty()) {
-            BlockPos currentPos = frontier.remove(0);
+            BlockPos currentPos = frontier.removeFirst();
             if (!visited.add(currentPos))
                 continue;
 
@@ -259,10 +259,10 @@ public class TreeCutter {
         DOWN(-1, 0),
         BOTH(-1, 1);
 
-        int minY;
-        int maxY;
+        final int minY;
+        final int maxY;
 
-        private SearchDirection(int minY, int maxY) {
+        SearchDirection(int minY, int maxY) {
             this.minY = minY;
             this.maxY = maxY;
         }

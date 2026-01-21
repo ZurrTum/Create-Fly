@@ -3,6 +3,7 @@ package com.zurrtum.create.infrastructure.config;
 import com.google.gson.JsonObject;
 import com.zurrtum.create.catnip.config.Builder;
 import com.zurrtum.create.catnip.config.ConfigBase;
+import org.jspecify.annotations.Nullable;
 
 public class CServer extends ConfigBase {
     public Builder builder;
@@ -12,7 +13,7 @@ public class CServer extends ConfigBase {
         this.builder = builder;
     }
 
-    public void reload(JsonObject object) {
+    public void reload(@Nullable JsonObject object) {
         if (object == null) {
             builder.read();
         } else {

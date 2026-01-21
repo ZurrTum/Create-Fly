@@ -21,6 +21,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionEntity> {
     public static final BehaviourType<CarriageAudioBehaviour> TYPE = new BehaviourType<>();
@@ -30,12 +31,12 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
     LerpedFloat approachFactor;
     LerpedFloat seatCrossfade;
 
-    LoopingSound minecartEsqueSound;
-    LoopingSound sharedWheelSound;
-    LoopingSound sharedWheelSoundSeated;
-    LoopingSound sharedHonkSound;
+    @Nullable LoopingSound minecartEsqueSound;
+    @Nullable LoopingSound sharedWheelSound;
+    @Nullable LoopingSound sharedWheelSoundSeated;
+    @Nullable LoopingSound sharedHonkSound;
 
-    Couple<SoundEvent> bogeySounds;
+    @Nullable Couple<SoundEvent> bogeySounds;
     SoundEvent closestBogeySound;
 
     boolean arrived;
@@ -113,7 +114,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         double distance1 = toBogey1.length();
         double distance2 = toBogey2.length();
 
-        Couple<CarriageBogey> bogeys = carriage.bogeys;
+        Couple<@Nullable CarriageBogey> bogeys = carriage.bogeys;
         CarriageBogey relevantBogey = bogeys.get(distance1 > distance2);
         if (relevantBogey == null) {
             relevantBogey = bogeys.getFirst();
@@ -247,11 +248,11 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
 
     }
 
-    private LoopingSound playIfMissing(Minecraft mc, LoopingSound loopingSound, SoundEvent sound) {
+    private LoopingSound playIfMissing(Minecraft mc, @Nullable LoopingSound loopingSound, SoundEvent sound) {
         return playIfMissing(mc, loopingSound, sound, false);
     }
 
-    private LoopingSound playIfMissing(Minecraft mc, LoopingSound loopingSound, SoundEvent sound, boolean continuouslyShowSubtitle) {
+    private LoopingSound playIfMissing(Minecraft mc, @Nullable LoopingSound loopingSound, SoundEvent sound, boolean continuouslyShowSubtitle) {
         if (loopingSound == null) {
             loopingSound = new LoopingSound(sound, SoundSource.NEUTRAL, continuouslyShowSubtitle);
             mc.getSoundManager().play(loopingSound);

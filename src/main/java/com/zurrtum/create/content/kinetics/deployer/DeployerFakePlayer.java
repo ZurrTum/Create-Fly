@@ -15,10 +15,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlayer {
-    public Pair<BlockPos, Float> blockBreakingProgress;
-    private ItemStack spawnedItemEffects;
+    public @Nullable Pair<BlockPos, Float> blockBreakingProgress;
+    private @Nullable ItemStack spawnedItemEffects;
     public boolean placedTracks;
     public boolean onMinecartContraption;
 
@@ -33,22 +34,24 @@ public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlay
     }
 
     @Override
+    @Nullable
     public Pair<BlockPos, Float> getBlockBreakingProgress() {
         return blockBreakingProgress;
     }
 
     @Override
-    public void setBlockBreakingProgress(Pair<BlockPos, Float> blockBreakingProgress) {
+    public void setBlockBreakingProgress(@Nullable Pair<BlockPos, Float> blockBreakingProgress) {
         this.blockBreakingProgress = blockBreakingProgress;
     }
 
     @Override
+    @Nullable
     public ItemStack getSpawnedItemEffects() {
         return spawnedItemEffects;
     }
 
     @Override
-    public void setSpawnedItemEffects(ItemStack spawnedItemEffects) {
+    public void setSpawnedItemEffects(@Nullable ItemStack spawnedItemEffects) {
         this.spawnedItemEffects = spawnedItemEffects;
     }
 

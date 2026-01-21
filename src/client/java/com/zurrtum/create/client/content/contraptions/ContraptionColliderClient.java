@@ -39,6 +39,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -47,8 +48,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public class ContraptionColliderClient {
-    private static MutablePair<WeakReference<AbstractContraptionEntity>, Double> safetyLock = new MutablePair<>();
-    private static Map<AbstractContraptionEntity, Map<Player, Double>> remoteSafetyLocks = new WeakHashMap<>();
+    private static final MutablePair<@Nullable WeakReference<AbstractContraptionEntity>, Double> safetyLock = new MutablePair<>();
+    private static final Map<AbstractContraptionEntity, Map<Player, Double>> remoteSafetyLocks = new WeakHashMap<>();
 
     static void collideEntities(AbstractContraptionEntity contraptionEntity) {
         Contraption contraption = contraptionEntity.getContraption();

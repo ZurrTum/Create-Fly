@@ -4,6 +4,7 @@ import com.zurrtum.create.infrastructure.items.BaseSidedInventory;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,17 +21,17 @@ public interface WorldlyContainerMixin extends BaseSidedInventory {
     boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir);
 
     @Override
-    default int[] create$getAvailableSlots(Direction side) {
+    default int @NonNull [] create$getAvailableSlots(@Nullable Direction side) {
         return getSlotsForFace(side);
     }
 
     @Override
-    default boolean create$canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    default boolean create$canInsert(int slot, @NonNull ItemStack stack, @Nullable Direction dir) {
         return canPlaceItemThroughFace(slot, stack, dir);
     }
 
     @Override
-    default boolean create$canExtract(int slot, ItemStack stack, Direction dir) {
+    default boolean create$canExtract(int slot, @NonNull ItemStack stack, @Nullable Direction dir) {
         return canTakeItemThroughFace(slot, stack, dir);
     }
 }

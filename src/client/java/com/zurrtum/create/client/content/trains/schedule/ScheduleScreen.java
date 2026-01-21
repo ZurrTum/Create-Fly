@@ -91,15 +91,15 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
     private IconButton resetProgress;
     private IconButton skipProgress;
 
-    private ScheduleInstruction editingDestination;
-    private ScheduleWaitCondition editingCondition;
+    private @Nullable ScheduleInstruction editingDestination;
+    private @Nullable ScheduleWaitCondition editingCondition;
     private SelectionScrollInput scrollInput;
     private Label scrollInputLabel;
     private IconButton editorConfirm, editorDelete;
     private ModularGuiLine editorSubWidgets;
     private Consumer<Boolean> onEditorClose;
 
-    private DestinationSuggestions destinationSuggestions;
+    private @Nullable DestinationSuggestions destinationSuggestions;
 
     public ScheduleScreen(ScheduleMenu menu, Inventory inv, Component title) {
         super(menu, inv, title, AllGuiTextures.SCHEDULE.getWidth(), AllGuiTextures.SCHEDULE.getHeight());
@@ -115,6 +115,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         editorSubWidgets = new ModularGuiLine();
     }
 
+    @Nullable
     public static ScheduleScreen create(
         Minecraft mc,
         MenuType<ItemStack> type,
@@ -280,8 +281,14 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         skipProgress.visible = true;
         resetProgress.visible = true;
 
-        if (editingCondition == null && editingDestination == null)
+        ScheduleDataEntry input;
+        if (editingCondition != null) {
+            input = editingCondition;
+        } else if (editingDestination != null) {
+            input = editingDestination;
+        } else {
             return;
+        }
 
         destinationSuggestions = null;
 
@@ -290,7 +297,6 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         removeWidget(editorConfirm);
         removeWidget(editorDelete);
 
-        ScheduleDataEntry input = editingCondition == null ? editingDestination : editingCondition;
         IScheduleInput<ScheduleDataEntry> editing = AllScheduleRenders.get(input);
         for (int i = 0; i < editing.slotsTargeted(); i++) {
             editing.setItem(input, i, menu.ghostInventory.getItem(i));
@@ -425,7 +431,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
 
             matrixStack.pushMatrix();
             matrixStack.translate(0, scrollOffset);
-            if (i == 0 || entries.size() == 0)
+            if (i == 0 || entries.isEmpty())
                 UIRenderHelper.drawStretched(graphics, leftPos + 33, topPos + 16, 3, 10, AllGuiTextures.SCHEDULE_STRIP_LIGHT);
 
             if (i == entries.size()) {
@@ -617,7 +623,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         return maxWidth;
     }
 
-    protected int renderInput(GuiGraphics graphics, Pair<ItemStack, Component> pair, int x, int y, boolean clean, int minSize) {
+    protected int renderInput(GuiGraphics graphics, Pair<ItemStack, @Nullable Component> pair, int x, int y, boolean clean, int minSize) {
         ItemStack stack = pair.getFirst();
         Component text = pair.getSecond();
         boolean hasItem = !stack.isEmpty();
@@ -686,8 +692,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
             IScheduleInput<ScheduleInstruction> input = AllScheduleRenders.get(instruction);
             int fieldSize = getFieldSize(100, input.getSummary(instruction));
             if (x > 25 && x <= 25 + fieldSize && y > 4 && y <= 20) {
-                List<Component> components = new ArrayList<>();
-                components.addAll(input.getTitleAs(instruction, "instruction"));
+                List<Component> components = new ArrayList<>(input.getTitleAs(instruction, "instruction"));
                 components.add(empty);
                 components.add(clickToEdit);
                 renderActionTooltip(graphics, components, mx, my);
@@ -878,7 +883,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
             graphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mx, my);
     }
 
-    private int getFieldSize(int minSize, Pair<ItemStack, Component> pair) {
+    private int getFieldSize(int minSize, Pair<ItemStack, @Nullable Component> pair) {
         ItemStack stack = pair.getFirst();
         Component text = pair.getSecond();
         boolean hasItem = !stack.isEmpty();

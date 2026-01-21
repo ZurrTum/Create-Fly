@@ -22,6 +22,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -115,7 +116,7 @@ public class CopycatPanelModel extends CopycatModel {
         }
     }
 
-    protected void addBarsCroppedQuads(TextureAtlasSprite targetSprite, List<BakedQuad> quads, Consumer<BakedQuad> consumer) {
+    protected void addBarsCroppedQuads(@Nullable TextureAtlasSprite targetSprite, List<BakedQuad> quads, Consumer<BakedQuad> consumer) {
         if (targetSprite == null) {
             quads.forEach(consumer);
             return;

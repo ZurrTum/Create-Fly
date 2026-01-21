@@ -119,7 +119,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
 
     @Override
     public void submit(
-        CogRenderData data,
+        @Nullable CogRenderData data,
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,

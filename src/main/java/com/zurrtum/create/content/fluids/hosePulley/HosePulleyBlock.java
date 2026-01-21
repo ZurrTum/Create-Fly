@@ -15,6 +15,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class HosePulleyBlock extends HorizontalKineticBlock implements IBE<HosePulleyBlockEntity>, FluidInventoryProvider<HosePulleyBlockEntity> {
 
@@ -28,7 +29,7 @@ public class HosePulleyBlock extends HorizontalKineticBlock implements IBE<HoseP
         BlockPos pos,
         BlockState state,
         HosePulleyBlockEntity blockEntity,
-        Direction context
+        @Nullable Direction context
     ) {
         return blockEntity.handler;
     }
@@ -57,6 +58,7 @@ public class HosePulleyBlock extends HorizontalKineticBlock implements IBE<HoseP
     }
 
     @Override
+    @Nullable
     public Direction getPreferredHorizontalFacing(BlockPlaceContext context) {
         Direction fromParent = super.getPreferredHorizontalFacing(context);
         if (fromParent != null)

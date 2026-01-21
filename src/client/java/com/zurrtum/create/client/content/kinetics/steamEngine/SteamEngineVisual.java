@@ -14,13 +14,13 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
-
-import java.util.Objects;
-import java.util.function.Consumer;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBlockEntity> implements SimpleDynamicVisual {
 
@@ -28,8 +28,8 @@ public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBloc
     protected final TransformedInstance linkage;
     protected final TransformedInstance connector;
 
-    private Float lastAngle = Float.NaN;
-    private Axis lastAxis = null;
+    private @Nullable Float lastAngle = Float.NaN;
+    private @Nullable Axis lastAxis = null;
 
     public SteamEngineVisual(VisualizationContext context, SteamEngineBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);

@@ -108,7 +108,7 @@ public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock,
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
@@ -254,7 +254,7 @@ public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock,
             context.getClickedPos()
         ).setValue(
             BlockStateProperties.WATERLOGGED,
-            Boolean.valueOf(FluidState.getType() == Fluids.WATER)
+            FluidState.getType() == Fluids.WATER
         );
     }
 

@@ -71,7 +71,7 @@ public abstract class AbstractBellBlock<BE extends AbstractBellBlockEntity> exte
         return ring(world, pos, direction, player);
     }
 
-    protected boolean ring(Level world, BlockPos pos, Direction direction, Player player) {
+    protected boolean ring(Level world, BlockPos pos, Direction direction, @Nullable Player player) {
         BE be = getBlockEntity(world, pos);
         if (world.isClientSide())
             return true;

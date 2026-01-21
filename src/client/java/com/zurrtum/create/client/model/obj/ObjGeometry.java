@@ -12,6 +12,7 @@ import com.mojang.math.Transformation;
 import com.zurrtum.create.client.model.ExtendedUnbakedGeometry;
 import com.zurrtum.create.client.model.NeoForgeModelProperties;
 import com.zurrtum.create.client.model.StandardModelParameters;
+import com.zurrtum.create.client.model.obj.ObjMaterialLibrary.Material;
 import joptsimple.internal.Strings;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
@@ -82,7 +83,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
             modelPath = "";
 
         ObjMaterialLibrary mtllib = ObjMaterialLibrary.EMPTY;
-        ObjMaterialLibrary.Material currentMat = null;
+        Material currentMat = null;
         String currentSmoothingGroup = null;
         ModelGroup currentGroup = null;
         ModelObject currentObject = null;
@@ -117,10 +118,10 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
                 case "usemtl": // Sets the current material (starts new mesh)
                 {
                     String mat = Strings.join(Arrays.copyOfRange(line, 1, line.length), " ");
-                    ObjMaterialLibrary.Material newMat = mtllib.getMaterial(mat);
+                    Material newMat = mtllib.getMaterial(mat);
                     if (!Objects.equals(newMat, currentMat)) {
                         currentMat = newMat;
-                        if (currentMesh != null && currentMesh.mat == null && currentMesh.faces.size() == 0) {
+                        if (currentMesh != null && currentMesh.mat == null && currentMesh.faces.isEmpty()) {
                             currentMesh.mat = currentMat;
                         } else {
                             // Start new mesh
@@ -198,7 +199,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
                     String smoothingGroup = "off".equals(line[1]) ? null : line[1];
                     if (!Objects.equals(currentSmoothingGroup, smoothingGroup)) {
                         currentSmoothingGroup = smoothingGroup;
-                        if (currentMesh != null && currentMesh.smoothingGroup == null && currentMesh.faces.size() == 0) {
+                        if (currentMesh != null && currentMesh.smoothingGroup == null && currentMesh.faces.isEmpty()) {
                             currentMesh.smoothingGroup = currentSmoothingGroup;
                         } else {
                             // Start new mesh
@@ -362,10 +363,10 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         for (int i = 0; i < 4; i++) {
             int[] index = indices[Math.min(i, indices.length - 1)];
             Vector4f position = new Vector4f(positions.get(index[0]), 1);
-            Vec2 texCoord = index.length >= 2 && texCoords.size() > 0 ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
-            Vector3f norm0 = !needsNormalRecalculation && index.length >= 3 && normals.size() > 0 ? normals.get(index[2]) : faceNormal;
+            Vec2 texCoord = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
+            Vector3f norm0 = !needsNormalRecalculation && index.length >= 3 && !normals.isEmpty() ? normals.get(index[2]) : faceNormal;
             Vector3f normal = norm0;
-            Vector4f color = index.length >= 4 && colors.size() > 0 ? colors.get(index[3]) : COLOR_WHITE;
+            Vector4f color = index.length >= 4 && !colors.isEmpty() ? colors.get(index[3]) : COLOR_WHITE;
             if (hasTransform) {
                 normal = new Vector3f(norm0);
                 position.mul(transformation.getMatrix());
@@ -489,12 +490,12 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
 
     private class ModelMesh {
         @Nullable
-        public ObjMaterialLibrary.Material mat;
+        public Material mat;
         @Nullable
         public String smoothingGroup;
         public final List<int[][]> faces = Lists.newArrayList();
 
-        public ModelMesh(@Nullable ObjMaterialLibrary.Material currentMat, @Nullable String currentSmoothingGroup) {
+        public ModelMesh(@Nullable Material currentMat, @Nullable String currentSmoothingGroup) {
             this.mat = currentMat;
             this.smoothingGroup = currentSmoothingGroup;
         }
@@ -516,7 +517,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
             var rootTransform = additionalProperties.getOrDefault(NeoForgeModelProperties.TRANSFORM, Transformation.identity());
             var transform = rootTransform.equals(Transformation.identity()) ? state.transformation() : state.transformation().compose(rootTransform);
             for (int[][] face : faces) {
-                Pair<BakedQuad, Direction> quad = makeQuad(face, tintIndex, colorTint, mat.ambientColor, texture, transform);
+                Pair<BakedQuad, @Nullable Direction> quad = makeQuad(face, tintIndex, colorTint, mat.ambientColor, texture, transform);
                 if (quad.getRight() == null)
                     builder.addUnculledFace(quad.getLeft());
                 else

@@ -21,10 +21,10 @@ public class EdgeData {
 
     public static final UUID passiveGroup = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    private UUID singleSignalGroup;
-    private List<TrackEdgePoint> points;
-    private List<TrackEdgeIntersection> intersections;
-    private TrackEdge edge;
+    private @Nullable UUID singleSignalGroup;
+    private final List<TrackEdgePoint> points;
+    private final List<TrackEdgeIntersection> intersections;
+    private final TrackEdge edge;
 
     public EdgeData(TrackEdge edge) {
         this.edge = edge;
@@ -37,11 +37,12 @@ public class EdgeData {
         return singleSignalGroup == null;
     }
 
+    @Nullable
     public UUID getSingleSignalGroup() {
         return singleSignalGroup;
     }
 
-    public void setSingleSignalGroup(@Nullable MinecraftServer server, @Nullable TrackGraph graph, UUID singleSignalGroup) {
+    public void setSingleSignalGroup(@Nullable MinecraftServer server, @Nullable TrackGraph graph, @Nullable UUID singleSignalGroup) {
         if (graph != null && !Objects.equal(singleSignalGroup, this.singleSignalGroup))
             refreshIntersectingSignalGroups(server, graph);
         this.singleSignalGroup = singleSignalGroup;
@@ -91,13 +92,10 @@ public class EdgeData {
 
     public void removeIntersection(MinecraftServer server, TrackGraph graph, UUID id) {
         refreshIntersectingSignalGroups(server, graph);
-        for (Iterator<TrackEdgeIntersection> iterator = intersections.iterator(); iterator.hasNext(); ) {
-            TrackEdgeIntersection existing = iterator.next();
-            if (existing.id.equals(id))
-                iterator.remove();
-        }
+        intersections.removeIf(existing -> existing.id.equals(id));
     }
 
+    @Nullable
     public UUID getGroupAtPosition(TrackGraph graph, double position) {
         if (!hasSignalBoundaries())
             return getEffectiveEdgeGroupId(graph);
@@ -121,6 +119,7 @@ public class EdgeData {
         return points;
     }
 
+    @Nullable
     public UUID getEffectiveEdgeGroupId(TrackGraph graph) {
         return singleSignalGroup == null ? null : singleSignalGroup.equals(passiveGroup) ? graph.id : singleSignalGroup;
     }

@@ -16,9 +16,10 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class MovementBehaviour {
     public static final SimpleRegistry<Block, MovementBehaviour> REGISTRY = SimpleRegistry.create();
-    public Object attachRender;
+    public @Nullable Object attachRender;
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T getAttachRender() {
         return (T) attachRender;
     }

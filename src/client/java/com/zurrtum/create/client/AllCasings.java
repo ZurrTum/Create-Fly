@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.function.BiPredicate;
 public class AllCasings {
     private static final Map<Block, Entry> ALL = new IdentityHashMap<>();
 
+    @Nullable
     public static Entry get(BlockState state) {
         return ALL.get(state.getBlock());
     }

@@ -20,6 +20,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -47,6 +48,7 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
         this.background = AllGuiTextures.LINKED_CONTROLLER;
     }
 
+    @Nullable
     public static LinkedControllerScreen create(
         Minecraft mc,
         MenuType<ItemStack> type,

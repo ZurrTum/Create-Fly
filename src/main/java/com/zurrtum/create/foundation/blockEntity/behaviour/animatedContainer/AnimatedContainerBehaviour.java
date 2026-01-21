@@ -1,14 +1,15 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -19,7 +20,7 @@ public class AnimatedContainerBehaviour<M extends MenuBase<? extends SmartBlockE
     public int openCount;
 
     private final Class<M> menuClass;
-    private Consumer<Boolean> openChanged;
+    private @Nullable Consumer<Boolean> openChanged;
 
     public AnimatedContainerBehaviour(SmartBlockEntity be, Class<M> menuClass) {
         super(be);

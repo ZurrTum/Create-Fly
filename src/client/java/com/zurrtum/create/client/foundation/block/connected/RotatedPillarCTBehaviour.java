@@ -10,6 +10,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class RotatedPillarCTBehaviour extends HorizontalCTBehaviour {
 
@@ -25,8 +26,8 @@ public class RotatedPillarCTBehaviour extends HorizontalCTBehaviour {
         BlockPos pos,
         BlockPos otherPos,
         Direction face,
-        Direction primaryOffset,
-        Direction secondaryOffset
+        @Nullable Direction primaryOffset,
+        @Nullable Direction secondaryOffset
     ) {
         if (other.getBlock() != state.getBlock())
             return false;
@@ -105,7 +106,8 @@ public class RotatedPillarCTBehaviour extends HorizontalCTBehaviour {
     }
 
     @Override
-    public CTSpriteShiftEntry getShift(BlockState state, Direction direction, TextureAtlasSprite sprite) {
+    @Nullable
+    public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         return super.getShift(state, direction.getAxis() == state.getValue(LayeredBlock.AXIS) ? Direction.UP : Direction.SOUTH, sprite);
     }
 

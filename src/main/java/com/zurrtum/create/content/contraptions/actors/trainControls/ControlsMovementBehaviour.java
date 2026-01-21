@@ -4,6 +4,7 @@ import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 public class ControlsMovementBehaviour extends MovementBehaviour {
     // TODO: rendering the levers should be specific to Carriage Contraptions -
@@ -14,6 +15,7 @@ public class ControlsMovementBehaviour extends MovementBehaviour {
     }
 
     @Override
+    @Nullable
     public ItemStack canBeDisabledVia(MovementContext context) {
         return null;
     }

@@ -15,7 +15,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.function.BiFunction;
 
 public final class BakedModelBuilder {
+    @Nullable
     final BlockStateModel model;
+    @Nullable
     final SimpleModelWrapper bakedModel;
     @Nullable BlockAndTintGetter level;
     @Nullable BlockPos pos;

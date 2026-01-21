@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import org.jspecify.annotations.Nullable;
 
 public abstract class HorizontalKineticBlock extends KineticBlock {
 
@@ -26,10 +27,12 @@ public abstract class HorizontalKineticBlock extends KineticBlock {
     }
 
     @Override
+    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 
+    @Nullable
     public Direction getPreferredHorizontalFacing(BlockPlaceContext context) {
         Direction prefferedSide = null;
         for (Direction side : Iterate.horizontalDirections) {

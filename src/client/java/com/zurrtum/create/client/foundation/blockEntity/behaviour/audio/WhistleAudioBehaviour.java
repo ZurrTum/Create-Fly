@@ -16,9 +16,10 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
-    protected WhistleSoundInstance soundInstance;
+    protected @Nullable WhistleSoundInstance soundInstance;
 
     public WhistleAudioBehaviour(WhistleBlockEntity be) {
         super(be);

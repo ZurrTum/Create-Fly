@@ -4,13 +4,13 @@ import com.zurrtum.create.client.catnip.lang.FontHelper.Palette;
 import com.zurrtum.create.client.foundation.item.TooltipHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.contraptions.AssemblyException;
-
-import java.util.Arrays;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.List;
 
 public interface IDisplayAssemblyExceptions {
 
@@ -31,6 +31,6 @@ public interface IDisplayAssemblyExceptions {
         return true;
     }
 
-    AssemblyException getLastAssemblyException();
+    @Nullable AssemblyException getLastAssemblyException();
 
 }

@@ -44,6 +44,7 @@ public class DeployerMovementRenderBehaviour implements MovementRenderBehaviour 
     }
 
     @Override
+    @Nullable
     public MovementRenderState getRenderState(
         Vec3 camera,
         Font textRenderer,
@@ -107,7 +108,7 @@ public class DeployerMovementRenderBehaviour implements MovementRenderBehaviour 
         public int light;
         public Level world;
         public Matrix4f worldMatrix4f;
-        public Vec3 offset;
+        public @Nullable Vec3 offset;
         public float upAngle;
         public float eastAngle;
         public float southAngle;

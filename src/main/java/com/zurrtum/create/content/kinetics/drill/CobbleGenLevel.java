@@ -1,9 +1,6 @@
 package com.zurrtum.create.content.kinetics.drill;
 
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
-
-import java.util.HashMap;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -11,6 +8,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.ticks.TickPriority;
+import org.jspecify.annotations.Nullable;
+
+import java.util.HashMap;
 
 public class CobbleGenLevel extends WrappedLevel {
 
@@ -56,7 +56,7 @@ public class CobbleGenLevel extends WrappedLevel {
     }
 
     @Override
-    public void levelEvent(Entity player, int type, BlockPos pos, int data) {
+    public void levelEvent(@Nullable Entity player, int type, BlockPos pos, int data) {
     }
 
     @Override

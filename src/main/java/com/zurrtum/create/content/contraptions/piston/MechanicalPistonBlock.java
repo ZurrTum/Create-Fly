@@ -5,9 +5,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,6 +30,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
 
 public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implements IBE<MechanicalPistonBlockEntity>, NeighborUpdateListeningBlock {
 
@@ -178,13 +178,13 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
     }
 
     @Override
-    public BlockState playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, @Nullable Player player) {
         Direction direction = state.getValue(FACING);
         BlockPos pistonHead = null;
         BlockPos pistonBase = pos;
         boolean dropBlocks = player == null || !player.isCreative();
 
-        Integer maxPoles = maxAllowedPistonPoles();
+        int maxPoles = maxAllowedPistonPoles();
         for (int offset = 1; offset < maxPoles; offset++) {
             BlockPos currentPos = pos.relative(direction, offset);
             BlockState block = worldIn.getBlockState(currentPos);

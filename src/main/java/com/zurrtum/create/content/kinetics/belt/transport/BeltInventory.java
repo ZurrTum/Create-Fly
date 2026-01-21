@@ -37,7 +37,7 @@ public class BeltInventory {
     final List<TransportedItemStack> toRemove;
     boolean beltMovementPositive;
 
-    TransportedItemStack lazyClientItem;
+    @Nullable TransportedItemStack lazyClientItem;
 
     public BeltInventory(BeltBlockEntity be) {
         this.belt = be;
@@ -283,10 +283,12 @@ public class BeltInventory {
         return false;
     }
 
+    @Nullable
     protected BeltProcessingBehaviour getBeltProcessingAtSegment(int segment) {
         return BlockEntityBehaviour.get(belt.getLevel(), BeltHelper.getPositionForOffset(belt, segment).above(2), BeltProcessingBehaviour.TYPE);
     }
 
+    @Nullable
     protected TransportedItemStackHandlerBehaviour getTransportedItemStackHandlerAtSegment(int segment) {
         return BlockEntityBehaviour.get(belt.getLevel(), BeltHelper.getPositionForOffset(belt, segment), TransportedItemStackHandlerBehaviour.TYPE);
     }
@@ -298,7 +300,7 @@ public class BeltInventory {
         FUNNEL(.5f),
         BLOCKED(.45f);
 
-        private float margin;
+        private final float margin;
 
         Ending(float f) {
             this.margin = f;
@@ -372,6 +374,7 @@ public class BeltInventory {
         }
     }
 
+    @Nullable
     public TransportedItemStack getStackAtOffset(int offset) {
         float min = offset;
         float max = offset + 1;
@@ -420,7 +423,11 @@ public class BeltInventory {
         items.clear();
     }
 
-    public void applyToEachWithin(float position, float maxDistanceToPosition, Function<TransportedItemStack, TransportedResult> processFunction) {
+    public void applyToEachWithin(
+        float position,
+        float maxDistanceToPosition,
+        Function<TransportedItemStack, @Nullable TransportedResult> processFunction
+    ) {
         boolean dirty = false;
         for (TransportedItemStack transported : items) {
             if (toRemove.contains(transported))

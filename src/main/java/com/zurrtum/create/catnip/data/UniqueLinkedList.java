@@ -1,5 +1,7 @@
 package com.zurrtum.create.catnip.data;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.Serial;
 import java.util.*;
 
@@ -14,6 +16,7 @@ public class UniqueLinkedList<E> extends LinkedList<E> {
     }
 
     @Override
+    @Nullable
     public E poll() {
         E e = super.poll();
         contained.remove(e);

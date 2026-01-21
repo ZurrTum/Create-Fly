@@ -13,11 +13,11 @@ import java.util.function.BiFunction;
 
 public class CachedDirectionInventoryBehaviour<T extends SmartBlockEntity> extends BlockEntityBehaviour<T> {
     public static final BehaviourType<CachedInventoryBehaviour<?>> TYPE = new BehaviourType<>();
-    private final BiFunction<T, Direction, Container> factory;
+    private final BiFunction<T, @Nullable Direction, @Nullable Container> factory;
     @SuppressWarnings("unchecked")
-    Storage<ItemVariant>[] sides = new Storage[7];
+    @Nullable Storage<ItemVariant>[] sides = new Storage[7];
 
-    public CachedDirectionInventoryBehaviour(T be, BiFunction<T, Direction, Container> factory) {
+    public CachedDirectionInventoryBehaviour(T be, BiFunction<T, Direction, @Nullable Container> factory) {
         super(be);
         this.factory = factory;
     }
@@ -26,7 +26,8 @@ public class CachedDirectionInventoryBehaviour<T extends SmartBlockEntity> exten
         return be.getBehaviour(TYPE).get(side);
     }
 
-    public Storage<ItemVariant> get(Direction side) {
+    @Nullable
+    public Storage<ItemVariant> get(@Nullable Direction side) {
         int i = side == null ? 6 : side.get3DDataValue();
         Storage<ItemVariant> sideStorage = sides[i];
         if (sideStorage == null) {

@@ -40,7 +40,7 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ChuteBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ChuteBlockEntity blockEntity, @Nullable Direction context) {
         return blockEntity.itemHandler;
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }

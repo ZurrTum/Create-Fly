@@ -75,7 +75,7 @@ public class PonderScene {
     private final List<PonderTag> tags;
     private final List<SceneOrderingEntry> orderingEntries;
 
-    private final PonderLevel world;
+    private final @Nullable PonderLevel world;
     private final String namespace;
     private final Identifier location;
     private final SceneCamera camera;
@@ -85,7 +85,7 @@ public class PonderScene {
     //	private String defaultTitle;
 
     private final WorldSectionElement baseWorldSection;
-    private final Entity renderViewEntity;
+    private final @Nullable Entity renderViewEntity;
     private Vec3 pointOfInterest;
     @Nullable
     private Vec3 chasingPointOfInterest;
@@ -154,7 +154,7 @@ public class PonderScene {
         forEach(WorldSectionElement.class, WorldSectionElement::resetSelectedBlock);
     }
 
-    public Pair<ItemStack, BlockPos> rayTraceScene(Vec3 from, Vec3 to) {
+    public Pair<ItemStack, @Nullable BlockPos> rayTraceScene(Vec3 from, Vec3 to) {
         MutableObject<Pair<WorldSectionElement, Pair<Vec3, BlockHitResult>>> nearestHit = new MutableObject<>();
         MutableDouble bestDistance = new MutableDouble(0);
 
@@ -167,7 +167,7 @@ public class PonderScene {
                 if (rayTrace == null)
                     return;
                 double distanceTo = rayTrace.getFirst().distanceTo(from);
-                if (nearestHit.getValue() != null && distanceTo >= bestDistance.getValue())
+                if (nearestHit.get() != null && distanceTo >= bestDistance.intValue())
                     return;
 
                 nearestHit.setValue(Pair.of(wse, rayTrace));
@@ -175,10 +175,10 @@ public class PonderScene {
             }
         );
 
-        if (nearestHit.getValue() == null)
+        if (nearestHit.get() == null)
             return Pair.of(ItemStack.EMPTY, BlockPos.ZERO);
 
-        Pair<Vec3, BlockHitResult> selectedHit = nearestHit.getValue().getSecond();
+        Pair<Vec3, BlockHitResult> selectedHit = nearestHit.get().getSecond();
         BlockPos selectedPos = selectedHit.getSecond().getBlockPos();
 
         BlockPos origin = new BlockPos(basePlateOffsetX, 0, basePlateOffsetZ);
@@ -186,11 +186,11 @@ public class PonderScene {
             return Pair.of(ItemStack.EMPTY, null);
         if (BoundingBox.fromCorners(origin, origin.offset(new Vec3i(basePlateSize - 1, 0, basePlateSize - 1))).isInside(selectedPos)) {
             if (PonderIndex.editingModeActive())
-                nearestHit.getValue().getFirst().selectBlock(selectedPos);
+                nearestHit.get().getFirst().selectBlock(selectedPos);
             return Pair.of(ItemStack.EMPTY, selectedPos);
         }
 
-        nearestHit.getValue().getFirst().selectBlock(selectedPos);
+        nearestHit.get().getFirst().selectBlock(selectedPos);
         BlockState blockState = world.getBlockState(selectedPos);
 
         ItemStack pickBlock = blockState.getCloneItemStack(world, selectedPos, true);
@@ -367,11 +367,11 @@ public class PonderScene {
         return Optional.ofNullable(resolve(link));
     }
 
-    public <E extends PonderElement> void runWith(ElementLink<E> link, Consumer<E> callback) {
+    public <E extends @Nullable PonderElement> void runWith(ElementLink<E> link, Consumer<E> callback) {
         callback.accept(resolve(link));
     }
 
-    public <E extends PonderElement, F> F applyTo(ElementLink<E> link, Function<E, F> function) {
+    public <E extends @Nullable PonderElement, F> F applyTo(ElementLink<E> link, Function<E, F> function) {
         return function.apply(resolve(link));
     }
 
@@ -535,7 +535,7 @@ public class PonderScene {
         // Screen params
         private int width, height;
         private double offset;
-        private Matrix4f cachedMat;
+        private @Nullable Matrix4f cachedMat;
 
         public SceneTransform() {
             xRotation = LerpedFloat.angular().disableSmartAngleChasing().startWithValue(-35);

@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 public class FactoryGaugeDisplaySource extends ValueListDisplaySource {
 
     @Override
+    @SuppressWarnings("NullableProblems")
     protected Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows) {
         List<FactoryPanelPosition> panels = context.blockEntity().factoryPanelSupport.getLinkedPanels();
         if (panels.isEmpty())

@@ -8,6 +8,7 @@ import com.zurrtum.create.client.model.LayerUnbakedModel;
 import com.zurrtum.create.client.model.UnbakedModelParser;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,7 +26,7 @@ public class BlockModelMixin implements LayerUnbakedModel {
     }
 
     @Override
-    public void create$setBlockRenderLayer(ChunkSectionLayer blockRenderLayer) {
+    public void create$setBlockRenderLayer(@NonNull ChunkSectionLayer blockRenderLayer) {
         this.blockRenderLayer = blockRenderLayer;
     }
 

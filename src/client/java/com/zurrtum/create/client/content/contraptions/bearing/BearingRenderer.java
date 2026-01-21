@@ -11,7 +11,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.contraptions.bearing.IBearingBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
@@ -33,13 +33,7 @@ public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity>
     }
 
     @Override
-    public void extractRenderState(
-        T be,
-        BearingRenderState state,
-        float tickProgress,
-        Vec3 cameraPos,
-        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
-    ) {
+    public void extractRenderState(T be, BearingRenderState state, float tickProgress, Vec3 cameraPos, @Nullable CrumblingOverlay crumblingOverlay) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
             return;
@@ -56,7 +50,7 @@ public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity>
     }
 
     @Override
-    public void updateBaseRenderState(T be, BearingRenderState state, Level world, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void updateBaseRenderState(T be, BearingRenderState state, Level world, @Nullable CrumblingOverlay crumblingOverlay) {
         super.updateBaseRenderState(be, state, world, crumblingOverlay);
         state.facing = state.blockState.getValue(BlockStateProperties.FACING);
     }

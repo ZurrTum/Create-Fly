@@ -6,10 +6,6 @@ import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.foundation.item.TooltipWorldContext;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
-
-import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -22,12 +18,17 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ShoppingListItem extends Item {
     public ShoppingListItem(Properties pProperties) {
         super(pProperties);
     }
 
+    @Nullable
     public static ShoppingList getList(ItemStack stack) {
         return stack.get(AllDataComponents.SHOPPING_LIST);
     }
@@ -43,6 +44,7 @@ public class ShoppingListItem extends Item {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void appendHoverText(
         ItemStack stack,
         TooltipContext context,
@@ -85,7 +87,7 @@ public class ShoppingListItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    public InteractionResult use(Level pLevel, @Nullable Player pPlayer, InteractionHand pUsedHand) {
         if (pUsedHand == InteractionHand.OFF_HAND || pPlayer == null || !pPlayer.isShiftKeyDown())
             return InteractionResult.PASS;
 

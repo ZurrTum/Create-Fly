@@ -2,11 +2,11 @@ package com.zurrtum.create.content.kinetics.chainConveyor;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChainConveyorPackage {
     public static final Codec<ChainConveyorPackage> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -36,9 +36,9 @@ public class ChainConveyorPackage {
     public int netId;
     public boolean justFlipped;
 
-    public Vec3 worldPosition;
+    public @Nullable Vec3 worldPosition;
     public float yaw;
-    public Object physicsData;
+    public @Nullable Object physicsData;
 
     public ChainConveyorPackage(float chainPosition, ItemStack item) {
         this(chainPosition, item, netIdGenerator.incrementAndGet());

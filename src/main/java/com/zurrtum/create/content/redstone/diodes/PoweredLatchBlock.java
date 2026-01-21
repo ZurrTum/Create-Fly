@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.ticks.TickPriority;
+import org.jspecify.annotations.Nullable;
 
 public class PoweredLatchBlock extends ToggleLatchBlock {
 
@@ -107,7 +108,7 @@ public class PoweredLatchBlock extends ToggleLatchBlock {
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, Direction side) {
+    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
         if (side == null)
             return false;
         return side.getAxis().isHorizontal();

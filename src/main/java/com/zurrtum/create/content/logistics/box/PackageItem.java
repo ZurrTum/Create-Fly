@@ -212,6 +212,7 @@ public class PackageItem extends Item implements EntityItem {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void appendHoverText(
         ItemStack stack,
         TooltipContext tooltipContext,
@@ -289,19 +290,21 @@ public class PackageItem extends Item implements EntityItem {
                 if (itemstack.isEmpty())
                     continue;
 
-                if (itemstack.getItem() instanceof SpawnEggItem sei && worldIn instanceof ServerLevel sl) {
-                    EntityType<?> entitytype = sei.getType(itemstack);
-                    Entity entity = entitytype.spawn(
-                        sl,
-                        itemstack,
-                        null,
-                        BlockPos.containing(playerIn.position().add(playerIn.getLookAngle().multiply(1, 0, 1).normalize())),
-                        EntitySpawnReason.SPAWN_ITEM_USE,
-                        false,
-                        false
-                    );
-                    if (entity != null)
-                        itemstack.shrink(1);
+                if (itemstack.getItem() instanceof SpawnEggItem && worldIn instanceof ServerLevel sl) {
+                    EntityType<?> entitytype = SpawnEggItem.getType(itemstack);
+                    if (entitytype != null) {
+                        Entity entity = entitytype.spawn(
+                            sl,
+                            itemstack,
+                            null,
+                            BlockPos.containing(playerIn.position().add(playerIn.getLookAngle().multiply(1, 0, 1).normalize())),
+                            EntitySpawnReason.SPAWN_ITEM_USE,
+                            false,
+                            false
+                        );
+                        if (entity != null)
+                            itemstack.shrink(1);
+                    }
                 }
 
                 playerIn.getInventory().placeItemBackInInventory(itemstack.copy());

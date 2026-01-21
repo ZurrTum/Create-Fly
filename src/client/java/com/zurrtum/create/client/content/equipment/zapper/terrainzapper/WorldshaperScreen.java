@@ -22,6 +22,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,17 +40,17 @@ public class WorldshaperScreen extends ZapperScreen {
         "cluster"
     );
 
-    protected List<IconButton> toolButtons;
-    protected List<IconButton> placementButtons;
+    protected @Nullable List<IconButton> toolButtons;
+    protected @Nullable List<IconButton> placementButtons;
 
     protected ScrollInput brushInput;
     protected Label brushLabel;
     protected List<ScrollInput> brushParams = new ArrayList<>(3);
     protected List<Label> brushParamLabels = new ArrayList<>(3);
-    protected IconButton followDiagonals;
-    protected IconButton acrossMaterials;
-    protected Indicator followDiagonalsIndicator;
-    protected Indicator acrossMaterialsIndicator;
+    protected @Nullable IconButton followDiagonals;
+    protected @Nullable IconButton acrossMaterials;
+    protected @Nullable Indicator followDiagonalsIndicator;
+    protected @Nullable Indicator acrossMaterialsIndicator;
 
     protected TerrainBrushes currentBrush;
     protected int[] currentBrushParams = new int[]{1, 1, 1};

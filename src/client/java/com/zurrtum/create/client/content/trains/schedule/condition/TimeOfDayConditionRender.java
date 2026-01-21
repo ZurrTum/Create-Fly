@@ -105,21 +105,21 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
         );
 
         CompoundTag data = input.getData();
-        hourInput.getValue().titled(CreateLang.translateDirect("generic.daytime.hour")).calling(t -> {
+        hourInput.get().titled(CreateLang.translateDirect("generic.daytime.hour")).calling(t -> {
             data.putInt("Hour", t);
-            timeLabel.getValue().text = input.getDigitalDisplay(t, minuteInput.getValue().getState(), true);
+            timeLabel.get().text = input.getDigitalDisplay(t, minuteInput.get().getState(), true);
         }).writingTo(null).withShiftStep(6);
 
-        minuteInput.getValue().titled(CreateLang.translateDirect("generic.daytime.minute")).calling(t -> {
+        minuteInput.get().titled(CreateLang.translateDirect("generic.daytime.minute")).calling(t -> {
             data.putInt("Minute", t);
-            timeLabel.getValue().text = input.getDigitalDisplay(hourInput.getValue().getState(), t, true);
+            timeLabel.get().text = input.getDigitalDisplay(hourInput.get().getState(), t, true);
         }).writingTo(null).withShiftStep(15);
 
-        minuteInput.getValue().lockedTooltipX = hourInput.getValue().lockedTooltipX = -15;
-        minuteInput.getValue().lockedTooltipY = hourInput.getValue().lockedTooltipY = 35;
+        minuteInput.get().lockedTooltipX = hourInput.get().lockedTooltipX = -15;
+        minuteInput.get().lockedTooltipY = hourInput.get().lockedTooltipY = 35;
 
-        hourInput.getValue().setState(input.intData("Hour"));
-        minuteInput.getValue().setState(input.intData("Minute")).onChanged();
+        hourInput.get().setState(input.intData("Hour"));
+        minuteInput.get().setState(input.intData("Minute")).onChanged();
 
         builder.customArea(0, 52);
         builder.customArea(52, 69);

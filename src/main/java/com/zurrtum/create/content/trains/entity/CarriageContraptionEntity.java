@@ -46,6 +46,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -70,7 +71,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     public UUID trainId;
     public int carriageIndex;
 
-    private Carriage carriage;
+    private @Nullable Carriage carriage;
     public boolean validForRender;
     public boolean movingBackwards;
 
@@ -81,7 +82,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     private boolean arrivalSoundReversed;
     private int arrivalSoundTicks;
 
-    private Vec3 serverPrevPos;
+    private @Nullable Vec3 serverPrevPos;
 
     public CarriageContraptionEntity(EntityType<? extends CarriageContraptionEntity> type, Level world) {
         super(type, world);
@@ -235,8 +236,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         }
 
         tickActors();
-        boolean isStalled = isStalled();
-        carriage.stalled = isStalled;
+        carriage.stalled = isStalled();
 
         CarriageSyncData carriageData = getCarriageData();
 
@@ -502,7 +502,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     }
 
     @Override
-    public boolean startControlling(BlockPos controlsLocalPos, Player player) {
+    public boolean startControlling(BlockPos controlsLocalPos, @Nullable Player player) {
         if (player == null || player.isSpectator())
             return false;
         if (carriage == null)
@@ -705,6 +705,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         return false;
     }
 
+    @Nullable
     public Carriage getCarriage() {
         return carriage;
     }
@@ -749,7 +750,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             }
 
         }
-        if (particleSlice.size() > 0)
+        if (!particleSlice.isEmpty())
             particleAvgY /= particleSlice.size();
     }
 }

@@ -5,13 +5,9 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementHelpers;
-import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.PistonState;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -38,6 +34,8 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.function.Predicate;
 
 import static com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.*;
 
@@ -100,7 +98,7 @@ public class PistonExtensionPoleBlock extends WrenchableDirectionalBlock impleme
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState FluidState = context.getLevel().getFluidState(context.getClickedPos());
         return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite())
-            .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
+            .setValue(BlockStateProperties.WATERLOGGED, FluidState.getType() == Fluids.WATER);
     }
 
     @Override

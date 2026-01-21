@@ -38,7 +38,7 @@ public class FactoryPanelBlockEntity extends SmartBlockEntity {
 
     public boolean redraw;
     public boolean restocker;
-    public VoxelShape lastShape;
+    public @Nullable VoxelShape lastShape;
 
     public FactoryPanelBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.FACTORY_PANEL, pos, state);
@@ -127,7 +127,7 @@ public class FactoryPanelBlockEntity extends SmartBlockEntity {
             Block.popResource(level, worldPosition, new ItemStack(AllItems.FACTORY_GAUGE, panelCount - 1));
     }
 
-    public boolean addPanel(PanelSlot slot, UUID frequency) {
+    public boolean addPanel(PanelSlot slot, @Nullable UUID frequency) {
         ServerFactoryPanelBehaviour behaviour = panels.get(slot);
         if (behaviour != null && !behaviour.isActive()) {
             behaviour.enable();

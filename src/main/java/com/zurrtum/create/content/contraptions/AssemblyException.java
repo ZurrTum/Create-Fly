@@ -3,9 +3,6 @@ package com.zurrtum.create.content.contraptions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -13,6 +10,9 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 public class AssemblyException extends Exception {
     public static final Codec<AssemblyException> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -22,18 +22,19 @@ public class AssemblyException extends Exception {
 
     private static final long serialVersionUID = 1L;
     public final Component component;
-    private BlockPos position = null;
+    private @Nullable BlockPos position = null;
 
-    public static void write(ValueOutput view, AssemblyException exception) {
+    public static void write(ValueOutput view, @Nullable AssemblyException exception) {
         if (exception == null)
             return;
 
         ValueOutput lastException = view.child("LastException");
         lastException.store("Component", ComponentSerialization.CODEC, exception.component);
-        if (exception.hasPosition())
-            lastException.store("Position", BlockPos.CODEC, exception.getPosition());
+        if (exception.position != null)
+            lastException.store("Position", BlockPos.CODEC, exception.position);
     }
 
+    @Nullable
     public static AssemblyException read(ValueInput view) {
         return view.child("LastException").map(lastException -> {
             Component component = lastException.read("Component", ComponentSerialization.CODEC).orElse(CommonComponents.EMPTY);
@@ -91,6 +92,7 @@ public class AssemblyException extends Exception {
         return position != null;
     }
 
+    @Nullable
     public BlockPos getPosition() {
         return position;
     }

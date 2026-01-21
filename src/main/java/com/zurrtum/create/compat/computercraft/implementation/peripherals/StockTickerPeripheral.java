@@ -21,6 +21,7 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
     }
 
     @LuaFunction(mainThread = true)
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public final Map<Integer, Map<String, ?>> stock(Optional<Boolean> detailed) {
         Map<Integer, Map<String, ?>> result = new HashMap<>();
         int i = 0;
@@ -37,6 +38,7 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public final Map<String, ?> getStockItemDetail(int slot) throws LuaException {
         return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.getAccurateSummary(), slot);
     }
@@ -100,6 +102,7 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
     }
 
     @LuaFunction(mainThread = true)
+    @Nullable
     public Map<String, ?> getItemDetail(int slot) throws LuaException {
         return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.getReceivedPaymentsHandler(), slot);
     }

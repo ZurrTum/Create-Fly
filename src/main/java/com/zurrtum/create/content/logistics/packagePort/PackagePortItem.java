@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.Nullable;
 
 public class PackagePortItem extends BlockItem {
 
@@ -17,7 +18,7 @@ public class PackagePortItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, Player player, ItemStack p_195943_4_, BlockState p_195943_5_) {
+    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack p_195943_4_, BlockState p_195943_5_) {
         if (!world.isClientSide() && player instanceof ServerPlayer sp)
             sp.connection.send(new PackagePortPlacementRequestPacket(pos));
         return super.updateCustomBlockEntityTag(pos, world, player, p_195943_4_, p_195943_5_);
