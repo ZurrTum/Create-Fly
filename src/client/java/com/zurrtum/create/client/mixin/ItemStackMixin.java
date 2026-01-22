@@ -5,6 +5,8 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.foundation.item.TooltipModifier;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.List;
 
 @Mixin(ItemStack.class)
+@Environment(EnvType.CLIENT)
 public abstract class ItemStackMixin {
     @Shadow
     public abstract Item getItem();
