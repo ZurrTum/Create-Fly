@@ -993,7 +993,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
         }
 
         List<BigItemStack> craftingList = new ArrayList<>();
-        ItemStack output = availableCraftingRecipe.assemble(CraftingInput.EMPTY, registryManager);
+        ItemStack output = availableCraftingRecipe.assemble(CraftingInput.EMPTY);
         int count = output.getCount();
         output.setCount(1);
         craftingList.add(new BigItemStack(output, count));

@@ -2,7 +2,6 @@ package com.zurrtum.create.foundation.recipe;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -17,11 +16,11 @@ public interface CreateSingleStackRollableRecipe extends CreateRollableRecipe<Si
     }
 
     @Override
-    default ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
+    default ItemStack assemble(SingleRecipeInput input) {
         SequencedAssemblyJunk junk = input.item().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
         if (junk != null && junk.hasJunk()) {
             return junk.getJunk();
         }
-        return CreateRollableRecipe.super.assemble(input, registries);
+        return CreateRollableRecipe.super.assemble(input);
     }
 }

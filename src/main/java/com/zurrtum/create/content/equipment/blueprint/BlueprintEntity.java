@@ -25,7 +25,6 @@ import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -346,7 +345,6 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
         Level world = level();
         if (!holdingWrench && !world.isClientSide() && !items.getItem(9).isEmpty()) {
-            RegistryAccess registryManager = world.registryAccess();
             Inventory playerInv = player.getInventory();
             int size = playerInv.getContainerSize();
             boolean firstPass = true;
@@ -398,7 +396,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
                         success = false;
                     } else {
                         CraftingRecipe craftingRecipe = recipe.value();
-                        ItemStack result = craftingRecipe.assemble(input, registryManager);
+                        ItemStack result = craftingRecipe.assemble(input);
                         if (result.isEmpty() || result.getCount() + amountCrafted > 64) {
                             success = false;
                         } else {
@@ -522,8 +520,8 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
             return new BlueprintPreviewPacket(availableStacks, missingStacks, items.getItem(9));
         }
         CraftingInput input = CraftingInput.of(3, 3, craftingStacks);
-        Optional<ItemStack> result = world.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, world)
-            .map(entry -> entry.value().assemble(input, world.registryAccess())).filter(stack -> !stack.isEmpty());
+        Optional<ItemStack> result = world.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, world).map(entry -> entry.value().assemble(input))
+            .filter(stack -> !stack.isEmpty());
         if (result.isEmpty()) {
             return new BlueprintPreviewPacket(availableStacks, List.of(), ItemStack.EMPTY);
         }

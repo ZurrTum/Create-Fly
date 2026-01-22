@@ -102,9 +102,9 @@ public class BeltDeployerCallbacks {
         ServerPlayer player = blockEntity.player.cast();
         ItemStack heldItem = player.getMainHandItem();
         if (recipe instanceof SandPaperPolishingRecipe polishingRecipe) {
-            resultItem = polishingRecipe.assemble(new SingleRecipeInput(transported.stack), world.registryAccess());
+            resultItem = polishingRecipe.assemble(new SingleRecipeInput(transported.stack));
         } else if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {
-            resultItem = itemApplicationRecipe.assemble(new ItemApplicationInput(transported.stack, heldItem), world.registryAccess());
+            resultItem = itemApplicationRecipe.assemble(new ItemApplicationInput(transported.stack, heldItem));
             keepHeld = itemApplicationRecipe.keepHeldItem();
         }
         if (resultItem != null && !resultItem.isEmpty()) {

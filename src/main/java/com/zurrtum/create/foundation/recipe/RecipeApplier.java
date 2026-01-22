@@ -124,18 +124,12 @@ public class RecipeApplier {
         if (recipe instanceof CreateRecipe<T> createRecipe) {
             return applyCreateRecipeOn(level, count, input, createRecipe, returnProcessingRemainder);
         } else {
-            return applyRecipeOn(level, count, input, recipe, returnProcessingRemainder);
+            return applyRecipeOn(count, input, recipe, returnProcessingRemainder);
         }
     }
 
-    public static <T extends RecipeInput> List<ItemStack> applyRecipeOn(
-        Level level,
-        int count,
-        T input,
-        Recipe<T> recipe,
-        boolean returnProcessingRemainder
-    ) {
-        ItemStack result = recipe.assemble(input, level.registryAccess());
+    public static <T extends RecipeInput> List<ItemStack> applyRecipeOn(int count, T input, Recipe<T> recipe, boolean returnProcessingRemainder) {
+        ItemStack result = recipe.assemble(input);
         if (returnProcessingRemainder) {
             int size = input.size();
             if (size != 1) {

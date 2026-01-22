@@ -68,7 +68,7 @@ public class ManualApplicationHelper {
         ManualApplicationRecipe recipe = foundRecipe.get().value();
         level.destroyBlock(pos, false);
 
-        ItemStack stack = recipe.assemble(input, level.registryAccess());
+        ItemStack stack = recipe.assemble(input);
         Item item = stack.getItem();
         if (item instanceof BlockItem blockItem) {
             BlockState transformedBlock = BlockHelper.copyProperties(blockState, blockItem.getBlock().defaultBlockState());

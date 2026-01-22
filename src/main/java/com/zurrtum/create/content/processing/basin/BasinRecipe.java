@@ -6,7 +6,6 @@ import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -664,7 +663,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     }
 
     @Override
-    default ItemStack assemble(BasinInput input, HolderLookup.Provider registries) {
+    default ItemStack assemble(BasinInput input) {
         return ItemStack.EMPTY;
     }
 }

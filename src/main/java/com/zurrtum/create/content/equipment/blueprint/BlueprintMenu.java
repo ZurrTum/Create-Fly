@@ -5,9 +5,6 @@ import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity.BlueprintSection;
 import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-
-import java.util.Optional;
-
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +18,8 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+
+import java.util.Optional;
 
 public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
     public BlueprintMenu(int id, Inventory inv, BlueprintSection section) {
@@ -69,7 +68,7 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
         }
 
         CraftingRecipe icraftingrecipe = optional.get().value();
-        ItemStack itemstack = icraftingrecipe.assemble(input, level.registryAccess());
+        ItemStack itemstack = icraftingrecipe.assemble(input);
         ghostInventory.setItem(9, itemstack);
         contentHolder.inferredIcon = true;
         ItemStack toSend = itemstack.copy();

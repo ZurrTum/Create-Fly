@@ -12,7 +12,6 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
 import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -30,7 +29,7 @@ public record FillingRecipe(ItemStackTemplate result, Ingredient ingredient, Flu
     }
 
     @Override
-    public ItemStack assemble(FillingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(FillingInput input) {
         SequencedAssemblyJunk junk = input.item().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
         if (junk != null && junk.hasJunk()) {
             return junk.getJunk();

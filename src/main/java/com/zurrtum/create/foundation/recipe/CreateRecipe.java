@@ -1,6 +1,5 @@
 package com.zurrtum.create.foundation.recipe;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.PlacementInfo;
@@ -33,7 +32,7 @@ public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
 
     default List<ItemStack> assemble(T input, RandomSource random) {
         List<ItemStack> list = new ArrayList<>(1);
-        list.add(assemble(input, (HolderLookup.Provider) null));
+        list.add(assemble(input));
         return list;
     }
 }

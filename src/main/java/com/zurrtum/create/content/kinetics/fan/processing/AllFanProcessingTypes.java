@@ -121,10 +121,9 @@ public class AllFanProcessingTypes {
             if (smeltingRecipe.isPresent()) {
                 Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = recipeManager.getRecipeFor(RecipeType.SMOKING, input, level)
                     .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
-                RegistryAccess registryAccess = level.registryAccess();
                 if (smokingRecipe.isEmpty() || !ItemStack.isSameItem(
-                    smokingRecipe.get().value().assemble(input, registryAccess),
-                    smeltingRecipe.get().value().assemble(input, registryAccess)
+                    smokingRecipe.get().value().assemble(input),
+                    smeltingRecipe.get().value().assemble(input)
                 )) {
                     return RecipeApplier.applyRecipeOn(level, stack.getCount(), input, smeltingRecipe.get(), false);
                 }

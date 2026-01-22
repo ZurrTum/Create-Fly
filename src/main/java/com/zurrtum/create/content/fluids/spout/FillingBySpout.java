@@ -35,7 +35,7 @@ public class FillingBySpout {
         Optional<RecipeHolder<FillingRecipe>> findRecipe = world.recipeAccess().getRecipeFor(AllRecipeTypes.FILLING, input, world);
         if (findRecipe.isPresent()) {
             FillingRecipe recipe = findRecipe.get().value();
-            ItemStack result = recipe.assemble(input, world.registryAccess());
+            ItemStack result = recipe.assemble(input);
             availableFluid.decrement(recipe.fluidIngredient().amount());
             stack.shrink(1);
             return result;

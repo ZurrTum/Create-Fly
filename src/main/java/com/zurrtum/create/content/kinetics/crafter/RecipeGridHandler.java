@@ -12,7 +12,6 @@ import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -143,15 +142,14 @@ public class RecipeGridHandler {
         items.calcStats();
         CraftingInput craftingInput = items.toCraftingInput();
         ItemStack result = null;
-        RegistryAccess registryAccess = world.registryAccess();
         RecipeManager recipeManager = world.recipeAccess();
         if (AllConfigs.server().recipes.allowRegularCraftingInCrafter.get()) {
             result = recipeManager.recipes.getRecipesFor(RecipeType.CRAFTING, craftingInput, world).filter(r -> isRecipeAllowed(r, craftingInput))
-                .findFirst().map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
+                .findFirst().map(r -> r.value().assemble(craftingInput)).orElse(null);
         }
         if (result == null)
-            result = recipeManager.getRecipeFor(AllRecipeTypes.MECHANICAL_CRAFTING, craftingInput, world)
-                .map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
+            result = recipeManager.getRecipeFor(AllRecipeTypes.MECHANICAL_CRAFTING, craftingInput, world).map(r -> r.value().assemble(craftingInput))
+                .orElse(null);
         return result;
     }
 

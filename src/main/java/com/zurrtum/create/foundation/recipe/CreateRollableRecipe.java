@@ -1,7 +1,6 @@
 package com.zurrtum.create.foundation.recipe;
 
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -16,7 +15,7 @@ public interface CreateRollableRecipe<T extends RecipeInput> extends CreateRecip
     }
 
     @Override
-    default ItemStack assemble(T input, HolderLookup.Provider registries) {
+    default ItemStack assemble(T input) {
         return ItemStack.EMPTY;
     }
 

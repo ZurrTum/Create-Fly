@@ -18,7 +18,6 @@ import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -310,7 +309,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         inventory.setItem(0, ItemStack.EMPTY);
         ItemStack output = pair.getSecond();
         if (output == null) {
-            output = pair.getFirst().assemble(input, level.registryAccess());
+            output = pair.getFirst().assemble(input);
         }
         List<ItemStack> list;
         ItemStackTemplate recipeRemainder = stack.getItem().getCraftingRemainder();
@@ -362,11 +361,10 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
                 }
             }
         } else {
-            RegistryAccess registryManager = level.registryAccess();
             for (RecipeHolder<? extends Recipe<?>> entry : startedSearch) {
                 Recipe<SingleRecipeInput> recipe = (Recipe<SingleRecipeInput>) entry.value();
                 if (recipe.matches(input, level)) {
-                    ItemStack output = recipe.assemble(input, registryManager);
+                    ItemStack output = recipe.assemble(input);
                     if (filtering.test(output)) {
                         return Pair.of(recipe, output);
                     }

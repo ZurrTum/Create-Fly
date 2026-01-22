@@ -2,7 +2,6 @@ package com.zurrtum.create.content.equipment.toolbox;
 
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllRecipeSerializers;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +44,7 @@ public class ToolboxDyeingRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         ItemStack toolbox = ItemStack.EMPTY;
         DyeColor color = DyeColor.BROWN;
 

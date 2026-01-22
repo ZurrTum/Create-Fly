@@ -2,7 +2,6 @@ package com.zurrtum.create.foundation.recipe;
 
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.catnip.data.IntAttached;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
@@ -46,7 +45,7 @@ public class ItemCopyingRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         IntAttached<ItemStack> copyCheck = copyCheck(input);
         if (copyCheck == null)
             return ItemStack.EMPTY;

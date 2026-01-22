@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
 import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -31,7 +30,7 @@ public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput
     }
 
     @Override
-    default ItemStack assemble(ItemApplicationInput input, HolderLookup.Provider registries) {
+    default ItemStack assemble(ItemApplicationInput input) {
         SequencedAssemblyJunk junk = input.target().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
         if (junk != null && junk.hasJunk()) {
             return junk.getJunk();
