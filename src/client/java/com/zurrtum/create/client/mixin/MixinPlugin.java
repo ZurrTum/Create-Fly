@@ -32,7 +32,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         //            mixins.add("RecipeViewScreenMixin");
         //            mixins.add("CraftingViewRecipeAccessor");
         //        }
-        if (!loader.isModLoaded("fabric-item-group-api-v1")) {
+        if (!loader.isModLoaded("fabric-creative-tab-api-v1")) {
             mixins.add("CreativeModeInventoryScreenMixin");
         }
         if (loader.isModLoaded("fabric-renderer-api-v1")) {
