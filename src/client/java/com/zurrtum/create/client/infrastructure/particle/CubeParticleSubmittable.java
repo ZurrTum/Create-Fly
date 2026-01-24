@@ -57,8 +57,16 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
     }
 
     @Override
+    public boolean isEmpty() {
+        return particles == 0;
+    }
+
+    @Override
     @Nullable
-    public PreparedBuffers prepare(ParticleFeatureRenderer.ParticleBufferCache cache) {
+    public PreparedBuffers prepare(ParticleFeatureRenderer.ParticleBufferCache cache, boolean translucent) {
+        if (translucent) {
+            return null;
+        }
         int i = particles * 24;
         try (ByteBufferBuilder bufferAllocator = ByteBufferBuilder.exactlySized(i * DefaultVertexFormat.PARTICLE.getVertexSize())) {
             BufferBuilder bufferBuilder = new BufferBuilder(bufferAllocator, VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
@@ -89,16 +97,7 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
     }
 
     @Override
-    public void render(
-        PreparedBuffers buffers,
-        ParticleFeatureRenderer.ParticleBufferCache cache,
-        RenderPass renderPass,
-        TextureManager manager,
-        boolean translucent
-    ) {
-        if (translucent) {
-            return;
-        }
+    public void render(PreparedBuffers buffers, ParticleFeatureRenderer.ParticleBufferCache cache, RenderPass renderPass, TextureManager manager) {
         RenderSystem.AutoStorageIndexBuffer shapeIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         renderPass.setVertexBuffer(0, cache.get());
         renderPass.setIndexBuffer(shapeIndexBuffer.getBuffer(buffers.indexCount()), shapeIndexBuffer.type());
