@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
+import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllDataComponents;
@@ -16,14 +17,18 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.function.Supplier;
+
 public class SandPaperRenderer extends PictureInPictureRenderer<SandPaperRenderState> {
     private final ItemStackRenderState renderState = new ItemStackRenderState();
-    private final ItemStack stack;
+    private final Supplier<ItemStack> stack = Suppliers.memoize(() -> {
+        ItemStack stack = AllItems.SAND_PAPER.getDefaultInstance();
+        stack.set(AllDataComponents.SAND_PAPER_JEI, Unit.INSTANCE);
+        return stack;
+    });
 
     public SandPaperRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
-        stack = AllItems.SAND_PAPER.getDefaultInstance();
-        stack.set(AllDataComponents.SAND_PAPER_JEI, Unit.INSTANCE);
     }
 
     @Override
@@ -33,9 +38,10 @@ public class SandPaperRenderer extends PictureInPictureRenderer<SandPaperRenderS
         Minecraft mc = Minecraft.getInstance();
         Lighting lighting = mc.gameRenderer.getLighting();
         lighting.setupFor(Lighting.Entry.ITEMS_FLAT);
-        stack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(state.stack()));
+        ItemStack renderStack = stack.get();
+        renderStack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(state.stack()));
         FeatureRenderDispatcher renderDispatcher = mc.gameRenderer.getFeatureRenderDispatcher();
-        mc.getItemModelResolver().updateForTopItem(renderState, stack, ItemDisplayContext.GUI, null, null, 0);
+        mc.getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.GUI, null, null, 0);
         renderState.submit(matrices, renderDispatcher.getSubmitNodeStorage(), LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
         renderDispatcher.renderAllFeatures();
     }

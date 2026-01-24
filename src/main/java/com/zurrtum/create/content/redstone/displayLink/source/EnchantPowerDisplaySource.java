@@ -1,5 +1,6 @@
 package com.zurrtum.create.content.redstone.displayLink.source;
 
+import com.google.common.base.Suppliers;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import net.minecraft.core.BlockPos;
@@ -13,10 +14,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnchantingTableBlock;
 import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 
+import java.util.function.Supplier;
+
 public class EnchantPowerDisplaySource extends NumericSingleLineDisplaySource {
 
     protected static final RandomSource random = RandomSource.create();
-    protected static final ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
+    protected static final Supplier<ItemStack> stack = Suppliers.memoize(() -> new ItemStack(Items.DIAMOND_PICKAXE));
 
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
@@ -34,7 +37,7 @@ public class EnchantPowerDisplaySource extends NumericSingleLineDisplaySource {
         }
 
 
-        int cost = EnchantmentHelper.getEnchantmentCost(random, 2, enchantPower, stack);
+        int cost = EnchantmentHelper.getEnchantmentCost(random, 2, enchantPower, stack.get());
 
         return Component.literal(String.valueOf(cost));
     }
