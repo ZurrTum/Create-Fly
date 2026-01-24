@@ -30,7 +30,6 @@ public interface SuperRenderTypeBuffer extends MultiBufferSource {
             case SOLID -> RenderTypes.solidMovingBlock();
             case CUTOUT -> RenderTypes.cutoutMovingBlock();
             case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
-            case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
         };
     }
 

@@ -13,7 +13,6 @@ public final class NamedBlockRenderLayer {
         builder.put("minecraft:cutout_mipped", ChunkSectionLayer.CUTOUT);
         builder.put("minecraft:cutout_mipped_all", ChunkSectionLayer.CUTOUT);
         builder.put("minecraft:translucent", ChunkSectionLayer.TRANSLUCENT);
-        builder.put("minecraft:tripwire", ChunkSectionLayer.TRIPWIRE);
         return builder.build();
     });
 

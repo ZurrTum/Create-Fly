@@ -385,7 +385,6 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             case SOLID -> RenderTypes.solidMovingBlock();
             case CUTOUT -> RenderTypes.cutoutMovingBlock();
             case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
-            case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
         };
         structureBuffer.light(light).renderInto(poseStack.last(), buffer.getBuffer(layer));
     }

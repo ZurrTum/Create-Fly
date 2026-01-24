@@ -26,11 +26,11 @@ public final class ModelUtil {
 
     // Array of chunk materials to make lookups easier.
     // Index by (renderTypeIdx * 4 + shaded * 2 + ambientOcclusion).
-    private static final Material[] CHUNK_MATERIALS = new Material[16];
+    private static final Material[] CHUNK_MATERIALS = new Material[12];
     private static final Map<RenderType, Material> ITEM_CHUNK_MATERIALS = new IdentityHashMap<>();
 
     static {
-        Material[] baseChunkMaterials = new Material[]{Materials.SOLID_BLOCK, Materials.CUTOUT_BLOCK, Materials.TRANSLUCENT_BLOCK, Materials.TRIPWIRE_BLOCK,};
+        Material[] baseChunkMaterials = new Material[]{Materials.SOLID_BLOCK, Materials.CUTOUT_BLOCK, Materials.TRANSLUCENT_BLOCK};
         for (int chunkLayerIdx = 0, size = baseChunkMaterials.length; chunkLayerIdx < size; chunkLayerIdx++) {
             int baseMaterialIdx = chunkLayerIdx * 4;
             Material baseChunkMaterial = baseChunkMaterials[chunkLayerIdx];
@@ -48,13 +48,12 @@ public final class ModelUtil {
         ITEM_CHUNK_MATERIALS.put(RenderTypes.solidMovingBlock(), CHUNK_MATERIALS[2]);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.cutoutMovingBlock(), CHUNK_MATERIALS[6]);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.translucentMovingBlock(), CHUNK_MATERIALS[10]);
-        ITEM_CHUNK_MATERIALS.put(RenderTypes.tripwireMovingBlock(), CHUNK_MATERIALS[14]);
         ITEM_CHUNK_MATERIALS.put(Sheets.cutoutBlockSheet(), CHUNK_MATERIALS[7]);
         ITEM_CHUNK_MATERIALS.put(Sheets.solidBlockSheet(), CHUNK_MATERIALS[3]);
         ITEM_CHUNK_MATERIALS.put(Sheets.translucentBlockItemSheet(), Materials.TRANSLUCENT_ITEM_ENTITY_BLOCK);
         ITEM_CHUNK_MATERIALS.put(Sheets.translucentItemSheet(), Materials.TRANSLUCENT_ITEM_ENTITY_ITEM);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.glint(), Materials.GLINT);
-        ITEM_CHUNK_MATERIALS.put(RenderTypes.glintTranslucent(), Materials.TRANSLUCENT_GLINT);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.glintTranslucent(), Materials.GLINT);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.entityGlint(), Materials.GLINT_ENTITY);
     }
 

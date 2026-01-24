@@ -267,7 +267,6 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
             case SOLID -> RenderTypes.solidMovingBlock();
             case CUTOUT -> RenderTypes.cutoutMovingBlock();
             case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
-            case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
         };
     }
 
