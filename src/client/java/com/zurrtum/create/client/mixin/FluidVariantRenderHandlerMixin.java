@@ -34,7 +34,7 @@ public interface FluidVariantRenderHandlerMixin {
         Fluid fluid = variant.getFluid();
         FluidConfig config = AllFluidConfigs.get(fluid);
         if (config != null) {
-            return config.tint().apply(variant.getComponents());
+            return config.tint().apply(variant.getComponentsPatch());
         }
         return -1;
     }

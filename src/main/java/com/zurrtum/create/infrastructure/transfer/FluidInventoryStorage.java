@@ -25,7 +25,7 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
     }
 
     static FluidStack toStack(FluidVariant variant) {
-        return new FluidStack(variant.getFluid(), 1, variant.getComponents());
+        return new FluidStack(variant.getFluid(), 1, variant.getComponentsPatch());
     }
 
     static FluidInventoryStorage of(FluidInventory inventory) {
@@ -43,7 +43,7 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
             return false;
         }
         DataComponentPatch stackComponents = stack.getComponentChanges();
-        DataComponentPatch variantComponents = variant.getComponents();
+        DataComponentPatch variantComponents = variant.getComponentsPatch();
         if (stackComponents == variantComponents) {
             return true;
         }

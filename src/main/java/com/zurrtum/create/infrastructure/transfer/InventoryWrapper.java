@@ -463,7 +463,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         try (Transaction transaction = Transaction.openOuter()) {
             for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
                 ItemVariant variant = view.getResource();
-                int maxAmount = variant.getComponentMap().getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
+                int maxAmount = variant.getComponents().getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
                 long extract = storage.extract(variant, maxAmount, transaction);
                 if (extract == 0) {
                     continue;
@@ -484,7 +484,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
                 ItemVariant variant = view.getResource();
                 ItemStack stack = ((ItemVariantImpl) variant).getCachedStack();
                 if (predicate.test(stack)) {
-                    int maxAmount = variant.getComponentMap().getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
+                    int maxAmount = variant.getComponents().getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
                     long extract = storage.extract(variant, maxAmount, transaction);
                     if (extract == 0) {
                         continue;
@@ -560,7 +560,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
             return ItemStack.EMPTY;
         }
         ItemVariant variant = view.getResource();
-        return new ItemStack(variant.getRegistryEntry(), (int) view.getAmount(), variant.getComponents());
+        return new ItemStack(variant.typeHolder(), (int) view.getAmount(), variant.getComponentsPatch());
     }
 
     protected void init() {
@@ -828,7 +828,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
             amount = view.extract(variant, amount, transaction);
             transaction.commit();
         }
-        return new ItemStack(variant.getRegistryEntry(), (int) amount, variant.getComponents());
+        return new ItemStack(variant.typeHolder(), (int) amount, variant.getComponentsPatch());
     }
 
     @Override
@@ -848,7 +848,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
             amount = (int) view.extract(variant, amount, transaction);
             transaction.commit();
         }
-        return new ItemStack(variant.getRegistryEntry(), amount, variant.getComponents());
+        return new ItemStack(variant.typeHolder(), amount, variant.getComponentsPatch());
     }
 
     @Override
@@ -896,7 +896,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
             if (predicate.test(stack)) {
                 try (Transaction transaction = Transaction.openOuter()) {
                     long amount = view.getAmount();
-                    ItemStack replace = update.apply(new ItemStack(variant.getRegistryEntry(), (int) amount, variant.getComponents()));
+                    ItemStack replace = update.apply(new ItemStack(variant.typeHolder(), (int) amount, variant.getComponentsPatch()));
                     if (ItemStack.isSameItemSameComponents(stack, replace)) {
                         int count = replace.getCount();
                         if (count == amount) {
@@ -1853,7 +1853,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
                 if (predicate.test(stack)) {
                     try (Transaction transaction = Transaction.openOuter()) {
                         long amount = slot.getAmount();
-                        ItemStack replace = update.apply(new ItemStack(variant.getRegistryEntry(), (int) amount, variant.getComponents()));
+                        ItemStack replace = update.apply(new ItemStack(variant.typeHolder(), (int) amount, variant.getComponentsPatch()));
                         if (ItemStack.isSameItemSameComponents(stack, replace)) {
                             int count = replace.getCount();
                             if (count == amount) {
@@ -1920,7 +1920,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
                 return ItemStack.EMPTY;
             }
             ItemVariant variant = view.getResource();
-            return new ItemStack(variant.getRegistryEntry(), (int) view.getAmount(), variant.getComponents());
+            return new ItemStack(variant.typeHolder(), (int) view.getAmount(), variant.getComponentsPatch());
         }
     }
 }

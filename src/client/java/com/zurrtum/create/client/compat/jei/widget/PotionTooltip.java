@@ -33,7 +33,7 @@ public class PotionTooltip implements IRecipeSlotRichTooltipCallback {
         recipeSlotView.getDisplayedIngredient(FabricTypes.FLUID_STACK).ifPresent(ingredient -> {
             FluidVariant variant = ingredient.getFluidVariant();
             if (variant.isOf(AllFluids.POTION)) {
-                DataComponentMap components = variant.getComponentMap();
+                DataComponentMap components = variant.getComponents();
                 PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                 BottleType bottleType = components.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
                 ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(bottleType);

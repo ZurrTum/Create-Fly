@@ -17,7 +17,7 @@ public class PotionFluidSubtypeInterpreter implements ISubtypeInterpreter<IJeiFl
 
     @Override
     public @Nullable Object getSubtypeData(IJeiFluidIngredient ingredient, UidContext context) {
-        DataComponentMap components = ingredient.getFluidVariant().getComponentMap();
+        DataComponentMap components = ingredient.getFluidVariant().getComponents();
         if (components.isEmpty()) {
             return null;
         }

@@ -160,7 +160,7 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
                 i,
                 new Matrix3x2f(graphics.pose()),
                 fluidVariant.getFluid(),
-                fluidVariant.getComponents(),
+                fluidVariant.getComponentsPatch(),
                 75,
                 1,
                 0

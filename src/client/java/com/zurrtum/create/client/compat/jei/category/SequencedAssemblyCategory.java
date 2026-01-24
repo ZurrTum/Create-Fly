@@ -286,7 +286,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
                 matrices.translate(-x, -y);
                 FluidVariant fluidVariant = ingredient.getFluidVariant();
                 Fluid fluid = fluidVariant.getFluid();
-                DataComponentPatch components = fluidVariant.getComponents();
+                DataComponentPatch components = fluidVariant.getComponentsPatch();
                 graphics.guiRenderState.submitPicturesInPictureState(new SpoutRenderState(
                     i,
                     new Matrix3x2f(matrices),
@@ -306,7 +306,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
                 FluidVariant fluidVariant = ingredient.getFluidVariant();
                 Fluid fluid = fluidVariant.getFluid();
                 if (fluid == AllFluids.POTION) {
-                    DataComponentMap components = fluidVariant.getComponentMap();
+                    DataComponentMap components = fluidVariant.getComponents();
                     PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                     BottleType bottleType = components.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
                     ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(bottleType);

@@ -345,7 +345,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
             return FluidStack.EMPTY;
         }
         FluidVariant variant = view.getResource();
-        return new FluidStack(variant.getFluid(), view.getAmount(), variant.getComponents());
+        return new FluidStack(variant.getFluid(), view.getAmount(), variant.getComponentsPatch());
     }
 
     protected void init() {
@@ -599,7 +599,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
             amount = view.extract(variant, amount, transaction);
             transaction.commit();
         }
-        return new FluidStack(variant.getFluid(), amount, variant.getComponents());
+        return new FluidStack(variant.getFluid(), amount, variant.getComponentsPatch());
     }
 
     @Override
@@ -619,7 +619,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
             amount = (int) view.extract(variant, amount, transaction);
             transaction.commit();
         }
-        return new FluidStack(variant.getFluid(), amount, variant.getComponents());
+        return new FluidStack(variant.getFluid(), amount, variant.getComponentsPatch());
     }
 
     @Override
@@ -1179,7 +1179,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         public FluidStack next() {
             StorageView<FluidVariant> view = iterator.next();
             FluidVariant variant = view.getResource();
-            return new FluidStack(variant.getFluid(), view.getAmount(), variant.getComponents());
+            return new FluidStack(variant.getFluid(), view.getAmount(), variant.getComponentsPatch());
         }
     }
 }

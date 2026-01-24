@@ -61,7 +61,7 @@ public abstract class SingleFluidStackStorage extends SnapshotParticipant<FluidS
 
                 if (currentStack.isEmpty()) {
                     Integer capacity = currentStack.get(AllDataComponents.FLUID_MAX_CAPACITY);
-                    currentStack = new FluidStack(insertedVariant.getFluid(), insertedAmount, insertedVariant.getComponents());
+                    currentStack = new FluidStack(insertedVariant.getFluid(), insertedAmount, insertedVariant.getComponentsPatch());
                     if (capacity != null) {
                         currentStack.set(AllDataComponents.FLUID_MAX_CAPACITY, capacity);
                     }
