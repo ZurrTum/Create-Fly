@@ -337,7 +337,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
     }
 
     @Override
-    public InteractionResult interactAt(Player player, Vec3 vec, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 vec) {
         if (FakePlayerHandler.has(player))
             return InteractionResult.PASS;
 
