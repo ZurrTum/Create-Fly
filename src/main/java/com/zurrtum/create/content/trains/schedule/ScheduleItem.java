@@ -16,7 +16,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -165,7 +167,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
 
     @Override
     public Component getDisplayName() {
-        return getName();
+        return components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
@@ -88,7 +89,7 @@ public abstract class FilterItem extends Item implements MenuProvider, SupportsI
 
     @Override
     public Component getDisplayName() {
-        return getName();
+        return components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
     }
 
     public static boolean testDirect(ItemStack filter, ItemStack stack, boolean matchNBT) {

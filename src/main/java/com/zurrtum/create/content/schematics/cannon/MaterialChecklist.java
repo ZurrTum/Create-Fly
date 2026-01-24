@@ -12,10 +12,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -91,8 +88,8 @@ public class MaterialChecklist {
         List<Item> keys = new ArrayList<>(Sets.union(required.keySet(), damageRequired.keySet()));
         keys.sort((item1, item2) -> {
             Locale locale = Locale.ENGLISH;
-            String name1 = item1.getName().getString().toLowerCase(locale);
-            String name2 = item2.getName().getString().toLowerCase(locale);
+            String name1 = item1.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY).getString().toLowerCase(locale);
+            String name2 = item2.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY).getString().toLowerCase(locale);
             return name1.compareTo(name2);
         });
 
@@ -164,8 +161,8 @@ public class MaterialChecklist {
         List<Item> keys = new ArrayList<>(Sets.union(required.keySet(), damageRequired.keySet()));
         keys.sort((item1, item2) -> {
             Locale locale = Locale.ENGLISH;
-            String name1 = item1.getName().getString().toLowerCase(locale);
-            String name2 = item2.getName().getString().toLowerCase(locale);
+            String name1 = item1.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY).getString().toLowerCase(locale);
+            String name2 = item2.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY).getString().toLowerCase(locale);
             return name1.compareTo(name2);
         });
 

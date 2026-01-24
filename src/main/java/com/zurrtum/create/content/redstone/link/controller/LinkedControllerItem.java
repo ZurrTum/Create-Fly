@@ -11,7 +11,9 @@ import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -121,6 +123,6 @@ public class LinkedControllerItem extends Item implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return getName();
+        return components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
     }
 }

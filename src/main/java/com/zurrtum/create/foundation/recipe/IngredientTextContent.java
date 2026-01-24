@@ -9,6 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.RegistryOps;
@@ -106,7 +107,7 @@ public class IngredientTextContent implements ComponentContents {
         if (ingredient != null && ingredient.values.isBound()) {
             Optional<Holder<Item>> first = ingredient.values.stream().findFirst();
             if (first.isPresent()) {
-                name = first.get().value().getName();
+                name = first.get().value().components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
                 ingredient = null;
                 return Optional.of(name);
             }

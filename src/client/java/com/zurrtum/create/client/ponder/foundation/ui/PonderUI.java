@@ -42,6 +42,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -889,7 +891,7 @@ public class PonderUI extends AbstractPonderScreen {
         if (chapter != null)
             return chapter.getTitle();
 
-        return stack.getItem().getName().getString();
+        return stack.getItem().components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY).getString();
     }
 
     public Font getFontRenderer() {

@@ -25,8 +25,10 @@ import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -658,7 +660,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
         @Override
         public Component getDisplayName() {
-            return AllItems.CRAFTING_BLUEPRINT.getName();
+            return AllItems.CRAFTING_BLUEPRINT.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
         }
 
         @Override

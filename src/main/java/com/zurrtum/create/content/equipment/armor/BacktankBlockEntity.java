@@ -11,7 +11,9 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap.Builder;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.util.Mth;
@@ -45,10 +47,10 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
 
     public static Component getDefaultName(BlockState state) {
         if (state.is(AllBlocks.NETHERITE_BACKTANK)) {
-            AllItems.NETHERITE_BACKTANK.getName();
+            return AllItems.NETHERITE_BACKTANK.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
         }
 
-        return AllItems.COPPER_BACKTANK.getName();
+        return AllItems.COPPER_BACKTANK.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY);
     }
 
     @Override

@@ -25,6 +25,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -450,7 +451,9 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
 
         if (be.hasCreativeCrate) {
             tooltip.add(CreateLang.translateDirect(_gunpowderLevel, "" + 100));
-            tooltip.add(Component.literal("(").append(AllItems.CREATIVE_CRATE.getName()).append(")").withStyle(ChatFormatting.DARK_PURPLE));
+            tooltip.add(Component.literal("(")
+                .append(AllItems.CREATIVE_CRATE.components().getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY)).append(")")
+                .withStyle(ChatFormatting.DARK_PURPLE));
             return tooltip;
         }
 
