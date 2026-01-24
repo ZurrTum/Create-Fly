@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -26,7 +27,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -112,11 +112,11 @@ public class AllFluidConfigs {
         FogRenderer.FOG_ENVIRONMENTS.addFirst(new FluidFogModifier());
         config(
             AllFluids.POTION, -1, () -> 96.0f, component -> {
-                Optional<? extends PotionContents> potion = component.get(DataComponents.POTION_CONTENTS);
-                if (potion != null && potion.isPresent()) {
-                    return potion.get().getColor() | 0xFF000000;
+                PotionContents potion = component.get(DataComponentMap.EMPTY, DataComponents.POTION_CONTENTS);
+                if (potion == null) {
+                    potion = PotionContents.EMPTY;
                 }
-                return PotionContents.EMPTY.getColor() | 0xFF000000;
+                return potion.getColor() | 0xFF000000;
             }
         );
         config(AllFluids.TEA);
