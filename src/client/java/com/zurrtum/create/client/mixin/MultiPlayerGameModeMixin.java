@@ -189,12 +189,12 @@ public class MultiPlayerGameModeMixin {
         return FunnelItem.funnelItemAlwaysPlacesWhenUsed(stack) || ClickToLinkBlockItem.linkableItemAlwaysPlacesWhenUsed(minecraft.level, pos, stack);
     }
 
-    @WrapOperation(method = "interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    @WrapOperation(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult interactEntityAtLocation(
-        Entity entity,
         Player player,
-        Vec3 hitPos,
+        Entity entity,
         InteractionHand hand,
+        Vec3 location,
         Operation<InteractionResult> original
     ) {
         InteractionResult result = ScheduleItemEntityInteraction.interactWithConductor(entity, player, hand);
@@ -205,7 +205,7 @@ public class MultiPlayerGameModeMixin {
         if (result != null) {
             return result;
         }
-        return original.call(entity, player, hitPos, hand);
+        return original.call(player, entity, hand, location);
     }
 
     @WrapOperation(method = "destroyBlock(Lnet/minecraft/core/BlockPos;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))

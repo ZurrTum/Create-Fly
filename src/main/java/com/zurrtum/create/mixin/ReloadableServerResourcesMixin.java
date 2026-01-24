@@ -36,8 +36,9 @@ public class ReloadableServerResourcesMixin {
         return Collections.unmodifiableList(list);
     }
 
-    @Inject(method = "lambda$loadResources$0(Lnet/minecraft/world/flag/FeatureFlagSet;Lnet/minecraft/commands/Commands$CommandSelection;Ljava/util/List;Lnet/minecraft/server/permissions/PermissionSet;Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Lnet/minecraft/server/ReloadableServerRegistries$LoadResult;)Ljava/util/concurrent/CompletionStage;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/SimpleReloadInstance;create(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
+    @Inject(method = "lambda$loadResources$2(Lnet/minecraft/server/ReloadableServerRegistries$LoadResult;Lnet/minecraft/world/flag/FeatureFlagSet;Lnet/minecraft/commands/Commands$CommandSelection;Ljava/util/List;Lnet/minecraft/server/permissions/PermissionSet;Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/List;)Ljava/util/concurrent/CompletionStage;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/SimpleReloadInstance;create(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Z)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
     private static void onReload(
+        ReloadableServerRegistries.LoadResult fullRegistries,
         FeatureFlagSet enabledFeatures,
         Commands.CommandSelection commandSelection,
         List<?> updatedContextTags,
@@ -45,8 +46,8 @@ public class ReloadableServerResourcesMixin {
         ResourceManager resourceManager,
         Executor backgroundExecutor,
         Executor mainThreadExecutor,
-        ReloadableServerRegistries.LoadResult fullRegistries,
-        CallbackInfoReturnable<CompletionStage<ReloadableServerResources>> cir
+        List<?> pendingComponents,
+        CallbackInfoReturnable<CompletionStage<?>> cir
     ) {
         PotionRecipe.data = new PotionRecipe.ReloadData(fullRegistries.lookupWithUpdatedTags(), enabledFeatures);
     }

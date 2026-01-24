@@ -38,7 +38,7 @@ public class FlywheelLevelRendererMixin {
 
     @Shadow
     @Final
-    public RenderBuffers renderBuffers;
+    private RenderBuffers renderBuffers;
 
     @Shadow
     @Final

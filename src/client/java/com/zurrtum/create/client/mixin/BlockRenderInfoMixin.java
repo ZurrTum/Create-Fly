@@ -16,12 +16,12 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(BlockRenderInfo.class)
 public class BlockRenderInfoMixin {
     @Shadow
-    public BlockAndTintGetter blockView;
+    public BlockAndTintGetter level;
 
     @WrapOperation(method = "prepareForBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getLightEmission()I"))
     private int getLuminance(BlockState state, Operation<Integer> original, @Local(argsOnly = true) BlockPos pos) {
         if (state.getBlock() instanceof LightControlBlock block) {
-            return block.getLuminance(blockView, pos);
+            return block.getLuminance(level, pos);
         }
         return original.call(state);
     }

@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBlockStateModel;
+import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.core.BlockPos;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Mixin(FabricBlockStateModel.class)
 public interface FabricBlockStateModelMixin {
-    @WrapOperation(method = "emitQuads(Lnet/fabricmc/fabric/api/renderer/v1/mesh/QuadEmitter;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;Ljava/util/function/Predicate;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockStateModel;collectParts(Lnet/minecraft/util/RandomSource;)Ljava/util/List;"))
+    @WrapOperation(method = "emitQuads(Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;Ljava/util/function/Predicate;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockStateModel;collectParts(Lnet/minecraft/util/RandomSource;)Ljava/util/List;"))
     private List<BlockModelPart> getParts(
         BlockStateModel instance,
         RandomSource random,

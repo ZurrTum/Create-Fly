@@ -7,9 +7,11 @@ import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.content.contraptions.minecart.MinecartCouplingItem;
 import com.zurrtum.create.content.contraptions.mounted.MinecartContraptionItem;
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
+import com.zurrtum.create.content.equipment.wrench.WrenchItem;
 import com.zurrtum.create.foundation.item.CustomAttackSoundItem;
 import com.zurrtum.create.foundation.item.DamageControlItem;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -21,6 +23,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,8 +32,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin {
-    @Inject(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;", ordinal = 0), cancellable = true)
-    private void interact(Entity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+    @Inject(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;", ordinal = 0), cancellable = true)
+    private void interact(Entity entity, InteractionHand hand, Vec3 location, CallbackInfoReturnable<InteractionResult> cir) {
         Player player = (Player) (Object) this;
         InteractionResult result = MinecartCouplingItem.handleInteractionWithMinecart(player, hand, entity);
         if (result != null) {
@@ -101,6 +104,13 @@ public abstract class PlayerMixin {
             }
         }
         original.call(player, entity, criticalAttack, sweepAttack, fullStrengthAttack, stabAttack, magicBoost);
+    }
+
+    @Inject(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
+    private void attack(Entity target, CallbackInfo ci) {
+        if (((Object) this) instanceof ServerPlayer player && WrenchItem.wrenchInstaKillsMinecarts(player, target)) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "addAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("TAIL"))
