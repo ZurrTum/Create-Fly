@@ -7,6 +7,7 @@ import com.zurrtum.create.content.trains.display.FlapDisplaySection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.timeline.Timelines;
 
 public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 
@@ -27,7 +28,8 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 
         boolean c12 = context.sourceConfig().getIntOr("Cycle", 0) == 0;
 
-        int dayTime = (int) (sLevel.getDayTime() % 24000);
+        int periodTicks = sLevel.registryAccess().get(Timelines.OVERWORLD_DAY).flatMap(timeline -> timeline.value().periodTicks()).orElse(24000);
+        int dayTime = (int) (sLevel.getOverworldClockTime() % periodTicks);
         int hours = (dayTime / 1000 + 6) % 24;
         int minutes = (dayTime % 1000) * 60 / 1000;
         MutableComponent suffix = Component.translatable("create.generic.daytime." + (hours > 11 ? "pm" : "am"));

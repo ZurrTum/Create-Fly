@@ -9,8 +9,14 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.clock.ClockTimeMarker;
+import net.minecraft.world.clock.ClockTimeMarkers;
+import net.minecraft.world.clock.ServerClockManager.ClockInstance;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -19,6 +25,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class CuckooClockBlockEntity extends KineticBlockEntity {
     public LerpedFloat animationProgress = LerpedFloat.linear();
@@ -73,13 +80,23 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
             return;
 
         if (animationType == Animation.NONE) {
-            int dayTime = (int) (level.getDayTime() % 24000);
-            int hours = (dayTime / 1000 + 6) % 24;
-            int minutes = (dayTime % 1000) * 60 / 1000;
-            if (hours == 12 && minutes < 5)
-                startAnimation(Animation.PIG);
-            if (hours == 18 && minutes < 36 && minutes > 31)
-                startAnimation(Animation.CREEPER);
+            level.dimensionType().defaultClock().or(() -> level.registryAccess().get(WorldClocks.OVERWORLD)).ifPresent(clock -> {
+                ClockInstance instance = ((ServerLevel) level).clockManager().getInstance(clock);
+                Map<ResourceKey<ClockTimeMarker>, ClockTimeMarker> timeMarkers = instance.timeMarkers;
+                ClockTimeMarker marker = timeMarkers.get(ClockTimeMarkers.NOON);
+                long totalTicks = instance.totalTicks;
+                if (marker != null && marker.occursAt(totalTicks)) {
+                    startAnimation(Animation.PIG);
+                    return;
+                }
+                marker = timeMarkers.get(ClockTimeMarkers.NIGHT);
+                if (marker != null) {
+                    totalTicks += 500;
+                    if (marker.occursAt(totalTicks)) {
+                        startAnimation(Animation.CREEPER);
+                    }
+                }
+            });
         } else {
             float value = getAndIncrementProgress();
             if (value > 100)

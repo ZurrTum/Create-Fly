@@ -8,8 +8,10 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.timeline.Timelines;
 
 public class CuckooClockAnimationBehaviour extends AnimationBehaviour<CuckooClockBlockEntity> {
     public LerpedFloat hourHand = LerpedFloat.angular();
@@ -25,7 +27,9 @@ public class CuckooClockAnimationBehaviour extends AnimationBehaviour<CuckooCloc
             return;
 
         Level world = blockEntity.getLevel();
-        int dayTime = (int) (world.getDayTime() % 24000);
+        int dayTime = world.dimensionType().defaultClock().or(() -> world.registryAccess().get(WorldClocks.OVERWORLD))
+            .map(clock -> (int) (world.clockManager().getTotalTicks(clock) % world.registryAccess().get(Timelines.OVERWORLD_DAY)
+                .flatMap(timeline -> timeline.value().periodTicks()).orElse(24000))).orElse(0);
         int hours = (dayTime / 1000 + 6) % 24;
         int minutes = (dayTime % 1000) * 60 / 1000;
         moveHands(hours, minutes);

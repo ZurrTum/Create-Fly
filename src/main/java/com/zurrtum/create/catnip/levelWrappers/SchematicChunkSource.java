@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.attribute.EnvironmentAttributeSystem;
+import net.minecraft.world.clock.ClockManager;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
@@ -106,6 +107,7 @@ public class SchematicChunkSource extends ChunkSource {
                 @Nullable ResourceKey<Level> pDimension,
                 RegistryAccess pRegistryAccess,
                 Holder<DimensionType> pDimensionTypeRegistration,
+                ClockManager pClockManager,
                 EnvironmentAttributeSystem pEnvironmentAttributes,
                 boolean pIsClientSide,
                 boolean pIsDebug,
@@ -124,14 +126,32 @@ public class SchematicChunkSource extends ChunkSource {
                 );
                 access = pRegistryAccess;
                 environmentAttributes = pEnvironmentAttributes;
+                clockManager = pClockManager;
             }
 
             private final RegistryAccess access;
+            private final ClockManager clockManager;
             private final EnvironmentAttributeSystem environmentAttributes;
             private final WorldBorder border = new WorldBorder();
 
             private DummyLevel(Level level) {
-                this(null, null, level.registryAccess(), level.dimensionTypeRegistration(), level.environmentAttributes(), false, false, 0, 0);
+                this(
+                    null,
+                    null,
+                    level.registryAccess(),
+                    level.dimensionTypeRegistration(),
+                    level.clockManager(),
+                    level.environmentAttributes(),
+                    false,
+                    false,
+                    0,
+                    0
+                );
+            }
+
+            @Override
+            public ClockManager clockManager() {
+                return clockManager;
             }
 
             @Override

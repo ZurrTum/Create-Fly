@@ -83,7 +83,7 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
             MoonPhase moonPhase = level.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, pos);
             moonBrightness = DimensionType.MOON_BRIGHTNESS_PER_PHASE[moonPhase.index()];
         }
-        return new DifficultyInstance(level.getDifficulty(), level.getDayTime(), localTime, moonBrightness);
+        return new DifficultyInstance(level.getDifficulty(), level.getOverworldClockTime(), localTime, moonBrightness);
     }
 
     @Override

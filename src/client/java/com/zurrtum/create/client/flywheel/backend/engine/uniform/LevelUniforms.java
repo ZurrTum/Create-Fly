@@ -8,9 +8,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.attribute.EnvironmentAttributeProbe;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.timeline.Timelines;
 import org.joml.Vector3f;
 
 import java.util.EnumMap;
@@ -56,9 +58,11 @@ public final class LevelUniforms extends UniformWriter {
         ptr = writeVec3(ptr, LIGHT_DIRECTION[0], LIGHT_DIRECTION[1], LIGHT_DIRECTION[2]);
         ptr = writeVec3(ptr, LIGHT_DIRECTION[3], LIGHT_DIRECTION[4], LIGHT_DIRECTION[5]);
 
-        long dayTime = level.getDayTime();
-        long levelDay = dayTime / 24000L;
-        float timeOfDay = (float) (dayTime - levelDay * 24000L) / 24000f;
+        int periodTicks = level.registryAccess().get(Timelines.OVERWORLD_DAY).flatMap(timeline -> timeline.value().periodTicks()).orElse(24000);
+        long dayTime = level.dimensionType().defaultClock().or(() -> level.registryAccess().get(WorldClocks.OVERWORLD))
+            .map(clock -> level.clockManager().getTotalTicks(clock)).orElse(0L);
+        long levelDay = dayTime / periodTicks;
+        float timeOfDay = (float) (dayTime % periodTicks) / periodTicks;
         ptr = writeInt(ptr, (int) (levelDay % 0x7FFFFFFFL));
         ptr = writeFloat(ptr, timeOfDay);
 

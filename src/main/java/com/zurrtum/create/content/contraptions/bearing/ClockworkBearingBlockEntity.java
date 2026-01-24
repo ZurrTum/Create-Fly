@@ -16,10 +16,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.timeline.Timelines;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 
@@ -169,16 +171,20 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
         return speed + clientMinuteAngleDiff / 3f;
     }
 
+    private int getDayTime() {
+        return level.dimensionType().defaultClock().or(() -> level.registryAccess().get(WorldClocks.OVERWORLD))
+            .map(clock -> (int) (level.clockManager().getTotalTicks(clock) % level.registryAccess().get(Timelines.OVERWORLD_DAY)
+                .flatMap(timeline -> timeline.value().periodTicks()).orElse(24000))).orElse(0);
+    }
+
     protected float getHourTarget(boolean cycle24) {
-        int dayTime = (int) (level.getDayTime() % 24000);
-        int hours = (dayTime / 1000 + 6) % 24;
+        int hours = (getDayTime() / 1000 + 6) % 24;
         int offset = getBlockState().getValue(ClockworkBearingBlock.FACING).getAxisDirection().getStep();
         return offset * -360 / (cycle24 ? 24f : 12f) * (hours % (cycle24 ? 24 : 12));
     }
 
     protected float getMinuteTarget() {
-        int dayTime = (int) (level.getDayTime() % 24000);
-        int minutes = (dayTime % 1000) * 60 / 1000;
+        int minutes = (getDayTime() % 1000) * 60 / 1000;
         int offset = getBlockState().getValue(ClockworkBearingBlock.FACING).getAxisDirection().getStep();
         return offset * -360 / 60f * (minutes);
     }

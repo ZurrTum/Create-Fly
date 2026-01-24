@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.timeline.Timelines;
 
 public class TimeOfDayCondition extends ScheduleWaitCondition {
     public TimeOfDayCondition(Identifier id) {
@@ -19,7 +20,7 @@ public class TimeOfDayCondition extends ScheduleWaitCondition {
         int maxTickDiff = 40;
         int targetHour = intData("Hour");
         int targetMinute = intData("Minute");
-        int dayTime = (int) (level.getDayTime() % getRotation());
+        int dayTime = (int) (level.getOverworldClockTime() % getRotation());
         int targetTicks = (int) ((((targetHour + 18) % 24) * 1000 + Math.ceil(targetMinute / 60f * 1000)) % getRotation());
         int diff = dayTime - targetTicks;
         return diff >= 0 && maxTickDiff >= diff;
@@ -62,7 +63,7 @@ public class TimeOfDayCondition extends ScheduleWaitCondition {
     public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
         int targetHour = intData("Hour");
         int targetMinute = intData("Minute");
-        long timeOfDay = level.getDayTime();
+        long timeOfDay = level.getOverworldClockTime();
         int dayTime = (int) (timeOfDay % getRotation());
         int targetTicks = (int) ((((targetHour + 18) % 24) * 1000 + Math.ceil(targetMinute / 60f * 1000)) % getRotation());
         int diff = targetTicks - dayTime;
@@ -70,7 +71,8 @@ public class TimeOfDayCondition extends ScheduleWaitCondition {
         if (diff < 0)
             diff += getRotation();
 
-        int departureTime = (int) (timeOfDay + diff) % 24000;
+        int periodTicks = level.registryAccess().get(Timelines.OVERWORLD_DAY).flatMap(timeline -> timeline.value().periodTicks()).orElse(24000);
+        int departureTime = (int) (timeOfDay + diff) % periodTicks;
         int departingHour = (departureTime / 1000 + 6) % 24;
         int departingMinute = (departureTime % 1000) * 60 / 1000;
 
