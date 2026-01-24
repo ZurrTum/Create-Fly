@@ -6,6 +6,7 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -118,6 +119,9 @@ public class ClientContraption {
                 MovementBehaviour movementBehaviour = MovementBehaviour.REGISTRY.get(info.state());
                 if (movementBehaviour == null || !movementBehaviour.disableBlockEntityRendering()) {
                     renderedBlockEntities.add(blockEntity);
+                    if (blockEntity instanceof SmartBlockEntity smartBlockEntity) {
+                        smartBlockEntity.tick();
+                    }
                 }
             }
         }
