@@ -14,9 +14,10 @@ import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -61,25 +62,21 @@ public class BakedItemModelBufferer {
         ItemMeshEmitterProvider provider = objects.provider;
         provider.setResultConsumer(resultConsumer, meshResultConsumer);
         ItemStackRenderState state = objects.state;
-        SubmitNodeStorage queue = objects.queue;
+        FeatureRenderDispatcher dispatcher = objects.featureRenderDispatcher;
         Minecraft.getInstance().getItemModelResolver().updateForTopItem(state, stack, displayContext, world, null, 0);
-        state.submit(poseStack, queue, 0, OverlayTexture.NO_OVERLAY, 0);
-        for (SubmitNodeCollection commandQueue : queue.getSubmitsPerOrder().values()) {
-            ModelCommandRendererHelper.render(poseStack, commandQueue, provider, provider, provider);
-            ModelPartCommandRendererHelper.render(poseStack, commandQueue, provider, provider, provider);
-            ItemCommandRendererHelper.render(poseStack, commandQueue, provider, provider);
-            CustomCommandRendererHelper.render(commandQueue, provider);
-        }
-        queue.clear();
-        provider.end();
+        state.submit(poseStack, dispatcher.getSubmitNodeStorage(), 0, OverlayTexture.NO_OVERLAY, 0);
+        dispatcher.renderAllFeatures();
+        provider.endBatch();
     }
 
-    public static class ItemMeshEmitterProvider implements MultiBufferSource {
+    public static class ItemMeshEmitterProvider extends MultiBufferSource.BufferSource {
         private final ThreadLocalObjects objects;
         private ResultConsumer resultConsumer;
         private MeshResultConsumer meshResultConsumer;
 
+        @SuppressWarnings("DataFlowIssue")
         private ItemMeshEmitterProvider(ThreadLocalObjects objects) {
+            super(null, null);
             this.objects = objects;
         }
 
@@ -144,10 +141,19 @@ public class BakedItemModelBufferer {
             return emitter;
         }
 
-        public void end() {
+        @Override
+        public void endBatch() {
             for (ItemMeshEmitter emitter : objects.emitters) {
                 emitter.end();
             }
+        }
+
+        @Override
+        public void endLastBatch() {
+        }
+
+        @Override
+        public void endBatch(RenderType type) {
         }
     }
 
@@ -167,19 +173,72 @@ public class BakedItemModelBufferer {
 
     private static class ThreadLocalObjects {
         public final PoseStack identityPoseStack = new PoseStack();
-        public final SubmitNodeStorage queue = new SubmitNodeStorage();
         public final ItemStackRenderState state = new ItemStackRenderState();
         public final ItemMeshEmitterProvider provider = new ItemMeshEmitterProvider(this);
         public final Map<RenderType, Material> materials = new HashMap<>();
         public final Map<RenderType, Integer> chunkLayers = new HashMap<>();
         public final List<ItemMeshEmitter> emitters = new ArrayList<>();
+        public final FeatureRenderDispatcher featureRenderDispatcher;
 
         {
+            Minecraft mc = Minecraft.getInstance();
+            featureRenderDispatcher = new FeatureRenderDispatcher(
+                new SubmitNodeStorage(),
+                mc.getBlockRenderer(),
+                provider,
+                mc.getAtlasManager(),
+                EmptyOutlineBufferSource.INSTANCE,
+                EmptyBufferSource.INSTANCE,
+                mc.font
+            );
             for (int i = 0, size = CHUNK_LAYERS.size(); i < size; i++) {
                 RenderType renderType = CHUNK_LAYERS.get(i);
                 chunkLayers.put(renderType, i);
                 emitters.add(new ItemMeshEmitter(renderType));
             }
+        }
+    }
+
+    private static class EmptyOutlineBufferSource extends OutlineBufferSource {
+        public static final EmptyOutlineBufferSource INSTANCE = new EmptyOutlineBufferSource();
+
+        @Override
+        public VertexConsumer getBuffer(RenderType renderType) {
+            return EmptyVertexConsumer.INSTANCE;
+        }
+
+        @Override
+        public void setColor(int color) {
+        }
+
+        @Override
+        public void endOutlineBatch() {
+        }
+    }
+
+    private static class EmptyBufferSource extends MultiBufferSource.BufferSource {
+        public static final EmptyBufferSource INSTANCE = new EmptyBufferSource();
+
+        @SuppressWarnings("DataFlowIssue")
+        public EmptyBufferSource() {
+            super(null, null);
+        }
+
+        @Override
+        public VertexConsumer getBuffer(RenderType renderType) {
+            return EmptyVertexConsumer.INSTANCE;
+        }
+
+        @Override
+        public void endLastBatch() {
+        }
+
+        @Override
+        public void endBatch() {
+        }
+
+        @Override
+        public void endBatch(RenderType type) {
         }
     }
 }
