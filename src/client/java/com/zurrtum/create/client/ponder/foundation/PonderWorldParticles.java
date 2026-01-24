@@ -3,6 +3,7 @@ package com.zurrtum.create.client.ponder.foundation;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -133,34 +134,73 @@ public class PonderWorldParticles {
             if (commands.isEmpty()) {
                 continue;
             }
-            GpuTextureView gpuTextureView = RenderSystem.outputColorTextureOverride;
-            GpuTextureView gpuTextureView2 = RenderSystem.outputDepthTextureOverride;
+            GpuTextureView colorTextureView = RenderSystem.outputColorTextureOverride;
+            GpuTextureView depthTextureView = RenderSystem.outputDepthTextureOverride;
+            GpuBufferSlice projection = RenderSystem.getProjectionMatrixBuffer();
+            GpuBufferSlice fog = RenderSystem.getShaderFog();
             Minecraft mc = Minecraft.getInstance();
             GpuTextureView lightTextureView = mc.gameRenderer.lightmap();
             GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
             TextureManager textureManager = mc.getTextureManager();
-            for (SubmitNodeCollector.ParticleGroupRenderer layeredCustom : commands) {
-                QuadParticleRenderState.PreparedBuffers buffers = layeredCustom.prepare(verticesCache);
-                if (buffers != null) {
-                    try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                        () -> "Immediate draw for particle",
-                        gpuTextureView,
-                        OptionalInt.empty(),
-                        gpuTextureView2,
-                        OptionalDouble.empty()
-                    )) {
-                        renderPass.setUniform("Projection", RenderSystem.getProjectionMatrixBuffer());
-                        renderPass.setUniform("Fog", RenderSystem.getShaderFog());
-                        renderPass.bindTexture("Sampler2", lightTextureView, sampler);
-                        layeredCustom.render(buffers, verticesCache, renderPass, textureManager, false);
-                        layeredCustom.render(buffers, verticesCache, renderPass, textureManager, true);
-                    }
-                }
-            }
+            renderParticles(
+                colorTextureView,
+                depthTextureView,
+                commands,
+                verticesCache,
+                projection,
+                fog,
+                lightTextureView,
+                sampler,
+                textureManager,
+                false
+            );
+            renderParticles(
+                colorTextureView,
+                depthTextureView,
+                commands,
+                verticesCache,
+                projection,
+                fog,
+                lightTextureView,
+                sampler,
+                textureManager,
+                true
+            );
             commands.clear();
         }
         stack.popMatrix();
         particleBatch.reset();
+    }
+
+    private static void renderParticles(
+        GpuTextureView colorTextureView,
+        @Nullable GpuTextureView depthTextureView,
+        List<SubmitNodeCollector.ParticleGroupRenderer> commands,
+        ParticleFeatureRenderer.ParticleBufferCache verticesCache,
+        GpuBufferSlice projection,
+        GpuBufferSlice fog,
+        GpuTextureView lightTextureView,
+        GpuSampler sampler,
+        TextureManager textureManager,
+        boolean translucent
+    ) {
+        for (SubmitNodeCollector.ParticleGroupRenderer layeredCustom : commands) {
+            QuadParticleRenderState.PreparedBuffers buffers = layeredCustom.prepare(verticesCache, translucent);
+            if (buffers != null) {
+                try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                    () -> "Immediate draw for particle",
+                    colorTextureView,
+                    OptionalInt.empty(),
+                    depthTextureView,
+                    OptionalDouble.empty()
+                )) {
+                    renderPass.setUniform("Projection", projection);
+                    renderPass.setUniform("Fog", fog);
+                    renderPass.bindTexture("Sampler2", lightTextureView, sampler);
+                    layeredCustom.render(buffers, verticesCache, renderPass, textureManager);
+                }
+            }
+        }
     }
 
     public void clearEffects() {
