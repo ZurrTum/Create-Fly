@@ -1,17 +1,18 @@
 package com.zurrtum.create.client.model;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import org.jspecify.annotations.Nullable;
 
 public interface NormalsBakedQuad {
-    void create$setNormals(int[] normal);
+    void create$setNormals(int @Nullable [] normal);
 
-    int[] create$getNormals();
+    int @Nullable [] create$getNormals();
 
-    static int[] getNormals(BakedQuad quad) {
+    static int @Nullable [] getNormals(BakedQuad quad) {
         return ((NormalsBakedQuad) (Object) quad).create$getNormals();
     }
 
-    static void setNormals(BakedQuad quad, int[] normals) {
+    static void setNormals(BakedQuad quad, int @Nullable [] normals) {
         ((NormalsBakedQuad) (Object) quad).create$setNormals(normals);
     }
 }
