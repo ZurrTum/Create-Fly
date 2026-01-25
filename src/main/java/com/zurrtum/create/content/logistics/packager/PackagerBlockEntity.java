@@ -405,6 +405,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
 
     private static ItemStack createBox(ItemStack stack) {
         if (stack.getItem() instanceof PackageItem) {
+            stack = stack.copy();
             PackageItem.clearAddress(stack);
             return stack;
         }
