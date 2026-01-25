@@ -244,3 +244,4 @@ accessible field net/minecraft/world/clock/ServerClockManager$ClockInstance tota
 accessible field net/minecraft/world/clock/ServerClockManager$ClockInstance timeMarkers Ljava/util/Map;
 accessible method net/minecraft/core/component/DataComponentPatch <init> (Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;)V
 accessible field net/minecraft/world/item/alchemy/PotionBrewing containers Ljava/util/List;
+accessible field net/minecraft/client/renderer/entity/AbstractMinecartRenderer MINECART_LOCATION Lnet/minecraft/resources/Identifier;

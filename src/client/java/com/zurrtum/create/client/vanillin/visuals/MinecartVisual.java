@@ -16,7 +16,7 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.entity.AbstractMinecartRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.minecart.MinecartBehavior;
@@ -33,8 +33,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVisual<T> implements SimpleTickableVisual, SimpleDynamicVisual {
-    private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/entity/minecart.png");
-    private static final Material MATERIAL = SimpleMaterial.builder().texture(TEXTURE).mipmap(false).build();
+    private static final Material MATERIAL = SimpleMaterial.builder().texture(AbstractMinecartRenderer.MINECART_LOCATION).mipmap(false).build();
 
     private final InstanceTree instances;
     @Nullable
