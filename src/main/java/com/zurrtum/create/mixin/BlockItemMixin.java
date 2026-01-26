@@ -5,25 +5,66 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.zurrtum.create.content.contraptions.glue.SuperGlueHandler;
+import com.zurrtum.create.content.equipment.symmetryWand.SymmetryHandler;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryPlacementContext;
 import com.zurrtum.create.foundation.item.ItemPlacementSoundContext;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockItem.class)
 public class BlockItemMixin {
     @WrapOperation(method = "useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", at = @At(value = "NEW", target = "(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/item/ItemPlacementContext;"))
-    private ItemPlacementContext replaceContext(ItemUsageContext context, Operation<ItemPlacementContext> original) {
-        if (context instanceof SymmetryPlacementContext placementContext) {
-            return placementContext;
+    private ItemPlacementContext replaceContext(
+        ItemUsageContext context,
+        Operation<ItemPlacementContext> original,
+        @Share("place") LocalRef<ItemPlacementContext> place
+    ) {
+        if (context.getWorld().isClient()) {
+            return original.call(context);
         }
-        return original.call(context);
+        if (context instanceof SymmetryPlacementContext placementContext) {
+            place.set(placementContext);
+            return placementContext;
+        } else {
+            ItemPlacementContext blockContext = original.call(context);
+            place.set(blockContext);
+            return blockContext;
+        }
+    }
+
+    @Inject(method = "useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", at = @At("RETURN"))
+    private void useOn(
+        ItemUsageContext useOnContext,
+        CallbackInfoReturnable<ActionResult> cir,
+        @Share("place") LocalRef<ItemPlacementContext> place
+    ) {
+        if (cir.getReturnValue().isAccepted()) {
+            ItemPlacementContext context = place.get();
+            if (context != null) {
+                PlayerEntity player = context.getPlayer();
+                if (player != null) {
+                    ServerWorld world = (ServerWorld) context.getWorld();
+                    BlockPos pos = context.getBlockPos();
+                    SuperGlueHandler.glueListensForBlockPlacement(world, player, pos);
+                    if (!(context instanceof SymmetryPlacementContext)) {
+                        SymmetryHandler.onBlockPlaced(world, player, pos, context);
+                    }
+                }
+            }
+        }
     }
 
     @WrapOperation(method = "place(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/util/ActionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;getSoundGroup()Lnet/minecraft/sound/BlockSoundGroup;"))
