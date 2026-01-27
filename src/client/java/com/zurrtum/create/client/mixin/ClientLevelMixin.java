@@ -2,16 +2,18 @@ package com.zurrtum.create.client.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.Create;
+import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.catnip.levelWrappers.WrappedClientLevel;
 import com.zurrtum.create.client.content.contraptions.ContraptionHandlerClient;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.impl.visualization.VisualizationEventHandler;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
+import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
 import com.zurrtum.create.content.equipment.armor.DivingBootsItem;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,8 +33,13 @@ public class ClientLevelMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void onLoadWorld(CallbackInfo ci) {
-        Create.SCHEMATIC_HANDLER.updateRenderers();
-        REDSTONE_LINK_NETWORK_HANDLER.onLoadWorld((Level) (Object) this);
+        ClientLevel level = (ClientLevel) (Object) this;
+        if (!(level instanceof WrappedClientLevel)) {
+            Create.invalidateRenderers();
+            AnimationTickHolder.reset();
+            Ponder.invalidateRenderers();
+        }
+        REDSTONE_LINK_NETWORK_HANDLER.onLoadWorld(level);
     }
 
     @Inject(method = "addEntity(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))

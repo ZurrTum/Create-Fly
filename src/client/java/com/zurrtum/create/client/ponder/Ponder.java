@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder;
 
 import com.mojang.logging.LogUtils;
+import com.zurrtum.create.client.catnip.event.ClientResourceReloadListener;
 import com.zurrtum.create.client.catnip.lang.LangBuilder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 public class Ponder {
     public static final String MOD_ID = "ponder";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final ClientResourceReloadListener RESOURCE_RELOAD_LISTENER = new ClientResourceReloadListener();
 
     public static LangBuilder lang() {
         return new LangBuilder(MOD_ID);
@@ -28,5 +30,9 @@ public class Ponder {
         SuperByteBufferCache cache = SuperByteBufferCache.getInstance();
         cache.registerCompartment(CachedBuffers.GENERIC_BLOCK);
         cache.registerCompartment(WorldSectionElementImpl.PONDER_WORLD_SECTION);
+    }
+
+    public static void invalidateRenderers() {
+        SuperByteBufferCache.getInstance().invalidate();
     }
 }
