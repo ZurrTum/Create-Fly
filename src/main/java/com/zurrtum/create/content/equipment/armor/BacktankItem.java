@@ -35,14 +35,6 @@ public class BacktankItem extends BlockItem {
         return stack;
     }
 
-    //TODO
-    //    @Override
-    //    public boolean supportsEnchantment(ItemStack stack, RegistryEntry<Enchantment> enchantment) {
-    //        if (enchantment.is(Enchantments.MENDING) || enchantment.is(Enchantments.UNBREAKING))
-    //            return false;
-    //        return super.supportsEnchantment(stack, enchantment);
-    //    }
-
     @Override
     public boolean isBarVisible(ItemStack stack) {
         return true;

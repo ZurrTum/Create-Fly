@@ -835,7 +835,11 @@ public class AllItems {
         new Item.Properties().rarity(Rarity.UNCOMMON)
     );
     public static final ScheduleItem SCHEDULE = register("schedule", ScheduleItem::new);
-    public static final PotatoCannonItem POTATO_CANNON = register("potato_cannon", PotatoCannonItem::new, new Item.Properties().durability(100));
+    public static final PotatoCannonItem POTATO_CANNON = register(
+        "potato_cannon",
+        PotatoCannonItem::new,
+        new Item.Properties().durability(100).enchantable(1)
+    );
     public static final ExtendoGripItem EXTENDO_GRIP = register(
         "extendo_grip",
         ExtendoGripItem::new,
