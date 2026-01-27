@@ -9,6 +9,7 @@ import com.zurrtum.create.client.content.schematics.client.ClientSchematicLoader
 import com.zurrtum.create.client.content.schematics.client.SchematicAndQuillHandler;
 import com.zurrtum.create.client.content.schematics.client.SchematicHandler;
 import com.zurrtum.create.client.flywheel.impl.Flywheel;
+import com.zurrtum.create.client.foundation.ClientResourceReloadListener;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsClient;
 import com.zurrtum.create.client.foundation.ponder.CreatePonderPlugin;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
@@ -31,6 +32,7 @@ public class Create implements ClientModInitializer {
     public static SchematicHandler SCHEMATIC_HANDLER;
     public static SchematicAndQuillHandler SCHEMATIC_AND_QUILL_HANDLER;
     public static ZapperRenderHandler ZAPPER_RENDER_HANDLER;
+    public static ClientResourceReloadListener RESOURCE_RELOAD_LISTENER;
 
     @Override
     public void onInitializeClient() {
@@ -46,6 +48,7 @@ public class Create implements ClientModInitializer {
         SCHEMATIC_HANDLER = new SchematicHandler();
         SCHEMATIC_AND_QUILL_HANDLER = new SchematicAndQuillHandler();
         ZAPPER_RENDER_HANDLER = new ZapperRenderHandler();
+        RESOURCE_RELOAD_LISTENER = new ClientResourceReloadListener();
         AllConfigs.register();
         AllFluidConfigs.register();
         AllHandle.register();
@@ -77,5 +80,9 @@ public class Create implements ClientModInitializer {
 
     public static Identifier asResource(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    public static void invalidateRenderers() {
+        SCHEMATIC_HANDLER.updateRenderers();
     }
 }

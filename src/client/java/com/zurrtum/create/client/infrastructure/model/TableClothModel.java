@@ -17,9 +17,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TableClothModel extends WrapperBlockStateModel {
+    private static final List<WeakReference<TableClothModel>> MODELS = new ArrayList<>(19);
     private static final Direction[] DIRECTIONS = new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
     private static final int SOUTH_WEST = 0b0011;
     private static final int NORTH_WEST = 0b0110;
@@ -34,6 +38,23 @@ public class TableClothModel extends WrapperBlockStateModel {
 
     public TableClothModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked);
+        MODELS.add(new WeakReference<>(this));
+    }
+
+    public static void reload() {
+        MODELS.removeIf(ref -> {
+            TableClothModel model = ref.get();
+            if (model != null) {
+                model.clearCache();
+                return false;
+            }
+            return true;
+        });
+    }
+
+    public void clearCache() {
+        Arrays.fill(corner, null);
+        south = west = north = east = null;
     }
 
     @Override
