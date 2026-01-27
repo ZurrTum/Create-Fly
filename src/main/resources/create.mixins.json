@@ -21,6 +21,7 @@
     "DetectorRailBlockMixin",
     "DiodeBlockMixin",
     "EnchantingTableBlockMixin",
+    "EnchantmentMixin",
     "EntityCallbacksMixin",
     "EntityDataSerializersMixin",
     "EntityMixin",

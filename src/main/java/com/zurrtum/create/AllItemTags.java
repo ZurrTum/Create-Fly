@@ -43,6 +43,12 @@ public class AllItemTags {
     public static final TagKey<Item> DISPENSE_BEHAVIOR_WRAP_BLACKLIST = register("dispense_behavior_wrap_blacklist");
     public static final TagKey<Item> REPAIRS_COPPER_ARMOR = register("repairs_copper_armor");
     public static final TagKey<Item> REPAIRS_CARDBOARD_ARMOR = register("repairs_cardboard_armor");
+    public static final TagKey<Item> ENCHANTMENT_KNOCKBACK = register("enchantment/knockback");
+    public static final TagKey<Item> ENCHANTMENT_LOOTING = register("enchantment/looting");
+    public static final TagKey<Item> ENCHANTMENT_DENY_MENDING = register("enchantment/deny_mending");
+    public static final TagKey<Item> ENCHANTMENT_DENY_UNBREAKING = register("enchantment/deny_unbreaking");
+    public static final TagKey<Item> ENCHANTMENT_DENY_INFINITY = register("enchantment/deny_infinity");
+    public static final TagKey<Item> ENCHANTMENT_DENY_AQUA_AFFINITY = register("enchantment/deny_aqua_affinity");
 
     public static final TagKey<Item> PLATES = register("c", "plates");
     public static final TagKey<Item> OBSIDIAN_DUST = register("c", "dusts/obsidian");
