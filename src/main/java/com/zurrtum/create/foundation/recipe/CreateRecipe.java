@@ -22,6 +22,16 @@ public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
     }
 
     @Override
+    default String group() {
+        return "";
+    }
+
+    @Override
+    default boolean showNotification() {
+        return true;
+    }
+
+    @Override
     default boolean isSpecial() {
         return true;
     }

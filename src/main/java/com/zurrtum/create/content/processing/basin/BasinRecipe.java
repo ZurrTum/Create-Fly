@@ -658,6 +658,16 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     }
 
     @Override
+    default String group() {
+        return "";
+    }
+
+    @Override
+    default boolean showNotification() {
+        return true;
+    }
+
+    @Override
     default boolean isSpecial() {
         return true;
     }
