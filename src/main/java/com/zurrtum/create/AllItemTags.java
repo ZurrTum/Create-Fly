@@ -1,11 +1,11 @@
 package com.zurrtum.create;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
@@ -98,8 +98,9 @@ public class AllItemTags {
 
     @Nullable
     public static DyeColor getDyeColor(ItemStack stack) {
-        if (stack.getItem() instanceof DyeItem dyeItem) {
-            return dyeItem.getDyeColor();
+        DyeColor color = stack.get(DataComponents.DYE);
+        if (color != null) {
+            return color;
         }
         return dyesTag.entrySet().stream().filter(entry -> stack.is(entry.getKey())).map(Map.Entry::getValue).findAny().orElse(null);
     }
