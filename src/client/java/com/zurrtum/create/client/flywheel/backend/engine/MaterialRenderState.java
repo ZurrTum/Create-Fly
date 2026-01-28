@@ -175,11 +175,9 @@ public final class MaterialRenderState {
     }
 
     public static void setupFrameBuffer() {
-        RenderTarget framebuffer = Minecraft.getInstance().getMainRenderTarget();
-        int i = ((GlTexture) framebuffer.getColorTexture()).getFbo(
-            ((GlDevice) RenderSystem.getDevice()).directStateAccess(),
-            framebuffer.useDepth ? framebuffer.getDepthTexture() : null
-        );
+        RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
+        DirectStateAccess access = ((GlDevice) RenderSystem.getDevice().backend).directStateAccess();
+        int i = ((GlTexture) target.getColorTexture()).getFbo(access, target.useDepth ? target.getDepthTexture() : null);
         GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, i);
     }
 

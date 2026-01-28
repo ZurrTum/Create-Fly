@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
+import com.mojang.blaze3d.opengl.DirectStateAccess;
+import com.mojang.blaze3d.opengl.GlDevice;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -16,8 +18,6 @@ import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL46;
 
 import static com.mojang.blaze3d.opengl.GlConst.*;
-
-import com.mojang.blaze3d.opengl.GlDevice;
 
 public class OitFramebuffer {
     public static final float[] CLEAR_TO_ZERO = {0, 0, 0, 0};
@@ -173,20 +173,13 @@ public class OitFramebuffer {
      * Composite the accumulated luminance onto the main framebuffer.
      */
     public void composite() {
+        DirectStateAccess access = ((GlDevice) RenderSystem.getDevice().backend).directStateAccess();
+        Minecraft mc = Minecraft.getInstance();
+        RenderTarget mainTarget = mc.getMainRenderTarget();
         if (Minecraft.useShaderTransparency()) {
-            RenderTarget framebuffer = Minecraft.getInstance().levelRenderer.getItemEntityTarget();
-            int i = ((GlTexture) framebuffer.getColorTexture()).getFbo(
-                ((GlDevice) RenderSystem.getDevice()).directStateAccess(),
-                framebuffer.getDepthTexture()
-            );
-            GlStateManager._glBindFramebuffer(GL_FRAMEBUFFER, i);
+            bindRenderTarget(mc.levelRenderer.getItemEntityTarget(), access);
         } else {
-            RenderTarget framebuffer = Minecraft.getInstance().getMainRenderTarget();
-            int i = ((GlTexture) framebuffer.getColorTexture()).getFbo(
-                ((GlDevice) RenderSystem.getDevice()).directStateAccess(),
-                framebuffer.getDepthTexture()
-            );
-            GlStateManager._glBindFramebuffer(GL_FRAMEBUFFER, i);
+            bindRenderTarget(mainTarget, access);
         }
 
         // The composite shader writes out the closest depth to gl_FragDepth.
@@ -215,11 +208,11 @@ public class OitFramebuffer {
         drawFullscreenQuad();
 
 
-        RenderTarget framebuffer = Minecraft.getInstance().getMainRenderTarget();
-        int i = ((GlTexture) framebuffer.getColorTexture()).getFbo(
-            ((GlDevice) RenderSystem.getDevice()).directStateAccess(),
-            framebuffer.getDepthTexture()
-        );
+        bindRenderTarget(mainTarget, access);
+    }
+
+    private static void bindRenderTarget(RenderTarget target, DirectStateAccess access) {
+        int i = ((GlTexture) target.getColorTexture()).getFbo(access, target.getDepthTexture());
         GlStateManager._glBindFramebuffer(GL_FRAMEBUFFER, i);
     }
 
