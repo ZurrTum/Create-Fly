@@ -29,6 +29,27 @@ import java.util.Optional;
 public record CompactingRecipe(
     ItemStackTemplate result, @Nullable FluidIngredient fluidIngredient, List<SizedIngredient> ingredients
 ) implements BasinRecipe {
+    public static final MapCodec<CompactingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec((Instance<CompactingRecipe> instance) -> instance.group(
+        ItemStackTemplate.CODEC.fieldOf("result").forGetter(CompactingRecipe::result),
+        FluidIngredient.CODEC.optionalFieldOf("fluid_ingredient").forGetter(CompactingRecipe::getOptionalFluidIngredient),
+        SizedIngredient.getListCodec(1, 9).optionalFieldOf("ingredients", List.of()).forGetter(CompactingRecipe::ingredients)
+    ).apply(instance, CompactingRecipe::createRecipe)).validate(recipe -> {
+        if (recipe.fluidIngredient == null && recipe.ingredients.isEmpty()) {
+            return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
+        }
+        return DataResult.success(recipe);
+    });
+    public static final StreamCodec<RegistryFriendlyByteBuf, CompactingRecipe> STREAM_CODEC = StreamCodec.composite(
+        ItemStackTemplate.STREAM_CODEC,
+        CompactingRecipe::result,
+        FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs::optional),
+        CompactingRecipe::getOptionalFluidIngredient,
+        SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
+        CompactingRecipe::ingredients,
+        CompactingRecipe::createRecipe
+    );
+    public static final RecipeSerializer<CompactingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
     @Override
     public int getIngredientSize() {
         return (fluidIngredient == null ? 0 : 1) + ingredients.size();
@@ -93,48 +114,16 @@ public record CompactingRecipe(
         return AllRecipeTypes.COMPACTING;
     }
 
-    public static class Serializer implements RecipeSerializer<CompactingRecipe> {
-        public static final MapCodec<CompactingRecipe> CODEC = RecordCodecBuilder.mapCodec((Instance<CompactingRecipe> instance) -> instance.group(
-            ItemStackTemplate.CODEC.fieldOf("result").forGetter(CompactingRecipe::result),
-            FluidIngredient.CODEC.optionalFieldOf("fluid_ingredient").forGetter(Serializer::getOptionalFluidIngredient),
-            SizedIngredient.getListCodec(1, 9).optionalFieldOf("ingredients", List.of()).forGetter(CompactingRecipe::ingredients)
-        ).apply(instance, Serializer::createRecipe)).validate(recipe -> {
-            if (recipe.fluidIngredient == null && recipe.ingredients.isEmpty()) {
-                return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
-            }
-            return DataResult.success(recipe);
-        });
-        public static final StreamCodec<RegistryFriendlyByteBuf, CompactingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ItemStackTemplate.STREAM_CODEC,
-            CompactingRecipe::result,
-            FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs::optional),
-            Serializer::getOptionalFluidIngredient,
-            SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
-            CompactingRecipe::ingredients,
-            Serializer::createRecipe
-        );
+    private static Optional<@Nullable FluidIngredient> getOptionalFluidIngredient(CompactingRecipe recipe) {
+        return Optional.ofNullable(recipe.fluidIngredient);
+    }
 
-        private static Optional<@Nullable FluidIngredient> getOptionalFluidIngredient(CompactingRecipe recipe) {
-            return Optional.ofNullable(recipe.fluidIngredient);
-        }
-
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private static CompactingRecipe createRecipe(
-            ItemStackTemplate result,
-            Optional<FluidIngredient> fluidIngredient,
-            List<SizedIngredient> ingredients
-        ) {
-            return new CompactingRecipe(result, fluidIngredient.orElse(null), ingredients);
-        }
-
-        @Override
-        public MapCodec<CompactingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CompactingRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static CompactingRecipe createRecipe(
+        ItemStackTemplate result,
+        Optional<FluidIngredient> fluidIngredient,
+        List<SizedIngredient> ingredients
+    ) {
+        return new CompactingRecipe(result, fluidIngredient.orElse(null), ingredients);
     }
 }

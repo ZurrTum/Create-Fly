@@ -23,6 +23,22 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
 public record FillingRecipe(ItemStackTemplate result, Ingredient ingredient, FluidIngredient fluidIngredient) implements CreateRecipe<FillingInput> {
+    public static final MapCodec<FillingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ItemStackTemplate.CODEC.fieldOf("result").forGetter(FillingRecipe::result),
+        Ingredient.CODEC.fieldOf("ingredient").forGetter(FillingRecipe::ingredient),
+        FluidIngredient.CODEC.fieldOf("fluid_ingredient").forGetter(FillingRecipe::fluidIngredient)
+    ).apply(instance, FillingRecipe::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, FillingRecipe> STREAM_CODEC = StreamCodec.composite(
+        ItemStackTemplate.STREAM_CODEC,
+        FillingRecipe::result,
+        Ingredient.CONTENTS_STREAM_CODEC,
+        FillingRecipe::ingredient,
+        FluidIngredient.PACKET_CODEC,
+        FillingRecipe::fluidIngredient,
+        FillingRecipe::new
+    );
+    public static final RecipeSerializer<FillingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
     @Override
     public boolean matches(FillingInput input, Level world) {
         return ingredient.test(input.item()) && fluidIngredient.test(input.fluid());
@@ -52,32 +68,5 @@ public record FillingRecipe(ItemStackTemplate result, Ingredient ingredient, Flu
             .flatMap(fluidIngredient -> fluidIngredient.getMatchingFluidStacks().stream().findFirst())
             .map(stack -> Component.translatable("create.recipe.assembly.spout_filling_fluid", stack.getName().getString()))
             .orElseGet(() -> Component.literal("Invalid"));
-    }
-
-    public static class Serializer implements RecipeSerializer<FillingRecipe> {
-        public static final MapCodec<FillingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStackTemplate.CODEC.fieldOf("result").forGetter(FillingRecipe::result),
-            Ingredient.CODEC.fieldOf("ingredient").forGetter(FillingRecipe::ingredient),
-            FluidIngredient.CODEC.fieldOf("fluid_ingredient").forGetter(FillingRecipe::fluidIngredient)
-        ).apply(instance, FillingRecipe::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, FillingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ItemStackTemplate.STREAM_CODEC,
-            FillingRecipe::result,
-            Ingredient.CONTENTS_STREAM_CODEC,
-            FillingRecipe::ingredient,
-            FluidIngredient.PACKET_CODEC,
-            FillingRecipe::fluidIngredient,
-            FillingRecipe::new
-        );
-
-        @Override
-        public MapCodec<FillingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, FillingRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
     }
 }

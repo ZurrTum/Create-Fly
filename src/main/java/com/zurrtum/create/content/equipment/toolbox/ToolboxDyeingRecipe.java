@@ -1,11 +1,13 @@
 package com.zurrtum.create.content.equipment.toolbox;
 
+import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllRecipeSerializers;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -13,10 +15,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
 public class ToolboxDyeingRecipe extends CustomRecipe {
-
-    public ToolboxDyeingRecipe(CraftingBookCategory category) {
-        super(category);
-    }
+    public static final ToolboxDyeingRecipe INSTANCE = new ToolboxDyeingRecipe();
+    public static final MapCodec<ToolboxDyeingRecipe> MAP_CODEC = MapCodec.unit(INSTANCE);
+    public static final StreamCodec<RegistryFriendlyByteBuf, ToolboxDyeingRecipe> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final RecipeSerializer<ToolboxDyeingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     @Override
     public boolean matches(CraftingInput input, Level level) {

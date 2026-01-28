@@ -12,7 +12,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput> {
@@ -38,32 +37,30 @@ public interface ItemApplicationRecipe extends CreateRecipe<ItemApplicationInput
         return result().create();
     }
 
-    record Serializer<T extends ItemApplicationRecipe>(
-        MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec
-    ) implements RecipeSerializer<T> {
-        public Serializer(Factory<T> factory) {
-            this(
-                RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(ItemApplicationRecipe::result),
-                    Codec.BOOL.optionalFieldOf("keep_held_item", false).forGetter(ItemApplicationRecipe::keepHeldItem),
-                    Ingredient.CODEC.fieldOf("target").forGetter(ItemApplicationRecipe::target),
-                    Ingredient.CODEC.fieldOf("ingredient").forGetter(ItemApplicationRecipe::ingredient)
-                ).apply(instance, factory::create)), StreamCodec.composite(
-                    ItemStackTemplate.STREAM_CODEC,
-                    ItemApplicationRecipe::result,
-                    ByteBufCodecs.BOOL,
-                    ItemApplicationRecipe::keepHeldItem,
-                    Ingredient.CONTENTS_STREAM_CODEC,
-                    ItemApplicationRecipe::target,
-                    Ingredient.CONTENTS_STREAM_CODEC,
-                    ItemApplicationRecipe::ingredient,
-                    factory::create
-                )
-            );
-        }
+    static <T extends ItemApplicationRecipe> MapCodec<T> createCodec(ItemApplicationRecipeFactory<T> factory) {
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ItemStackTemplate.CODEC.fieldOf("result").forGetter(ItemApplicationRecipe::result),
+            Codec.BOOL.optionalFieldOf("keep_held_item", false).forGetter(ItemApplicationRecipe::keepHeldItem),
+            Ingredient.CODEC.fieldOf("target").forGetter(ItemApplicationRecipe::target),
+            Ingredient.CODEC.fieldOf("ingredient").forGetter(ItemApplicationRecipe::ingredient)
+        ).apply(instance, factory::create));
+    }
 
-        public interface Factory<T extends ItemApplicationRecipe> {
-            T create(ItemStackTemplate result, boolean keepHeldItem, Ingredient block, Ingredient item);
-        }
+    static <T extends ItemApplicationRecipe> StreamCodec<RegistryFriendlyByteBuf, T> createStreamCodec(ItemApplicationRecipeFactory<T> factory) {
+        return StreamCodec.composite(
+            ItemStackTemplate.STREAM_CODEC,
+            ItemApplicationRecipe::result,
+            ByteBufCodecs.BOOL,
+            ItemApplicationRecipe::keepHeldItem,
+            Ingredient.CONTENTS_STREAM_CODEC,
+            ItemApplicationRecipe::target,
+            Ingredient.CONTENTS_STREAM_CODEC,
+            ItemApplicationRecipe::ingredient,
+            factory::create
+        );
+    }
+
+    interface ItemApplicationRecipeFactory<T extends ItemApplicationRecipe> {
+        T create(ItemStackTemplate result, boolean keepHeldItem, Ingredient block, Ingredient item);
     }
 }

@@ -31,6 +31,35 @@ public record MixingRecipe(
     Optional<ItemStackTemplate> result, FluidStack fluidResult, HeatCondition heat, List<FluidIngredient> fluidIngredients,
     List<SizedIngredient> ingredients
 ) implements BasinRecipe {
+    public static final MapCodec<MixingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec((Instance<MixingRecipe> instance) -> instance.group(
+        ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(MixingRecipe::result),
+        FluidStack.CODEC.optionalFieldOf("fluid_result", FluidStack.EMPTY).forGetter(MixingRecipe::fluidResult),
+        HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(MixingRecipe::heat),
+        FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
+        SizedIngredient.getListCodec(1, 4).optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
+    ).apply(instance, MixingRecipe::new)).validate(recipe -> {
+        if (recipe.result.isEmpty() && recipe.fluidResult.isEmpty()) {
+            return DataResult.error(() -> "MixingRecipe must have a result or a fluid result");
+        } else if (recipe.fluidIngredients.isEmpty() && recipe.ingredients.isEmpty()) {
+            return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
+        }
+        return DataResult.success(recipe);
+    });
+    private static final StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> STREAM_CODEC = StreamCodec.composite(
+        ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs::optional),
+        MixingRecipe::result,
+        FluidStack.OPTIONAL_PACKET_CODEC,
+        MixingRecipe::fluidResult,
+        HeatCondition.PACKET_CODEC,
+        MixingRecipe::heat,
+        FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
+        MixingRecipe::fluidIngredients,
+        SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
+        MixingRecipe::ingredients,
+        MixingRecipe::new
+    );
+    public static final RecipeSerializer<MixingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
     @Override
     public int getIngredientSize() {
         return fluidIngredients.size() + ingredients().size();
@@ -111,45 +140,5 @@ public record MixingRecipe(
     @Override
     public RecipeType<MixingRecipe> getType() {
         return AllRecipeTypes.MIXING;
-    }
-
-    public static class Serializer implements RecipeSerializer<MixingRecipe> {
-        public static final MapCodec<MixingRecipe> CODEC = RecordCodecBuilder.mapCodec((Instance<MixingRecipe> instance) -> instance.group(
-            ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(MixingRecipe::result),
-            FluidStack.CODEC.optionalFieldOf("fluid_result", FluidStack.EMPTY).forGetter(MixingRecipe::fluidResult),
-            HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(MixingRecipe::heat),
-            FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
-            SizedIngredient.getListCodec(1, 4).optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
-        ).apply(instance, MixingRecipe::new)).validate(recipe -> {
-            if (recipe.result.isEmpty() && recipe.fluidResult.isEmpty()) {
-                return DataResult.error(() -> "MixingRecipe must have a result or a fluid result");
-            } else if (recipe.fluidIngredients.isEmpty() && recipe.ingredients.isEmpty()) {
-                return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
-            }
-            return DataResult.success(recipe);
-        });
-        private static final StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs::optional),
-            MixingRecipe::result,
-            FluidStack.OPTIONAL_PACKET_CODEC,
-            MixingRecipe::fluidResult,
-            HeatCondition.PACKET_CODEC,
-            MixingRecipe::heat,
-            FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
-            MixingRecipe::fluidIngredients,
-            SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
-            MixingRecipe::ingredients,
-            MixingRecipe::new
-        );
-
-        @Override
-        public MapCodec<MixingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
     }
 }

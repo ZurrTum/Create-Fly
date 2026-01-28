@@ -15,6 +15,22 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
 public record CuttingRecipe(int time, ItemStackTemplate result, Ingredient ingredient) implements CreateSingleStackRecipe {
+    public static final MapCodec<CuttingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        Codec.INT.fieldOf("processing_time").forGetter(CuttingRecipe::time),
+        ItemStackTemplate.CODEC.fieldOf("result").forGetter(CuttingRecipe::result),
+        Ingredient.CODEC.fieldOf("ingredient").forGetter(CuttingRecipe::ingredient)
+    ).apply(instance, CuttingRecipe::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
+        CuttingRecipe::time,
+        ItemStackTemplate.STREAM_CODEC,
+        CuttingRecipe::result,
+        Ingredient.CONTENTS_STREAM_CODEC,
+        CuttingRecipe::ingredient,
+        CuttingRecipe::new
+    );
+    public static final RecipeSerializer<CuttingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
     @Override
     public RecipeSerializer<CuttingRecipe> getSerializer() {
         return AllRecipeSerializers.CUTTING;
@@ -23,33 +39,5 @@ public record CuttingRecipe(int time, ItemStackTemplate result, Ingredient ingre
     @Override
     public RecipeType<CuttingRecipe> getType() {
         return AllRecipeTypes.CUTTING;
-    }
-
-    public static class Serializer implements RecipeSerializer<CuttingRecipe> {
-        public static final MapCodec<CuttingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.INT.fieldOf("processing_time").forGetter(CuttingRecipe::time),
-            ItemStackTemplate.CODEC.fieldOf("result").forGetter(CuttingRecipe::result),
-            Ingredient.CODEC.fieldOf("ingredient").forGetter(CuttingRecipe::ingredient)
-        ).apply(instance, CuttingRecipe::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT,
-            CuttingRecipe::time,
-            ItemStackTemplate.STREAM_CODEC,
-            CuttingRecipe::result,
-            Ingredient.CONTENTS_STREAM_CODEC,
-            CuttingRecipe::ingredient,
-            CuttingRecipe::new
-        );
-
-        @Override
-        public MapCodec<CuttingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
     }
 }

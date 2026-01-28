@@ -39,6 +39,21 @@ import java.util.*;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, Ingredient ingredient) implements BasinRecipe {
+    public static final MapCodec<PotionRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec((RecordCodecBuilder.Instance<PotionRecipe> instance) -> instance.group(
+        FluidStack.CODEC.fieldOf("result").forGetter(PotionRecipe::result),
+        FluidIngredient.CODEC.fieldOf("fluid_ingredient").forGetter(PotionRecipe::fluidIngredient),
+        Ingredient.CODEC.fieldOf("ingredient").forGetter(PotionRecipe::ingredient)
+    ).apply(instance, PotionRecipe::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, PotionRecipe> STREAM_CODEC = StreamCodec.composite(
+        FluidStack.PACKET_CODEC,
+        PotionRecipe::result,
+        FluidIngredient.PACKET_CODEC,
+        PotionRecipe::fluidIngredient,
+        Ingredient.CONTENTS_STREAM_CODEC,
+        PotionRecipe::ingredient,
+        PotionRecipe::new
+    );
+    public static final RecipeSerializer<PotionRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
     public static @Nullable ReloadData data;
 
     public static void register(Map<Identifier, Recipe<?>> map) {
@@ -161,32 +176,5 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     public record ReloadData(
         HolderLookup.Provider registries, FeatureFlagSet enabledFeatures
     ) {
-    }
-
-    public static class Serializer implements RecipeSerializer<PotionRecipe> {
-        public static final MapCodec<PotionRecipe> CODEC = RecordCodecBuilder.mapCodec((RecordCodecBuilder.Instance<PotionRecipe> instance) -> instance.group(
-            FluidStack.CODEC.fieldOf("result").forGetter(PotionRecipe::result),
-            FluidIngredient.CODEC.fieldOf("fluid_ingredient").forGetter(PotionRecipe::fluidIngredient),
-            Ingredient.CODEC.fieldOf("ingredient").forGetter(PotionRecipe::ingredient)
-        ).apply(instance, PotionRecipe::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, PotionRecipe> PACKET_CODEC = StreamCodec.composite(
-            FluidStack.PACKET_CODEC,
-            PotionRecipe::result,
-            FluidIngredient.PACKET_CODEC,
-            PotionRecipe::fluidIngredient,
-            Ingredient.CONTENTS_STREAM_CODEC,
-            PotionRecipe::ingredient,
-            PotionRecipe::new
-        );
-
-        @Override
-        public MapCodec<PotionRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, PotionRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
     }
 }

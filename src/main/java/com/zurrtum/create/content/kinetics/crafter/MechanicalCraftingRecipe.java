@@ -22,6 +22,30 @@ import java.util.Optional;
 public record MechanicalCraftingRecipe(
     ShapedRecipePattern raw, ItemStackTemplate result, boolean symmetrical
 ) implements CreateRecipe<CraftingInput> {
+    public static final MapCodec<ShapedRecipePattern.Data> DATA_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ExtraCodecs.strictUnboundedMap(Codec.STRING.xmap(key -> key.charAt(0), String::valueOf), Ingredient.CODEC).fieldOf("key")
+            .forGetter(ShapedRecipePattern.Data::key), Codec.STRING.listOf().fieldOf("pattern").forGetter(ShapedRecipePattern.Data::pattern)
+    ).apply(instance, ShapedRecipePattern.Data::new));
+    public static final MapCodec<ShapedRecipePattern> RAW_CODEC = DATA_CODEC.flatXmap(
+        ShapedRecipePattern::unpack,
+        recipe -> recipe.data.map(DataResult::success).orElseGet(() -> DataResult.error(() -> "Cannot encode unpacked recipe"))
+    );
+    public static final MapCodec<MechanicalCraftingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        RAW_CODEC.forGetter(MechanicalCraftingRecipe::raw),
+        ItemStackTemplate.CODEC.fieldOf("result").forGetter(MechanicalCraftingRecipe::result),
+        Codec.BOOL.optionalFieldOf("accept_mirrored", false).forGetter(MechanicalCraftingRecipe::symmetrical)
+    ).apply(instance, MechanicalCraftingRecipe::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, MechanicalCraftingRecipe> STREAM_CODEC = StreamCodec.composite(
+        ShapedRecipePattern.STREAM_CODEC,
+        MechanicalCraftingRecipe::raw,
+        ItemStackTemplate.STREAM_CODEC,
+        MechanicalCraftingRecipe::result,
+        ByteBufCodecs.BOOL,
+        MechanicalCraftingRecipe::symmetrical,
+        MechanicalCraftingRecipe::new
+    );
+    public static final RecipeSerializer<MechanicalCraftingRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
     @Override
     public boolean matches(CraftingInput input, Level worldIn) {
         if (symmetrical)
@@ -65,42 +89,5 @@ public record MechanicalCraftingRecipe(
     @Override
     public RecipeSerializer<MechanicalCraftingRecipe> getSerializer() {
         return AllRecipeSerializers.MECHANICAL_CRAFTING;
-    }
-
-    public static class Serializer implements RecipeSerializer<MechanicalCraftingRecipe> {
-        public static final MapCodec<ShapedRecipePattern.Data> DATA_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ExtraCodecs.strictUnboundedMap(Codec.STRING.xmap(key -> key.charAt(0), String::valueOf), Ingredient.CODEC).fieldOf("key")
-                .forGetter(ShapedRecipePattern.Data::key),
-            Codec.STRING.listOf().fieldOf("pattern").forGetter(ShapedRecipePattern.Data::pattern)
-        ).apply(instance, ShapedRecipePattern.Data::new));
-        public static final MapCodec<ShapedRecipePattern> RAW_CODEC = DATA_CODEC.flatXmap(
-            ShapedRecipePattern::unpack,
-            recipe -> recipe.data.map(DataResult::success).orElseGet(() -> DataResult.error(() -> "Cannot encode unpacked recipe"))
-        );
-        public static final MapCodec<MechanicalCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            RAW_CODEC.forGetter(MechanicalCraftingRecipe::raw),
-            ItemStackTemplate.CODEC.fieldOf("result").forGetter(MechanicalCraftingRecipe::result),
-            Codec.BOOL.optionalFieldOf("accept_mirrored", false).forGetter(MechanicalCraftingRecipe::symmetrical)
-        ).apply(instance, MechanicalCraftingRecipe::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, MechanicalCraftingRecipe> PACKET_CODEC = StreamCodec.composite(
-            ShapedRecipePattern.STREAM_CODEC,
-            MechanicalCraftingRecipe::raw,
-            ItemStackTemplate.STREAM_CODEC,
-            MechanicalCraftingRecipe::result,
-            ByteBufCodecs.BOOL,
-            MechanicalCraftingRecipe::symmetrical,
-            MechanicalCraftingRecipe::new
-        );
-
-        @Override
-        public MapCodec<MechanicalCraftingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, MechanicalCraftingRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
     }
 }
