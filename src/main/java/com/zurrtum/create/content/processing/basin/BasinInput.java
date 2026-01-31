@@ -4,6 +4,7 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -11,10 +12,10 @@ import net.minecraft.world.item.crafting.RecipeInput;
 import java.util.List;
 
 public record BasinInput(
-    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items, BasinBlockEntity blockEntity
+    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items, RandomSource random, BasinBlockEntity blockEntity
 ) implements RecipeInput {
     public BasinInput(BasinBlockEntity basin) {
-        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin);
+        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin.getLevel().getRandom(), basin);
     }
 
     public boolean acceptOutputs(List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {

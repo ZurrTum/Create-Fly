@@ -47,7 +47,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
     public interface PressingBehaviourSpecifics {
         boolean tryProcessInBasin(boolean simulate);
 
-        boolean tryProcessOnBelt(TransportedItemStack input, @Nullable List<ItemStack> outputList, boolean simulate);
+        boolean tryProcessOnBelt(TransportedItemStack input, @Nullable List<ItemStack> outputList);
 
         boolean tryProcessInWorld(ItemEntity itemEntity, boolean simulate);
 

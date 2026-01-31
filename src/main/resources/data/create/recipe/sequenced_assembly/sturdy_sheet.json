@@ -21,12 +21,12 @@
     {
       "type": "create:pressing",
       "ingredient": "$ingredient",
-      "result": "$result"
+      "results": ["$result"]
     },
     {
       "type": "create:pressing",
       "ingredient": "$ingredient",
-      "result": "$result"
+      "results": ["$result"]
     }
   ]
 }

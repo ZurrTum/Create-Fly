@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:waxed_weathered_copper_lantern",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:weathered_copper_lantern"
-  }
+  "results": [
+    {
+      "id": "minecraft:weathered_copper_lantern"
+    }
+  ]
 }

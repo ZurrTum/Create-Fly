@@ -3,7 +3,7 @@ package com.zurrtum.create.compat.eiv.display;
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
@@ -29,7 +29,7 @@ public class CrushingDisplay extends CreateDisplay {
         int size = recipe.results().size();
         results = new ArrayList<>(size);
         chances = new ArrayList<>(size);
-        for (ChanceOutput output : recipe.results()) {
+        for (ProcessingOutput output : recipe.results()) {
             results.add(output.stack());
             chances.add(output.chance());
         }

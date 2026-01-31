@@ -18,7 +18,7 @@ import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import mezz.jei.api.fabric.constants.FabricTypes;
@@ -112,7 +112,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SequencedAssemblyRecipe> entry, IFocusGroup focuses) {
         SequencedAssemblyRecipe recipe = entry.value();
-        ChanceOutput chanceOutput = recipe.result();
+        ProcessingOutput chanceOutput = recipe.result();
         boolean randomOutput = chanceOutput.chance() != 1;
         int xOffset = randomOutput ? -7 : 0;
         builder.addInputSlot(xOffset + 22, 91).setBackground(SLOT, -1, -1).add(recipe.ingredient());
@@ -146,7 +146,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
         double mouseY
     ) {
         SequencedAssemblyRecipe recipe = entry.value();
-        ChanceOutput chanceOutput = recipe.result();
+        ProcessingOutput chanceOutput = recipe.result();
         boolean randomOutput = chanceOutput.chance() != 1;
         int xOffset = randomOutput ? -7 : 0;
         List<Recipe<?>> recipes = recipe.sequence();

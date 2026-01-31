@@ -1,14 +1,14 @@
 package com.zurrtum.create.client.compat.jei.widget;
 
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotRichTooltipCallback;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import net.minecraft.ChatFormatting;
 
 public record ChanceTooltip(float chance) implements IRecipeSlotRichTooltipCallback {
-    public ChanceTooltip(ChanceOutput output) {
+    public ChanceTooltip(ProcessingOutput output) {
         this(output.chance());
     }
 

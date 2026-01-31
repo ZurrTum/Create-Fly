@@ -3,15 +3,12 @@ package com.zurrtum.create.content.fluids.transfer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
-import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -46,9 +43,9 @@ public record FillingRecipe(ItemStackTemplate result, Ingredient ingredient, Flu
 
     @Override
     public ItemStack assemble(FillingInput input) {
-        SequencedAssemblyJunk junk = input.item().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
-        if (junk != null && junk.hasJunk()) {
-            return junk.getJunk();
+        ItemStack junk = CreateRecipe.getJunk(input.item());
+        if (junk != null) {
+            return junk;
         }
         return result.create();
     }
@@ -64,7 +61,7 @@ public record FillingRecipe(ItemStackTemplate result, Ingredient ingredient, Flu
     }
 
     public static Component getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
-        return FluidIngredient.CODEC.parse(JsonOps.INSTANCE, object.get("fluid_ingredient")).result()
+        return FluidIngredient.CODEC.parse(ops, object.get("fluid_ingredient")).result()
             .flatMap(fluidIngredient -> fluidIngredient.getMatchingFluidStacks().stream().findFirst())
             .map(stack -> Component.translatable("create.recipe.assembly.spout_filling_fluid", stack.getName().getString()))
             .orElseGet(() -> Component.literal("Invalid"));

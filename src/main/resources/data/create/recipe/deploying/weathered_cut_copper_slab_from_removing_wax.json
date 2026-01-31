@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:waxed_weathered_cut_copper_slab",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:weathered_cut_copper_slab"
-  }
+  "results": [
+    {
+      "id": "minecraft:weathered_cut_copper_slab"
+    }
+  ]
 }

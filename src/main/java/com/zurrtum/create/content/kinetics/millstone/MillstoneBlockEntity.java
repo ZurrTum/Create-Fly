@@ -126,14 +126,18 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements Clearabl
         }
 
         ItemStackTemplate recipeRemainder = stack.getItem().getCraftingRemainder();
-        stack.shrink(1);
-        capability.setItem(0, stack);
-        capability.outputAllowInsertion();
-        List<ItemStack> list = lastRecipe.assemble(input, level.getRandom());
-        if (recipeRemainder != null) {
-            list.add(recipeRemainder.create());
+        int count = stack.getCount();
+        if (count == 1) {
+            capability.setItem(0, ItemStack.EMPTY);
+        } else {
+            stack.setCount(count - 1);
+            capability.setItem(0, stack);
         }
-        capability.insert(list);
+        capability.outputAllowInsertion();
+        capability.insert(lastRecipe.assemble(input, level.getRandom()));
+        if (recipeRemainder != null) {
+            capability.insert(recipeRemainder.create());
+        }
         capability.outputForbidInsertion();
 
         award(AllAdvancements.MILLSTONE);

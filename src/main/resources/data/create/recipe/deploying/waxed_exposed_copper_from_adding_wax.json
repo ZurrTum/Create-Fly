@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:exposed_copper",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "minecraft:waxed_exposed_copper"
-  }
+  "results": [
+    {
+      "id": "minecraft:waxed_exposed_copper"
+    }
+  ]
 }

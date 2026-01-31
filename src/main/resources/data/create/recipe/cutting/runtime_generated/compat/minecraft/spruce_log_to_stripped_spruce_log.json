@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:stripped_spruce_log",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:stripped_spruce_log"
+    }
+  ],
   "ingredient": "minecraft:spruce_log",
   "type": "create:cutting"
 }

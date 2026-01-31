@@ -14,7 +14,10 @@ import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
+import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
+import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,6 +40,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -303,25 +307,36 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
         if (pair == null)
             return;
 
-        inventory.remainingTime = 0;
-        inventory.recipeDuration = 0;
-        inventory.appliedRecipe = false;
-        inventory.setItem(0, ItemStack.EMPTY);
-        ItemStack output = pair.getSecond();
-        if (output == null) {
-            output = pair.getFirst().assemble(input);
-        }
-        List<ItemStack> list;
-        ItemStackTemplate recipeRemainder = stack.getItem().getCraftingRemainder();
-        if (recipeRemainder == null) {
-            list = ItemHelper.multipliedOutput(output, stack.getCount());
-        } else {
-            list = ItemHelper.multipliedOutput(List.of(output, recipeRemainder.create()), stack.getCount());
-        }
-        for (int slot = 1, listSize = list.size(), invSize = inventory.getContainerSize(); slot < invSize; slot++) {
-            inventory.setItem(slot, slot <= listSize ? list.get(slot - 1) : ItemStack.EMPTY);
+        inventory.clearContent();
+        List<ItemStack> list = getResults(level, input, stack, pair);
+        int i = 1;
+        for (ItemStack result : list) {
+            inventory.setItem(i++, result);
         }
         award(AllAdvancements.SAW_PROCESSING);
+    }
+
+    private static List<ItemStack> getResults(
+        Level level,
+        SingleRecipeInput input,
+        ItemStack stack,
+        Pair<Recipe<SingleRecipeInput>, @Nullable ItemStack> pair
+    ) {
+        int rolls = stack.getCount();
+        ItemStackTemplate recipeRemainder = stack.getItem().getCraftingRemainder();
+        ItemStack output = pair.getSecond();
+        if (output == null) {
+            Recipe<SingleRecipeInput> recipe = pair.getFirst();
+            if (recipe instanceof CreateSingleStackRollableRecipe rollableRecipe) {
+                return RecipeApplier.applyRecipeOn(level.getRandom(), rolls, input, rollableRecipe);
+            } else {
+                output = recipe.assemble(input);
+            }
+        }
+        if (recipeRemainder == null) {
+            return ItemHelper.multipliedOutput(output, rolls);
+        }
+        return ItemHelper.multipliedOutput(List.of(output, recipeRemainder.create()), rolls);
     }
 
     private static boolean matchCuttingRecipe(RecipeHolder<? extends Recipe<?>> entry) {
@@ -364,9 +379,15 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
             for (RecipeHolder<? extends Recipe<?>> entry : startedSearch) {
                 Recipe<SingleRecipeInput> recipe = (Recipe<SingleRecipeInput>) entry.value();
                 if (recipe.matches(input, level)) {
-                    ItemStack output = recipe.assemble(input);
-                    if (filtering.test(output)) {
-                        return Pair.of(recipe, output);
+                    if (recipe instanceof CreateSingleStackRollableRecipe rollableRecipe) {
+                        if (filtering.test(rollableRecipe.results().getFirst().create())) {
+                            return Pair.of(recipe, null);
+                        }
+                    } else {
+                        ItemStack output = recipe.assemble(input);
+                        if (filtering.test(output)) {
+                            return Pair.of(recipe, output);
+                        }
                     }
                 }
             }
@@ -417,8 +438,8 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
             return;
         }
 
-        if (pair.getFirst() instanceof CuttingRecipe cuttingRecipe) {
-            time = cuttingRecipe.time();
+        if (pair.getFirst() instanceof TimedRecipe recipe) {
+            time = recipe.time();
         }
 
         inventory.remainingTime = time * Math.max(1, (inserted.getCount() / 5));

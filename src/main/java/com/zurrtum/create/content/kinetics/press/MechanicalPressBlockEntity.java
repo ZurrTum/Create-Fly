@@ -19,6 +19,7 @@ import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -120,15 +121,16 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
         ItemStack itemCreated = ItemStack.EMPTY;
         pressingBehaviour.particleItems.add(item);
         if (canProcessInBulk() || item.getCount() == 1) {
-            RecipeApplier.applyCreateRecipeOn(itemEntity, input, recipe.get().value(), true);
+            RecipeApplier.applyRecipeOn(itemEntity, input, recipe.get().value());
             itemCreated = itemEntity.getItem().copy();
         } else {
-            for (ItemStack result : RecipeApplier.applyCreateRecipeOn(level, 1, input, recipe.get().value(), true)) {
+            RandomSource random = level.getRandom();
+            for (ItemStack result : RecipeApplier.applyRecipeOn(random, 1, input, recipe.get().value())) {
                 if (itemCreated.isEmpty())
                     itemCreated = result.copy();
                 ItemEntity created = new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), result);
                 created.setDefaultPickUpDelay();
-                created.setDeltaMovement(VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .05f));
+                created.setDeltaMovement(VecHelper.offsetRandomly(Vec3.ZERO, random, .05f));
                 level.addFreshEntity(created);
             }
             item.shrink(1);
@@ -140,20 +142,19 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
     }
 
     @Override
-    public boolean tryProcessOnBelt(TransportedItemStack input, @Nullable List<ItemStack> outputList, boolean simulate) {
+    public boolean tryProcessOnBelt(TransportedItemStack input, @Nullable List<ItemStack> outputList) {
         SingleRecipeInput recipeInput = new SingleRecipeInput(input.stack);
         Optional<RecipeHolder<PressingRecipe>> recipe = getRecipe(recipeInput);
         if (recipe.isEmpty())
             return false;
-        if (simulate)
+        if (outputList == null)
             return true;
         pressingBehaviour.particleItems.add(input.stack);
-        List<ItemStack> outputs = RecipeApplier.applyCreateRecipeOn(
-            level,
+        List<ItemStack> outputs = RecipeApplier.applyRecipeOn(
+            level.getRandom(),
             canProcessInBulk() ? input.stack.getCount() : 1,
             recipeInput,
-            recipe.get().value(),
-            true
+            recipe.get().value()
         );
 
         for (ItemStack created : outputs) {

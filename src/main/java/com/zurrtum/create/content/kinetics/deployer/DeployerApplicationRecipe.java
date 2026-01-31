@@ -6,17 +6,19 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.foundation.recipe.IngredientText;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
+import java.util.List;
+
 public record DeployerApplicationRecipe(
-    ItemStackTemplate result, boolean keepHeldItem, Ingredient target, Ingredient ingredient
+    List<ProcessingOutput> results, boolean keepHeldItem, Ingredient target, Ingredient ingredient
 ) implements ItemApplicationRecipe {
     public static final MapCodec<DeployerApplicationRecipe> MAP_CODEC = ItemApplicationRecipe.createCodec(DeployerApplicationRecipe::new);
     public static final StreamCodec<RegistryFriendlyByteBuf, DeployerApplicationRecipe> STREAM_CODEC = ItemApplicationRecipe.createStreamCodec(

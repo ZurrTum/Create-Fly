@@ -3,6 +3,7 @@ package com.zurrtum.create.content.processing.basin;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.recipe.CreateRecipe;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
@@ -17,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-public interface BasinRecipe extends Recipe<BasinInput> {
+public interface BasinRecipe extends CreateRecipe<BasinInput> {
     Map<ShapelessRecipe, List<SizedIngredient>> SHAPELESS_CACHE = new IdentityHashMap<>();
     Map<ShapedRecipe, List<SizedIngredient>> SHAPED_CACHE = new IdentityHashMap<>();
 
@@ -646,31 +647,6 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     List<FluidIngredient> getFluidIngredients();
 
     boolean apply(BasinInput input);
-
-    @Override
-    default PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
-    }
-
-    @Override
-    default RecipeBookCategory recipeBookCategory() {
-        return null;
-    }
-
-    @Override
-    default String group() {
-        return "";
-    }
-
-    @Override
-    default boolean showNotification() {
-        return true;
-    }
-
-    @Override
-    default boolean isSpecial() {
-        return true;
-    }
 
     @Override
     default ItemStack assemble(BasinInput input) {

@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:birch_door",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:birch_door"
+    }
+  ],
   "ingredient": "minecraft:birch_planks",
   "type": "create:cutting"
 }

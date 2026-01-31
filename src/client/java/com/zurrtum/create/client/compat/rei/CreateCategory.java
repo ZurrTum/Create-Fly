@@ -3,7 +3,7 @@ package com.zurrtum.create.client.compat.rei;
 import com.zurrtum.create.client.compat.rei.renderer.ChanceItemRenderer;
 import com.zurrtum.create.client.compat.rei.renderer.FluidStackRenderer;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -76,7 +76,7 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
         return ingredient;
     }
 
-    public static EntryIngredient getRenderEntryStack(ChanceOutput output) {
+    public static EntryIngredient getRenderEntryStack(ProcessingOutput output) {
         float chance = output.chance();
         if (chance == 1) {
             return EntryIngredients.of(output.stack());
@@ -119,7 +119,7 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
     }
 
     public static void addOutputData(
-        ChanceOutput output,
+        ProcessingOutput output,
         int x,
         int y,
         List<Point> outputs,

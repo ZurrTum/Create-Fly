@@ -12,11 +12,13 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.State;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
+import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -26,6 +28,7 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING;
@@ -96,24 +99,38 @@ public class BeltDeployerCallbacks {
         Recipe<?> recipe
     ) {
         Level world = blockEntity.getLevel();
-        TransportedItemStack result = null;
-        ItemStack resultItem = null;
-        boolean keepHeld = false;
+        List<TransportedItemStack> collect;
         ServerPlayer player = blockEntity.player.cast();
         ItemStack heldItem = player.getMainHandItem();
+        boolean keepHeld;
         if (recipe instanceof SandPaperPolishingRecipe polishingRecipe) {
-            resultItem = polishingRecipe.assemble(new SingleRecipeInput(transported.stack));
+            ItemStack result = polishingRecipe.assemble(new SingleRecipeInput(transported.stack));
+            TransportedItemStack copy = transported.copy();
+            copy.stack = result;
+            copy.angle = BeltHelper.isItemUpright(result) ? 180 : world.getRandom().nextInt(360);
+            copy.locked = false;
+            collect = List.of(copy);
+            keepHeld = false;
         } else if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {
-            resultItem = itemApplicationRecipe.assemble(new ItemApplicationInput(transported.stack, heldItem));
+            RandomSource random = world.getRandom();
+            List<ItemStack> results = RecipeApplier.applyRecipeOn(
+                random,
+                1,
+                new ItemApplicationInput(transported.stack, heldItem),
+                itemApplicationRecipe
+            );
+            collect = new ArrayList<>(results.size());
+            for (ItemStack result : results) {
+                TransportedItemStack copy = transported.copy();
+                copy.stack = result;
+                copy.angle = BeltHelper.isItemUpright(result) ? 180 : random.nextInt(360);
+                copy.locked = false;
+                collect.add(copy);
+            }
             keepHeld = itemApplicationRecipe.keepHeldItem();
-        }
-        if (resultItem != null && !resultItem.isEmpty()) {
-            result = transported.copy();
-            boolean centered = BeltHelper.isItemUpright(resultItem);
-            result.stack = resultItem;
-            result.locked = true;
-            result.angle = centered ? 180 : world.getRandom().nextInt(360);
-            result.locked = false;
+        } else {
+            collect = List.of();
+            keepHeld = false;
         }
 
         blockEntity.award(AllAdvancements.DEPLOYER);
@@ -124,11 +141,13 @@ public class BeltDeployerCallbacks {
         blockEntity.player.setSpawnedItemEffects(transported.stack.copy());
         left.stack.shrink(1);
 
-        if (result == null) {
+        ItemStack resultItem;
+        if (collect.isEmpty()) {
             resultItem = left.stack.copy();
             handler.handleProcessingOnItem(transported, TransportedResult.convertTo(left));
         } else {
-            handler.handleProcessingOnItem(transported, TransportedResult.convertToAndLeaveHeld(List.of(result), left));
+            resultItem = collect.getFirst().stack;
+            handler.handleProcessingOnItem(transported, TransportedResult.convertToAndLeaveHeld(collect, left));
         }
 
         if (!keepHeld) {

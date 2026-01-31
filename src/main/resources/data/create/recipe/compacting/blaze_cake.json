@@ -1,7 +1,9 @@
 {
   "type": "create:compacting",
   "ingredients": ["#c:eggs", "minecraft:sugar", "create:cinder_flour"],
-  "result": {
-    "id": "create:blaze_cake_base"
-  }
+  "results": [
+    {
+      "id": "create:blaze_cake_base"
+    }
+  ]
 }

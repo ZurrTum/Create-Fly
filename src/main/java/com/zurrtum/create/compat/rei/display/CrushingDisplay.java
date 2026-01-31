@@ -4,7 +4,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.crusher.CrushingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -21,16 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
+public record CrushingDisplay(EntryIngredient input, List<ProcessingOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<CrushingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(CrushingDisplay::input),
-            ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(CrushingDisplay::outputs),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(CrushingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(CrushingDisplay::location)
         ).apply(instance, CrushingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             CrushingDisplay::input,
-            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
+            ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
             CrushingDisplay::outputs,
             ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             CrushingDisplay::location,
@@ -66,7 +66,7 @@ public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs,
     @Override
     public List<EntryIngredient> getOutputEntries() {
         List<EntryIngredient> list = new ArrayList<>();
-        for (ChanceOutput output : outputs) {
+        for (ProcessingOutput output : outputs) {
             list.add(EntryIngredients.of(output.stack()));
         }
         return list;

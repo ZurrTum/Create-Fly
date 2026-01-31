@@ -3,7 +3,7 @@ package com.zurrtum.create.compat.rei.display;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -18,16 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
+public record FanWashingDisplay(EntryIngredient input, List<ProcessingOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanWashingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanWashingDisplay::input),
-            ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanWashingDisplay::outputs),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanWashingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(FanWashingDisplay::location)
         ).apply(instance, FanWashingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             FanWashingDisplay::input,
-            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
+            ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
             FanWashingDisplay::outputs,
             ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             FanWashingDisplay::location,
@@ -51,7 +51,7 @@ public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> output
     @Override
     public List<EntryIngredient> getOutputEntries() {
         List<EntryIngredient> list = new ArrayList<>();
-        for (ChanceOutput output : outputs) {
+        for (ProcessingOutput output : outputs) {
             list.add(EntryIngredients.of(output.stack()));
         }
         return list;

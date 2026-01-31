@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:jungle_fence",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:jungle_fence"
+    }
+  ],
   "ingredient": "minecraft:jungle_planks",
   "type": "create:cutting"
 }

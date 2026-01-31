@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:exposed_lightning_rod",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:lightning_rod"
-  }
+  "results": [
+    {
+      "id": "minecraft:lightning_rod"
+    }
+  ]
 }

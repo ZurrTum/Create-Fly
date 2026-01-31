@@ -9,7 +9,6 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -48,7 +47,7 @@ public class ItemHelper {
 
     public static List<ItemStack> multipliedOutput(ItemStack out, int count) {
         if (out.isEmpty()) {
-            return new ArrayList<>(0);
+            return new ArrayList<>();
         }
         int total = count * out.getCount();
         int max = out.getMaxStackSize();
@@ -73,12 +72,12 @@ public class ItemHelper {
 
     public static List<ItemStack> multipliedOutput(List<ItemStack> out, int count) {
         if (out.isEmpty()) {
-            return new ArrayList<>(0);
+            return new ArrayList<>();
         }
         List<ItemStack> stacks = new ArrayList<>();
         for (ItemStack stack : out) {
             int total = count * stack.getCount();
-            int max = stack.getOrDefault(DataComponents.MAX_STACK_SIZE, 64);
+            int max = stack.getMaxStackSize();
             int size = total / max;
             stacks.add(stack);
             if (size != 0) {

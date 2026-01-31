@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:crimson_planks",
-    "count": 6
-  },
+  "results": [
+    {
+      "id": "minecraft:crimson_planks",
+      "count": 6
+    }
+  ],
   "ingredient": "minecraft:stripped_crimson_hyphae",
   "type": "create:cutting"
 }

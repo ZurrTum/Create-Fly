@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:waxed_oxidized_copper_door",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:oxidized_copper_door"
-  }
+  "results": [
+    {
+      "id": "minecraft:oxidized_copper_door"
+    }
+  ]
 }

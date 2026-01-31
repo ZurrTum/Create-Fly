@@ -9,7 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.CrushWheelRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -56,7 +56,7 @@ public class CrushingCategory extends CreateCategory<RecipeHolder<? extends Abst
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends AbstractCrushingRecipe> entry, IFocusGroup focuses) {
         AbstractCrushingRecipe recipe = entry.value();
         builder.addInputSlot(51, 3).setBackground(SLOT, -1, -1).add(recipe.ingredient());
-        List<ChanceOutput> results = recipe.results();
+        List<ProcessingOutput> results = recipe.results();
         for (int i = 0, size = results.size(), start = (179 - 19 * size) / 2 + 3; i < size; i++) {
             addChanceSlot(builder, start + i * 19, 83, results.get(i));
         }

@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:weathered_copper_chest",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:exposed_copper_chest"
-  }
+  "results": [
+    {
+      "id": "minecraft:exposed_copper_chest"
+    }
+  ]
 }

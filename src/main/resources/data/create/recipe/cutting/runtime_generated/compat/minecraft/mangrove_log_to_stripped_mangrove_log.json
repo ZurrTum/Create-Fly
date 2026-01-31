@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:stripped_mangrove_log",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:stripped_mangrove_log"
+    }
+  ],
   "ingredient": "minecraft:mangrove_log",
   "type": "create:cutting"
 }

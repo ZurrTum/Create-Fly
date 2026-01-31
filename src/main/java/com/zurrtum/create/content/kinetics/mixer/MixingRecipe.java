@@ -9,6 +9,7 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.processing.basin.BasinInput;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
@@ -17,7 +18,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -25,31 +25,34 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
-import java.util.Optional;
 
 public record MixingRecipe(
-    Optional<ItemStackTemplate> result, FluidStack fluidResult, HeatCondition heat, List<FluidIngredient> fluidIngredients,
+    List<ProcessingOutput> results, List<FluidStack> fluidResults, HeatCondition heat, List<FluidIngredient> fluidIngredients,
     List<SizedIngredient> ingredients
 ) implements BasinRecipe {
     public static final MapCodec<MixingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec((Instance<MixingRecipe> instance) -> instance.group(
-        ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(MixingRecipe::result),
-        FluidStack.CODEC.optionalFieldOf("fluid_result", FluidStack.EMPTY).forGetter(MixingRecipe::fluidResult),
+        ProcessingOutput.CODEC.listOf(1, 4).optionalFieldOf("results", List.of()).forGetter(MixingRecipe::results),
+        FluidStack.CODEC.listOf(1, 2).optionalFieldOf("fluid_results", List.of()).forGetter(MixingRecipe::fluidResults),
         HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(MixingRecipe::heat),
         FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
-        SizedIngredient.getListCodec(1, 4).optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
+        SizedIngredient.LIST_CODEC.optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
     ).apply(instance, MixingRecipe::new)).validate(recipe -> {
-        if (recipe.result.isEmpty() && recipe.fluidResult.isEmpty()) {
+        if (recipe.results.isEmpty() && recipe.fluidResults.isEmpty()) {
             return DataResult.error(() -> "MixingRecipe must have a result or a fluid result");
-        } else if (recipe.fluidIngredients.isEmpty() && recipe.ingredients.isEmpty()) {
+        }
+        if (recipe.fluidIngredients.isEmpty() && recipe.ingredients.isEmpty()) {
             return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
+        }
+        if (recipe.ingredients.size() > 9) {
+            return DataResult.error(() -> "Ingredients type is too many: " + recipe.ingredients.size() + ", expected range [0-9]");
         }
         return DataResult.success(recipe);
     });
     private static final StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> STREAM_CODEC = StreamCodec.composite(
-        ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs::optional),
-        MixingRecipe::result,
-        FluidStack.OPTIONAL_PACKET_CODEC,
-        MixingRecipe::fluidResult,
+        ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
+        MixingRecipe::results,
+        FluidStack.PACKET_CODEC.apply(ByteBufCodecs.list()),
+        MixingRecipe::fluidResults,
         HeatCondition.PACKET_CODEC,
         MixingRecipe::heat,
         FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
@@ -84,17 +87,12 @@ public record MixingRecipe(
         if (filter == null) {
             return false;
         }
-        ItemStack stack;
-        if (result.isEmpty()) {
-            if (!filter.test(fluidResult)) {
+        if (results.isEmpty()) {
+            if (!filter.test(fluidResults.getFirst())) {
                 return false;
             }
-            stack = null;
-        } else {
-            stack = result.get().create();
-            if (!filter.test(stack)) {
-                return false;
-            }
+        } else if (!filter.test(results.getFirst().create())) {
+            return false;
         }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
         if (outputs == null) {
@@ -103,11 +101,8 @@ public record MixingRecipe(
         if (!BasinRecipe.matchFluidIngredient(input, fluidIngredients)) {
             return false;
         }
-        if (stack != null) {
-            outputs.add(stack);
-        }
-        List<FluidStack> fluids = fluidResult.isEmpty() ? List.of() : List.of(fluidResult);
-        return input.acceptOutputs(outputs, fluids, true);
+        ProcessingOutput.rollOutput(input.random(), results, outputs::add);
+        return input.acceptOutputs(outputs, fluidResults, true);
     }
 
     @Override
@@ -123,13 +118,12 @@ public record MixingRecipe(
         if (!BasinRecipe.prepareFluidCraft(input, fluidIngredients, changes)) {
             return false;
         }
-        result.map(ItemStackTemplate::create).ifPresent(outputs::add);
-        List<FluidStack> fluids = fluidResult.isEmpty() ? List.of() : List.of(fluidResult);
-        if (!input.acceptOutputs(outputs, fluids, true)) {
+        ProcessingOutput.rollOutput(input.random(), results, outputs::add);
+        if (!input.acceptOutputs(outputs, fluidResults, true)) {
             return false;
         }
         changes.forEach(Runnable::run);
-        return input.acceptOutputs(outputs, fluids, false);
+        return input.acceptOutputs(outputs, fluidResults, false);
     }
 
     @Override

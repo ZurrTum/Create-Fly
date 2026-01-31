@@ -6,7 +6,7 @@ import com.zurrtum.create.client.compat.jei.renderer.SlotRenderer;
 import com.zurrtum.create.client.compat.jei.widget.ChanceTooltip;
 import com.zurrtum.create.client.compat.jei.widget.PotionTooltip;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
@@ -93,7 +93,7 @@ public abstract class CreateCategory<T> implements IRecipeCategory<T> {
         return slot.addRichTooltipCallback(POTION);
     }
 
-    public static void addChanceSlot(IRecipeLayoutBuilder builder, int x, int y, ChanceOutput output) {
+    public static void addChanceSlot(IRecipeLayoutBuilder builder, int x, int y, ProcessingOutput output) {
         IRecipeSlotBuilder slot = builder.addOutputSlot(x, y).add(output.stack());
         if (output.chance() == 1) {
             slot.setBackground(SLOT, -1, -1);

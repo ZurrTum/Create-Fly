@@ -8,7 +8,7 @@ import com.zurrtum.create.client.foundation.gui.render.FanRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.FanHauntingDisplay;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -47,7 +47,7 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
         List<EntryIngredient> outputIngredients = new ArrayList<>();
         List<Point> chances = new ArrayList<>();
         List<EntryIngredient> chanceIngredients = new ArrayList<>();
-        List<ChanceOutput> results = display.outputs();
+        List<ProcessingOutput> results = display.outputs();
         int outputSize = results.size();
         Point input;
         int xOffsetAmount = 1 - Math.min(3, outputSize);

@@ -11,7 +11,9 @@
     "minecraft:snow_block",
     "minecraft:snow_block"
   ],
-  "result": {
-    "id": "minecraft:ice"
-  }
+  "results": [
+    {
+      "id": "minecraft:ice"
+    }
+  ]
 }

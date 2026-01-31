@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:exposed_cut_copper_slab",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:cut_copper_slab"
-  }
+  "results": [
+    {
+      "id": "minecraft:cut_copper_slab"
+    }
+  ]
 }

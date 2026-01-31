@@ -9,7 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.FanRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -53,7 +53,7 @@ public class FanHauntingCategory extends CreateCategory<RecipeHolder<HauntingRec
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<HauntingRecipe> entry, IFocusGroup focuses) {
         HauntingRecipe recipe = entry.value();
-        List<ChanceOutput> results = recipe.results();
+        List<ProcessingOutput> results = recipe.results();
         int outputSize = results.size();
         if (outputSize == 1) {
             builder.addInputSlot(21, 48).setBackground(SLOT, -1, -1).add(recipe.ingredient());

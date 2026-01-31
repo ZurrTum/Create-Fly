@@ -3,7 +3,7 @@ package com.zurrtum.create.compat.eiv.display;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import net.minecraft.nbt.CompoundTag;
@@ -18,7 +18,7 @@ import java.util.List;
 public class SequencedAssemblyDisplay extends CreateDisplay {
     private static final Codec<List<Recipe<?>>> SEQUENCE_CODEC = Recipe.CODEC.listOf();
     public List<ItemStack> ingredient;
-    public ChanceOutput result;
+    public ProcessingOutput result;
     public int loops;
     public List<Recipe<?>> sequence;
 
@@ -38,7 +38,7 @@ public class SequencedAssemblyDisplay extends CreateDisplay {
     public void writeToTag(CompoundTag tag) {
         RegistryOps<Tag> ops = getServerOps();
         tag.store("ingredient", STACKS_CODEC, ops, ingredient);
-        tag.store("result", ChanceOutput.CODEC, ops, result);
+        tag.store("result", ProcessingOutput.CODEC, ops, result);
         tag.putInt("loops", loops);
         tag.store("sequence", SEQUENCE_CODEC, ops, sequence);
     }
@@ -47,7 +47,7 @@ public class SequencedAssemblyDisplay extends CreateDisplay {
     public void loadFromTag(CompoundTag tag) {
         RegistryOps<Tag> ops = getClientOps();
         ingredient = tag.read("ingredient", STACKS_CODEC, ops).orElseThrow();
-        result = tag.read("result", ChanceOutput.CODEC, ops).orElseThrow();
+        result = tag.read("result", ProcessingOutput.CODEC, ops).orElseThrow();
         loops = tag.getIntOr("loops", 1);
         sequence = tag.read("sequence", SEQUENCE_CODEC, ops).orElseThrow();
     }

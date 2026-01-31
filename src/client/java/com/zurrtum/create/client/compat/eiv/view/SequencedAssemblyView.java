@@ -16,7 +16,7 @@ import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu.AdditionalStackModifier;
@@ -80,7 +80,7 @@ public class SequencedAssemblyView extends CreateView {
     private final int loops;
 
     public SequencedAssemblyView(SequencedAssemblyDisplay display) {
-        ChanceOutput output = display.result;
+        ProcessingOutput output = display.result;
         result = SlotContent.of(output.stack());
         chance = output.chance();
         sequence = display.sequence;

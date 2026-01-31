@@ -8,7 +8,7 @@ import com.zurrtum.create.client.foundation.gui.render.CrushWheelRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.CrushingDisplay;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -46,9 +46,9 @@ public class CrushingCategory extends CreateCategory<CrushingDisplay> {
         List<EntryIngredient> outputIngredients = new ArrayList<>();
         List<Point> chances = new ArrayList<>();
         List<EntryIngredient> chanceIngredients = new ArrayList<>();
-        List<ChanceOutput> results = display.outputs();
+        List<ProcessingOutput> results = display.outputs();
         for (int i = 0, size = results.size(), start = bounds.x + (184 - 19 * size) / 2 + 3, y = bounds.y + 83; i < size; i++) {
-            ChanceOutput output = results.get(i);
+            ProcessingOutput output = results.get(i);
             addOutputData(output, start + i * 19, y, outputs, outputIngredients, chances, chanceIngredients);
         }
         widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {

@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:bamboo_button",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:bamboo_button"
+    }
+  ],
   "ingredient": "minecraft:bamboo_planks",
   "type": "create:cutting"
 }

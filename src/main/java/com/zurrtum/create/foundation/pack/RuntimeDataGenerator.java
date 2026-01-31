@@ -9,7 +9,7 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.foundation.data.recipe.Mods;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,7 +19,6 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
@@ -173,7 +172,7 @@ public class RuntimeDataGenerator {
             addRecipe(
                 typeId, inputId.getNamespace(), inputId.getPath(), outputId.getPath(), new CuttingRecipe(
                     50,
-                    new ItemStackTemplate(BuiltInRegistries.ITEM.getValue(outputId), amount),
+                    List.of(new ProcessingOutput(BuiltInRegistries.ITEM.get(outputId).orElseThrow(), amount)),
                     Ingredient.of(BuiltInRegistries.ITEM.getValue(inputId))
                 )
             );
@@ -184,7 +183,12 @@ public class RuntimeDataGenerator {
         if (BuiltInRegistries.ITEM.containsKey(outputId)) {
             Recipe.CODEC.encodeStart(
                 EmptyJsonOps.INSTANCE,
-                new CuttingRecipe(50, new ItemStackTemplate(BuiltInRegistries.ITEM.getValue(outputId), amount), EmptyJsonOps.ofTag(inputTag))
+                new CuttingRecipe(
+                    50,
+                    List.of(new ProcessingOutput(BuiltInRegistries.ITEM.get(outputId).orElseThrow(), amount)),
+                    EmptyJsonOps.ofTag(inputTag)
+
+                )
             ).ifSuccess(json -> {
                 Identifier inputId = inputTag.location();
                 Identifier path = Identifier.fromNamespaceAndPath(
@@ -203,7 +207,7 @@ public class RuntimeDataGenerator {
             first.getPath(),
             second.getPath(),
             new SplashingRecipe(
-                List.of(new ChanceOutput(1, new ItemStackTemplate(BuiltInRegistries.BLOCK.getValue(second).asItem()))),
+                List.of(new ProcessingOutput(BuiltInRegistries.BLOCK.getValue(second), 1)),
                 Ingredient.of(BuiltInRegistries.BLOCK.getValue(first))
             )
         );

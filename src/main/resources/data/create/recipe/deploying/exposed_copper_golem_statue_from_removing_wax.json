@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:waxed_exposed_copper_golem_statue",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:exposed_copper_golem_statue"
-  }
+  "results": [
+    {
+      "id": "minecraft:exposed_copper_golem_statue"
+    }
+  ]
 }

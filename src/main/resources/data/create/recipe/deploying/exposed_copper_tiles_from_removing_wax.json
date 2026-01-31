@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "create:waxed_exposed_copper_tiles",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "create:exposed_copper_tiles"
-  }
+  "results": [
+    {
+      "id": "create:exposed_copper_tiles"
+    }
+  ]
 }
