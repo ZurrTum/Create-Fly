@@ -64,7 +64,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     public static final Identifier CORE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core");
     public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core_glow");
     public static final Identifier ACCELERATOR_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/accelerator");
-    private static final int[] TINTS = new int[0];
+    private static final int[] TINTS = new int[]{-1};
     private static final RandomSource random = RandomSource.create();
     private static final PoseStack matrices = new PoseStack();
 
@@ -156,28 +156,31 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         matrices.translate(0.5F, 0.5F, 0.5F);
         matrices.pushPose();
         data.transform.apply(displayContext.leftHand(), matrices.last());
-        renderItem(displayContext, matrices, queue, light, overlay, item, blockLayer);
+        renderItem(displayContext, matrices, queue, light, overlay, TINTS, item, blockLayer);
 
         float pt = AnimationTickHolder.getPartialTicks();
         float worldTime = AnimationTickHolder.getRenderTime() / 20;
         float animation = Mth.clamp(Create.ZAPPER_RENDER_HANDLER.getAnimation(data.rightHand, pt) * 5, 0, 1);
 
         // Core glows
+        float multiplier;
+        if (data.inHand) {
+            multiplier = animation;
+        } else {
+            multiplier = Mth.sin(worldTime * 5);
+        }
         int glowLight;
+        int[] glowTint;
         if (displayContext == ItemDisplayContext.GUI) {
             glowLight = 0;
+            glowTint = new int[]{(int) (225 * Mth.clamp(multiplier, 0, 1) + 30) << 24 | 0xFFFFFF};
         } else {
-            float multiplier;
-            if (data.inHand) {
-                multiplier = animation;
-            } else {
-                multiplier = Mth.sin(worldTime * 5);
-            }
             int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
             glowLight = LightCoordsUtil.pack(lightItensity, Math.max(lightItensity, 4));
+            glowTint = TINTS;
         }
-        renderItem(displayContext, matrices, queue, glowLight, overlay, core, itemLayer);
-        renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, translucent);
+        renderItem(displayContext, matrices, queue, glowLight, overlay, glowTint, core, itemLayer);
+        renderItem(displayContext, matrices, queue, glowLight, overlay, glowTint, coreGlow, translucent);
 
         // Accelerator spins
         float angle = worldTime * -25;
@@ -188,7 +191,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         matrices.translate(0.5f, 0.345f, 0.5f);
         matrices.mulPose(Axis.ZP.rotationDegrees(angle));
         matrices.translate(-0.5f, -0.345f, -0.5f);
-        renderItem(displayContext, matrices, queue, light, overlay, accelerator, blockLayer);
+        renderItem(displayContext, matrices, queue, light, overlay, TINTS, accelerator, blockLayer);
         matrices.popPose();
 
         if (data.used != null) {
@@ -203,10 +206,11 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         SubmitNodeCollector queue,
         int light,
         int overlay,
+        int[] tintLayers,
         List<BakedQuad> item,
         RenderType layer
     ) {
-        queue.submitItem(matrices, displayContext, light, overlay, 0, TINTS, item, layer, ItemStackRenderState.FoilType.NONE);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, tintLayers, item, layer, ItemStackRenderState.FoilType.NONE);
     }
 
     public static class RenderData {
