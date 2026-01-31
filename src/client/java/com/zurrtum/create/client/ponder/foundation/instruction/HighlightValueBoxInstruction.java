@@ -22,7 +22,7 @@ public class HighlightValueBoxInstruction extends TickingInstruction {
         AABB point = new AABB(vec, vec);
         AABB expanded = point.inflate(expands.x, expands.y, expands.z);
         scene.getOutliner().chaseAABB(vec, remainingTicks + 1 >= totalTicks ? point : expanded).lineWidth(1 / 15f)
-            .colored(PonderPalette.WHITE.getColor()).lightmap(0);
+            .colored(PonderPalette.WHITE.getColor());
     }
 
 }

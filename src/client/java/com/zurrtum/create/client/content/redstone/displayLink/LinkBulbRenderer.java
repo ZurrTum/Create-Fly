@@ -8,7 +8,6 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
-import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -47,7 +46,7 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         state.blockPos = be.getBlockPos();
         state.blockState = be.getBlockState();
         state.blockEntityType = be.getType();
-        state.lightCoords = be.getLevel() instanceof PonderLevel ? 0 : LightCoordsUtil.FULL_BRIGHT;
+        state.lightCoords = LightCoordsUtil.FULL_BRIGHT;
         state.breakProgress = crumblingOverlay;
         Direction face = be.getBulbFacing(state.blockState);
         state.yRot = Mth.DEG_TO_RAD * (AngleHelper.horizontalAngle(face) + 180);

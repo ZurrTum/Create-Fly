@@ -62,15 +62,17 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
 
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
+        boolean lightOption = gameRenderer.useUiLightmap;
+        gameRenderer.useUiLightmap = false;
         Lighting lighting = gameRenderer.getLighting();
-        FeatureRenderDispatcher renderDispatcher = gameRenderer.getFeatureRenderDispatcher();
         lighting.updateBuffer(Lighting.Entry.LEVEL, DIFFUSE_LIGHT_0, DIFFUSE_LIGHT_1);
         lighting.setupFor(Lighting.Entry.LEVEL);
-        SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();
-        renderScene(mc, renderState, matrices, queue);
+        FeatureRenderDispatcher renderDispatcher = gameRenderer.getFeatureRenderDispatcher();
+        renderScene(mc, renderState, matrices, renderDispatcher.getSubmitNodeStorage());
         renderDispatcher.renderAllFeatures();
         bufferSource.endBatch();
         lighting.updateLevel(mc.level.dimensionType().cardinalLightType());
+        gameRenderer.useUiLightmap = lightOption;
         matrices.popPose();
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(

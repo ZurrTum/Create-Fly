@@ -152,7 +152,7 @@ public class PonderLevel extends SchematicLevel {
 
     @Override
     public int getBrightness(LightLayer p_226658_1_, BlockPos p_226658_2_) {
-        return overrideLight == -1 ? 0 : overrideLight;
+        return overrideLight == -1 ? 15 : overrideLight;
     }
 
     public void setMask(@Nullable Selection mask) {

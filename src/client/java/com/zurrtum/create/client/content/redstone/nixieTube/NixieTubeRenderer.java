@@ -13,7 +13,6 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
-import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.DoubleAttachFace;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
@@ -23,7 +22,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -38,7 +36,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
@@ -63,25 +60,15 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         Vec3 cameraPos,
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
-        state.blockPos = be.getBlockPos();
-        state.blockState = be.getBlockState();
-        state.blockEntityType = be.getType();
-        Level level = be.getLevel();
-        boolean inPonder = level instanceof PonderLevel;
-        if (inPonder) {
-            state.lightCoords = 0;
-        } else {
-            state.lightCoords = level != null ? LevelRenderer.getLightCoords(level, be.getBlockPos()) : 15728880;
-        }
-        state.breakProgress = crumblingOverlay;
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         if (be.signalState != null || be.computerSignal != null) {
             updateSignalRenderState(be, state, cameraPos);
         } else {
-            updateTextRenderState(textRenderer, be, state, inPonder);
+            updateTextRenderState(textRenderer, be, state);
         }
     }
 
-    public static void updateTextRenderState(Font textRenderer, NixieTubeBlockEntity be, NixieTubeRenderState state, boolean inPonder) {
+    public static void updateTextRenderState(Font textRenderer, NixieTubeBlockEntity be, NixieTubeRenderState state) {
         TextRenderState data = new TextRenderState();
         DoubleAttachFace face = state.blockState.getValue(NixieTubeBlock.FACE);
         Direction facing = state.blockState.getValue(NixieTubeBlock.FACING);
@@ -102,9 +89,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             int darkColor = couple.getSecond() | 0xFF000000;
             int flickeringBrightColor = Color.mixColors(brightColor, darkColor, flicker / 4);
             int y = face == DoubleAttachFace.CEILING ? -5 : -3;
-            int light = inPonder ? 0 : LightCoordsUtil.FULL_BRIGHT;
-            data.left = createTextDrawable(textRenderer, s.getFirst(), y, flickeringBrightColor, darkColor, light);
-            data.right = createTextDrawable(textRenderer, s.getSecond(), y, flickeringBrightColor, darkColor, light);
+            data.left = createTextDrawable(textRenderer, s.getFirst(), y, flickeringBrightColor, darkColor, LightCoordsUtil.FULL_BRIGHT);
+            data.right = createTextDrawable(textRenderer, s.getSecond(), y, flickeringBrightColor, darkColor, LightCoordsUtil.FULL_BRIGHT);
         }
         state.data = data;
     }

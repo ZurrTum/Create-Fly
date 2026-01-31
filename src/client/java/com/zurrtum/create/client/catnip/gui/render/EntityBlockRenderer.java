@@ -73,6 +73,8 @@ public class EntityBlockRenderer extends PictureInPictureRenderer<EntityBlockRen
         matrices.scale(scale, -scale, scale);
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
+        boolean lightOption = gameRenderer.useUiLightmap;
+        gameRenderer.useUiLightmap = false;
         gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
         if (block.zRot() != 0) {
             matrices.mulPose(Axis.ZP.rotation(block.zRot()));
@@ -89,7 +91,7 @@ public class EntityBlockRenderer extends PictureInPictureRenderer<EntityBlockRen
         BlockState blockState = block.state();
         BlockEntity blockEntity = block.entity();
         RenderType layer = ItemBlockRenderTypes.getChunkRenderType(blockState) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
-        SinglePosVirtualBlockGetter lightWorld = SinglePosVirtualBlockGetter.createFullDark();
+        SinglePosVirtualBlockGetter lightWorld = SinglePosVirtualBlockGetter.createFullBright();
         lightWorld.blockState(blockState);
         lightWorld.blockEntity(blockEntity);
         BlockStateModel model = blockRenderManager.getBlockModel(blockState);
@@ -118,6 +120,7 @@ public class EntityBlockRenderer extends PictureInPictureRenderer<EntityBlockRen
             }
         }
         bufferSource.endBatch();
+        gameRenderer.useUiLightmap = lightOption;
         matrices.popPose();
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(

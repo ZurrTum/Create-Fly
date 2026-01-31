@@ -162,12 +162,9 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
                 overlay = template.overlay(i);
             }
 
-            int light;
+            int light = template.light(i);
             if (hasCustomLight) {
-                //                light = SuperByteBuffer.maxLight(light, packedLight);
-                light = packedLight;
-            } else {
-                light = template.light(i);
+                light = SuperByteBuffer.maxLight(light, packedLight);
             }
             if (useLevelLight) {
                 lightPos.set(((x - .5f) * 15 / 16f) + .5f, (y - .5f) * 15 / 16f + .5f, (z - .5f) * 15 / 16f + .5f, 1f);
