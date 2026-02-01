@@ -1361,7 +1361,7 @@
   "create.gui.stock_keeper.no_packagers_linked": "無已連接的包裹装卸站",
   "create.gui.stock_keeper.no_search_results": "未找到匹配的物品",
   "create.gui.stock_keeper.not_in_stock": "所需的物品不在庫存中",
-  "create.gui.stock_keeper.package_adress": "包裹地址",
+  "create.gui.stock_keeper.package_address": "包裹地址",
   "create.gui.stock_keeper.program_requester": "編程請求器",
   "create.gui.stock_keeper.recipe_result_empty": "暫無法查找到此配方的結果，請向添加此配方的模組或資料包說明此問題。",
   "create.gui.stock_keeper.request_sent": "請求已發送！",
@@ -3150,10 +3150,10 @@
   "entity.create.seat": "坐墊",
   "entity.create.stationary_contraption": "固定結構",
   "entity.create.super_glue": "強力膠",
-  "block.create.milk": "奶",
-  "fluid.create.milk": "奶",
   "fluid.create.chocolate": "巧克力",
+  "block.create.chocolate": "巧克力",
   "fluid.create.honey": "蜂蜜",
+  "block.create.honey": "蜂蜜",
   "fluid.create.potion": "藥水",
   "block.create.potion": "藥水",
   "fluid.create.tea": "茶",
@@ -3363,5 +3363,7 @@
   "item.create.zinc_ingot": "鋅錠",
   "item.create.zinc_nugget": "鋅粒",
   "itemGroup.create.base": "機械動力",
-  "itemGroup.create.palettes": "機械動力 | 建築方塊"
+  "itemGroup.create.palettes": "機械動力 | 建築方塊",
+  "fluid.create.milk": "奶",
+  "block.create.milk": "奶"
 }

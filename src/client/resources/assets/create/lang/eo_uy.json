@@ -1102,10 +1102,10 @@
   "entity.create.seat": "Seĝo",
   "entity.create.stationary_contraption": "Senmova aparato",
   "entity.create.super_glue": "Supergluo",
-  "block.create.milk": "Lakto",
-  "fluid.create.milk": "Lakto",
   "fluid.create.chocolate": "Ĉokolado",
+  "block.create.chocolate": "Ĉokolado",
   "fluid.create.honey": "Mielo",
+  "block.create.honey": "Mielo",
   "fluid.create.potion": "Eliksiro",
   "block.create.potion": "Eliksiro",
   "fluid.create.tea": "Teo de konstruisto",
@@ -1224,5 +1224,7 @@
   "item.create.zinc_ingot": "Zinka ingoto",
   "item.create.zinc_nugget": "Zinkobulo",
   "itemGroup.create.base": "Krieto",
-  "itemGroup.create.palettes": "Konstruaj blokoj de Krieto"
+  "itemGroup.create.palettes": "Konstruaj blokoj de Krieto",
+  "fluid.create.milk": "Milk",
+  "block.create.milk": "Milk"
 }

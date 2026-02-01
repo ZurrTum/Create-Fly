@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.base;
 
 import com.zurrtum.create.catnip.theme.Color;
-import com.zurrtum.create.client.content.kinetics.KineticDebugger;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.instance.ColoredLitOverlayInstance;
@@ -64,13 +63,8 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
     public RotatingInstance setup(KineticBlockEntity blockEntity, Axis axis, float speed) {
         var blockState = blockEntity.getBlockState();
         var pos = blockEntity.getBlockPos();
-        var instance = setRotationAxis(axis).setRotationalSpeed(speed * RotatingInstance.SPEED_MULTIPLIER)
+        return setRotationAxis(axis).setRotationalSpeed(speed * RotatingInstance.SPEED_MULTIPLIER)
             .setRotationOffset(KineticBlockEntityVisual.rotationOffset(blockState, axis, pos) + blockEntity.getRotationAngleOffset(axis));
-
-        if (KineticDebugger.isActive())
-            instance.setColor(blockEntity);
-
-        return instance;
     }
 
     public RotatingInstance rotateToFace(Direction.Axis axis) {

@@ -466,7 +466,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (addressBox.getValue().isBlank() && !addressBox.isFocused()) {
             graphics.drawString(
                 font,
-                CreateLang.translate("gui.stock_keeper.package_adress").style(ChatFormatting.ITALIC).component(),
+                CreateLang.translate("gui.stock_keeper.package_address").style(ChatFormatting.ITALIC).component(),
                 addressBox.getX(),
                 addressBox.getY(),
                 0xff_CDBCA8,
@@ -814,10 +814,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
     private void renderItemEntry(GuiGraphics graphics, BigItemStack entry, boolean isStackHovered, boolean isRenderingOrders) {
         int customCount = entry.count;
+        ItemStack stackWithCount = entry.stack.copyWithCount(customCount);
+
         if (!isRenderingOrders) {
-            BigItemStack order = getOrderForItem(entry.stack);
+            BigItemStack order = getOrderForItem(stackWithCount);
             if (entry.count < BigItemStack.INF) {
-                int forcedCount = forcedEntries.getCountOf(entry.stack);
+                int forcedCount = forcedEntries.getCountOf(stackWithCount);
                 if (forcedCount != 0)
                     customCount = Math.min(customCount, -forcedCount - 1);
                 if (order != null)
@@ -839,12 +841,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         ms.scale(scaleFromHover, scaleFromHover);
         ms.translate((float) (-18 / 2.0), (float) (-18 / 2.0));
         if (customCount != 0 || craftable)
-            graphics.renderItem(entry.stack, 0, 0);
+            graphics.renderItem(stackWithCount, 0, 0);
         ms.popMatrix();
 
         ms.pushMatrix();
         if (customCount != 0 || craftable)
-            graphics.renderItemDecorations(font, entry.stack, 1, 1, "");
+            graphics.renderItemDecorations(font, stackWithCount, 1, 1, "");
         if (customCount > 1 || craftable)
             drawItemCount(graphics, customCount);
         ms.popMatrix();

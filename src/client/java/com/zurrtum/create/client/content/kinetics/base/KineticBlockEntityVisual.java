@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.base;
 
+import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.content.kinetics.base.IRotate;
@@ -37,5 +38,23 @@ public abstract class KineticBlockEntityVisual<T extends KineticBlockEntity> ext
 
     public static Axis rotationAxis(BlockState blockState) {
         return (blockState.getBlock() instanceof IRotate irotate) ? irotate.getRotationAxis(blockState) : Axis.Y;
+    }
+
+    public static void applyOverstressEffect(KineticBlockEntity be, RotatingInstance... instances) {
+        float overStressedEffect = be.effects.overStressedEffect;
+        if (overStressedEffect != 0) {
+            boolean overstressed = overStressedEffect > 0;
+            Color color = overstressed ? Color.RED : Color.SPRING_GREEN;
+            float weight = overstressed ? overStressedEffect : -overStressedEffect;
+
+            for (RotatingInstance instance : instances)
+                instance.setColor(Color.WHITE.mixWith(color, weight));
+        } else {
+            for (RotatingInstance instance : instances)
+                instance.setColor(Color.WHITE);
+        }
+
+        for (RotatingInstance instance : instances)
+            instance.setChanged();
     }
 }

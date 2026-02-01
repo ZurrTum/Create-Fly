@@ -1302,7 +1302,7 @@
   "create.gui.stock_keeper.no_packagers_linked": "Nenhum empacotador vinculado",
   "create.gui.stock_keeper.no_search_results": "Nenhum item correspondente encontrado",
   "create.gui.stock_keeper.not_in_stock": "Os itens necessários não estão disponíveis em stock",
-  "create.gui.stock_keeper.package_adress": "Endereço do Pacote",
+  "create.gui.stock_keeper.package_address": "Endereço do Pacote",
   "create.gui.stock_keeper.program_requester": "Solicitador de programa",
   "create.gui.stock_keeper.request_sent": "Pedido enviado!",
   "create.gui.stock_keeper.schematic_list.no_results": "Nenhum item de sua lista está em estoque",
@@ -1902,8 +1902,6 @@
   "entity.create.seat": "Assento",
   "entity.create.stationary_contraption": "Mecanismo estacionário",
   "entity.create.super_glue": "Super-cola",
-  "block.create.milk": "Milk",
-  "fluid.create.milk": "Milk",
   "fluid.create.potion": "Poção",
   "block.create.potion": "Poção",
   "fluid.create.tea": "Chá do Construtor",
@@ -2010,5 +2008,7 @@
   "item.create.zinc_ingot": "Barra de zinco",
   "item.create.zinc_nugget": "Pepita de zinco",
   "itemGroup.create.base": "Create",
-  "itemGroup.create.palettes": "Blocos de construção do Create"
+  "itemGroup.create.palettes": "Blocos de construção do Create",
+  "fluid.create.milk": "Milk",
+  "block.create.milk": "Milk"
 }
