@@ -3,15 +3,16 @@ package com.zurrtum.create.foundation.recipe.trie;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
-
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class RecipeTrieFinder {
     private static final Cache<Object, RecipeTrie<Recipe<?>>> CACHED_TRIES = CacheBuilder.newBuilder().build();
@@ -35,5 +36,16 @@ public class RecipeTrieFinder {
         );
     }
 
-    public static final ResourceManagerReloadListener LISTENER = resourceManager -> CACHED_TRIES.invalidateAll();
+    public static final ResourceManagerReloadListener LISTENER = new ReloadListener();
+
+    private static class ReloadListener extends CreateResourceReloader {
+        public ReloadListener() {
+            super("recipe_trie");
+        }
+
+        @Override
+        public void onResourceManagerReload(ResourceManager resourceManager) {
+            CACHED_TRIES.invalidateAll();
+        }
+    }
 }

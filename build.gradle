@@ -120,6 +120,7 @@ dependencies {
         compileOnly fabricApi.module("fabric-renderer-indigo", project.fabric_version)
         compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-resource-loader-v1", project.fabric_version)
     } else {
         implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }
