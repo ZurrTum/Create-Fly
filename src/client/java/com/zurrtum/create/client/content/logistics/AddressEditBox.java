@@ -36,8 +36,13 @@ public class AddressEditBox extends EditBox {
         destinationSuggestions.setAllowSuggestions(true);
         destinationSuggestions.updateCommandInfo();
         mainResponder = t -> {
-            if (!t.equals(prevValue))
+            if (!t.equals(prevValue)) {
+                int length = t.length();
+                if (highlightPos > length) {
+                    highlightPos = length;
+                }
                 destinationSuggestions.updateCommandInfo();
+            }
             prevValue = t;
         };
         setResponder(mainResponder);
