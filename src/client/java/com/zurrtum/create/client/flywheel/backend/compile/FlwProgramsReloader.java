@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.flywheel.backend.compile;
 
 import com.zurrtum.create.client.flywheel.backend.NoiseTextures;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-public final class FlwProgramsReloader implements ResourceManagerReloadListener {
+public final class FlwProgramsReloader extends CreateResourceReloader {
     public static final FlwProgramsReloader INSTANCE = new FlwProgramsReloader();
 
     private FlwProgramsReloader() {
+        super("flywheel");
     }
 
     @Override

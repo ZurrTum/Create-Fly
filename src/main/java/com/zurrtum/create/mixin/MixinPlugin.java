@@ -16,14 +16,15 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         mixins = new ArrayList<>();
-        Create.Lazy = FabricLoader.getInstance().isModLoaded("fabric-api");
-        if (FabricLoader.getInstance().isModLoaded("computercraft")) {
+        FabricLoader loader = FabricLoader.getInstance();
+        Create.Lazy = loader.isModLoaded("fabric-api");
+        if (loader.isModLoaded("computercraft")) {
             mixins.add("CreateIntegrationMixin");
         }
-        if (FabricLoader.getInstance().isModLoaded("architectury")) {
+        if (loader.isModLoaded("architectury")) {
             mixins.add("ArchitecturyMixin");
         }
-        if (FabricLoader.getInstance().isModLoaded("jei")) {
+        if (loader.isModLoaded("jei")) {
             mixins.add("JustEnoughItemsMixin");
         }
         if (Create.Lazy) {
@@ -33,6 +34,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("CreativeModeTabsMixin");
             mixins.add("DimensionDataStorageMixin");
             mixins.add("IngredientMixin");
+        }
+        if (loader.isModLoaded("fabric-resource-loader-v1")) {
+            mixins.add("ReloadListenerMixin");
         }
     }
 

@@ -3,12 +3,14 @@ package com.zurrtum.create.content.kinetics.belt;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 
 import java.util.Map;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
@@ -22,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 public class BeltHelper {
 
     public static Map<Item, Boolean> uprightCache = new Object2BooleanOpenHashMap<>();
-    public static final ResourceManagerReloadListener LISTENER = resourceManager -> uprightCache.clear();
+    public static final ResourceManagerReloadListener LISTENER = new ReloadListener();
 
     public static boolean isItemUpright(ItemStack stack) {
         return uprightCache.computeIfAbsent(
@@ -111,4 +113,14 @@ public class BeltHelper {
         return new Vec3(0, verticality, 0).add(horizontalMovement);
     }
 
+    private static class ReloadListener extends CreateResourceReloader {
+        public ReloadListener() {
+            super("belt");
+        }
+
+        @Override
+        public void onResourceManagerReload(ResourceManager resourceManager) {
+            uprightCache.clear();
+        }
+    }
 }

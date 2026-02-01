@@ -11,16 +11,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.UnbakedModelLoader;
-
-import java.io.FileNotFoundException;
-import java.util.Map;
-
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
+
+import java.io.FileNotFoundException;
+import java.util.Map;
 
 /**
  * A loader for {@link ObjModel OBJ models}.
@@ -28,13 +27,17 @@ import net.minecraft.util.GsonHelper;
  * Allows the user to enable automatic face culling, toggle quad shading, flip UVs, render emissively and specify a
  * {@link ObjMaterialLibrary material library} override.
  */
-public class ObjLoader implements UnbakedModelLoader<ObjModel>, ResourceManagerReloadListener {
+public class ObjLoader extends CreateResourceReloader implements UnbakedModelLoader<ObjModel> {
     public static ObjLoader INSTANCE = new ObjLoader();
 
     private final Map<ObjGeometry.Settings, ObjGeometry> geometryCache = Maps.newConcurrentMap();
     private final Map<Identifier, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
 
     private final ResourceManager manager = Minecraft.getInstance().getResourceManager();
+
+    public ObjLoader() {
+        super("model");
+    }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {

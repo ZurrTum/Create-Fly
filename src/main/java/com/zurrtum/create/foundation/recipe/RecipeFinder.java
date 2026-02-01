@@ -3,6 +3,11 @@ package com.zurrtum.create.foundation.recipe;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -10,10 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
-
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
  * Utility for searching through a level's recipe collection.
@@ -24,7 +25,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 public class RecipeFinder {
     private static final Cache<Object, List<RecipeHolder<?>>> CACHED_SEARCHES = CacheBuilder.newBuilder().build();
 
-    public static final ResourceManagerReloadListener LISTENER = resourceManager -> CACHED_SEARCHES.invalidateAll();
+    public static final ResourceManagerReloadListener LISTENER = new ReloadListener();
 
     /**
      * Find all recipes matching the condition predicate.
@@ -53,5 +54,16 @@ public class RecipeFinder {
             if (conditions.test(r))
                 recipes.add(r);
         return recipes;
+    }
+
+    private static class ReloadListener extends CreateResourceReloader {
+        public ReloadListener() {
+            super("recipe_search");
+        }
+
+        @Override
+        public void onResourceManagerReload(ResourceManager resourceManager) {
+            CACHED_SEARCHES.invalidateAll();
+        }
     }
 }

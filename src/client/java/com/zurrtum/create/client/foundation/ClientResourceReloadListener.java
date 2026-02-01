@@ -4,10 +4,13 @@ import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.foundation.sound.SoundScapes;
 import com.zurrtum.create.client.infrastructure.model.TableClothModel;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-public class ClientResourceReloadListener implements ResourceManagerReloadListener {
+public class ClientResourceReloadListener extends CreateResourceReloader {
+    public ClientResourceReloadListener() {
+        super("resource");
+    }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
