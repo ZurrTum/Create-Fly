@@ -93,7 +93,7 @@ public class FactoryPanelBehaviour extends FilteringBehaviour<ServerFactoryPanel
 
     @Override
     public void tick() {
-        if (getWorld().isClient && behaviour.active) {
+        if (behaviour.active) {
             LogisticallyLinkedClientHandler.tickPanel(this);
         }
     }
