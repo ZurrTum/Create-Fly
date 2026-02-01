@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.redstone.link;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
@@ -7,7 +8,6 @@ import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
@@ -27,6 +27,10 @@ public class LinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     @Override
     public void initialize() {
         behaviour = blockEntity.getBehaviour(ServerLinkBehaviour.TYPE);
+    }
+
+    @Override
+    public void tick() {
     }
 
     @Override

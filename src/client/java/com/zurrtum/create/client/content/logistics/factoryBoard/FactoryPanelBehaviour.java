@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.logistics.factoryBoard;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.content.logistics.packagerLink.LogisticallyLinkedClientHandler;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsBoard;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.PanelSlot;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
@@ -93,7 +93,7 @@ public class FactoryPanelBehaviour extends FilteringBehaviour<ServerFactoryPanel
 
     @Override
     public void tick() {
-        if (getWorld().isClient() && behaviour.active) {
+        if (behaviour.active) {
             LogisticallyLinkedClientHandler.tickPanel(this);
         }
     }
