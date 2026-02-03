@@ -4,7 +4,7 @@
   "key": {
     "E": "#c:eggs",
     "M": "minecraft:milk_bucket",
-    "P": "#c:doughs",
+    "P": "#c:foods/dough",
     "S": "minecraft:sugar"
   },
   "pattern": [

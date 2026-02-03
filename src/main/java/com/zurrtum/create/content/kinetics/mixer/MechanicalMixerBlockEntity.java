@@ -130,6 +130,13 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
             if (level.isClientSide() && runningTicks == 20)
                 renderParticles();
 
+            if (getSpeed() == 0 || !isSpeedRequirementFulfilled()) {
+                if (runningTicks < 20)
+                    runningTicks = 40 - runningTicks;
+                else if (runningTicks == 20)
+                    runningTicks++;
+            }
+
             if ((!level.isClientSide() || isVirtual()) && runningTicks == 20) {
                 if (processingTicks < 0) {
                     float recipeSpeed = currentRecipe instanceof TimedRecipe recipe ? recipe.time() * 0.15f : 15;

@@ -119,13 +119,16 @@ public class ReiClientPlugin implements REIClientPlugin {
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void registerInputMethods(InputMethodRegistry registry) {
-        StockKeeperRequestScreen.setSearchConsumer(ReiClientPlugin::setSearchField);
-    }
-
-    public static void setSearchField(String text) {
-        TextField search = REIRuntime.getInstance().getSearchTextField();
+        REIRuntime runtime = REIRuntime.getInstance();
+        TextField search = runtime.getSearchTextField();
         if (search != null) {
-            search.setText(text);
+            StockKeeperRequestScreen.setSearchConsumer(search::setText);
+            StockKeeperRequestScreen.setSearchSupplier(force -> {
+                if (force || search.isFocused()) {
+                    return search.getText();
+                }
+                return null;
+            });
         }
     }
 }

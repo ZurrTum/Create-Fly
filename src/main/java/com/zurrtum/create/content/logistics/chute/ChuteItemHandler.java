@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.chute;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 
 public class ChuteItemHandler implements ItemInventory {
@@ -38,6 +39,6 @@ public class ChuteItemHandler implements ItemInventory {
 
     @Override
     public int getMaxStackSize(ItemStack stack) {
-        return Math.min(stack.getMaxStackSize(), 64);
+        return stack.getOrDefault(DataComponents.MAX_STACK_SIZE, 64);
     }
 }
