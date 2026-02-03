@@ -19,6 +19,7 @@
     "DedicatedServerMixin",
     "DefaultAttributesMixin",
     "DetectorRailBlockMixin",
+    "DimensionStorageFileFixMixin",
     "DiodeBlockMixin",
     "EnchantingTableBlockMixin",
     "EnchantmentMixin",

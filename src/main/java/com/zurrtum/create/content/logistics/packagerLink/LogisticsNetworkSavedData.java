@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -10,12 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.zurrtum.create.Create.MOD_ID;
+
 public class LogisticsNetworkSavedData extends SavedData {
     public static final Codec<LogisticsNetworkSavedData> CODEC = Codec.list(LogisticsNetwork.CODEC)
         .xmap(LogisticsNetworkSavedData::createMap, LogisticsNetworkSavedData::toList)
         .xmap(LogisticsNetworkSavedData::new, LogisticsNetworkSavedData::getLogisticsNetworks);
     private static final SavedDataType<LogisticsNetworkSavedData> TYPE = new SavedDataType<>(
-        "create_logistics",
+        Identifier.fromNamespaceAndPath(MOD_ID, "logistics"),
         LogisticsNetworkSavedData::new,
         CODEC,
         null
@@ -46,6 +49,6 @@ public class LogisticsNetworkSavedData extends SavedData {
     }
 
     public static LogisticsNetworkSavedData load(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
+        return server.getDataStorage().computeIfAbsent(TYPE);
     }
 }
