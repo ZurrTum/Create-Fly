@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 public class CachedDirectionInventoryBehaviour<T extends SmartBlockEntity> extends BlockEntityBehaviour<T> {
-    public static final BehaviourType<CachedInventoryBehaviour<?>> TYPE = new BehaviourType<>();
+    public static final BehaviourType<CachedDirectionInventoryBehaviour<?>> TYPE = new BehaviourType<>();
     private final BiFunction<T, Direction, Container> factory;
     @SuppressWarnings("unchecked")
     Storage<ItemVariant>[] sides = new Storage[7];
