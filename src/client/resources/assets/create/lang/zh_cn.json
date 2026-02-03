@@ -3624,7 +3624,7 @@
   "tag.recipe_serializer.create.automation_ignore": "不可自动处理",
   "fluid.create.milk": "奶",
   "block.create.milk": "奶",
-  "create.gui.stock_keeper.click_to_cycle": "点击切换",
+  "create.gui.stock_keeper.click_to_cycle": "单击以切换",
   "create.gui.stock_keeper.jei_sync.none": "不进行同步",
   "create.gui.stock_keeper.jei_sync.none.description": "仓库管理员界面和物品列表的搜索功能是相互独立的",
   "create.gui.stock_keeper.jei_sync.sync_both": "同步搜索内容",
