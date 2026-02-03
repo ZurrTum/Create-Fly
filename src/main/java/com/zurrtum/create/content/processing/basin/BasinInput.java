@@ -4,24 +4,22 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.apache.commons.lang3.function.TriFunction;
-
-import java.util.List;
-
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 
+import java.util.List;
+
 public record BasinInput(
-    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items,
-    TriFunction<List<ItemStack>, List<FluidStack>, Boolean, Boolean> callback
+    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items, RandomSource random, BasinBlockEntity blockEntity
 ) implements RecipeInput {
     public BasinInput(BasinBlockEntity basin) {
-        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin::acceptOutputs);
+        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin.getLevel().getRandom(), basin);
     }
 
     public boolean acceptOutputs(List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {
-        return callback.apply(outputItems, outputFluids, simulate);
+        return blockEntity.acceptOutputs(outputItems, outputFluids, simulate);
     }
 
     @Override

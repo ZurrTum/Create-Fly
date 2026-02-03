@@ -4,6 +4,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
+import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -14,23 +16,29 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredients;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getFluidIngredientStream;
 
-public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record CompactingDisplay(
+    List<EntryIngredient> inputs, List<ProcessingOutput> outputs, HeatCondition heat, Optional<Identifier> location
+) implements Display {
     public static final DisplaySerializer<CompactingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(CompactingDisplay::inputs),
-            EntryIngredient.codec().fieldOf("output").forGetter(CompactingDisplay::output),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(CompactingDisplay::outputs),
+            HeatCondition.CODEC.fieldOf("heat").forGetter(CompactingDisplay::heat),
             Identifier.CODEC.optionalFieldOf("location").forGetter(CompactingDisplay::location)
         ).apply(instance, CompactingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
             CompactingDisplay::inputs,
-            EntryIngredient.streamCodec(),
-            CompactingDisplay::output,
+            ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            CompactingDisplay::outputs,
+            HeatCondition.PACKET_CODEC,
+            CompactingDisplay::heat,
             ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             CompactingDisplay::location,
             CompactingDisplay::new
@@ -43,8 +51,9 @@ public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient ou
 
     public CompactingDisplay(Identifier id, CompactingRecipe recipe) {
         this(
-            getEntryIngredients(IngredientHelper.getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredient())),
-            EntryIngredients.of(recipe.result()),
+            getEntryIngredients(IngredientHelper.getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredients())),
+            recipe.results(),
+            recipe.heat(),
             Optional.of(id)
         );
     }
@@ -56,7 +65,11 @@ public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient ou
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(output);
+        List<EntryIngredient> list = new ArrayList<>();
+        for (ProcessingOutput output : outputs) {
+            list.add(EntryIngredients.of(output.create()));
+        }
+        return list;
     }
 
     @Override

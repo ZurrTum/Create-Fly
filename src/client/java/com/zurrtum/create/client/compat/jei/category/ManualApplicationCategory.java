@@ -9,7 +9,9 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.ManualBlockRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -56,9 +58,20 @@ public class ManualApplicationCategory extends CreateCategory<RecipeHolder<Manua
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ManualApplicationRecipe> entry, IFocusGroup focuses) {
         ManualApplicationRecipe recipe = entry.value();
-        builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
+        IRecipeSlotBuilder slot = builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
+        if (recipe.keepHeldItem()) {
+            slot.addRichTooltipCallback(KEEP_HELD);
+        }
         builder.addInputSlot(27, 38).setSlotName("target").setBackground(SLOT, -1, -1).add(recipe.target());
-        builder.addOutputSlot(132, 38).setBackground(SLOT, -1, -1).add(recipe.result());
+        List<ProcessingOutput> results = recipe.results();
+        int size = results.size();
+        if (size == 1) {
+            addChanceSlot(builder, 132, 38, results.getFirst());
+        } else {
+            for (int i = 0; i < size; i++) {
+                addChanceSlot(builder, i % 2 == 0 ? 132 : 151, 38 + (i / 2) * -19, results.get(i));
+            }
+        }
     }
 
     @Override

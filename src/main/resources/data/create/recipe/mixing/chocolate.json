@@ -12,8 +12,10 @@
       "fluid_tag": "#c:milk"
     }
   ],
-  "fluid_result": {
-    "amount": 20250,
-    "id": "create:chocolate"
-  }
+  "fluid_results": [
+    {
+      "amount": 20250,
+      "id": "create:chocolate"
+    }
+  ]
 }

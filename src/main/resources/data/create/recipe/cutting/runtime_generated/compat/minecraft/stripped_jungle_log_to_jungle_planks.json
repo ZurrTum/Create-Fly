@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:jungle_planks",
-    "count": 6
-  },
+  "results": [
+    {
+      "id": "minecraft:jungle_planks",
+      "count": 6
+    }
+  ],
   "ingredient": "minecraft:stripped_jungle_log",
   "type": "create:cutting"
 }

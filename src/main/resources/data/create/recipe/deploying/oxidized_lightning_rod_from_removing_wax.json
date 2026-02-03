@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:waxed_oxidized_lightning_rod",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:oxidized_lightning_rod"
-  }
+  "results": [
+    {
+      "id": "minecraft:oxidized_lightning_rod"
+    }
+  ]
 }

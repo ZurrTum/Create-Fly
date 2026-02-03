@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "create:oxidized_copper_tiles",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "create:waxed_oxidized_copper_tiles"
-  }
+  "results": [
+    {
+      "id": "create:waxed_oxidized_copper_tiles"
+    }
+  ]
 }

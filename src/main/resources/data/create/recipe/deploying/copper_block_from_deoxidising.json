@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:exposed_copper",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:copper_block"
-  }
+  "results": [
+    {
+      "id": "minecraft:copper_block"
+    }
+  ]
 }

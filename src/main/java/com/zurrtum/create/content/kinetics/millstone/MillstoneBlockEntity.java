@@ -3,11 +3,11 @@ package com.zurrtum.create.content.kinetics.millstone;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.core.BlockPos;
@@ -125,14 +125,18 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements Clearabl
         }
 
         ItemStack recipeRemainder = stack.getItem().getCraftingRemainder();
-        stack.shrink(1);
-        capability.setItem(0, stack);
-        capability.outputAllowInsertion();
-        List<ItemStack> list = lastRecipe.assemble(input, level.random);
-        if (!recipeRemainder.isEmpty()) {
-            list.add(recipeRemainder);
+        int count = stack.getCount();
+        if (count == 1) {
+            capability.setItem(0, ItemStack.EMPTY);
+        } else {
+            stack.setCount(count - 1);
+            capability.setItem(0, stack);
         }
-        capability.insert(list);
+        capability.outputAllowInsertion();
+        capability.insert(lastRecipe.assemble(input, level.getRandom()));
+        if (!recipeRemainder.isEmpty()) {
+            capability.insert(recipeRemainder);
+        }
         capability.outputForbidInsertion();
 
         award(AllAdvancements.MILLSTONE);

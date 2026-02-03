@@ -9,7 +9,6 @@ import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen
 import com.zurrtum.create.compat.rei.display.DrainingDisplay;
 import com.zurrtum.create.compat.rei.display.SpoutFillingDisplay;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
-import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
@@ -24,14 +23,11 @@ import me.shedaniel.rei.api.client.search.method.InputMethodRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import me.shedaniel.rei.api.common.util.EntryStacks;
 import me.shedaniel.rei.plugin.client.displays.ClientsidedCraftingDisplay;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
@@ -44,44 +40,38 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class ReiClientPlugin implements REIClientPlugin {
     public static final CategoryIdentifier<MysteriousItemConversionDisplay> MYSTERY_CONVERSION = CategoryIdentifier.of(MOD_ID, "mystery_conversion");
 
-    @SuppressWarnings("unchecked")
-    private <T extends Display> Consumer<CategoryConfiguration<T>> config(ItemLike... item) {
-        EntryStack<ItemStack>[] workstations = new EntryStack[item.length];
+    private <T extends Display> Consumer<CategoryConfiguration<T>> workstations(ItemLike... item) {
+        EntryIngredient[] workstations = new EntryIngredient[item.length];
         for (int i = 0; i < item.length; i++) {
-            workstations[i] = EntryStacks.of(item[i]);
+            workstations[i] = EntryIngredients.of(item[i]);
         }
-        return config -> {
-            if (workstations.length > 0) {
-                config.addWorkstations(workstations);
-            }
-            config.setPlusButtonArea(bounds -> new Rectangle(bounds.getMaxX() - 16, bounds.getMinY() + 6, 10, 10));
-        };
+        return config -> config.addWorkstations(workstations);
     }
 
     @Override
     public void registerCategories(CategoryRegistry registry) {
-        registry.add(new AutoCompactingCategory(), config(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
-        registry.add(new CompactingCategory(), config(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
-        registry.add(new PressingCategory(), config(AllItems.MECHANICAL_PRESS));
-        registry.add(new AutoMixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
-        registry.add(new MixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
-        registry.add(new MillingCategory(), config(AllItems.MILLSTONE));
-        registry.add(new SawingCategory(), config(AllItems.MECHANICAL_SAW));
-        registry.add(new CrushingCategory(), config(AllItems.CRUSHING_WHEEL));
-        registry.add(new MysteriousItemConversionCategory(), config());
-        registry.add(new ManualApplicationCategory(), config());
-        registry.add(new DeployingCategory(), config(AllItems.DEPLOYER, AllItems.DEPOT, AllItems.BELT_CONNECTOR));
-        registry.add(new DrainingCategory(), config(AllItems.ITEM_DRAIN));
-        registry.add(new MechanicalCraftingCategory(), config(AllItems.MECHANICAL_CRAFTER));
-        registry.add(new SpoutFillingCategory(), config(AllItems.SPOUT));
-        registry.add(new SandpaperPolishingCategory(), config(AllItems.SAND_PAPER, AllItems.RED_SAND_PAPER));
-        registry.add(new SequencedAssemblyCategory(), config());
-        registry.add(new BlockCuttingCategory(), config(AllItems.MECHANICAL_SAW));
-        registry.add(new FanBlastingCategory(), config(AllItems.ENCASED_FAN));
-        registry.add(new FanHauntingCategory(), config(AllItems.ENCASED_FAN));
-        registry.add(new FanSmokingCategory(), config(AllItems.ENCASED_FAN));
-        registry.add(new FanWashingCategory(), config(AllItems.ENCASED_FAN));
-        registry.add(new PotionCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
+        registry.add(new PotionCategory(), workstations(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
+        registry.add(new AutoCompactingCategory(), workstations(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
+        registry.add(new AutoMixingCategory(), workstations(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
+        registry.add(new BlockCuttingCategory(), workstations(AllItems.MECHANICAL_SAW));
+        registry.add(new CrushingCategory(), workstations(AllItems.CRUSHING_WHEEL));
+        registry.add(new DeployingCategory(), workstations(AllItems.DEPLOYER, AllItems.DEPOT, AllItems.BELT_CONNECTOR));
+        registry.add(new DrainingCategory(), workstations(AllItems.ITEM_DRAIN));
+        registry.add(new FanBlastingCategory(), workstations(AllItems.ENCASED_FAN));
+        registry.add(new FanHauntingCategory(), workstations(AllItems.ENCASED_FAN));
+        registry.add(new FanSmokingCategory(), workstations(AllItems.ENCASED_FAN));
+        registry.add(new FanWashingCategory(), workstations(AllItems.ENCASED_FAN));
+        registry.add(new ManualApplicationCategory());
+        registry.add(new MechanicalCraftingCategory(), workstations(AllItems.MECHANICAL_CRAFTER));
+        registry.add(new MillingCategory(), workstations(AllItems.MILLSTONE));
+        registry.add(new MixingCategory(), workstations(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
+        registry.add(new MysteriousItemConversionCategory());
+        registry.add(new CompactingCategory(), workstations(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
+        registry.add(new PressingCategory(), workstations(AllItems.MECHANICAL_PRESS));
+        registry.add(new SandpaperPolishingCategory(), workstations(AllItems.SAND_PAPER, AllItems.RED_SAND_PAPER));
+        registry.add(new SawingCategory(), workstations(AllItems.MECHANICAL_SAW));
+        registry.add(new SequencedAssemblyCategory());
+        registry.add(new SpoutFillingCategory(), workstations(AllItems.SPOUT));
     }
 
     @Override

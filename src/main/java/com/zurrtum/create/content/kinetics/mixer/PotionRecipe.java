@@ -92,13 +92,18 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     }
 
     @Override
-    public List<SizedIngredient> getIngredients() {
+    public List<SizedIngredient> ingredients() {
         return List.of(new SizedIngredient(ingredient, 1));
     }
 
     @Override
-    public List<FluidIngredient> getFluidIngredients() {
+    public List<FluidIngredient> fluidIngredients() {
         return List.of(fluidIngredient);
+    }
+
+    @Override
+    public HeatCondition heat() {
+        return HeatCondition.HEATED;
     }
 
     @Override

@@ -23,15 +23,15 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (loader.isModLoaded("iris")) {
             mixins.add("IrisPipelinesMixin");
         }
-        if (loader.isModLoaded("eiv")) {
-            mixins.add("ItemSlotMixin");
-            mixins.add("FabricEIVMixin");
-            mixins.add("RecipeViewMenuMixin");
-            mixins.add("ViewTypeButtonMixin");
-            mixins.add("FluidItemSpecialRendererMixin");
-            mixins.add("RecipeViewScreenMixin");
-            mixins.add("CraftingViewRecipeAccessor");
-        }
+        //        if (loader.isModLoaded("eiv")) {
+        //            mixins.add("ItemSlotMixin");
+        //            mixins.add("FabricEIVMixin");
+        //            mixins.add("RecipeViewMenuMixin");
+        //            mixins.add("ViewTypeButtonMixin");
+        //            mixins.add("FluidItemSpecialRendererMixin");
+        //            mixins.add("RecipeViewScreenMixin");
+        //            mixins.add("CraftingViewRecipeAccessor");
+        //        }
         if (!loader.isModLoaded("fabric-item-group-api-v1")) {
             mixins.add("CreativeModeInventoryScreenMixin");
         }

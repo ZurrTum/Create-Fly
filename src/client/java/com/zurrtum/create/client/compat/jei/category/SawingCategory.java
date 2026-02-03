@@ -9,6 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.SawRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -55,7 +56,15 @@ public class SawingCategory extends CreateCategory<RecipeHolder<CuttingRecipe>> 
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CuttingRecipe> entry, IFocusGroup focuses) {
         CuttingRecipe recipe = entry.value();
         builder.addInputSlot(44, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
-        builder.addOutputSlot(118, 48).setBackground(SLOT, -1, -1).add(recipe.result());
+        List<ProcessingOutput> results = recipe.results();
+        int size = results.size();
+        if (size == 1) {
+            addChanceSlot(builder, 118, 48, results.getFirst());
+        } else {
+            for (int i = 0; i < size; i++) {
+                addChanceSlot(builder, i % 2 == 0 ? 118 : 137, 48 + (i / 2) * -19, results.get(i));
+            }
+        }
     }
 
     @Override

@@ -4,9 +4,10 @@ import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.client.compat.jei.renderer.JunkSlotRenderer;
 import com.zurrtum.create.client.compat.jei.renderer.SlotRenderer;
 import com.zurrtum.create.client.compat.jei.widget.ChanceTooltip;
+import com.zurrtum.create.client.compat.jei.widget.KeepHeldTooltip;
 import com.zurrtum.create.client.compat.jei.widget.PotionTooltip;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
@@ -29,6 +30,7 @@ public abstract class CreateCategory<T> implements IRecipeCategory<T> {
     public static final SlotRenderer SLOT = new SlotRenderer(AllGuiTextures.JEI_SLOT);
     public static final SlotRenderer CHANCE_SLOT = new SlotRenderer(AllGuiTextures.JEI_CHANCE_SLOT);
     public static final PotionTooltip POTION = new PotionTooltip();
+    public static final KeepHeldTooltip KEEP_HELD = new KeepHeldTooltip();
 
     public static List<ItemStack> getStacks(SizedIngredient ingredient) {
         int count = ingredient.getCount();
@@ -93,17 +95,18 @@ public abstract class CreateCategory<T> implements IRecipeCategory<T> {
         return slot.addRichTooltipCallback(POTION);
     }
 
-    public static void addChanceSlot(IRecipeLayoutBuilder builder, int x, int y, ChanceOutput output) {
-        IRecipeSlotBuilder slot = builder.addOutputSlot(x, y).add(output.stack());
-        if (output.chance() == 1) {
+    public static void addChanceSlot(IRecipeLayoutBuilder builder, int x, int y, ProcessingOutput output) {
+        IRecipeSlotBuilder slot = builder.addOutputSlot(x, y).add(output.create());
+        float chance = output.chance();
+        if (chance == 1) {
             slot.setBackground(SLOT, -1, -1);
         } else {
-            slot.setBackground(CHANCE_SLOT, -1, -1).addRichTooltipCallback(new ChanceTooltip(output));
+            slot.setBackground(CHANCE_SLOT, -1, -1).addRichTooltipCallback(new ChanceTooltip(chance));
         }
     }
 
-    public static void addJunkSlot(IRecipeLayoutBuilder builder, int x, int y, float chance) {
-        JunkSlotRenderer.addSlot(builder, x, y, chance);
+    public static IRecipeSlotBuilder addJunkSlot(IRecipeLayoutBuilder builder, int x, int y) {
+        return JunkSlotRenderer.addSlot(builder, x, y);
     }
 
     @Override

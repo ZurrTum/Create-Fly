@@ -4,6 +4,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -14,20 +15,21 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record PressingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record PressingDisplay(EntryIngredient input, List<ProcessingOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<PressingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("inputs").forGetter(PressingDisplay::input),
-            EntryIngredient.codec().fieldOf("output").forGetter(PressingDisplay::output),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(PressingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(PressingDisplay::location)
         ).apply(instance, PressingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             PressingDisplay::input,
-            EntryIngredient.streamCodec(),
-            PressingDisplay::output,
+            ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            PressingDisplay::outputs,
             ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             PressingDisplay::location,
             PressingDisplay::new
@@ -39,7 +41,7 @@ public record PressingDisplay(EntryIngredient input, EntryIngredient output, Opt
     }
 
     public PressingDisplay(Identifier id, PressingRecipe recipe) {
-        this(IngredientHelper.getInputEntryIngredient(recipe.ingredient()), EntryIngredients.of(recipe.result()), Optional.of(id));
+        this(IngredientHelper.getInputEntryIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
     @Override
@@ -49,7 +51,11 @@ public record PressingDisplay(EntryIngredient input, EntryIngredient output, Opt
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(output);
+        List<EntryIngredient> list = new ArrayList<>();
+        for (ProcessingOutput output : outputs) {
+            list.add(EntryIngredients.of(output.create()));
+        }
+        return list;
     }
 
     @Override

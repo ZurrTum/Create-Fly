@@ -1,8 +1,7 @@
 {
   "results": [
     {
-      "id": "minecraft:yellow_concrete",
-      "count": 1
+      "id": "minecraft:yellow_concrete"
     }
   ],
   "ingredient": "minecraft:yellow_concrete_powder",

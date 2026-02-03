@@ -1,8 +1,10 @@
 package com.zurrtum.create.compat.rei.display;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -13,25 +15,29 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public record ManualApplicationDisplay(
-    EntryIngredient input, EntryIngredient target, EntryIngredient output, Optional<Identifier> location
+    EntryIngredient input, EntryIngredient target, List<ProcessingOutput> outputs, boolean keepHeldItem, Optional<Identifier> location
 ) implements Display {
     public static final DisplaySerializer<ManualApplicationDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(ManualApplicationDisplay::input),
             EntryIngredient.codec().fieldOf("target").forGetter(ManualApplicationDisplay::target),
-            EntryIngredient.codec().fieldOf("output").forGetter(ManualApplicationDisplay::output),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(ManualApplicationDisplay::outputs),
+            Codec.BOOL.optionalFieldOf("keep_held_item", false).forGetter(ManualApplicationDisplay::keepHeldItem),
             Identifier.CODEC.optionalFieldOf("location").forGetter(ManualApplicationDisplay::location)
         ).apply(instance, ManualApplicationDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             ManualApplicationDisplay::input,
             EntryIngredient.streamCodec(),
             ManualApplicationDisplay::target,
-            EntryIngredient.streamCodec(),
-            ManualApplicationDisplay::output,
+            ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            ManualApplicationDisplay::outputs,
+            ByteBufCodecs.BOOL,
+            ManualApplicationDisplay::keepHeldItem,
             ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             ManualApplicationDisplay::location,
             ManualApplicationDisplay::new
@@ -46,7 +52,8 @@ public record ManualApplicationDisplay(
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             EntryIngredients.ofIngredient(recipe.target()),
-            EntryIngredients.of(recipe.result()),
+            recipe.results(),
+            recipe.keepHeldItem(),
             Optional.of(id)
         );
     }
@@ -58,7 +65,11 @@ public record ManualApplicationDisplay(
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(output);
+        List<EntryIngredient> list = new ArrayList<>();
+        for (ProcessingOutput output : outputs) {
+            list.add(EntryIngredients.of(output.create()));
+        }
+        return list;
     }
 
     @Override

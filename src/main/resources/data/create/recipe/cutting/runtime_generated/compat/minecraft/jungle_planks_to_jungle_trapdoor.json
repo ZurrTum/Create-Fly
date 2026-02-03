@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:jungle_trapdoor",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:jungle_trapdoor"
+    }
+  ],
   "ingredient": "minecraft:jungle_planks",
   "type": "create:cutting"
 }

@@ -46,19 +46,19 @@
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "create:cogwheel",
-      "result": "$result"
+      "results": ["$result"]
     },
     {
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "create:large_cogwheel",
-      "result": "$result"
+      "results": ["$result"]
     },
     {
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "#c:nuggets/iron",
-      "result": "$result"
+      "results": ["$result"]
     }
   ]
 }

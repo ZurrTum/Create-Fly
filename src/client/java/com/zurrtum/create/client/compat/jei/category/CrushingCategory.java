@@ -8,8 +8,8 @@ import com.zurrtum.create.client.compat.jei.renderer.TwoIconRenderer;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.CrushWheelRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -25,9 +25,9 @@ import org.joml.Matrix3x2f;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrushingCategory extends CreateCategory<RecipeHolder<? extends AbstractCrushingRecipe>> {
-    public static List<RecipeHolder<? extends AbstractCrushingRecipe>> getRecipes(RecipeMap preparedRecipes) {
-        List<RecipeHolder<? extends AbstractCrushingRecipe>> recipes = new ArrayList<>();
+public class CrushingCategory extends CreateCategory<RecipeHolder<? extends CreateSingleStackRollableRecipe>> {
+    public static List<RecipeHolder<? extends CreateSingleStackRollableRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        List<RecipeHolder<? extends CreateSingleStackRollableRecipe>> recipes = new ArrayList<>();
         recipes.addAll(preparedRecipes.byType(AllRecipeTypes.CRUSHING));
         recipes.addAll(preparedRecipes.byType(AllRecipeTypes.MILLING));
         return recipes;
@@ -35,7 +35,7 @@ public class CrushingCategory extends CreateCategory<RecipeHolder<? extends Abst
 
     @Override
     @NotNull
-    public IRecipeType<RecipeHolder<? extends AbstractCrushingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<? extends CreateSingleStackRollableRecipe>> getRecipeType() {
         return JeiClientPlugin.CRUSHING;
     }
 
@@ -56,10 +56,10 @@ public class CrushingCategory extends CreateCategory<RecipeHolder<? extends Abst
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends AbstractCrushingRecipe> entry, IFocusGroup focuses) {
-        AbstractCrushingRecipe recipe = entry.value();
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends CreateSingleStackRollableRecipe> entry, IFocusGroup focuses) {
+        CreateSingleStackRollableRecipe recipe = entry.value();
         builder.addInputSlot(51, 3).setBackground(SLOT, -1, -1).add(recipe.ingredient());
-        List<ChanceOutput> results = recipe.results();
+        List<ProcessingOutput> results = recipe.results();
         for (int i = 0, size = results.size(), start = (179 - 19 * size) / 2 + 3; i < size; i++) {
             addChanceSlot(builder, start + i * 19, 83, results.get(i));
         }
@@ -67,7 +67,7 @@ public class CrushingCategory extends CreateCategory<RecipeHolder<? extends Abst
 
     @Override
     public void draw(
-        RecipeHolder<? extends AbstractCrushingRecipe> entry,
+        RecipeHolder<? extends CreateSingleStackRollableRecipe> entry,
         IRecipeSlotsView recipeSlotsView,
         GuiGraphics graphics,
         double mouseX,

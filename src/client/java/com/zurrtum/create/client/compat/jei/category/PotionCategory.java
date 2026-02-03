@@ -15,8 +15,8 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
@@ -60,19 +60,20 @@ public class PotionCategory extends CreateCategory<RecipeHolder<PotionRecipe>> {
         builder.addInputSlot(21, 51).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         addFluidSlot(builder, 40, 51, recipe.fluidIngredient()).setBackground(SLOT, -1, -1);
         addFluidSlot(builder, 142, 51, recipe.result()).setBackground(SLOT, -1, -1);
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 134, 81).add(AllItems.BLAZE_BURNER);
     }
 
     @Override
     public void draw(RecipeHolder<PotionRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         HeatCondition requiredHeat = HeatCondition.HEATED;
-        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 33);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
         Matrix3x2f pose = new Matrix3x2f(graphics.pose());
-        AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 81);
+        AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 80);
         AllGuiTextures.JEI_LIGHT.render(graphics, 81, 88);
         graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(pose, 91, 69, requiredHeat.visualizeAsBlazeBurner()));
         graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 91, -5));
         graphics.drawString(
-            Minecraft.getInstance().font,
+            graphics.minecraft.font,
             CreateLang.translateDirect(requiredHeat.getTranslationKey()),
             9,
             86,

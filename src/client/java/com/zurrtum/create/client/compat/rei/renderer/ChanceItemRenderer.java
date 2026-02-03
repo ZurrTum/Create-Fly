@@ -21,8 +21,11 @@ public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) 
     public @Nullable Tooltip getTooltip(EntryStack<ItemStack> entry, TooltipContext context) {
         Tooltip tooltip = origin.getTooltip(entry, context);
         if (tooltip != null) {
-            tooltip.add(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100))
-                .withStyle(ChatFormatting.GOLD));
+            tooltip.entries().add(
+                1,
+                Tooltip.entry(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100))
+                    .withStyle(ChatFormatting.GOLD))
+            );
         }
         return tooltip;
     }

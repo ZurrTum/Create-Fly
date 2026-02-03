@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "create:waxed_copper_shingles",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "create:copper_shingles"
-  }
+  "results": [
+    {
+      "id": "create:copper_shingles"
+    }
+  ]
 }

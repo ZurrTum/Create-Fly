@@ -9,7 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.MillstoneRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -55,7 +55,7 @@ public class MillingCategory extends CreateCategory<RecipeHolder<MillingRecipe>>
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MillingRecipe> entry, IFocusGroup focuses) {
         MillingRecipe recipe = entry.value();
         builder.addInputSlot(15, 9).setBackground(SLOT, -1, -1).add(recipe.ingredient());
-        List<ChanceOutput> results = recipe.results();
+        List<ProcessingOutput> results = recipe.results();
         int size = results.size();
         if (size == 1) {
             addChanceSlot(builder, 139, 27, results.getFirst());

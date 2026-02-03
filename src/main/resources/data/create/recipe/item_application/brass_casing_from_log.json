@@ -2,7 +2,9 @@
   "type": "create:item_application",
   "target": "#c:stripped_logs",
   "ingredient": "#c:ingots/brass",
-  "result": {
-    "id": "create:brass_casing"
-  }
+  "results": [
+    {
+      "id": "create:brass_casing"
+    }
+  ]
 }

@@ -1,5 +1,6 @@
 package com.zurrtum.create.compat.rei;
 
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
@@ -43,6 +44,10 @@ public interface IngredientHelper {
         return builder.build();
     }
 
+    static List<EntryIngredient> getFluidIngredientList(List<com.zurrtum.create.infrastructure.fluids.FluidStack> stacks) {
+        return stacks.stream().map(IngredientHelper::createEntryIngredient).toList();
+    }
+
     static Stream<EntryIngredient> getFluidIngredientStream(@Nullable FluidIngredient ingredient) {
         return ingredient == null ? Stream.empty() : Stream.of(createEntryIngredient(ingredient));
     }
@@ -76,7 +81,6 @@ public interface IngredientHelper {
         return Stream.concat(first, second).toList();
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     static EntryIngredient getInputEntryIngredient(Ingredient ingredient) {
         CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
         if (customIngredient instanceof ComponentsIngredient) {
@@ -91,5 +95,13 @@ public interface IngredientHelper {
         } else {
             return EntryIngredients.ofIngredient(ingredient);
         }
+    }
+
+    static List<EntryIngredient> getOutputEntryIngredients(List<ProcessingOutput> outputs) {
+        return outputs.stream().map(output -> EntryIngredients.of(output.create())).toList();
+    }
+
+    static List<Float> getOutputChances(List<ProcessingOutput> outputs) {
+        return outputs.stream().map(ProcessingOutput::chance).toList();
     }
 }

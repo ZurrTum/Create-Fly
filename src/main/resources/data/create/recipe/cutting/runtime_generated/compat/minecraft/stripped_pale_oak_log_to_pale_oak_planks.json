@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:pale_oak_planks",
-    "count": 6
-  },
+  "results": [
+    {
+      "id": "minecraft:pale_oak_planks",
+      "count": 6
+    }
+  ],
   "ingredient": "minecraft:stripped_pale_oak_log",
   "type": "create:cutting"
 }

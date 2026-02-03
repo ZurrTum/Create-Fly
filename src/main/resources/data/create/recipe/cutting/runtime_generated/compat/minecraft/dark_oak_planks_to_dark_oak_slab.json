@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:dark_oak_slab",
-    "count": 2
-  },
+  "results": [
+    {
+      "id": "minecraft:dark_oak_slab",
+      "count": 2
+    }
+  ],
   "ingredient": "minecraft:dark_oak_planks",
   "type": "create:cutting"
 }

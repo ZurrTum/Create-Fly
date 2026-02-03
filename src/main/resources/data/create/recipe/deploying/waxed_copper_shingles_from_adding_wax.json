@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "create:copper_shingles",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "create:waxed_copper_shingles"
-  }
+  "results": [
+    {
+      "id": "create:waxed_copper_shingles"
+    }
+  ]
 }

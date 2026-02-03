@@ -14,12 +14,6 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +22,11 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class RecipeTrie<R extends Recipe<?>> {
     private static final int MAX_CACHE_SIZE = Integer.getInteger("create.recipe_trie.max_cache_size", 512);
@@ -196,8 +195,8 @@ public class RecipeTrie<R extends Recipe<?>> {
             } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
                 items = shapelessRecipe.ingredients.iterator();
             } else if (recipe instanceof BasinRecipe basinRecipe) {
-                items = basinRecipe.getIngredients().stream().map(SizedIngredient::getIngredient).iterator();
-                fluids = basinRecipe.getFluidIngredients();
+                items = basinRecipe.ingredients().stream().map(SizedIngredient::getIngredient).iterator();
+                fluids = basinRecipe.fluidIngredients();
             }
             if (items != null) {
                 while (items.hasNext()) {

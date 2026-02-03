@@ -2,36 +2,26 @@ package com.zurrtum.create.client.compat.jei.category;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.client.compat.jei.CreateCategory;
 import com.zurrtum.create.client.compat.jei.JeiClientPlugin;
 import com.zurrtum.create.client.compat.jei.renderer.TwoIconRenderer;
-import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import com.zurrtum.create.client.foundation.gui.render.BasinBlazeBurnerRenderState;
-import com.zurrtum.create.client.foundation.gui.render.MixingBasinRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
-import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
-import com.zurrtum.create.content.processing.recipe.HeatCondition;
-import com.zurrtum.create.content.processing.recipe.SizedIngredient;
-import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class MixingCategory extends CreateCategory<RecipeHolder<MixingRecipe>> {
+public class MixingCategory extends BasinCategory<MixingRecipe> {
     public static List<RecipeHolder<MixingRecipe>> getRecipes(RecipeMap preparedRecipes) {
         return preparedRecipes.byType(AllRecipeTypes.MIXING).stream().toList();
     }
@@ -61,66 +51,22 @@ public class MixingCategory extends CreateCategory<RecipeHolder<MixingRecipe>> {
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MixingRecipe> entry, IFocusGroup focuses) {
         MixingRecipe recipe = entry.value();
-        List<SizedIngredient> ingredients = recipe.ingredients();
-        List<FluidIngredient> fluidIngredients = recipe.fluidIngredients();
-        int i = 0;
-        int ingredientSize = ingredients.size();
-        int fluidIngredientSize = fluidIngredients.size();
-        int size = ingredientSize + fluidIngredientSize;
-        int xOffset = size < 3 ? 12 + (3 - size) * 19 / 2 : 12;
-        int yOffset = 51;
-        for (; i < ingredientSize; i++) {
-            builder.addInputSlot(xOffset + (i % 3) * 19, yOffset - (i / 3) * 19).setBackground(SLOT, -1, -1)
-                .addItemStacks(getStacks(ingredients.get(i)));
-        }
-        for (; i < size; i++) {
-            addFluidSlot(builder, xOffset + (i % 3) * 19, yOffset - (i / 3) * 19, fluidIngredients.get(i - ingredientSize)).setBackground(
-                SLOT,
-                -1,
-                -1
-            );
-        }
-        ItemStack result = recipe.result();
-        if (result.isEmpty()) {
-            addFluidSlot(builder, 142, 51, recipe.fluidResult()).setBackground(SLOT, -1, -1);
-        } else {
-            builder.addOutputSlot(142, 51).setBackground(SLOT, -1, -1).add(result);
-        }
-        HeatCondition requiredHeat = recipe.heat();
-        if (!requiredHeat.testBlazeBurner(BlazeBurnerBlock.HeatLevel.NONE)) {
-            builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 134, 81).add(AllItems.BLAZE_BURNER);
-        }
-        if (!requiredHeat.testBlazeBurner(BlazeBurnerBlock.HeatLevel.KINDLED)) {
-            builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 153, 81).add(AllItems.BLAZE_CAKE);
-        }
+        addIngredientSlots(builder, recipe);
+        List<ProcessingOutput> results = recipe.results();
+        List<FluidStack> fluidResults = recipe.fluidResults();
+        int resultSize = results.size();
+        int size = resultSize + fluidResults.size();
+        boolean isOddSize = size % 2 != 0;
+        int end = size - 1;
+        int y = size <= 4 ? 51 : 60;
+        addResultSlots(builder, results, 0, end, y, isOddSize);
+        addFluidResultSlots(builder, fluidResults, resultSize, end, y, isOddSize);
+        addHeatSlots(builder, recipe);
     }
 
     @Override
     public void draw(RecipeHolder<MixingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
-        Matrix3x2f pose = new Matrix3x2f(graphics.pose());
-        HeatCondition requiredHeat = entry.value().heat();
-        if (requiredHeat == HeatCondition.NONE) {
-            AllGuiTextures.JEI_NO_HEAT_BAR.render(graphics, 4, 80);
-            AllGuiTextures.JEI_SHADOW.render(graphics, 81, 68);
-        } else {
-            AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 80);
-            AllGuiTextures.JEI_LIGHT.render(graphics, 81, 88);
-            graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(
-                pose,
-                91,
-                69,
-                requiredHeat.visualizeAsBlazeBurner()
-            ));
-        }
-        graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 91, -5));
-        graphics.drawString(
-            Minecraft.getInstance().font,
-            CreateLang.translateDirect(requiredHeat.getTranslationKey()),
-            9,
-            86,
-            requiredHeat.getColor(),
-            false
-        );
+        MixingRecipe recipe = entry.value();
+        drawBackground(recipe, graphics, recipe.results().size() + recipe.fluidResults().size());
     }
 }

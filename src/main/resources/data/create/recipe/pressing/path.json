@@ -6,7 +6,9 @@
     "minecraft:coarse_dirt",
     "minecraft:rooted_dirt"
   ],
-  "result": {
-    "id": "minecraft:dirt_path"
-  }
+  "results": [
+    {
+      "id": "minecraft:dirt_path"
+    }
+  ]
 }

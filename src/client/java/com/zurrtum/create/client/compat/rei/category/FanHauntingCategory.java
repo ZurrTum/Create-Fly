@@ -8,7 +8,7 @@ import com.zurrtum.create.client.foundation.gui.render.FanRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.FanHauntingDisplay;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -47,7 +47,7 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
         List<EntryIngredient> outputIngredients = new ArrayList<>();
         List<Point> chances = new ArrayList<>();
         List<EntryIngredient> chanceIngredients = new ArrayList<>();
-        List<ChanceOutput> results = display.outputs();
+        List<ProcessingOutput> results = display.outputs();
         int outputSize = results.size();
         Point input;
         int xOffsetAmount = 1 - Math.min(3, outputSize);
@@ -56,7 +56,7 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
             addOutputData(results.getFirst(), bounds.x + 146, bounds.y + 53, outputs, outputIngredients, chances, chanceIngredients);
         } else {
             input = new Point(bounds.x + 26 + xOffsetAmount * 5, bounds.y + 53);
-            for (int i = 0, left = bounds.x + 146 + xOffsetAmount * 9, top = bounds.y + 53; i < outputSize; i++) {
+            for (int i = 0, left = bounds.x + 146 + xOffsetAmount * 9, top = bounds.y + (outputSize <= 9 ? 53 : 62); i < outputSize; i++) {
                 int xOffset = (i % 3) * 19;
                 int yOffset = (i / 3) * -19;
                 addOutputData(results.get(i), left + xOffset, top + yOffset, outputs, outputIngredients, chances, chanceIngredients);

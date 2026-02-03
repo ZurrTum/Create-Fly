@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:crimson_stairs",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:crimson_stairs"
+    }
+  ],
   "ingredient": "minecraft:crimson_planks",
   "type": "create:cutting"
 }

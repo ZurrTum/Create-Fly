@@ -68,7 +68,6 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
                     scale,
                     context.vanillaContext().tickRate()
                 );
-                contents.addToTooltip(context.vanillaContext(), text -> list.add(Tooltip.entry(text)), context.getFlag(), components);
                 entries.removeFirst();
                 entries.addAll(0, list);
             }

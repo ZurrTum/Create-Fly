@@ -7,7 +7,7 @@ import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Optional;
 
 public record SequencedAssemblyDisplay(
-    EntryIngredient input, SequenceData sequences, ChanceOutput output, int loop, Optional<Identifier> location
+    EntryIngredient input, SequenceData sequences, ProcessingOutput output, int loop, Optional<Identifier> location
 ) implements Display {
     public static final DisplaySerializer<SequencedAssemblyDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SequencedAssemblyDisplay::input),
             SequenceData.CODEC.fieldOf("sequences").forGetter(SequencedAssemblyDisplay::sequences),
-            ChanceOutput.CODEC.fieldOf("output").forGetter(SequencedAssemblyDisplay::output),
+            ProcessingOutput.CODEC.fieldOf("output").forGetter(SequencedAssemblyDisplay::output),
             Codec.INT.fieldOf("loop").forGetter(SequencedAssemblyDisplay::loop),
             Identifier.CODEC.optionalFieldOf("location").forGetter(SequencedAssemblyDisplay::location)
         ).apply(instance, SequencedAssemblyDisplay::new)), StreamCodec.composite(
@@ -47,7 +47,7 @@ public record SequencedAssemblyDisplay(
             SequencedAssemblyDisplay::input,
             SequenceData.PACKET_CODEC,
             SequencedAssemblyDisplay::sequences,
-            ChanceOutput.PACKET_CODEC,
+            ProcessingOutput.STREAM_CODEC,
             SequencedAssemblyDisplay::output,
             ByteBufCodecs.INT,
             SequencedAssemblyDisplay::loop,
@@ -80,7 +80,7 @@ public record SequencedAssemblyDisplay(
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(EntryIngredients.of(output.stack()));
+        return List.of(EntryIngredients.of(output.create()));
     }
 
     @Override

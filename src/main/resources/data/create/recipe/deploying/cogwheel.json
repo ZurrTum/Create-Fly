@@ -2,7 +2,9 @@
   "type": "create:deploying",
   "target": "create:shaft",
   "ingredient": "#minecraft:planks",
-  "result": {
-    "id": "create:cogwheel"
-  }
+  "results": [
+    {
+      "id": "create:cogwheel"
+    }
+  ]
 }

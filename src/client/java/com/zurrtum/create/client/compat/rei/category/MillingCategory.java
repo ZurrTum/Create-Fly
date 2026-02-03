@@ -8,7 +8,7 @@ import com.zurrtum.create.client.foundation.gui.render.MillstoneRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.MillingDisplay;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -46,7 +46,7 @@ public class MillingCategory extends CreateCategory<MillingDisplay> {
         List<EntryIngredient> outputIngredients = new ArrayList<>();
         List<Point> chances = new ArrayList<>();
         List<EntryIngredient> chanceIngredients = new ArrayList<>();
-        List<ChanceOutput> results = display.outputs();
+        List<ProcessingOutput> results = display.outputs();
         int outputSize = results.size();
         if (outputSize == 1) {
             addOutputData(results.getFirst(), bounds.x + 144, bounds.y + 32, outputs, outputIngredients, chances, chanceIngredients);

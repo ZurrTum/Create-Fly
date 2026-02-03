@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:warped_pressure_plate",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:warped_pressure_plate"
+    }
+  ],
   "ingredient": "minecraft:warped_planks",
   "type": "create:cutting"
 }

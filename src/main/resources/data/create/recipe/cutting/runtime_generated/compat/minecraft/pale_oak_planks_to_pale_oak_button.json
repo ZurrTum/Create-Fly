@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:pale_oak_button",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:pale_oak_button"
+    }
+  ],
   "ingredient": "minecraft:pale_oak_planks",
   "type": "create:cutting"
 }

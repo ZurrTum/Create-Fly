@@ -14,7 +14,7 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.SequencedAssemblyDisplay;
 import com.zurrtum.create.compat.rei.display.SequencedAssemblyDisplay.SequenceData;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -126,7 +126,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
 
     @Override
     public void addWidgets(List<Widget> widgets, SequencedAssemblyDisplay display, Rectangle bounds) {
-        ChanceOutput chanceOutput = display.output();
+        ProcessingOutput chanceOutput = display.output();
         boolean randomOutput = chanceOutput.chance() != 1;
         boolean willRepeat = display.loop() > 1;
         int xOffset = randomOutput ? bounds.x - 7 : bounds.x;

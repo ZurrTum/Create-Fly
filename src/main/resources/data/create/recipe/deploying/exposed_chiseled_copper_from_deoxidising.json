@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:weathered_chiseled_copper",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:exposed_chiseled_copper"
-  }
+  "results": [
+    {
+      "id": "minecraft:exposed_chiseled_copper"
+    }
+  ]
 }
