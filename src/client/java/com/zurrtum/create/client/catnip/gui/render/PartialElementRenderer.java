@@ -89,7 +89,7 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
-            partial.IDENTITY_POSE,
+            partial.pose,
             partial.x1,
             partial.y1,
             partial.x2,

@@ -3,6 +3,7 @@ package com.zurrtum.create.content.redstone.nixieTube;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.compat.Mods;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
@@ -301,16 +302,16 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (state.getBlock() == oldState.getBlock() || isMoving || oldState.getBlock() instanceof NixieTubeBlock)
             return;
-        //        if (Mods.COMPUTERCRAFT.isLoaded() && isInComputerControlledRow(worldIn, pos)) {
-        //            // The nixie tube has been placed in a computer-controlled row.
-        //            walkNixies(
-        //                worldIn, pos, true, (currentPos, rowPosition) -> {
-        //                    if (worldIn.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
-        //                        ntbe.displayEmptyText(rowPosition);
-        //                }
-        //            );
-        //            return;
-        //        }
+        if (Mods.COMPUTERCRAFT.isLoaded() && isInComputerControlledRow(worldIn, pos)) {
+            // The nixie tube has been placed in a computer-controlled row.
+            walkNixies(
+                worldIn, pos, true, (currentPos, rowPosition) -> {
+                    if (worldIn.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
+                        ntbe.displayEmptyText(rowPosition);
+                }
+            );
+            return;
+        }
         updateDisplayedRedstoneValue(state, worldIn, pos);
     }
 
