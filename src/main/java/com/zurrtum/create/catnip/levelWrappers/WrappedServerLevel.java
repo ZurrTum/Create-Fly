@@ -37,8 +37,7 @@ public class WrappedServerLevel extends ServerLevel {
             level.isDebug(),
             level.getBiomeManager().biomeZoomSeed,
             Collections.emptyList(),
-            false,
-            level.getRandomSequences()
+            false
         );
         this.level = level;
     }
