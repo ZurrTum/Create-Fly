@@ -20,6 +20,9 @@ public interface ItemInventoryProvider<T extends SmartBlockEntity> extends Inven
     @Override
     default SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
         Inventory inventory = getInventory(state, world, pos, null, null);
+        if (inventory == null) {
+            return null;
+        }
         if (inventory instanceof SidedInventory sidedInventory) {
             return sidedInventory;
         }
