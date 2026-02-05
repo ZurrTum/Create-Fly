@@ -1,5 +1,6 @@
 package com.zurrtum.create.content.processing.basin;
 
+import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
@@ -642,9 +643,13 @@ public interface BasinRecipe extends CreateRecipe<BasinInput> {
 
     int getIngredientSize();
 
-    List<SizedIngredient> getIngredients();
+    List<SizedIngredient> ingredients();
 
-    List<FluidIngredient> getFluidIngredients();
+    List<FluidIngredient> fluidIngredients();
+
+    default HeatCondition heat() {
+        return HeatCondition.NONE;
+    }
 
     boolean apply(BasinInput input);
 

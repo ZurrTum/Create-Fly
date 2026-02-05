@@ -36,6 +36,10 @@ public record ProcessingOutput(Holder<Item> item, int count, DataComponentPatch 
         ProcessingOutput::new
     );
 
+    public ProcessingOutput(ItemStack stack) {
+        this(stack.typeHolder(), stack.getCount(), stack.getComponentsPatch(), 1);
+    }
+
     public ProcessingOutput(Holder<Item> item, int count, int chance) {
         this(item, count, DataComponentPatch.EMPTY, chance);
     }

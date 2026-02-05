@@ -61,16 +61,6 @@ public record CompactingRecipe(
     }
 
     @Override
-    public List<SizedIngredient> getIngredients() {
-        return ingredients;
-    }
-
-    @Override
-    public List<FluidIngredient> getFluidIngredients() {
-        return fluidIngredients;
-    }
-
-    @Override
     public boolean matches(BasinInput input, Level world) {
         if (!heat.testBlazeBurner(input.heat())) {
             return false;

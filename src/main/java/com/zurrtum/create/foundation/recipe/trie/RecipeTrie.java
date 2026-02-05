@@ -194,8 +194,8 @@ public class RecipeTrie<R extends Recipe<?>> {
             } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
                 items = shapelessRecipe.ingredients.iterator();
             } else if (recipe instanceof BasinRecipe basinRecipe) {
-                items = basinRecipe.getIngredients().stream().map(SizedIngredient::getIngredient).iterator();
-                fluids = basinRecipe.getFluidIngredients();
+                items = basinRecipe.ingredients().stream().map(SizedIngredient::getIngredient).iterator();
+                fluids = basinRecipe.fluidIngredients();
             }
             if (items != null) {
                 while (items.hasNext()) {
