@@ -25,6 +25,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.LevelLoadListener;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,6 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.Proxy;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
@@ -96,16 +98,17 @@ public abstract class MinecraftServerMixin {
         Create.SERVER = null;
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/WorldStem;worldData()Lnet/minecraft/world/level/storage/WorldData;"))
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/LayeredRegistryAccess;compositeAccess()Lnet/minecraft/core/RegistryAccess$Frozen;", ordinal = 0))
     private void addBiomeFeatures(
         Thread serverThread,
-        LevelStorageSource.LevelStorageAccess session,
-        PackRepository dataPackManager,
-        WorldStem saveLoader,
+        LevelStorageSource.LevelStorageAccess storageSource,
+        PackRepository packRepository,
+        WorldStem worldStem,
+        Optional<GameRules> gameRules,
         Proxy proxy,
-        DataFixer dataFixer,
-        Services apiServices,
-        LevelLoadListener chunkLoadProgress,
+        DataFixer fixerUpper,
+        Services services,
+        LevelLoadListener levelLoadListener,
         CallbackInfo ci
     ) {
         if ((Object) this instanceof DedicatedServer) {

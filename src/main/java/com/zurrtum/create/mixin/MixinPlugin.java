@@ -32,7 +32,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         } else {
             mixins.add("CreativeModeTabMixin");
             mixins.add("CreativeModeTabsMixin");
-            mixins.add("DimensionDataStorageMixin");
+            mixins.add("SavedDataStorageMixin");
             mixins.add("IngredientMixin");
         }
         if (loader.isModLoaded("fabric-resource-loader-v1")) {
