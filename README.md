@@ -8,7 +8,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 - This is a Fabric fork of [Create](https://github.com/Creators-of-Create/Create).
   The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork has not released a version 1.21.1
-  or higher. it has been 10 months since then.
+  or higher. it has been 11 months since then.
 - Minecraft uses a new rendering method in higher versions: item models use a dedicated rendering folder, rendering uses
   a rendering pipeline, Entity, BlockEntity and GUI rendering is changed to extract the state first and then render,
   which requires
@@ -75,10 +75,10 @@ repositories {
 }
 
 dependencies {
-    // 26.1-snapshot-5
-    implementation "maven.modrinth:create-fly:26.1-snapshot-5-6.0.9-2"
+    // 26.1-snapshot-6
+    implementation "maven.modrinth:create-fly:26.1-snapshot-6-6.0.9-1"
     // 1.21.11
-    modImplementation "maven.modrinth:create-fly:1.21.11-6.0.9-2"
+    modImplementation "maven.modrinth:create-fly:1.21.11-6.0.9-3"
     // 1.21.10
     modImplementation "maven.modrinth:create-fly:1.21.10-6.0.9-1"
     // 1.21.8
@@ -103,10 +103,10 @@ repositories {
 }
 
 dependencies {
-    // 26.1-snapshot-5
-    implementation "curse.maven:create-fly-1346281:7560650-sources-7560653"
+    // 26.1-snapshot-6
+    implementation "curse.maven:create-fly-1346281:7580187-sources-7580193"
     // 1.21.11
-    modImplementation "curse.maven:create-fly-1346281:7476455-sources-7476462"
+    modImplementation "curse.maven:create-fly-1346281:7572621-sources-7572624"
     // 1.21.10
     modImplementation "curse.maven:create-fly-1346281:7460694-sources-7460703"
     // 1.21.8
