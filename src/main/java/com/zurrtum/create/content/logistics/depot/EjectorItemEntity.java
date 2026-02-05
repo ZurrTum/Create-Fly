@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
+import com.zurrtum.create.foundation.item.EntityItem;
 import com.zurrtum.create.infrastructure.packet.s2c.EjectorItemSpawnPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +15,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -174,8 +176,9 @@ public class EjectorItemEntity extends ItemEntity {
 
     private void placeItemAtTarget(boolean isClient, float maxTime) {
         DirectBeltInputBehaviour targetOpenInv = getTargetOpenInv();
+        ItemStack stack = getItem();
         if (targetOpenInv != null) {
-            ItemStack remainder = targetOpenInv.handleInsertion(getItem(), Direction.UP, isClient);
+            ItemStack remainder = targetOpenInv.handleInsertion(stack, Direction.UP, isClient);
             if (remainder.isEmpty()) {
                 discard();
                 return;
@@ -188,6 +191,18 @@ public class EjectorItemEntity extends ItemEntity {
         setPos(ejectVec.x, ejectVec.y, ejectVec.z);
         setOldPos();
         setDeltaMovement(ejectMotionVec);
+        if (stack.getItem() instanceof EntityItem item) {
+            if (!isClient) {
+                Level level = level();
+                Entity newEntity = item.createEntity(level, this, stack);
+                if (newEntity != null) {
+                    discard();
+                    level.addFreshEntity(newEntity);
+                }
+            } else {
+                discard();
+            }
+        }
     }
 
     @Nullable

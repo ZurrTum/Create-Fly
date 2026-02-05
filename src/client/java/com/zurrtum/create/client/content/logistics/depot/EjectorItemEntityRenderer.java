@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.logistics.depot;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -45,9 +46,14 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
                 itemEntityRenderState.ageInTicks = (entity.age - entity.data.initAge + f) / 10.0F;
             }
         } else {
-            state.rotateY = entity.data.rotateY;
+            state.isPackage = PackageItem.isPackage(entity.getItem());
             float time = entity.progress + f;
-            state.rotateX = Mth.DEG_TO_RAD * time * 40;
+            if (state.isPackage) {
+                state.rotateY = Mth.DEG_TO_RAD * time * 20;
+            } else {
+                state.rotateY = entity.data.rotateY;
+                state.rotateX = Mth.DEG_TO_RAD * time * 40;
+            }
             state.location = entity.getLaunchedItemLocation(time).subtract(entity.position());
         }
         itemEntityRenderState.bobOffset = entity.data.animateOffset;
@@ -79,10 +85,16 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
             if (!state.alive) {
                 matrixStack.translate(state.location);
                 matrixStack.translate(0, 0.25f, 0);
+                if (state.isPackage) {
+                    matrixStack.translate(0, 0.25f, 0);
+                    matrixStack.scale(3f, 3f, 3f);
+                }
                 if (state.rotateY != 0) {
                     matrixStack.mulPose(Axis.YP.rotation(state.rotateY));
                 }
-                matrixStack.mulPose(Axis.XP.rotation(state.rotateX));
+                if (state.rotateX != 0) {
+                    matrixStack.mulPose(Axis.XP.rotation(state.rotateX));
+                }
                 matrixStack.translate(0, -0.25f, 0);
             } else if (state.ageInTicks > 0) {
                 float g = Mth.sin(state.ageInTicks) * 0.1F + 0.1F;
@@ -109,5 +121,6 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
         public float rotateY;
         public float rotateX;
         public Vec3 location;
+        public boolean isPackage;
     }
 }

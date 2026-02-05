@@ -2,6 +2,7 @@ package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.content.contraptions.ContraptionHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
+import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import com.zurrtum.create.foundation.item.EntityItem;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -19,6 +20,9 @@ public class PersistentEntitySectionManagerMixin {
     @ModifyVariable(method = "addEntity(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private EntityAccess addEntity(EntityAccess entity) {
         if (entity instanceof ItemEntity itemEntity) {
+            if (entity instanceof EjectorItemEntity) {
+                return entity;
+            }
             ItemStack stack = itemEntity.getItem();
             if (stack.getItem() instanceof EntityItem item) {
                 Entity newEntity = item.createEntity(itemEntity.level(), itemEntity, stack);
