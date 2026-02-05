@@ -63,8 +63,14 @@ public class CreateRenderTypes {
             .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     ));
 
+    private static final RenderType SOLID_BLOCK_SHEET = RenderTypes.entitySolid(TextureAtlas.LOCATION_BLOCKS);
+
     public static RenderType translucent() {
         return TRANSLUCENT;
+    }
+
+    public static RenderType solidBlockSheet() {
+        return SOLID_BLOCK_SHEET;
     }
 
     public static RenderType additive() {

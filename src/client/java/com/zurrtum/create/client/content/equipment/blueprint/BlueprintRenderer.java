@@ -8,8 +8,8 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -47,7 +47,7 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
         float yaw = entity.getYRot(tickProgress);
         float pitch = entity.getXRot();
         int size = entity.size;
-        state.layer = Sheets.solidBlockSheet();
+        state.layer = CreateRenderTypes.solidBlockSheet();
         PartialModel partialModel = size == 3 ? AllPartialModels.CRAFTING_BLUEPRINT_3x3 : size == 2 ? AllPartialModels.CRAFTING_BLUEPRINT_2x2 : AllPartialModels.CRAFTING_BLUEPRINT_1x1;
         state.model = CachedBuffers.partial(partialModel, Blocks.AIR.defaultBlockState());
         state.yRot = Mth.DEG_TO_RAD * -yaw;

@@ -47,9 +47,9 @@ public final class ModelUtil {
         }
         ITEM_CHUNK_MATERIALS.put(RenderTypes.solidMovingBlock(), CHUNK_MATERIALS[2]);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.cutoutMovingBlock(), CHUNK_MATERIALS[6]);
+        ITEM_CHUNK_MATERIALS.put(Sheets.cutoutBlockItemSheet(), CHUNK_MATERIALS[6]);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.translucentMovingBlock(), CHUNK_MATERIALS[10]);
         ITEM_CHUNK_MATERIALS.put(Sheets.cutoutBlockSheet(), CHUNK_MATERIALS[7]);
-        ITEM_CHUNK_MATERIALS.put(Sheets.solidBlockSheet(), CHUNK_MATERIALS[3]);
         ITEM_CHUNK_MATERIALS.put(Sheets.translucentBlockItemSheet(), Materials.TRANSLUCENT_ITEM_ENTITY_BLOCK);
         ITEM_CHUNK_MATERIALS.put(Sheets.translucentItemSheet(), Materials.TRANSLUCENT_ITEM_ENTITY_ITEM);
         ITEM_CHUNK_MATERIALS.put(RenderTypes.glint(), Materials.GLINT);

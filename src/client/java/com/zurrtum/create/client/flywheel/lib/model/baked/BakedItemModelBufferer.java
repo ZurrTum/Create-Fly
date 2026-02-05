@@ -41,7 +41,6 @@ public class BakedItemModelBufferer {
         Transparency.TRANSLUCENT
     );
     static final List<RenderType> CHUNK_LAYERS = List.of(
-        Sheets.solidBlockSheet(),
         Sheets.cutoutBlockSheet(),
         Sheets.translucentItemSheet(),
         RenderTypes.glint(),

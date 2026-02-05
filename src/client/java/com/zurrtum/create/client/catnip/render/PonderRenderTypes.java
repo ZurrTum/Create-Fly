@@ -26,9 +26,9 @@ public class PonderRenderTypes {
 
     private static final BiFunction<Identifier, Boolean, RenderType> OUTLINE_TRANSLUCENT = Util.memoize((texture, cull) -> RenderType.create(
         createLayerName("outline_translucent" + (cull ? "_cull" : "")),
-        RenderSetup.builder(cull ? PonderRenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL : PonderRenderPipelines.ENTITY_TRANSLUCENT)
-            .bufferSize(256).sortOnUpload().withTexture("Sampler0", texture).useLightmap().useOverlay()
-            .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET).createRenderSetup()
+        RenderSetup.builder(cull ? PonderRenderPipelines.ENTITY_TRANSLUCENT_CULL : PonderRenderPipelines.ENTITY_TRANSLUCENT).bufferSize(256)
+            .sortOnUpload().withTexture("Sampler0", texture).useLightmap().useOverlay().setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+            .createRenderSetup()
     ));
 
     public static RenderType getGui() {
