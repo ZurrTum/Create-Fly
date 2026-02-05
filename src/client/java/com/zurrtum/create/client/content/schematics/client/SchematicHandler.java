@@ -149,8 +149,12 @@ public class SchematicHandler {
 
         try {
             schematic.placeInWorld(w, pos, pos, placementSettings, w.getRandom(), Block.UPDATE_CLIENTS);
-            for (BlockEntity blockEntity : w.getBlockEntities())
+            for (BlockEntity blockEntity : w.getBlockEntities()) {
                 blockEntity.setLevel(w);
+                if (blockEntity instanceof SmartBlockEntity smartBlockEntity) {
+                    smartBlockEntity.tick();
+                }
+            }
             fixControllerBlockEntities(w);
         } catch (Exception e) {
             mc.player.displayClientMessage(CreateLang.translate("schematic.error").component(), false);
@@ -162,16 +166,24 @@ public class SchematicHandler {
         pos = BlockPos.ZERO.east(size.getX() - 1);
         schematic.placeInWorld(wMirroredFB, pos, pos, placementSettings, wMirroredFB.getRandom(), Block.UPDATE_CLIENTS);
         transform = new StructureTransform(placementSettings.getRotationPivot(), Axis.Y, Rotation.NONE, placementSettings.getMirror());
-        for (BlockEntity be : wMirroredFB.getRenderedBlockEntities())
+        for (BlockEntity be : wMirroredFB.getRenderedBlockEntities()) {
             transform.apply(be);
+            if (be instanceof SmartBlockEntity smartBlockEntity) {
+                smartBlockEntity.tick();
+            }
+        }
         fixControllerBlockEntities(wMirroredFB);
 
         placementSettings.setMirror(Mirror.LEFT_RIGHT);
         pos = BlockPos.ZERO.south(size.getZ() - 1);
         schematic.placeInWorld(wMirroredLR, pos, pos, placementSettings, wMirroredFB.getRandom(), Block.UPDATE_CLIENTS);
         transform = new StructureTransform(placementSettings.getRotationPivot(), Axis.Y, Rotation.NONE, placementSettings.getMirror());
-        for (BlockEntity be : wMirroredLR.getRenderedBlockEntities())
+        for (BlockEntity be : wMirroredLR.getRenderedBlockEntities()) {
             transform.apply(be);
+            if (be instanceof SmartBlockEntity smartBlockEntity) {
+                smartBlockEntity.tick();
+            }
+        }
         fixControllerBlockEntities(wMirroredLR);
 
         renderers[0] = new SchematicRenderer(w);
