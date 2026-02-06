@@ -35,6 +35,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("PersistentStateManagerMixin");
             mixins.add("IngredientMixin");
         }
+        if (loader.isModLoaded("fabric-resource-loader-v1")) {
+            mixins.add("ReloadListenerMixin");
+        }
     }
 
     @Override

@@ -3,8 +3,10 @@ package com.zurrtum.create.foundation.recipe.trie;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloader;
 import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
@@ -35,5 +37,16 @@ public class RecipeTrieFinder {
         );
     }
 
-    public static final SynchronousResourceReloader LISTENER = resourceManager -> CACHED_TRIES.invalidateAll();
+    public static final SynchronousResourceReloader LISTENER = new ReloadListener();
+
+    private static class ReloadListener extends CreateResourceReloader {
+        public ReloadListener() {
+            super("recipe_trie");
+        }
+
+        @Override
+        public void reload(ResourceManager resourceManager) {
+            CACHED_TRIES.invalidateAll();
+        }
+    }
 }

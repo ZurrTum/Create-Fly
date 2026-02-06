@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.UnbakedModelLoader;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -27,13 +28,17 @@ import java.util.Map;
  * Allows the user to enable automatic face culling, toggle quad shading, flip UVs, render emissively and specify a
  * {@link ObjMaterialLibrary material library} override.
  */
-public class ObjLoader implements UnbakedModelLoader<ObjModel>, SynchronousResourceReloader {
+public class ObjLoader extends CreateResourceReloader implements UnbakedModelLoader<ObjModel>, SynchronousResourceReloader {
     public static ObjLoader INSTANCE = new ObjLoader();
 
     private final Map<ObjGeometry.Settings, ObjGeometry> geometryCache = Maps.newConcurrentMap();
     private final Map<Identifier, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
 
     private final ResourceManager manager = MinecraftClient.getInstance().getResourceManager();
+
+    public ObjLoader() {
+        super("model");
+    }
 
     @Override
     public void reload(ResourceManager resourceManager) {

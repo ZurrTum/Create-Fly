@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id 'fabric-loom' version '1.13-SNAPSHOT'
+    id 'fabric-loom' version "${loom_version}"
 }
 
 repositories {
@@ -96,6 +96,7 @@ dependencies {
         modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
         modCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
         modCompileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-resource-loader-v1", project.fabric_version)
     } else {
         modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }

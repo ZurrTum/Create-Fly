@@ -3,7 +3,9 @@ package com.zurrtum.create.foundation.recipe;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.foundation.utility.CreateResourceReloader;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloader;
 import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +25,7 @@ import java.util.function.Predicate;
 public class RecipeFinder {
     private static final Cache<Object, List<RecipeEntry<?>>> CACHED_SEARCHES = CacheBuilder.newBuilder().build();
 
-    public static final SynchronousResourceReloader LISTENER = resourceManager -> CACHED_SEARCHES.invalidateAll();
+    public static final SynchronousResourceReloader LISTENER = new ReloadListener();
 
     /**
      * Find all recipes matching the condition predicate.
@@ -52,5 +54,16 @@ public class RecipeFinder {
             if (conditions.test(r))
                 recipes.add(r);
         return recipes;
+    }
+
+    private static class ReloadListener extends CreateResourceReloader {
+        public ReloadListener() {
+            super("recipe_search");
+        }
+
+        @Override
+        public void reload(ResourceManager resourceManager) {
+            CACHED_SEARCHES.invalidateAll();
+        }
     }
 }
