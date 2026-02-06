@@ -64,6 +64,7 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.Sc
 import com.zurrtum.create.client.foundation.sound.SoundScapes;
 import com.zurrtum.create.client.foundation.utility.ServerSpeedProvider;
 import com.zurrtum.create.client.model.obj.ObjLoader;
+import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
@@ -127,7 +128,9 @@ public abstract class MinecraftClientMixin {
     private void register(RunArgs args, CallbackInfo ci) {
         resourceManager.registerReloader(ObjLoader.INSTANCE);
         resourceManager.registerReloader(FlwProgramsReloader.INSTANCE);
+        resourceManager.registerReloader(Create.RESOURCE_RELOAD_LISTENER);
         resourceManager.registerReloader(TrainHatInfoReloadListener.LISTENER);
+        resourceManager.registerReloader(Ponder.RESOURCE_RELOAD_LISTENER);
     }
 
     @Inject(method = "<init>", at = @At(value = "NEW", target = "net/minecraft/resource/ReloadableResourceManagerImpl"))
@@ -156,13 +159,6 @@ public abstract class MinecraftClientMixin {
     ) {
         BackendManagerImpl.onEndClientResourceReload(error.isPresent());
         RendererReloadCache.onReloadLevelRenderer();
-    }
-
-    @Inject(method = "setWorld(Lnet/minecraft/client/world/ClientWorld;)V", at = @At("HEAD"))
-    private void unload(ClientWorld world, CallbackInfo ci) {
-        if (world != null) {
-            LevelAttached.invalidateLevel(world);
-        }
     }
 
     @Inject(method = "tick()V", at = @At("HEAD"))
@@ -301,12 +297,14 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;clear()V"))
     private void onUnloadWorld(CallbackInfo ci) {
-        Create.SCHEMATIC_HANDLER.updateRenderers();
+        LevelAttached.invalidateLevel(world);
+        Create.invalidateRenderers();
         Create.SOUL_PULSE_EFFECT_HANDLER.refresh();
         AnimationTickHolder.reset();
         ControlsHandler.levelUnloaded();
         WorldAttached.invalidateWorld(world);
         CobbleGenOptimisation.invalidateWorld(world);
+        Ponder.invalidateRenderers();
     }
 
     @Inject(method = "doItemPick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;hasControlDown()Z"), cancellable = true)
