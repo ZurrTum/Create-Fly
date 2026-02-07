@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.logistics.depot;
 
+import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -44,9 +45,15 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
                 itemEntityRenderState.age = (entity.age - entity.data.initAge + f) / 10.0F;
             }
         } else {
-            state.rotateY = entity.data.rotateY;
+            state.isPackage = PackageItem.isPackage(entity.getStack());
             float time = entity.progress + f;
-            state.rotateX = MathHelper.RADIANS_PER_DEGREE * time * 40;
+            if (state.isPackage) {
+                state.rotateY = MathHelper.RADIANS_PER_DEGREE * time * 20;
+                state.rotateX = 0;
+            } else {
+                state.rotateY = entity.data.rotateY;
+                state.rotateX = MathHelper.RADIANS_PER_DEGREE * time * 40;
+            }
             state.location = entity.getLaunchedItemLocation(time).subtract(entity.getPos());
         }
         itemEntityRenderState.uniqueOffset = entity.data.animateOffset;
@@ -73,10 +80,16 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
             if (!state.alive) {
                 matrixStack.translate(state.location);
                 matrixStack.translate(0, 0.25f, 0);
+                if (state.isPackage) {
+                    matrixStack.translate(0, 0.25f, 0);
+                    matrixStack.scale(3f, 3f, 3f);
+                }
                 if (state.rotateY != 0) {
                     matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(state.rotateY));
                 }
-                matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(state.rotateX));
+                if (state.rotateX != 0) {
+                    matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(state.rotateX));
+                }
                 matrixStack.translate(0, -0.25f, 0);
             } else if (itemEntityRenderState.age > 0) {
                 float g = MathHelper.sin(itemEntityRenderState.age) * 0.1F + 0.1F;
@@ -105,5 +118,6 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
         public float rotateY;
         public float rotateX;
         public Vec3d location;
+        public boolean isPackage;
     }
 }

@@ -2,6 +2,7 @@ package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.content.contraptions.ContraptionHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
+import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import com.zurrtum.create.foundation.item.EntityItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -21,6 +22,9 @@ public class ServerEntityManagerMixin {
         if (entity instanceof ItemEntity itemEntity) {
             ItemStack stack = itemEntity.getStack();
             if (stack.getItem() instanceof EntityItem item) {
+                if (entity instanceof EjectorItemEntity) {
+                    return entity;
+                }
                 Entity newEntity = item.createEntity(itemEntity.getWorld(), itemEntity, stack);
                 if (newEntity != null) {
                     itemEntity.discard();
