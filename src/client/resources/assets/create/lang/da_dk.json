@@ -1361,7 +1361,7 @@
   "create.gui.stock_keeper.no_packagers_linked": "Ingen Pakkere Linket",
   "create.gui.stock_keeper.no_search_results": "Ingen matchende varer fundet",
   "create.gui.stock_keeper.not_in_stock": "Påkrævede varer er ikke på lager",
-  "create.gui.stock_keeper.package_adress": "Pakke Adresse",
+  "create.gui.stock_keeper.package_address": "Pakke Adresse",
   "create.gui.stock_keeper.program_requester": "Program Anmodning",
   "create.gui.stock_keeper.request_sent": "Anmod Om Sendt!",
   "create.gui.stock_keeper.schematic_list.no_results": "Ingen varer fra din tjekliste er på lager",
@@ -3149,10 +3149,10 @@
   "entity.create.seat": "Sæde",
   "entity.create.stationary_contraption": "Stationær mekanisme",
   "entity.create.super_glue": "Superlim",
-  "block.create.milk": "Milk",
-  "fluid.create.milk": "Milk",
   "fluid.create.chocolate": "Chokolade",
+  "block.create.chocolate": "Chokolade",
   "fluid.create.honey": "Honning",
+  "block.create.honey": "Honning",
   "fluid.create.potion": "Eliksir",
   "block.create.potion": "Eliksir",
   "fluid.create.tea": "Håndværkerens te",
@@ -3362,5 +3362,7 @@
   "item.create.zinc_ingot": "Zinkbarre",
   "item.create.zinc_nugget": "Zinkklump",
   "itemGroup.create.base": "Create",
-  "itemGroup.create.palettes": "Creates byggeblokke"
+  "itemGroup.create.palettes": "Creates byggeblokke",
+  "fluid.create.milk": "Milk",
+  "block.create.milk": "Milk"
 }

@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.redstone.link.controller;
 
 import com.zurrtum.create.*;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.Entity;
@@ -169,7 +169,7 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
     public static boolean playerInRange(PlayerEntity player, World world, BlockPos pos) {
         //double modifier = world.isRemote ? 0 : 1.0;
         double reach = 0.4 * player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE);// + modifier;
-        return player.squaredDistanceTo(Vec3d.ofCenter(pos)) < reach * reach;
+        return player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(pos)) < reach * reach;
     }
 
     private ItemStack createLinkedController() {

@@ -69,8 +69,7 @@ public class AllItemTags {
     public static final TagKey<Item> DRINKS_TEA = register("c", "drinks/tea");
     public static final TagKey<Item> FLOURS = register("c", "flours");
     public static final TagKey<Item> WHEAT_FLOURS = register("c", "flours/wheat");
-    public static final TagKey<Item> DOUGHS = register("c", "doughs");
-    public static final TagKey<Item> WHEAT_DOUGHS = register("c", "doughs/wheat");
+    public static final TagKey<Item> WHEAT_DOUGHS = register("c", "foods/dough/wheat");
 
     public static final TagKey<Item> ALLURITE = register("stone_types/galosphere/allurite");
     public static final TagKey<Item> AMETHYST = register("stone_types/galosphere/amethyst");

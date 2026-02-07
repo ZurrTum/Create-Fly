@@ -11,6 +11,7 @@ import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -79,6 +80,7 @@ public class EivClientPlugin implements IExtendedItemViewIntegration {
         addTransferHandler(CraftingViewType.INSTANCE, new BlueprintTransferHandler());
         addTransferHandler(new StockKeeperTransferHandler());
         StockKeeperRequestScreen.setSearchConsumer(EivClientPlugin::setSearchText);
+        StockKeeperRequestScreen.setSearchSupplier(EivClientPlugin::readSearchText);
     }
 
     public static void setSearchText(String text) {
@@ -86,5 +88,14 @@ public class EivClientPlugin implements IExtendedItemViewIntegration {
         if (searchbar != null) {
             searchbar.setText(text);
         }
+    }
+
+    @Nullable
+    public static String readSearchText(boolean force) {
+        TextFieldWidget searchbar = ItemViewOverlay.INSTANCE.getSearchbar();
+        if (searchbar != null && (force || searchbar.isFocused())) {
+            return searchbar.getText();
+        }
+        return null;
     }
 }

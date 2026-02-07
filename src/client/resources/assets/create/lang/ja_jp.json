@@ -1361,7 +1361,7 @@
   "create.gui.stock_keeper.no_packagers_linked": "梱包機が接続されていません",
   "create.gui.stock_keeper.no_search_results": "一致するアイテムが見つかりませんでした",
   "create.gui.stock_keeper.not_in_stock": "必要なアイテムが在庫にありません",
-  "create.gui.stock_keeper.package_adress": "小包の住所",
+  "create.gui.stock_keeper.package_address": "小包の住所",
   "create.gui.stock_keeper.program_requester": "リクエスターをプログラム",
   "create.gui.stock_keeper.recipe_result_empty": "このレシピには空の結果があります。これは許可されておらず、このレシピを追加するModまたはデータパックに報告する必要があります。",
   "create.gui.stock_keeper.request_sent": "リクエストを送信しました！",
@@ -3152,10 +3152,10 @@
   "entity.create.seat": "シート",
   "entity.create.stationary_contraption": "付設からくり",
   "entity.create.super_glue": "超粘着剤",
-  "block.create.milk": "ミルク",
-  "fluid.create.milk": "ミルク",
   "fluid.create.chocolate": "チョコレート",
+  "block.create.chocolate": "チョコレート",
   "fluid.create.honey": "ハチミツ",
+  "block.create.honey": "ハチミツ",
   "fluid.create.potion": "ポーション",
   "block.create.potion": "ポーション",
   "fluid.create.tea": "建築家のお茶",
@@ -3449,5 +3449,7 @@
   "tag.item.create.upgrade_aquatic.coral": "Upgrade Aquaticのサンゴ",
   "tag.item.create.upright_on_belt": "ベルト上で直立",
   "tag.item.create.valve_handles": "バルブハンドル",
-  "tag.recipe_serializer.create.automation_ignore": "自動化不可"
+  "tag.recipe_serializer.create.automation_ignore": "自動化不可",
+  "fluid.create.milk": "ミルク",
+  "block.create.milk": "ミルク"
 }

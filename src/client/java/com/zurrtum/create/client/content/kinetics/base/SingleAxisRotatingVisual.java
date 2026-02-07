@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.content.kinetics.base;
 
-import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.equipment.armor.BacktankRenderer;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -74,18 +73,7 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
 
     @Override
     public void tick(Context context) {
-        float overStressedEffect = blockEntity.effects.overStressedEffect;
-        if (overStressedEffect != 0) {
-            boolean overstressed = overStressedEffect > 0;
-            Color color = overstressed ? Color.RED : Color.SPRING_GREEN;
-            float weight = overstressed ? overStressedEffect : -overStressedEffect;
-
-            rotatingModel.setColor(Color.WHITE.mixWith(color, weight));
-        } else {
-            rotatingModel.setColor(Color.WHITE);
-        }
-
-        rotatingModel.setChanged();
+        applyOverstressEffect(blockEntity, rotatingModel);
     }
 
     @Override
