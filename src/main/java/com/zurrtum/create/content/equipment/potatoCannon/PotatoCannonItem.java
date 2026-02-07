@@ -246,16 +246,6 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
         return 15;
     }
 
-    //TODO
-    //    @Override
-    //    public boolean supportsEnchantment(ItemStack stack, RegistryEntry<Enchantment> enchantment) {
-    //        if (enchantment.is(Enchantments.INFINITY))
-    //            return false;
-    //        if (enchantment.is(Enchantments.LOOTING))
-    //            return true;
-    //        return super.supportsEnchantment(stack, enchantment);
-    //    }
-
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
         return BacktankUtil.isBarVisible(stack, maxUses());
