@@ -69,6 +69,11 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
 
     @Override
     public void attemptToSend(Collection<PackagingRequest> queuedRequests) {
+        attemptToSend();
+    }
+
+    @Override
+    public void attemptToSend() {
         if (!heldBox.isEmpty() || animationTicks != 0 || buttonCooldown > 0)
             return;
         if (!queuedExitingPackages.isEmpty())
