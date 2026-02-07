@@ -1,14 +1,16 @@
 package com.zurrtum.create.content.logistics.depot;
 
 import com.zurrtum.create.AllEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.item.EntityItem;
 import com.zurrtum.create.infrastructure.packet.s2c.EjectorItemSpawnPacket;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -170,8 +172,9 @@ public class EjectorItemEntity extends ItemEntity {
 
     private void placeItemAtTarget(boolean isClient, float maxTime) {
         DirectBeltInputBehaviour targetOpenInv = getTargetOpenInv();
+        ItemStack stack = getStack();
         if (targetOpenInv != null) {
-            ItemStack remainder = targetOpenInv.handleInsertion(getStack(), Direction.UP, isClient);
+            ItemStack remainder = targetOpenInv.handleInsertion(stack, Direction.UP, isClient);
             if (remainder.isEmpty()) {
                 discard();
                 return;
@@ -184,6 +187,18 @@ public class EjectorItemEntity extends ItemEntity {
         setPosition(ejectVec.x, ejectVec.y, ejectVec.z);
         updateLastPosition();
         setVelocity(ejectMotionVec);
+        if (stack.getItem() instanceof EntityItem item) {
+            if (isClient) {
+                discard();
+            } else {
+                World level = getEntityWorld();
+                Entity newEntity = item.createEntity(level, this, stack);
+                if (newEntity != null) {
+                    discard();
+                    level.spawnEntity(newEntity);
+                }
+            }
+        }
     }
 
     private DirectBeltInputBehaviour getTargetOpenInv() {
