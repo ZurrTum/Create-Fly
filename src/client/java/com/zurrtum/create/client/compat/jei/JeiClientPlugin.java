@@ -40,6 +40,8 @@ import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.helpers.IPlatformFluidHelper;
 import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.*;
+import mezz.jei.api.runtime.IIngredientFilter;
+import mezz.jei.api.runtime.IIngredientListOverlay;
 import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.common.Internal;
@@ -236,6 +238,14 @@ public class JeiClientPlugin implements IModPlugin {
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
-        StockKeeperRequestScreen.setSearchConsumer(jeiRuntime.getIngredientFilter()::setFilterText);
+        IIngredientFilter filter = jeiRuntime.getIngredientFilter();
+        IIngredientListOverlay overlay = jeiRuntime.getIngredientListOverlay();
+        StockKeeperRequestScreen.setSearchConsumer(filter::setFilterText);
+        StockKeeperRequestScreen.setSearchSupplier(force -> {
+            if (force || overlay.hasKeyboardFocus()) {
+                return filter.getFilterText();
+            }
+            return null;
+        });
     }
 }

@@ -6,6 +6,7 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.graph.TrackGraphSync;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
+import com.zurrtum.create.content.trains.signal.EdgeGroupColor;
 import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
 import com.zurrtum.create.infrastructure.packet.s2c.AddTrainPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveTrainPacket;
@@ -39,11 +40,20 @@ public class GlobalRailwayManager {
 
     public void playerLogin(MinecraftServer server, ServerPlayerEntity player) {
         loadTrackData(server);
-        trackNetworks.values().forEach(g -> sync.sendFullGraphTo(g, player));
-        ArrayList<SignalEdgeGroup> asList = new ArrayList<>(signalEdgeGroups.values());
-        sync.sendEdgeGroups(asList.stream().map(g -> g.id).toList(), asList.stream().map(g -> g.color).toList(), player);
-        for (Train train : trains.values())
+        for (TrackGraph g : trackNetworks.values()) {
+            sync.sendFullGraphTo(g, player);
+        }
+
+        List<UUID> ids = new ArrayList<>(signalEdgeGroups.size());
+        List<EdgeGroupColor> colors = new ArrayList<>(signalEdgeGroups.size());
+        for (SignalEdgeGroup group : signalEdgeGroups.values()) {
+            ids.add(group.id);
+            colors.add(group.color);
+        }
+        sync.sendEdgeGroups(ids, colors, player);
+        for (Train train : trains.values()) {
             player.networkHandler.sendPacket(new AddTrainPacket(train));
+        }
     }
 
     public void levelLoaded(MinecraftServer server) {
@@ -59,7 +69,7 @@ public class GlobalRailwayManager {
         trains = savedData.getTrains();
         trackNetworks = savedData.getTrackNetworks();
         signalEdgeGroups = savedData.getSignalBlocks();
-        trains.values().forEach(movingTrains::add);
+        movingTrains.addAll(trains.values());
     }
 
     public void cleanUp() {

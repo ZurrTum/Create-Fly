@@ -125,7 +125,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
         if (!filter.isEmpty() && !predicate.test(filter))
             return false;
         this.filter = FilterItemStack.of(filter);
-        if (!upTo)
+        if (!upTo && !stack.isEmpty())
             count = Math.min(count, stack.getMaxCount());
         callback.accept(filter);
         blockEntity.markDirty();

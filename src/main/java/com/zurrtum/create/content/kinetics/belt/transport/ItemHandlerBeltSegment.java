@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.belt.transport;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 
 public class ItemHandlerBeltSegment implements ItemInventory {
@@ -95,6 +96,6 @@ public class ItemHandlerBeltSegment implements ItemInventory {
 
     @Override
     public int getMaxCount(ItemStack stack) {
-        return Math.min(stack.getMaxCount(), 64);
+        return stack.getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 64);
     }
 }

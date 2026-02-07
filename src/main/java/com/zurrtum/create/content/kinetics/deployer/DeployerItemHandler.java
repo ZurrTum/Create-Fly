@@ -2,6 +2,7 @@ package com.zurrtum.create.content.kinetics.deployer;
 
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
@@ -80,5 +81,10 @@ public class DeployerItemHandler implements SidedItemInventory {
     public void markDirty() {
         be.overflowItems.removeIf(ItemStack::isEmpty);
         be.notifyUpdate();
+    }
+
+    @Override
+    public int getMaxCount(ItemStack stack) {
+        return stack.getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 64);
     }
 }
