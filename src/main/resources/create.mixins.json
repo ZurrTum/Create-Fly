@@ -18,6 +18,7 @@
     "DefaultMinecartControllerMixin",
     "DetectorRailBlockMixin",
     "EnchantingTableBlockMixin",
+    "EnchantmentMixin",
     "EntityMixin",
     "EntityTypeMixin",
     "ExperienceOrbEntityMixin",

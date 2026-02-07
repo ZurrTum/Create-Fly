@@ -6,6 +6,7 @@ import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.item.ItemRenderState;
+import net.minecraft.client.render.item.ItemRenderState.Glint;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.model.*;
@@ -53,25 +54,21 @@ public class CardboardSwordModel implements ItemModel {
         int seed
     ) {
         state.addModelKey(this);
-        if (displayContext == ItemDisplayContext.GUI) {
-            update(state, displayContext, itemQuads, settings, itemVector);
-        } else {
-            update(state, displayContext, blockQuads, settings, blockVector);
-        }
-    }
-
-    private void update(
-        ItemRenderState state,
-        ItemDisplayContext displayContext,
-        List<BakedQuad> quads,
-        ModelSettings settings,
-        Supplier<Vector3f[]> vector
-    ) {
         ItemRenderState.LayerRenderState layerRenderState = state.newLayer();
         layerRenderState.setRenderLayer(layer);
-        layerRenderState.setVertices(vector);
         settings.addSettings(layerRenderState, displayContext);
-        layerRenderState.getQuads().addAll(quads);
+        if (stack.hasGlint()) {
+            layerRenderState.setGlint(Glint.STANDARD);
+            state.markAnimated();
+            state.addModelKey(Glint.STANDARD);
+        }
+        if (displayContext == ItemDisplayContext.GUI) {
+            layerRenderState.setVertices(itemVector);
+            layerRenderState.getQuads().addAll(itemQuads);
+        } else {
+            layerRenderState.setVertices(blockVector);
+            layerRenderState.getQuads().addAll(blockQuads);
+        }
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
