@@ -23,7 +23,7 @@ public class MixingCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 9;
+        return 19;
     }
 
     @Override

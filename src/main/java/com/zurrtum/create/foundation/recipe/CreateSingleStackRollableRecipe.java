@@ -1,12 +1,14 @@
 package com.zurrtum.create.foundation.recipe;
 
-import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public interface CreateSingleStackRollableRecipe extends CreateRollableRecipe<SingleStackRecipeInput> {
     Ingredient ingredient();
@@ -16,12 +18,17 @@ public interface CreateSingleStackRollableRecipe extends CreateRollableRecipe<Si
         return ingredient().test(input.item());
     }
 
+    List<ProcessingOutput> results();
+
     @Override
-    default ItemStack craft(SingleStackRecipeInput input, RegistryWrapper.WrapperLookup registries) {
-        SequencedAssemblyJunk junk = input.item().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
-        if (junk != null && junk.hasJunk()) {
-            return junk.getJunk();
+    default List<ItemStack> craft(SingleStackRecipeInput input, Random random) {
+        ItemStack junk = CreateRecipe.getJunk(input.item());
+        if (junk != null) {
+            return List.of(junk);
         }
-        return CreateRollableRecipe.super.craft(input, registries);
+        List<ProcessingOutput> results = results();
+        List<ItemStack> outputs = new ArrayList<>(results.size());
+        ProcessingOutput.rollOutput(random, results, outputs::add);
+        return outputs;
     }
 }

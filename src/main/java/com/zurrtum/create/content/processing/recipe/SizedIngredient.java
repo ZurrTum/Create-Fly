@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class SizedIngredient {
+    public static Codec<List<SizedIngredient>> LIST_CODEC = Ingredient.CODEC.listOf().xmap(SizedIngredient::of, SizedIngredient::unpack);
     public static PacketCodec<RegistryByteBuf, SizedIngredient> PACKET_CODEC = PacketCodec.tuple(
         Ingredient.PACKET_CODEC,
         i -> i.ingredient,
@@ -21,10 +22,6 @@ public class SizedIngredient {
         i -> i.count,
         SizedIngredient::new
     );
-
-    public static Codec<List<SizedIngredient>> getListCodec(int min, int max) {
-        return Ingredient.CODEC.listOf(min, max).xmap(SizedIngredient::of, SizedIngredient::unpack);
-    }
 
     private final Ingredient ingredient;
     private int count;

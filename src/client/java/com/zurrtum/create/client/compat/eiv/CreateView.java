@@ -40,7 +40,7 @@ import java.util.function.UnaryOperator;
 public abstract class CreateView extends AbstractList<IEivViewRecipe> implements IEivViewRecipe {
     public static final OptionalSlotRenderer SLOT = (context, x, y, pt) -> AllGuiTextures.JEI_SLOT.render(context, 0, 0);
     public static final OptionalSlotRenderer CHANCE_SLOT = (context, x, y, pt) -> AllGuiTextures.JEI_CHANCE_SLOT.render(context, 0, 0);
-    public static final AdditionalStackModifier NOT_CONSUMED = (stack, tooltip) -> tooltip.add(CreateLang.translateDirect(
+    public static final AdditionalStackModifier NOT_CONSUMED = (stack, tooltip) -> tooltip.add(1, CreateLang.translateDirect(
         "recipe.deploying.not_consumed").formatted(Formatting.GOLD));
 
     public void placeSlots(SlotDefinition slotDefinition) {
@@ -67,7 +67,7 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
     public void bindChanceSlot(SlotFillContext slotFillContext, int i, SlotContent content, float chance) {
         Text text = CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100)).formatted(Formatting.GOLD);
         slotFillContext.bindOptionalSlot(i, content, CHANCE_SLOT);
-        slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(text));
+        slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(1, text));
     }
 
     @Override

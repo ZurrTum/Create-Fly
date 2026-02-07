@@ -19,11 +19,11 @@ public class RecipeTrieFinder {
     public static RecipeTrie<Recipe<?>> get(
         @NotNull Object cacheKey,
         ServerWorld world,
-        Predicate<RecipeEntry<? extends Recipe<?>>> conditions
+        Predicate<RecipeEntry<?>> conditions
     ) throws ExecutionException {
         return CACHED_TRIES.get(
             cacheKey, () -> {
-                List<RecipeEntry<? extends Recipe<?>>> list = RecipeFinder.get(cacheKey, world, conditions);
+                List<RecipeEntry<?>> list = RecipeFinder.get(cacheKey, world, conditions);
 
                 RecipeTrie.Builder<Recipe<?>> builder = RecipeTrie.builder();
                 for (RecipeEntry<? extends Recipe<?>> recipe : list) {

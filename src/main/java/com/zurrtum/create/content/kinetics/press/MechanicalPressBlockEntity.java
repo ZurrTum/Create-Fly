@@ -4,6 +4,7 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.press.PressingBehaviour.Mode;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.processing.basin.BasinInventory;
 import com.zurrtum.create.content.processing.basin.BasinOperatingBlockEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
@@ -28,6 +28,7 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,15 +121,16 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
         ItemStack itemCreated = ItemStack.EMPTY;
         pressingBehaviour.particleItems.add(item);
         if (canProcessInBulk() || item.getCount() == 1) {
-            RecipeApplier.applyCreateRecipeOn(itemEntity, input, recipe.get().value(), true);
+            RecipeApplier.applyRecipeOn(itemEntity, input, recipe.get().value());
             itemCreated = itemEntity.getStack().copy();
         } else {
-            for (ItemStack result : RecipeApplier.applyCreateRecipeOn(world, 1, input, recipe.get().value(), true)) {
+            Random random = world.getRandom();
+            for (ItemStack result : RecipeApplier.applyRecipeOn(random, 1, input, recipe.get().value())) {
                 if (itemCreated.isEmpty())
                     itemCreated = result.copy();
                 ItemEntity created = new ItemEntity(world, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), result);
                 created.setToDefaultPickupDelay();
-                created.setVelocity(VecHelper.offsetRandomly(Vec3d.ZERO, world.random, .05f));
+                created.setVelocity(VecHelper.offsetRandomly(Vec3d.ZERO, random, .05f));
                 world.spawnEntity(created);
             }
             item.decrement(1);
@@ -140,20 +142,19 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
     }
 
     @Override
-    public boolean tryProcessOnBelt(TransportedItemStack input, List<ItemStack> outputList, boolean simulate) {
+    public boolean tryProcessOnBelt(TransportedItemStack input, List<ItemStack> outputList) {
         SingleStackRecipeInput recipeInput = new SingleStackRecipeInput(input.stack);
         Optional<RecipeEntry<PressingRecipe>> recipe = getRecipe(recipeInput);
         if (recipe.isEmpty())
             return false;
-        if (simulate)
+        if (outputList == null)
             return true;
         pressingBehaviour.particleItems.add(input.stack);
-        List<ItemStack> outputs = RecipeApplier.applyCreateRecipeOn(
-            world,
+        List<ItemStack> outputs = RecipeApplier.applyRecipeOn(
+            world.getRandom(),
             canProcessInBulk() ? input.stack.getCount() : 1,
             recipeInput,
-            recipe.get().value(),
-            true
+            recipe.get().value()
         );
 
         for (ItemStack created : outputs) {

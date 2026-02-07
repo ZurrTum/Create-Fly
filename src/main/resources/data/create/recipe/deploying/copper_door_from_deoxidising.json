@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:exposed_copper_door",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:copper_door"
-  }
+  "results": [
+    {
+      "id": "minecraft:copper_door"
+    }
+  ]
 }

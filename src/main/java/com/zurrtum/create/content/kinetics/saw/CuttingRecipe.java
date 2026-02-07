@@ -5,8 +5,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
-import net.minecraft.item.ItemStack;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
+import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -14,7 +15,10 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 
-public record CuttingRecipe(int time, ItemStack result, Ingredient ingredient) implements CreateSingleStackRecipe {
+import java.util.List;
+
+public record CuttingRecipe(int time, List<ProcessingOutput> results,
+                            Ingredient ingredient) implements CreateSingleStackRollableRecipe, TimedRecipe {
     @Override
     public RecipeSerializer<CuttingRecipe> getSerializer() {
         return AllRecipeSerializers.CUTTING;
@@ -28,15 +32,15 @@ public record CuttingRecipe(int time, ItemStack result, Ingredient ingredient) i
     public static class Serializer implements RecipeSerializer<CuttingRecipe> {
         public static final MapCodec<CuttingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("processing_time").forGetter(CuttingRecipe::time),
-            ItemStack.CODEC.fieldOf("result").forGetter(CuttingRecipe::result),
+            ProcessingOutput.CODEC.listOf(1, 4).fieldOf("results").forGetter(CuttingRecipe::results),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(CuttingRecipe::ingredient)
         ).apply(instance, CuttingRecipe::new));
 
         public static final PacketCodec<RegistryByteBuf, CuttingRecipe> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER,
             CuttingRecipe::time,
-            ItemStack.PACKET_CODEC,
-            CuttingRecipe::result,
+            ProcessingOutput.STREAM_CODEC.collect(PacketCodecs.toList()),
+            CuttingRecipe::results,
             Ingredient.PACKET_CODEC,
             CuttingRecipe::ingredient,
             CuttingRecipe::new

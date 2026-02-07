@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:spruce_trapdoor",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:spruce_trapdoor"
+    }
+  ],
   "ingredient": "minecraft:spruce_planks",
   "type": "create:cutting"
 }

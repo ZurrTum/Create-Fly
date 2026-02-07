@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:exposed_copper_grate",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "minecraft:waxed_exposed_copper_grate"
-  }
+  "results": [
+    {
+      "id": "minecraft:waxed_exposed_copper_grate"
+    }
+  ]
 }

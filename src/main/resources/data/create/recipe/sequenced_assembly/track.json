@@ -12,18 +12,18 @@
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "#create:track_nuggets",
-      "result": "$result"
+      "results": ["$result"]
     },
     {
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "#create:track_nuggets",
-      "result": "$result"
+      "results": ["$result"]
     },
     {
       "type": "create:pressing",
       "ingredient": "$ingredient",
-      "result": "$result"
+      "results": ["$result"]
     }
   ]
 }

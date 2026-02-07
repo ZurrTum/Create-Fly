@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:mangrove_stairs",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:mangrove_stairs"
+    }
+  ],
   "ingredient": "minecraft:mangrove_planks",
   "type": "create:cutting"
 }

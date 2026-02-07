@@ -12,7 +12,6 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -51,7 +50,7 @@ public class ItemHelper {
 
     public static List<ItemStack> multipliedOutput(ItemStack out, int count) {
         if (out.isEmpty()) {
-            return new ArrayList<>(0);
+            return new ArrayList<>();
         }
         int total = count * out.getCount();
         int max = out.getMaxCount();
@@ -76,12 +75,12 @@ public class ItemHelper {
 
     public static List<ItemStack> multipliedOutput(List<ItemStack> out, int count) {
         if (out.isEmpty()) {
-            return new ArrayList<>(0);
+            return new ArrayList<>();
         }
         List<ItemStack> stacks = new ArrayList<>();
         for (ItemStack stack : out) {
             int total = count * stack.getCount();
-            int max = stack.getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 64);
+            int max = stack.getMaxCount();
             int size = total / max;
             stacks.add(stack);
             if (size != 0) {

@@ -32,7 +32,8 @@ import java.util.*;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, Ingredient ingredient) implements BasinRecipe {
+public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient,
+                           Ingredient ingredient) implements BasinRecipe {
     public static final List<Item> SUPPORTED_CONTAINERS = List.of(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
     public static ReloadData data;
 
@@ -96,13 +97,18 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     }
 
     @Override
-    public List<SizedIngredient> getIngredients() {
+    public List<SizedIngredient> ingredients() {
         return List.of(new SizedIngredient(ingredient, 1));
     }
 
     @Override
-    public List<FluidIngredient> getFluidIngredients() {
+    public List<FluidIngredient> fluidIngredients() {
         return List.of(fluidIngredient);
+    }
+
+    @Override
+    public HeatCondition heat() {
+        return HeatCondition.HEATED;
     }
 
     @Override

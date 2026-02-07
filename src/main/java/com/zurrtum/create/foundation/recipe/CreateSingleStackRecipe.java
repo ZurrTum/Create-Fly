@@ -1,7 +1,5 @@
 package com.zurrtum.create.foundation.recipe;
 
-import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
@@ -20,9 +18,9 @@ public interface CreateSingleStackRecipe extends CreateRecipe<SingleStackRecipeI
 
     @Override
     default ItemStack craft(SingleStackRecipeInput input, RegistryWrapper.WrapperLookup registries) {
-        SequencedAssemblyJunk junk = input.item().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
-        if (junk != null && junk.hasJunk()) {
-            return junk.getJunk();
+        ItemStack junk = CreateRecipe.getJunk(input.item());
+        if (junk != null) {
+            return junk;
         }
         return result().copy();
     }

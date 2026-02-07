@@ -9,13 +9,12 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.foundation.data.recipe.Mods;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.ConcretePowderBlock;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.Registries;
@@ -176,7 +175,7 @@ public class RuntimeDataGenerator {
                 inputId.getNamespace(),
                 inputId.getPath(),
                 outputId.getPath(),
-                new CuttingRecipe(50, new ItemStack(Registries.ITEM.get(outputId), amount), Ingredient.ofItem(Registries.ITEM.get(inputId)))
+                new CuttingRecipe(50, List.of(new ProcessingOutput(Registries.ITEM.getEntry(outputId).orElseThrow(), amount)), Ingredient.ofItem(Registries.ITEM.get(inputId)))
             );
         }
     }
@@ -185,7 +184,7 @@ public class RuntimeDataGenerator {
         if (Registries.ITEM.containsId(outputId)) {
             Recipe.CODEC.encodeStart(
                 EmptyJsonOps.INSTANCE,
-                new CuttingRecipe(50, new ItemStack(Registries.ITEM.get(outputId), amount), EmptyJsonOps.ofTag(inputTag))
+                new CuttingRecipe(50, List.of(new ProcessingOutput(Registries.ITEM.getEntry(outputId).orElseThrow(), amount)), EmptyJsonOps.ofTag(inputTag))
             ).ifSuccess(json -> {
                 Identifier inputId = inputTag.id();
                 Identifier path = Identifier.of(
@@ -204,7 +203,7 @@ public class RuntimeDataGenerator {
             first.getPath(),
             second.getPath(),
             new SplashingRecipe(
-                List.of(new ChanceOutput(1, new ItemStack(Registries.BLOCK.get(second)))),
+                List.of(new ProcessingOutput(Registries.BLOCK.get(second), 1)),
                 Ingredient.ofItem(Registries.BLOCK.get(first))
             )
         );

@@ -12,7 +12,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
@@ -26,6 +25,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ManualApplicationHelper {
@@ -65,16 +65,22 @@ public class ManualApplicationHelper {
         ManualApplicationRecipe recipe = foundRecipe.get().value();
         level.breakBlock(pos, false);
 
-        ItemStack stack = recipe.craft(input, level.getRegistryManager());
-        Item item = stack.getItem();
-        if (item instanceof BlockItem blockItem) {
-            BlockState transformedBlock = BlockHelper.copyProperties(blockState, blockItem.getBlock().getDefaultState());
-            level.setBlockState(pos, transformedBlock, Block.NOTIFY_ALL);
-            awardAdvancements((ServerPlayerEntity) player, transformedBlock);
-        } else {
-            Block.dropStack(level, pos, stack);
+        List<ItemStack> results = recipe.craft(input, level.getRandom());
+        int size = results.size();
+        if (size != 0) {
+            ItemStack stack = results.getFirst();
+            if (stack.getItem() instanceof BlockItem blockItem) {
+                BlockState transformedBlock = BlockHelper.copyProperties(blockState, blockItem.getBlock().getDefaultState());
+                level.setBlockState(pos, transformedBlock, Block.NOTIFY_ALL);
+                awardAdvancements((ServerPlayerEntity) player, transformedBlock);
+            } else {
+                Block.dropStack(level, pos, stack);
+            }
+            for (int i = 1; i < size; i++) {
+                stack = results.get(i);
+                Block.dropStack(level, pos, stack);
+            }
         }
-
         if (!heldItem.contains(DataComponentTypes.UNBREAKABLE) && !player.isCreative() && !recipe.keepHeldItem()) {
             if (heldItem.getMaxDamage() > 0) {
                 heldItem.damage(1, player, EquipmentSlot.MAINHAND);

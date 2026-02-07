@@ -3,7 +3,7 @@ package com.zurrtum.create.compat.eiv.display;
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import net.minecraft.item.ItemStack;
@@ -25,11 +25,12 @@ public class FanHauntingDisplay extends CreateDisplay {
 
     public FanHauntingDisplay(RecipeEntry<HauntingRecipe> entry) {
         HauntingRecipe recipe = entry.value();
-        int size = recipe.results().size();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
         results = new ArrayList<>(size);
         chances = new ArrayList<>(size);
-        for (ChanceOutput output : recipe.results()) {
-            results.add(output.stack());
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
             chances.add(output.chance());
         }
         ingredient = getItemStacks(recipe.ingredient());

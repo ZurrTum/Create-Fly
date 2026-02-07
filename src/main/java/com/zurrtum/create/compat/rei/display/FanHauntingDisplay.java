@@ -3,7 +3,7 @@ package com.zurrtum.create.compat.rei.display;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -18,16 +18,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
+public record FanHauntingDisplay(EntryIngredient input, List<ProcessingOutput> outputs,
+                                 Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanHauntingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanHauntingDisplay::input),
-            ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanHauntingDisplay::outputs),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanHauntingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(FanHauntingDisplay::location)
         ).apply(instance, FanHauntingDisplay::new)), PacketCodec.tuple(
             EntryIngredient.streamCodec(),
             FanHauntingDisplay::input,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ProcessingOutput.STREAM_CODEC.collect(PacketCodecs.toList()),
             FanHauntingDisplay::outputs,
             PacketCodecs.optional(Identifier.PACKET_CODEC),
             FanHauntingDisplay::location,
@@ -51,8 +52,8 @@ public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outpu
     @Override
     public List<EntryIngredient> getOutputEntries() {
         List<EntryIngredient> list = new ArrayList<>();
-        for (ChanceOutput output : outputs) {
-            list.add(EntryIngredients.of(output.stack()));
+        for (ProcessingOutput output : outputs) {
+            list.add(EntryIngredients.of(output.create()));
         }
         return list;
     }

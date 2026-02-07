@@ -1,10 +1,11 @@
 package com.zurrtum.create.compat.eiv.display;
 
-import com.mojang.serialization.Codec;
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
@@ -18,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MixingDisplay extends CreateDisplay {
-    private static final Codec<List<FluidIngredient>> FLUID_INGREDIENTS_CODEC = FluidIngredient.CODEC.listOf();
-    public ItemStack result;
-    public FluidStack fluidResult;
+    public List<ItemStack> results;
+    public List<Float> chances;
+    public List<FluidStack> fluidResults;
     public List<List<ItemStack>> ingredients;
     public List<FluidIngredient> fluidIngredients;
     public HeatCondition heat;
@@ -30,8 +31,15 @@ public class MixingDisplay extends CreateDisplay {
 
     public MixingDisplay(RecipeEntry<MixingRecipe> entry) {
         MixingRecipe recipe = entry.value();
-        result = recipe.result();
-        fluidResult = recipe.fluidResult();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
+        results = new ArrayList<>(size);
+        chances = new ArrayList<>(size);
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
+            chances.add(output.chance());
+        }
+        fluidResults = recipe.fluidResults();
         ingredients = new ArrayList<>(recipe.ingredients().size());
         addSizedIngredient(recipe.ingredients(), ingredients);
         fluidIngredients = recipe.fluidIngredients();
@@ -41,10 +49,10 @@ public class MixingDisplay extends CreateDisplay {
     @Override
     public void writeToTag(NbtCompound tag) {
         RegistryOps<NbtElement> ops = getServerOps();
-        if (result.isEmpty()) {
-            tag.put("fluidResult", FluidStack.CODEC, fluidResult);
-        } else {
-            tag.put("result", ItemStack.CODEC, ops, result);
+        tag.put("results", STACKS_CODEC, ops, results);
+        tag.put("chances", CreateCodecs.FLOAT_LIST_CODEC, ops, chances);
+        if (!fluidResults.isEmpty()) {
+            tag.put("fluidResults", FLUID_STACKS_CODEC, fluidResults);
         }
         tag.put("ingredients", STACKS_LIST_CODEC, ops, ingredients);
         if (!fluidIngredients.isEmpty()) {
@@ -58,8 +66,9 @@ public class MixingDisplay extends CreateDisplay {
     @Override
     public void loadFromTag(NbtCompound tag) {
         RegistryOps<NbtElement> ops = getClientOps();
-        result = tag.get("result", ItemStack.CODEC, ops).orElse(ItemStack.EMPTY);
-        fluidResult = tag.get("fluidResult", FluidStack.CODEC, ops).orElse(FluidStack.EMPTY);
+        results = tag.get("results", STACKS_CODEC, ops).orElseThrow();
+        chances = tag.get("chances", CreateCodecs.FLOAT_LIST_CODEC, ops).orElseThrow();
+        fluidResults = tag.get("fluidResults", FLUID_STACKS_CODEC, ops).orElse(List.of());
         fluidIngredients = tag.get("fluidIngredients", FLUID_INGREDIENTS_CODEC, ops).orElse(List.of());
         ingredients = tag.get("ingredients", STACKS_LIST_CODEC, ops).orElseThrow();
         heat = tag.get("heat", HeatCondition.CODEC, ops).orElse(HeatCondition.NONE);

@@ -1,16 +1,20 @@
 package com.zurrtum.create.content.processing.basin;
 
+import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.recipe.CreateRecipe;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.ShapedRecipe;
+import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-public interface BasinRecipe extends Recipe<BasinInput> {
+public interface BasinRecipe extends CreateRecipe<BasinInput> {
     Map<ShapelessRecipe, List<SizedIngredient>> SHAPELESS_CACHE = new IdentityHashMap<>();
     Map<ShapedRecipe, List<SizedIngredient>> SHAPED_CACHE = new IdentityHashMap<>();
 
@@ -637,26 +641,15 @@ public interface BasinRecipe extends Recipe<BasinInput> {
 
     int getIngredientSize();
 
-    List<SizedIngredient> getIngredients();
+    List<SizedIngredient> ingredients();
 
-    List<FluidIngredient> getFluidIngredients();
+    List<FluidIngredient> fluidIngredients();
+
+    default HeatCondition heat() {
+        return HeatCondition.NONE;
+    }
 
     boolean apply(BasinInput input);
-
-    @Override
-    default IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
-    }
-
-    @Override
-    default RecipeBookCategory getRecipeBookCategory() {
-        return null;
-    }
-
-    @Override
-    default boolean isIgnoredInRecipeBook() {
-        return true;
-    }
 
     @Override
     default ItemStack craft(BasinInput input, RegistryWrapper.WrapperLookup registries) {

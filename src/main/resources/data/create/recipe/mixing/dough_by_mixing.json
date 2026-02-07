@@ -8,7 +8,9 @@
       "fluid": "minecraft:water"
     }
   ],
-  "result": {
-    "id": "create:dough"
-  }
+  "results": [
+    {
+      "id": "create:dough"
+    }
+  ]
 }

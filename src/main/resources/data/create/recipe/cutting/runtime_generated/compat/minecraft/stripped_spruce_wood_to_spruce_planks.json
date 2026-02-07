@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:spruce_planks",
-    "count": 6
-  },
+  "results": [
+    {
+      "id": "minecraft:spruce_planks",
+      "count": 6
+    }
+  ],
   "ingredient": "minecraft:stripped_spruce_wood",
   "type": "create:cutting"
 }

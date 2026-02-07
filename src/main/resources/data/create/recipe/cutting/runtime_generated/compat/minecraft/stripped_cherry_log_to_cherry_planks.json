@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:cherry_planks",
-    "count": 6
-  },
+  "results": [
+    {
+      "id": "minecraft:cherry_planks",
+      "count": 6
+    }
+  ],
   "ingredient": "minecraft:stripped_cherry_log",
   "type": "create:cutting"
 }

@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "create:waxed_oxidized_copper_tile_stairs",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "create:oxidized_copper_tile_stairs"
-  }
+  "results": [
+    {
+      "id": "create:oxidized_copper_tile_stairs"
+    }
+  ]
 }

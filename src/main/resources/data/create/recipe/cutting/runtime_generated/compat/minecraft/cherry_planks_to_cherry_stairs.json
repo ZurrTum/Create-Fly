@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:cherry_stairs",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:cherry_stairs"
+    }
+  ],
   "ingredient": "minecraft:cherry_planks",
   "type": "create:cutting"
 }

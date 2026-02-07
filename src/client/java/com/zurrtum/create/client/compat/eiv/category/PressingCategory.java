@@ -24,7 +24,7 @@ public class PressingCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 2;
+        return 3;
     }
 
     @Override

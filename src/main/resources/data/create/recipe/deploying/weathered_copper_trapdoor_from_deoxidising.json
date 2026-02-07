@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:oxidized_copper_trapdoor",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:weathered_copper_trapdoor"
-  }
+  "results": [
+    {
+      "id": "minecraft:weathered_copper_trapdoor"
+    }
+  ]
 }

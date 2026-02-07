@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "create:exposed_copper_tile_stairs",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "create:waxed_exposed_copper_tile_stairs"
-  }
+  "results": [
+    {
+      "id": "create:waxed_exposed_copper_tile_stairs"
+    }
+  ]
 }

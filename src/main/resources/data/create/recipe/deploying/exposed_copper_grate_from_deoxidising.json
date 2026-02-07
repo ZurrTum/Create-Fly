@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:weathered_copper_grate",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:exposed_copper_grate"
-  }
+  "results": [
+    {
+      "id": "minecraft:exposed_copper_grate"
+    }
+  ]
 }

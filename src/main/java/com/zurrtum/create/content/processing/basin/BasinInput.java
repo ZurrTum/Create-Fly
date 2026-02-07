@@ -7,20 +7,20 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.input.RecipeInput;
-import org.apache.commons.lang3.function.TriFunction;
+import net.minecraft.util.math.random.Random;
 
 import java.util.List;
 
 public record BasinInput(
-    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Inventory items,
-    TriFunction<List<ItemStack>, List<FluidStack>, Boolean, Boolean> callback
+    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Inventory items, Random random,
+    BasinBlockEntity blockEntity
 ) implements RecipeInput {
     public BasinInput(BasinBlockEntity basin) {
-        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin::acceptOutputs);
+        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin.getWorld().getRandom(), basin);
     }
 
     public boolean acceptOutputs(List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {
-        return callback.apply(outputItems, outputFluids, simulate);
+        return blockEntity.acceptOutputs(outputItems, outputFluids, simulate);
     }
 
     @Override

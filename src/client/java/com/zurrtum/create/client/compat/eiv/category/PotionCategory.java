@@ -24,7 +24,7 @@ public class PotionCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 3;
+        return 4;
     }
 
     @Override

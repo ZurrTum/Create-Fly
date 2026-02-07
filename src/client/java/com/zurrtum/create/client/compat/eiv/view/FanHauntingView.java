@@ -46,13 +46,13 @@ public class FanHauntingView extends CreateView {
     protected int placeViewSlots(SlotDefinition slotDefinition) {
         int size = results.size();
         if (size == 1) {
-            slotDefinition.addItemSlot(0, 17, 44);
-            slotDefinition.addItemSlot(1, 137, 44);
+            slotDefinition.addItemSlot(0, 17, 55);
+            slotDefinition.addItemSlot(1, 137, 55);
             return 2;
         } else {
             int xOffsetAmount = 1 - Math.min(3, size);
-            slotDefinition.addItemSlot(0, 17 + xOffsetAmount * 5, 44);
-            for (int i = 0, left = 137 + xOffsetAmount * 9, top = 44; i < size; i++) {
+            slotDefinition.addItemSlot(0, 17 + xOffsetAmount * 5, 55);
+            for (int i = 0, left = (size == 2 ? 137 : 132) + xOffsetAmount * 9, top = 55; i < size; i++) {
                 slotDefinition.addItemSlot(i + 1, left + (i % 3) * 19, top + (i / 3) * -19);
             }
             return size + 1;
@@ -77,9 +77,9 @@ public class FanHauntingView extends CreateView {
     @Override
     public void renderRecipe(RecipeViewScreen screen, RecipePosition position, DrawContext context, int mouseX, int mouseY, float partialTicks) {
         int xOffsetAmount = 1 - Math.min(3, results.size());
-        AllGuiTextures.JEI_SHADOW.render(context, 42, 23);
-        AllGuiTextures.JEI_LIGHT.render(context, 61, 35);
-        AllGuiTextures.JEI_LONG_ARROW.render(context, 50 + 7 * xOffsetAmount, 47);
-        context.state.addSpecialElement(new FanRenderState(new Matrix3x2f(context.getMatrices()), 52, 0, Blocks.SOUL_FIRE.getDefaultState()));
+        AllGuiTextures.JEI_SHADOW.render(context, 42, 34);
+        AllGuiTextures.JEI_LIGHT.render(context, 61, 46);
+        AllGuiTextures.JEI_LONG_ARROW.render(context, 50 + 7 * xOffsetAmount, 58);
+        context.state.addSpecialElement(new FanRenderState(new Matrix3x2f(context.getMatrices()), 52, 11, Blocks.SOUL_FIRE.getDefaultState()));
     }
 }

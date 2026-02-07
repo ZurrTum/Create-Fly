@@ -4,7 +4,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
-import dev.architectury.fluid.FluidStack;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -15,25 +15,30 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.zurrtum.create.compat.rei.IngredientHelper.*;
 
 public record MixingDisplay(
-    List<EntryIngredient> inputs, EntryIngredient output, HeatCondition heat, Optional<Identifier> location
+    List<EntryIngredient> inputs, List<ProcessingOutput> results, List<EntryIngredient> fluidResults,
+    HeatCondition heat, Optional<Identifier> location
 ) implements Display {
     public static final DisplaySerializer<MixingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(MixingDisplay::inputs),
-            EntryIngredient.codec().fieldOf("output").forGetter(MixingDisplay::output),
+            ProcessingOutput.CODEC.listOf().fieldOf("results").forGetter(MixingDisplay::results),
+            EntryIngredient.codec().listOf().fieldOf("fluid_results").forGetter(MixingDisplay::fluidResults),
             HeatCondition.CODEC.fieldOf("heat").forGetter(MixingDisplay::heat),
             Identifier.CODEC.optionalFieldOf("location").forGetter(MixingDisplay::location)
         ).apply(instance, MixingDisplay::new)), PacketCodec.tuple(
             EntryIngredient.streamCodec().collect(PacketCodecs.toList()),
             MixingDisplay::inputs,
-            EntryIngredient.streamCodec(),
-            MixingDisplay::output,
+            ProcessingOutput.STREAM_CODEC.collect(PacketCodecs.toList()),
+            MixingDisplay::results,
+            EntryIngredient.streamCodec().collect(PacketCodecs.toList()),
+            MixingDisplay::fluidResults,
             HeatCondition.PACKET_CODEC,
             MixingDisplay::heat,
             PacketCodecs.optional(Identifier.PACKET_CODEC),
@@ -49,10 +54,8 @@ public record MixingDisplay(
     public MixingDisplay(Identifier id, MixingRecipe recipe) {
         this(
             getEntryIngredients(getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredients())),
-            recipe.result().isEmpty() ? EntryIngredients.of(FluidStack.create(
-                recipe.fluidResult().getFluid(),
-                recipe.fluidResult().getAmount()
-            )) : EntryIngredients.of(recipe.result()),
+            recipe.results(),
+            getFluidIngredientList(recipe.fluidResults()),
             recipe.heat(),
             Optional.of(id)
         );
@@ -65,7 +68,12 @@ public record MixingDisplay(
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(output);
+        List<EntryIngredient> list = new ArrayList<>();
+        for (ProcessingOutput output : results) {
+            list.add(EntryIngredients.of(output.create()));
+        }
+        list.addAll(fluidResults);
+        return list;
     }
 
     @Override

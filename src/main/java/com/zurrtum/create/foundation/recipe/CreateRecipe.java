@@ -1,15 +1,13 @@
 package com.zurrtum.create.foundation.recipe;
 
+import com.zurrtum.create.AllDataComponents;
+import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.random.Random;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
     @Override
@@ -27,13 +25,12 @@ public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
         return true;
     }
 
-    default boolean isRollable() {
-        return false;
-    }
-
-    default List<ItemStack> craft(T input, Random random) {
-        List<ItemStack> list = new ArrayList<>(1);
-        list.add(craft(input, (RegistryWrapper.WrapperLookup) null));
-        return list;
+    @Nullable
+    static ItemStack getJunk(ItemStack stack) {
+        SequencedAssemblyJunk junk = stack.get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
+        if (junk != null && junk.hasJunk()) {
+            return junk.getJunk();
+        }
+        return null;
     }
 }

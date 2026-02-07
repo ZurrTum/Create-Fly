@@ -1,9 +1,10 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:stripped_warped_stem",
-    "count": 1
-  },
+  "results": [
+    {
+      "id": "minecraft:stripped_warped_stem"
+    }
+  ],
   "ingredient": "minecraft:warped_stem",
   "type": "create:cutting"
 }

@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.LitBlazeBurnerBlock;
+import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -123,11 +124,9 @@ public class AllFanProcessingTypes {
                 Optional<RecipeEntry<SmokingRecipe>> smokingRecipe = recipeManager.getFirstMatch(RecipeType.SMOKING, input, level)
                     .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
                 DynamicRegistryManager registryAccess = level.getRegistryManager();
-                if (smokingRecipe.isEmpty() || !ItemStack.areItemsEqual(
-                    smokingRecipe.get().value().craft(input, registryAccess),
-                    smeltingRecipe.get().value().craft(input, registryAccess)
-                )) {
-                    return RecipeApplier.applyRecipeOn(level, stack.getCount(), input, smeltingRecipe.get(), false);
+                ItemStack result = smeltingRecipe.get().value().craft(input, registryAccess);
+                if (smokingRecipe.isEmpty() || !ItemStack.areItemsEqual(smokingRecipe.get().value().craft(input, registryAccess), result)) {
+                    return ItemHelper.multipliedOutput(result, stack.getCount());
                 }
             }
 
@@ -196,7 +195,7 @@ public class AllFanProcessingTypes {
             SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
             Optional<RecipeEntry<HauntingRecipe>> recipe = ((ServerWorld) level).getRecipeManager()
                 .getFirstMatch(AllRecipeTypes.HAUNTING, input, level);
-            return recipe.map(entry -> RecipeApplier.applyCreateRecipeOn(level, stack.getCount(), input, entry.value(), true)).orElse(null);
+            return recipe.map(entry -> RecipeApplier.applyRecipeOn(level.getRandom(), stack.getCount(), input, entry.value())).orElse(null);
         }
 
         @Override
@@ -318,7 +317,7 @@ public class AllFanProcessingTypes {
         public List<ItemStack> process(ItemStack stack, World level) {
             SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
             return ((ServerWorld) level).getRecipeManager().getFirstMatch(RecipeType.SMOKING, input, level).filter(AllRecipeTypes.CAN_BE_AUTOMATED)
-                .map(entry -> RecipeApplier.applyRecipeOn(level, stack.getCount(), input, entry, false)).orElse(null);
+                .map(entry -> ItemHelper.multipliedOutput(entry.value().craft(input, level.getRegistryManager()), stack.getCount())).orElse(null);
         }
 
         @Override
@@ -376,7 +375,7 @@ public class AllFanProcessingTypes {
         public List<ItemStack> process(ItemStack stack, World level) {
             SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
             return ((ServerWorld) level).getRecipeManager().getFirstMatch(AllRecipeTypes.SPLASHING, input, level)
-                .map(entry -> RecipeApplier.applyCreateRecipeOn(level, stack.getCount(), input, entry.value(), true)).orElse(null);
+                .map(entry -> RecipeApplier.applyRecipeOn(level.getRandom(), stack.getCount(), input, entry.value())).orElse(null);
         }
 
         @Override
