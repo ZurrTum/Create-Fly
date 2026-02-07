@@ -24,7 +24,7 @@ public class SawingCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 2;
+        return 5;
     }
 
     @Override

@@ -23,7 +23,7 @@ public class CrushingCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 6;
+        return 8;
     }
 
     @Override

@@ -4,15 +4,19 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
-import net.minecraft.item.ItemStack;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 
-public record PressingRecipe(ItemStack result, Ingredient ingredient) implements CreateSingleStackRecipe {
+import java.util.List;
+
+public record PressingRecipe(List<ProcessingOutput> results,
+                             Ingredient ingredient) implements CreateSingleStackRollableRecipe {
     @Override
     public RecipeSerializer<PressingRecipe> getSerializer() {
         return AllRecipeSerializers.PRESSING;
@@ -25,14 +29,13 @@ public record PressingRecipe(ItemStack result, Ingredient ingredient) implements
 
     public static class Serializer implements RecipeSerializer<PressingRecipe> {
         public static final MapCodec<PressingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.CODEC.fieldOf("result")
-                .forGetter(PressingRecipe::result),
+            ProcessingOutput.CODEC.listOf(1, 2).fieldOf("results").forGetter(PressingRecipe::results),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(PressingRecipe::ingredient)
         ).apply(instance, PressingRecipe::new));
 
         public static final PacketCodec<RegistryByteBuf, PressingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.PACKET_CODEC,
-            PressingRecipe::result,
+            ProcessingOutput.STREAM_CODEC.collect(PacketCodecs.toList()),
+            PressingRecipe::results,
             Ingredient.PACKET_CODEC,
             PressingRecipe::ingredient,
             PressingRecipe::new

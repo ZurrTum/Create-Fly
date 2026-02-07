@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:weathered_copper_bars",
   "ingredient": "#minecraft:axes",
-  "result": {
-    "id": "minecraft:exposed_copper_bars"
-  }
+  "results": [
+    {
+      "id": "minecraft:exposed_copper_bars"
+    }
+  ]
 }

@@ -4,8 +4,10 @@
   "ingredients": [
     "create:bar_of_chocolate"
   ],
-  "fluid_result": {
-    "amount": 20250,
-    "id": "create:chocolate"
-  }
+  "fluid_results": [
+    {
+      "amount": 20250,
+      "id": "create:chocolate"
+    }
+  ]
 }

@@ -2,15 +2,12 @@ package com.zurrtum.create.client.compat.jei.category;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.client.compat.jei.CreateCategory;
 import com.zurrtum.create.client.compat.jei.JeiClientPlugin;
 import com.zurrtum.create.client.compat.jei.renderer.TwoIconRenderer;
-import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.PressBasinRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
-import com.zurrtum.create.content.processing.recipe.SizedIngredient;
-import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -25,7 +22,7 @@ import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class CompactingCategory extends CreateCategory<RecipeEntry<CompactingRecipe>> {
+public class CompactingCategory extends BasinCategory<CompactingRecipe> {
     public static List<RecipeEntry<CompactingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
         return preparedRecipes.getAll(AllRecipeTypes.COMPACTING).stream().toList();
     }
@@ -48,37 +45,19 @@ public class CompactingCategory extends CreateCategory<RecipeEntry<CompactingRec
     }
 
     @Override
-    public int getHeight() {
-        return 85;
-    }
-
-    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<CompactingRecipe> entry, IFocusGroup iFocusGroup) {
         CompactingRecipe recipe = entry.value();
-        List<SizedIngredient> ingredients = recipe.ingredients();
-        FluidIngredient fluidIngredient = recipe.fluidIngredient();
-        int ingredientSize = ingredients.size();
-        int size = ingredientSize;
-        if (fluidIngredient != null) {
-            size++;
-        }
-        int xOffset = size < 3 ? 12 + (3 - size) * 19 / 2 : 12;
-        int yOffset = 51;
-        int i = 0;
-        for (; i < ingredientSize; i++) {
-            builder.addInputSlot(xOffset + (i % 3) * 19, yOffset - (i / 3) * 19).setBackground(SLOT, -1, -1)
-                .addItemStacks(getStacks(ingredients.get(i)));
-        }
-        if (fluidIngredient != null) {
-            addFluidSlot(builder, xOffset + (i % 3) * 19, yOffset - (i / 3) * 19, fluidIngredient).setBackground(SLOT, -1, -1);
-        }
-        builder.addOutputSlot(142, 51).setBackground(SLOT, -1, -1).add(recipe.result());
+        addIngredientSlots(builder, recipe);
+        List<ProcessingOutput> results = recipe.results();
+        int size = results.size();
+        addResultSlots(builder, results, 0, size - 1, 51, size % 2 != 0);
+        addHeatSlots(builder, recipe);
     }
 
     @Override
     public void draw(RecipeEntry<CompactingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
-        AllGuiTextures.JEI_SHADOW.render(graphics, 81, 68);
+        CompactingRecipe recipe = entry.value();
+        drawBackground(recipe, graphics, recipe.results().size());
         graphics.state.addSpecialElement(new PressBasinRenderState(new Matrix3x2f(graphics.getMatrices()), 91, -5));
     }
 }

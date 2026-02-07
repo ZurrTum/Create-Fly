@@ -9,7 +9,9 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.item.ItemHelper;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
+import com.zurrtum.create.foundation.recipe.RecipeApplier;
+import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -34,7 +36,6 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.random.Random;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -271,39 +272,24 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
     }
 
     private void applyRecipe() {
-        AbstractCrushingRecipe recipe = findRecipe();
-
-        List<ItemStack> list = new ArrayList<>();
+        CreateSingleStackRollableRecipe recipe = findRecipe();
         if (recipe != null) {
             ItemStack item = inventory.getStack(0);
             SingleStackRecipeInput input = new SingleStackRecipeInput(item);
-            int rolls = item.getCount();
             inventory.clear();
-            ItemStack recipeRemainder = item.getItem().getRecipeRemainder();
-            if (recipeRemainder.isEmpty()) {
-                recipeRemainder = null;
-            }
-            for (int roll = 0; roll < rolls; roll++) {
-                List<ItemStack> rolledResults = recipe.craft(input, world.random);
-                for (ItemStack stack : rolledResults) {
-                    ItemHelper.addToList(stack, list);
-                }
-                if (recipeRemainder != null) {
-                    ItemHelper.addToList(recipeRemainder, list);
-                }
-            }
-            for (int slot = 0, max = Math.min(list.size(), inventory.size() - 1); slot < max; slot++)
+            List<ItemStack> list = RecipeApplier.applyRecipeOn(world.getRandom(), item.getCount(), input, recipe);
+            for (int slot = 0, max = Math.min(list.size(), inventory.size() - 1); slot < max; slot++) {
                 inventory.setStack(slot + 1, list.get(slot));
+            }
         } else {
             inventory.clear();
         }
-
     }
 
-    public AbstractCrushingRecipe findRecipe() {
+    public CreateSingleStackRollableRecipe findRecipe() {
         ServerRecipeManager recipeManager = ((ServerWorld) world).getRecipeManager();
         SingleStackRecipeInput input = new SingleStackRecipeInput(inventory.getStack(0));
-        AbstractCrushingRecipe crushingRecipe = recipeManager.getFirstMatch(AllRecipeTypes.CRUSHING, input, world).map(RecipeEntry::value)
+        CreateSingleStackRollableRecipe crushingRecipe = recipeManager.getFirstMatch(AllRecipeTypes.CRUSHING, input, world).map(RecipeEntry::value)
             .orElse(null);
         if (crushingRecipe == null)
             crushingRecipe = recipeManager.getFirstMatch(AllRecipeTypes.MILLING, input, world).map(RecipeEntry::value).orElse(null);
@@ -343,8 +329,12 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
     }
 
     private void itemInserted(ItemStack stack) {
-        AbstractCrushingRecipe recipe = findRecipe();
-        inventory.remainingTime = recipe != null ? recipe.time() : 100;
+        CreateSingleStackRollableRecipe recipe = findRecipe();
+        if (recipe instanceof TimedRecipe timed) {
+            inventory.remainingTime = timed.time();
+        } else {
+            inventory.remainingTime = 100;
+        }
         inventory.appliedRecipe = false;
     }
 

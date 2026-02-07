@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:copper_lantern",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "minecraft:waxed_copper_lantern"
-  }
+  "results": [
+    {
+      "id": "minecraft:waxed_copper_lantern"
+    }
+  ]
 }

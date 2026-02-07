@@ -9,6 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.PressRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -54,7 +55,10 @@ public class PressingCategory extends CreateCategory<RecipeEntry<PressingRecipe>
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<PressingRecipe> entry, IFocusGroup focuses) {
         PressingRecipe recipe = entry.value();
         builder.addInputSlot(27, 51).setBackground(SLOT, -1, -1).add(recipe.ingredient());
-        builder.addOutputSlot(131, 51).setBackground(SLOT, -1, -1).add(recipe.result());
+        List<ProcessingOutput> results = recipe.results();
+        for (int i = 0, size = results.size(); i < size; i++) {
+            addChanceSlot(builder, 131 + 19 * i, 51, results.get(i));
+        }
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.FanRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -50,13 +50,13 @@ public class FanHauntingCategory extends CreateCategory<RecipeEntry<HauntingReci
 
     @Override
     public int getHeight() {
-        return 77;
+        return 72;
     }
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<HauntingRecipe> entry, IFocusGroup focuses) {
         HauntingRecipe recipe = entry.value();
-        List<ChanceOutput> results = recipe.results();
+        List<ProcessingOutput> results = recipe.results();
         int outputSize = results.size();
         if (outputSize == 1) {
             builder.addInputSlot(21, 48).setBackground(SLOT, -1, -1).add(recipe.ingredient());
@@ -64,7 +64,7 @@ public class FanHauntingCategory extends CreateCategory<RecipeEntry<HauntingReci
         } else {
             int xOffsetAmount = 1 - Math.min(3, outputSize);
             builder.addInputSlot(21 + xOffsetAmount * 5, 48).setBackground(SLOT, -1, -1).add(recipe.ingredient());
-            for (int i = 0, left = 141 + xOffsetAmount * 9, top = 48; i < outputSize; i++) {
+            for (int i = 0, left = 141 + xOffsetAmount * 9, top = outputSize <= 9 ? 48 : 57; i < outputSize; i++) {
                 addChanceSlot(builder, left + (i % 3) * 19, top + (i / 3) * -19, results.get(i));
             }
         }

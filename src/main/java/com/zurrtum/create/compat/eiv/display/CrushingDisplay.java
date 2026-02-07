@@ -2,9 +2,9 @@ package com.zurrtum.create.compat.eiv.display;
 
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
-import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import net.minecraft.item.ItemStack;
@@ -24,13 +24,14 @@ public class CrushingDisplay extends CreateDisplay {
     public CrushingDisplay() {
     }
 
-    public CrushingDisplay(RecipeEntry<? extends AbstractCrushingRecipe> entry) {
-        AbstractCrushingRecipe recipe = entry.value();
-        int size = recipe.results().size();
+    public CrushingDisplay(RecipeEntry<? extends CreateSingleStackRollableRecipe> entry) {
+        CreateSingleStackRollableRecipe recipe = entry.value();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
         results = new ArrayList<>(size);
         chances = new ArrayList<>(size);
-        for (ChanceOutput output : recipe.results()) {
-            results.add(output.stack());
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
             chances.add(output.chance());
         }
         ingredient = getItemStacks(recipe.ingredient());

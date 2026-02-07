@@ -10,7 +10,9 @@
       "fluid": "minecraft:water"
     }
   ],
-  "result": {
-    "id": "minecraft:mud"
-  }
+  "results": [
+    {
+      "id": "minecraft:mud"
+    }
+  ]
 }

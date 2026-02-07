@@ -50,7 +50,7 @@ public class FanSmokingCategory extends CreateCategory<RecipeEntry<SmokingRecipe
 
     @Override
     public int getHeight() {
-        return 77;
+        return 72;
     }
 
     @Override

@@ -23,7 +23,7 @@ public class DeployingCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 3;
+        return 6;
     }
 
     @Override

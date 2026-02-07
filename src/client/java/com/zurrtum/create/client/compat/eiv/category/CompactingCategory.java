@@ -18,12 +18,12 @@ public class CompactingCategory extends CreateCategory {
 
     @Override
     public int getDisplayHeight() {
-        return 70;
+        return 99;
     }
 
     @Override
     public int getSlotCount() {
-        return 10;
+        return 17;
     }
 
     @Override

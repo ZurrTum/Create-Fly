@@ -13,7 +13,9 @@
       "fluid": "minecraft:water"
     }
   ],
-  "result": {
-    "id": "create:pulp"
-  }
+  "results": [
+    {
+      "id": "create:pulp"
+    }
+  ]
 }

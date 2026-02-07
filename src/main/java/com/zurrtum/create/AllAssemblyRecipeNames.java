@@ -15,11 +15,12 @@ import java.util.function.BiFunction;
 public class AllAssemblyRecipeNames {
     private static final Map<String, BiFunction<DynamicOps<JsonElement>, JsonObject, Text>> ALL = new HashMap<>();
 
-    public static Text get(DynamicOps<JsonElement> ops, JsonObject json) {
-        String type = json.get("type").getAsString();
+    public static Text get(DynamicOps<JsonElement> ops, JsonElement json) {
+        JsonObject object = (JsonObject) json;
+        String type = object.get("type").getAsString();
         BiFunction<DynamicOps<JsonElement>, JsonObject, Text> factory = ALL.get(type);
         if (factory != null) {
-            return factory.apply(ops, json);
+            return factory.apply(ops, object);
         }
         String name;
         if (type.startsWith("create:")) {

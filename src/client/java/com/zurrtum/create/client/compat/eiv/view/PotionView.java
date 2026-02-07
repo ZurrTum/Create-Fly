@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.compat.eiv.view;
 
+import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.eiv.CreateView;
 import com.zurrtum.create.client.compat.eiv.EivClientPlugin;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
@@ -22,11 +23,13 @@ public class PotionView extends CreateView {
     private final SlotContent result;
     private final SlotContent ingredient;
     private final SlotContent fluidIngredient;
+    private final SlotContent burner;
 
     public PotionView(PotionDisplay display) {
         result = SlotContent.of(getItemStack(display.result));
         ingredient = SlotContent.of(display.ingredient);
         fluidIngredient = SlotContent.of(getItemStacks(display.fluidIngredient));
+        burner = SlotContent.of(AllItems.BLAZE_BURNER);
     }
 
     @Override
@@ -49,6 +52,7 @@ public class PotionView extends CreateView {
         slotDefinition.addItemSlot(0, 21, 51);
         slotDefinition.addItemSlot(1, 40, 51);
         slotDefinition.addItemSlot(2, 142, 51);
+        slotDefinition.addItemSlot(3, 130, 81);
     }
 
     @Override
@@ -56,6 +60,7 @@ public class PotionView extends CreateView {
         slotFillContext.bindOptionalSlot(0, ingredient, SLOT);
         slotFillContext.bindOptionalSlot(1, fluidIngredient, SLOT);
         slotFillContext.bindOptionalSlot(2, result, SLOT);
+        slotFillContext.bindSlot(3, burner);
     }
 
     @Override

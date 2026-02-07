@@ -13,6 +13,7 @@ import com.zurrtum.create.content.processing.basin.BasinOperatingBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
+import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
@@ -130,20 +131,11 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
             if ((!world.isClient() || isVirtual()) && runningTicks == 20) {
                 if (processingTicks < 0) {
-                    float recipeSpeed = 1;
-                    //TODO
-                    //                    if (currentRecipe instanceof StandardProcessingRecipe) {
-                    //                        int t = ((StandardProcessingRecipe<?>) currentRecipe).getProcessingDuration();
-                    //                        if (t != 0)
-                    //                            recipeSpeed = t / 100f;
-                    //                    }
-
+                    float recipeSpeed = currentRecipe instanceof TimedRecipe recipe ? recipe.time() * 0.15f : 15;
                     processingTicks = MathHelper.clamp((MathHelper.floorLog2((int) (512 / speed))) * MathHelper.ceil(recipeSpeed * 15) + 1, 1, 512);
-
-                    Optional<BasinBlockEntity> basin = getBasin();
-                    if (basin.isPresent()) {
-                        Couple<SmartFluidTankBehaviour> tanks = basin.get().getTanks();
-                        if (!tanks.getFirst().isEmpty() || !tanks.getSecond().isEmpty())
+                    getBasin().ifPresent(basin -> {
+                        Couple<SmartFluidTankBehaviour> tanks = basin.getTanks();
+                        if (!tanks.getFirst().isEmpty() || !tanks.getSecond().isEmpty()) {
                             world.playSound(
                                 null,
                                 pos,
@@ -152,8 +144,8 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
                                 .75f,
                                 speed < 65 ? .75f : 1.5f
                             );
-                    }
-
+                        }
+                    });
                 } else {
                     processingTicks--;
                     if (processingTicks == 0) {

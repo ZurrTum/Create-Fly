@@ -26,7 +26,7 @@ public class BeltPressingCallbacks {
             return PASS;
         if (behaviour.running)
             return HOLD;
-        if (!behaviour.specifics.tryProcessOnBelt(transported, null, true))
+        if (!behaviour.specifics.tryProcessOnBelt(transported, null))
             return PASS;
 
         behaviour.start(Mode.BELT);
@@ -48,7 +48,7 @@ public class BeltPressingCallbacks {
 
         behaviour.particleItems.clear();
         ArrayList<ItemStack> results = new ArrayList<>();
-        if (!behaviour.specifics.tryProcessOnBelt(transported, results, false))
+        if (!behaviour.specifics.tryProcessOnBelt(transported, results))
             return PASS;
 
         boolean bulk = behaviour.specifics.canProcessInBulk() || transported.stack.getCount() == 1;

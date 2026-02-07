@@ -5,8 +5,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
+import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -16,7 +17,8 @@ import net.minecraft.recipe.RecipeType;
 
 import java.util.List;
 
-public record MillingRecipe(int time, List<ChanceOutput> results, Ingredient ingredient) implements AbstractCrushingRecipe {
+public record MillingRecipe(int time, List<ProcessingOutput> results,
+                            Ingredient ingredient) implements CreateSingleStackRollableRecipe, TimedRecipe {
     @Override
     public RecipeSerializer<MillingRecipe> getSerializer() {
         return AllRecipeSerializers.MILLING;
@@ -30,14 +32,14 @@ public record MillingRecipe(int time, List<ChanceOutput> results, Ingredient ing
     public static class Serializer implements RecipeSerializer<MillingRecipe> {
         public static final MapCodec<MillingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("processing_time").forGetter(MillingRecipe::time),
-            ChanceOutput.CODEC.listOf(1, 3).fieldOf("results").forGetter(MillingRecipe::results),
+            ProcessingOutput.CODEC.listOf(1, 4).fieldOf("results").forGetter(MillingRecipe::results),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(MillingRecipe::ingredient)
         ).apply(instance, MillingRecipe::new));
 
         public static final PacketCodec<RegistryByteBuf, MillingRecipe> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER,
             MillingRecipe::time,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ProcessingOutput.STREAM_CODEC.collect(PacketCodecs.toList()),
             MillingRecipe::results,
             Ingredient.PACKET_CODEC,
             MillingRecipe::ingredient,

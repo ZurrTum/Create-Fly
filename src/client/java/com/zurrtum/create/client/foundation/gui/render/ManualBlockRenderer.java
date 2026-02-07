@@ -19,6 +19,7 @@ import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -28,6 +29,7 @@ public class ManualBlockRenderer extends SpecialGuiElementRenderer<ManualBlockRe
     public static int MAX = 6;
     private int allocate = MAX;
     private static final Deque<GpuTexture> TEXTURES = new ArrayDeque<>(MAX);
+    private static final Random random = Random.create();
     private final MatrixStack matrices = new MatrixStack();
     private int windowScaleFactor;
 
@@ -70,7 +72,8 @@ public class ManualBlockRenderer extends SpecialGuiElementRenderer<ManualBlockRe
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
         world.blockState(block.state());
-        List<BlockModelPart> parts = blockRenderManager.getModel(block.state()).getParts(mc.world.random);
+        random.setSeed(42L);
+        List<BlockModelPart> parts = blockRenderManager.getModel(block.state()).getParts(random);
         blockRenderManager.renderBlock(block.state(), BlockPos.ORIGIN, world, matrices, buffer, false, parts);
 
         vertexConsumers.draw();

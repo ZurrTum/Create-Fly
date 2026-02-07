@@ -11,12 +11,12 @@ import com.zurrtum.create.compat.eiv.display.MixingDisplay;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import org.joml.Matrix3x2f;
@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MixingView extends CreateView {
-    private final SlotContent result;
+    private final List<SlotContent> results;
+    private final List<Float> chances;
     private final List<SlotContent> ingredients;
     private final HeatCondition heat;
     private final SlotContent burner;
@@ -33,7 +34,14 @@ public class MixingView extends CreateView {
 
 
     public MixingView(MixingDisplay display) {
-        result = SlotContent.of(display.result.isEmpty() ? getItemStack(display.fluidResult) : display.result);
+        results = new ArrayList<>(display.results.size() + display.fluidResults.size());
+        chances = display.chances;
+        for (ItemStack result : display.results) {
+            results.add(SlotContent.of(result));
+        }
+        for (FluidStack fluidResult : display.fluidResults) {
+            results.add(SlotContent.of(getItemStack(fluidResult)));
+        }
         ingredients = new ArrayList<>(display.ingredients.size() + display.fluidIngredients.size());
         for (List<ItemStack> ingredient : display.ingredients) {
             ingredients.add(SlotContent.of(ingredient));
@@ -58,21 +66,31 @@ public class MixingView extends CreateView {
 
     @Override
     public List<SlotContent> getResults() {
-        return List.of(result);
+        return results;
     }
 
     @Override
     protected int placeViewSlots(SlotDefinition slotDefinition) {
         int i = 0;
-        for (int size = ingredients.size(), xOffset = size < 3 ? 12 + (3 - size) * 19 / 2 : 12; i < size; i++) {
-            slotDefinition.addItemSlot(i, xOffset + (i % 3) * 19, 51 - (i / 3) * 19);
+        for (int size = ingredients.size(), xOffset = size < 3 ? 8 + (3 - size) * 19 / 2 : 8, yOffset = size <= 9 ? 51 : 60; i < size; i++) {
+            slotDefinition.addItemSlot(i, xOffset + (i % 3) * 19, yOffset - (i / 3) * 19);
         }
-        slotDefinition.addItemSlot(i++, 142, 51);
+        int size = results.size();
+        int end = size - 1;
+        int y = size <= 4 ? 51 : 60;
+        for (int j = 0; j < end; j++) {
+            slotDefinition.addItemSlot(i++, j % 2 == 0 ? 128 : 147, y - 19 * (j / 2));
+        }
+        if (size % 2 != 0) {
+            slotDefinition.addItemSlot(i++, 138, y - 19 * (end / 2));
+        } else {
+            slotDefinition.addItemSlot(i++, end % 2 == 0 ? 128 : 147, y - 19 * (end / 2));
+        }
         if (burner != null) {
-            slotDefinition.addItemSlot(i++, 134, 81);
+            slotDefinition.addItemSlot(i++, 130, 81);
         }
         if (cake != null) {
-            slotDefinition.addItemSlot(i++, 153, 81);
+            slotDefinition.addItemSlot(i++, 149, 81);
         }
         return i;
     }
@@ -83,7 +101,18 @@ public class MixingView extends CreateView {
         for (int size = ingredients.size(); i < size; i++) {
             slotFillContext.bindOptionalSlot(i, ingredients.get(i), SLOT);
         }
-        slotFillContext.bindOptionalSlot(i++, result, SLOT);
+        int j = 0;
+        for (int size = chances.size(); j < size; j++) {
+            float chance = chances.get(j);
+            if (chance == 1) {
+                slotFillContext.bindOptionalSlot(i++, results.get(j), SLOT);
+            } else {
+                bindChanceSlot(slotFillContext, i++, results.get(j), chance);
+            }
+        }
+        for (int size = results.size(); j < size; j++) {
+            slotFillContext.bindOptionalSlot(i++, results.get(j), SLOT);
+        }
         if (burner != null) {
             slotFillContext.bindSlot(i++, burner);
         }
@@ -95,7 +124,8 @@ public class MixingView extends CreateView {
 
     @Override
     public void renderRecipe(RecipeViewScreen screen, RecipePosition position, DrawContext context, int mouseX, int mouseY, float partialTicks) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 32);
+        int size = results.size();
+        AllGuiTextures.JEI_DOWN_ARROW.render(context, 132, (size <= 4 ? 32 : 41) - (size - 1) / 2 * 19);
         Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
         if (heat == HeatCondition.NONE) {
             AllGuiTextures.JEI_NO_HEAT_BAR.render(context, 0, 80);
@@ -107,7 +137,7 @@ public class MixingView extends CreateView {
         }
         context.state.addSpecialElement(new MixingBasinRenderState(pose, 87, -5));
         context.drawText(
-            MinecraftClient.getInstance().textRenderer,
+            context.client.textRenderer,
             CreateLang.translateDirect(heat.getTranslationKey()),
             5,
             86,

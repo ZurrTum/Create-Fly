@@ -16,8 +16,10 @@
       "fluid_tag": "#c:milk"
     }
   ],
-  "fluid_result": {
-    "amount": 40500,
-    "id": "create:tea"
-  }
+  "fluid_results": [
+    {
+      "amount": 40500,
+      "id": "create:tea"
+    }
+  ]
 }

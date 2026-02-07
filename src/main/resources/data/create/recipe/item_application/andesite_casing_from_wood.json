@@ -2,7 +2,9 @@
   "type": "create:item_application",
   "target": "#c:stripped_woods",
   "ingredient": "create:andesite_alloy",
-  "result": {
-    "id": "create:andesite_casing"
-  }
+  "results": [
+    {
+      "id": "create:andesite_casing"
+    }
+  ]
 }

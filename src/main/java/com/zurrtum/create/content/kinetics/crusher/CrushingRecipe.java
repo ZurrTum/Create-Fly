@@ -5,7 +5,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
+import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -15,7 +17,8 @@ import net.minecraft.recipe.RecipeType;
 
 import java.util.List;
 
-public record CrushingRecipe(int time, List<ChanceOutput> results, Ingredient ingredient) implements AbstractCrushingRecipe {
+public record CrushingRecipe(int time, List<ProcessingOutput> results,
+                             Ingredient ingredient) implements CreateSingleStackRollableRecipe, TimedRecipe {
     @Override
     public RecipeSerializer<CrushingRecipe> getSerializer() {
         return AllRecipeSerializers.CRUSHING;
@@ -29,14 +32,14 @@ public record CrushingRecipe(int time, List<ChanceOutput> results, Ingredient in
     public static class Serializer implements RecipeSerializer<CrushingRecipe> {
         public static final MapCodec<CrushingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("processing_time").forGetter(CrushingRecipe::time),
-            ChanceOutput.CODEC.listOf(1, 5).fieldOf("results").forGetter(CrushingRecipe::results),
+            ProcessingOutput.CODEC.listOf(1, 7).fieldOf("results").forGetter(CrushingRecipe::results),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(CrushingRecipe::ingredient)
         ).apply(instance, CrushingRecipe::new));
 
         public static final PacketCodec<RegistryByteBuf, CrushingRecipe> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER,
             CrushingRecipe::time,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ProcessingOutput.STREAM_CODEC.collect(PacketCodecs.toList()),
             CrushingRecipe::results,
             Ingredient.PACKET_CODEC,
             CrushingRecipe::ingredient,

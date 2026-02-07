@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:chiseled_copper",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "minecraft:waxed_chiseled_copper"
-  }
+  "results": [
+    {
+      "id": "minecraft:waxed_chiseled_copper"
+    }
+  ]
 }

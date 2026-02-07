@@ -3,7 +3,9 @@
   "keep_held_item": true,
   "target": "minecraft:weathered_copper_bulb",
   "ingredient": "minecraft:honeycomb_block",
-  "result": {
-    "id": "minecraft:waxed_weathered_copper_bulb"
-  }
+  "results": [
+    {
+      "id": "minecraft:waxed_weathered_copper_bulb"
+    }
+  ]
 }

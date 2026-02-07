@@ -43,6 +43,10 @@ public interface IngredientHelper {
         return builder.build();
     }
 
+    static List<EntryIngredient> getFluidIngredientList(List<com.zurrtum.create.infrastructure.fluids.FluidStack> stacks) {
+        return stacks.stream().map(IngredientHelper::createEntryIngredient).toList();
+    }
+
     static Stream<EntryIngredient> getFluidIngredientStream(@Nullable FluidIngredient ingredient) {
         return ingredient == null ? Stream.empty() : Stream.of(createEntryIngredient(ingredient));
     }

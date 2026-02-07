@@ -19,7 +19,7 @@ public class FanSmokingCategory extends CreateCategory {
 
     @Override
     public int getDisplayHeight() {
-        return 61;
+        return 72;
     }
 
     @Override

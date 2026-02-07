@@ -1,9 +1,11 @@
 {
   "processing_time": 50,
-  "result": {
-    "id": "minecraft:warped_planks",
-    "count": 6
-  },
+  "results": [
+    {
+      "id": "minecraft:warped_planks",
+      "count": 6
+    }
+  ],
   "ingredient": "minecraft:stripped_warped_hyphae",
   "type": "create:cutting"
 }

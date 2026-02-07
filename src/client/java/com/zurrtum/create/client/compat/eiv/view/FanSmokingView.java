@@ -41,8 +41,8 @@ public class FanSmokingView extends CreateView {
 
     @Override
     public void placeSlots(RecipeViewMenu.SlotDefinition slotDefinition) {
-        slotDefinition.addItemSlot(0, 17, 44);
-        slotDefinition.addItemSlot(1, 137, 44);
+        slotDefinition.addItemSlot(0, 17, 55);
+        slotDefinition.addItemSlot(1, 137, 55);
     }
 
     @Override
@@ -53,9 +53,9 @@ public class FanSmokingView extends CreateView {
 
     @Override
     public void renderRecipe(RecipeViewScreen screen, RecipePosition position, DrawContext context, int mouseX, int mouseY, float partialTicks) {
-        AllGuiTextures.JEI_SHADOW.render(context, 42, 23);
-        AllGuiTextures.JEI_LIGHT.render(context, 61, 35);
-        AllGuiTextures.JEI_LONG_ARROW.render(context, 50, 47);
-        context.state.addSpecialElement(new FanRenderState(new Matrix3x2f(context.getMatrices()), 52, 0, Blocks.FIRE.getDefaultState()));
+        AllGuiTextures.JEI_SHADOW.render(context, 42, 34);
+        AllGuiTextures.JEI_LIGHT.render(context, 61, 46);
+        AllGuiTextures.JEI_LONG_ARROW.render(context, 50, 58);
+        context.state.addSpecialElement(new FanRenderState(new Matrix3x2f(context.getMatrices()), 52, 11, Blocks.FIRE.getDefaultState()));
     }
 }

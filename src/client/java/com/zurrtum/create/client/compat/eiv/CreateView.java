@@ -67,7 +67,7 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
     public void bindChanceSlot(SlotFillContext slotFillContext, int i, SlotContent content, float chance) {
         Text text = CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100)).formatted(Formatting.GOLD);
         slotFillContext.bindOptionalSlot(i, content, CHANCE_SLOT);
-        slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(text));
+        slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(1, text));
     }
 
     @Override

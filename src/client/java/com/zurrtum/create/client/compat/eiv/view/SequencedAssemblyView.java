@@ -1,5 +1,8 @@
 package com.zurrtum.create.client.compat.eiv.view;
 
+import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
+import com.zurrtum.create.AllAssemblyRecipeNames;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.AllRecipeTypes;
@@ -16,7 +19,7 @@ import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
-import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu.AdditionalStackModifier;
@@ -29,6 +32,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.component.ComponentChanges;
@@ -41,6 +45,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -79,8 +84,8 @@ public class SequencedAssemblyView extends CreateView {
     private final int loops;
 
     public SequencedAssemblyView(SequencedAssemblyDisplay display) {
-        ChanceOutput output = display.result;
-        result = SlotContent.of(output.stack());
+        ProcessingOutput output = display.result;
+        result = SlotContent.of(output.create());
         chance = output.chance();
         sequence = display.sequence;
         int size = sequence.size();
@@ -222,21 +227,25 @@ public class SequencedAssemblyView extends CreateView {
     }
 
     public interface SequencedRenderer<T extends Recipe<?>> {
+        Map<Recipe<?>, Text> NAMES = new WeakHashMap<>();
+
         void render(DrawContext graphics, int i, int x, int y, @Nullable ItemStack stack);
 
         static Text getSequenceName(Recipe<?> recipe) {
-            Identifier id = Registries.RECIPE_TYPE.getId(recipe.getType());
-            if (id != null) {
-                String namespace = id.getNamespace();
-                String recipeName;
-                if (namespace.equals("create")) {
-                    recipeName = id.getPath();
-                } else {
-                    recipeName = id.getNamespace() + "." + id.getPath();
-                }
-                return Text.translatable("create.recipe.assembly." + recipeName);
+            Text name = NAMES.get(recipe);
+            if (name != null) {
+                return name;
             }
-            return ScreenTexts.EMPTY;
+            Identifier id = Registries.RECIPE_TYPE.getId(recipe.getType());
+            if (id == null) {
+                name = ScreenTexts.EMPTY;
+            } else {
+                RegistryOps<JsonElement> ops = MinecraftClient.getInstance().world.getRegistryManager().getOps(JsonOps.INSTANCE);
+                name = Recipe.CODEC.encodeStart(ops, recipe).result().map(json -> AllAssemblyRecipeNames.get(ops, json))
+                    .orElse(ScreenTexts.EMPTY);
+            }
+            NAMES.put(recipe, name);
+            return name;
         }
 
         @SuppressWarnings("unchecked")

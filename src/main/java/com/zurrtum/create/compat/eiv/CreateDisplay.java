@@ -3,6 +3,8 @@ package com.zurrtum.create.compat.eiv;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -24,8 +26,10 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class CreateDisplay implements IEivServerRecipe {
-    public Codec<List<ItemStack>> STACKS_CODEC = ItemStack.CODEC.listOf();
-    public Codec<List<List<ItemStack>>> STACKS_LIST_CODEC = STACKS_CODEC.listOf();
+    public static final Codec<List<ItemStack>> STACKS_CODEC = ItemStack.CODEC.listOf();
+    public static final Codec<List<List<ItemStack>>> STACKS_LIST_CODEC = STACKS_CODEC.listOf();
+    public static final Codec<List<FluidStack>> FLUID_STACKS_CODEC = FluidStack.CODEC.listOf();
+    public static final Codec<List<FluidIngredient>> FLUID_INGREDIENTS_CODEC = FluidIngredient.CODEC.listOf();
 
     public static RegistryOps<NbtElement> getServerOps() {
         return ServerRecipeManager.INSTANCE.getServer().getRegistryManager().getOps(NbtOps.INSTANCE);

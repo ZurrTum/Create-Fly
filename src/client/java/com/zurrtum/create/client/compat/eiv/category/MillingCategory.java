@@ -23,7 +23,7 @@ public class MillingCategory extends CreateCategory {
 
     @Override
     public int getSlotCount() {
-        return 4;
+        return 5;
     }
 
     @Override
