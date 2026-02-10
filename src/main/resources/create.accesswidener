@@ -238,3 +238,4 @@ accessible method net/minecraft/component/type/ContainerComponent <init> (I)V
 accessible field net/minecraft/client/render/model/json/JsonUnbakedModel GSON Lcom/google/gson/Gson;
 accessible class net/minecraft/client/render/model/BlockStatesLoader$LoadedBlockStateDefinition
 accessible class net/minecraft/client/render/model/ReferencedModelsCollector$Holder
+accessible field net/minecraft/client/render/RenderPhase MAIN_TARGET Lnet/minecraft/client/render/RenderPhase$Target;

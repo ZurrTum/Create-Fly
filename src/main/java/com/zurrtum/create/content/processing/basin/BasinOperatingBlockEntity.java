@@ -1,9 +1,9 @@
 package com.zurrtum.create.content.processing.basin;
 
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.simple.DeferralBehaviour;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.foundation.recipe.trie.AbstractVariant;
@@ -98,8 +98,10 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
             return false;
         return getBasin().map(blockEntity -> switch (recipe) {
             case BasinRecipe basinRecipe -> basinRecipe.matches(new BasinInput(blockEntity), world);
-            case ShapedRecipe shapedRecipe -> BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity), shapedRecipe, world);
-            case ShapelessRecipe shapelessRecipe -> BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity), shapelessRecipe, world);
+            case ShapedRecipe shapedRecipe ->
+                BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity), shapedRecipe, world);
+            case ShapelessRecipe shapelessRecipe ->
+                BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity), shapelessRecipe, world);
             default -> false;
         }).orElse(false);
 
@@ -157,7 +159,7 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
             return finder.match(basin, trie.lookup(availableVariants));
         } catch (Exception e) {
             Create.LOGGER.error("Failed to get recipe trie, falling back to slow logic", e);
-            List<RecipeEntry<? extends Recipe<?>>> recipes = RecipeFinder.get(getRecipeCacheKey(), (ServerWorld) world, this::matchStaticFilters);
+            List<RecipeEntry<?>> recipes = RecipeFinder.get(getRecipeCacheKey(), (ServerWorld) world, this::matchStaticFilters);
             if (recipes.isEmpty()) {
                 return null;
             }
