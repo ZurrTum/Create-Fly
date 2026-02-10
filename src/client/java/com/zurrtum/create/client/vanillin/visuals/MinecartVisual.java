@@ -211,9 +211,6 @@ public class MinecartVisual<T extends AbstractMinecartEntity> extends AbstractEn
     }
 
     public static boolean shouldSkipRender(AbstractMinecartEntity minecart) {
-        if (minecart.getController() instanceof ExperimentalMinecartController) {
-            return true;
-        }
         Block block = minecart.getContainedBlock().getBlock();
         return !MinecraftClient.getInstance().getBakedModelManager().getBlockEntityModelsSupplier().get().renderers.containsKey(block);
     }
