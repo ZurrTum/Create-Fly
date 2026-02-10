@@ -38,9 +38,16 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         // Render Hands
         SuperByteBuffer hourHand = CachedBuffers.partial(AllPartialModels.CUCKOO_HOUR_HAND, blockState);
         SuperByteBuffer minuteHand = CachedBuffers.partial(AllPartialModels.CUCKOO_MINUTE_HAND, blockState);
+        float hourAngle;
+        float minuteAngle;
         CuckooClockAnimationBehaviour behaviour = (CuckooClockAnimationBehaviour) be.getBehaviour(AnimationBehaviour.TYPE);
-        float hourAngle = behaviour.hourHand.getValue(partialTicks);
-        float minuteAngle = behaviour.minuteHand.getValue(partialTicks);
+        if (behaviour != null) {
+            hourAngle = behaviour.hourHand.getValue(partialTicks);
+            minuteAngle = behaviour.minuteHand.getValue(partialTicks);
+        } else {
+            hourAngle = 0;
+            minuteAngle = 0;
+        }
         rotateHand(hourHand, hourAngle, direction).light(light).renderInto(ms, vb);
         rotateHand(minuteHand, minuteAngle, direction).light(light).renderInto(ms, vb);
 
