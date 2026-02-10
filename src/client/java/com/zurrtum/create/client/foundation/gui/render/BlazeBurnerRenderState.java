@@ -9,7 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 public record BlazeBurnerRenderState(
-    Matrix3x2f pose, int x, int y, World world, BlockState block, BlazeBurnerBlock.HeatLevel heatLevel, float animation, boolean drawGoggles,
+    Matrix3x2f pose, int x, int y, World world, BlockState block, BlazeBurnerBlock.HeatLevel heatLevel, float animation,
+    boolean drawGoggles,
     int hash, ScreenRect bounds
 ) implements SpecialGuiElementRenderState {
     public BlazeBurnerRenderState(
@@ -24,16 +25,6 @@ public record BlazeBurnerRenderState(
         int hash
     ) {
         this(pose, x, y, world, block, heatLevel, animation, drawGoggles, hash, new ScreenRect(x, y, 68, 68).transformEachVertex(pose));
-    }
-
-    @Override
-    public @Nullable ScreenRect bounds() {
-        return bounds;
-    }
-
-    @Override
-    public Matrix3x2f pose() {
-        return pose;
     }
 
     @Override

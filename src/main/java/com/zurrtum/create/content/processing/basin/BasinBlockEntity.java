@@ -202,7 +202,7 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             return;
         }
 
-        //        setAreFluidsMoving(mixer.running && mixer.runningTicks <= 20);
+        setAreFluidsMoving(mixer.running && mixer.runningTicks <= 20);
     }
 
     public boolean isEmpty() {
