@@ -232,9 +232,9 @@ public class ContinuousOBBCollider {
         final Vec3d stepSeparationAxis;
         double stepSeparation;
 
-        Vec3d normalAxis;
+        Vec3d normalAxis = Vec3d.ZERO;
         double normalSeparation;
-        Vec3d axis;
+        Vec3d axis = Vec3d.ZERO;
         double separation;
 
         public ContinuousSeparationManifold(Vec3d stepSeparationAxis) {
@@ -322,8 +322,8 @@ public class ContinuousOBBCollider {
 
         public void reset() {
             // Reset the manifold.
-            this.axis = null;
-            this.normalAxis = null;
+            this.axis = Vec3d.ZERO;
+            this.normalAxis = Vec3d.ZERO;
             this.separation = Double.MAX_VALUE;
             this.stepSeparation = Double.MAX_VALUE;
             this.normalSeparation = Double.MAX_VALUE;
