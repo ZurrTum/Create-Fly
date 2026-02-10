@@ -330,7 +330,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements C
                 output = recipe.assemble(input, level.registryAccess());
             }
         }
-        if (!recipeRemainder.isEmpty()) {
+        if (recipeRemainder.isEmpty()) {
             return ItemHelper.multipliedOutput(output, rolls);
         }
         return ItemHelper.multipliedOutput(List.of(output, recipeRemainder), rolls);
