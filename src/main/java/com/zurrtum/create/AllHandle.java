@@ -1538,11 +1538,10 @@ public class AllHandle {
     }
 
     public static void onClipboardEdit(ServerPlayNetworkHandler listener, ClipboardEditPacket packet) {
-        ServerPlayerEntity sender = listener.player;
-        ClipboardContent processedContent = clipboardProcessor(packet.clipboardContent());
-
         BlockPos targetedBlock = packet.targetedBlock();
         if (targetedBlock != null) {
+            NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
+            ServerPlayerEntity sender = listener.player;
             ServerWorld world = sender.getWorld();
             if (!world.isPosLoaded(targetedBlock))
                 return;
@@ -1550,6 +1549,7 @@ public class AllHandle {
                 return;
             if (world.getBlockEntity(targetedBlock) instanceof ClipboardBlockEntity cbe) {
                 MergedComponentMap map = new MergedComponentMap(cbe.getComponents());
+                ClipboardContent processedContent = clipboardProcessor(packet.clipboardContent());
                 if (processedContent == null) {
                     map.remove(AllDataComponents.CLIPBOARD_CONTENT);
                 } else {
@@ -1561,9 +1561,11 @@ public class AllHandle {
             return;
         }
 
+        ServerPlayerEntity sender = listener.player;
         ItemStack itemStack = sender.getInventory().getStack(packet.hotbarSlot());
         if (!itemStack.isOf(AllItems.CLIPBOARD))
             return;
+        ClipboardContent processedContent = clipboardProcessor(packet.clipboardContent());
         if (processedContent == null) {
             itemStack.remove(AllDataComponents.CLIPBOARD_CONTENT);
         } else {
