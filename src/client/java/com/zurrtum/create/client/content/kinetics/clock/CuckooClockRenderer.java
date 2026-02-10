@@ -59,9 +59,14 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         state.hourHand = CachedBuffers.partial(AllPartialModels.CUCKOO_HOUR_HAND, state.blockState);
         state.minuteHand = CachedBuffers.partial(AllPartialModels.CUCKOO_MINUTE_HAND, state.blockState);
         CuckooClockAnimationBehaviour behaviour = (CuckooClockAnimationBehaviour) be.getBehaviour(AnimationBehaviour.TYPE);
+        if (behaviour != null) {
+            state.hourAngle = AngleHelper.rad(behaviour.hourHand.getValue(tickProgress));
+            state.minuteAngle = AngleHelper.rad(behaviour.minuteHand.getValue(tickProgress));
+        } else {
+            state.hourAngle = 0;
+            state.minuteAngle = 0;
+        }
         state.angle = AngleHelper.rad(AngleHelper.horizontalAngle(state.facing.getCounterClockWise()));
-        state.hourAngle = AngleHelper.rad(behaviour.hourHand.getValue(tickProgress));
-        state.minuteAngle = AngleHelper.rad(behaviour.minuteHand.getValue(tickProgress));
         state.leftDoor = CachedBuffers.partial(AllPartialModels.CUCKOO_LEFT_DOOR, state.blockState);
         state.rightDoor = CachedBuffers.partial(AllPartialModels.CUCKOO_RIGHT_DOOR, state.blockState);
         float angle = 0;
