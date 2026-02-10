@@ -78,11 +78,11 @@ dependencies {
     // 26.1-snapshot-6
     implementation "maven.modrinth:create-fly:26.1-snapshot-6-6.0.9-1"
     // 1.21.11
-    modImplementation "maven.modrinth:create-fly:1.21.11-6.0.9-3"
+    modImplementation "maven.modrinth:create-fly:1.21.11-6.0.9-4"
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.9-1"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.9-2"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.9-1"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.9-2"
 }
 ```
 
@@ -106,11 +106,11 @@ dependencies {
     // 26.1-snapshot-6
     implementation "curse.maven:create-fly-1346281:7580187-sources-7580193"
     // 1.21.11
-    modImplementation "curse.maven:create-fly-1346281:7572621-sources-7572624"
+    modImplementation "curse.maven:create-fly-1346281:7604910-sources-7604915"
     // 1.21.10
-    modImplementation "curse.maven:create-fly-1346281:7460694-sources-7460703"
+    modImplementation "curse.maven:create-fly-1346281:7589702-sources-7589709"
     // 1.21.8
-    modImplementation "curse.maven:create-fly-1346281:7476039-sources-7476048"
+    modImplementation "curse.maven:create-fly-1346281:7604718-sources-7604724"
 }
 ```
 
