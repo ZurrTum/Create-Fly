@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -29,6 +30,7 @@ public class ManualBlockRenderer extends PictureInPictureRenderer<ManualBlockRen
     public static int MAX = 6;
     private int allocate = MAX;
     private static final Deque<GpuTexture> TEXTURES = new ArrayDeque<>(MAX);
+    private static final RandomSource random = RandomSource.create();
     private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
@@ -71,7 +73,8 @@ public class ManualBlockRenderer extends PictureInPictureRenderer<ManualBlockRen
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
         world.blockState(block.state());
-        List<BlockModelPart> parts = blockRenderManager.getBlockModel(block.state()).collectParts(mc.level.random);
+        random.setSeed(42L);
+        List<BlockModelPart> parts = blockRenderManager.getBlockModel(block.state()).collectParts(random);
         blockRenderManager.renderBatched(block.state(), BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         bufferSource.endBatch();
