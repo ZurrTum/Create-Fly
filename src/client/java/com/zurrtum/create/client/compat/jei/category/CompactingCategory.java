@@ -4,6 +4,7 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.client.compat.jei.JeiClientPlugin;
 import com.zurrtum.create.client.compat.jei.renderer.TwoIconRenderer;
+import com.zurrtum.create.client.foundation.gui.render.PressBasinRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3x2f;
 
 import java.util.List;
 
@@ -56,5 +58,6 @@ public class CompactingCategory extends BasinCategory<CompactingRecipe> {
     public void draw(RecipeHolder<CompactingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         CompactingRecipe recipe = entry.value();
         drawBackground(recipe, graphics, recipe.results().size());
+        graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(new Matrix3x2f(graphics.pose()), 91, -5));
     }
 }

@@ -4,7 +4,6 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.jei.CreateCategory;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.render.BasinBlazeBurnerRenderState;
-import com.zurrtum.create.client.foundation.gui.render.MixingBasinRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
@@ -84,7 +83,6 @@ public abstract class BasinCategory<T extends BasinRecipe> extends CreateCategor
 
     public static void drawBackground(BasinRecipe recipe, GuiGraphics graphics, int size) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, (size <= 4 ? 32 : 41) - (size - 1) / 2 * 19);
-        Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         HeatCondition requiredHeat = recipe.heat();
         if (requiredHeat == HeatCondition.NONE) {
             AllGuiTextures.JEI_NO_HEAT_BAR.render(graphics, 4, 80);
@@ -93,13 +91,12 @@ public abstract class BasinCategory<T extends BasinRecipe> extends CreateCategor
             AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 80);
             AllGuiTextures.JEI_LIGHT.render(graphics, 81, 88);
             graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(
-                pose,
+                new Matrix3x2f(graphics.pose()),
                 91,
                 69,
                 requiredHeat.visualizeAsBlazeBurner()
             ));
         }
-        graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 91, -5));
         graphics.drawString(
             graphics.minecraft.font,
             CreateLang.translateDirect(requiredHeat.getTranslationKey()),
