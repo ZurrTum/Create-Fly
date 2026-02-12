@@ -3,6 +3,7 @@ package com.zurrtum.create.content.kinetics.crafter;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.Pointing;
@@ -15,7 +16,6 @@ import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.core.BlockPos;
@@ -86,6 +86,7 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
 
     @Override
     public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, worldIn, pos, oldState, isMoving);
         if (oldState.is(this) && getTargetDirection(state) != getTargetDirection(oldState)) {
             MechanicalCrafterBlockEntity crafter = CrafterHelper.getCrafter(worldIn, pos);
             if (crafter != null)
