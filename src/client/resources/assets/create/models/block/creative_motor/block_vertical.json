@@ -88,15 +88,13 @@
 		},
 		{
 			"name": "Between Rims",
-			"from": [5, 9, 5],
-			"to": [11, 13, 11],
+			"from": [5, 11, 5],
+			"to": [11, 12, 11],
 			"faces": {
-				"north": {"uv": [10, 6, 16, 10], "texture": "#6"},
-				"east": {"uv": [10, 6, 16, 10], "texture": "#6"},
-				"south": {"uv": [10, 6, 16, 10], "texture": "#6"},
-				"west": {"uv": [10, 6, 16, 10], "texture": "#6"},
-				"up": {"uv": [10, 0, 16, 6], "texture": "#6"},
-				"down": {"uv": [14, 4, 20, 10], "rotation": 180, "texture": "#6"}
+				"north": {"uv": [10, 7, 16, 8], "texture": "#6"},
+				"east": {"uv": [10, 7, 16, 8], "texture": "#6"},
+				"south": {"uv": [10, 7, 16, 8], "texture": "#6"},
+				"west": {"uv": [10, 7, 16, 8], "texture": "#6"}
 			}
 		},
 		{
@@ -120,8 +118,7 @@
 				"east": {"uv": [4, 3, 12, 12], "texture": "#5"},
 				"south": {"uv": [4, 3, 12, 12], "texture": "#5"},
 				"west": {"uv": [4, 3, 12, 12], "texture": "#5"},
-				"up": {"uv": [3, 3, 11, 11], "rotation": 180, "texture": "#5"},
-				"down": {"uv": [0, 4, 8, 14], "texture": "#5"}
+				"up": {"uv": [3, 3, 11, 11], "rotation": 180, "texture": "#5"}
 			}
 		},
 		{
