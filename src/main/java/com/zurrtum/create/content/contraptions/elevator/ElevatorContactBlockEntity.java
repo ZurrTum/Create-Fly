@@ -48,8 +48,7 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
         view.putString("ShortName", shortName);
         view.putString("LongName", longName);
 
-        if (lastReportedCurrentFloor != null)
-            view.putString("LastReportedCurrentFloor", lastReportedCurrentFloor);
+        view.putString("LastReportedCurrentFloor", lastReportedCurrentFloor);
 
         if (clientPacket)
             return;
@@ -72,7 +71,7 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
         shortName = view.getString("ShortName", "");
         longName = view.getString("LongName", "");
 
-        lastReportedCurrentFloor = view.getString("LastReportedCurrentFloor", null);
+        view.getOptionalString("LastReportedCurrentFloor").ifPresent(string -> lastReportedCurrentFloor = string);
 
         if (clientPacket)
             return;
