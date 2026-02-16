@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.ponder.foundation.render;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -48,18 +47,13 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        int width = renderState.width() * windowScaleFactor;
-        int height = renderState.height() * windowScaleFactor;
         GpuTexture texture = TEXTURES.get(renderState.id());
         if (texture == null) {
-            texture = GpuTexture.create(width, height);
+            texture = GpuTexture.create(renderState.width(), renderState.height(), windowScaleFactor);
             TEXTURES.put(renderState.id(), texture);
         }
-        RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(width, height), ProjectionType.ORTHOGRAPHIC);
-        texture.prepare();
+        texture.prepare(projectionMatrixBuffer);
         matrices.pushPose();
-        matrices.scale(windowScaleFactor, windowScaleFactor, 1);
-
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
         Lighting lighting = gameRenderer.getLighting();

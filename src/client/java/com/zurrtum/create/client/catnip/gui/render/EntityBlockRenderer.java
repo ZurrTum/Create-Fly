@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -65,8 +64,7 @@ public class EntityBlockRenderer extends PictureInPictureRenderer<EntityBlockRen
             texture = GpuTexture.create((int) size);
             TEXTURES.put(block.id(), texture);
         }
-        RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(size, size), ProjectionType.ORTHOGRAPHIC);
-        texture.prepare();
+        texture.prepare(projectionMatrixBuffer);
         matrices.pushPose();
         matrices.translate(size / 2, size / 2, 0);
         float scale = block.scale() * windowScaleFactor;

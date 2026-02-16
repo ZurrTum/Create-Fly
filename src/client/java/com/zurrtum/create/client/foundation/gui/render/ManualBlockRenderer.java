@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -55,8 +54,7 @@ public class ManualBlockRenderer extends PictureInPictureRenderer<ManualBlockRen
             texture = TEXTURES.poll();
             assert texture != null;
         }
-        RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(size, size), ProjectionType.ORTHOGRAPHIC);
-        texture.prepare();
+        texture.prepare(projectionMatrixBuffer);
         matrices.pushPose();
         matrices.translate(size / 2.0F, size, 0.0F);
         float scale = 20 * windowScaleFactor;

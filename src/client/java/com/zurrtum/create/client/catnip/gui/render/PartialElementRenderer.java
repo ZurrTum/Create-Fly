@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -61,8 +60,7 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
                 texture = GpuTexture.create((int) size);
                 TEXTURES.put(partial, texture);
             }
-            RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(size, size), ProjectionType.ORTHOGRAPHIC);
-            texture.prepare();
+            texture.prepare(projectionMatrixBuffer);
             matrices.pushPose();
             if (partial.padding != 0) {
                 size -= partial.padding * windowScaleFactor;

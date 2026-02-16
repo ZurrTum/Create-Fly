@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -56,8 +55,7 @@ public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemT
             draw = item.state().isAnimated();
         }
         if (draw) {
-            RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(size, size), ProjectionType.ORTHOGRAPHIC);
-            texture.prepare();
+            texture.prepare(projectionMatrixBuffer);
             matrices.pushPose();
             matrices.translate(size / 2, size / 2, 0);
             if (item.padding() != 0) {
