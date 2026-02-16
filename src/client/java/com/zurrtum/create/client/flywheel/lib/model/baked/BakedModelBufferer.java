@@ -211,6 +211,8 @@ final class BakedModelBufferer {
             BlockPos pos = posIterator.next();
             BlockState state = level.getBlockState(pos);
 
+            emitters.prepareForBlock();
+
             if (renderFluids) {
                 FluidState fluidState = state.getFluidState();
                 if (!fluidState.isEmpty()) {
