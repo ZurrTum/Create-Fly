@@ -85,10 +85,6 @@
 			"from": [1, 5.975, 1],
 			"to": [15, 10.025, 15],
 			"faces": {
-				"north": {"uv": [10, 0, 12.5, 7], "rotation": 90, "texture": "#4"},
-				"east": {"uv": [10, 0, 12.5, 7], "rotation": 90, "texture": "#4"},
-				"south": {"uv": [10, 0, 12.5, 7], "rotation": 90, "texture": "#4"},
-				"west": {"uv": [10, 0, 12.5, 7], "rotation": 90, "texture": "#4"},
 				"up": {"uv": [1.5, 1.5, 8.5, 8.5], "texture": "#4"},
 				"down": {"uv": [1.5, 1.5, 8.5, 8.5], "texture": "#4"}
 			}
