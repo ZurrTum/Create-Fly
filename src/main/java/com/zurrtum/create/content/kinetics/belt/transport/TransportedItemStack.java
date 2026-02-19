@@ -28,8 +28,8 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         CreateRegistries.FAN_PROCESSING_TYPE.byNameCodec().optionalFieldOf("FanProcessingType")
             .forGetter(i -> Optional.ofNullable(i.processedBy)),
         Codec.INT.optionalFieldOf("FanProcessingTime", 0).forGetter(i -> i.processingTime),
-        Codec.BOOL.fieldOf("Locked").forGetter(i -> i.locked),
-        Codec.BOOL.fieldOf("LockedExternally").forGetter(i -> i.lockedExternally)
+        Codec.BOOL.optionalFieldOf("Locked", false).forGetter(i -> i.locked),
+        Codec.BOOL.optionalFieldOf("LockedExternally", false).forGetter(i -> i.lockedExternally)
     ).apply(instance, TransportedItemStack::new));
 
     private static final Random R = new Random();

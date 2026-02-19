@@ -9,6 +9,7 @@ import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.PonderWorldParticles;
 import com.zurrtum.create.client.ponder.foundation.level.PonderChunk;
+import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import com.zurrtum.create.ponder.api.VirtualBlockEntity;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -257,7 +258,11 @@ public class PonderLevel extends SchematicLevel {
                 entity.discard();
             }
 
-            if (!entity.isAlive()) {
+            if (entity instanceof EjectorItemEntity) {
+                if (entity.isRemoved()) {
+                    iterator.remove();
+                }
+            } else if (!entity.isAlive()) {
                 iterator.remove();
             }
         }
