@@ -9,6 +9,7 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
+import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -60,6 +61,8 @@ public class FanScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.addKeyframe();
         scene.world().modifyKineticSpeed(reverse, f -> -f);
+        scene.world()
+            .modifyBlockEntity(fanPos, EncasedFanBlockEntity.class, EncasedFanBlockEntity::blockInFrontChanged);
         scene.effects().rotationDirectionIndicator(fanPos.south());
         scene.special().rotateParrot(flappyBirb, 0, 215 * 2, 0, 30);
         scene.special().moveParrot(flappyBirb, util.vector().of(0, 0, 2.5), 30);
@@ -74,6 +77,8 @@ public class FanScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.world().modifyKineticSpeed(reverse, f -> -f);
         scene.world().modifyKineticSpeed(util.select().everywhere(), f -> 4 * f);
+        scene.world()
+            .modifyBlockEntity(fanPos, EncasedFanBlockEntity.class, EncasedFanBlockEntity::blockInFrontChanged);
         scene.effects().rotationSpeedIndicator(fanPos.south());
         scene.special().rotateParrot(flappyBirb, 0, 245 * 4, 0, 30);
         scene.special().moveParrot(flappyBirb, util.vector().of(0, 0, -20), 30);

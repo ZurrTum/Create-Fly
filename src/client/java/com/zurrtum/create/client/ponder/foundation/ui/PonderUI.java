@@ -582,6 +582,7 @@ public class PonderUI extends AbstractPonderScreen {
         renderScene(graphics, 0, window, index, partialTicks, uiTicks);
         float lazyIndexValue = lazyIndex.getValue(partialTicks);
         if (Math.abs(lazyIndexValue - index) > 1 / 512f) {
+            finishingFlashWarmup = 0;
             renderScene(graphics, 1, window, lazyIndexValue < index ? index - 1 : index + 1, partialTicks, uiTicks);
         }
     }

@@ -234,3 +234,6 @@ accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (L
 accessible method net/minecraft/world/item/component/ItemContainerContents <init> (I)V
 accessible field net/minecraft/client/renderer/block/model/BlockModel GSON Lcom/google/gson/Gson;
 accessible class net/minecraft/client/resources/model/BlockStateModelLoader$LoadedBlockModelDefinition
+accessible field net/minecraft/client/renderer/RenderPipelines PIPELINES_BY_LOCATION Ljava/util/Map;
+accessible field net/minecraft/client/renderer/RenderPipelines GUI_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible method net/minecraft/client/renderer/feature/ParticleFeatureRenderer$ParticleBufferCache rotate ()V

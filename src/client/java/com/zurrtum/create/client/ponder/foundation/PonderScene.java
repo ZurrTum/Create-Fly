@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.ponder.foundation;
 
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
@@ -302,14 +301,15 @@ public class PonderScene {
                 pt
             )
         );
-        Lighting lighting = mc.gameRenderer.getLighting();
-        lighting.setupFor(Lighting.Entry.ENTITY_IN_UI);
         world.renderEntities(ms, queue, camera, cameraRenderState, pt);
-        lighting.setupFor(Lighting.Entry.LEVEL);
-        world.renderParticles(ms, queue, camera, cameraRenderState, pt);
+        world.renderParticles(queue, camera, cameraRenderState, pt);
         outliner.renderOutlines(mc, ms, buffer, Vec3.ZERO, pt);
 
         ms.popPose();
+    }
+
+    public void resetParticles() {
+        world.resetParticles();
     }
 
     public void renderOverlay(PonderUI screen, GuiGraphics graphics, float partialTicks) {

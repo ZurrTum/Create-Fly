@@ -231,14 +231,12 @@ public class PonderLevel extends SchematicLevel {
         renderManager.submit(state, cameraRenderState, state.x - x, state.y - y, state.z - z, ms, queue);
     }
 
-    public void renderParticles(
-        PoseStack ms,
-        SubmitNodeStorage queue,
-        Camera ari,
-        CameraRenderState cameraRenderState,
-        float pt
-    ) {
-        particles.renderParticles(ms, queue, ari, cameraRenderState, pt);
+    public void renderParticles(SubmitNodeStorage queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
+        particles.renderParticles(queue, ari, cameraRenderState, pt);
+    }
+
+    public void resetParticles() {
+        particles.resetParticles();
     }
 
     public void tick() {

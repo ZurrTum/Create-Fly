@@ -16,27 +16,41 @@ public class AllRenderPipelines {
     public static final RenderPipeline.Snippet GLOWING_SNIPPET = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
         .withVertexShader(GLOWING_ID).withFragmentShader(GLOWING_ID).withSampler("Sampler0").withSampler("Sampler2")
         .withVertexFormat(DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS).buildSnippet();
-    public static final RenderPipeline ADDITIVE = RenderPipeline.builder(RenderPipelines.BLOCK_SNIPPET)
-        .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/additive")).withBlend(BlendFunction.ADDITIVE)
-        .withCull(false).build();
-    public static final RenderPipeline ADDITIVE2 = RenderPipeline.builder(RenderPipelines.BLOCK_SNIPPET)
-        .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/additive2")).withBlend(BlendFunction.ADDITIVE)
-        .withCull(false).withDepthWrite(false).build();
-    public static final RenderPipeline GLOWING = RenderPipeline.builder(GLOWING_SNIPPET)
-        .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/glowing")).withBlend(new BlendFunction(
+    public static final RenderPipeline ADDITIVE = register(
+        "additive",
+        RenderPipeline.builder(RenderPipelines.BLOCK_SNIPPET).withBlend(BlendFunction.ADDITIVE).withCull(false)
+    );
+    public static final RenderPipeline ADDITIVE2 = register(
+        "additive2",
+        RenderPipeline.builder(RenderPipelines.BLOCK_SNIPPET).withBlend(BlendFunction.ADDITIVE).withCull(false)
+            .withDepthWrite(false)
+    );
+    public static final RenderPipeline GLOWING = register(
+        "glowing", RenderPipeline.builder(GLOWING_SNIPPET).withBlend(new BlendFunction(
             SourceFactor.SRC_ALPHA,
             DestFactor.ONE_MINUS_SRC_ALPHA,
             SourceFactor.SRC_ALPHA,
             DestFactor.ONE_MINUS_SRC_ALPHA
-        )).build();
-    public static final RenderPipeline GLOWING_TRANSLUCENT = RenderPipeline.builder(GLOWING_SNIPPET)
-        .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/glowing_translucent"))
-        .withBlend(BlendFunction.TRANSLUCENT).build();
-    public static final RenderPipeline CUBE = RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET)
-        .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/cube")).withBlend(new BlendFunction(
+        ))
+    );
+    public static final RenderPipeline GLOWING_TRANSLUCENT = register(
+        "glowing_translucent",
+        RenderPipeline.builder(GLOWING_SNIPPET).withBlend(BlendFunction.TRANSLUCENT)
+    );
+    public static final RenderPipeline CUBE = register(
+        "cube",
+        RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET).withBlend(new BlendFunction(
             SourceFactor.SRC_ALPHA,
             DestFactor.ONE_MINUS_SRC_ALPHA,
             SourceFactor.SRC_ALPHA,
             DestFactor.ONE_MINUS_SRC_ALPHA
-        )).withDepthWrite(false).build();
+        )).withDepthWrite(false)
+    );
+
+    private static RenderPipeline register(String id, RenderPipeline.Builder builder) {
+        Identifier location = Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/" + id);
+        RenderPipeline pipeline = builder.withLocation(location).build();
+        RenderPipelines.PIPELINES_BY_LOCATION.put(location, pipeline);
+        return pipeline;
+    }
 }

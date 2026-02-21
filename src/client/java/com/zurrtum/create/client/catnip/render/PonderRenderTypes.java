@@ -15,7 +15,7 @@ import static com.zurrtum.create.client.ponder.Ponder.MOD_ID;
 public class PonderRenderTypes {
     private static final RenderType GUI = RenderType.create(
         createLayerName("gui"),
-        RenderSetup.builder(RenderPipelines.GUI).bufferSize(786432).createRenderSetup()
+        RenderSetup.builder(PonderRenderPipelines.GUI).bufferSize(786432).createRenderSetup()
     );
 
     private static final RenderType OUTLINE_SOLID = RenderType.create(
