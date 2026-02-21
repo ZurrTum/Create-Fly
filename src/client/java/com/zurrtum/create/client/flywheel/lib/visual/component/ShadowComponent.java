@@ -12,6 +12,7 @@ import com.zurrtum.create.client.flywheel.lib.instance.ShadowInstance;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.model.QuadMesh;
 import com.zurrtum.create.client.flywheel.lib.model.SingleMeshModel;
+import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.util.InstanceRecycler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -99,7 +100,7 @@ public final class ShadowComponent implements EntityComponent {
 
     /**
      * Update the shadow instances. You'd typically call this in your visual's
-     * {@link com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual#beginFrame(DynamicVisual.Context) beginFrame} method.
+     * {@link SimpleDynamicVisual#beginFrame(DynamicVisual.Context) beginFrame} method.
      *
      * @param context The frame context.
      */

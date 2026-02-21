@@ -646,7 +646,7 @@ public interface SidedFluidInventory extends FluidInventory {
     @Override
     @NotNull
     default java.util.Iterator<FluidStack> iterator(Direction side) {
-        return new com.zurrtum.create.infrastructure.fluids.SidedFluidInventory.Iterator(this, side);
+        return new Iterator(this, side);
     }
 
     @Override

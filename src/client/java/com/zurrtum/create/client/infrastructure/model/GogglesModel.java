@@ -84,11 +84,10 @@ public class GogglesModel implements ItemModel {
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked> CODEC = MapCodec.unit(
-            com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked::new);
+        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
 
         @Override
-        public MapCodec<com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked> type() {
+        public MapCodec<Unbaked> type() {
             return CODEC;
         }
 

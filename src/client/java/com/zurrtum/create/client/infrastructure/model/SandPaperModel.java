@@ -183,13 +183,11 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
     }
 
     public record Unbaked(Identifier model) implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(Identifier.CODEC.fieldOf("model")
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked::model))
-                .apply(instance, com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked::new));
+        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(Identifier.CODEC.fieldOf(
+            "model").forGetter(Unbaked::model)).apply(instance, Unbaked::new));
 
         @Override
-        public MapCodec<com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked> type() {
+        public MapCodec<Unbaked> type() {
             return CODEC;
         }
 

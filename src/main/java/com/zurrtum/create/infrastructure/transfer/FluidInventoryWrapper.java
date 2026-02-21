@@ -507,8 +507,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
     @Override
     @NotNull
     public java.util.Iterator<FluidStack> iterator() {
-        return storage.supportsExtraction() ? new com.zurrtum.create.infrastructure.transfer.FluidInventoryWrapper.Iterator(
-            storage) : Collections.emptyIterator();
+        return storage.supportsExtraction() ? new Iterator(storage) : Collections.emptyIterator();
     }
 
     @Override

@@ -18,7 +18,7 @@ public class GenericMultiTagBuilder<T> implements MultiTagBuilder {
         }
 
         @Override
-        public com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Tag add(T component) {
+        public Tag add(T component) {
             tags.forEach(tag -> helper.addTagToComponent(component, tag));
             return this;
         }
@@ -34,7 +34,7 @@ public class GenericMultiTagBuilder<T> implements MultiTagBuilder {
         }
 
         @Override
-        public com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Component add(Identifier tag) {
+        public Component add(Identifier tag) {
             components.forEach(component -> helper.addTagToComponent(component, tag));
             return this;
         }

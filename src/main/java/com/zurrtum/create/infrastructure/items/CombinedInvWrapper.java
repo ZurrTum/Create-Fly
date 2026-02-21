@@ -306,7 +306,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
         if (itemHandler.length == 0) {
             return Collections.emptyIterator();
         } else {
-            return new com.zurrtum.create.infrastructure.items.CombinedInvWrapper.Iterator(side);
+            return new Iterator(side);
         }
     }
 

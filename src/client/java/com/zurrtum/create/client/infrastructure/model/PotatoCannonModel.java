@@ -182,11 +182,10 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> CODEC = MapCodec.unit(
-            com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked::new);
+        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
 
         @Override
-        public MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> type() {
+        public MapCodec<Unbaked> type() {
             return CODEC;
         }
 

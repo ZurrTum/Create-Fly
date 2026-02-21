@@ -107,17 +107,12 @@ public class OversizedModel implements ItemModel {
 
     public record Unbaked(Identifier model, List<ItemTintSource> tints, List<Double> min,
                           List<Double> max) implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(
-                Identifier.CODEC.fieldOf("model")
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::model),
-                ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::tints),
-                Codec.DOUBLE.listOf(3, 3).fieldOf("min")
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::min),
-                Codec.DOUBLE.listOf(3, 3).fieldOf("max")
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::max)
-            ).apply(instance, com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::new));
+        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Identifier.CODEC.fieldOf("model").forGetter(Unbaked::model),
+            ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of()).forGetter(Unbaked::tints),
+            Codec.DOUBLE.listOf(3, 3).fieldOf("min").forGetter(Unbaked::min),
+            Codec.DOUBLE.listOf(3, 3).fieldOf("max").forGetter(Unbaked::max)
+        ).apply(instance, Unbaked::new));
 
         @Override
         public void resolveDependencies(ResolvableModel.Resolver resolver) {
@@ -147,7 +142,7 @@ public class OversizedModel implements ItemModel {
         }
 
         @Override
-        public MapCodec<com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked> type() {
+        public MapCodec<Unbaked> type() {
             return CODEC;
         }
     }

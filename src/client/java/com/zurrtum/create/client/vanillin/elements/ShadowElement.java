@@ -99,7 +99,7 @@ public final class ShadowElement extends AbstractVisual implements SimpleDynamic
 
     /**
      * Update the shadow instances. You'd typically call this in your visual's
-     * {@link com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual#beginFrame(DynamicVisual.Context) beginFrame} method.
+     * {@link SimpleDynamicVisual#beginFrame(DynamicVisual.Context) beginFrame} method.
      *
      * @param context The frame context.
      */

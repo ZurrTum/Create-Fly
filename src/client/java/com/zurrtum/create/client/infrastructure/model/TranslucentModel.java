@@ -91,13 +91,10 @@ public class TranslucentModel implements ItemModel {
     }
 
     public record Unbaked(Identifier model, List<ItemTintSource> tints) implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(
-                Identifier.CODEC.fieldOf("model")
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::model),
-                ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
-                    .forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::tints)
-            ).apply(instance, com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::new));
+        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Identifier.CODEC.fieldOf("model").forGetter(Unbaked::model),
+            ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of()).forGetter(Unbaked::tints)
+        ).apply(instance, Unbaked::new));
 
         @Override
         public void resolveDependencies(ResolvableModel.Resolver resolver) {
@@ -120,7 +117,7 @@ public class TranslucentModel implements ItemModel {
         }
 
         @Override
-        public MapCodec<com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked> type() {
+        public MapCodec<Unbaked> type() {
             return CODEC;
         }
     }

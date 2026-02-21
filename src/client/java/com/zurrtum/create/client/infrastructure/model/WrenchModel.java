@@ -132,11 +132,10 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> CODEC = MapCodec.unit(
-            com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked::new);
+        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
 
         @Override
-        public MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> type() {
+        public MapCodec<Unbaked> type() {
             return CODEC;
         }
 

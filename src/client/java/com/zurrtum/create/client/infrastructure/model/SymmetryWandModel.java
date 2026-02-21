@@ -160,8 +160,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked> CODEC = MapCodec.unit(
-            com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked::new);
+        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
 
         @Override
         public MapCodec<? extends ItemModel.Unbaked> type() {

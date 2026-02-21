@@ -116,15 +116,15 @@ public class LayerPattern {
             private int weight = 1;
             private boolean netherMode;
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder block(Supplier<? extends Block> block) {
+            public Builder block(Supplier<? extends Block> block) {
                 return block(block.get());
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder passiveBlock() {
+            public Builder passiveBlock() {
                 return blocks(Blocks.STONE.defaultBlockState(), Blocks.DEEPSLATE.defaultBlockState());
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder block(Block block) {
+            public Builder block(Block block) {
                 if (netherMode) {
                     this.targets.add(ImmutableList.of(OreConfiguration.target(
                         NETHER_ORE_REPLACEABLES,
@@ -135,24 +135,18 @@ public class LayerPattern {
                 return blocks(block.defaultBlockState(), block.defaultBlockState());
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(
-                Block block,
-                Block deepblock
-            ) {
+            public Builder blocks(Block block, Block deepblock) {
                 return blocks(block.defaultBlockState(), deepblock.defaultBlockState());
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(Couple<Supplier<? extends Block>> blocksByDepth) {
+            public Builder blocks(Couple<Supplier<? extends Block>> blocksByDepth) {
                 return blocks(
                     blocksByDepth.getFirst().get().defaultBlockState(),
                     blocksByDepth.getSecond().get().defaultBlockState()
                 );
             }
 
-            private com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(
-                BlockState stone,
-                BlockState deepslate
-            ) {
+            private Builder blocks(BlockState stone, BlockState deepslate) {
                 this.targets.add(ImmutableList.of(
                     OreConfiguration.target(STONE_ORE_REPLACEABLES, stone),
                     OreConfiguration.target(DEEPSLATE_ORE_REPLACEABLES, deepslate)
@@ -160,12 +154,12 @@ public class LayerPattern {
                 return this;
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder weight(int weight) {
+            public Builder weight(int weight) {
                 this.weight = weight;
                 return this;
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder size(int min, int max) {
+            public Builder size(int min, int max) {
                 this.minSize = min;
                 this.maxSize = max;
                 return this;
