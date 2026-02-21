@@ -67,8 +67,8 @@ public class FactoryPanelSetItemScreen extends AbstractSimiContainerScreen<Facto
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         renderedItem.getRenderElement().clear();
     }
 

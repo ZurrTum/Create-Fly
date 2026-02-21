@@ -184,12 +184,6 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
         }
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        clearRenderedElements();
-    }
-
     private void clearRenderedElements() {
         renderedBlock.getRenderElement().clear();
         if (renderedItem != null) {
@@ -574,7 +568,7 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
     @Override
     public void removed() {
         sendIt(null, false);
-        super.removed();
+        clearRenderedElements();
     }
 
     private void sendIt(@Nullable FactoryPanelPosition toRemove, boolean clearPromises) {

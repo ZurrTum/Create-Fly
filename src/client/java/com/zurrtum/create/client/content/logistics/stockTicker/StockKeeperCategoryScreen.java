@@ -109,12 +109,6 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
         addRenderableWidget(renderedItem);
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.getRenderElement().clear();
-    }
-
     protected void startEditing(int index) {
         confirmButton.visible = false;
 
@@ -577,6 +571,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
     public void removed() {
         super.removed();
         minecraft.player.connection.send(new StockKeeperCategoryEditPacket(menu.contentHolder.getBlockPos(), schedule));
+        renderedItem.getRenderElement().clear();
     }
 
     @Override

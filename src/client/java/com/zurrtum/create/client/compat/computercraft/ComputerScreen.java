@@ -90,9 +90,8 @@ public class ComputerScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        previousScreen.onClose();
+    public void removed() {
+        previousScreen.removed();
         if (computerWidget != null) {
             computerWidget.getRenderElement().clear();
         }

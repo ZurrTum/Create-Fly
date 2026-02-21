@@ -142,12 +142,6 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         addRenderableWidget(renderedItem);
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.getRenderElement().clear();
-    }
-
     private int nameBoxX(String s, EditBox nameBox) {
         return leftPos + background.getWidth() / 2 - (Math.min(font.width(s), nameBox.getWidth()) + 10) / 2;
     }
@@ -228,6 +222,7 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
             acceptPackages.green
         ));
         super.removed();
+        renderedItem.getRenderElement().clear();
     }
 
     @Override

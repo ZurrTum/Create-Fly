@@ -85,8 +85,8 @@ public abstract class AbstractFilterScreen<F extends AbstractFilterMenu> extends
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         renderedItem.getRenderElement().clear();
     }
 

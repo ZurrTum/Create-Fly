@@ -87,12 +87,6 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
         ).showingElement(renderedItem));
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.clear();
-    }
-
     private static String translationKey(SequencerInstructions def) {
         return "gui.sequenced_gearshift.instruction." + Lang.asId(def.name());
     }
@@ -329,6 +323,7 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
     @Override
     public void removed() {
         sendPacket();
+        renderedItem.clear();
     }
 
     private static int defaultValue(SequencerInstructions def) {

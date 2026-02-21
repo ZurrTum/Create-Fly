@@ -144,13 +144,6 @@ public class SymmetryWandScreen extends AbstractSimiScreen {
         addRenderableWidget(renderedBlock);
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.getRenderElement().clear();
-        renderedBlock.getRenderElement().clear();
-    }
-
     private void initAlign(SymmetryMirror element, int x, int y) {
         if (areaAlign != null) {
             removeWidget(areaAlign);
@@ -193,6 +186,8 @@ public class SymmetryWandScreen extends AbstractSimiScreen {
     public void removed() {
         SymmetryWandItem.configureSettings(wand, currentElement);
         minecraft.player.connection.send(new ConfigureSymmetryWandPacket(hand, currentElement));
+        renderedItem.getRenderElement().clear();
+        renderedBlock.getRenderElement().clear();
     }
 
 }

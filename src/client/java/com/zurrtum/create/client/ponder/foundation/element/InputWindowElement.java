@@ -158,4 +158,19 @@ public class InputWindowElement extends AnimatedOverlayElementBase {
             item.clear();
         }
     }
+
+    @Override
+    public void setFade(float fade) {
+        super.setFade(fade);
+        if (item != null && fade == 0) {
+            item.clear();
+        }
+    }
+
+    @Override
+    public void clear() {
+        if (visible) {
+            setVisible(false);
+        }
+    }
 }

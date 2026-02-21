@@ -201,12 +201,6 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         addRenderableWidget(renderedItem);
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.getRenderElement().clear();
-    }
-
     public static <T> List<MutableComponent> getTypeOptions(List<Pair<Identifier, T>> list) {
         String langSection = list.equals(AllSchedules.INSTRUCTION_TYPES) ? "instruction." : "condition.";
         return list.stream().map(Pair::getFirst)
@@ -1299,6 +1293,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
     public void removed() {
         super.removed();
         minecraft.player.connection.send(new ScheduleEditPacket(schedule));
+        renderedItem.getRenderElement().clear();
     }
 
     @Override

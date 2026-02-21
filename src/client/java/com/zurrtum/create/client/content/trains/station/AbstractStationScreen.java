@@ -104,8 +104,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
         renderedFlag.clear();
         renderedItem.clear();
     }

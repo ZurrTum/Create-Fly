@@ -32,6 +32,7 @@ import java.util.List;
 public class PonderTagScreen extends AbstractPonderScreen {
 
     private final PonderTag tag;
+    private final PonderTag renderTag;
     protected final List<ItemEntry> items = new ArrayList<>();
     private final double itemXmult = 0.5;
     @Nullable
@@ -47,10 +48,12 @@ public class PonderTagScreen extends AbstractPonderScreen {
 
     public PonderTagScreen(Identifier tag) {
         this.tag = PonderIndex.getTagAccess().getRegisteredTag(tag);
+        renderTag = new PonderTag(this.tag, 1.66f);
     }
 
     public PonderTagScreen(PonderTag tag) {
         this.tag = tag;
+        renderTag = new PonderTag(this.tag, 1.66f);
     }
 
     @Override
@@ -180,9 +183,8 @@ public class PonderTagScreen extends AbstractPonderScreen {
         poseStack.popMatrix();
 
         poseStack.pushMatrix();
-        poseStack.translate(23, 23);
-        poseStack.scale(1.66f, 1.66f);
-        tag.render(graphics, 0, 0);
+        poseStack.translate(21.5f, 22f);
+        renderTag.render(graphics, 0, 0);
         poseStack.popMatrix();
         poseStack.popMatrix();
 
@@ -308,6 +310,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
                 widget.getRenderElement().clear();
             }
         }
+        renderTag.clear();
     }
 
     public record ItemEntry(@Nullable ItemLike item, Identifier key) {

@@ -78,7 +78,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
         addRenderableWidget(backTrack = new BoxWidget(31, height - 31 - 20).withBounds(20, 20)
             .withCustomBackground(BoxElement.COLOR_BACKGROUND_FLAT).enableFade(0, 5).withPadding(2, 2).fade(1)
-            .withCallback(() -> ScreenOpener.openPreviousScreen(this, null)));
+            .withCallback(ScreenOpener::openPreviousScreen));
 
         Screen previousScreen = screenHistory.getFirst();
         if (previousScreen instanceof NavigatableSimiScreen screen) {
@@ -167,40 +167,8 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
         float guiScaledWidth = window.getGuiScaledWidth();
         float guiScaledHeight = window.getGuiScaledHeight();
 
-        Screen lastScreen = ScreenOpener.getPreviouslyRenderedScreen();
         float tValue = transition.getValue(partialTicks);
         float tValueAbsolute = Math.abs(tValue);
-
-        // draw last screen into buffer
-        /*if (lastScreen != null && lastScreen != this && !transition.settled()) {
-            currentlyRenderingPreviousScreen = true;
-            ms.pushMatrix();
-            lastScreen.render(graphics, 0, 0, partialTicks);
-            ms.popMatrix();
-
-            ms.pushMatrix();
-            int dpx = (int) (guiScaledWidth / 2);
-            int dpy = (int) (guiScaledHeight / 2);
-            if (lastScreen instanceof NavigatableSimiScreen navigableScreen && tValue > 0) {
-                dpx = navigableScreen.depthPointX;
-                dpy = navigableScreen.depthPointY;
-            }
-
-            float scale = 1 + (0.2f * tValue);
-
-            Matrix4f matrix4f = new Matrix4f().setOrtho(0.0F, guiScaledWidth, guiScaledHeight, 0.0F, 1000.0F, 3000.0F);
-            MatrixStack poseStack2 = new MatrixStack();
-            poseStack2.peek().getPositionMatrix().set(matrix4f);
-            poseStack2.translate(dpx, dpy, 0);
-            poseStack2.scale(scale, scale, 1);
-            poseStack2.translate(-dpx, -dpy, 0);
-
-
-            UIRenderHelper.drawFramebuffer(poseStack2, 1f - tValueAbsolute);
-            ms.popMatrix();
-            currentlyRenderingPreviousScreen = false;
-        }*/
-
         // modify current screen as well
         float scale = tValue > 0 ? 1 - 0.5f * (1 - tValueAbsolute) : 1 + .5f * (1 - tValueAbsolute);
         int dpx = (int) (guiScaledWidth / 2);
@@ -215,7 +183,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
     @Override
     public boolean keyPressed(KeyEvent input) {
         if (input.key() == GLFW.GLFW_KEY_BACKSPACE) {
-            ScreenOpener.openPreviousScreen(this, null);
+            ScreenOpener.openPreviousScreen();
             return true;
         }
         return super.keyPressed(input);

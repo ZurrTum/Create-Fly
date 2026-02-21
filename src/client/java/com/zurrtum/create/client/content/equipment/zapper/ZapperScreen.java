@@ -115,13 +115,6 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.getRenderElement().clear();
-        renderedBlock.getRenderElement().clear();
-    }
-
-    @Override
     protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
@@ -145,6 +138,8 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
         ConfigureZapperPacket packet = getConfigurationPacket();
         packet.configureZapper(zapper);
         minecraft.player.connection.send(packet);
+        renderedItem.getRenderElement().clear();
+        renderedBlock.getRenderElement().clear();
     }
 
     protected abstract ConfigureZapperPacket getConfigurationPacket();

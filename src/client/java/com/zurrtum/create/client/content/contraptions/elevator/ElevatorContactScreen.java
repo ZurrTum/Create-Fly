@@ -110,8 +110,7 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
         renderedItem.getRenderElement().clear();
     }
 

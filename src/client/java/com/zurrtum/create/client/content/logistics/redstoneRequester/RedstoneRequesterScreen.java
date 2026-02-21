@@ -131,12 +131,6 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        renderedItem.getRenderElement().clear();
-    }
-
-    @Override
     protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         AllGuiTextures.REDSTONE_REQUESTER.render(pGuiGraphics, leftPos + 3, topPos);
         renderPlayerInventory(pGuiGraphics, leftPos - 3, topPos + 124);
@@ -249,6 +243,7 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
             amounts
         ));
         super.removed();
+        renderedItem.getRenderElement().clear();
     }
 
 }

@@ -161,7 +161,12 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
         addRenderableWidget(refreshButton);
 
         extraAreas = ImmutableList.of(
-            new Rect2i(leftPos + background.getWidth(), y + background.getHeight() - 40, 48, 48),
+            new Rect2i(
+                leftPos + background.getWidth(),
+                y + background.getHeight() - 40,
+                48,
+                48
+            ),
             new Rect2i(refreshButton.getX(), refreshButton.getY(), refreshButton.getWidth(), refreshButton.getHeight())
         );
 
@@ -173,8 +178,8 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         renderedItem.getRenderElement().clear();
     }
 

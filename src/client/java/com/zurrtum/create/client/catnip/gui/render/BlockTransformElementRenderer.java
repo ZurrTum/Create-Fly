@@ -21,11 +21,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class BlockTransformElementRenderer extends PictureInPictureRenderer<BlockTransformRenderState> {
-    private static final Map<Object, GpuTexture> TEXTURES = new HashMap<>();
+    private static final Map<BlockTransformRenderKey, GpuTexture> TEXTURES = new IdentityHashMap<>();
     private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
@@ -33,7 +33,7 @@ public class BlockTransformElementRenderer extends PictureInPictureRenderer<Bloc
         super(vertexConsumers);
     }
 
-    public static void clear(Object key) {
+    public static void clear(BlockTransformRenderKey key) {
         GpuTexture texture = TEXTURES.remove(key);
         if (texture != null) {
             texture.close();
@@ -47,47 +47,56 @@ public class BlockTransformElementRenderer extends PictureInPictureRenderer<Bloc
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        Object key = block.getKey();
+        BlockTransformRenderKey key = block.key();
         GpuTexture texture = TEXTURES.get(key);
-        if (texture == null) {
-            float size = block.scale() * windowScaleFactor;
-            texture = GpuTexture.create((int) size);
-            TEXTURES.put(key, texture);
+        if (texture == null || key.dirty) {
+            float size = key.size * windowScaleFactor;
+            if (key.dirty) {
+                key.dirty = false;
+                if (texture != null && texture.width() != size) {
+                    texture.close();
+                    texture = null;
+                }
+            }
+            if (texture == null) {
+                texture = GpuTexture.create((int) size);
+                TEXTURES.put(key, texture);
+            }
             texture.prepare(projectionMatrixBuffer);
             matrices.pushPose();
             matrices.translate(size / 2, size / 2, 0);
-            if (block.padding() != 0) {
-                size -= block.padding() * windowScaleFactor;
+            if (key.padding != 0) {
+                size -= key.padding * windowScaleFactor;
             }
             matrices.scale(size, size, size);
-            if (block.zRot() != 0) {
-                matrices.mulPose(Axis.ZP.rotation(block.zRot()));
+            if (key.zRot != 0) {
+                matrices.mulPose(Axis.ZP.rotation(key.zRot));
             }
-            if (block.xRot() != 0) {
-                matrices.mulPose(Axis.XP.rotation(block.xRot()));
+            if (key.xRot != 0) {
+                matrices.mulPose(Axis.XP.rotation(key.xRot));
             }
-            if (block.yRot() != 0) {
-                matrices.mulPose(Axis.YP.rotation(block.yRot()));
+            if (key.yRot != 0) {
+                matrices.mulPose(Axis.YP.rotation(key.yRot));
             }
             matrices.scale(1, -1, 1);
             matrices.translate(-0.5F, -0.5F, -0.5F);
             Minecraft mc = Minecraft.getInstance();
             RenderType layer;
-            if (block.state().is(Blocks.REDSTONE_TORCH) && block.state().getValue(RedstoneTorchBlock.LIT)) {
+            if (key.state.is(Blocks.REDSTONE_TORCH) && key.state.getValue(RedstoneTorchBlock.LIT)) {
                 layer = RenderTypes.cutoutMovingBlock();
             } else {
-                layer = ItemBlockRenderTypes.getChunkRenderType(block.state()) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
+                layer = ItemBlockRenderTypes.getChunkRenderType(key.state) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             }
             SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
-            world.blockState(block.state());
+            world.blockState(key.state);
             mc.getBlockRenderer().renderBatched(
-                block.state(),
+                key.state,
                 BlockPos.ZERO,
                 world,
                 matrices,
                 bufferSource.getBuffer(layer),
                 false,
-                block.parts()
+                key.parts
             );
             bufferSource.endBatch();
             matrices.popPose();

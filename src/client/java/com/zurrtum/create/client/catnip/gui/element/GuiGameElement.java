@@ -59,11 +59,10 @@ public class GuiGameElement {
     }
 
     public static class GuiItemRenderBuilder extends GuiRenderBuilder<GuiItemRenderBuilder> {
-        private final ItemStack stack;
-        private Object key;
+        private final ItemTransformRenderKey key;
 
         public GuiItemRenderBuilder(ItemStack stack) {
-            this.stack = stack;
+            key = new ItemTransformRenderKey(stack);
         }
 
         @Override
@@ -75,64 +74,43 @@ public class GuiGameElement {
         public void render(GuiGraphics graphics) {
             if (scale <= 1 && xRot == 0 && yRot == 0 && zRot == 0) {
                 if (scale == 1) {
-                    graphics.renderItem(stack, (int) x, (int) y);
+                    graphics.renderItem(key.stack, (int) x, (int) y);
                 } else {
                     Matrix3x2fStack matrices = graphics.pose();
                     matrices.pushMatrix();
                     matrices.scale(scale);
-                    graphics.renderItem(stack, (int) x, (int) y);
+                    graphics.renderItem(key.stack, (int) x, (int) y);
                     matrices.popMatrix();
                 }
                 return;
             }
-            ItemTransformRenderState state = ItemTransformRenderState.create(
-                graphics,
-                stack,
-                x,
-                y,
-                scale,
-                padding,
-                xRot,
-                yRot,
-                zRot
-            );
-            key = state.getKey();
-            graphics.guiRenderState.submitPicturesInPictureState(state);
-        }
-
-        @Override
-        public GuiItemRenderBuilder scale(float scale) {
-            clear();
-            return super.scale(scale);
-        }
-
-        @Override
-        public GuiItemRenderBuilder padding(int padding) {
-            clear();
-            return super.padding(padding);
-        }
-
-        @Override
-        public GuiItemRenderBuilder rotate(float x, float y, float z) {
-            clear();
-            return super.rotate(x, y, z);
+            key.update(scale, padding, xRot, yRot, zRot);
+            graphics.guiRenderState.submitPicturesInPictureState(ItemTransformRenderState.create(graphics, key, x, y));
         }
 
         @Override
         public void clear() {
-            if (key != null) {
-                ItemTransformElementRenderer.clear(key);
-                key = null;
-            }
+            ItemTransformElementRenderer.clear(key);
+        }
+
+        public GuiItemRenderBuilder copy() {
+            GuiItemRenderBuilder builder = new GuiItemRenderBuilder(key.stack);
+            builder.scale = scale;
+            builder.padding = padding;
+            builder.xRot = xRot;
+            builder.yRot = yRot;
+            builder.zRot = zRot;
+            builder.x = x;
+            builder.y = y;
+            return builder;
         }
     }
 
     public static class GuiBlockStateRenderBuilder extends GuiRenderBuilder<GuiBlockStateRenderBuilder> {
-        private final BlockState block;
-        boolean rendering = false;
+        private final BlockTransformRenderKey key;
 
         public GuiBlockStateRenderBuilder(BlockState block) {
-            this.block = block;
+            key = new BlockTransformRenderKey(block);
         }
 
         @Override
@@ -142,51 +120,13 @@ public class GuiGameElement {
 
         @Override
         public void render(GuiGraphics graphics) {
-            graphics.guiRenderState.submitPicturesInPictureState(BlockTransformRenderState.create(
-                graphics,
-                block,
-                x,
-                y,
-                scale,
-                padding,
-                xRot,
-                yRot,
-                zRot
-            ));
-            rendering = true;
-        }
-
-        @Override
-        public GuiBlockStateRenderBuilder scale(float scale) {
-            clear();
-            return super.scale(scale);
-        }
-
-        @Override
-        public GuiBlockStateRenderBuilder padding(int padding) {
-            clear();
-            return super.padding(padding);
-        }
-
-        @Override
-        public GuiBlockStateRenderBuilder rotate(float x, float y, float z) {
-            clear();
-            return super.rotate(x, y, z);
+            key.update(scale, padding, xRot, yRot, zRot);
+            graphics.guiRenderState.submitPicturesInPictureState(BlockTransformRenderState.create(graphics, key, x, y));
         }
 
         @Override
         public void clear() {
-            if (rendering) {
-                BlockTransformElementRenderer.clear(BlockTransformRenderState.getKey(
-                    block,
-                    scale,
-                    padding,
-                    xRot,
-                    yRot,
-                    zRot
-                ));
-                rendering = false;
-            }
+            BlockTransformElementRenderer.clear(key);
         }
     }
 

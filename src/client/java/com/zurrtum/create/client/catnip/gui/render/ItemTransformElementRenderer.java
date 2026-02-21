@@ -17,11 +17,11 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemTransformRenderState> {
-    private static final Map<Object, GpuTexture> TEXTURES = new HashMap<>();
+    private static final Map<ItemTransformRenderKey, GpuTexture> TEXTURES = new IdentityHashMap<>();
     private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
@@ -29,7 +29,7 @@ public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemT
         super(vertexConsumers);
     }
 
-    public static void clear(Object key) {
+    public static void clear(ItemTransformRenderKey key) {
         GpuTexture texture = TEXTURES.remove(key);
         if (texture != null) {
             texture.close();
@@ -43,35 +43,48 @@ public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemT
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        float size = item.scale() * windowScaleFactor;
-        Object key = item.getKey();
+        float size = 0;
+        ItemTransformRenderKey key = item.key();
         GpuTexture texture = TEXTURES.get(key);
         boolean draw;
-        if (texture == null) {
-            texture = GpuTexture.create((int) size);
-            TEXTURES.put(key, texture);
+        if (texture == null || key.dirty) {
+            size = key.size * windowScaleFactor;
+            if (key.dirty) {
+                key.dirty = false;
+                if (texture != null && texture.width() != size) {
+                    texture.close();
+                    texture = null;
+                }
+            }
+            if (texture == null) {
+                texture = GpuTexture.create((int) size);
+                TEXTURES.put(key, texture);
+            }
             draw = true;
         } else {
-            draw = item.state().isAnimated();
+            draw = key.state.isAnimated();
         }
         if (draw) {
+            if (size == 0) {
+                size = key.size * windowScaleFactor;
+            }
             texture.prepare(projectionMatrixBuffer);
             matrices.pushPose();
             matrices.translate(size / 2, size / 2, 0);
-            if (item.padding() != 0) {
-                size -= item.padding() * windowScaleFactor;
+            if (key.padding != 0) {
+                size -= key.padding * windowScaleFactor;
             }
             matrices.scale(size, -size, size);
-            if (item.zRot() != 0) {
-                matrices.mulPose(Axis.ZP.rotation(item.zRot()));
+            if (key.zRot != 0) {
+                matrices.mulPose(Axis.ZP.rotation(key.zRot));
             }
-            if (item.xRot() != 0) {
-                matrices.mulPose(Axis.XP.rotation(item.xRot()));
+            if (key.xRot != 0) {
+                matrices.mulPose(Axis.XP.rotation(key.xRot));
             }
-            if (item.yRot() != 0) {
-                matrices.mulPose(Axis.YP.rotation(item.yRot()));
+            if (key.yRot != 0) {
+                matrices.mulPose(Axis.YP.rotation(key.yRot));
             }
-            boolean blockLight = item.state().usesBlockLight();
+            boolean blockLight = key.state.usesBlockLight();
             Lighting lighting = Minecraft.getInstance().gameRenderer.getLighting();
             if (blockLight) {
                 lighting.setupFor(Lighting.Entry.ITEMS_3D);
@@ -80,7 +93,7 @@ public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemT
             }
             FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
             SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();
-            item.state().submit(matrices, queue, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            key.state.submit(matrices, queue, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
             renderDispatcher.renderAllFeatures();
             bufferSource.endBatch();
             matrices.popPose();

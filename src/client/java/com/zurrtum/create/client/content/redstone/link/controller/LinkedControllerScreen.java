@@ -93,8 +93,8 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         renderedItem.getRenderElement().clear();
     }
 

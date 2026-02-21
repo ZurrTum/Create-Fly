@@ -364,6 +364,12 @@ public class PonderScene {
         }
     }
 
+    public void clear() {
+        for (PonderElement element : elements) {
+            element.clear();
+        }
+    }
+
     public void seekToTime(int time) {
         if (time < currentTime) {
             throw new IllegalStateException("Cannot seek backwards. Rewind first.");

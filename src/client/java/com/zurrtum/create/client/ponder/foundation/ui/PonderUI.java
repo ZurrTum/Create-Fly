@@ -1138,6 +1138,9 @@ public class PonderUI extends AbstractPonderScreen {
         for (PonderTag tag : tags) {
             tag.clear();
         }
+        for (PonderScene scene : scenes) {
+            scene.clear();
+        }
     }
 
     public boolean isComfyReadingEnabled() {
