@@ -2,10 +2,10 @@ package com.zurrtum.create.content.contraptions.actors.contraptionControls;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItemTags;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -45,11 +45,13 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity implements 
     }
 
     public void updatePoweredState() {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         boolean powered = level.hasNeighborSignal(worldPosition);
-        if (this.powered == powered)
+        if (this.powered == powered) {
             return;
+        }
         this.powered = powered;
         this.disabled = powered;
         notifyUpdate();
@@ -64,8 +66,9 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity implements 
     @Override
     public void tick() {
         super.tick();
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
         tickAnimations();
         int value = disabled ? 4 * 45 : 0;
         indicator.setValue(value);
@@ -101,7 +104,10 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity implements 
             .withColor(enabled ? 0xA3DF55 : 0xEE9246);
 
         if (filter.isEmpty()) {
-            player.displayClientMessage(Component.translatable("create.contraption.controls.all_actor_toggle", state), true);
+            player.displayClientMessage(
+                Component.translatable("create.contraption.controls.all_actor_toggle", state),
+                true
+            );
             return;
         }
 

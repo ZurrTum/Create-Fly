@@ -8,10 +8,6 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlockEntity.CartMovementMode;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.Queue;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -28,6 +24,9 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Queue;
 
 import static com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlock.RAIL_SHAPE;
 
@@ -52,18 +51,21 @@ public class MountedContraption extends Contraption {
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         BlockState state = world.getBlockState(pos);
-        if (!state.hasProperty(RAIL_SHAPE))
+        if (!state.hasProperty(RAIL_SHAPE)) {
             return false;
-        if (!searchMovedStructure(world, pos, null))
+        }
+        if (!searchMovedStructure(world, pos, null)) {
             return false;
+        }
 
         Axis axis = state.getValue(RAIL_SHAPE) == RailShape.EAST_WEST ? Axis.X : Axis.Z;
         addBlock(
-            world,
-            pos,
-            Pair.of(
-                new StructureBlockInfo(pos, AllBlocks.MINECART_ANCHOR.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_AXIS, axis), null),
-                null
+            world, pos, Pair.of(
+                new StructureBlockInfo(
+                    pos,
+                    AllBlocks.MINECART_ANCHOR.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_AXIS, axis),
+                    null
+                ), null
             )
         );
 
@@ -81,8 +83,9 @@ public class MountedContraption extends Contraption {
     protected Pair<StructureBlockInfo, BlockEntity> capture(Level world, BlockPos pos) {
         Pair<StructureBlockInfo, BlockEntity> pair = super.capture(world, pos);
         StructureBlockInfo capture = pair.getKey();
-        if (!capture.state().is(AllBlocks.CART_ASSEMBLER))
+        if (!capture.state().is(AllBlocks.CART_ASSEMBLER)) {
             return pair;
+        }
 
         Pair<StructureBlockInfo, BlockEntity> anchorSwap = Pair.of(
             new StructureBlockInfo(
@@ -91,15 +94,21 @@ public class MountedContraption extends Contraption {
                 null
             ), pair.getValue()
         );
-        if (pos.equals(anchor) || connectedCart != null)
+        if (pos.equals(anchor) || connectedCart != null) {
             return anchorSwap;
+        }
 
         for (Axis axis : Iterate.axes) {
-            if (axis.isVertical() || !VecHelper.onSameAxis(anchor, pos, axis))
+            if (axis.isVertical() || !VecHelper.onSameAxis(anchor, pos, axis)) {
                 continue;
-            for (AbstractMinecart abstractMinecartEntity : world.getEntitiesOfClass(AbstractMinecart.class, new AABB(pos))) {
-                if (!CartAssemblerBlock.canAssembleTo(abstractMinecartEntity))
+            }
+            for (AbstractMinecart abstractMinecartEntity : world.getEntitiesOfClass(
+                AbstractMinecart.class,
+                new AABB(pos)
+            )) {
+                if (!CartAssemblerBlock.canAssembleTo(abstractMinecartEntity)) {
                     break;
+                }
                 connectedCart = abstractMinecartEntity;
                 connectedCart.setPos(pos.getX() + .5, pos.getY(), pos.getZ() + .5f);
             }
@@ -110,18 +119,24 @@ public class MountedContraption extends Contraption {
 
     @Override
     protected boolean movementAllowed(BlockState state, Level world, BlockPos pos) {
-        if (!pos.equals(anchor) && state.is(AllBlocks.CART_ASSEMBLER))
+        if (!pos.equals(anchor) && state.is(AllBlocks.CART_ASSEMBLER)) {
             return testSecondaryCartAssembler(world, pos);
+        }
         return super.movementAllowed(state, world, pos);
     }
 
     protected boolean testSecondaryCartAssembler(Level world, BlockPos pos) {
         for (Axis axis : Iterate.axes) {
-            if (axis.isVertical() || !VecHelper.onSameAxis(anchor, pos, axis))
+            if (axis.isVertical() || !VecHelper.onSameAxis(anchor, pos, axis)) {
                 continue;
-            for (AbstractMinecart abstractMinecartEntity : world.getEntitiesOfClass(AbstractMinecart.class, new AABB(pos))) {
-                if (!CartAssemblerBlock.canAssembleTo(abstractMinecartEntity))
+            }
+            for (AbstractMinecart abstractMinecartEntity : world.getEntitiesOfClass(
+                AbstractMinecart.class,
+                new AABB(pos)
+            )) {
+                if (!CartAssemblerBlock.canAssembleTo(abstractMinecartEntity)) {
                     break;
+                }
                 return true;
             }
         }
@@ -156,8 +171,9 @@ public class MountedContraption extends Contraption {
     }
 
     public void addExtraInventories(Entity cart) {
-        if (cart instanceof Container inventory)
+        if (cart instanceof Container inventory) {
             storage.attachExternal(inventory);
+        }
     }
 
 

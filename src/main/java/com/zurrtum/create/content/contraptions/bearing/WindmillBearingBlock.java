@@ -28,13 +28,16 @@ public class WindmillBearingBlock extends BearingBlock implements IBE<WindmillBe
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.mayBuild())
+        if (!player.mayBuild()) {
             return InteractionResult.FAIL;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.FAIL;
+        }
         if (stack.isEmpty()) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
+            }
             withBlockEntityDo(
                 level, pos, be -> {
                     if (be.running) {

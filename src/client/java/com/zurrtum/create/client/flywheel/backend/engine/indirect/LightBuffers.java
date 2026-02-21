@@ -38,8 +38,20 @@ public class LightBuffers {
             return;
         }
 
-        GL46.glBindBufferRange(GL46.GL_SHADER_STORAGE_BUFFER, BufferBindings.LIGHT_LUT, lut.handle(), 0, lut.byteCapacity());
-        GL46.glBindBufferRange(GL46.GL_SHADER_STORAGE_BUFFER, BufferBindings.LIGHT_SECTION, sections.handle(), 0, sections.byteCapacity());
+        GL46.glBindBufferRange(
+            GL46.GL_SHADER_STORAGE_BUFFER,
+            BufferBindings.LIGHT_LUT,
+            lut.handle(),
+            0,
+            lut.byteCapacity()
+        );
+        GL46.glBindBufferRange(
+            GL46.GL_SHADER_STORAGE_BUFFER,
+            BufferBindings.LIGHT_SECTION,
+            sections.handle(),
+            0,
+            sections.byteCapacity()
+        );
     }
 
     public void delete() {

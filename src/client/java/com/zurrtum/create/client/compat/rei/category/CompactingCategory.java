@@ -72,7 +72,11 @@ public class CompactingCategory extends CreateCategory<CompactingDisplay> {
             drawSlotBackground(graphics, points);
             drawSlotBackground(graphics, outputs);
             drawChanceSlotBackground(graphics, chances);
-            AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + (resultSize <= 4 ? 37 : 46) - (resultSize - 1) / 2 * 19);
+            AllGuiTextures.JEI_DOWN_ARROW.render(
+                graphics,
+                bounds.x + 141,
+                bounds.y + (resultSize <= 4 ? 37 : 46) - (resultSize - 1) / 2 * 19
+            );
             Matrix3x2f pose = new Matrix3x2f(graphics.pose());
             if (requiredHeat == HeatCondition.NONE) {
                 AllGuiTextures.JEI_NO_HEAT_BAR.render(graphics, bounds.x + 9, bounds.y + 85);
@@ -87,7 +91,11 @@ public class CompactingCategory extends CreateCategory<CompactingDisplay> {
                     requiredHeat.visualizeAsBlazeBurner()
                 ));
             }
-            graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(pose, bounds.x + 96, bounds.y));
+            graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(
+                pose,
+                bounds.x + 96,
+                bounds.y
+            ));
             graphics.drawString(
                 Minecraft.getInstance().font,
                 CreateLang.translateDirect(requiredHeat.getTranslationKey()),
@@ -107,10 +115,16 @@ public class CompactingCategory extends CreateCategory<CompactingDisplay> {
             widgets.add(createOutputSlot(chances.get(i)).entries(chanceIngredients.get(i)));
         }
         if (!requiredHeat.testBlazeBurner(BlazeBurnerBlock.HeatLevel.NONE)) {
-            widgets.add(createSlot(new Point(bounds.x + 139, bounds.y + 86)).entries(EntryIngredients.of(AllItems.BLAZE_BURNER)));
+            widgets.add(createSlot(new Point(
+                bounds.x + 139,
+                bounds.y + 86
+            )).entries(EntryIngredients.of(AllItems.BLAZE_BURNER)));
         }
         if (!requiredHeat.testBlazeBurner(BlazeBurnerBlock.HeatLevel.KINDLED)) {
-            widgets.add(createSlot(new Point(bounds.x + 158, bounds.y + 86)).entries(EntryIngredients.of(AllItems.BLAZE_CAKE)));
+            widgets.add(createSlot(new Point(
+                bounds.x + 158,
+                bounds.y + 86
+            )).entries(EntryIngredients.of(AllItems.BLAZE_CAKE)));
         }
     }
 

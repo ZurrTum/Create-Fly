@@ -35,7 +35,8 @@ public class ItemOutline extends Outline {
         ms.translate(pos.x - camera.x, pos.y - camera.y, pos.z - camera.z);
         ms.scale(params.alpha, params.alpha, params.alpha);
 
-        mc.getItemModelResolver().updateForTopItem(this.itemRenderState, stack, ItemDisplayContext.FIXED, null, null, 0);
+        mc.getItemModelResolver()
+            .updateForTopItem(this.itemRenderState, stack, ItemDisplayContext.FIXED, null, null, 0);
         itemRenderState.submit(ms, queue, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
         for (SubmitNodeCollection batchingRenderCommandQueue : queue.getSubmitsPerOrder().values()) {
             for (SubmitNodeStorage.ItemSubmit itemCommand : batchingRenderCommandQueue.getItemSubmits()) {

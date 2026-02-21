@@ -38,7 +38,8 @@ public class GearshiftBlock extends AbstractEncasedShaftBlock implements IBE<Spl
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return super.getStateForPlacement(context).setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
+        return super.getStateForPlacement(context)
+            .setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
     }
 
     @Override
@@ -50,8 +51,9 @@ public class GearshiftBlock extends AbstractEncasedShaftBlock implements IBE<Spl
         @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         boolean previouslyPowered = state.getValue(POWERED);
         if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
@@ -72,20 +74,23 @@ public class GearshiftBlock extends AbstractEncasedShaftBlock implements IBE<Spl
 
     public void detachKinetics(Level worldIn, BlockPos pos, boolean reAttachNextTick) {
         BlockEntity be = worldIn.getBlockEntity(pos);
-        if (be == null || !(be instanceof KineticBlockEntity))
+        if (be == null || !(be instanceof KineticBlockEntity)) {
             return;
+        }
         RotationPropagator.handleRemoved(worldIn, pos, (KineticBlockEntity) be);
 
         // Re-attach next tick
-        if (reAttachNextTick)
+        if (reAttachNextTick) {
             worldIn.scheduleTick(pos, this, 1, TickPriority.EXTREMELY_HIGH);
+        }
     }
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
         BlockEntity be = worldIn.getBlockEntity(pos);
-        if (!(be instanceof KineticBlockEntity kte))
+        if (!(be instanceof KineticBlockEntity kte)) {
             return;
+        }
         RotationPropagator.handleAdded(worldIn, pos, kte);
     }
 }

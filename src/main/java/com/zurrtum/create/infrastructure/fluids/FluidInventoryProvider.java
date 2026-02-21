@@ -37,12 +37,19 @@ public interface FluidInventoryProvider<T extends SmartBlockEntity> {
             }
         }
         Class<T> expectedClass = getBlockEntityClass();
-        if (!expectedClass.isInstance(blockEntity))
+        if (!expectedClass.isInstance(blockEntity)) {
             return null;
+        }
         return getFluidInventory(world, pos, state, (T) blockEntity, context);
     }
 
     Class<T> getBlockEntityClass();
 
-    FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, T blockEntity, Direction context);
+    FluidInventory getFluidInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        T blockEntity,
+        Direction context
+    );
 }

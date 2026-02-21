@@ -55,11 +55,12 @@ public class RedstoneScenes {
         scene.idle(10);
         ElementLink<WorldSectionElement> sticker = scene.world().showIndependentSection(stickerSelect, Direction.DOWN);
         scene.idle(10);
-        ElementLink<WorldSectionElement> plank = scene.world().showIndependentSection(util.select().position(2, 2, 1), Direction.SOUTH);
+        ElementLink<WorldSectionElement> plank = scene.world()
+            .showIndependentSection(util.select().position(2, 2, 1), Direction.SOUTH);
         scene.world().configureCenterOfRotation(sticker, util.vector().centerOf(stickerPos));
         scene.world().configureCenterOfRotation(plank, util.vector().centerOf(stickerPos));
-        scene.overlay().showText(60).text("Stickers are ideal for Redstone-controlled block attachment").attachKeyFrame()
-            .pointAt(util.vector().blockSurface(stickerPos, Direction.WEST)).placeNearTarget();
+        scene.overlay().showText(60).text("Stickers are ideal for Redstone-controlled block attachment")
+            .attachKeyFrame().pointAt(util.vector().blockSurface(stickerPos, Direction.WEST)).placeNearTarget();
         scene.idle(70);
 
         scene.world().toggleRedstonePower(redstone);
@@ -78,8 +79,8 @@ public class RedstoneScenes {
         scene.world().rotateBearing(bearingPos, 180 * 3, 80);
         scene.world().rotateSection(sticker, 0, 180 * 3, 0, 80);
         scene.world().rotateSection(plank, 0, 180 * 3, 0, 80);
-        scene.overlay().showText(70).text("If it is now moved in a contraption, the block will move with it").pointAt(util.vector().topOf(stickerPos))
-            .placeNearTarget();
+        scene.overlay().showText(70).text("If it is now moved in a contraption, the block will move with it")
+            .pointAt(util.vector().topOf(stickerPos)).placeNearTarget();
         scene.idle(90);
         scene.addKeyframe();
 
@@ -165,8 +166,9 @@ public class RedstoneScenes {
             scene.world().rotateSection(contact, 0, 340, 0, 34 * speed);
             scene.idle(34 * speed);
 
-            if (i == 0)
+            if (i == 0) {
                 scene.markAsFinished();
+            }
         }
 
         scene.world().toggleRedstonePower(topContact);
@@ -183,15 +185,20 @@ public class RedstoneScenes {
         BlockPos circuitPos = util.grid().at(2, 1, 2);
         BlockPos leverPos = util.grid().at(4, 1, 2);
 
-        scene.world().modifyBlockEntityNBT(util.select().position(circuitPos), PulseExtenderBlockEntity.class, nbt -> nbt.putInt("ScrollValue", 30));
-        scene.world().showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(circuitPos),
+            PulseExtenderBlockEntity.class,
+            nbt -> nbt.putInt("ScrollValue", 30)
+        );
+        scene.world()
+            .showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
         scene.idle(10);
         scene.world().showSection(util.select().position(circuitPos), Direction.DOWN);
         scene.idle(20);
 
         Vec3 circuitTop = util.vector().blockSurface(circuitPos, Direction.DOWN).add(0, 3 / 16f, 0);
-        scene.overlay().showText(70).text("Pulse Extenders can lengthen a signal passing through").attachKeyFrame().placeNearTarget()
-            .pointAt(circuitTop);
+        scene.overlay().showText(70).text("Pulse Extenders can lengthen a signal passing through").attachKeyFrame()
+            .placeNearTarget().pointAt(circuitTop);
         scene.idle(60);
 
         scene.effects().indicateRedstone(leverPos);
@@ -220,9 +227,13 @@ public class RedstoneScenes {
         scene.overlay().showRepeaterScrollInput(circuitPos, 60);
         scene.overlay().showControls(circuitTop, Pointing.DOWN, 60).rightClick();
         scene.idle(10);
-        scene.overlay().showText(60).text("Using the value panel, the discharge time can be configured").attachKeyFrame().placeNearTarget()
-            .pointAt(circuitTop);
-        scene.world().modifyBlockEntityNBT(util.select().position(circuitPos), PulseExtenderBlockEntity.class, nbt -> nbt.putInt("ScrollValue", 120));
+        scene.overlay().showText(60).text("Using the value panel, the discharge time can be configured")
+            .attachKeyFrame().placeNearTarget().pointAt(circuitTop);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(circuitPos),
+            PulseExtenderBlockEntity.class,
+            nbt -> nbt.putInt("ScrollValue", 120)
+        );
         scene.idle(70);
 
         scene.effects().indicateRedstone(leverPos);
@@ -233,7 +244,8 @@ public class RedstoneScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.world().toggleRedstonePower(util.select().fromTo(4, 1, 2, 2, 1, 2));
         scene.idle(15);
-        scene.overlay().showText(50).text("The configured duration can range up to an hour").placeNearTarget().pointAt(circuitTop);
+        scene.overlay().showText(50).text("The configured duration can range up to an hour").placeNearTarget()
+            .pointAt(circuitTop);
         scene.idle(70);
         scene.world().cycleBlockProperty(circuitPos, BrassDiodeBlock.POWERING);
         scene.world().toggleRedstonePower(util.select().position(1, 1, 2));
@@ -251,8 +263,13 @@ public class RedstoneScenes {
         BlockPos circuitPos = util.grid().at(2, 1, 2);
         BlockPos leverPos = util.grid().at(4, 1, 2);
 
-        scene.world().modifyBlockEntityNBT(util.select().position(circuitPos), PulseRepeaterBlockEntity.class, nbt -> nbt.putInt("ScrollValue", 30));
-        scene.world().showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(circuitPos),
+            PulseRepeaterBlockEntity.class,
+            nbt -> nbt.putInt("ScrollValue", 30)
+        );
+        scene.world()
+            .showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
         scene.idle(10);
         scene.world().showSection(util.select().position(circuitPos), Direction.DOWN);
         scene.idle(20);
@@ -271,7 +288,8 @@ public class RedstoneScenes {
         scene.world().toggleRedstonePower(util.select().position(0, 1, 2));
         scene.idle(15);
 
-        scene.overlay().showText(60).text("Pulse Repeaters emit a short pulse after a delay").attachKeyFrame().placeNearTarget().pointAt(circuitTop);
+        scene.overlay().showText(60).text("Pulse Repeaters emit a short pulse after a delay").attachKeyFrame()
+            .placeNearTarget().pointAt(circuitTop);
 
         scene.world().toggleRedstonePower(util.select().fromTo(4, 1, 2, 2, 1, 2));
         scene.idle(70);
@@ -279,15 +297,20 @@ public class RedstoneScenes {
         scene.overlay().showRepeaterScrollInput(circuitPos, 60);
         scene.overlay().showControls(circuitTop, Pointing.DOWN, 60).rightClick();
         scene.idle(10);
-        scene.overlay().showText(60).text("Using the value panel, the charge time can be configured").attachKeyFrame().placeNearTarget()
-            .pointAt(circuitTop);
-        scene.world().modifyBlockEntityNBT(util.select().position(circuitPos), PulseRepeaterBlockEntity.class, nbt -> nbt.putInt("ScrollValue", 120));
+        scene.overlay().showText(60).text("Using the value panel, the charge time can be configured").attachKeyFrame()
+            .placeNearTarget().pointAt(circuitTop);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(circuitPos),
+            PulseRepeaterBlockEntity.class,
+            nbt -> nbt.putInt("ScrollValue", 120)
+        );
         scene.idle(70);
 
         scene.effects().indicateRedstone(leverPos);
         scene.world().toggleRedstonePower(util.select().fromTo(4, 1, 2, 2, 1, 2));
         scene.idle(60);
-        scene.overlay().showText(50).text("Configured delays can range up to an hour").placeNearTarget().pointAt(circuitTop);
+        scene.overlay().showText(50).text("Configured delays can range up to an hour").placeNearTarget()
+            .pointAt(circuitTop);
         scene.idle(60);
         scene.world().cycleBlockProperty(circuitPos, BrassDiodeBlock.POWERING);
         scene.world().toggleRedstonePower(util.select().fromTo(1, 1, 2, 0, 1, 2));
@@ -307,12 +330,14 @@ public class RedstoneScenes {
         BlockPos buttonPos = util.grid().at(4, 1, 2);
         Vec3 circuitTop = util.vector().blockSurface(circuitPos, Direction.DOWN).add(0, 3 / 16f, 0);
 
-        scene.world().showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
+        scene.world()
+            .showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
         scene.idle(10);
         scene.world().showSection(util.select().position(circuitPos), Direction.DOWN);
         scene.idle(20);
 
-        scene.overlay().showText(40).attachKeyFrame().text("Powered Latches are redstone controllable Levers").placeNearTarget().pointAt(circuitTop);
+        scene.overlay().showText(40).attachKeyFrame().text("Powered Latches are redstone controllable Levers")
+            .placeNearTarget().pointAt(circuitTop);
         scene.idle(50);
 
         scene.effects().indicateRedstone(buttonPos);
@@ -323,7 +348,8 @@ public class RedstoneScenes {
 
         AABB bb = new AABB(circuitPos).inflate(-.48f, -.45f, -.05f).move(.575, -.45, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb, 40);
-        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("Signals at the back switch it on").placeNearTarget().pointAt(bb.getCenter());
+        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("Signals at the back switch it on")
+            .placeNearTarget().pointAt(bb.getCenter());
         scene.idle(60);
 
         scene.effects().indicateRedstone(util.grid().at(2, 1, 0));
@@ -337,8 +363,8 @@ public class RedstoneScenes {
         AABB bb2 = new AABB(circuitPos).inflate(-.05f, -.45f, -.48f).move(0, -.45, -.575);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.RED, bb, bb, 40);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.RED, bb2, bb2, 40);
-        scene.overlay().showText(40).colored(PonderPalette.RED).text("Signals from the side switch it back off").placeNearTarget()
-            .pointAt(bb2.getCenter());
+        scene.overlay().showText(40).colored(PonderPalette.RED).text("Signals from the side switch it back off")
+            .placeNearTarget().pointAt(bb2.getCenter());
         scene.idle(50);
 
         scene.addKeyframe();
@@ -349,7 +375,8 @@ public class RedstoneScenes {
         scene.world().cycleBlockProperty(circuitPos, PoweredLatchBlock.POWERING);
         scene.idle(10);
 
-        scene.overlay().showText(50).text("Powered latches can also be toggled manually").placeNearTarget().pointAt(circuitTop);
+        scene.overlay().showText(50).text("Powered latches can also be toggled manually").placeNearTarget()
+            .pointAt(circuitTop);
         scene.idle(60);
 
         scene.overlay().showControls(circuitTop, Pointing.DOWN, 40).rightClick();
@@ -368,13 +395,14 @@ public class RedstoneScenes {
         BlockPos buttonPos = util.grid().at(4, 1, 2);
         Vec3 circuitTop = util.vector().blockSurface(circuitPos, Direction.DOWN).add(0, 3 / 16f, 0);
 
-        scene.world().showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
+        scene.world()
+            .showSection(util.select().layersFrom(1).substract(util.select().position(circuitPos)), Direction.UP);
         scene.idle(10);
         scene.world().showSection(util.select().position(circuitPos), Direction.DOWN);
         scene.idle(20);
 
-        scene.overlay().showText(40).attachKeyFrame().text("Powered Toggle Latches are redstone controllable Levers").placeNearTarget()
-            .pointAt(circuitTop);
+        scene.overlay().showText(40).attachKeyFrame().text("Powered Toggle Latches are redstone controllable Levers")
+            .placeNearTarget().pointAt(circuitTop);
         scene.idle(50);
 
         scene.effects().indicateRedstone(buttonPos);
@@ -385,8 +413,8 @@ public class RedstoneScenes {
 
         AABB bb = new AABB(circuitPos).inflate(-.48f, -.45f, -.05f).move(.575, -.45, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb, 40);
-        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("Signals at the back will toggle its state").placeNearTarget()
-            .pointAt(bb.getCenter());
+        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("Signals at the back will toggle its state")
+            .placeNearTarget().pointAt(bb.getCenter());
         scene.idle(60);
 
         scene.effects().indicateRedstone(buttonPos);
@@ -395,7 +423,8 @@ public class RedstoneScenes {
         scene.idle(30);
         scene.world().toggleRedstonePower(util.select().fromTo(4, 1, 2, 3, 1, 2));
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.RED, bb, bb, 40);
-        scene.overlay().showText(30).colored(PonderPalette.RED).text("...on and back off").placeNearTarget().pointAt(bb.getCenter());
+        scene.overlay().showText(30).colored(PonderPalette.RED).text("...on and back off").placeNearTarget()
+            .pointAt(bb.getCenter());
         scene.idle(50);
 
         scene.addKeyframe();
@@ -406,7 +435,8 @@ public class RedstoneScenes {
         scene.world().cycleBlockProperty(circuitPos, ToggleLatchBlock.POWERING);
         scene.idle(10);
 
-        scene.overlay().showText(50).text("Powered toggle latches can also be toggled manually").placeNearTarget().pointAt(circuitTop);
+        scene.overlay().showText(50).text("Powered toggle latches can also be toggled manually").placeNearTarget()
+            .pointAt(circuitTop);
         scene.idle(60);
 
         scene.overlay().showControls(circuitTop, Pointing.DOWN, 40).rightClick();
@@ -420,19 +450,23 @@ public class RedstoneScenes {
         scene.title("analog_lever", "Controlling signals using the Analog Lever");
         scene.configureBasePlate(0, 0, 5);
 
-        BlockPos[] wireLocations = new BlockPos[]{util.grid().at(2, 1, 1), util.grid().at(2, 1, 0), util.grid().at(1, 1, 0), util.grid().at(
-            0,
-            1,
-            0
-        ), util.grid().at(0, 1, 1), util.grid().at(0, 1, 2), util.grid().at(0, 1, 3), util.grid().at(0, 1, 4), util.grid().at(
-            1,
-            1,
-            4
-        ), util.grid().at(2, 1, 4), util.grid().at(3, 1, 4), util.grid().at(4, 1, 4), util.grid().at(4, 1, 3), util.grid().at(
-            4,
-            1,
-            2
-        ), util.grid().at(4, 1, 1)};
+        BlockPos[] wireLocations = new BlockPos[]{
+            util.grid().at(2, 1, 1),
+            util.grid().at(2, 1, 0),
+            util.grid().at(1, 1, 0),
+            util.grid().at(0, 1, 0),
+            util.grid().at(0, 1, 1),
+            util.grid().at(0, 1, 2),
+            util.grid().at(0, 1, 3),
+            util.grid().at(0, 1, 4),
+            util.grid().at(1, 1, 4),
+            util.grid().at(2, 1, 4),
+            util.grid().at(3, 1, 4),
+            util.grid().at(4, 1, 4),
+            util.grid().at(4, 1, 3),
+            util.grid().at(4, 1, 2),
+            util.grid().at(4, 1, 1)
+        };
 
         Selection leverSelection = util.select().fromTo(2, 1, 2, 2, 2, 2);
         Selection lamp = util.select().position(4, 1, 0);
@@ -447,8 +481,8 @@ public class RedstoneScenes {
         scene.world().showSection(leverSelection, Direction.DOWN);
         scene.idle(20);
 
-        scene.overlay().showText(60).text("Analog Levers make for a compact and precise source of redstone power").placeNearTarget().attachKeyFrame()
-            .pointAt(leverVec);
+        scene.overlay().showText(60).text("Analog Levers make for a compact and precise source of redstone power")
+            .placeNearTarget().attachKeyFrame().pointAt(leverVec);
         scene.idle(70);
 
         IntegerProperty power = RedStoneWireBlock.POWER;
@@ -457,13 +491,15 @@ public class RedstoneScenes {
         for (int i = 0; i < 7; i++) {
             scene.idle(2);
             final int state = i + 1;
-            scene.world().modifyBlockEntityNBT(leverSelection, AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", state));
+            scene.world()
+                .modifyBlockEntityNBT(leverSelection, AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", state));
             scene.world().modifyBlock(wireLocations[i], s -> s.setValue(power, 8 - state), false);
             scene.effects().indicateRedstone(wireLocations[i]);
         }
         scene.idle(20);
 
-        scene.overlay().showText(60).attachKeyFrame().text("Right-click to increase its analog power output").placeNearTarget().pointAt(leverVec);
+        scene.overlay().showText(60).attachKeyFrame().text("Right-click to increase its analog power output")
+            .placeNearTarget().pointAt(leverVec);
         scene.idle(70);
 
         scene.overlay().showControls(leverVec, Pointing.DOWN, 40).rightClick().whileSneaking();
@@ -472,7 +508,11 @@ public class RedstoneScenes {
             scene.idle(2);
             final int state = i - 1;
             if (i > 4) {
-                scene.world().modifyBlockEntityNBT(leverSelection, AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", state));
+                scene.world().modifyBlockEntityNBT(
+                    leverSelection,
+                    AnalogLeverBlockEntity.class,
+                    nbt -> nbt.putInt("State", state)
+                );
                 scene.effects().indicateRedstone(wireLocations[state]);
             }
             scene.world().modifyBlock(wireLocations[i], s -> s.setValue(power, state > 2 ? 0 : 3 - state), false);
@@ -480,8 +520,8 @@ public class RedstoneScenes {
         scene.world().modifyBlock(wireLocations[0], s -> s.setValue(power, 4), false);
         scene.idle(20);
 
-        scene.overlay().showText(60).attachKeyFrame().text("Right-click while Sneaking to decrease the power output again").placeNearTarget()
-            .pointAt(leverVec);
+        scene.overlay().showText(60).attachKeyFrame()
+            .text("Right-click while Sneaking to decrease the power output again").placeNearTarget().pointAt(leverVec);
         scene.idle(70);
 
         scene.overlay().showControls(leverVec, Pointing.DOWN, 40).rightClick();
@@ -490,7 +530,11 @@ public class RedstoneScenes {
             scene.idle(2);
             final int state = i + 1;
             if (i >= 4) {
-                scene.world().modifyBlockEntityNBT(leverSelection, AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", state));
+                scene.world().modifyBlockEntityNBT(
+                    leverSelection,
+                    AnalogLeverBlockEntity.class,
+                    nbt -> nbt.putInt("State", state)
+                );
                 scene.effects().indicateRedstone(wireLocations[i]);
             }
             scene.world().modifyBlock(wireLocations[i], s -> s.setValue(power, 16 - state), false);
@@ -513,14 +557,20 @@ public class RedstoneScenes {
         Selection tubes = util.select().fromTo(3, 1, 3, 1, 1, 3);
 
         scene.effects().indicateRedstone(util.grid().at(2, 1, 1));
-        scene.world().modifyBlockEntityNBT(util.select().position(2, 1, 1), AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", 11));
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(2, 1, 1),
+            AnalogLeverBlockEntity.class,
+            nbt -> nbt.putInt("State", 11)
+        );
         scene.world().modifyBlock(util.grid().at(2, 1, 2), s -> s.setValue(RedStoneWireBlock.POWER, 11), false);
-        scene.world().modifyBlockEntityNBT(tubes, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 11));
+        scene.world()
+            .modifyBlockEntityNBT(tubes, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 11));
         scene.idle(20);
 
         Vec3 centerTube = util.vector().centerOf(2, 1, 3);
 
-        scene.overlay().showText(60).attachKeyFrame().text("When powered by Redstone, Nixie Tubes will display the signal strength").placeNearTarget()
+        scene.overlay().showText(60).attachKeyFrame()
+            .text("When powered by Redstone, Nixie Tubes will display the signal strength").placeNearTarget()
             .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 3), Direction.WEST));
         scene.idle(70);
 
@@ -542,7 +592,8 @@ public class RedstoneScenes {
             final int index = i;
             scene.world().modifyBlockEntityNBT(
                 util.select().position(3 - i, 1, 3), NixieTubeBlockEntity.class, nbt -> {
-                    RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                    RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                        .createSerializationContext(NbtOps.INSTANCE);
                     nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
                     nbt.putInt("CustomTextIndex", index);
                 }
@@ -555,11 +606,13 @@ public class RedstoneScenes {
         scene.special().createBirb(util.vector().topOf(util.grid().at(0, 0, 3)), ParrotPose.DancePose::new);
 
         scene.idle(20);
-        scene.overlay().showText(80).attachKeyFrame().placeNearTarget().text("Using written Clipboards, custom text can be displayed")
+        scene.overlay().showText(80).attachKeyFrame().placeNearTarget()
+            .text("Using written Clipboards, custom text can be displayed")
             .pointAt(util.vector().topOf(util.grid().at(3, 1, 3)).add(-.75, -.05f, 0));
         scene.idle(90);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 1, 3), Direction.UP), Pointing.DOWN, 30)
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(3, 1, 3), Direction.UP), Pointing.DOWN, 30)
             .withItem(new ItemStack(Items.BLUE_DYE));
         scene.idle(7);
         scene.world().setBlocks(
@@ -568,7 +621,8 @@ public class RedstoneScenes {
             false
         );
         scene.idle(10);
-        scene.overlay().showText(80).colored(PonderPalette.BLUE).text("Right-Click with Dye to change their display colour").attachKeyFrame()
+        scene.overlay().showText(80).colored(PonderPalette.BLUE)
+            .text("Right-Click with Dye to change their display colour").attachKeyFrame()
             .pointAt(util.vector().topOf(util.grid().at(3, 1, 3)).add(-.75, -.05f, 0)).placeNearTarget();
         scene.idle(60);
     }
@@ -600,22 +654,25 @@ public class RedstoneScenes {
         scene.world().showSection(link3Select, Direction.DOWN);
         scene.idle(10);
 
-        scene.overlay().showText(50).attachKeyFrame().text("Redstone Links can transmit redstone signals wirelessly").placeNearTarget()
-            .pointAt(link1Vec);
+        scene.overlay().showText(50).attachKeyFrame().text("Redstone Links can transmit redstone signals wirelessly")
+            .placeNearTarget().pointAt(link1Vec);
         scene.idle(60);
 
         scene.overlay().showControls(link2Vec, Pointing.UP, 40).rightClick().whileSneaking();
         scene.idle(7);
         scene.world().modifyBlock(link2Pos, s -> s.cycle(RedstoneLinkBlock.RECEIVER), true);
         scene.idle(10);
-        scene.overlay().showText(50).text("Right-click while Sneaking to toggle receive mode").placeNearTarget().pointAt(link2Vec);
+        scene.overlay().showText(50).text("Right-click while Sneaking to toggle receive mode").placeNearTarget()
+            .pointAt(link2Vec);
         scene.idle(60);
 
-        scene.overlay().showControls(link3Vec, Pointing.UP, 40).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(link3Vec, Pointing.UP, 40).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().modifyBlock(link3Pos, s -> s.cycle(RedstoneLinkBlock.RECEIVER), true);
         scene.idle(10);
-        scene.overlay().showText(50).text("A simple Right-click with a Wrench can do the same").placeNearTarget().pointAt(link3Vec);
+        scene.overlay().showText(50).text("A simple Right-click with a Wrench can do the same").placeNearTarget()
+            .pointAt(link3Vec);
         scene.idle(70);
 
         scene.addKeyframe();
@@ -628,8 +685,9 @@ public class RedstoneScenes {
         scene.effects().indicateRedstone(link3Pos);
 
         scene.idle(10);
-        scene.overlay().showText(70).colored(PonderPalette.GREEN).text("Receivers emit the redstone power of transmitters within 256 blocks")
-            .placeNearTarget().pointAt(link2Vec);
+        scene.overlay().showText(70).colored(PonderPalette.GREEN)
+            .text("Receivers emit the redstone power of transmitters within 256 blocks").placeNearTarget()
+            .pointAt(link2Vec);
         scene.idle(80);
         scene.world().toggleRedstonePower(redstone);
         scene.idle(5);
@@ -649,7 +707,8 @@ public class RedstoneScenes {
         scene.overlay().showFilterSlotInput(backSlot, Direction.UP, 100);
         scene.idle(10);
 
-        scene.overlay().showText(50).text("Placing items in the two slots can specify a Frequency").placeNearTarget().pointAt(backSlot);
+        scene.overlay().showText(50).text("Placing items in the two slots can specify a Frequency").placeNearTarget()
+            .pointAt(backSlot);
         scene.idle(60);
 
         ItemStack iron = new ItemStack(Items.IRON_INGOT);
@@ -661,14 +720,16 @@ public class RedstoneScenes {
         scene.overlay().showControls(backSlot, Pointing.DOWN, 30).withItem(sapling);
         scene.world().modifyBlockEntityNBT(
             link1Select, RedstoneLinkBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("FrequencyLast", ItemStack.CODEC, ops, iron);
             }
         );
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(
             link1Select, RedstoneLinkBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("FrequencyFirst", ItemStack.CODEC, ops, sapling);
             }
         );
@@ -679,14 +740,16 @@ public class RedstoneScenes {
         scene.overlay().showControls(top2Slot, Pointing.DOWN, 30).withItem(sapling);
         scene.world().modifyBlockEntityNBT(
             link2Select, RedstoneLinkBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("FrequencyLast", ItemStack.CODEC, ops, iron);
             }
         );
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(
             link2Select, RedstoneLinkBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("FrequencyFirst", ItemStack.CODEC, ops, sapling);
             }
         );
@@ -697,14 +760,16 @@ public class RedstoneScenes {
         scene.overlay().showControls(top3Slot, Pointing.DOWN, 30).withItem(sapling);
         scene.world().modifyBlockEntityNBT(
             link3Select, RedstoneLinkBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("FrequencyLast", ItemStack.CODEC, ops, gold);
             }
         );
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(
             link3Select, RedstoneLinkBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("FrequencyFirst", ItemStack.CODEC, ops, sapling);
             }
         );
@@ -714,13 +779,14 @@ public class RedstoneScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.idle(2);
         scene.world().toggleRedstonePower(util.select().fromTo(1, 2, 2, 1, 2, 3));
-        scene.overlay().showText(90).attachKeyFrame().text("Only the links with matching Frequencies will communicate").placeNearTarget()
-            .pointAt(link2Vec);
+        scene.overlay().showText(90).attachKeyFrame().text("Only the links with matching Frequencies will communicate")
+            .placeNearTarget().pointAt(link2Vec);
 
         scene.idle(30);
         for (int i = 0; i < 4; i++) {
-            if (i % 2 == 1)
+            if (i % 2 == 1) {
                 scene.effects().indicateRedstone(leverPos);
+            }
             scene.world().toggleRedstonePower(redstone);
             scene.idle(2);
             scene.world().toggleRedstonePower(util.select().fromTo(1, 2, 2, 1, 2, 3));

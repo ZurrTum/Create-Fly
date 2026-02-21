@@ -101,7 +101,11 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
         state.itemLight = Mth.floor(sl + .5) << 20 | (Mth.floor(bl + .5) & 0xf) << 4;
     }
 
-    private static ItemStackRenderState createItemRenderState(ItemModelResolver itemModelManager, ItemStack stack, Level world) {
+    private static ItemStackRenderState createItemRenderState(
+        ItemModelResolver itemModelManager,
+        ItemStack stack,
+        Level world
+    ) {
         ItemStackRenderState state = new ItemStackRenderState();
         state.displayContext = ItemDisplayContext.GUI;
         itemModelManager.appendItemLayers(state, stack, state.displayContext, world, null, 0);
@@ -109,7 +113,12 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
     }
 
     @Override
-    public void submit(BlueprintState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BlueprintState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
         ItemStackRenderState[] items = state.items;
         if (items == null) {
@@ -171,7 +180,8 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            model.rotateY(yRot).rotateX(xRot).translate(offset).disableDiffuse().light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            model.rotateY(yRot).rotateX(xRot).translate(offset).disableDiffuse().light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

@@ -11,13 +11,17 @@ public class RollingModeScrollBehaviour extends ScrollOptionBehaviour<RollingMod
     public RollingModeScrollBehaviour(
         SmartBlockEntity be
     ) {
-        super(RollingModeIcon.class, RollingModeIcon::from, CreateLang.translateDirect("contraptions.roller_mode"), be, new RollerValueBox(-3));
+        super(
+            RollingModeIcon.class,
+            RollingModeIcon::from,
+            CreateLang.translateDirect("contraptions.roller_mode"),
+            be,
+            new RollerValueBox(-3)
+        );
     }
 
     public enum RollingModeIcon implements INamedIconOptions {
-        TUNNEL_PAVE(AllIcons.I_ROLLER_PAVE),
-        STRAIGHT_FILL(AllIcons.I_ROLLER_FILL),
-        WIDE_FILL(AllIcons.I_ROLLER_WIDE_FILL);
+        TUNNEL_PAVE(AllIcons.I_ROLLER_PAVE), STRAIGHT_FILL(AllIcons.I_ROLLER_FILL), WIDE_FILL(AllIcons.I_ROLLER_WIDE_FILL);
 
         private final String translationKey;
         private final AllIcons icon;

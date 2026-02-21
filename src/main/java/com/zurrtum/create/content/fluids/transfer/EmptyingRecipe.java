@@ -13,7 +13,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
-public record EmptyingRecipe(ItemStack result, FluidStack fluidResult, Ingredient ingredient) implements CreateSingleStackRecipe {
+public record EmptyingRecipe(ItemStack result, FluidStack fluidResult,
+                             Ingredient ingredient) implements CreateSingleStackRecipe {
     @Override
     public RecipeSerializer<EmptyingRecipe> getSerializer() {
         return AllRecipeSerializers.EMPTYING;

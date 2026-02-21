@@ -34,16 +34,28 @@ public abstract class BasinCategory<T extends BasinRecipe> extends CreateCategor
         int yOffset = size <= 9 ? 51 : 60;
         int i = 0;
         for (SizedIngredient ingredient : ingredients) {
-            builder.addInputSlot(xOffset + (i % 3) * 19, yOffset - (i / 3) * 19).setBackground(SLOT, -1, -1).addItemStacks(getStacks(ingredient));
+            builder.addInputSlot(xOffset + (i % 3) * 19, yOffset - (i / 3) * 19).setBackground(SLOT, -1, -1)
+                .addItemStacks(getStacks(ingredient));
             i++;
         }
         for (FluidIngredient fluidIngredient : fluidIngredients) {
-            addFluidSlot(builder, xOffset + (i % 3) * 19, yOffset - (i / 3) * 19, fluidIngredient).setBackground(SLOT, -1, -1);
+            addFluidSlot(builder, xOffset + (i % 3) * 19, yOffset - (i / 3) * 19, fluidIngredient).setBackground(
+                SLOT,
+                -1,
+                -1
+            );
             i++;
         }
     }
 
-    public static void addResultSlots(IRecipeLayoutBuilder builder, List<ProcessingOutput> results, int i, int end, int y, boolean isOddSize) {
+    public static void addResultSlots(
+        IRecipeLayoutBuilder builder,
+        List<ProcessingOutput> results,
+        int i,
+        int end,
+        int y,
+        boolean isOddSize
+    ) {
         int xPosition, yPosition;
         for (ProcessingOutput result : results) {
             if (isOddSize && i == end) {
@@ -57,7 +69,14 @@ public abstract class BasinCategory<T extends BasinRecipe> extends CreateCategor
         }
     }
 
-    public static void addFluidResultSlots(IRecipeLayoutBuilder builder, List<FluidStack> fluidResults, int i, int end, int y, boolean isOddSize) {
+    public static void addFluidResultSlots(
+        IRecipeLayoutBuilder builder,
+        List<FluidStack> fluidResults,
+        int i,
+        int end,
+        int y,
+        boolean isOddSize
+    ) {
         int xPosition, yPosition;
         for (FluidStack fluidResult : fluidResults) {
             if (isOddSize && i == end) {

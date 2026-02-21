@@ -83,11 +83,13 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
 
     @Override
     public void setPositionOffset(Vec3 position, boolean immediate) {
-        if (entity == null)
+        if (entity == null) {
             return;
+        }
         entity.setPosRaw(position.x, position.y, position.z);
-        if (!immediate)
+        if (!immediate) {
             return;
+        }
         entity.xo = position.x;
         entity.yo = position.y;
         entity.zo = position.z;
@@ -95,12 +97,14 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
 
     @Override
     public void setRotation(Vec3 eulers, boolean immediate) {
-        if (entity == null)
+        if (entity == null) {
             return;
+        }
         entity.setXRot((float) eulers.x);
         entity.setYRot((float) eulers.y);
-        if (!immediate)
+        if (!immediate) {
             return;
+        }
         entity.xRotO = entity.getXRot();
         entity.yo = entity.getYRot();
     }
@@ -135,7 +139,11 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
 
         poseStack.pushPose();
         poseStack.translate(location.x, location.y, location.z);
-        poseStack.translate(Mth.lerp(pt, entity.xo, entity.getX()), Mth.lerp(pt, entity.yo, entity.getY()), Mth.lerp(pt, entity.zo, entity.getZ()));
+        poseStack.translate(
+            Mth.lerp(pt, entity.xo, entity.getX()),
+            Mth.lerp(pt, entity.yo, entity.getY()),
+            Mth.lerp(pt, entity.zo, entity.getZ())
+        );
 
         float angle = AngleHelper.angleLerp(pt, entity.yRotO, entity.getYRot());
         poseStack.mulPose(Axis.YP.rotationDegrees(angle));

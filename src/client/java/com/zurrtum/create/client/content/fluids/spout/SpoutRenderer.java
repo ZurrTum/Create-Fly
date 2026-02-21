@@ -101,11 +101,23 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
         SuperByteBuffer middle = CachedBuffers.partial(AllPartialModels.SPOUT_MIDDLE, state.blockState);
         SuperByteBuffer bottom = CachedBuffers.partial(AllPartialModels.SPOUT_BOTTOM, state.blockState);
         float offset = -3 * squeeze / 32f;
-        state.bits = new BitsRenderState(RenderTypes.solidMovingBlock(), top, middle, bottom, offset, state.lightCoords);
+        state.bits = new BitsRenderState(
+            RenderTypes.solidMovingBlock(),
+            top,
+            middle,
+            bottom,
+            offset,
+            state.lightCoords
+        );
     }
 
     @Override
-    public void submit(SpoutRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SpoutRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.process != null) {
             queue.submitCustomGeometry(matrices, state.process.layer, state.process);
         }
@@ -122,18 +134,31 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
         public BitsRenderState bits;
     }
 
-    public record FluidRenderState(
-        RenderType layer, Fluid fluid, DataComponentPatch changes, float min, float max, float yMin, float offset, int light
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record FluidRenderState(RenderType layer, Fluid fluid, DataComponentPatch changes, float min, float max,
+                                   float yMin, float offset,
+                                   int light) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            FluidRenderHelper.renderFluidBox(fluid, changes, min, yMin, min, max, min, max, vertexConsumer, matricesEntry, light, false, true);
+            FluidRenderHelper.renderFluidBox(
+                fluid,
+                changes,
+                min,
+                yMin,
+                min,
+                max,
+                min,
+                max,
+                vertexConsumer,
+                matricesEntry,
+                light,
+                false,
+                true
+            );
         }
     }
 
-    public record ProcessRenderState(
-        RenderType layer, Fluid fluid, DataComponentPatch changes, AABB box, int light
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record ProcessRenderState(RenderType layer, Fluid fluid, DataComponentPatch changes, AABB box,
+                                     int light) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             FluidRenderHelper.renderFluidBox(
@@ -154,9 +179,8 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
         }
     }
 
-    public record BitsRenderState(
-        RenderType layer, SuperByteBuffer top, SuperByteBuffer middle, SuperByteBuffer bottom, float offset, int light
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record BitsRenderState(RenderType layer, SuperByteBuffer top, SuperByteBuffer middle, SuperByteBuffer bottom,
+                                  float offset, int light) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             top.light(light).renderInto(matricesEntry, vertexConsumer);

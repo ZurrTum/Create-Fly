@@ -34,12 +34,12 @@ import java.util.Objects;
 public class ItemModels {
     public static final TagKey<Item> NO_INSTANCING = TagKey.create(Registries.ITEM, Vanillin.rl("no_instancing"));
     private static final Model EMPTY_MODEL = new SimpleModel(List.of());
-    private static final RendererReloadCache<BakedModelKey, Model> MODEL_CACHE = new RendererReloadCache<>(key -> bakeModel(
-        key.world(),
+    private static final RendererReloadCache<BakedModelKey, Model> MODEL_CACHE = new RendererReloadCache<>(key -> bakeModel(key.world(),
         key.stack(),
         key.displayContext()
     ));
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
 
     public static boolean isSupported(ItemStack stack, ItemDisplayContext context) {
         if (stack.is(NO_INSTANCING)) {
@@ -81,7 +81,10 @@ public class ItemModels {
                 if (itemStack.getItem() instanceof BlockItem && material.transparency() == Transparency.TRANSLUCENT) {
                     material = SimpleMaterial.builderOf(material).transparency(Transparency.ORDER_INDEPENDENT).build();
                 }
-                Mesh mesh = MeshHelper.blockVerticesToMesh(data, "source=ItemModels,ItemStack=" + itemStack + ",renderType=" + renderType);
+                Mesh mesh = MeshHelper.blockVerticesToMesh(
+                    data,
+                    "source=ItemModels,ItemStack=" + itemStack + ",renderType=" + renderType
+                );
                 builder.add(renderType, new Model.ConfiguredMesh(material, mesh));
             }, (renderType, material, mesh, translucent) -> {
                 if (translucent && itemStack.getItem() instanceof BlockItem && material.transparency() == Transparency.TRANSLUCENT) {
@@ -101,7 +104,9 @@ public class ItemModels {
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof BakedModelKey(ClientLevel otherWorld, ItemStack otherStack, ItemDisplayContext otherDisplayContext))) {
+            if (!(obj instanceof BakedModelKey(
+                ClientLevel otherWorld, ItemStack otherStack, ItemDisplayContext otherDisplayContext
+            ))) {
                 return false;
             }
             boolean stackEqual = stack == otherStack || ItemStack.isSameItemSameComponents(stack, otherStack);
@@ -116,8 +121,7 @@ public class ItemModels {
             }
 
             public boolean equals(ItemStack itemStack, ItemStack itemStack2) {
-                return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.isSameItemSameComponents(
-                    itemStack,
+                return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.isSameItemSameComponents(itemStack,
                     itemStack2
                 );
             }

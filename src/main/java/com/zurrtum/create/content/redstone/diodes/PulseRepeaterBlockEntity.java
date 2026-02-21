@@ -14,22 +14,27 @@ public class PulseRepeaterBlockEntity extends BrassDiodeBlockEntity {
 
     @Override
     protected void updateState(boolean powered, boolean powering, boolean atMax, boolean atMin) {
-        if (atMin && !powered)
+        if (atMin && !powered) {
             return;
+        }
         if (state > maxState.getValue() + 1) {
-            if (!powered && !powering)
+            if (!powered && !powering) {
                 state = 0;
+            }
             return;
         }
 
         state++;
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
-        if (state == maxState.getValue() - 1 && !powering)
+        if (state == maxState.getValue() - 1 && !powering) {
             level.setBlockAndUpdate(worldPosition, getBlockState().cycle(POWERING));
-        if (state == maxState.getValue() + 1 && powering)
+        }
+        if (state == maxState.getValue() + 1 && powering) {
             level.setBlockAndUpdate(worldPosition, getBlockState().cycle(POWERING));
+        }
     }
 
 }

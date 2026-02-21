@@ -12,8 +12,11 @@ public class SmallBogeyRenderState extends StandardBogeyRenderState {
     @Override
     public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
         super.render(matricesEntry, vertexConsumer);
-        frame.scale(0.998046875f).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-        wheels.translate(0, 0.75f, 1).rotateX(angle).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-        wheels.translate(0, 0.75f, -1).rotateX(angle).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+        frame.scale(0.998046875f).light(light).overlay(OverlayTexture.NO_OVERLAY)
+            .renderInto(matricesEntry, vertexConsumer);
+        wheels.translate(0, 0.75f, 1).rotateX(angle).light(light).overlay(OverlayTexture.NO_OVERLAY)
+            .renderInto(matricesEntry, vertexConsumer);
+        wheels.translate(0, 0.75f, -1).rotateX(angle).light(light).overlay(OverlayTexture.NO_OVERLAY)
+            .renderInto(matricesEntry, vertexConsumer);
     }
 }

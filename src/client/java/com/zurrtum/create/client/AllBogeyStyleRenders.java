@@ -7,6 +7,8 @@ import com.zurrtum.create.client.content.trains.bogey.SizeRenderer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.content.trains.bogey.BogeySize;
 import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -14,9 +16,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
 
 public class AllBogeyStyleRenders {
     public static final Map<Identifier, Map<BogeySize, SizeRenderer>> ALL = new HashMap<>();
@@ -34,11 +33,18 @@ public class AllBogeyStyleRenders {
         if (sizeRenderers == null) {
             return null;
         }
-        return sizeRenderers.get(size).renderer().getRenderData(bogeyData, wheelAngle, tickProgress, light, inContraption);
+        return sizeRenderers.get(size).renderer()
+            .getRenderData(bogeyData, wheelAngle, tickProgress, light, inContraption);
     }
 
     @Nullable
-    public static BogeyVisual createVisual(BogeyStyle style, BogeySize size, VisualizationContext ctx, float partialTick, boolean inContraption) {
+    public static BogeyVisual createVisual(
+        BogeyStyle style,
+        BogeySize size,
+        VisualizationContext ctx,
+        float partialTick,
+        boolean inContraption
+    ) {
         Map<BogeySize, SizeRenderer> sizeRenderers = ALL.get(style.id);
         if (sizeRenderers == null) {
             return null;

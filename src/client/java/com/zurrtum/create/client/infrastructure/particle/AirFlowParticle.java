@@ -24,7 +24,15 @@ public class AirFlowParticle extends SimpleAnimatedParticle {
     private final IAirCurrentSource source;
     private final Access access = new Access();
 
-    protected AirFlowParticle(ClientLevel world, IAirCurrentSource source, double x, double y, double z, SpriteSet sprite, RandomSource random) {
+    protected AirFlowParticle(
+        ClientLevel world,
+        IAirCurrentSource source,
+        double x,
+        double y,
+        double z,
+        SpriteSet sprite,
+        RandomSource random
+    ) {
         super(world, x, y, z, sprite, random.nextFloat() * .5f);
         this.source = source;
         this.quadSize *= 0.75F;
@@ -60,10 +68,12 @@ public class AirFlowParticle extends SimpleAnimatedParticle {
 
             Vec3 directionVec = Vec3.atLowerCornerOf(airCurrent.direction.getUnitVec3i());
             Vec3 motion = directionVec.scale(1 / 8f);
-            if (!source.getAirCurrent().pushing)
+            if (!source.getAirCurrent().pushing) {
                 motion = motion.scale(-1);
+            }
 
-            double distance = new Vec3(x, y, z).subtract(VecHelper.getCenterOf(source.getAirCurrentPos())).multiply(directionVec).length() - .5f;
+            double distance = new Vec3(x, y, z).subtract(VecHelper.getCenterOf(source.getAirCurrentPos()))
+                .multiply(directionVec).length() - .5f;
             if (distance > airCurrent.maxDistance + 1 || distance < -.25f) {
                 remove();
                 return;
@@ -94,8 +104,9 @@ public class AirFlowParticle extends SimpleAnimatedParticle {
 
     @Nullable
     private FanProcessingType getType(double distance) {
-        if (source.getAirCurrent() == null)
+        if (source.getAirCurrent() == null) {
             return null;
+        }
         return source.getAirCurrent().getTypeAt((float) distance);
     }
 
@@ -129,8 +140,9 @@ public class AirFlowParticle extends SimpleAnimatedParticle {
             RandomSource random
         ) {
             BlockEntity be = worldIn.getBlockEntity(new BlockPos(data.posX(), data.posY(), data.posZ()));
-            if (!(be instanceof IAirCurrentSource))
+            if (!(be instanceof IAirCurrentSource)) {
                 be = null;
+            }
             return new AirFlowParticle(worldIn, (IAirCurrentSource) be, x, y, z, this.spriteSet, random);
         }
     }

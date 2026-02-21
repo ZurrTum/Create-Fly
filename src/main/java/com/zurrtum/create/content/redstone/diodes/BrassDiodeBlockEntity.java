@@ -1,15 +1,11 @@
 package com.zurrtum.create.content.redstone.diodes;
 
 import com.mojang.serialization.Codec;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.clipboard.ClipboardCloneable;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBrassDiodeScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
-
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -19,6 +15,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
+import java.util.Optional;
 
 import static com.zurrtum.create.content.redstone.diodes.BrassDiodeBlock.POWERING;
 
@@ -89,13 +88,16 @@ public abstract class BrassDiodeBlockEntity extends SmartBlockEntity implements 
     @Override
     public boolean readFromClipboard(ValueInput view, Player player, Direction side, boolean simulate) {
         Optional<Boolean> inverted = view.read("Inverted", Codec.BOOL);
-        if (inverted.isEmpty())
+        if (inverted.isEmpty()) {
             return false;
-        if (simulate)
+        }
+        if (simulate) {
             return true;
+        }
         BlockState blockState = getBlockState();
-        if (blockState.getValue(BrassDiodeBlock.INVERTED) != inverted.get())
+        if (blockState.getValue(BrassDiodeBlock.INVERTED) != inverted.get()) {
             level.setBlockAndUpdate(worldPosition, blockState.cycle(BrassDiodeBlock.INVERTED));
+        }
         return true;
     }
 

@@ -11,7 +11,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record PackagePortConfigurationPacket(BlockPos pos, String newFilter, boolean acceptPackages) implements Packet<ServerGamePacketListener> {
+public record PackagePortConfigurationPacket(BlockPos pos, String newFilter,
+                                             boolean acceptPackages) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, PackagePortConfigurationPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         PackagePortConfigurationPacket::pos,

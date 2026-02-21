@@ -25,11 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,7 +48,13 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, StationBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        StationBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.depotBehaviour.itemHandler;
     }
 
@@ -118,26 +120,32 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null || player.isShiftKeyDown())
+        if (player == null || player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (stack.is(AllItems.WRENCH))
+        }
+        if (stack.is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         if (stack.getItem() == Items.FILLED_MAP) {
             return onBlockEntityUseItemOn(
                 level, pos, station -> {
-                    if (level.isClientSide())
+                    if (level.isClientSide()) {
                         return InteractionResult.SUCCESS;
+                    }
 
-                    if (station.getStation() == null || station.getStation().getId() == null)
+                    if (station.getStation() == null || station.getStation().getId() == null) {
                         return InteractionResult.FAIL;
+                    }
 
                     MapItemSavedData savedData = MapItem.getSavedData(stack, level);
-                    if (!(savedData instanceof StationMapData stationMapData))
+                    if (!(savedData instanceof StationMapData stationMapData)) {
                         return InteractionResult.FAIL;
+                    }
 
-                    if (!stationMapData.create$toggleStation(level, pos, station))
+                    if (!stationMapData.create$toggleStation(level, pos, station)) {
                         return InteractionResult.FAIL;
+                    }
 
                     return InteractionResult.SUCCESS;
                 }
@@ -147,10 +155,12 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
         InteractionResult result = onBlockEntityUse(
             level, pos, station -> {
                 ItemStack autoSchedule = station.getAutoSchedule();
-                if (autoSchedule.isEmpty())
+                if (autoSchedule.isEmpty()) {
                     return InteractionResult.PASS;
-                if (level.isClientSide())
+                }
+                if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
+                }
                 player.getInventory().placeItemBackInInventory(autoSchedule.copy());
                 station.depotBehaviour.removeHeldItem();
                 station.notifyUpdate();
@@ -166,8 +176,9 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
             }
         );
 
-        if (result == InteractionResult.PASS)
+        if (result == InteractionResult.PASS) {
             AllClientHandle.INSTANCE.openStationScreen(level, pos, player);
+        }
         return InteractionResult.SUCCESS;
     }
 

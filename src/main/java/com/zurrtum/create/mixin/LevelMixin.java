@@ -13,7 +13,12 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(Level.class)
 public class LevelMixin {
     @WrapOperation(method = "updateNeighbourForOutputSignal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", ordinal = 0))
-    private BlockState onNeighborChange(Level world, BlockPos pos, Operation<BlockState> original, @Local(argsOnly = true) BlockPos neighbor) {
+    private BlockState onNeighborChange(
+        Level world,
+        BlockPos pos,
+        Operation<BlockState> original,
+        @Local(argsOnly = true) BlockPos neighbor
+    ) {
         BlockState state = original.call(world, pos);
         if (state.getBlock() instanceof NeighborChangeListeningBlock block) {
             block.onNeighborChange(state, world, pos, neighbor);

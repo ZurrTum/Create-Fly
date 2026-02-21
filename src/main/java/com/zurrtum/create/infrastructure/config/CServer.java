@@ -23,7 +23,14 @@ public class CServer extends ConfigBase {
     }
 
     public final ConfigGroup infrastructure = group(0, "infrastructure", Comments.infrastructure);
-    public final ConfigInt tickrateSyncTimer = i(20, 5, "tickrateSyncTimer", "[in Ticks]", Comments.tickrateSyncTimer, Comments.tickrateSyncTimer2);
+    public final ConfigInt tickrateSyncTimer = i(
+        20,
+        5,
+        "tickrateSyncTimer",
+        "[in Ticks]",
+        Comments.tickrateSyncTimer,
+        Comments.tickrateSyncTimer2
+    );
 
     public final CRecipes recipes = nested(0, CRecipes::new, Comments.recipes);
     public final CKinetics kinetics = nested(0, CKinetics::new, Comments.kinetics);

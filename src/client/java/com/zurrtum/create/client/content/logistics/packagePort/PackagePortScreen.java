@@ -74,7 +74,14 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
 
         Consumer<String> onTextChanged;
         onTextChanged = s -> addressBox.setX(nameBoxX(s, addressBox));
-        addressBox = new EditBox(new NoShadowFontWrapper(font), leftPos + 23, topPos - 11, background.getWidth() - 20, 10, Component.empty());
+        addressBox = new EditBox(
+            new NoShadowFontWrapper(font),
+            leftPos + 23,
+            topPos - 11,
+            background.getWidth() - 20,
+            10,
+            Component.empty()
+        );
         addressBox.setBordered(false);
         addressBox.setMaxLength(25);
         addressBox.setTextColor(0xFF3D3C48);
@@ -85,11 +92,19 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         addressBox.setX(nameBoxX(addressBox.getValue(), addressBox));
         addRenderableWidget(addressBox);
 
-        confirmButton = new IconButton(leftPos + background.getWidth() - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            leftPos + background.getWidth() - 33,
+            topPos + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(() -> minecraft.player.closeContainer());
         addRenderableWidget(confirmButton);
 
-        acceptPackages = new IconButton(leftPos + 37, topPos + background.getHeight() - 24, AllIcons.I_SEND_AND_RECEIVE);
+        acceptPackages = new IconButton(
+            leftPos + 37,
+            topPos + background.getHeight() - 24,
+            AllIcons.I_SEND_AND_RECEIVE
+        );
         acceptPackages.withCallback(() -> {
             acceptPackages.green = true;
             dontAcceptPackages.green = false;
@@ -98,7 +113,11 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         acceptPackages.setToolTip(CreateLang.translateDirect("gui.package_port.send_and_receive"));
         addRenderableWidget(acceptPackages);
 
-        dontAcceptPackages = new IconButton(leftPos + 37 + 18, topPos + background.getHeight() - 24, AllIcons.I_SEND_ONLY);
+        dontAcceptPackages = new IconButton(
+            leftPos + 37 + 18,
+            topPos + background.getHeight() - 24,
+            AllIcons.I_SEND_ONLY
+        );
         dontAcceptPackages.withCallback(() -> {
             acceptPackages.green = false;
             dontAcceptPackages.green = true;
@@ -109,10 +128,17 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
 
         containerTick();
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + background.getWidth(), topPos + background.getHeight() - 50, 70, 60));
+        extraAreas = ImmutableList.of(new Rect2i(
+            leftPos + background.getWidth(),
+            topPos + background.getHeight() - 50,
+            70,
+            60
+        ));
 
-        renderedItem = new ElementWidget(leftPos + background.getWidth() + 6, topPos + background.getHeight() - 56).showingElement(GuiGameElement.of(
-            icon).scale(4));
+        renderedItem = new ElementWidget(
+            leftPos + background.getWidth() + 6,
+            topPos + background.getHeight() - 56
+        ).showingElement(GuiGameElement.of(icon).scale(4));
         addRenderableWidget(renderedItem);
     }
 
@@ -147,15 +173,20 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
                 text = icon.getHoverName().getString();
                 graphics.drawString(font, text, nameBoxX(text, addressBox), y - 11, 0xFF3D3C48, false);
             }
-            AllGuiTextures.FROGPORT_EDIT_NAME.render(graphics, nameBoxX(text, addressBox) + font.width(text) + 5, y - 14);
+            AllGuiTextures.FROGPORT_EDIT_NAME.render(
+                graphics,
+                nameBoxX(text, addressBox) + font.width(text) + 5,
+                y - 14
+            );
         }
 
         int invX = x + 30;
         int invY = y + 8 + imageHeight - AllGuiTextures.PLAYER_INVENTORY.getHeight();
         renderPlayerInventory(graphics, invX, invY);
 
-        if (menu.contentHolder.target == null)
+        if (menu.contentHolder.target == null) {
             return;
+        }
 
         x += 13;
         y += 58;
@@ -165,9 +196,12 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         if (addressBox.isHovered()) {
             graphics.setComponentTooltipForNextFrame(
                 font, List.of(
-                    CreateLang.translate("gui.package_port.catch_packages").color(AbstractSimiWidget.HEADER_RGB).component(),
-                    CreateLang.translate("gui.package_port.catch_packages_empty").style(ChatFormatting.GRAY).component(),
-                    CreateLang.translate("gui.package_port.catch_packages_wildcard").style(ChatFormatting.GRAY).component()
+                    CreateLang.translate("gui.package_port.catch_packages").color(AbstractSimiWidget.HEADER_RGB)
+                        .component(),
+                    CreateLang.translate("gui.package_port.catch_packages_empty").style(ChatFormatting.GRAY)
+                        .component(),
+                    CreateLang.translate("gui.package_port.catch_packages_wildcard").style(ChatFormatting.GRAY)
+                        .component()
                 ), pMouseX, pMouseY
             );
         }

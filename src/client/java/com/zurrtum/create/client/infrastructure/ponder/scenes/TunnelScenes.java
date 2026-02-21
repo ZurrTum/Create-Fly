@@ -63,8 +63,8 @@ public class TunnelScenes {
             scene.idle(4);
         }
 
-        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().topOf(util.grid().at(1, 2, 2))).placeNearTarget()
-            .text("Andesite Tunnels can be used to cover up your belts");
+        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().topOf(util.grid().at(1, 2, 2)))
+            .placeNearTarget().text("Andesite Tunnels can be used to cover up your belts");
         scene.idle(70);
 
         for (int i = 0; i < 3; i++) {
@@ -79,16 +79,19 @@ public class TunnelScenes {
         scene.idle(10);
         scene.world().cycleBlockProperty(util.grid().at(2, 1, 2), BeltBlock.CASING);
 
-        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH)).placeNearTarget()
+        scene.overlay().showText(60).attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH)).placeNearTarget()
             .text("Whenever an Andesite Tunnel has connections to the sides...");
         scene.idle(70);
 
-        scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 1, 2)), Pointing.DOWN, 20).withItem(new ItemStack(Items.COPPER_INGOT));
+        scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 1, 2)), Pointing.DOWN, 20)
+            .withItem(new ItemStack(Items.COPPER_INGOT));
         scene.idle(7);
         scene.world().createItemOnBelt(util.grid().at(4, 1, 2), Direction.UP, new ItemStack(Items.COPPER_INGOT, 64));
         scene.idle(40);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 16f);
-        scene.overlay().showText(80).attachKeyFrame().text("...they will split exactly one item off of any passing stacks")
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("...they will split exactly one item off of any passing stacks")
             .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 0), Direction.WEST)).placeNearTarget();
         scene.idle(90);
         scene.overlay().showText(80).text("The remainder will continue on its path")
@@ -128,8 +131,8 @@ public class TunnelScenes {
             scene.idle(4);
         }
 
-        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().topOf(util.grid().at(2, 2, 2))).placeNearTarget()
-            .text("Brass Tunnels can be used to cover up your belts");
+        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().topOf(util.grid().at(2, 2, 2)))
+            .placeNearTarget().text("Brass Tunnels can be used to cover up your belts");
         scene.idle(70);
 
         for (int i = 0; i < 3; i++) {
@@ -147,15 +150,16 @@ public class TunnelScenes {
 
         BlockPos tunnelPos = util.grid().at(3, 2, 2);
         for (Direction d : Iterate.horizontalDirections) {
-            if (d == Direction.SOUTH)
+            if (d == Direction.SOUTH) {
                 continue;
+            }
             Vec3 filter = getTunnelFilterVec(tunnelPos, d);
             scene.overlay().showFilterSlotInput(filter, d, 40);
             scene.idle(3);
         }
 
-        scene.overlay().showText(60).attachKeyFrame().pointAt(getTunnelFilterVec(tunnelPos, Direction.WEST)).placeNearTarget()
-            .text("Brass Tunnels have filter slots on each open side");
+        scene.overlay().showText(60).attachKeyFrame().pointAt(getTunnelFilterVec(tunnelPos, Direction.WEST))
+            .placeNearTarget().text("Brass Tunnels have filter slots on each open side");
         scene.idle(70);
 
         scene.rotateCameraY(70);
@@ -167,8 +171,11 @@ public class TunnelScenes {
             .text("Filters on inbound connections simply block non-matching items");
         ItemStack copper = new ItemStack(Items.COPPER_INGOT);
         Class<BrassTunnelBlockEntity> tunnelClass = BrassTunnelBlockEntity.class;
-        scene.world()
-            .modifyBlockEntity(tunnelPos, tunnelClass, be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.EAST, copper));
+        scene.world().modifyBlockEntity(
+            tunnelPos,
+            tunnelClass,
+            be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.EAST, copper)
+        );
         scene.overlay().showControls(tunnelFilterVec, Pointing.DOWN, 30).withItem(copper);
         ItemStack zinc = AllItems.ZINC_INGOT.getDefaultInstance();
         scene.world().createItemOnBelt(util.grid().at(5, 1, 2), Direction.EAST, zinc);
@@ -193,13 +200,19 @@ public class TunnelScenes {
         scene.idle(70);
 
         scene.overlay().showControls(tunnelFilterVec, Pointing.LEFT, 30).withItem(copper);
-        scene.world()
-            .modifyBlockEntity(tunnelPos, tunnelClass, be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.WEST, copper));
+        scene.world().modifyBlockEntity(
+            tunnelPos,
+            tunnelClass,
+            be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.WEST, copper)
+        );
         scene.idle(4);
         tunnelFilterVec = getTunnelFilterVec(tunnelPos, Direction.NORTH);
         scene.overlay().showControls(tunnelFilterVec, Pointing.RIGHT, 30).withItem(zinc);
-        scene.world()
-            .modifyBlockEntity(tunnelPos, tunnelClass, be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.NORTH, zinc));
+        scene.world().modifyBlockEntity(
+            tunnelPos,
+            tunnelClass,
+            be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.NORTH, zinc)
+        );
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1.5f);
         for (int i = 0; i < 6; i++) {
@@ -226,7 +239,8 @@ public class TunnelScenes {
             .text("Whenever a passing item has multiple valid exits, the distribution mode will decide how to handle it");
         for (int i = 0; i < 3; i++) {
             scene.idle(40);
-            scene.world().createItemOnBelt(util.grid().at(5, 1, 2), Direction.EAST, new ItemStack(AllItems.BRASS_INGOT, 63));
+            scene.world()
+                .createItemOnBelt(util.grid().at(5, 1, 2), Direction.EAST, new ItemStack(AllItems.BRASS_INGOT, 63));
         }
         scene.idle(30);
 
@@ -236,7 +250,10 @@ public class TunnelScenes {
         scene.idle(15);
 
         ElementLink<WorldSectionElement> newBelt = scene.world()
-            .showIndependentSection(util.select().fromTo(3, 3, 2, 0, 3, 4).add(util.select().fromTo(5, 3, 3, 4, 3, 3)), Direction.DOWN);
+            .showIndependentSection(
+                util.select().fromTo(3, 3, 2, 0, 3, 4).add(util.select().fromTo(5, 3, 3, 4, 3, 3)),
+                Direction.DOWN
+            );
         scene.world().moveSection(newBelt, util.vector().of(0, -2, -1), 0);
         scene.idle(15);
         for (int i = 0; i < 3; i++) {
@@ -244,8 +261,8 @@ public class TunnelScenes {
             scene.world().showSectionAndMerge(util.select().position(3, 4, 2 + i), Direction.DOWN, newBelt);
         }
 
-        scene.overlay().showOutlineWithText(util.select().fromTo(3, 1, 1, 3, 2, 3), 80).attachKeyFrame().placeNearTarget()
-            .text("Brass Tunnels on parallel belts will form a group");
+        scene.overlay().showOutlineWithText(util.select().fromTo(3, 1, 1, 3, 2, 3), 80).attachKeyFrame()
+            .placeNearTarget().text("Brass Tunnels on parallel belts will form a group");
         scene.idle(90);
 
         ItemStack item1 = new ItemStack(Items.CARROT);
@@ -262,8 +279,11 @@ public class TunnelScenes {
         );
         scene.idle(4);
         scene.overlay().showControls(tunnelFilterVec, Pointing.DOWN, 20).withItem(item2);
-        scene.world()
-            .modifyBlockEntity(newTunnelPos, tunnelClass, be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.WEST, item2));
+        scene.world().modifyBlockEntity(
+            newTunnelPos,
+            tunnelClass,
+            be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.WEST, item2)
+        );
         scene.idle(4);
         scene.overlay().showControls(tunnelFilterVec.add(0, 0, 1), Pointing.LEFT, 20).withItem(item3);
         scene.world().modifyBlockEntity(
@@ -273,7 +293,8 @@ public class TunnelScenes {
         );
         scene.idle(30);
 
-        scene.overlay().showText(80).pointAt(tunnelTop).placeNearTarget().text("Incoming Items will now be distributed across all connected exits");
+        scene.overlay().showText(80).pointAt(tunnelTop).placeNearTarget()
+            .text("Incoming Items will now be distributed across all connected exits");
         scene.idle(90);
 
         BlockPos beltPos = util.grid().at(5, 3, 3);
@@ -295,8 +316,8 @@ public class TunnelScenes {
 
         scene.world().showSectionAndMerge(util.select().position(3, 5, 2), Direction.DOWN, newBelt);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(tunnelPos.above().north(), Direction.WEST)).placeNearTarget()
-            .text("For this, items can also be inserted into the Tunnel block directly");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(tunnelPos.above().north(), Direction.WEST))
+            .placeNearTarget().text("For this, items can also be inserted into the Tunnel block directly");
         scene.idle(20);
 
         beltPos = util.grid().at(3, 3, 3);
@@ -329,7 +350,10 @@ public class TunnelScenes {
         scene.world().setBlock(util.grid().at(1, 1, 0), barrier, false);
         scene.world().showSection(util.select().layer(0), Direction.UP);
         scene.idle(5);
-        scene.world().showSection(util.select().fromTo(1, 1, 1, 5, 1, 5).add(util.select().fromTo(3, 2, 5, 1, 2, 5)), Direction.DOWN);
+        scene.world().showSection(
+            util.select().fromTo(1, 1, 1, 5, 1, 5).add(util.select().fromTo(3, 2, 5, 1, 2, 5)),
+            Direction.DOWN
+        );
         scene.idle(10);
         for (int i = 0; i < 3; i++) {
             scene.world().showSection(util.select().position(3 - i, 2, 3), Direction.DOWN);
@@ -345,7 +369,8 @@ public class TunnelScenes {
         scene.idle(130);
 
         Class<BrassTunnelBlockEntity> tunnelClass = BrassTunnelBlockEntity.class;
-        ElementLink<WorldSectionElement> blockage = scene.world().showIndependentSection(util.select().position(4, 1, 0), Direction.UP);
+        ElementLink<WorldSectionElement> blockage = scene.world()
+            .showIndependentSection(util.select().position(4, 1, 0), Direction.UP);
         scene.world().moveSection(blockage, util.vector().of(-3, 0, 0), 0);
 
         Vec3 modeVec = util.vector().of(4, 2.5, 3);
@@ -354,8 +379,10 @@ public class TunnelScenes {
         ElementLink<WorldSectionElement> blockage2 = null;
 
         for (int i = 0; i < 32; i++) {
-            if (i < 30)
-                scene.world().createItemOnBelt(util.grid().at(1, 1, 5), Direction.EAST, new ItemStack(Items.SNOWBALL, 12));
+            if (i < 30) {
+                scene.world()
+                    .createItemOnBelt(util.grid().at(1, 1, 5), Direction.EAST, new ItemStack(Items.SNOWBALL, 12));
+            }
             scene.idle(i > 8 ? 30 : 40);
 
             if (i == 0) {
@@ -365,7 +392,8 @@ public class TunnelScenes {
 
             if (i == 2) {
                 scene.overlay().showText(60).text("If an output is unable to take more items, it will be skipped")
-                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget().colored(PonderPalette.GREEN);
+                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget()
+                    .colored(PonderPalette.GREEN);
             }
 
             if (i == 4) {
@@ -373,13 +401,16 @@ public class TunnelScenes {
                 scene.world().modifyBlockEntity(
                     util.grid().at(1, 2, 3),
                     tunnelClass,
-                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE).setValue(BrassTunnelBlockEntity.SelectionMode.FORCED_SPLIT.ordinal())
+                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE)
+                        .setValue(BrassTunnelBlockEntity.SelectionMode.FORCED_SPLIT.ordinal())
                 );
             }
 
             if (i == 5) {
-                scene.overlay().showText(80).attachKeyFrame().text("'Forced Split' will never skip outputs, and instead wait until they are free")
-                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget().colored(PonderPalette.RED);
+                scene.overlay().showText(80).attachKeyFrame()
+                    .text("'Forced Split' will never skip outputs, and instead wait until they are free")
+                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget()
+                    .colored(PonderPalette.RED);
                 scene.idle(60);
                 scene.world().moveSection(blockage, util.vector().of(-1, 0, 0), 10);
                 scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.defaultBlockState(), false);
@@ -390,7 +421,8 @@ public class TunnelScenes {
                 scene.world().modifyBlockEntity(
                     util.grid().at(1, 2, 3),
                     tunnelClass,
-                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE).setValue(BrassTunnelBlockEntity.SelectionMode.ROUND_ROBIN.ordinal())
+                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE)
+                        .setValue(BrassTunnelBlockEntity.SelectionMode.ROUND_ROBIN.ordinal())
                 );
                 scene.overlay().showControls(modeVec, Pointing.RIGHT, 140).showing(AllIcons.I_TUNNEL_ROUND_ROBIN);
                 scene.overlay().showText(80).attachKeyFrame().pointAt(tunnelTop).placeNearTarget()
@@ -403,12 +435,15 @@ public class TunnelScenes {
             }
 
             if (i == 13) {
-                scene.overlay().showText(60).text("Once Again, if an output is unable to take more items, it will be skipped").placeNearTarget()
-                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).colored(PonderPalette.GREEN);
+                scene.overlay().showText(60)
+                    .text("Once Again, if an output is unable to take more items, it will be skipped").placeNearTarget()
+                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP))
+                    .colored(PonderPalette.GREEN);
             }
 
             if (i == 15) {
-                scene.overlay().showControls(modeVec, Pointing.RIGHT, 140).showing(AllIcons.I_TUNNEL_FORCED_ROUND_ROBIN);
+                scene.overlay().showControls(modeVec, Pointing.RIGHT, 140)
+                    .showing(AllIcons.I_TUNNEL_FORCED_ROUND_ROBIN);
                 scene.world().modifyBlockEntity(
                     util.grid().at(1, 2, 3),
                     tunnelClass,
@@ -418,8 +453,10 @@ public class TunnelScenes {
             }
 
             if (i == 16) {
-                scene.overlay().showText(50).attachKeyFrame().placeNearTarget().text("'Forced Round Robin' never skips outputs")
-                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).colored(PonderPalette.RED);
+                scene.overlay().showText(50).attachKeyFrame().placeNearTarget()
+                    .text("'Forced Round Robin' never skips outputs")
+                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP))
+                    .colored(PonderPalette.RED);
                 scene.idle(30);
                 scene.world().moveSection(blockage, util.vector().of(-1, 0, 0), 10);
                 scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.defaultBlockState(), false);
@@ -430,12 +467,15 @@ public class TunnelScenes {
                 scene.world().modifyBlockEntity(
                     util.grid().at(1, 2, 3),
                     tunnelClass,
-                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE).setValue(BrassTunnelBlockEntity.SelectionMode.PREFER_NEAREST.ordinal())
+                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE)
+                        .setValue(BrassTunnelBlockEntity.SelectionMode.PREFER_NEAREST.ordinal())
                 );
                 scene.world().moveSection(blockage, util.vector().of(1, 0, 0), 10);
                 scene.world().setBlock(util.grid().at(1, 1, 0), barrier, false);
-                scene.overlay().showText(70).attachKeyFrame().text("'Prefer Nearest' prioritizes the outputs closest to the items' input location")
-                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget().colored(PonderPalette.GREEN);
+                scene.overlay().showText(70).attachKeyFrame()
+                    .text("'Prefer Nearest' prioritizes the outputs closest to the items' input location")
+                    .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget()
+                    .colored(PonderPalette.GREEN);
             }
 
             if (i == 21) {
@@ -456,13 +496,15 @@ public class TunnelScenes {
                 scene.world().modifyBlockEntity(
                     util.grid().at(1, 2, 3),
                     tunnelClass,
-                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE).setValue(BrassTunnelBlockEntity.SelectionMode.RANDOMIZE.ordinal())
+                    be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE)
+                        .setValue(BrassTunnelBlockEntity.SelectionMode.RANDOMIZE.ordinal())
                 );
             }
 
             if (i == 27) {
-                scene.overlay().showText(70).attachKeyFrame().text("'Randomize' will distribute whole stacks to randomly picked outputs")
-                    .pointAt(tunnelTop).placeNearTarget();
+                scene.overlay().showText(70).attachKeyFrame()
+                    .text("'Randomize' will distribute whole stacks to randomly picked outputs").pointAt(tunnelTop)
+                    .placeNearTarget();
             }
         }
 
@@ -472,11 +514,12 @@ public class TunnelScenes {
         scene.world().modifyBlockEntity(
             util.grid().at(1, 2, 3),
             tunnelClass,
-            be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE).setValue(BrassTunnelBlockEntity.SelectionMode.SYNCHRONIZE.ordinal())
+            be -> be.getBehaviour(ServerScrollOptionBehaviour.TYPE)
+                .setValue(BrassTunnelBlockEntity.SelectionMode.SYNCHRONIZE.ordinal())
         );
         scene.idle(30);
-        scene.overlay().showText(70).attachKeyFrame().text("'Synchronize Inputs' is a unique setting for Brass Tunnels").pointAt(tunnelTop)
-            .placeNearTarget();
+        scene.overlay().showText(70).attachKeyFrame().text("'Synchronize Inputs' is a unique setting for Brass Tunnels")
+            .pointAt(tunnelTop).placeNearTarget();
 
         ItemStack item1 = new ItemStack(Items.CARROT);
         ItemStack item2 = new ItemStack(Items.HONEY_BOTTLE);
@@ -494,14 +537,16 @@ public class TunnelScenes {
         scene.world().multiplyKineticSpeed(util.select().everywhere(), .5f);
 
         scene.overlay().showText(70).text("Items are only allowed past if every tunnel in the group has one waiting")
-            .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 4), Direction.UP)).placeNearTarget().colored(PonderPalette.OUTPUT);
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 4), Direction.UP)).placeNearTarget()
+            .colored(PonderPalette.OUTPUT);
         scene.idle(60);
         scene.world().createItemOnBelt(util.grid().at(1, 1, 5), Direction.SOUTH, item3);
         scene.idle(90);
         scene.rotateCameraY(90);
 
         scene.overlay().showText(100).text("This ensures that all affected belts supply items at the same rate")
-            .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 3), Direction.WEST)).placeNearTarget().colored(PonderPalette.GREEN);
+            .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 3), Direction.WEST)).placeNearTarget()
+            .colored(PonderPalette.GREEN);
     }
 
 }

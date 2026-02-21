@@ -57,12 +57,15 @@ public class ContinuousOBBCollider {
         // space required for the actual collision pass and improve the cache locality of the colliders.
         denseViableColliders.size = 0;
         for (int bbIdx = 0; bbIdx < collidableBBs.size; ++bbIdx) {
-            if (Math.abs((obbCenter.x + motion.x) - collidableBBs.centerX[bbIdx]) > collidableBBs.extentsX[bbIdx] + aabbInLocalX)
+            if (Math.abs((obbCenter.x + motion.x) - collidableBBs.centerX[bbIdx]) > collidableBBs.extentsX[bbIdx] + aabbInLocalX) {
                 continue;
-            if (Math.abs((obbCenter.y + motion.y) - collidableBBs.centerY[bbIdx]) > collidableBBs.extentsY[bbIdx] + aabbInLocalY)
+            }
+            if (Math.abs((obbCenter.y + motion.y) - collidableBBs.centerY[bbIdx]) > collidableBBs.extentsY[bbIdx] + aabbInLocalY) {
                 continue;
-            if (Math.abs((obbCenter.z + motion.z) - collidableBBs.centerZ[bbIdx]) > collidableBBs.extentsZ[bbIdx] + aabbInLocalZ)
+            }
+            if (Math.abs((obbCenter.z + motion.z) - collidableBBs.centerZ[bbIdx]) > collidableBBs.extentsZ[bbIdx] + aabbInLocalZ) {
                 continue;
+            }
 
             populateDenseViableColliders.appendFrom(collidableBBs, bbIdx);
         }
@@ -125,13 +128,28 @@ public class ContinuousOBBCollider {
                 double extentsZ = denseViableColliders.extentsZ[bbIdx];
 
                 // Separate along A's local axes (global XYZ)
-                if (mf.separate(uA0, deltaX, extentsX, a00 * obbExtents.x + a01 * obbExtents.y + a02 * obbExtents.z, motion.x, true) || mf.separate(uA1,
+                if (mf.separate(
+                    uA0,
+                    deltaX,
+                    extentsX,
+                    a00 * obbExtents.x + a01 * obbExtents.y + a02 * obbExtents.z,
+                    motion.x,
+                    true
+                ) || mf.separate(
+                    uA1,
                     deltaY,
                     extentsY,
                     a10 * obbExtents.x + a11 * obbExtents.y + a12 * obbExtents.z,
                     motion.y,
                     true
-                ) || mf.separate(uA2, deltaZ, extentsZ, a20 * obbExtents.x + a21 * obbExtents.y + a22 * obbExtents.z, motion.z, true)) {
+                ) || mf.separate(
+                    uA2,
+                    deltaZ,
+                    extentsZ,
+                    a20 * obbExtents.x + a21 * obbExtents.y + a22 * obbExtents.z,
+                    motion.z,
+                    true
+                )) {
                     continue;
                 }
 
@@ -152,14 +170,22 @@ public class ContinuousOBBCollider {
                     obbExtents.y,
                     motion2.y,
                     false
-                ) || mf.separate(uB2, deltaEntityFrame.z, extentsX * a02 + extentsY * a12 + extentsZ * a22, obbExtents.z, motion2.z, false)) {
+                ) || mf.separate(
+                    uB2,
+                    deltaEntityFrame.z,
+                    extentsX * a02 + extentsY * a12 + extentsZ * a22,
+                    obbExtents.z,
+                    motion2.z,
+                    false
+                )) {
                     continue;
                 }
 
                 // If we reach here, the manifold has valid collision positions and normals.
 
-                if (verticalPass && !surfaceCollision)
+                if (verticalPass && !surfaceCollision) {
                     surfaceCollision = true;
+                }
 
                 double timeOfImpact = mf.getTimeOfImpact();
                 boolean isTemporal = timeOfImpact > 0 && timeOfImpact < 1;
@@ -195,13 +221,15 @@ public class ContinuousOBBCollider {
                 }
             }
 
-            if (verticalPass)
+            if (verticalPass) {
                 break;
+            }
 
             boolean noVerticalMotionResponse = temporalResponse == 1;
             boolean noVerticalCollision = collisionResponseY == 0;
-            if (noVerticalCollision && noVerticalMotionResponse)
+            if (noVerticalCollision && noVerticalMotionResponse) {
                 break;
+            }
 
             // Re-run collisions with horizontal offset
             collisionResponseX *= 129.0 / 128.0;
@@ -250,8 +278,9 @@ public class ContinuousOBBCollider {
             double diff = distance - (rA + rB);
 
             boolean discreteCollision = diff <= 0;
-            if (!discreteCollision && signum(projectedMotion) == signum(TL))
+            if (!discreteCollision && signum(projectedMotion) == signum(TL)) {
                 return true;
+            }
 
             double sTL = signum(TL);
             double separation = sTL * abs(diff);
@@ -260,8 +289,9 @@ public class ContinuousOBBCollider {
                 isDiscreteCollision = false;
 
                 // Missed on this axis, means we missed entirely.
-                if (abs(separation) > abs(projectedMotion))
+                if (abs(separation) > abs(projectedMotion)) {
                     return true;
+                }
 
                 double entryTime = abs(separation) / abs(projectedMotion);
                 double exitTime = (diff + abs(rA) + abs(rB)) / abs(projectedMotion);
@@ -284,14 +314,17 @@ public class ContinuousOBBCollider {
                     Vec3 sepVec = axis.scale(dotSeparation);
                     Vec3 axisPlane = axis.cross(cross);
                     Vec3 stepPlane = stepSeparationAxis.cross(cross);
-                    Vec3 stepSeparationVec = sepVec.subtract(axisPlane.scale(sepVec.dot(stepPlane) / axisPlane.dot(stepPlane)));
+                    Vec3 stepSeparationVec = sepVec.subtract(axisPlane.scale(sepVec.dot(stepPlane) / axisPlane.dot(
+                        stepPlane)));
                     stepSeparation = stepSeparationVec.length();
-                    if (abs(this.stepSeparation) > abs(stepSeparation) && stepSeparation != 0)
+                    if (abs(this.stepSeparation) > abs(stepSeparation) && stepSeparation != 0) {
                         this.stepSeparation = stepSeparation;
+                    }
 
                 } else {
-                    if (abs(this.stepSeparation) > stepSeparation)
+                    if (abs(this.stepSeparation) > stepSeparation) {
                         this.stepSeparation = stepSeparation;
+                    }
                 }
             }
 
@@ -309,10 +342,12 @@ public class ContinuousOBBCollider {
         }
 
         public double getTimeOfImpact() {
-            if (latestCollisionEntryTime == UNDEFINED)
+            if (latestCollisionEntryTime == UNDEFINED) {
                 return UNDEFINED;
-            if (latestCollisionEntryTime > earliestCollisionExitTime)
+            }
+            if (latestCollisionEntryTime > earliestCollisionExitTime) {
                 return UNDEFINED;
+            }
             return latestCollisionEntryTime;
         }
 

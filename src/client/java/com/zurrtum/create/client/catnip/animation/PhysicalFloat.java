@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.catnip.animation;
 
-import java.util.ArrayList;
-
 import net.minecraft.util.Mth;
+
+import java.util.ArrayList;
 
 public class PhysicalFloat {
 
@@ -52,8 +52,9 @@ public class PhysicalFloat {
         previousValue = value;
 
         float totalImpulse = 0;
-        for (Force force : forces)
+        for (Force force : forces) {
             totalImpulse += force.get(mass, value, speed) / mass;
+        }
 
         speed += totalImpulse;
 

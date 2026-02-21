@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record PressingDisplay(EntryIngredient input, List<ProcessingOutput> outputs, Optional<Identifier> location) implements Display {
+public record PressingDisplay(EntryIngredient input, List<ProcessingOutput> outputs,
+                              Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<PressingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("inputs").forGetter(PressingDisplay::input),

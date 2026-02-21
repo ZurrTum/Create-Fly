@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.api.goggles;
 
-import java.util.List;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.List;
 
 /**
  * Implement this interface on the {@link BlockEntity} that wants to add info to the hovering overlay

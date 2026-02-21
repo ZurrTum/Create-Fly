@@ -95,7 +95,16 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 
         if (addressBox == null) {
             String frogAddress = behaviour.getFrogAddress();
-            addressBox = new AddressEditBox(this, new NoShadowFontWrapper(font), x + 36, y + windowHeight - 51, 108, 10, false, frogAddress);
+            addressBox = new AddressEditBox(
+                this,
+                new NoShadowFontWrapper(font),
+                x + 36,
+                y + windowHeight - 51,
+                108,
+                10,
+                false,
+                frogAddress
+            );
             addressBox.setValue(behaviour.recipeAddress);
             addressBox.setTextColor(0xFF555555);
         }
@@ -158,12 +167,17 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 
         // ITEM PREVIEW
         int previewY = restocker ? 0 : 60;
-        renderedBlock = new ElementWidget(x + 195, y + 55 + previewY).showingElement(GuiGameElement.of(AllItems.FACTORY_GAUGE.getDefaultInstance())
-            .scale(4));
+        renderedBlock = new ElementWidget(
+            x + 195,
+            y + 55 + previewY
+        ).showingElement(GuiGameElement.of(AllItems.FACTORY_GAUGE.getDefaultInstance()).scale(4));
         addRenderableWidget(renderedBlock);
 
         if (!behaviour.getFilter().isEmpty()) {
-            renderedItem = new ElementWidget(x + 214, y + 68 + previewY).showingElement(GuiGameElement.of(behaviour.getFilter()).scale(1.625F));
+            renderedItem = new ElementWidget(
+                x + 214,
+                y + 68 + previewY
+            ).showingElement(GuiGameElement.of(behaviour.getFilter()).scale(1.625F));
             addRenderableWidget(renderedItem);
         } else {
             renderedItem = null;
@@ -191,8 +205,9 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
             clearRenderedElements();
             init();
         }
-        if (activateCraftingButton != null)
+        if (activateCraftingButton != null) {
             activateCraftingButton.green = craftingActive;
+        }
         addressBox.tick();
         promiseExpiration.titled(CreateLang.translate(promiseExpiration.getState() == -1 ? "gui.factory_panel.promises_do_not_expire" : "gui.factory_panel.promises_expire_title")
             .component());
@@ -205,8 +220,9 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 
         // BG
         AllGuiTextures bg = restocker ? FACTORY_GAUGE_RESTOCK : FACTORY_GAUGE_RECIPE;
-        if (restocker)
+        if (restocker) {
             FACTORY_GAUGE_RECIPE.render(graphics, x, y - 16);
+        }
         bg.render(graphics, x, y);
         FACTORY_GAUGE_BOTTOM.render(graphics, x, y + bg.getHeight());
         y = guiTop;
@@ -219,24 +235,30 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
                 renderInputItem(graphics, slot++, list.get(i), mouseX, mouseY);
             }
         } else {
-            for (BigItemStack itemStack : inputConfig)
+            for (BigItemStack itemStack : inputConfig) {
                 renderInputItem(graphics, slot++, itemStack, mouseX, mouseY);
+            }
             if (inputConfig.isEmpty()) {
                 int inputX = guiLeft + (restocker ? 88 : 68 + (slot % 3 * 20));
                 int inputY = guiTop + (restocker ? 12 : 28) + (slot / 3 * 20);
-                if (!restocker && mouseY > inputY && mouseY < inputY + 60 && mouseX > inputX && mouseX < inputX + 60)
+                if (!restocker && mouseY > inputY && mouseY < inputY + 60 && mouseX > inputX && mouseX < inputX + 60) {
                     graphics.setComponentTooltipForNextFrame(
                         font, List.of(
-                            CreateLang.translate("gui.factory_panel.unconfigured_input").color(ScrollInput.HEADER_RGB).component(),
-                            CreateLang.translate("gui.factory_panel.unconfigured_input_tip").style(ChatFormatting.GRAY).component(),
-                            CreateLang.translate("gui.factory_panel.unconfigured_input_tip_1").style(ChatFormatting.GRAY).component()
+                            CreateLang.translate("gui.factory_panel.unconfigured_input").color(ScrollInput.HEADER_RGB)
+                                .component(),
+                            CreateLang.translate("gui.factory_panel.unconfigured_input_tip").style(ChatFormatting.GRAY)
+                                .component(),
+                            CreateLang.translate("gui.factory_panel.unconfigured_input_tip_1")
+                                .style(ChatFormatting.GRAY).component()
                         ), mouseX, mouseY
                     );
+                }
             }
         }
 
-        if (restocker)
+        if (restocker) {
             renderInputItem(graphics, slot, new BigItemStack(behaviour.getFilter(), 1), mouseX, mouseY);
+        }
 
         if (!restocker) {
             int outputX = x + 160;
@@ -249,11 +271,18 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
                     "gui.factory_panel.expected_output",
                     CreateLang.itemName(outputConfig.stack).add(CreateLang.text(" x" + outputConfig.count)).string()
                 ).color(ScrollInput.HEADER_RGB).component();
-                MutableComponent c2 = CreateLang.translate("gui.factory_panel.expected_output_tip").style(ChatFormatting.GRAY).component();
-                MutableComponent c3 = CreateLang.translate("gui.factory_panel.expected_output_tip_1").style(ChatFormatting.GRAY).component();
-                MutableComponent c4 = CreateLang.translate("gui.factory_panel.expected_output_tip_2").style(ChatFormatting.DARK_GRAY)
-                    .style(ChatFormatting.ITALIC).component();
-                graphics.setComponentTooltipForNextFrame(font, craftingActive ? List.of(c1, c2, c3) : List.of(c1, c2, c3, c4), mouseX, mouseY);
+                MutableComponent c2 = CreateLang.translate("gui.factory_panel.expected_output_tip")
+                    .style(ChatFormatting.GRAY).component();
+                MutableComponent c3 = CreateLang.translate("gui.factory_panel.expected_output_tip_1")
+                    .style(ChatFormatting.GRAY).component();
+                MutableComponent c4 = CreateLang.translate("gui.factory_panel.expected_output_tip_2")
+                    .style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC).component();
+                graphics.setComponentTooltipForNextFrame(
+                    font,
+                    craftingActive ? List.of(c1, c2, c3) : List.of(c1, c2, c3, c4),
+                    mouseX,
+                    mouseY
+                );
             }
         }
 
@@ -261,11 +290,13 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
         ms.pushMatrix();
 
         // ADDRESS
-        if (addressBox.isHovered() && !addressBox.isFocused())
+        if (addressBox.isHovered() && !addressBox.isFocused()) {
             showAddressBoxTooltip(graphics, mouseX, mouseY);
+        }
 
         // TITLE
-        Component title = CreateLang.translate(restocker ? "gui.factory_panel.title_as_restocker" : "gui.factory_panel.title_as_recipe").component();
+        Component title = CreateLang.translate(restocker ? "gui.factory_panel.title_as_restocker" : "gui.factory_panel.title_as_recipe")
+            .component();
         graphics.drawString(font, title, x + 97 - font.width(title) / 2, y + (restocker ? -12 : 4), 0xFF3D3C48, false);
 
         // REDSTONE LINKS
@@ -278,9 +309,10 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 
             if (mouseX >= itemX && mouseX < itemX + 16 && mouseY >= itemY && mouseY < itemY + 16) {
                 List<Component> linkTip = List.of(
-                    CreateLang.translate("gui.factory_panel.has_link_connections").color(ScrollInput.HEADER_RGB).component(),
-                    CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-                        .component()
+                    CreateLang.translate("gui.factory_panel.has_link_connections").color(ScrollInput.HEADER_RGB)
+                        .component(),
+                    CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY)
+                        .style(ChatFormatting.ITALIC).component()
                 );
                 graphics.setComponentTooltipForNextFrame(font, linkTip, mouseX, mouseY);
             }
@@ -309,19 +341,21 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 
             if (promised == 0) {
                 promiseTip = List.of(
-                    CreateLang.translate("gui.factory_panel.no_open_promises").color(ScrollInput.HEADER_RGB).component(),
+                    CreateLang.translate("gui.factory_panel.no_open_promises").color(ScrollInput.HEADER_RGB)
+                        .component(),
                     CreateLang.translate(restocker ? "gui.factory_panel.restocker_promises_tip" : "gui.factory_panel.recipe_promises_tip")
                         .style(ChatFormatting.GRAY).component(),
                     CreateLang.translate(restocker ? "gui.factory_panel.restocker_promises_tip_1" : "gui.factory_panel.recipe_promises_tip_1")
                         .style(ChatFormatting.GRAY).component(),
-                    CreateLang.translate("gui.factory_panel.promise_prevents_oversending").style(ChatFormatting.GRAY).component()
+                    CreateLang.translate("gui.factory_panel.promise_prevents_oversending").style(ChatFormatting.GRAY)
+                        .component()
                 );
             } else {
                 promiseTip = List.of(
                     CreateLang.translate("gui.factory_panel.promised_items").color(ScrollInput.HEADER_RGB).component(),
                     CreateLang.text(behaviour.getFilter().getHoverName().getString() + " x" + promised).component(),
-                    CreateLang.translate("gui.factory_panel.left_click_reset").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-                        .component()
+                    CreateLang.translate("gui.factory_panel.left_click_reset").style(ChatFormatting.DARK_GRAY)
+                        .style(ChatFormatting.ITALIC).component()
                 );
             }
 
@@ -338,18 +372,21 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
         int inputY = guiTop + (restocker ? 12 : 28) + (slot / 3 * 20);
 
         graphics.renderItem(itemStack.stack, inputX, inputY);
-        if (!craftingActive && !restocker && !itemStack.stack.isEmpty())
+        if (!craftingActive && !restocker && !itemStack.stack.isEmpty()) {
             graphics.renderItemDecorations(font, itemStack.stack, inputX, inputY, itemStack.count + "");
+        }
 
-        if (mouseX < inputX - 2 || mouseX >= inputX - 2 + 20 || mouseY < inputY - 2 || mouseY >= inputY - 2 + 20)
+        if (mouseX < inputX - 2 || mouseX >= inputX - 2 + 20 || mouseY < inputY - 2 || mouseY >= inputY - 2 + 20) {
             return;
+        }
 
         if (craftingActive) {
             graphics.setComponentTooltipForNextFrame(
                 font, List.of(
                     CreateLang.translate("gui.factory_panel.crafting_input").color(ScrollInput.HEADER_RGB).component(),
                     CreateLang.translate("gui.factory_panel.crafting_input_tip").style(ChatFormatting.GRAY).component(),
-                    CreateLang.translate("gui.factory_panel.crafting_input_tip_1").style(ChatFormatting.GRAY).component()
+                    CreateLang.translate("gui.factory_panel.crafting_input_tip_1").style(ChatFormatting.GRAY)
+                        .component()
                 ), mouseX, mouseY
             );
             return;
@@ -359,8 +396,8 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
             graphics.setComponentTooltipForNextFrame(
                 font, List.of(
                     CreateLang.translate("gui.factory_panel.empty_panel").color(ScrollInput.HEADER_RGB).component(),
-                    CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-                        .component()
+                    CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY)
+                        .style(ChatFormatting.ITALIC).component()
                 ), mouseX, mouseY
             );
             return;
@@ -369,8 +406,10 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
         if (restocker) {
             graphics.setComponentTooltipForNextFrame(
                 font, List.of(
-                    CreateLang.translate("gui.factory_panel.sending_item", CreateLang.itemName(itemStack.stack).string())
-                        .color(ScrollInput.HEADER_RGB).component(),
+                    CreateLang.translate(
+                        "gui.factory_panel.sending_item",
+                        CreateLang.itemName(itemStack.stack).string()
+                    ).color(ScrollInput.HEADER_RGB).component(),
                     CreateLang.translate("gui.factory_panel.sending_item_tip").style(ChatFormatting.GRAY).component(),
                     CreateLang.translate("gui.factory_panel.sending_item_tip_1").style(ChatFormatting.GRAY).component()
                 ), mouseX, mouseY
@@ -384,10 +423,10 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
                     "gui.factory_panel.sending_item",
                     CreateLang.itemName(itemStack.stack).add(CreateLang.text(" x" + itemStack.count)).string()
                 ).color(ScrollInput.HEADER_RGB).component(),
-                CreateLang.translate("gui.factory_panel.scroll_to_change_amount").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-                    .component(),
-                CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-                    .component()
+                CreateLang.translate("gui.factory_panel.scroll_to_change_amount").style(ChatFormatting.DARK_GRAY)
+                    .style(ChatFormatting.ITALIC).component(),
+                CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY)
+                    .style(ChatFormatting.ITALIC).component()
             ), mouseX, mouseY
         );
     }
@@ -397,24 +436,32 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
             if (restocker) {
                 graphics.setComponentTooltipForNextFrame(
                     font, List.of(
-                        CreateLang.translate("gui.factory_panel.restocker_address").color(ScrollInput.HEADER_RGB).component(),
-                        CreateLang.translate("gui.factory_panel.restocker_address_tip").style(ChatFormatting.GRAY).component(),
-                        CreateLang.translate("gui.factory_panel.restocker_address_tip_1").style(ChatFormatting.GRAY).component(),
-                        CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC).component()
+                        CreateLang.translate("gui.factory_panel.restocker_address").color(ScrollInput.HEADER_RGB)
+                            .component(),
+                        CreateLang.translate("gui.factory_panel.restocker_address_tip").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.factory_panel.restocker_address_tip_1").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY)
+                            .style(ChatFormatting.ITALIC).component()
                     ), mouseX, mouseY
                 );
 
             } else {
                 graphics.setComponentTooltipForNextFrame(
                     font, List.of(
-                        CreateLang.translate("gui.factory_panel.recipe_address").color(ScrollInput.HEADER_RGB).component(),
-                        CreateLang.translate("gui.factory_panel.recipe_address_tip").style(ChatFormatting.GRAY).component(),
-                        CreateLang.translate("gui.factory_panel.recipe_address_tip_1").style(ChatFormatting.GRAY).component(),
-                        CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC).component()
+                        CreateLang.translate("gui.factory_panel.recipe_address").color(ScrollInput.HEADER_RGB)
+                            .component(),
+                        CreateLang.translate("gui.factory_panel.recipe_address_tip").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.factory_panel.recipe_address_tip_1").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY)
+                            .style(ChatFormatting.ITALIC).component()
                     ), mouseX, mouseY
                 );
             }
-        } else
+        } else {
             graphics.setComponentTooltipForNextFrame(
                 font, List.of(
                     CreateLang.translate(restocker ? "gui.factory_panel.restocker_address_given" : "gui.factory_panel.recipe_address_given")
@@ -422,6 +469,7 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
                     CreateLang.text("'" + addressBox.getValue() + "'").style(ChatFormatting.GRAY).component()
                 ), mouseX, mouseY
             );
+        }
     }
 
     //
@@ -430,14 +478,15 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         double mouseX = click.x();
         double mouseY = click.y();
-        if (getFocused() != null && !getFocused().isMouseOver(mouseX, mouseY))
+        if (getFocused() != null && !getFocused().isMouseOver(mouseX, mouseY)) {
             setFocused(null);
+        }
 
         int x = guiLeft;
         int y = guiTop;
 
         // Remove connections
-        if (!craftingActive)
+        if (!craftingActive) {
             for (int i = 0; i < connections.size(); i++) {
                 int inputX = x + 68 + (i % 3 * 20);
                 int inputY = y + 28 + (i / 3 * 20);
@@ -447,6 +496,7 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
                     return true;
                 }
             }
+        }
 
         // Clear promises
         int itemX = x + 68;
@@ -479,20 +529,27 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop;
 
-        if (addressBox.mouseScrolled(mouseX, mouseY, scrollX, scrollY))
+        if (addressBox.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
             return true;
+        }
 
-        if (craftingActive)
+        if (craftingActive) {
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        }
 
         for (int i = 0; i < inputConfig.size(); i++) {
             int inputX = x + 68 + (i % 3 * 20);
             int inputY = y + 26 + (i / 3 * 20);
             if (mouseX >= inputX && mouseX < inputX + 16 && mouseY >= inputY && mouseY < inputY + 16) {
                 BigItemStack itemStack = inputConfig.get(i);
-                if (itemStack.stack.isEmpty())
+                if (itemStack.stack.isEmpty()) {
                     return true;
-                itemStack.count = Mth.clamp((int) (itemStack.count + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)), 1, 64);
+                }
+                itemStack.count = Mth.clamp(
+                    (int) (itemStack.count + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)),
+                    1,
+                    64
+                );
                 return true;
             }
         }
@@ -502,7 +559,11 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
             int outputY = y + 48;
             if (mouseX >= outputX && mouseX < outputX + 16 && mouseY >= outputY && mouseY < outputY + 16) {
                 BigItemStack itemStack = outputConfig;
-                itemStack.count = Mth.clamp((int) (itemStack.count + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)), 1, 64);
+                itemStack.count = Mth.clamp(
+                    (int) (itemStack.count + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)),
+                    1,
+                    64
+                );
                 return true;
             }
         }
@@ -525,13 +586,16 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
                 inputs.put(
                     connections.get(i).from,
                     craftingActive ? (int) behaviour.craftingList.stream().skip(1)
-                        .filter(b -> !b.stack.isEmpty() && ItemStack.isSameItemSameComponents(b.stack, stackInConfig.stack))
-                        .count() : stackInConfig.count
+                        .filter(b -> !b.stack.isEmpty() && ItemStack.isSameItemSameComponents(
+                            b.stack,
+                            stackInConfig.stack
+                        )).count() : stackInConfig.count
                 );
             }
         }
 
-        List<ItemStack> craftingArrangement = craftingActive ? behaviour.craftingList.stream().skip(1).map(b -> b.stack).toList() : List.of();
+        List<ItemStack> craftingArrangement = craftingActive ? behaviour.craftingList.stream().skip(1).map(b -> b.stack)
+            .toList() : List.of();
 
         FactoryPanelPosition pos = behaviour.getPanelPosition();
         int promiseExp = promiseExpiration.getState();

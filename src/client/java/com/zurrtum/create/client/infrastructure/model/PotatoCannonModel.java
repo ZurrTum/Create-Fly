@@ -53,7 +53,10 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     private final ModelRenderProperties cogSettings;
     private final Supplier<Vector3fc[]> cogVector;
 
-    public PotatoCannonModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> cog) {
+    public PotatoCannonModel(
+        Tuple<List<BakedQuad>, ModelRenderProperties> item,
+        Tuple<List<BakedQuad>, ModelRenderProperties> cog
+    ) {
         itemQuads = item.getA();
         itemSettings = item.getB();
         itemVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(itemQuads));
@@ -92,7 +95,10 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
                 boolean leftHanded = player.getMainArm() == HumanoidArm.LEFT;
-                float speed = Create.POTATO_CANNON_RENDER_HANDLER.getAnimation(inMainHand ^ leftHanded, AnimationTickHolder.getPartialTicks());
+                float speed = Create.POTATO_CANNON_RENDER_HANDLER.getAnimation(
+                    inMainHand ^ leftHanded,
+                    AnimationTickHolder.getPartialTicks()
+                );
                 cog.rotation += 360 * Mth.clamp(speed * 5, 0, 1);
             }
         }
@@ -133,7 +139,17 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         matrices.mulPose(Axis.ZP.rotationDegrees(data.rotation));
         matrices.translate(-0.5f, -0.53125f, -0.5f);
         LayerRenderState state = data.state;
-        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tintLayers, state.prepareQuadList(), state.renderType, state.foilType);
+        queue.submitItem(
+            matrices,
+            displayContext,
+            light,
+            overlay,
+            0,
+            state.tintLayers,
+            state.prepareQuadList(),
+            state.renderType,
+            state.foilType
+        );
     }
 
     public static void renderDecorator(Minecraft client, GuiGraphics drawContext, ItemStack stack, int x, int y) {
@@ -166,7 +182,8 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked::new);
 
         @Override
         public MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> type() {

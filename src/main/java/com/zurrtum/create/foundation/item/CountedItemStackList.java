@@ -2,14 +2,13 @@ package com.zurrtum.create.foundation.item;
 
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-
-import java.util.*;
-import java.util.stream.Stream;
-
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 public class CountedItemStackList {
 
@@ -18,8 +17,9 @@ public class CountedItemStackList {
     public CountedItemStackList(Container inventory, ServerFilteringBehaviour filteringBehaviour) {
         for (int slot = 0, size = inventory.getContainerSize(); slot < size; slot++) {
             ItemStack extractItem = inventory.getItem(slot);
-            if (filteringBehaviour.test(extractItem))
+            if (filteringBehaviour.test(extractItem)) {
                 add(extractItem);
+            }
         }
     }
 
@@ -33,13 +33,15 @@ public class CountedItemStackList {
     }
 
     public void add(ItemStack stack, int amount) {
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
             return;
+        }
 
         Set<ItemStackEntry> stackSet = getOrCreateItemSet(stack);
         for (ItemStackEntry entry : stackSet) {
-            if (!entry.matches(stack))
+            if (!entry.matches(stack)) {
                 continue;
+            }
             entry.grow(amount);
             return;
         }
@@ -47,8 +49,9 @@ public class CountedItemStackList {
     }
 
     private Set<ItemStackEntry> getOrCreateItemSet(ItemStack stack) {
-        if (!items.containsKey(stack.getItem()))
+        if (!items.containsKey(stack.getItem())) {
             items.put(stack.getItem(), new HashSet<>());
+        }
         return getItemSet(stack);
     }
 

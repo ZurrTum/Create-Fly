@@ -10,8 +10,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record AddTrainPacket(Train train) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<RegistryFriendlyByteBuf, AddTrainPacket> CODEC = Train.STREAM_CODEC.map(
-        AddTrainPacket::new,
+    public static final StreamCodec<RegistryFriendlyByteBuf, AddTrainPacket> CODEC = Train.STREAM_CODEC.map(AddTrainPacket::new,
         AddTrainPacket::train
     );
 

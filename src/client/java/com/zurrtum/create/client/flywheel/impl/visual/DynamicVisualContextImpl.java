@@ -5,7 +5,6 @@ import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import net.minecraft.client.Camera;
 import org.joml.FrustumIntersection;
 
-public record DynamicVisualContextImpl(
-    Camera camera, FrustumIntersection frustum, float partialTick, DistanceUpdateLimiter limiter
-) implements DynamicVisual.Context {
+public record DynamicVisualContextImpl(Camera camera, FrustumIntersection frustum, float partialTick,
+                                       DistanceUpdateLimiter limiter) implements DynamicVisual.Context {
 }

@@ -81,7 +81,13 @@ public class AllPortalTracks {
      * @param levelKey    The resource key of the dimension to travel to
      */
     private static void tryRegisterSimpleInteraction(Block portalBlock, ResourceKey<Level> levelKey) {
-        PortalTrackProvider p = (level, face) -> PortalTrackProvider.fromPortal(level, face, Level.OVERWORLD, levelKey, (Portal) portalBlock);
+        PortalTrackProvider p = (level, face) -> PortalTrackProvider.fromPortal(
+            level,
+            face,
+            Level.OVERWORLD,
+            levelKey,
+            (Portal) portalBlock
+        );
         PortalTrackProvider.REGISTRY.register(portalBlock, p);
     }
 
@@ -120,8 +126,9 @@ public class AllPortalTracks {
         MinecraftServer minecraftServer = level.getServer();
         ServerLevel otherLevel = minecraftServer.getLevel(resourceKey);
 
-        if (otherLevel == null)
+        if (otherLevel == null) {
             return null;
+        }
 
         BlockPos portalPos = inboundTrack.getConnectedPos();
         BlockState portalState = level.getBlockState(portalPos);
@@ -130,20 +137,24 @@ public class AllPortalTracks {
         probe.setYRot(inboundTrack.getFace().toYRot());
 
         TeleportTransition dimensiontransition = portal.getPortalDestination(level, probe, probe.blockPosition());
-        if (dimensiontransition == null)
+        if (dimensiontransition == null) {
             return null;
+        }
 
-        if (!level.isAllowedToEnterPortal(dimensiontransition.newLevel()))
+        if (!level.isAllowedToEnterPortal(dimensiontransition.newLevel())) {
             return null;
+        }
 
         BlockPos otherPortalPos = BlockPos.containing(dimensiontransition.position());
         BlockState otherPortalState = otherLevel.getBlockState(otherPortalPos);
-        if (!otherPortalState.is(portalState.getBlock()))
+        if (!otherPortalState.is(portalState.getBlock())) {
             return null;
+        }
 
         Direction targetDirection = inboundTrack.getFace();
-        if (targetDirection.getAxis() == otherPortalState.getValue(BlockStateProperties.HORIZONTAL_AXIS))
+        if (targetDirection.getAxis() == otherPortalState.getValue(BlockStateProperties.HORIZONTAL_AXIS)) {
             targetDirection = targetDirection.getClockWise();
+        }
         BlockPos otherPos = otherPortalPos.relative(targetDirection);
         return new PortalTrackProvider.Exit(otherLevel, new BlockFace(otherPos, targetDirection.getOpposite()));
     }

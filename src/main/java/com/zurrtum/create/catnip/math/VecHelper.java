@@ -31,10 +31,12 @@ public class VecHelper {
     }
 
     public static Vec3 rotate(Vec3 vec, double deg, Axis axis) {
-        if (deg == 0)
+        if (deg == 0) {
             return vec;
-        if (vec == Vec3.ZERO)
+        }
+        if (vec == Vec3.ZERO) {
             return vec;
+        }
 
         float angle = (float) (deg / 180f * Math.PI);
         double sin = Mth.sin(angle);
@@ -43,12 +45,15 @@ public class VecHelper {
         double y = vec.y;
         double z = vec.z;
 
-        if (axis == Axis.X)
+        if (axis == Axis.X) {
             return new Vec3(x, y * cos - z * sin, z * cos + y * sin);
-        if (axis == Axis.Y)
+        }
+        if (axis == Axis.Y) {
             return new Vec3(x * cos + z * sin, y, z * cos - x * sin);
-        if (axis == Axis.Z)
+        }
+        if (axis == Axis.Z) {
             return new Vec3(x * cos - y * sin, y * cos + x * sin, z);
+        }
         return vec;
     }
 
@@ -58,19 +63,23 @@ public class VecHelper {
     }
 
     public static Vec3 mirror(Vec3 vec, Mirror mirror) {
-        if (mirror == Mirror.NONE)
+        if (mirror == Mirror.NONE) {
             return vec;
-        if (vec == Vec3.ZERO)
+        }
+        if (vec == Vec3.ZERO) {
             return vec;
+        }
 
         double x = vec.x;
         double y = vec.y;
         double z = vec.z;
 
-        if (mirror == Mirror.LEFT_RIGHT)
+        if (mirror == Mirror.LEFT_RIGHT) {
             return new Vec3(x, y, -z);
-        if (mirror == Mirror.FRONT_BACK)
+        }
+        if (mirror == Mirror.FRONT_BACK) {
             return new Vec3(-x, y, z);
+        }
         return vec;
     }
 
@@ -78,8 +87,9 @@ public class VecHelper {
         fwd = fwd.normalize();
         Vec3 up = new Vec3(0, 1, 0);
         double dot = fwd.dot(up);
-        if (Math.abs(dot) > 1 - 1.0E-3)
+        if (Math.abs(dot) > 1 - 1.0E-3) {
             up = new Vec3(0, 0, dot > 0 ? 1 : -1);
+        }
         Vec3 right = fwd.cross(up).normalize();
         up = right.cross(fwd).normalize();
         double x = vec.x * right.x + vec.y * up.x + vec.z * fwd.x;
@@ -94,8 +104,9 @@ public class VecHelper {
     }
 
     public static Vec3 getCenterOf(Vec3i pos) {
-        if (pos.equals(Vec3i.ZERO))
+        if (pos.equals(Vec3i.ZERO)) {
             return CENTER_OF_ORIGIN;
+        }
         return Vec3.atLowerCornerOf(pos).add(.5f, .5f, .5f);
     }
 
@@ -131,8 +142,9 @@ public class VecHelper {
     }
 
     public static Vec3 readNBT(ListTag list) {
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             return Vec3.ZERO;
+        }
         return new Vec3(list.getDoubleOr(0, 0), list.getDoubleOr(1, 0), list.getDoubleOr(2, 0));
     }
 
@@ -163,12 +175,16 @@ public class VecHelper {
     }
 
     public static boolean onSameAxis(BlockPos pos1, BlockPos pos2, Axis axis) {
-        if (pos1.equals(pos2))
+        if (pos1.equals(pos2)) {
             return true;
-        for (Axis otherAxis : Axis.values())
-            if (axis != otherAxis)
-                if (getCoordinate(pos1, otherAxis) != getCoordinate(pos2, otherAxis))
+        }
+        for (Axis otherAxis : Axis.values()) {
+            if (axis != otherAxis) {
+                if (getCoordinate(pos1, otherAxis) != getCoordinate(pos2, otherAxis)) {
                     return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -182,11 +198,16 @@ public class VecHelper {
 
     public static Vec3 slerp(float p, Vec3 from, Vec3 to) {
         double theta = Math.acos(from.dot(to));
-        return from.scale(Mth.sin(1 - p) * theta).add(to.scale(Mth.sin((float) (theta * p)))).scale(1 / Mth.sin((float) theta));
+        return from.scale(Mth.sin(1 - p) * theta).add(to.scale(Mth.sin((float) (theta * p))))
+            .scale(1 / Mth.sin((float) theta));
     }
 
     public static Vec3 clampComponentWise(Vec3 vec, float maxLength) {
-        return new Vec3(Mth.clamp(vec.x, -maxLength, maxLength), Mth.clamp(vec.y, -maxLength, maxLength), Mth.clamp(vec.z, -maxLength, maxLength));
+        return new Vec3(
+            Mth.clamp(vec.x, -maxLength, maxLength),
+            Mth.clamp(vec.y, -maxLength, maxLength),
+            Mth.clamp(vec.z, -maxLength, maxLength)
+        );
     }
 
     public static Vec3 componentMin(Vec3 vec1, Vec3 vec2) {
@@ -198,23 +219,27 @@ public class VecHelper {
     }
 
     public static Vec3 project(Vec3 vec, Vec3 ontoVec) {
-        if (ontoVec.equals(Vec3.ZERO))
+        if (ontoVec.equals(Vec3.ZERO)) {
             return Vec3.ZERO;
+        }
         return ontoVec.scale(vec.dot(ontoVec) / ontoVec.lengthSqr());
     }
 
     @Nullable
     public static Vec3 intersectSphere(Vec3 origin, Vec3 lineDirection, Vec3 sphereCenter, double radius) {
-        if (lineDirection.equals(Vec3.ZERO))
+        if (lineDirection.equals(Vec3.ZERO)) {
             return null;
-        if (lineDirection.lengthSqr() != 1)
+        }
+        if (lineDirection.lengthSqr() != 1) {
             lineDirection = lineDirection.normalize();
+        }
 
         Vec3 diff = origin.subtract(sphereCenter);
         double lineDotDiff = lineDirection.dot(diff);
         double delta = lineDotDiff * lineDotDiff - (diff.lengthSqr() - radius * radius);
-        if (delta < 0)
+        if (delta < 0) {
             return null;
+        }
         double t = -lineDotDiff + Math.sqrt(delta);
         return origin.add(lineDirection.scale(t));
     }
@@ -229,19 +254,23 @@ public class VecHelper {
     }
 
     public static Vec3 bezierDerivative(Vec3 p1, Vec3 p2, Vec3 q1, Vec3 q2, float t) {
-        return p1.scale(-3 * t * t + 6 * t - 3).add(q1.scale(9 * t * t - 12 * t + 3)).add(q2.scale(-9 * t * t + 6 * t)).add(p2.scale(3 * t * t));
+        return p1.scale(-3 * t * t + 6 * t - 3).add(q1.scale(9 * t * t - 12 * t + 3)).add(q2.scale(-9 * t * t + 6 * t))
+            .add(p2.scale(3 * t * t));
     }
 
     public static double @Nullable [] intersectRanged(Vec3 p1, Vec3 q1, Vec3 p2, Vec3 q2, Axis plane) {
         Vec3 pDiff = p2.subtract(p1);
         Vec3 qDiff = q2.subtract(q1);
         double[] intersect = intersect(p1, q1, pDiff.normalize(), qDiff.normalize(), plane);
-        if (intersect == null)
+        if (intersect == null) {
             return null;
-        if (intersect[0] < 0 || intersect[1] < 0)
+        }
+        if (intersect[0] < 0 || intersect[1] < 0) {
             return null;
-        if (intersect[0] * intersect[0] > pDiff.lengthSqr() || intersect[1] * intersect[1] > qDiff.lengthSqr())
+        }
+        if (intersect[0] * intersect[0] > pDiff.lengthSqr() || intersect[1] * intersect[1] > qDiff.lengthSqr()) {
             return null;
+        }
         return intersect;
     }
 
@@ -262,8 +291,9 @@ public class VecHelper {
 
         Vec3 qminusp = p2.subtract(p1);
         double rcs = r.x * s.z - r.z * s.x;
-        if (Mth.equal(rcs, 0))
+        if (Mth.equal(rcs, 0)) {
             return null;
+        }
         Vec3 rdivrcs = r.scale(1 / rcs);
         Vec3 sdivrcs = s.scale(1 / rcs);
         double t = qminusp.x * sdivrcs.z - qminusp.z * sdivrcs.x;
@@ -273,6 +303,9 @@ public class VecHelper {
 
     public static double alignedDistanceToFace(Vec3 pos, BlockPos blockPos, Direction face) {
         Axis axis = face.getAxis();
-        return Math.abs(getCoordinate(pos, axis) - (blockPos.get(axis) + (face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : 0)));
+        return Math.abs(getCoordinate(
+            pos,
+            axis
+        ) - (blockPos.get(axis) + (face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : 0)));
     }
 }

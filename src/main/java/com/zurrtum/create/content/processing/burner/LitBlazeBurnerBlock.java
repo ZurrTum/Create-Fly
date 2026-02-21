@@ -3,9 +3,6 @@ package com.zurrtum.create.content.processing.burner;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,6 +28,8 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Locale;
 
 public class LitBlazeBurnerBlock extends Block implements IWrenchable {
 
@@ -62,8 +61,9 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
     ) {
         if (stack.getItem() instanceof ShovelItem/* || stack.getItem().canPerformAction(stack, EXTINGUISH_FLAME_ACTION)*/) {
             level.playSound(player, pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 0.5f, 2);
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
+            }
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
             level.setBlockAndUpdate(pos, AllBlocks.BLAZE_BURNER.defaultBlockState());
             return InteractionResult.SUCCESS;
@@ -71,9 +71,17 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
 
         if (state.getValue(FLAME_TYPE) == FlameType.REGULAR) {
             if (stack.is(ItemTags.SOUL_FIRE_BASE_BLOCKS)) {
-                level.playSound(player, pos, SoundEvents.SOUL_SAND_PLACE, SoundSource.BLOCKS, 1.0f, level.random.nextFloat() * 0.4F + 0.8F);
-                if (level.isClientSide())
+                level.playSound(
+                    player,
+                    pos,
+                    SoundEvents.SOUL_SAND_PLACE,
+                    SoundSource.BLOCKS,
+                    1.0f,
+                    level.random.nextFloat() * 0.4F + 0.8F
+                );
+                if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
+                }
                 level.setBlockAndUpdate(pos, defaultBlockState().setValue(FLAME_TYPE, FlameType.SOUL));
                 return InteractionResult.SUCCESS;
             }
@@ -169,16 +177,16 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
     }
 
     public static int getLight(BlockState state) {
-        if (state.getValue(FLAME_TYPE) == FlameType.SOUL)
+        if (state.getValue(FLAME_TYPE) == FlameType.SOUL) {
             return 9;
-        else
+        } else {
             return 12;
+        }
     }
 
     public enum FlameType implements StringRepresentable {
 
-        REGULAR,
-        SOUL;
+        REGULAR, SOUL;
 
         @Override
         public String getSerializedName() {

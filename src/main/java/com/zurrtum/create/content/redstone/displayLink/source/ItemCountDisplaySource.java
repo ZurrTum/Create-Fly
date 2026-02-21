@@ -15,23 +15,27 @@ public class ItemCountDisplaySource extends NumericSingleLineDisplaySource {
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
-        if (!(sourceBE instanceof SmartObserverBlockEntity cobe))
+        if (!(sourceBE instanceof SmartObserverBlockEntity cobe)) {
             return ZERO.copy();
+        }
 
         InvManipulationBehaviour invManipulationBehaviour = cobe.getBehaviour(InvManipulationBehaviour.TYPE);
         ServerFilteringBehaviour filteringBehaviour = cobe.getBehaviour(ServerFilteringBehaviour.TYPE);
         Container handler = invManipulationBehaviour.getInventory();
 
-        if (handler == null)
+        if (handler == null) {
             return ZERO.copy();
+        }
 
         int collected = 0;
         for (int i = 0, size = handler.getContainerSize(); i < size; i++) {
             ItemStack stack = handler.getItem(i);
-            if (stack.isEmpty())
+            if (stack.isEmpty()) {
                 continue;
-            if (filteringBehaviour.test(stack))
+            }
+            if (filteringBehaviour.test(stack)) {
                 collected += stack.getCount();
+            }
         }
 
         return Component.literal(String.valueOf(collected));

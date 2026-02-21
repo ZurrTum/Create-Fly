@@ -82,7 +82,9 @@ public class ManualBlockRenderer extends PictureInPictureRenderer<ManualBlockRen
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+            TextureSetup.singleTexture(texture.textureView(),
+                RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)
+            ),
             block.pose(),
             block.x0(),
             block.y0(),

@@ -84,8 +84,9 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
                 Find:
                 for (Direction d : Iterate.horizontalDirections) {
                     for (int y : Iterate.zeroAndOne) {
-                        if (!(level.getBlockState(pos.relative(d).above(y)).getBlock() instanceof StockTickerBlock))
+                        if (!(level.getBlockState(pos.relative(d).above(y)).getBlock() instanceof StockTickerBlock)) {
                             continue;
+                        }
                         if (find) {
                             find = false;
                             break Find;
@@ -98,8 +99,8 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
                     state.create$updateHatInfo(entity);
                 }
             }
-        } else if (entity instanceof Parrot parrot && entity.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && AllSynchedDatas.PARROT_TRAIN_HAT.get(
-            parrot)) {
+        } else if (entity instanceof Parrot parrot && entity.getItemBySlot(EquipmentSlot.HEAD)
+            .isEmpty() && AllSynchedDatas.PARROT_TRAIN_HAT.get(parrot)) {
             hat = AllPartialModels.TRAIN_HAT;
             state.create$updateHatInfo(entity);
         }
@@ -108,7 +109,13 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
 
     @SuppressWarnings("unchecked")
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
-    private void render(S state, PoseStack matrixStack, SubmitNodeCollector queue, CameraRenderState cameraRenderState, CallbackInfo ci) {
+    private void render(
+        S state,
+        PoseStack matrixStack,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraRenderState,
+        CallbackInfo ci
+    ) {
         if ((LivingEntityRenderer<T, S, M>) (Object) this instanceof AvatarRenderer<?> renderer && CardboardArmorHandlerClient.playerRendersAsBoxWhenSneaking(renderer,
             (AvatarRenderState) state,
             matrixStack,

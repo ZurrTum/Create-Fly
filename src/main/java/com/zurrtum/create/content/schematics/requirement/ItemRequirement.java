@@ -56,7 +56,8 @@ public class ItemRequirement {
         Block block = state.getBlock();
 
         ItemRequirement requirement;
-        SchematicRequirementRegistries.BlockRequirement blockRequirement = SchematicRequirementRegistries.BLOCKS.get(block);
+        SchematicRequirementRegistries.BlockRequirement blockRequirement = SchematicRequirementRegistries.BLOCKS.get(
+            block);
         if (blockRequirement != null) {
             requirement = blockRequirement.getRequiredItems(state, be);
         } else if (block instanceof SpecialBlockItemRequirement specialBlock) {
@@ -66,7 +67,8 @@ public class ItemRequirement {
         }
 
         if (be != null) {
-            SchematicRequirementRegistries.BlockEntityRequirement beRequirement = SchematicRequirementRegistries.BLOCK_ENTITIES.get(be.getType());
+            SchematicRequirementRegistries.BlockEntityRequirement beRequirement = SchematicRequirementRegistries.BLOCK_ENTITIES.get(
+                be.getType());
             if (beRequirement != null) {
                 requirement = requirement.union(beRequirement.getRequiredItems(be, state));
             } else if (be instanceof SpecialBlockEntityItemRequirement specialBE) {
@@ -82,22 +84,34 @@ public class ItemRequirement {
 
     private static ItemRequirement defaultOf(BlockState state, BlockEntity be) {
         Block block = state.getBlock();
-        if (block == Blocks.AIR)
+        if (block == Blocks.AIR) {
             return NONE;
+        }
 
         Item item = block.asItem();
-        if (item == Items.AIR)
+        if (item == Items.AIR) {
             return INVALID;
+        }
 
         // double slab needs two items
-        if (state.hasProperty(BlockStateProperties.SLAB_TYPE) && state.getValue(BlockStateProperties.SLAB_TYPE) == SlabType.DOUBLE)
+        if (state.hasProperty(BlockStateProperties.SLAB_TYPE) && state.getValue(BlockStateProperties.SLAB_TYPE) == SlabType.DOUBLE) {
             return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, 2));
-        if (block instanceof TurtleEggBlock)
+        }
+        if (block instanceof TurtleEggBlock) {
             return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.getValue(TurtleEggBlock.EGGS)));
-        if (block instanceof SeaPickleBlock)
-            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.getValue(SeaPickleBlock.PICKLES)));
-        if (block instanceof SnowLayerBlock)
-            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.getValue(SnowLayerBlock.LAYERS).intValue()));
+        }
+        if (block instanceof SeaPickleBlock) {
+            return new ItemRequirement(
+                ItemUseType.CONSUME,
+                new ItemStack(item, state.getValue(SeaPickleBlock.PICKLES))
+            );
+        }
+        if (block instanceof SnowLayerBlock) {
+            return new ItemRequirement(
+                ItemUseType.CONSUME,
+                new ItemStack(item, state.getValue(SnowLayerBlock.LAYERS).intValue())
+            );
+        }
         // FD's rich soil extends FarmBlock so this is to make sure the cost is correct (it should be rich soil not dirt)
         //TODO
         //        if (block == BuiltInRegistries.BLOCK.get(Mods.FD.asResource("rich_soil_farmland")))
@@ -105,22 +119,27 @@ public class ItemRequirement {
         //                ItemUseType.CONSUME,
         //                BuiltInRegistries.ITEM.get(Mods.FD.asResource("rich_soil"))
         //            );
-        if (block instanceof FarmBlock || block instanceof DirtPathBlock)
+        if (block instanceof FarmBlock || block instanceof DirtPathBlock) {
             return new ItemRequirement(ItemUseType.CONSUME, Items.DIRT);
-        if (block instanceof AbstractBannerBlock && be instanceof BannerBlockEntity bannerBE)
+        }
+        if (block instanceof AbstractBannerBlock && be instanceof BannerBlockEntity bannerBE) {
             return new ItemRequirement(new StrictNbtStackRequirement(bannerBE.getItem(), ItemUseType.CONSUME));
+        }
         // Tall grass doesnt exist as a block so use 2 grass blades
-        if (block == Blocks.TALL_GRASS)
+        if (block == Blocks.TALL_GRASS) {
             return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(Items.SHORT_GRASS, 2));
+        }
         // Large ferns don't exist as blocks so use 2 ferns instead
-        if (block == Blocks.LARGE_FERN)
+        if (block == Blocks.LARGE_FERN) {
             return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(Items.FERN, 2));
+        }
 
         return new ItemRequirement(ItemUseType.CONSUME, item);
     }
 
     public static ItemRequirement of(Entity entity) {
-        SchematicRequirementRegistries.EntityRequirement requirement = SchematicRequirementRegistries.ENTITIES.get(entity.getType());
+        SchematicRequirementRegistries.EntityRequirement requirement = SchematicRequirementRegistries.ENTITIES.get(
+            entity.getType());
         if (requirement != null) {
             return requirement.getRequiredItems(entity);
         } else if (entity instanceof SpecialEntityItemRequirement specialEntity) {
@@ -130,8 +149,9 @@ public class ItemRequirement {
         if (entity instanceof ItemFrame itemFrame) {
             ItemStack frame = itemFrame.getFrameItemStack();
             ItemStack displayedItem = ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getItem());
-            if (displayedItem.isEmpty())
+            if (displayedItem.isEmpty()) {
                 return new ItemRequirement(ItemUseType.CONSUME, frame);
+            }
             return new ItemRequirement(List.of(
                 new ItemRequirement.StackRequirement(frame, ItemUseType.CONSUME),
                 new ItemRequirement.StrictNbtStackRequirement(displayedItem, ItemUseType.CONSUME)
@@ -143,7 +163,8 @@ public class ItemRequirement {
             requirements.add(new StackRequirement(new ItemStack(Items.ARMOR_STAND), ItemUseType.CONSUME));
             for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
                 ItemStack itemStack = armorStand.getItemBySlot(equipmentSlot);
-                requirements.add(new StrictNbtStackRequirement(ComponentProcessors.withUnsafeComponentsDiscarded(itemStack), ItemUseType.CONSUME));
+                requirements.add(new StrictNbtStackRequirement(
+                    ComponentProcessors.withUnsafeComponentsDiscarded(itemStack), ItemUseType.CONSUME));
             }
             return new ItemRequirement(requirements);
         }
@@ -164,19 +185,22 @@ public class ItemRequirement {
     }
 
     public ItemRequirement union(ItemRequirement other) {
-        if (this.isInvalid() || other.isInvalid())
+        if (this.isInvalid() || other.isInvalid()) {
             return INVALID;
-        if (this.isEmpty())
+        }
+        if (this.isEmpty()) {
             return other;
-        if (other.isEmpty())
+        }
+        if (other.isEmpty()) {
             return this;
+        }
 
-        return new ItemRequirement(Stream.concat(requiredItems.stream(), other.requiredItems.stream()).collect(Collectors.toList()));
+        return new ItemRequirement(Stream.concat(requiredItems.stream(), other.requiredItems.stream())
+            .collect(Collectors.toList()));
     }
 
     public enum ItemUseType {
-        CONSUME,
-        DAMAGE
+        CONSUME, DAMAGE
     }
 
     public static class StackRequirement {

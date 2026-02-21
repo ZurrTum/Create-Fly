@@ -59,7 +59,12 @@ public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, 
     }
 
     @Override
-    public void submit(StickerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        StickerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 

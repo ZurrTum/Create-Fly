@@ -27,7 +27,10 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class CardboardSwordModel implements ItemModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/cardboard_sword");
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/cardboard_sword/item");
-    public static final Identifier BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/cardboard_sword/item_in_hand");
+    public static final Identifier BLOCK_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/cardboard_sword/item_in_hand"
+    );
 
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
@@ -73,7 +76,8 @@ public class CardboardSwordModel implements ItemModel {
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked::new);
 
         @Override
         public MapCodec<com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked> type() {
@@ -91,10 +95,15 @@ public class CardboardSwordModel implements ItemModel {
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel itemModel = baker.getModel(ITEM_ID);
             TextureSlots itemTextures = itemModel.getTopTextureSlots();
-            List<BakedQuad> itemQuads = itemModel.bakeTopGeometry(itemTextures, baker, BlockModelRotation.IDENTITY).getAll();
+            List<BakedQuad> itemQuads = itemModel.bakeTopGeometry(itemTextures, baker, BlockModelRotation.IDENTITY)
+                .getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, itemModel, itemTextures);
             ResolvedModel blockModel = baker.getModel(BLOCK_ID);
-            List<BakedQuad> blockQuads = blockModel.bakeTopGeometry(blockModel.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
+            List<BakedQuad> blockQuads = blockModel.bakeTopGeometry(
+                blockModel.getTopTextureSlots(),
+                baker,
+                BlockModelRotation.IDENTITY
+            ).getAll();
             return new CardboardSwordModel(itemQuads, blockQuads, settings);
         }
     }

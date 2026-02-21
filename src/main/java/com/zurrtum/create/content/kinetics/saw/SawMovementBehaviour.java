@@ -50,8 +50,9 @@ public class SawMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     protected void onBlockBroken(MovementContext context, BlockPos pos, BlockState brokenState) {
-        if (brokenState.is(BlockTags.LEAVES))
+        if (brokenState.is(BlockTags.LEAVES)) {
             return;
+        }
 
         //TODO
         //        Optional<AbstractBlockBreakQueue> dynamicTree = TreeCutter.findDynamicTree(brokenState.getBlock(), pos);
@@ -68,8 +69,9 @@ public class SawMovementBehaviour extends BlockBreakingMovementBehaviour {
         Container inventory = context.contraption.getStorage().getAllItems();
         int count = stack.getCount();
         int insert = inventory.insert(stack);
-        if (insert == count)
+        if (insert == count) {
             return;
+        }
 
         Level world = context.world;
         Vec3 dropPos = VecHelper.getCenterOf(pos);

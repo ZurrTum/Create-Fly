@@ -11,8 +11,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.item.ItemStack;
 
 public record SchematicPlacePacket(ItemStack stack) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<RegistryFriendlyByteBuf, SchematicPlacePacket> CODEC = ItemStack.STREAM_CODEC.map(
-        SchematicPlacePacket::new,
+    public static final StreamCodec<RegistryFriendlyByteBuf, SchematicPlacePacket> CODEC = ItemStack.STREAM_CODEC.map(SchematicPlacePacket::new,
         SchematicPlacePacket::stack
     );
 

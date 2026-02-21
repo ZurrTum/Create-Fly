@@ -16,8 +16,9 @@ public sealed interface AbstractVariant {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof AbstractItem that))
+            if (!(o instanceof AbstractItem that)) {
                 return false;
+            }
 
             return item == that.item;
         }
@@ -39,8 +40,9 @@ public sealed interface AbstractVariant {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof AbstractFluid that))
+            if (!(o instanceof AbstractFluid that)) {
                 return false;
+            }
 
             return fluid == that.fluid;
         }

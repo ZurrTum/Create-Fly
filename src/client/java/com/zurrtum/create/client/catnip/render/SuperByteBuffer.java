@@ -38,7 +38,12 @@ public interface SuperByteBuffer extends TransformStack<SuperByteBuffer> {
 
     <Self extends SuperByteBuffer> Self shiftUVScrolling(SpriteShiftEntry entry, float scrollU, float scrollV);
 
-    <Self extends SuperByteBuffer> Self shiftUVtoSheet(SpriteShiftEntry entry, float uTarget, float vTarget, int sheetSize);
+    <Self extends SuperByteBuffer> Self shiftUVtoSheet(
+        SpriteShiftEntry entry,
+        float uTarget,
+        float vTarget,
+        int sheetSize
+    );
 
     <Self extends SuperByteBuffer> Self overlay(int overlay);
 

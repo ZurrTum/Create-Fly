@@ -49,11 +49,13 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
     @Override
     public void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean isMoving) {
         super.affectNeighborsAfterRemoval(state, worldIn, pos, isMoving);
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
         BlockState below = worldIn.getBlockState(pos.below());
-        if (below.getBlock() instanceof RopeBlockBase)
+        if (below.getBlock() instanceof RopeBlockBase) {
             worldIn.destroyBlock(pos.below(), true);
+        }
     }
 
     @Override
@@ -66,10 +68,12 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.mayBuild())
+        if (!player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (stack.isEmpty()) {
             withBlockEntityDo(level, pos, be -> be.assembleNextTick = true);
             return InteractionResult.SUCCESS;
@@ -112,18 +116,20 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
             boolean onBroken = !state.hasProperty(BlockStateProperties.WATERLOGGED);
             if (!onBroken) {
                 BlockState newState = worldIn.getBlockState(pos);
-                onBroken = !newState.hasProperty(BlockStateProperties.WATERLOGGED) || state.getValue(BlockStateProperties.WATERLOGGED) == newState.getValue(
-                    BlockStateProperties.WATERLOGGED);
+                onBroken = !newState.hasProperty(BlockStateProperties.WATERLOGGED) || state.getValue(
+                    BlockStateProperties.WATERLOGGED) == newState.getValue(BlockStateProperties.WATERLOGGED);
             }
             if (onBroken) {
                 onRopeBroken(worldIn, pos.above());
                 if (!worldIn.isClientSide()) {
                     BlockState above = worldIn.getBlockState(pos.above());
                     BlockState below = worldIn.getBlockState(pos.below());
-                    if (above.getBlock() instanceof RopeBlockBase)
+                    if (above.getBlock() instanceof RopeBlockBase) {
                         worldIn.destroyBlock(pos.above(), true);
-                    if (below.getBlock() instanceof RopeBlockBase)
+                    }
+                    if (below.getBlock() instanceof RopeBlockBase) {
                         worldIn.destroyBlock(pos.below(), true);
+                    }
                 }
             }
         }
@@ -151,8 +157,9 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
             BlockState neighbourState,
             RandomSource random
         ) {
-            if (state.getValue(BlockStateProperties.WATERLOGGED))
+            if (state.getValue(BlockStateProperties.WATERLOGGED)) {
                 tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            }
             return state;
         }
 

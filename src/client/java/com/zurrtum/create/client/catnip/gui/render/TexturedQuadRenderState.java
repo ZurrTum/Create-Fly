@@ -9,10 +9,10 @@ import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
 import org.joml.Matrix3x2f;
 
-public record TexturedQuadRenderState(
-    Matrix3x2f pose, float left, float right, float top, float bot, int red, int green, int blue, int alpha, float u1, float u2, float v1, float v2,
-    TextureSetup textureSetup, ScreenRectangle bounds, ScreenRectangle scissorArea
-) implements GuiElementRenderState {
+public record TexturedQuadRenderState(Matrix3x2f pose, float left, float right, float top, float bot, int red,
+                                      int green, int blue, int alpha, float u1, float u2, float v1, float v2,
+                                      TextureSetup textureSetup, ScreenRectangle bounds,
+                                      ScreenRectangle scissorArea) implements GuiElementRenderState {
     public TexturedQuadRenderState(
         Matrix3x2f pose,
         TextureSetup textureSetup,

@@ -65,7 +65,12 @@ public class MultiPlayerGameModeMixin {
     private GameType localPlayerMode;
 
     @Inject(method = "useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startPrediction(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V"), cancellable = true)
-    private void interactBlock(LocalPlayer player, InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
+    private void interactBlock(
+        LocalPlayer player,
+        InteractionHand hand,
+        BlockHitResult hitResult,
+        CallbackInfoReturnable<InteractionResult> cir
+    ) {
         if (localPlayerMode == GameType.SPECTATOR) {
             return;
         }
@@ -76,7 +81,8 @@ public class MultiPlayerGameModeMixin {
                 ValueSettingsInputHandler::onBlockActivated,
                 LinkHandler::onBlockActivated,
                 EjectorTargetHandler::rightClickingBlocksSelectsThem
-            ).map(handler -> handler.onRightClickBlock(minecraft.level, player, hand, hitResult)).filter(Objects::nonNull).findFirst()
+            ).map(handler -> handler.onRightClickBlock(minecraft.level, player, hand, hitResult)).filter(Objects::nonNull)
+            .findFirst()
             .ifPresentOrElse(cir::setReturnValue, () -> TrackPlacementClient.sendExtenderPacket(player, hand));
     }
 
@@ -96,14 +102,16 @@ public class MultiPlayerGameModeMixin {
                 EdgeInteractionHandler::onBlockActivated,
                 LinkedControllerItem::onItemUseFirst,
                 CogwheelBlockItem::onItemUseFirst
-            ).map(handler -> handler.onRightClickBlock(minecraft.level, player, stack, hand, hit, pos)).filter(Objects::nonNull).findFirst()
-            .ifPresent(cir::setReturnValue);
+            ).map(handler -> handler.onRightClickBlock(minecraft.level, player, stack, hand, hit, pos))
+            .filter(Objects::nonNull).findFirst().ifPresent(cir::setReturnValue);
     }
 
     @Inject(method = "startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/Tutorial;onDestroyBlock(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)V"), cancellable = true)
     private void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (EjectorTargetHandler.leftClickingBlocksDeselectsThem(minecraft.player, pos) || ArmInteractionPointHandler.leftClickingBlocksDeselectsThem(
-            pos)) {
+        if (EjectorTargetHandler.leftClickingBlocksDeselectsThem(
+            minecraft.player,
+            pos
+        ) || ArmInteractionPointHandler.leftClickingBlocksDeselectsThem(pos)) {
             cir.setReturnValue(true);
             return;
         }
@@ -112,8 +120,10 @@ public class MultiPlayerGameModeMixin {
 
     @Inject(method = "continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/Tutorial;onDestroyBlock(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)V"), cancellable = true)
     private void updateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (EjectorTargetHandler.leftClickingBlocksDeselectsThem(minecraft.player, pos) || ArmInteractionPointHandler.leftClickingBlocksDeselectsThem(
-            pos)) {
+        if (EjectorTargetHandler.leftClickingBlocksDeselectsThem(
+            minecraft.player,
+            pos
+        ) || ArmInteractionPointHandler.leftClickingBlocksDeselectsThem(pos)) {
             cir.setReturnValue(true);
         }
     }
@@ -125,7 +135,13 @@ public class MultiPlayerGameModeMixin {
         Operation<Boolean> original,
         @Local(argsOnly = true) Direction direction
     ) {
-        if (ClipboardValueSettingsHandler.leftClickToPaste(minecraft.level, minecraft.player, minecraft.player.getMainHandItem(), direction, pos)) {
+        if (ClipboardValueSettingsHandler.leftClickToPaste(
+            minecraft.level,
+            minecraft.player,
+            minecraft.player.getMainHandItem(),
+            direction,
+            pos
+        )) {
             return false;
         }
         return original.call(instance, pos);
@@ -138,7 +154,13 @@ public class MultiPlayerGameModeMixin {
         Operation<Boolean> original,
         @Local(argsOnly = true) Direction direction
     ) {
-        if (ClipboardValueSettingsHandler.leftClickToPaste(minecraft.level, minecraft.player, minecraft.player.getMainHandItem(), direction, pos)) {
+        if (ClipboardValueSettingsHandler.leftClickToPaste(
+            minecraft.level,
+            minecraft.player,
+            minecraft.player.getMainHandItem(),
+            direction,
+            pos
+        )) {
             return false;
         }
         return original.call(instance, pos);
@@ -151,7 +173,13 @@ public class MultiPlayerGameModeMixin {
         Operation<Boolean> original,
         @Local(argsOnly = true) Direction direction
     ) {
-        if (ClipboardValueSettingsHandler.leftClickToPaste(minecraft.level, minecraft.player, minecraft.player.getMainHandItem(), direction, pos)) {
+        if (ClipboardValueSettingsHandler.leftClickToPaste(
+            minecraft.level,
+            minecraft.player,
+            minecraft.player.getMainHandItem(),
+            direction,
+            pos
+        )) {
             return false;
         }
         return original.call(instance, pos);
@@ -164,7 +192,13 @@ public class MultiPlayerGameModeMixin {
         Operation<Boolean> original,
         @Local(argsOnly = true) Direction direction
     ) {
-        if (ClipboardValueSettingsHandler.leftClickToPaste(minecraft.level, minecraft.player, minecraft.player.getMainHandItem(), direction, pos)) {
+        if (ClipboardValueSettingsHandler.leftClickToPaste(
+            minecraft.level,
+            minecraft.player,
+            minecraft.player.getMainHandItem(),
+            direction,
+            pos
+        )) {
             return false;
         }
         return original.call(instance, pos);
@@ -186,7 +220,10 @@ public class MultiPlayerGameModeMixin {
                 stack
             ) || ExtendoGripItem.shouldInteraction(player, hand, stack));
         }
-        return FunnelItem.funnelItemAlwaysPlacesWhenUsed(stack) || ClickToLinkBlockItem.linkableItemAlwaysPlacesWhenUsed(minecraft.level, pos, stack);
+        return FunnelItem.funnelItemAlwaysPlacesWhenUsed(stack) || ClickToLinkBlockItem.linkableItemAlwaysPlacesWhenUsed(minecraft.level,
+            pos,
+            stack
+        );
     }
 
     @WrapOperation(method = "interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
@@ -218,14 +255,23 @@ public class MultiPlayerGameModeMixin {
         @Local BlockState state,
         @Local Block block
     ) {
-        if (block instanceof BreakControlBlock controlBlock && !controlBlock.onDestroyedByPlayer(state, world, pos, minecraft.player)) {
+        if (block instanceof BreakControlBlock controlBlock && !controlBlock.onDestroyedByPlayer(
+            state,
+            world,
+            pos,
+            minecraft.player
+        )) {
             return false;
         }
         return original.call(world, pos, newState, flags);
     }
 
     @WrapOperation(method = "continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getSoundType()Lnet/minecraft/world/level/block/SoundType;"))
-    private SoundType getHitSound(BlockState state, Operation<SoundType> original, @Local(argsOnly = true) BlockPos pos) {
+    private SoundType getHitSound(
+        BlockState state,
+        Operation<SoundType> original,
+        @Local(argsOnly = true) BlockPos pos
+    ) {
         if (state.getBlock() instanceof SoundControlBlock block) {
             return block.getSoundGroup(minecraft.level, pos);
         }

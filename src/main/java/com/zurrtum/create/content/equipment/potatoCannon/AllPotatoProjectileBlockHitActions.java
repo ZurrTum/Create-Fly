@@ -26,12 +26,17 @@ public class AllPotatoProjectileBlockHitActions {
     }
 
     private static void register(String name, MapCodec<? extends PotatoProjectileBlockHitAction> codec) {
-        Registry.register(CreateRegistries.POTATO_PROJECTILE_BLOCK_HIT_ACTION, Identifier.fromNamespaceAndPath(MOD_ID, name), codec);
+        Registry.register(
+            CreateRegistries.POTATO_PROJECTILE_BLOCK_HIT_ACTION,
+            Identifier.fromNamespaceAndPath(MOD_ID, name),
+            codec
+        );
     }
 
     public record PlantCrop(Holder<Block> cropBlock) implements PotatoProjectileBlockHitAction {
-        public static final MapCodec<PlantCrop> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(BuiltInRegistries.BLOCK.holderByNameCodec()
-            .fieldOf("block").forGetter(PlantCrop::cropBlock)).apply(instance, PlantCrop::new));
+        public static final MapCodec<PlantCrop> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                BuiltInRegistries.BLOCK.holderByNameCodec().fieldOf("block").forGetter(PlantCrop::cropBlock))
+            .apply(instance, PlantCrop::new));
 
         @SuppressWarnings("deprecation")
         public PlantCrop(Block cropBlock) {
@@ -40,18 +45,22 @@ public class AllPotatoProjectileBlockHitActions {
 
         @Override
         public boolean execute(LevelAccessor level, ItemStack projectile, BlockHitResult ray) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return true;
+            }
 
             BlockPos hitPos = ray.getBlockPos();
-            if (level instanceof Level l && !l.isLoaded(hitPos))
+            if (level instanceof Level l && !l.isLoaded(hitPos)) {
                 return true;
+            }
             Direction face = ray.getDirection();
-            if (face != Direction.UP)
+            if (face != Direction.UP) {
                 return false;
+            }
             BlockPos placePos = hitPos.relative(face);
-            if (!level.getBlockState(placePos).canBeReplaced())
+            if (!level.getBlockState(placePos).canBeReplaced()) {
                 return false;
+            }
             //TODO
             //            if (!(cropBlock.value() instanceof SpecialPlantable specialPlantable))
             //                return false;
@@ -67,8 +76,9 @@ public class AllPotatoProjectileBlockHitActions {
     }
 
     public record PlaceBlockOnGround(Holder<Block> block) implements PotatoProjectileBlockHitAction {
-        public static final MapCodec<PlaceBlockOnGround> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(BuiltInRegistries.BLOCK.holderByNameCodec()
-            .fieldOf("block").forGetter(PlaceBlockOnGround::block)).apply(instance, PlaceBlockOnGround::new));
+        public static final MapCodec<PlaceBlockOnGround> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                BuiltInRegistries.BLOCK.holderByNameCodec().fieldOf("block").forGetter(PlaceBlockOnGround::block))
+            .apply(instance, PlaceBlockOnGround::new));
 
         @SuppressWarnings("deprecation")
         public PlaceBlockOnGround(Block block) {
@@ -77,25 +87,30 @@ public class AllPotatoProjectileBlockHitActions {
 
         @Override
         public boolean execute(LevelAccessor levelAccessor, ItemStack projectile, BlockHitResult ray) {
-            if (levelAccessor.isClientSide())
+            if (levelAccessor.isClientSide()) {
                 return true;
+            }
 
             BlockPos hitPos = ray.getBlockPos();
-            if (levelAccessor instanceof Level l && !l.isLoaded(hitPos))
+            if (levelAccessor instanceof Level l && !l.isLoaded(hitPos)) {
                 return true;
+            }
             Direction face = ray.getDirection();
             BlockPos placePos = hitPos.relative(face);
-            if (!levelAccessor.getBlockState(placePos).canBeReplaced())
+            if (!levelAccessor.getBlockState(placePos).canBeReplaced()) {
                 return false;
+            }
 
             if (face == Direction.UP) {
                 levelAccessor.setBlock(placePos, block.value().defaultBlockState(), Block.UPDATE_ALL);
             } else if (levelAccessor instanceof Level level) {
                 double y = ray.getBlockPos().getY() - 0.5;
-                if (!level.isEmptyBlock(placePos.above()))
+                if (!level.isEmptyBlock(placePos.above())) {
                     y = Math.min(y, placePos.getY());
-                if (!level.isEmptyBlock(placePos.below()))
+                }
+                if (!level.isEmptyBlock(placePos.below())) {
                     y = Math.max(y, placePos.getY());
+                }
 
                 FallingBlockEntity falling = new FallingBlockEntity(
                     level,

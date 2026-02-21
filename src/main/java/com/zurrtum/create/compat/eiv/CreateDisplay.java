@@ -32,7 +32,8 @@ public abstract class CreateDisplay implements IEivServerRecipe {
     }
 
     public static RegistryOps<Tag> getClientOps() {
-        return AllClientHandle.INSTANCE.getPlayer().level().registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        return AllClientHandle.INSTANCE.getPlayer().level().registryAccess()
+            .createSerializationContext(NbtOps.INSTANCE);
     }
 
     public static void addSizedIngredient(List<SizedIngredient> sizedIngredients, List<List<ItemStack>> ingredients) {
@@ -44,7 +45,10 @@ public abstract class CreateDisplay implements IEivServerRecipe {
         }
     }
 
-    public static void addSizedIngredient(Object2IntMap<Ingredient> sizedIngredients, List<List<ItemStack>> ingredients) {
+    public static void addSizedIngredient(
+        Object2IntMap<Ingredient> sizedIngredients,
+        List<List<ItemStack>> ingredients
+    ) {
         MinecraftServer server = ServerRecipeManager.INSTANCE.getServer();
         ContextMap context = new ContextMap.Builder().withParameter(SlotDisplayContext.FUEL_VALUES, server.fuelValues())
             .withParameter(SlotDisplayContext.REGISTRIES, server.registryAccess()).create(SlotDisplayContext.CONTEXT);

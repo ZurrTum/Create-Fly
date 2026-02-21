@@ -60,8 +60,9 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
 
     @Override
     public void update(float pt) {
-        if (blockEntity.getConnections().isEmpty())
+        if (blockEntity.getConnections().isEmpty()) {
             return;
+        }
 
         _delete();
 
@@ -71,13 +72,15 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
     }
 
     private void collectConnections() {
-        blockEntity.getConnections().values().stream().map(this::createInstance).filter(Objects::nonNull).forEach(visuals::add);
+        blockEntity.getConnections().values().stream().map(this::createInstance).filter(Objects::nonNull)
+            .forEach(visuals::add);
     }
 
     @Nullable
     private BezierTrackVisual createInstance(BezierConnection bc) {
-        if (!bc.isPrimary())
+        if (!bc.isPrimary()) {
             return null;
+        }
         return new BezierTrackVisual(bc);
     }
 
@@ -157,9 +160,14 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
 
             TrackModelHolder modelHolder = bc.getMaterial().getModelHolder();
 
-            instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.flatChunk(modelHolder.tie())).createInstances(ties);
-            instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.flatChunk(modelHolder.leftSegment())).createInstances(left);
-            instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.flatChunk(modelHolder.rightSegment())).createInstances(right);
+            instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.flatChunk(modelHolder.tie()))
+                .createInstances(ties);
+            instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.flatChunk(modelHolder.leftSegment()))
+                .createInstances(left);
+            instancerProvider().instancer(
+                InstanceTypes.TRANSFORMED,
+                SpecialModels.flatChunk(modelHolder.rightSegment())
+            ).createInstances(right);
 
             SegmentAngles segment = bc.getBakedSegments(SegmentAngles::new);
             for (int i = 1; i < segment.length; i++) {
@@ -175,25 +183,33 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
         }
 
         void delete() {
-            for (var d : ties)
+            for (var d : ties) {
                 d.delete();
-            for (var d : left)
+            }
+            for (var d : left) {
                 d.delete();
-            for (var d : right)
+            }
+            for (var d : right) {
                 d.delete();
-            if (girder != null)
+            }
+            if (girder != null) {
                 girder.delete();
+            }
         }
 
         public void collectCrumblingInstances(Consumer<Instance> consumer) {
-            for (var d : ties)
+            for (var d : ties) {
                 consumer.accept(d);
-            for (var d : left)
+            }
+            for (var d : left) {
                 consumer.accept(d);
-            for (var d : right)
+            }
+            for (var d : right) {
                 consumer.accept(d);
-            if (girder != null)
+            }
+            if (girder != null) {
                 girder.collectCrumblingInstances(consumer);
+            }
         }
 
         private class GirderVisual {
@@ -226,7 +242,8 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
                         beams.get(first)[modelIndex].setTransform(pose).mul(beamTransform).setChanged();
                         for (boolean top : Iterate.trueAndFalse) {
                             Pose beamCapTransform = segment.beamCaps[i].get(top).get(first);
-                            beamCaps.get(top).get(first)[modelIndex].setTransform(pose).mul(beamCapTransform).setChanged();
+                            beamCaps.get(top).get(first)[modelIndex].setTransform(pose).mul(beamCapTransform)
+                                .setChanged();
                         }
                     }
                 }
@@ -234,23 +251,27 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
 
             void delete() {
                 beams.forEach(arr -> {
-                    for (var d : arr)
+                    for (var d : arr) {
                         d.delete();
+                    }
                 });
                 beamCaps.forEach(c -> c.forEach(arr -> {
-                    for (var d : arr)
+                    for (var d : arr) {
                         d.delete();
+                    }
                 }));
             }
 
             public void collectCrumblingInstances(Consumer<Instance> consumer) {
                 beams.forEach(arr -> {
-                    for (var d : arr)
+                    for (var d : arr) {
                         consumer.accept(d);
+                    }
                 });
                 beamCaps.forEach(c -> c.forEach(arr -> {
-                    for (var d : arr)
+                    for (var d : arr) {
                         consumer.accept(d);
+                    }
                 }));
             }
         }

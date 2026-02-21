@@ -52,18 +52,29 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
     public ArmVisual(VisualizationContext context, ArmBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick, Models.partial(AllPartialModels.ARM_COG));
 
-        base = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ARM_BASE)).createInstance();
-        lowerBody = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ARM_LOWER_BODY)).createInstance();
-        upperBody = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ARM_UPPER_BODY)).createInstance();
+        base = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ARM_BASE))
+            .createInstance();
+        lowerBody = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.ARM_LOWER_BODY)
+        ).createInstance();
+        upperBody = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.ARM_UPPER_BODY)
+        ).createInstance();
         claw = instancerProvider().instancer(
             InstanceTypes.TRANSFORMED,
             Models.partial(blockEntity.goggles ? AllPartialModels.ARM_CLAW_BASE_GOGGLES : AllPartialModels.ARM_CLAW_BASE)
         ).createInstance();
 
-        TransformedInstance clawGrip1 = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ARM_CLAW_GRIP_UPPER))
-            .createInstance();
-        TransformedInstance clawGrip2 = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ARM_CLAW_GRIP_LOWER))
-            .createInstance();
+        TransformedInstance clawGrip1 = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.ARM_CLAW_GRIP_UPPER)
+        ).createInstance();
+        TransformedInstance clawGrip2 = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.ARM_CLAW_GRIP_LOWER)
+        ).createInstance();
 
         clawGrips = Lists.newArrayList(clawGrip1, clawGrip2);
         models = Lists.newArrayList(base, lowerBody, upperBody, claw, clawGrip1, clawGrip2);
@@ -73,8 +84,9 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         msr.translate(getVisualPosition());
         msr.center();
 
-        if (ceiling)
+        if (ceiling) {
             msr.rotateXDegrees(180);
+        }
 
         animate(partialTick);
     }
@@ -96,8 +108,7 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         float upperArmAngleNow = blockEntity.upperArmAngle.getValue(pt);
         float headAngleNow = blockEntity.headAngle.getValue(pt);
 
-        boolean settled = Mth.equal(baseAngle, baseAngleNow) && Mth.equal(lowerArmAngle, lowerArmAngleNow) && Mth.equal(
-            upperArmAngle,
+        boolean settled = Mth.equal(baseAngle, baseAngleNow) && Mth.equal(lowerArmAngle, lowerArmAngleNow) && Mth.equal(upperArmAngle,
             upperArmAngleNow
         ) && Mth.equal(headAngle, headAngleNow);
 
@@ -107,8 +118,9 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         this.headAngle = headAngleNow;
 
         // Need to reset the animation if the arm is dancing. We'd very likely be settled
-        if (!settled || wasDancing)
+        if (!settled || wasDancing) {
             animateArm();
+        }
 
         wasDancing = false;
     }
@@ -145,20 +157,23 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
 
         ArmRenderer.transformHead(msr, headAngle);
 
-        if (ceiling && blockEntity.goggles)
+        if (ceiling && blockEntity.goggles) {
             msr.rotateZDegrees(180);
+        }
 
         claw.setTransform(poseStack).setChanged();
 
-        if (ceiling && blockEntity.goggles)
+        if (ceiling && blockEntity.goggles) {
             msr.rotateZDegrees(180);
+        }
 
         ItemStack item = blockEntity.heldItem;
         boolean hasItem = !item.isEmpty();
         boolean isBlockItem;
         if (hasItem && item.getItem() instanceof BlockItem) {
             Minecraft mc = Minecraft.getInstance();
-            mc.getItemModelResolver().updateForTopItem(itemRenderState, item, ItemDisplayContext.FIXED, mc.level, null, 0);
+            mc.getItemModelResolver()
+                .updateForTopItem(itemRenderState, item, ItemDisplayContext.FIXED, mc.level, null, 0);
             isBlockItem = itemRenderState.usesBlockLight();
         } else {
             isBlockItem = false;

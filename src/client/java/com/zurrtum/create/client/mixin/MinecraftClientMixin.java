@@ -217,11 +217,15 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "startUseItem()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;"), cancellable = true)
     private void doItemUse(CallbackInfo ci, @Local InteractionHand hand) {
         Minecraft mc = (Minecraft) (Object) this;
-        if (hand == InteractionHand.MAIN_HAND && (CurvedTrackInteraction.onClickInput(mc, false) || Create.GLUE_HANDLER.onMouseInput(
+        if (hand == InteractionHand.MAIN_HAND && (CurvedTrackInteraction.onClickInput(
             mc,
             false
-        ) || FactoryPanelConnectionHandler.onRightClick(mc) || ChainConveyorConnectionHandler.onRightClick(mc) || TrainRelocatorClient.onClicked(mc) || ChainConveyorInteractionHandler.onUse(
-            mc) || PackagePortTargetSelectionHandler.onUse(mc) || ChainPackageInteractionHandler.onUse(mc))) {
+        ) || Create.GLUE_HANDLER.onMouseInput(
+            mc,
+            false
+        ) || FactoryPanelConnectionHandler.onRightClick(mc) || ChainConveyorConnectionHandler.onRightClick(mc) || TrainRelocatorClient.onClicked(
+            mc) || ChainConveyorInteractionHandler.onUse(mc) || PackagePortTargetSelectionHandler.onUse(mc) || ChainPackageInteractionHandler.onUse(
+            mc))) {
             player.swing(hand);
             ci.cancel();
         } else if (ContraptionHandlerClient.rightClickingOnContraptionsGetsHandledLocally(mc, hand)) {
@@ -233,9 +237,17 @@ public abstract class MinecraftClientMixin {
     }
 
     @WrapOperation(method = "continueAttack(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"))
-    private boolean handleBlockBreaking(MultiPlayerGameMode instance, BlockPos pos, Direction direction, Operation<Boolean> original) {
+    private boolean handleBlockBreaking(
+        MultiPlayerGameMode instance,
+        BlockPos pos,
+        Direction direction,
+        Operation<Boolean> original
+    ) {
         Minecraft mc = (Minecraft) (Object) this;
-        return CurvedTrackInteraction.onClickInput(mc, true) || Create.GLUE_HANDLER.onMouseInput(mc, true) || original.call(instance, pos, direction);
+        return CurvedTrackInteraction.onClickInput(mc, true) || Create.GLUE_HANDLER.onMouseInput(
+            mc,
+            true
+        ) || original.call(instance, pos, direction);
     }
 
     @Inject(method = "startAttack()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)

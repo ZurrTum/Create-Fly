@@ -37,7 +37,11 @@ public class AutoCompactingDisplay extends CreateDisplay {
         }
         if (recipe instanceof ShapelessRecipe shapelessRecipe) {
             List<Ingredient> ingredients = shapelessRecipe.ingredients;
-            return new AutoCompactingDisplay(shapelessRecipe.result, getItemStacks(ingredients.getFirst()), ingredients.size());
+            return new AutoCompactingDisplay(
+                shapelessRecipe.result,
+                getItemStacks(ingredients.getFirst()),
+                ingredients.size()
+            );
         } else if (recipe instanceof ShapedRecipe shapedRecipe) {
             List<ItemStack> input = null;
             int size = 0;

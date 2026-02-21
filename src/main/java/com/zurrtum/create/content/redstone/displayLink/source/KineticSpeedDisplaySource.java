@@ -3,21 +3,21 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 import com.zurrtum.create.content.kinetics.gauge.SpeedGaugeBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
-
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class KineticSpeedDisplaySource extends NumericSingleLineDisplaySource {
     private final NumberFormat format = NumberFormat.getNumberInstance(Locale.ROOT);
 
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        if (!(context.getSourceBlockEntity() instanceof SpeedGaugeBlockEntity speedGauge))
+        if (!(context.getSourceBlockEntity() instanceof SpeedGaugeBlockEntity speedGauge)) {
             return ZERO.copy();
+        }
 
         boolean absoluteValue = context.sourceConfig().getIntOr("Directional", 0) == 0;
         float speed = absoluteValue ? Math.abs(speedGauge.getSpeed()) : speedGauge.getSpeed();

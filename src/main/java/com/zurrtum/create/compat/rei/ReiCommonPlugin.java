@@ -33,32 +33,72 @@ import java.util.Objects;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class ReiCommonPlugin implements REICommonPlugin {
-    public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_PACKING = CategoryIdentifier.of(MOD_ID, "automatic_packing");
+    public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_PACKING = CategoryIdentifier.of(
+        MOD_ID,
+        "automatic_packing"
+    );
     public static final CategoryIdentifier<CompactingDisplay> PACKING = CategoryIdentifier.of(MOD_ID, "packing");
     public static final CategoryIdentifier<PressingDisplay> PRESSING = CategoryIdentifier.of(MOD_ID, "pressing");
-    public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_SHAPELESS = CategoryIdentifier.of(MOD_ID, "automatic_shapeless");
+    public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_SHAPELESS = CategoryIdentifier.of(
+        MOD_ID,
+        "automatic_shapeless"
+    );
     public static final CategoryIdentifier<MixingDisplay> MIXING = CategoryIdentifier.of(MOD_ID, "mixing");
     public static final CategoryIdentifier<MillingDisplay> MILLING = CategoryIdentifier.of(MOD_ID, "milling");
     public static final CategoryIdentifier<SawingDisplay> SAWING = CategoryIdentifier.of(MOD_ID, "sawing");
     public static final CategoryIdentifier<CrushingDisplay> CRUSHING = CategoryIdentifier.of(MOD_ID, "crushing");
-    public static final CategoryIdentifier<ManualApplicationDisplay> ITEM_APPLICATION = CategoryIdentifier.of(MOD_ID, "item_application");
+    public static final CategoryIdentifier<ManualApplicationDisplay> ITEM_APPLICATION = CategoryIdentifier.of(
+        MOD_ID,
+        "item_application"
+    );
     public static final CategoryIdentifier<DeployingDisplay> DEPLOYING = CategoryIdentifier.of(MOD_ID, "deploying");
     public static final CategoryIdentifier<DrainingDisplay> DRAINING = CategoryIdentifier.of(MOD_ID, "draining");
-    public static final CategoryIdentifier<MechanicalCraftingDisplay> MECHANICAL_CRAFTING = CategoryIdentifier.of(MOD_ID, "mechanical_crafting");
-    public static final CategoryIdentifier<SpoutFillingDisplay> SPOUT_FILLING = CategoryIdentifier.of(MOD_ID, "spout_filling");
-    public static final CategoryIdentifier<SandpaperPolishingDisplay> SANDPAPER_POLISHING = CategoryIdentifier.of(MOD_ID, "sandpaper_polishing");
-    public static final CategoryIdentifier<SequencedAssemblyDisplay> SEQUENCED_ASSEMBLY = CategoryIdentifier.of(MOD_ID, "sequenced_assembly");
-    public static final CategoryIdentifier<BlockCuttingDisplay> BLOCK_CUTTING = CategoryIdentifier.of(MOD_ID, "block_cutting");
-    public static final CategoryIdentifier<FanBlastingDisplay> FAN_BLASTING = CategoryIdentifier.of(MOD_ID, "fan_blasting");
-    public static final CategoryIdentifier<FanHauntingDisplay> FAN_HAUNTING = CategoryIdentifier.of(MOD_ID, "fan_haunting");
-    public static final CategoryIdentifier<FanSmokingDisplay> FAN_SMOKING = CategoryIdentifier.of(MOD_ID, "fan_smoking");
-    public static final CategoryIdentifier<FanWashingDisplay> FAN_WASHING = CategoryIdentifier.of(MOD_ID, "fan_washing");
-    public static final CategoryIdentifier<PotionDisplay> AUTOMATIC_BREWING = CategoryIdentifier.of(MOD_ID, "automatic_brewing");
+    public static final CategoryIdentifier<MechanicalCraftingDisplay> MECHANICAL_CRAFTING = CategoryIdentifier.of(
+        MOD_ID,
+        "mechanical_crafting"
+    );
+    public static final CategoryIdentifier<SpoutFillingDisplay> SPOUT_FILLING = CategoryIdentifier.of(
+        MOD_ID,
+        "spout_filling"
+    );
+    public static final CategoryIdentifier<SandpaperPolishingDisplay> SANDPAPER_POLISHING = CategoryIdentifier.of(
+        MOD_ID,
+        "sandpaper_polishing"
+    );
+    public static final CategoryIdentifier<SequencedAssemblyDisplay> SEQUENCED_ASSEMBLY = CategoryIdentifier.of(
+        MOD_ID,
+        "sequenced_assembly"
+    );
+    public static final CategoryIdentifier<BlockCuttingDisplay> BLOCK_CUTTING = CategoryIdentifier.of(
+        MOD_ID,
+        "block_cutting"
+    );
+    public static final CategoryIdentifier<FanBlastingDisplay> FAN_BLASTING = CategoryIdentifier.of(
+        MOD_ID,
+        "fan_blasting"
+    );
+    public static final CategoryIdentifier<FanHauntingDisplay> FAN_HAUNTING = CategoryIdentifier.of(
+        MOD_ID,
+        "fan_haunting"
+    );
+    public static final CategoryIdentifier<FanSmokingDisplay> FAN_SMOKING = CategoryIdentifier.of(
+        MOD_ID,
+        "fan_smoking"
+    );
+    public static final CategoryIdentifier<FanWashingDisplay> FAN_WASHING = CategoryIdentifier.of(
+        MOD_ID,
+        "fan_washing"
+    );
+    public static final CategoryIdentifier<PotionDisplay> AUTOMATIC_BREWING = CategoryIdentifier.of(
+        MOD_ID,
+        "automatic_brewing"
+    );
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
         registry.beginRecipeFiller(CraftingRecipe.class).fill(AutoCompactingDisplay::of);
-        registry.beginRecipeFiller(CompactingRecipe.class).filterType(AllRecipeTypes.COMPACTING).fill(CompactingDisplay::new);
+        registry.beginRecipeFiller(CompactingRecipe.class).filterType(AllRecipeTypes.COMPACTING)
+            .fill(CompactingDisplay::new);
         registry.beginRecipeFiller(PressingRecipe.class).filterType(AllRecipeTypes.PRESSING).fill(PressingDisplay::new);
         registry.beginRecipeFiller(ShapelessRecipe.class).fill(AutoMixingDisplay::of);
         registry.beginRecipeFiller(MixingRecipe.class).fill(MixingDisplay::new);
@@ -87,17 +127,32 @@ public class ReiCommonPlugin implements REICommonPlugin {
 
     @Override
     public void registerDisplaySerializer(DisplaySerializerRegistry registry) {
-        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffix("/default/shapeless"), AutoCompactingDisplay.ShapelessDisplay.SERIALIZER);
-        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffix("/default/shaped"), AutoCompactingDisplay.ShapedDisplay.SERIALIZER);
-        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffix("/client/shaped"), AutoCompactingDisplay.CraftingDisplayShaped.SERIALIZER);
+        registry.register(
+            AUTOMATIC_PACKING.getIdentifier().withSuffix("/default/shapeless"),
+            AutoCompactingDisplay.ShapelessDisplay.SERIALIZER
+        );
+        registry.register(
+            AUTOMATIC_PACKING.getIdentifier().withSuffix("/default/shaped"),
+            AutoCompactingDisplay.ShapedDisplay.SERIALIZER
+        );
+        registry.register(
+            AUTOMATIC_PACKING.getIdentifier().withSuffix("/client/shaped"),
+            AutoCompactingDisplay.CraftingDisplayShaped.SERIALIZER
+        );
         registry.register(
             AUTOMATIC_PACKING.getIdentifier().withSuffix("/client/shapeless"),
             AutoCompactingDisplay.CraftingDisplayShapeless.SERIALIZER
         );
         registry.register(PACKING.getIdentifier(), CompactingDisplay.SERIALIZER);
         registry.register(PRESSING.getIdentifier(), PressingDisplay.SERIALIZER);
-        registry.register(AUTOMATIC_SHAPELESS.getIdentifier().withSuffix("/default/shapeless"), AutoMixingDisplay.ShapelessDisplay.SERIALIZER);
-        registry.register(AUTOMATIC_SHAPELESS.getIdentifier().withSuffix("/client/shapeless"), AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER);
+        registry.register(
+            AUTOMATIC_SHAPELESS.getIdentifier().withSuffix("/default/shapeless"),
+            AutoMixingDisplay.ShapelessDisplay.SERIALIZER
+        );
+        registry.register(
+            AUTOMATIC_SHAPELESS.getIdentifier().withSuffix("/client/shapeless"),
+            AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER
+        );
         registry.register(MIXING.getIdentifier(), MixingDisplay.SERIALIZER);
         registry.register(MILLING.getIdentifier(), MillingDisplay.SERIALIZER);
         registry.register(SAWING.getIdentifier(), SawingDisplay.SERIALIZER);

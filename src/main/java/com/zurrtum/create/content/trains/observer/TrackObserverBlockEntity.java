@@ -42,26 +42,31 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     }
 
     private void onFilterChanged(ItemStack newFilter) {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         TrackObserver observer = getObserver();
-        if (observer != null)
+        if (observer != null) {
             observer.setFilterAndNotify(level, newFilter);
+        }
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         boolean shouldBePowered = false;
         TrackObserver observer = getObserver();
-        if (observer != null)
+        if (observer != null) {
             shouldBePowered = observer.isActivated();
-        if (isBlockPowered() == shouldBePowered)
+        }
+        if (isBlockPowered() == shouldBePowered) {
             return;
+        }
 
         if (observer != null) {
             AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
@@ -71,8 +76,13 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
         }
 
         BlockState blockState = getBlockState();
-        if (blockState.hasProperty(TrackObserverBlock.POWERED))
-            level.setBlock(worldPosition, blockState.setValue(TrackObserverBlock.POWERED, shouldBePowered), Block.UPDATE_ALL);
+        if (blockState.hasProperty(TrackObserverBlock.POWERED)) {
+            level.setBlock(
+                worldPosition,
+                blockState.setValue(TrackObserverBlock.POWERED, shouldBePowered),
+                Block.UPDATE_ALL
+            );
+        }
         DisplayLinkBlock.notifyGatherers(level, worldPosition);
     }
 
@@ -91,7 +101,10 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
 
     @Override
     protected AABB createRenderBoundingBox() {
-        return new AABB(Vec3.atLowerCornerOf(worldPosition), Vec3.atLowerCornerOf(edgePoint.getGlobalPosition())).inflate(2);
+        return new AABB(
+            Vec3.atLowerCornerOf(worldPosition),
+            Vec3.atLowerCornerOf(edgePoint.getGlobalPosition())
+        ).inflate(2);
     }
 
     @Override

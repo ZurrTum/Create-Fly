@@ -47,8 +47,8 @@ public class RedstoneRequesterPeripheral extends SyncedPeripheral<RedstoneReques
 
         PackageOrder order = new PackageOrder(orderStacks);
         PackageOrderWithCrafts.CraftingEntry orderContext = new PackageOrderWithCrafts.CraftingEntry(
-            new PackageOrder(orderStacks.stream()
-                .map(stack -> new BigItemStack(stack.stack.copyWithCount(1))).toList()), count
+            new PackageOrder(
+            orderStacks.stream().map(stack -> new BigItemStack(stack.stack.copyWithCount(1))).toList()), count
         );
 
         this.blockEntity.encodedRequest = new PackageOrderWithCrafts(order, List.of(orderContext));
@@ -63,7 +63,10 @@ public class RedstoneRequesterPeripheral extends SyncedPeripheral<RedstoneReques
         RegistryAccess registryAccess = blockEntity.getLevel().registryAccess();
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack stack = stacks.get(i).stack;
-            Map<String, Object> details = new HashMap<>(VanillaDetailRegistries.ITEM_STACK.getDetails(registryAccess, stack));
+            Map<String, Object> details = new HashMap<>(VanillaDetailRegistries.ITEM_STACK.getDetails(
+                registryAccess,
+                stack
+            ));
             if (!details.get("name").equals("minecraft:air")) {
                 details.put("count", stacks.get(i).count);
                 result.put(i + 1, details); // +1 because lua
@@ -74,10 +77,11 @@ public class RedstoneRequesterPeripheral extends SyncedPeripheral<RedstoneReques
 
     @LuaFunction(mainThread = true)
     public final String getConfiguration() throws LuaException {
-        if (blockEntity.allowPartialRequests)
+        if (blockEntity.allowPartialRequests) {
             return "allow_partial";
-        else
+        } else {
             return "strict";
+        }
     }
 
     @LuaFunction(mainThread = true)
@@ -133,8 +137,9 @@ public class RedstoneRequesterPeripheral extends SyncedPeripheral<RedstoneReques
                     if (itemData.get("count") instanceof Number) {
                         Object countObj = itemData.get("count");
                         count = (countObj instanceof Number) ? ((Number) countObj).intValue() : 1;
-                        if (count > 256)
+                        if (count > 256) {
                             throw new LuaException("Count for item " + itemName + " exceeds 256");
+                        }
                     }
                     Identifier resourceLocation = Identifier.tryParse(itemName);
                     ItemLike item = BuiltInRegistries.ITEM.getValue(resourceLocation);

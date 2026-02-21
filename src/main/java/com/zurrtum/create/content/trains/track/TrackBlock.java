@@ -73,7 +73,8 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
     public TrackBlock(Properties p_49795_, TrackMaterial material) {
         super(p_49795_);
-        registerDefaultState(defaultBlockState().setValue(SHAPE, TrackShape.ZO).setValue(HAS_BE, false).setValue(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(SHAPE, TrackShape.ZO).setValue(HAS_BE, false)
+            .setValue(WATERLOGGED, false));
         this.material = material;
     }
 
@@ -101,43 +102,54 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         BlockState stateForPlacement = withWater(super.getStateForPlacement(ctx), ctx);
 
-        if (ctx.getPlayer() == null)
+        if (ctx.getPlayer() == null) {
             return stateForPlacement;
+        }
 
         Vec3 lookAngle = ctx.getPlayer().getLookAngle();
         lookAngle = lookAngle.multiply(1, 0, 1);
-        if (Mth.equal(lookAngle.length(), 0))
+        if (Mth.equal(lookAngle.length(), 0)) {
             lookAngle = VecHelper.rotate(new Vec3(0, 0, 1), -ctx.getPlayer().getYRot(), Axis.Y);
+        }
 
         lookAngle = lookAngle.normalize();
 
         TrackShape best = TrackShape.ZO;
         double bestValue = Float.MAX_VALUE;
         for (TrackShape shape : TrackShape.values()) {
-            if (shape.isJunction() || shape.isPortal())
+            if (shape.isJunction() || shape.isPortal()) {
                 continue;
+            }
             Vec3 axis = shape.getAxes().getFirst();
-            double distance = Math.min(axis.distanceToSqr(lookAngle), axis.normalize().scale(-1).distanceToSqr(lookAngle));
-            if (distance > bestValue)
+            double distance = Math.min(
+                axis.distanceToSqr(lookAngle),
+                axis.normalize().scale(-1).distanceToSqr(lookAngle)
+            );
+            if (distance > bestValue) {
                 continue;
+            }
             bestValue = distance;
             best = shape;
         }
 
         Level level = ctx.getLevel();
         Vec3 bestAxis = best.getAxes().getFirst();
-        if (bestAxis.lengthSqr() == 1)
+        if (bestAxis.lengthSqr() == 1) {
             for (boolean neg : Iterate.trueAndFalse) {
                 BlockPos offset = ctx.getClickedPos().offset(BlockPos.containing(bestAxis.scale(neg ? -1 : 1)));
 
-                if (level.getBlockState(offset).isFaceSturdy(level, offset, Direction.UP) && !level.getBlockState(offset.above())
+                if (level.getBlockState(offset)
+                    .isFaceSturdy(level, offset, Direction.UP) && !level.getBlockState(offset.above())
                     .isFaceSturdy(level, offset, Direction.DOWN)) {
-                    if (best == TrackShape.XO)
+                    if (best == TrackShape.XO) {
                         best = neg ? TrackShape.AW : TrackShape.AE;
-                    if (best == TrackShape.ZO)
+                    }
+                    if (best == TrackShape.ZO) {
                         best = neg ? TrackShape.AN : TrackShape.AS;
+                    }
                 }
             }
+        }
 
         return stateForPlacement.setValue(SHAPE, best);
     }
@@ -145,10 +157,12 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     @Override
     public BlockState playerWillDestroy(Level pLevel, BlockPos pPos, BlockState pState, Player pPlayer) {
         super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
-        if (pLevel.isClientSide())
+        if (pLevel.isClientSide()) {
             return pState;
-        if (!pPlayer.isCreative())
+        }
+        if (!pPlayer.isCreative()) {
             return pState;
+        }
         withBlockEntityDo(
             pLevel, pPos, be -> {
                 be.cancelDrops = true;
@@ -171,8 +185,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
             return;
         }
         LevelTickAccess<Block> blockTicks = pLevel.getBlockTicks();
-        if (!blockTicks.hasScheduledTick(pPos, this))
+        if (!blockTicks.hasScheduledTick(pPos, this)) {
             pLevel.scheduleTick(pPos, this, 1);
+        }
         updateGirders(pState, pLevel, pPos, blockTicks);
     }
 
@@ -186,15 +201,17 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource p_60465_) {
         TrackPropagator.onRailAdded(level, pos, state);
         withBlockEntityDo(level, pos, tbe -> tbe.tilt.undoSmoothing());
-        if (!state.getValue(SHAPE).isPortal())
+        if (!state.getValue(SHAPE).isPortal()) {
             connectToPortal(level, pos, state);
+        }
     }
 
     protected void connectToPortal(ServerLevel level, BlockPos pos, BlockState state) {
         TrackShape shape = state.getValue(TrackBlock.SHAPE);
         Axis portalTest = shape == TrackShape.XO ? Axis.X : shape == TrackShape.ZO ? Axis.Z : null;
-        if (portalTest == null)
+        if (portalTest == null) {
             return;
+        }
 
         boolean pop = false;
         String fail = null;
@@ -203,8 +220,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
         for (Direction d : Iterate.directionsInAxis(portalTest)) {
             BlockPos portalPos = pos.relative(d);
             BlockState portalState = level.getBlockState(portalPos);
-            if (!PortalTrackProvider.isSupportedPortal(portalState))
+            if (!PortalTrackProvider.isSupportedPortal(portalState)) {
                 continue;
+            }
 
             pop = true;
             PortalTrackProvider.Exit otherSide = PortalTrackProvider.getOtherSide(level, new BlockFace(pos, d));
@@ -225,8 +243,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
             level.setBlock(pos, state.setValue(SHAPE, TrackShape.asPortal(d)).setValue(HAS_BE, true), Block.UPDATE_ALL);
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof TrackBlockEntity tbe)
+            if (be instanceof TrackBlockEntity tbe) {
                 tbe.bind(otherLevel.dimension(), otherTrackPos);
+            }
 
             BlockState otherState = ProperWaterloggedBlock.withWater(
                 otherLevel,
@@ -235,31 +254,38 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
             );
             otherLevel.setBlock(otherTrackPos, otherState, Block.UPDATE_ALL);
             BlockEntity otherBE = otherLevel.getBlockEntity(otherTrackPos);
-            if (otherBE instanceof TrackBlockEntity tbe)
+            if (otherBE instanceof TrackBlockEntity tbe) {
                 tbe.bind(level.dimension(), pos);
+            }
 
             pop = false;
         }
 
-        if (!pop)
+        if (!pop) {
             return;
+        }
 
         level.destroyBlock(pos, true);
 
-        if (fail == null)
+        if (fail == null) {
             return;
+        }
         Player player = level.getNearestPlayer(pos.getX(), pos.getY(), pos.getZ(), 10, Predicates.alwaysTrue());
-        if (player == null)
+        if (player == null) {
             return;
+        }
         player.displayClientMessage(
-            Component.literal("<!> ").append(Component.translatable("create.portal_track.failed")).withStyle(ChatFormatting.GOLD), false);
+            Component.literal("<!> ")
+                .append(Component.translatable("create.portal_track.failed")).withStyle(ChatFormatting.GOLD), false
+        );
         MutableComponent component = failPos != null ? Component.translatable(
             "create.portal_track." + fail,
             failPos.getX(),
             failPos.getY(),
             failPos.getZ()
         ) : Component.translatable("create.portal_track." + fail);
-        player.displayClientMessage(Component.literal(" - ").withStyle(ChatFormatting.GRAY).append(component.withColor(0xFFD3B4)), false);
+        player.displayClientMessage(
+            Component.literal(" - ").withStyle(ChatFormatting.GRAY).append(component.withColor(0xFFD3B4)), false);
     }
 
     @Override
@@ -275,19 +301,23 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     ) {
         updateWater(level, tickView, state, pCurrentPos);
         TrackShape shape = state.getValue(SHAPE);
-        if (!shape.isPortal())
+        if (!shape.isPortal()) {
             return state;
+        }
 
         for (Direction d : Iterate.horizontalDirections) {
-            if (TrackShape.asPortal(d) != state.getValue(SHAPE))
+            if (TrackShape.asPortal(d) != state.getValue(SHAPE)) {
                 continue;
-            if (pDirection != d)
+            }
+            if (pDirection != d) {
                 continue;
+            }
 
             BlockPos portalPos = pCurrentPos.relative(d);
             BlockState portalState = level.getBlockState(portalPos);
-            if (!PortalTrackProvider.isSupportedPortal(portalState))
+            if (!PortalTrackProvider.isSupportedPortal(portalState)) {
                 return Blocks.AIR.defaultBlockState();
+            }
         }
 
         return state;
@@ -307,14 +337,15 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
         TrackNodeLocation connectedTo
     ) {
         Collection<DiscoveredLocation> list;
-        BlockGetter world = connectedTo != null && worldIn instanceof ServerLevel sl ? sl.getServer().getLevel(connectedTo.dimension) : worldIn;
+        BlockGetter world = connectedTo != null && worldIn instanceof ServerLevel sl ? sl.getServer()
+            .getLevel(connectedTo.dimension) : worldIn;
 
         if (getTrackAxes(world, pos, state).size() > 1) {
             Vec3 center = Vec3.atBottomCenterOf(pos).add(0, getElevationAtCenter(world, pos, state), 0);
             TrackShape shape = state.getValue(TrackBlock.SHAPE);
             list = new ArrayList<>();
-            for (Vec3 axis : getTrackAxes(world, pos, state))
-                for (boolean fromCenter : Iterate.trueAndFalse)
+            for (Vec3 axis : getTrackAxes(world, pos, state)) {
+                for (boolean fromCenter : Iterate.trueAndFalse) {
                     ITrackBlock.addToListIfConnected(
                         connectedTo,
                         list,
@@ -326,17 +357,23 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
                         null,
                         (b, v) -> ITrackBlock.getMaterialSimple(world, v)
                     );
-        } else
+                }
+            }
+        } else {
             list = ITrackBlock.super.getConnected(world, pos, state, linear, connectedTo);
+        }
 
-        if (!state.getValue(HAS_BE))
+        if (!state.getValue(HAS_BE)) {
             return list;
-        if (linear)
+        }
+        if (linear) {
             return list;
+        }
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (!(blockEntity instanceof TrackBlockEntity trackBE))
+        if (!(blockEntity instanceof TrackBlockEntity trackBE)) {
             return list;
+        }
 
         Map<BlockPos, BezierConnection> connections = trackBE.getConnections();
         connections.forEach((connectedPos, bc) -> ITrackBlock.addToListIfConnected(
@@ -351,20 +388,24 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
             (b, v) -> ITrackBlock.getMaterialSimple(world, v, bc.getMaterial())
         ));
 
-        if (trackBE.boundLocation == null || !(world instanceof ServerLevel level))
+        if (trackBE.boundLocation == null || !(world instanceof ServerLevel level)) {
             return list;
+        }
 
         ResourceKey<Level> otherDim = trackBE.boundLocation.getFirst();
         ServerLevel otherLevel = level.getServer().getLevel(otherDim);
-        if (otherLevel == null)
+        if (otherLevel == null) {
             return list;
+        }
         BlockPos boundPos = trackBE.boundLocation.getSecond();
         BlockState boundState = otherLevel.getBlockState(boundPos);
-        if (!boundState.is(AllBlockTags.TRACKS))
+        if (!boundState.is(AllBlockTags.TRACKS)) {
             return list;
+        }
 
         Vec3 center = Vec3.atBottomCenterOf(pos).add(0, getElevationAtCenter(world, pos, state), 0);
-        Vec3 boundCenter = Vec3.atBottomCenterOf(boundPos).add(0, getElevationAtCenter(otherLevel, boundPos, boundState), 0);
+        Vec3 boundCenter = Vec3.atBottomCenterOf(boundPos)
+            .add(0, getElevationAtCenter(otherLevel, boundPos, boundState), 0);
         TrackShape shape = state.getValue(TrackBlock.SHAPE);
         TrackShape boundShape = boundState.getValue(TrackBlock.SHAPE);
         Vec3 boundAxis = getTrackAxes(otherLevel, boundPos, boundState).getFirst();
@@ -399,8 +440,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     @Override
     public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
         TrackPropagator.onRailRemoved(pLevel, pPos, pState);
-        if (!pLevel.isClientSide())
+        if (!pLevel.isClientSide()) {
             updateGirders(pState, pLevel, pPos, pLevel.getBlockTicks());
+        }
     }
 
     @Override
@@ -413,14 +455,18 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         for (Map.Entry<BlockPos, BoundingBox> entry : StationBlockEntity.assemblyAreas.get(level).entrySet()) {
-            if (!entry.getValue().isInside(pos))
+            if (!entry.getValue().isInside(pos)) {
                 continue;
-            if (level.getBlockEntity(entry.getKey()) instanceof StationBlockEntity station)
-                if (station.trackClicked(player, hand, this, state, pos))
+            }
+            if (level.getBlockEntity(entry.getKey()) instanceof StationBlockEntity station) {
+                if (station.trackClicked(player, hand, this, state, pos)) {
                     return InteractionResult.SUCCESS;
+                }
+            }
         }
 
         return InteractionResult.TRY_WITH_EMPTY_HAND;
@@ -428,13 +474,18 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
     private void updateGirders(BlockState pState, Level pLevel, BlockPos pPos, LevelTickAccess<Block> blockTicks) {
         for (Vec3 vec3 : getTrackAxes(pLevel, pPos, pState)) {
-            if (vec3.length() > 1 || vec3.y != 0)
+            if (vec3.length() > 1 || vec3.y != 0) {
                 continue;
+            }
             for (int side : Iterate.positiveAndNegative) {
                 BlockPos girderPos = pPos.below().offset(BlockPos.containing(vec3.z * side, 0, vec3.x * side));
                 BlockState girderState = pLevel.getBlockState(girderPos);
-                if (girderState.getBlock() instanceof GirderBlock girderBlock && !blockTicks.hasScheduledTick(girderPos, girderBlock))
+                if (girderState.getBlock() instanceof GirderBlock girderBlock && !blockTicks.hasScheduledTick(
+                    girderPos,
+                    girderBlock
+                )) {
                     pLevel.scheduleTick(girderPos, girderBlock, 1);
+                }
             }
         }
     }
@@ -479,7 +530,12 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+    public VoxelShape getCollisionShape(
+        BlockState pState,
+        BlockGetter pLevel,
+        BlockPos pPos,
+        CollisionContext pContext
+    ) {
         return switch (pState.getValue(SHAPE)) {
             case AE, AW, AN, AS -> Shapes.empty();
             default -> AllShapes.TRACK_COLLISION;
@@ -488,8 +544,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
     @Override
     public BlockEntity newBlockEntity(BlockPos p_153215_, BlockState state) {
-        if (!state.getValue(HAS_BE))
+        if (!state.getValue(HAS_BE)) {
             return null;
+        }
         return AllBlockEntityTypes.TRACK.create(p_153215_, state);
     }
 
@@ -541,8 +598,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
     @Override
     public BlockState overlay(BlockGetter world, BlockPos pos, BlockState existing, BlockState placed) {
-        if (placed.getBlock() != this)
+        if (placed.getBlock() != this) {
             return existing;
+        }
 
         TrackShape existingShape = existing.getValue(SHAPE);
         TrackShape placedShape = placed.getValue(SHAPE);
@@ -551,22 +609,29 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
         for (boolean flip : Iterate.trueAndFalse) {
             TrackShape s1 = flip ? existingShape : placedShape;
             TrackShape s2 = flip ? placedShape : existingShape;
-            if (s1 == TrackShape.XO && s2 == TrackShape.ZO)
+            if (s1 == TrackShape.XO && s2 == TrackShape.ZO) {
                 combinedShape = TrackShape.CR_O;
-            if (s1 == TrackShape.PD && s2 == TrackShape.ND)
+            }
+            if (s1 == TrackShape.PD && s2 == TrackShape.ND) {
                 combinedShape = TrackShape.CR_D;
-            if (s1 == TrackShape.XO && s2 == TrackShape.PD)
+            }
+            if (s1 == TrackShape.XO && s2 == TrackShape.PD) {
                 combinedShape = TrackShape.CR_PDX;
-            if (s1 == TrackShape.ZO && s2 == TrackShape.PD)
+            }
+            if (s1 == TrackShape.ZO && s2 == TrackShape.PD) {
                 combinedShape = TrackShape.CR_PDZ;
-            if (s1 == TrackShape.XO && s2 == TrackShape.ND)
+            }
+            if (s1 == TrackShape.XO && s2 == TrackShape.ND) {
                 combinedShape = TrackShape.CR_NDX;
-            if (s1 == TrackShape.ZO && s2 == TrackShape.ND)
+            }
+            if (s1 == TrackShape.ZO && s2 == TrackShape.ND) {
                 combinedShape = TrackShape.CR_NDZ;
+            }
         }
 
-        if (combinedShape != null)
+        if (combinedShape != null) {
             existing = existing.setValue(SHAPE, combinedShape);
+        }
         return existing;
     }
 
@@ -588,7 +653,10 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
     @Override
     public boolean trackEquals(BlockState state1, BlockState state2) {
-        return state1.getBlock() == this && state2.getBlock() == this && state1.setValue(HAS_BE, false) == state2.setValue(HAS_BE, false);
+        return state1.getBlock() == this && state2.getBlock() == this && state1.setValue(
+            HAS_BE,
+            false
+        ) == state2.setValue(HAS_BE, false);
     }
 
     @Override
@@ -599,8 +667,9 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
         if (be instanceof TrackBlockEntity track) {
             for (BezierConnection bezierConnection : track.getConnections().values()) {
-                if (!bezierConnection.isPrimary())
+                if (!bezierConnection.isPrimary()) {
                     continue;
+                }
                 TrackMaterial material = bezierConnection.getMaterial();
                 if (material == getMaterial()) {
                     sameTypeTrackAmount += bezierConnection.getTrackItemCost();

@@ -17,9 +17,16 @@ public class PackagePortItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, Player player, ItemStack p_195943_4_, BlockState p_195943_5_) {
-        if (!world.isClientSide() && player instanceof ServerPlayer sp)
+    protected boolean updateCustomBlockEntityTag(
+        BlockPos pos,
+        Level world,
+        Player player,
+        ItemStack p_195943_4_,
+        BlockState p_195943_5_
+    ) {
+        if (!world.isClientSide() && player instanceof ServerPlayer sp) {
             sp.connection.send(new PackagePortPlacementRequestPacket(pos));
+        }
         return super.updateCustomBlockEntityTag(pos, world, player, p_195943_4_, p_195943_5_);
     }
 

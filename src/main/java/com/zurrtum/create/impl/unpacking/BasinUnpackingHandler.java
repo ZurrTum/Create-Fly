@@ -4,16 +4,15 @@ import com.zurrtum.create.AllUnpackingHandlers;
 import com.zurrtum.create.api.packager.unpacking.UnpackingHandler;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BasinUnpackingHandler implements UnpackingHandler {
     @Override
@@ -27,8 +26,9 @@ public class BasinUnpackingHandler implements UnpackingHandler {
         boolean simulate
     ) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof BasinBlockEntity basin))
+        if (!(be instanceof BasinBlockEntity basin)) {
             return false;
+        }
 
         basin.itemCapability.disableCheck();
 

@@ -1,11 +1,11 @@
 package com.zurrtum.create;
 
-import static com.zurrtum.create.Create.MOD_ID;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
+
+import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllFluidTags {
     public static final TagKey<Fluid> BOTTOMLESS_ALLOW = register("bottomless/allow");

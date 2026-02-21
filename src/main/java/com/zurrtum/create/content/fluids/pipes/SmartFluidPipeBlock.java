@@ -59,8 +59,9 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
         BlockPos pos = ctx.getClickedPos();
         Level world = ctx.getLevel();
         for (Direction side : Iterate.directions) {
-            if (!prefersConnectionTo(world, pos, side))
+            if (!prefersConnectionTo(world, pos, side)) {
                 continue;
+            }
             if (prefferedAxis != null && prefferedAxis != side.getAxis()) {
                 prefferedAxis = null;
                 break;
@@ -68,14 +69,17 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
             prefferedAxis = side.getAxis();
         }
 
-        if (prefferedAxis == Axis.Y)
-            stateForPlacement = stateForPlacement.setValue(FACE, AttachFace.WALL).setValue(FACING, stateForPlacement.getValue(FACING).getOpposite());
-        else if (prefferedAxis != null) {
-            if (stateForPlacement.getValue(FACE) == AttachFace.WALL)
+        if (prefferedAxis == Axis.Y) {
+            stateForPlacement = stateForPlacement.setValue(FACE, AttachFace.WALL)
+                .setValue(FACING, stateForPlacement.getValue(FACING).getOpposite());
+        } else if (prefferedAxis != null) {
+            if (stateForPlacement.getValue(FACE) == AttachFace.WALL) {
                 stateForPlacement = stateForPlacement.setValue(FACE, AttachFace.FLOOR);
+            }
             for (Direction direction : ctx.getNearestLookingDirections()) {
-                if (direction.getAxis() != prefferedAxis)
+                if (direction.getAxis() != prefferedAxis) {
                     continue;
+                }
                 stateForPlacement = stateForPlacement.setValue(FACING, direction.getOpposite());
             }
         }
@@ -91,8 +95,9 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
 
     @Override
     public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
-        if (!world.isClientSide())
+        if (!world.isClientSide()) {
             FluidPropagator.propagateChangedPipe(world, pos, state);
+        }
     }
 
     @Override
@@ -102,19 +107,30 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
-        if (state != oldState)
+        }
+        if (state != oldState) {
             world.scheduleTick(pos, this, 1, TickPriority.HIGH);
+        }
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos neighborPos, boolean isMoving) {
+    public void neighborUpdate(
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        Block otherBlock,
+        BlockPos neighborPos,
+        boolean isMoving
+    ) {
         Direction d = FluidPropagator.validateNeighbourChange(state, world, pos, otherBlock, neighborPos, isMoving);
-        if (d == null)
+        if (d == null) {
             return;
-        if (!isOpenAt(state, d))
+        }
+        if (!isOpenAt(state, d)) {
             return;
+        }
         world.scheduleTick(pos, this, 1, TickPriority.HIGH);
     }
 
@@ -143,7 +159,12 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState state,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         AttachFace face = state.getValue(FACE);
         VoxelShaper shape = face == AttachFace.FLOOR ? AllShapes.SMART_FLUID_PIPE_FLOOR : face == AttachFace.CEILING ? AllShapes.SMART_FLUID_PIPE_CEILING : AllShapes.SMART_FLUID_PIPE_WALL;
         return shape.get(state.getValue(FACING));

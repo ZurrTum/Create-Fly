@@ -15,7 +15,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
 
-public record SplashingRecipe(List<ProcessingOutput> results, Ingredient ingredient) implements CreateSingleStackRollableRecipe {
+public record SplashingRecipe(List<ProcessingOutput> results,
+                              Ingredient ingredient) implements CreateSingleStackRollableRecipe {
     @Override
     public RecipeSerializer<SplashingRecipe> getSerializer() {
         return AllRecipeSerializers.SPLASHING;

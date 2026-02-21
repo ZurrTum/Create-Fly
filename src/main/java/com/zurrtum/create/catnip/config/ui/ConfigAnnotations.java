@@ -7,9 +7,7 @@ public class ConfigAnnotations {
      * Changes the way the Integer value is display.
      */
     public enum IntDisplay implements ConfigAnnotation {
-        HEX("#"),
-        ZERO_X("0x"),
-        ZERO_B("0b");
+        HEX("#"), ZERO_X("0x"), ZERO_B("0b");
 
         private final String value;
 
@@ -32,9 +30,7 @@ public class ConfigAnnotations {
      * Indicates to the player that changing this value will require a restart to take full effect
      */
     public enum RequiresRestart implements ConfigAnnotation {
-        CLIENT("client"),
-        SERVER("server"),
-        BOTH("both");
+        CLIENT("client"), SERVER("server"), BOTH("both");
 
         private final String value;
 

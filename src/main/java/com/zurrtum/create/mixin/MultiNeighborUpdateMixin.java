@@ -24,7 +24,12 @@ public class MultiNeighborUpdateMixin {
     private Block sourceBlock;
 
     @Inject(method = "runNext(Lnet/minecraft/world/level/Level;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/redstone/NeighborUpdater;executeUpdate(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/redstone/Orientation;Z)V"))
-    private void neighborUpdate(Level world, CallbackInfoReturnable<Boolean> cir, @Local BlockState state, @Local BlockPos pos) {
+    private void neighborUpdate(
+        Level world,
+        CallbackInfoReturnable<Boolean> cir,
+        @Local BlockState state,
+        @Local BlockPos pos
+    ) {
         if (state.getBlock() instanceof NeighborUpdateListeningBlock block) {
             block.neighborUpdate(state, world, pos, this.sourceBlock, this.sourcePos, false);
         }

@@ -42,27 +42,32 @@ public class ToolboxHandlerClient {
 
     public static boolean onPickItem(Minecraft mc) {
         LocalPlayer player = mc.player;
-        if (player == null)
+        if (player == null) {
             return false;
+        }
         Level level = player.level();
         HitResult hitResult = mc.hitResult;
 
-        if (hitResult == null || hitResult.getType() == HitResult.Type.MISS)
+        if (hitResult == null || hitResult.getType() == HitResult.Type.MISS) {
             return false;
-        if (player.isCreative())
+        }
+        if (player.isCreative()) {
             return false;
+        }
 
         ItemStack result = ItemStack.EMPTY;
         List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.level(), player, 8);
 
-        if (toolboxes.isEmpty())
+        if (toolboxes.isEmpty()) {
             return false;
+        }
 
         if (hitResult.getType() == HitResult.Type.BLOCK) {
             BlockPos pos = ((BlockHitResult) hitResult).getBlockPos();
             BlockState state = level.getBlockState(pos);
-            if (state.isAir())
+            if (state.isAir()) {
                 return false;
+            }
             result = state.getCloneItemStack(level, pos, true);
 
         } else if (hitResult.getType() == HitResult.Type.ENTITY) {
@@ -70,21 +75,29 @@ public class ToolboxHandlerClient {
             result = entity.getPickResult();
         }
 
-        if (result.isEmpty())
+        if (result.isEmpty()) {
             return false;
+        }
 
         for (ToolboxBlockEntity toolboxBlockEntity : toolboxes) {
             ToolboxInventory inventory = toolboxBlockEntity.inventory;
             for (int comp = 0; comp < 8; comp++) {
                 ItemStack inSlot = inventory.takeFromCompartment(1, comp, true);
-                if (inSlot.isEmpty())
+                if (inSlot.isEmpty()) {
                     continue;
-                if (inSlot.getItem() != result.getItem())
+                }
+                if (inSlot.getItem() != result.getItem()) {
                     continue;
-                if (!ItemStack.matches(inSlot, result))
+                }
+                if (!ItemStack.matches(inSlot, result)) {
                     continue;
+                }
 
-                player.connection.send(new ToolboxEquipPacket(toolboxBlockEntity.getBlockPos(), comp, player.getInventory().getSelectedSlot()));
+                player.connection.send(new ToolboxEquipPacket(
+                    toolboxBlockEntity.getBlockPos(),
+                    comp,
+                    player.getInventory().getSelectedSlot()
+                ));
                 return true;
             }
 
@@ -94,15 +107,19 @@ public class ToolboxHandlerClient {
     }
 
     public static boolean onKeyInput(Minecraft mc, KeyEvent input) {
-        if (!AllKeys.TOOLBELT.matches(input))
+        if (!AllKeys.TOOLBELT.matches(input)) {
             return false;
-        if (mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
+        }
+        if (mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
             return false;
-        if (COOLDOWN > 0)
+        }
+        if (COOLDOWN > 0) {
             return false;
+        }
         LocalPlayer player = mc.player;
-        if (player == null)
+        if (player == null) {
             return false;
+        }
         Level level = player.level();
 
         List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.level(), player, 8);
@@ -137,13 +154,19 @@ public class ToolboxHandlerClient {
             return true;
         }
 
-        if (toolboxes.isEmpty())
+        if (toolboxes.isEmpty()) {
             return false;
+        }
 
-        if (toolboxes.size() == 1)
-            ScreenOpener.open(new RadialToolboxMenu(toolboxes, RadialToolboxMenu.State.SELECT_ITEM, toolboxes.getFirst()));
-        else
+        if (toolboxes.size() == 1) {
+            ScreenOpener.open(new RadialToolboxMenu(
+                toolboxes,
+                RadialToolboxMenu.State.SELECT_ITEM,
+                toolboxes.getFirst()
+            ));
+        } else {
             ScreenOpener.open(new RadialToolboxMenu(toolboxes, RadialToolboxMenu.State.SELECT_BOX, null));
+        }
         return true;
     }
 
@@ -155,14 +178,16 @@ public class ToolboxHandlerClient {
 
         Player player = mc.player;
         CompoundTag compound = AllSynchedDatas.TOOLBOX.get(player);
-        if (compound.isEmpty())
+        if (compound.isEmpty()) {
             return;
+        }
 
         int selectedSlot = player.getInventory().getSelectedSlot();
         for (int slot = 0; slot < 9; slot++) {
             String key = String.valueOf(slot);
-            if (!compound.contains(key))
+            if (!compound.contains(key)) {
                 continue;
+            }
             BlockPos pos = compound.getCompoundOrEmpty(key).read("Pos", BlockPos.CODEC).orElse(BlockPos.ZERO);
             double max = ToolboxHandler.getMaxRange(player);
             boolean selected = slot == selectedSlot;

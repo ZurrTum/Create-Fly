@@ -50,7 +50,14 @@ public class MysteriousItemConversionView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_LONG_ARROW.render(context, 52, 15);
         AllGuiTextures.JEI_QUESTION_MARK.render(context, 77, 0);
     }

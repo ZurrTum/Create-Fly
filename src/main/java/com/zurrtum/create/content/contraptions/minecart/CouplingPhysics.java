@@ -39,8 +39,9 @@ public class CouplingPhysics {
     }
 
     public static void hardCollisionStep(ServerLevel world, Couple<AbstractMinecart> carts, double couplingLength) {
-        if (!MinecartSim2020.canAddMotion(carts.get(false)) && MinecartSim2020.canAddMotion(carts.get(true)))
+        if (!MinecartSim2020.canAddMotion(carts.get(false)) && MinecartSim2020.canAddMotion(carts.get(true))) {
             carts = carts.swap();
+        }
 
         Couple<Vec3> corrections = Couple.create(null, null);
         Couple<Double> maxSpeed = carts.map(cart -> cart.getMaxSpeed(world));
@@ -51,23 +52,26 @@ public class CouplingPhysics {
 
             float stress = (float) (couplingLength - cart.position().distanceTo(otherCart.position()));
 
-            if (Math.abs(stress) < 1 / 8f)
+            if (Math.abs(stress) < 1 / 8f) {
                 continue;
+            }
 
             Vec3 pos = cart.position();
             Vec3 link = otherCart.position().subtract(pos);
             float correctionMagnitude = firstLoop ? -stress / 2f : -stress;
 
-            if (!MinecartSim2020.canAddMotion(cart))
+            if (!MinecartSim2020.canAddMotion(cart)) {
                 correctionMagnitude /= 2;
+            }
 
             Vec3 correction = link.normalize().scale(correctionMagnitude);
 
             float maxResolveSpeed = 1.75f;
             correction = VecHelper.clamp(correction, (float) Math.min(maxResolveSpeed, maxSpeed.get(current)));
 
-            if (corrections.get(current) == null)
+            if (corrections.get(current) == null) {
                 corrections.set(current, correction);
+            }
 
             cart.move(MoverType.SELF, correction);
             cart.setDeltaMovement(cart.getDeltaMovement().scale(0.95f));
@@ -94,14 +98,16 @@ public class CouplingPhysics {
             if (!railState.is(BlockTags.RAILS)) {
                 railState = world.getBlockState(pos.above());
             }
-            if (!(railState.getBlock() instanceof BaseRailBlock block))
+            if (!(railState.getBlock() instanceof BaseRailBlock block)) {
                 return null;
+            }
             return railState.getValue(block.getShapeProperty());
         });
 
         float futureStress = (float) (couplingLength - nextPositions.getFirst().distanceTo(nextPositions.getSecond()));
-        if (Mth.equal(futureStress, 0D))
+        if (Mth.equal(futureStress, 0D)) {
             return;
+        }
 
         for (boolean current : Iterate.trueAndFalse) {
             Vec3 correction;
@@ -109,17 +115,20 @@ public class CouplingPhysics {
             Vec3 link = nextPositions.get(!current).subtract(pos);
             float correctionMagnitude = -futureStress / 2f;
 
-            if (canAddmotion.get(current) != canAddmotion.get(!current))
+            if (canAddmotion.get(current) != canAddmotion.get(!current)) {
                 correctionMagnitude = !canAddmotion.get(current) ? 0 : correctionMagnitude * 2;
-            if (!canAddmotion.get(current))
+            }
+            if (!canAddmotion.get(current)) {
                 continue;
+            }
 
             RailShape shape = shapes.get(current);
             if (shape != null) {
                 Vec3 railVec = MinecartSim2020.getRailVec(shape);
                 correction = followLinkOnRail(link, pos, correctionMagnitude, railVec).subtract(pos);
-            } else
+            } else {
                 correction = link.normalize().scale(correctionMagnitude);
+            }
 
             correction = VecHelper.clamp(correction, maxSpeed.get(current));
 
@@ -132,8 +141,9 @@ public class CouplingPhysics {
 
     public static Vec3 followLinkOnRail(Vec3 link, Vec3 cart, float diffToReduce, Vec3 railAxis) {
         double dotProduct = railAxis.dot(link);
-        if (Double.isNaN(dotProduct) || dotProduct == 0 || diffToReduce == 0)
+        if (Double.isNaN(dotProduct) || dotProduct == 0 || diffToReduce == 0) {
             return cart;
+        }
 
         Vec3 axis = railAxis.scale(-Math.signum(dotProduct));
         Vec3 center = cart.add(link);
@@ -141,8 +151,9 @@ public class CouplingPhysics {
         Vec3 intersectSphere = VecHelper.intersectSphere(cart, axis, center, radius);
 
         // Cannot satisfy on current rail vector
-        if (intersectSphere == null)
+        if (intersectSphere == null) {
             return cart.add(VecHelper.project(link, axis));
+        }
 
         return intersectSphere;
     }

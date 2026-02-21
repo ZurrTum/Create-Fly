@@ -44,8 +44,10 @@ public class StockKeeperCategoryMenu extends MenuBase<StockTickerBlockEntity> {
 
     @Override
     public boolean stillValid(Player player) {
-        return !contentHolder.isRemoved() && player.position()
-            .closerThan(Vec3.atCenterOf(contentHolder.getBlockPos()), player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 4);
+        return !contentHolder.isRemoved() && player.position().closerThan(
+            Vec3.atCenterOf(contentHolder.getBlockPos()),
+            player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 4
+        );
     }
 
     class InactiveSlot extends Slot {
@@ -78,16 +80,18 @@ public class StockKeeperCategoryMenu extends MenuBase<StockTickerBlockEntity> {
     @Override
     public ItemStack quickMoveStack(Player pPlayer, int index) {
         Slot clickedSlot = getSlot(index);
-        if (!clickedSlot.hasItem())
+        if (!clickedSlot.hasItem()) {
             return ItemStack.EMPTY;
+        }
 
         ItemStack stack = clickedSlot.getItem();
         int size = 1;
         boolean success;
         if (index < size) {
             success = !moveItemStackTo(stack, size, slots.size(), true);
-        } else
+        } else {
             success = !moveItemStackTo(stack, 0, size, false);
+        }
 
         return success ? ItemStack.EMPTY : stack;
     }

@@ -15,8 +15,9 @@ public class ComparatorUtil {
 
     public static int levelOfSmartFluidTank(BlockGetter world, BlockPos pos) {
         SmartFluidTankBehaviour fluidBehaviour = BlockEntityBehaviour.get(world, pos, SmartFluidTankBehaviour.TYPE);
-        if (fluidBehaviour == null)
+        if (fluidBehaviour == null) {
             return 0;
+        }
         TankSegment primaryHandler = fluidBehaviour.getPrimaryHandler();
         double fillFraction = (double) primaryHandler.getFluid().getAmount() / primaryHandler.getMaxAmountPerStack();
         return fractionToRedstoneLevel(fillFraction);

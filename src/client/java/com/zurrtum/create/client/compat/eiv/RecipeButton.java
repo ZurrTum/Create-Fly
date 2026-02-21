@@ -15,7 +15,15 @@ import org.jetbrains.annotations.Nullable;
 public class RecipeButton extends Button.Plain {
     private IntSet missingIndices;
 
-    public RecipeButton(int x, int y, int width, int height, Component message, OnPress onPress, CreateNarration narrationSupplier) {
+    public RecipeButton(
+        int x,
+        int y,
+        int width,
+        int height,
+        Component message,
+        OnPress onPress,
+        CreateNarration narrationSupplier
+    ) {
         super(x, y, width, height, message, onPress, narrationSupplier);
     }
 

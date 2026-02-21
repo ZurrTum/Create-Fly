@@ -8,6 +8,12 @@ import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.ponder.enums.PonderGuiTextures;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
@@ -17,22 +23,20 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
-
 public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
-    public static final Couple<Color> COLOR_NAV_ARROW = Couple.create(new Color(0x80_aa9999, true), new Color(0x30_aa9999)).map(Color::setImmutable);
+    public static final Couple<Color> COLOR_NAV_ARROW = Couple.create(
+        new Color(0x80_aa9999, true),
+        new Color(0x30_aa9999)
+    ).map(Color::setImmutable);
 
     protected static boolean currentlyRenderingPreviousScreen = false;
 
     protected int depthPointX, depthPointY;
-    public final LerpedFloat transition = LerpedFloat.linear().startWithValue(0).chase(0, .1f, LerpedFloat.Chaser.LINEAR);
-    protected final LerpedFloat arrowAnimation = LerpedFloat.linear().startWithValue(0).chase(0, 0.075f, LerpedFloat.Chaser.LINEAR);
+    public final LerpedFloat transition = LerpedFloat.linear().startWithValue(0)
+        .chase(0, .1f, LerpedFloat.Chaser.LINEAR);
+    protected final LerpedFloat arrowAnimation = LerpedFloat.linear().startWithValue(0)
+        .chase(0, 0.075f, LerpedFloat.Chaser.LINEAR);
     @Nullable
     protected BoxWidget backTrack;
 
@@ -68,11 +72,13 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
         backTrack = null;
         List<Screen> screenHistory = ScreenOpener.getScreenHistory();
-        if (screenHistory.isEmpty())
+        if (screenHistory.isEmpty()) {
             return;
+        }
 
-        addRenderableWidget(backTrack = new BoxWidget(31, height - 31 - 20).withBounds(20, 20).withCustomBackground(BoxElement.COLOR_BACKGROUND_FLAT)
-            .enableFade(0, 5).withPadding(2, 2).fade(1).withCallback(() -> ScreenOpener.openPreviousScreen(this, null)));
+        addRenderableWidget(backTrack = new BoxWidget(31, height - 31 - 20).withBounds(20, 20)
+            .withCustomBackground(BoxElement.COLOR_BACKGROUND_FLAT).enableFade(0, 5).withPadding(2, 2).fade(1)
+            .withCallback(() -> ScreenOpener.openPreviousScreen(this, null)));
 
         Screen previousScreen = screenHistory.getFirst();
         if (previousScreen instanceof NavigatableSimiScreen screen) {
@@ -102,8 +108,9 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
     @Override
     protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         //		renderZeloBreadcrumbs(ms, mouseX, mouseY, partialTicks);
-        if (backTrack == null)
+        if (backTrack == null) {
             return;
+        }
 
         Matrix3x2fStack poseStack = graphics.pose();
 
@@ -113,8 +120,9 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
         poseStack.pushMatrix();
         poseStack.translate(0, 0);
-        if (x + 30 < backTrack.getX())
+        if (x + 30 < backTrack.getX()) {
             UIRenderHelper.breadcrumbArrow(graphics, x + 30, height - 51, maxX - (x + 30), 20, 5, colors);
+        }
 
         UIRenderHelper.breadcrumbArrow(graphics, x, height - 51, 30, 20, 5, colors);
         UIRenderHelper.breadcrumbArrow(graphics, x - 30, height - 51, 30, 20, 5, colors);
@@ -142,8 +150,9 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (!isCurrentlyRenderingPreviousScreen())
+        if (!isCurrentlyRenderingPreviousScreen()) {
             super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        }
     }
 
     @Override
@@ -233,15 +242,17 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
     protected void renderZeloBreadcrumbs(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         List<Screen> history = ScreenOpener.getScreenHistory();
-        if (history.isEmpty())
+        if (history.isEmpty()) {
             return;
+        }
 
         history.add(0, minecraft.screen);
         int spacing = 20;
 
         List<String> names = new ArrayList<>();
-        for (Screen screen : history)
+        for (Screen screen : history) {
             names.add(NavigatableSimiScreen.screenTitle(screen));
+        }
 
         int bWidth = 0;
         for (String name : names) {
@@ -252,8 +263,9 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
         MutableInt y = new MutableInt(height - 18);
         MutableBoolean first = new MutableBoolean(true);
 
-        if (x.getValue() < 25)
+        if (x.getValue() < 25) {
             x.setValue(25);
+        }
 
         Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();
@@ -270,7 +282,14 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
                 new Color(0xdd101010),
                 new Color(0x44101010)
             );
-            graphics.drawString(font, s, x.getValue() + 5, y.getValue() + 3, first.getValue() ? 0xffeeffee : 0xffddeeff, true);
+            graphics.drawString(
+                font,
+                s,
+                x.getValue() + 5,
+                y.getValue() + 3,
+                first.getValue() ? 0xffeeffee : 0xffddeeff,
+                true
+            );
             first.setFalse();
 
             x.add(sWidth + spacing);
@@ -283,8 +302,9 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
     }
 
     private static String screenTitle(Screen screen) {
-        if (screen instanceof NavigatableSimiScreen)
+        if (screen instanceof NavigatableSimiScreen) {
             return ((NavigatableSimiScreen) screen).getBreadcrumbTitle();
+        }
         return "<";
     }
 

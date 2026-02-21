@@ -12,8 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class CreativeCrateMountedStorage extends MountedItemStorage {
-    public static final MapCodec<CreativeCrateMountedStorage> CODEC = ItemStack.OPTIONAL_CODEC.xmap(
-        CreativeCrateMountedStorage::new,
+    public static final MapCodec<CreativeCrateMountedStorage> CODEC = ItemStack.OPTIONAL_CODEC.xmap(CreativeCrateMountedStorage::new,
         storage -> storage.suppliedStack
     ).fieldOf("value");
     private final ItemStack suppliedStack;
@@ -37,8 +36,9 @@ public class CreativeCrateMountedStorage extends MountedItemStorage {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot == 0)
+        if (slot == 0) {
             return suppliedStack;
+        }
         return ItemStack.EMPTY;
     }
 

@@ -31,7 +31,10 @@ public interface CreateRegisterPlugin {
         Comparator<Pair<String, CreateRegisterPlugin>> pluginComparator = Comparator.comparing((Pair<String, CreateRegisterPlugin> pair) -> !pair.getFirst()
             .equals("create")).thenComparing(Pair::getFirst);
         for (EntrypointContainer<CreateRegisterPlugin> container : list) {
-            Pair<String, CreateRegisterPlugin> plugin = Pair.of(container.getProvider().getMetadata().getId(), container.getEntrypoint());
+            Pair<String, CreateRegisterPlugin> plugin = Pair.of(
+                container.getProvider().getMetadata().getId(),
+                container.getEntrypoint()
+            );
             int index = Collections.binarySearch(entries, plugin, pluginComparator);
             int insertionPoint = index >= 0 ? index : -index - 1;
             entries.add(insertionPoint, plugin);

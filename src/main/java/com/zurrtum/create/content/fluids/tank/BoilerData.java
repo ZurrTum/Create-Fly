@@ -73,7 +73,16 @@ public class BoilerData {
     private final SoundPool.Sound sound = (level, pos) -> {
         float volume = 3f / Math.max(2, attachedEngines / 6);
         float pitch = 1.18f - level.random.nextFloat() * .25f;
-        level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, volume, pitch, false);
+        level.playLocalSound(
+            pos.getX(),
+            pos.getY(),
+            pos.getZ(),
+            SoundEvents.CANDLE_EXTINGUISH,
+            SoundSource.BLOCKS,
+            volume,
+            pitch,
+            false
+        );
 
         AllSoundEvents.STEAM.playAt(level, pos, volume / 16, .8f, false);
     };
@@ -81,25 +90,30 @@ public class BoilerData {
     private final EnumMap<Direction, SoundPool> pools = new EnumMap<>(Direction.class);
 
     public void tick(FluidTankBlockEntity controller) {
-        if (!isActive())
+        if (!isActive()) {
             return;
+        }
         Level level = controller.getLevel();
         if (level.isClientSide()) {
             pools.values().forEach(p -> p.play(level));
             gauge.tickChaser();
             float current = gauge.getValue(1);
-            if (current > 1 && level.random.nextFloat() < 1 / 2f)
+            if (current > 1 && level.random.nextFloat() < 1 / 2f) {
                 gauge.setValueNoUpdate(current + Math.min(-(current - 1) * level.random.nextFloat(), 0));
+            }
             return;
         }
-        if (needsHeatLevelUpdate && updateTemperature(controller))
+        if (needsHeatLevelUpdate && updateTemperature(controller)) {
             controller.notifyUpdate();
+        }
         ticksUntilNextSample--;
-        if (ticksUntilNextSample > 0)
+        if (ticksUntilNextSample > 0) {
             return;
+        }
         int capacity = controller.tankInventory.getMaxAmountPerStack();
-        if (capacity == 0)
+        if (capacity == 0) {
             return;
+        }
 
         ticksUntilNextSample = SAMPLE_RATE;
         supplyOverTime[currentIndex] = gatheredSupply / (float) SAMPLE_RATE;
@@ -109,27 +123,40 @@ public class BoilerData {
 
         if (currentIndex == 0) {
             waterSupply = 0;
-            for (float i : supplyOverTime)
+            for (float i : supplyOverTime) {
                 waterSupply = Math.max(i, waterSupply);
+            }
         }
 
-        if (controller instanceof CreativeFluidTankBlockEntity)
+        if (controller instanceof CreativeFluidTankBlockEntity) {
             waterSupply = waterSupplyPerLevel * 20;
+        }
 
-        if (getActualHeat(controller.getTotalTankSize()) == 18)
+        if (getActualHeat(controller.getTotalTankSize()) == 18) {
             controller.award(AllAdvancements.STEAM_ENGINE_MAXED);
+        }
 
         controller.notifyUpdate();
     }
 
     public void updateOcclusion(FluidTankBlockEntity controller) {
-        if (!controller.getLevel().isClientSide())
+        if (!controller.getLevel().isClientSide()) {
             return;
-        if (attachedEngines + attachedWhistles == 0)
+        }
+        if (attachedEngines + attachedWhistles == 0) {
             return;
+        }
         for (Direction d : Iterate.horizontalDirections) {
-            AABB aabb = new AABB(controller.getBlockPos()).move(controller.width / 2f - .5f, 0, controller.width / 2f - .5f).deflate(5f / 8);
-            aabb = aabb.move(d.getStepX() * (controller.width / 2f + 1 / 4f), 0, d.getStepZ() * (controller.width / 2f + 1 / 4f));
+            AABB aabb = new AABB(controller.getBlockPos()).move(
+                controller.width / 2f - .5f,
+                0,
+                controller.width / 2f - .5f
+            ).deflate(5f / 8);
+            aabb = aabb.move(
+                d.getStepX() * (controller.width / 2f + 1 / 4f),
+                0,
+                d.getStepZ() * (controller.width / 2f + 1 / 4f)
+            );
             aabb = aabb.inflate(Math.abs(d.getStepZ()) / 2f, 0.25f, Math.abs(d.getStepX()) / 2f);
             occludedDirections[d.get2DDataValue()] = !controller.getLevel().noCollision(aabb);
         }
@@ -166,10 +193,12 @@ public class BoilerData {
     }
 
     public float getEngineEfficiency(int boilerSize) {
-        if (isPassive(boilerSize))
+        if (isPassive(boilerSize)) {
             return passiveEngineEfficiency / attachedEngines;
-        if (activeHeat == 0)
+        }
+        if (activeHeat == 0) {
             return 0;
+        }
         int actualHeat = getActualHeat(boilerSize);
         return attachedEngines <= actualHeat ? 1 : (float) actualHeat / attachedEngines;
     }
@@ -193,8 +222,10 @@ public class BoilerData {
     public MutableComponent getHeatLevelTextComponent() {
         int boilerLevel = Math.min(activeHeat, Math.min(maxHeatForWater, maxHeatForSize));
 
-        return isPassive() ? Component.translatable("create.boiler.passive") : (boilerLevel == 0 ? Component.translatable("create.boiler.idle") : boilerLevel == 18 ? Component.translatable(
-            "create.boiler.max_lvl") : Component.translatable("create.boiler.lvl", String.valueOf(boilerLevel)));
+        return isPassive() ? Component.translatable("create.boiler.passive") : (boilerLevel == 0 ? Component.translatable(
+            "create.boiler.idle") : boilerLevel == 18 ? Component.translatable("create.boiler.max_lvl") : Component.translatable("create.boiler.lvl",
+            String.valueOf(boilerLevel)
+        ));
     }
 
     public MutableComponent getSizeComponent(boolean forGoggles, boolean useBlocksAsBars, ChatFormatting... styles) {
@@ -209,11 +240,18 @@ public class BoilerData {
         return componentHelper("heat", passiveHeat ? 1 : activeHeat, forGoggles, useBlocksAsBars, styles);
     }
 
-    private MutableComponent componentHelper(String label, int level, boolean forGoggles, boolean useBlocksAsBars, ChatFormatting... styles) {
+    private MutableComponent componentHelper(
+        String label,
+        int level,
+        boolean forGoggles,
+        boolean useBlocksAsBars,
+        ChatFormatting... styles
+    ) {
         MutableComponent base = useBlocksAsBars ? blockComponent(level) : barComponent(level);
 
-        if (!forGoggles)
+        if (!forGoggles) {
             return base;
+        }
 
         ChatFormatting style1 = styles.length >= 1 ? styles[0] : ChatFormatting.GRAY;
         ChatFormatting style2 = styles.length >= 2 ? styles[1] : ChatFormatting.DARK_GRAY;
@@ -228,9 +266,13 @@ public class BoilerData {
 
     private MutableComponent barComponent(int level) {
         return Component.empty().append(bars(Math.max(0, minValue - 1), ChatFormatting.DARK_GREEN))
-            .append(bars(minValue > 0 ? 1 : 0, ChatFormatting.GREEN)).append(bars(Math.max(0, level - minValue), ChatFormatting.DARK_GREEN))
+            .append(bars(minValue > 0 ? 1 : 0, ChatFormatting.GREEN))
+            .append(bars(Math.max(0, level - minValue), ChatFormatting.DARK_GREEN))
             .append(bars(Math.max(0, maxValue - level), ChatFormatting.DARK_RED))
-            .append(bars(Math.max(0, Math.min(18 - maxValue, ((maxValue / 5 + 1) * 5) - maxValue)), ChatFormatting.DARK_GRAY));
+            .append(bars(
+                Math.max(0, Math.min(18 - maxValue, ((maxValue / 5 + 1) * 5) - maxValue)),
+                ChatFormatting.DARK_GRAY
+            ));
     }
 
     private MutableComponent bars(int level, ChatFormatting format) {
@@ -251,15 +293,19 @@ public class BoilerData {
 
                     BlockPos pos = controllerPos.offset(xOffset, yOffset, zOffset);
                     BlockState blockState = level.getBlockState(pos);
-                    if (!FluidTankBlock.isTank(blockState))
+                    if (!FluidTankBlock.isTank(blockState)) {
                         continue;
+                    }
                     for (Direction d : Iterate.directions) {
                         BlockPos attachedPos = pos.relative(d);
                         BlockState attachedState = level.getBlockState(attachedPos);
-                        if (attachedState.is(AllBlocks.STEAM_ENGINE) && SteamEngineBlock.getFacing(attachedState) == d)
+                        if (attachedState.is(AllBlocks.STEAM_ENGINE) && SteamEngineBlock.getFacing(attachedState) == d) {
                             attachedEngines++;
-                        if (attachedState.is(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState).getOpposite() == d)
+                        }
+                        if (attachedState.is(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState)
+                            .getOpposite() == d) {
                             attachedWhistles++;
+                        }
                     }
                 }
             }
@@ -271,8 +317,9 @@ public class BoilerData {
 
     public void checkPipeOrganAdvancement(FluidTankBlockEntity controller) {
         AdvancementBehaviour behaviour = controller.getBehaviour(AdvancementBehaviour.TYPE);
-        if (behaviour == null || !behaviour.isOwnerPresent())
+        if (behaviour == null || !behaviour.isOwnerPresent()) {
             return;
+        }
 
         BlockPos controllerPos = controller.getBlockPos();
         Level level = controller.getLevel();
@@ -284,22 +331,26 @@ public class BoilerData {
 
                     BlockPos pos = controllerPos.offset(xOffset, yOffset, zOffset);
                     BlockState blockState = level.getBlockState(pos);
-                    if (!FluidTankBlock.isTank(blockState))
+                    if (!FluidTankBlock.isTank(blockState)) {
                         continue;
+                    }
                     for (Direction d : Iterate.directions) {
                         BlockPos attachedPos = pos.relative(d);
                         BlockState attachedState = level.getBlockState(attachedPos);
-                        if (attachedState.is(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState).getOpposite() == d) {
-                            if (level.getBlockEntity(attachedPos) instanceof WhistleBlockEntity wbe)
+                        if (attachedState.is(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState)
+                            .getOpposite() == d) {
+                            if (level.getBlockEntity(attachedPos) instanceof WhistleBlockEntity wbe) {
                                 whistlePitches.add(wbe.getPitchId());
+                            }
                         }
                     }
                 }
             }
         }
 
-        if (whistlePitches.size() >= 12)
+        if (whistlePitches.size() >= 12) {
             controller.award(AllAdvancements.PIPE_ORGAN);
+        }
     }
 
     public boolean updateTemperature(FluidTankBlockEntity controller) {

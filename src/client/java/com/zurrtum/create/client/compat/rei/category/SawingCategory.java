@@ -49,14 +49,26 @@ public class SawingCategory extends CreateCategory<SawingDisplay> {
         List<EntryIngredient> chanceIngredients = new ArrayList<>();
         List<ProcessingOutput> results = display.outputs();
         for (int i = 0, size = results.size(), start = bounds.x + 123, y = bounds.y + 53; i < size; i++) {
-            addOutputData(results.get(i), i % 2 == 0 ? start : start + 19, y + (i / 2) * -19, outputs, outputIngredients, chances, chanceIngredients);
+            addOutputData(
+                results.get(i),
+                i % 2 == 0 ? start : start + 19,
+                y + (i / 2) * -19,
+                outputs,
+                outputIngredients,
+                chances,
+                chanceIngredients
+            );
         }
         widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 75, bounds.y + 11);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 60, bounds.y + 60);
-            graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 69, bounds.y + 36));
+            graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(
+                new Matrix3x2f(graphics.pose()),
+                bounds.x + 69,
+                bounds.y + 36
+            ));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         for (int i = 0, size = outputs.size(); i < size; i++) {

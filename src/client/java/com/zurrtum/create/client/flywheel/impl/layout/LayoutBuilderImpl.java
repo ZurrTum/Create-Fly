@@ -279,7 +279,12 @@ public class LayoutBuilderImpl implements LayoutBuilder {
     }
 
     @Override
-    public LayoutBuilder matrix(String name, FloatRepr repr, @Range(from = 2, to = 4) int rows, @Range(from = 2, to = 4) int columns) {
+    public LayoutBuilder matrix(
+        String name,
+        FloatRepr repr,
+        @Range(from = 2, to = 4) int rows,
+        @Range(from = 2, to = 4) int columns
+    ) {
         return element(name, MatrixElementTypeImpl.create(repr, rows, columns));
     }
 
@@ -294,7 +299,12 @@ public class LayoutBuilderImpl implements LayoutBuilder {
     }
 
     @Override
-    public LayoutBuilder vectorArray(String name, ValueRepr repr, @Range(from = 2, to = 4) int size, @Range(from = 1, to = 256) int length) {
+    public LayoutBuilder vectorArray(
+        String name,
+        ValueRepr repr,
+        @Range(from = 2, to = 4) int size,
+        @Range(from = 1, to = 256) int length
+    ) {
         return element(name, ArrayElementTypeImpl.create(VectorElementTypeImpl.create(repr, size), length));
     }
 
@@ -310,7 +320,12 @@ public class LayoutBuilderImpl implements LayoutBuilder {
     }
 
     @Override
-    public LayoutBuilder matrixArray(String name, FloatRepr repr, @Range(from = 2, to = 4) int size, @Range(from = 1, to = 256) int length) {
+    public LayoutBuilder matrixArray(
+        String name,
+        FloatRepr repr,
+        @Range(from = 2, to = 4) int size,
+        @Range(from = 1, to = 256) int length
+    ) {
         return matrixArray(name, repr, size, size, length);
     }
 

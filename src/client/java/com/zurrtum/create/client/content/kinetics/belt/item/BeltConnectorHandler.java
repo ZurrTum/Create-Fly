@@ -5,10 +5,6 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
@@ -24,6 +20,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class BeltConnectorHandler {
     private static final int CONNECT_COLOR = ARGB.colorFromFloat(1, .3f, .9f, .5f);
     private static final int NO_CONNECT_COLOR = ARGB.colorFromFloat(1, .9f, .3f, .5f);
@@ -32,25 +31,30 @@ public class BeltConnectorHandler {
         Player player = mc.player;
         Level world = mc.level;
 
-        if (player == null || world == null)
+        if (player == null || world == null) {
             return;
-        if (mc.screen != null)
+        }
+        if (mc.screen != null) {
             return;
+        }
 
         RandomSource random = world.random;
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack heldItem = player.getItemInHand(hand);
 
-            if (!heldItem.is(AllItems.BELT_CONNECTOR))
+            if (!heldItem.is(AllItems.BELT_CONNECTOR)) {
                 continue;
+            }
 
-            if (!heldItem.has(AllDataComponents.BELT_FIRST_SHAFT))
+            if (!heldItem.has(AllDataComponents.BELT_FIRST_SHAFT)) {
                 continue;
+            }
 
             BlockPos first = heldItem.get(AllDataComponents.BELT_FIRST_SHAFT);
 
-            if (!world.getBlockState(first).hasProperty(BlockStateProperties.AXIS))
+            if (!world.getBlockState(first).hasProperty(BlockStateProperties.AXIS)) {
                 continue;
+            }
             Axis axis = world.getBlockState(first).getValue(BlockStateProperties.AXIS);
 
             HitResult rayTrace = mc.hitResult;
@@ -71,19 +75,30 @@ public class BeltConnectorHandler {
 
             BlockPos selected = ((BlockHitResult) rayTrace).getBlockPos();
 
-            if (world.getBlockState(selected).canBeReplaced())
+            if (world.getBlockState(selected).canBeReplaced()) {
                 return;
-            if (!ShaftBlock.isShaft(world.getBlockState(selected)))
+            }
+            if (!ShaftBlock.isShaft(world.getBlockState(selected))) {
                 selected = selected.relative(((BlockHitResult) rayTrace).getDirection());
-            if (!selected.closerThan(first, AllConfigs.server().kinetics.maxBeltLength.get()))
+            }
+            if (!selected.closerThan(first, AllConfigs.server().kinetics.maxBeltLength.get())) {
                 return;
+            }
 
-            boolean canConnect = BeltConnectorItem.validateAxis(world, selected) && BeltConnectorItem.canConnect(world, first, selected);
+            boolean canConnect = BeltConnectorItem.validateAxis(world, selected) && BeltConnectorItem.canConnect(
+                world,
+                first,
+                selected
+            );
 
             Vec3 start = Vec3.atLowerCornerOf(first);
             Vec3 end = Vec3.atLowerCornerOf(selected);
             Vec3 actualDiff = end.subtract(start);
-            end = end.subtract(axis.choose(actualDiff.x, 0, 0), axis.choose(0, actualDiff.y, 0), axis.choose(0, 0, actualDiff.z));
+            end = end.subtract(
+                axis.choose(actualDiff.x, 0, 0),
+                axis.choose(0, actualDiff.y, 0),
+                axis.choose(0, 0, actualDiff.z)
+            );
             Vec3 diff = end.subtract(start);
 
             double x = Math.abs(diff.x);
@@ -95,17 +110,22 @@ public class BeltConnectorHandler {
             int sames = ((x == y) ? 1 : 0) + ((y == z) ? 1 : 0) + ((z == x) ? 1 : 0);
             if (sames == 0) {
                 List<Vec3> validDiffs = new LinkedList<>();
-                for (int i = -1; i <= 1; i++)
-                    for (int j = -1; j <= 1; j++)
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
                         for (int k = -1; k <= 1; k++) {
-                            if (axis.choose(i, j, k) != 0)
+                            if (axis.choose(i, j, k) != 0) {
                                 continue;
-                            if (axis == Axis.Y && i != 0 && k != 0)
+                            }
+                            if (axis == Axis.Y && i != 0 && k != 0) {
                                 continue;
-                            if (i == 0 && j == 0 && k == 0)
+                            }
+                            if (i == 0 && j == 0 && k == 0) {
                                 continue;
+                            }
                             validDiffs.add(new Vec3(i, j, k));
                         }
+                    }
+                }
                 int closestIndex = 0;
                 float closest = Float.MAX_VALUE;
                 for (Vec3 validDiff : validDiffs) {
@@ -118,15 +138,24 @@ public class BeltConnectorHandler {
                 step = validDiffs.get(closestIndex);
             }
 
-            if (axis == Axis.Y && step.x != 0 && step.z != 0)
+            if (axis == Axis.Y && step.x != 0 && step.z != 0) {
                 return;
+            }
 
             step = new Vec3(Math.signum(step.x), Math.signum(step.y), Math.signum(step.z));
             int color = canConnect ? CONNECT_COLOR : NO_CONNECT_COLOR;
             for (float f = 0; f < length; f += .0625f) {
                 Vec3 position = start.add(step.scale(f));
                 if (random.nextInt(10) == 0) {
-                    world.addParticle(new DustParticleOptions(color, 1), position.x + .5f, position.y + .5f, position.z + .5f, 0, 0, 0);
+                    world.addParticle(
+                        new DustParticleOptions(color, 1),
+                        position.x + .5f,
+                        position.y + .5f,
+                        position.z + .5f,
+                        0,
+                        0,
+                        0
+                    );
                 }
             }
 

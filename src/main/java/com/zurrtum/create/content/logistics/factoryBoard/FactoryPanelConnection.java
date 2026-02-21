@@ -19,8 +19,7 @@ import java.util.List;
 
 public class FactoryPanelConnection {
     public static final Codec<FactoryPanelConnection> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        FactoryPanelPosition.CODEC.fieldOf(
-            "position").forGetter(i -> i.from),
+        FactoryPanelPosition.CODEC.fieldOf("position").forGetter(i -> i.from),
         Codec.INT.fieldOf("amount").forGetter(i -> i.amount),
         Codec.INT.fieldOf("arrow_bending").forGetter(i -> i.arrowBendMode)
     ).apply(instance, FactoryPanelConnection::new));
@@ -50,8 +49,9 @@ public class FactoryPanelConnection {
     }
 
     public List<Direction> getPath(Level level, BlockState state, FactoryPanelPosition to, Vec3 start) {
-        if (!path.isEmpty() && arrowBendModeCurrentPathUses == arrowBendMode)
+        if (!path.isEmpty() && arrowBendModeCurrentPathUses == arrowBendMode) {
             return path;
+        }
 
         boolean findSuitable = arrowBendMode == -1;
         arrowBendModeCurrentPathUses = arrowBendMode;
@@ -64,8 +64,9 @@ public class FactoryPanelConnection {
         ModeFinder:
         for (int actualMode = 0; actualMode <= 4; actualMode++) {
             path.clear();
-            if (!findSuitable && actualMode != arrowBendMode)
+            if (!findSuitable && actualMode != arrowBendMode) {
                 continue;
+            }
             boolean desperateOption = actualMode == 4;
 
             BlockPos toTravelFirst = BlockPos.ZERO;
@@ -88,22 +89,32 @@ public class FactoryPanelConnection {
             for (BlockPos toTravel : List.of(toTravelFirst, toTravelLast)) {
                 boolean zIsFarther = Math.abs(toTravel.getZ()) > Math.abs(toTravel.getX());
                 boolean zIsPreferred = desperateOption ? zIsFarther : actualMode % 2 == 1;
-                List<Direction> directionOrder = zIsPreferred ? List.of(Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.EAST) : List.of(Direction.WEST,
+                List<Direction> directionOrder = zIsPreferred ? List.of(
+                    Direction.SOUTH,
+                    Direction.NORTH,
+                    Direction.WEST,
+                    Direction.EAST
+                ) : List.of(
+                    Direction.WEST,
                     Direction.EAST,
                     Direction.SOUTH,
                     Direction.NORTH
                 );
 
                 for (int i = 0; i < 100; i++) {
-                    if (toTravel.equals(BlockPos.ZERO))
+                    if (toTravel.equals(BlockPos.ZERO)) {
                         break;
+                    }
 
                     for (Direction d : directionOrder) {
-                        if (lastDirection != null && d == lastDirection.getOpposite())
+                        if (lastDirection != null && d == lastDirection.getOpposite()) {
                             continue;
-                        if (currentDirection == null || toTravel.relative(d).distManhattan(BlockPos.ZERO) < toTravel.relative(currentDirection)
-                            .distManhattan(BlockPos.ZERO))
+                        }
+                        if (currentDirection == null || toTravel.relative(d)
+                            .distManhattan(BlockPos.ZERO) < toTravel.relative(currentDirection)
+                            .distManhattan(BlockPos.ZERO)) {
                             currentDirection = d;
+                        }
                     }
 
                     lastDirection = currentDirection;
@@ -122,8 +133,9 @@ public class FactoryPanelConnection {
                     testOffset = VecHelper.rotate(testOffset, xRot + 90, Axis.X);
                     testOffset = VecHelper.rotate(testOffset, yRot, Axis.Y);
                     Vec3 v = start.add(testOffset);
-                    if (!isSpaceEmpty(level, new AABB(v, v).inflate(1 / 128f)))
+                    if (!isSpaceEmpty(level, new AABB(v, v).inflate(1 / 128f))) {
                         continue ModeFinder;
+                    }
                 }
             }
 

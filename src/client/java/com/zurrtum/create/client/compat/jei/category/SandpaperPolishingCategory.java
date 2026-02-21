@@ -52,7 +52,11 @@ public class SandpaperPolishingCategory extends CreateCategory<RecipeHolder<Sand
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SandPaperPolishingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<SandPaperPolishingRecipe> entry,
+        IFocusGroup focuses
+    ) {
         SandPaperPolishingRecipe recipe = entry.value();
         builder.addInputSlot(27, 29).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         builder.addOutputSlot(132, 29).setBackground(SLOT, -1, -1).add(recipe.result());
@@ -69,7 +73,12 @@ public class SandpaperPolishingCategory extends CreateCategory<RecipeHolder<Sand
         AllGuiTextures.JEI_SHADOW.render(graphics, 61, 21);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 52, 32);
         recipeSlotsView.getSlotViews(RecipeIngredientRole.INPUT).getFirst().getDisplayedItemStack().ifPresent(stack -> {
-            graphics.guiRenderState.submitPicturesInPictureState(new SandPaperRenderState(new Matrix3x2f(graphics.pose()), stack, 74, -2));
+            graphics.guiRenderState.submitPicturesInPictureState(new SandPaperRenderState(
+                new Matrix3x2f(graphics.pose()),
+                stack,
+                74,
+                -2
+            ));
         });
     }
 }

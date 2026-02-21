@@ -19,7 +19,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
-public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidStack output, Optional<Identifier> location) implements Display {
+public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidStack output,
+                            Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<PotionDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(PotionDisplay::input),
@@ -44,7 +45,12 @@ public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidS
     }
 
     public PotionDisplay(Identifier id, PotionRecipe recipe) {
-        this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.fluidIngredient(), recipe.result(), Optional.of(id));
+        this(
+            EntryIngredients.ofIngredient(recipe.ingredient()),
+            recipe.fluidIngredient(),
+            recipe.result(),
+            Optional.of(id)
+        );
     }
 
     @Override

@@ -55,9 +55,19 @@ public class CompactingCategory extends BasinCategory<CompactingRecipe> {
     }
 
     @Override
-    public void draw(RecipeHolder<CompactingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<CompactingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         CompactingRecipe recipe = entry.value();
         drawBackground(recipe, graphics, recipe.results().size());
-        graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(new Matrix3x2f(graphics.pose()), 91, -5));
+        graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(
+            new Matrix3x2f(graphics.pose()),
+            91,
+            -5
+        ));
     }
 }

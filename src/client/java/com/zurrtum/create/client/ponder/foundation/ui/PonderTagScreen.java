@@ -59,11 +59,13 @@ public class PonderTagScreen extends AbstractPonderScreen {
 
         // items
         items.clear();
-        PonderIndex.getTagAccess().getItems(tag).stream().map(key -> new ItemEntry(RegisteredObjectsHelper.getItemOrBlock(key), key))
+        PonderIndex.getTagAccess().getItems(tag).stream()
+            .map(key -> new ItemEntry(RegisteredObjectsHelper.getItemOrBlock(key), key))
             .filter(entry -> entry.item != null).forEach(items::add);
 
-        if (!tag.getMainItem().isEmpty())
+        if (!tag.getMainItem().isEmpty()) {
             items.removeIf(entry -> entry.item == tag.getMainItem().getItem());
+        }
 
         int rowCount = Mth.clamp((int) Math.ceil(items.size() / 11d), 1, 3);
         LayoutHelper layout = LayoutHelper.centeredHorizontal(items.size(), rowCount, 28, 28, 8);
@@ -72,7 +74,8 @@ public class PonderTagScreen extends AbstractPonderScreen {
         int itemCenterY = getItemsY();
 
         for (ItemEntry entry : items) {
-            PonderButton b = new PonderButton(itemCenterX + layout.getX() + 4, itemCenterY + layout.getY() + 4).showing(new ItemStack(entry.item));
+            PonderButton b = new PonderButton(itemCenterX + layout.getX() + 4, itemCenterY + layout.getY() + 4).showing(
+                new ItemStack(entry.item));
 
             if (PonderIndex.getSceneAccess().doScenesExistForId(entry.key)) {
                 b.withCallback((mouseX, mouseY) -> {
@@ -80,7 +83,8 @@ public class PonderTagScreen extends AbstractPonderScreen {
                     ScreenOpener.transitionTo(PonderUI.of(new ItemStack(entry.item), tag));
                 });
             } else {
-                b.withBorderColors(entry.key.getNamespace().equals("minecraft") ? PonderUI.MISSING_VANILLA_ENTRY : PonderUI.MISSING_MODDED_ENTRY)
+                b.withBorderColors(entry.key.getNamespace()
+                        .equals("minecraft") ? PonderUI.MISSING_VANILLA_ENTRY : PonderUI.MISSING_MODDED_ENTRY)
                     .animateColors(false);
             }
 
@@ -91,7 +95,8 @@ public class PonderTagScreen extends AbstractPonderScreen {
         if (!tag.getMainItem().isEmpty()) {
             Identifier registryName = RegisteredObjectsHelper.getKeyOrThrow(tag.getMainItem().getItem());
 
-            PonderButton b = new PonderButton(itemCenterX - layout.getTotalWidth() / 2 - 48, itemCenterY - 10).showing(tag.getMainItem());
+            PonderButton b = new PonderButton(itemCenterX - layout.getTotalWidth() / 2 - 48, itemCenterY - 10).showing(
+                tag.getMainItem());
             //b.withCustomBackground(PonderTheme.Key.PONDER_BACKGROUND_IMPORTANT.c());
 
             if (PonderIndex.getSceneAccess().doScenesExistForId(registryName)) {
@@ -100,7 +105,8 @@ public class PonderTagScreen extends AbstractPonderScreen {
                     ScreenOpener.transitionTo(PonderUI.of(tag.getMainItem(), tag));
                 });
             } else {
-                b.withBorderColors(registryName.getNamespace().equals("minecraft") ? PonderUI.MISSING_VANILLA_ENTRY : PonderUI.MISSING_MODDED_ENTRY)
+                b.withBorderColors(registryName.getNamespace()
+                        .equals("minecraft") ? PonderUI.MISSING_VANILLA_ENTRY : PonderUI.MISSING_MODDED_ENTRY)
                     .animateColors(false);
             }
 
@@ -124,12 +130,14 @@ public class PonderTagScreen extends AbstractPonderScreen {
         int mX = (int) (minecraft.mouseHandler.xpos() * (double) w.getGuiScaledWidth() / (double) w.getScreenWidth());
         int mY = (int) (minecraft.mouseHandler.ypos() * (double) w.getGuiScaledHeight() / (double) w.getScreenHeight());
         for (GuiEventListener child : children()) {
-            if (child == backTrack)
+            if (child == backTrack) {
                 continue;
-            if (child instanceof PonderButton button)
+            }
+            if (child instanceof PonderButton button) {
                 if (button.isMouseOver(mX, mY)) {
                     hoveredItem = button.getItem();
                 }
+            }
         }
     }
 
@@ -154,8 +162,8 @@ public class PonderTagScreen extends AbstractPonderScreen {
         int streakHeight = 35;
         UIRenderHelper.streak(graphics, 0, x - 4, y - 12 + streakHeight / 2, streakHeight, 240);
         //PonderUI.renderBox(poseStack, 21, 21, 30, 30, false);
-        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE).at(21, 21, 100).withBounds(30, 30)
-            .render(graphics);
+        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE).at(21, 21, 100)
+            .withBounds(30, 30).render(graphics);
 
         graphics.drawString(
             font,
@@ -188,16 +196,17 @@ public class PonderTagScreen extends AbstractPonderScreen {
 
 
         //PonderUI.renderBox(poseStack, x - 3, y - 3, w + 6, h + 6, false);
-        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE).at(x - 3, y - 3, 90).withBounds(w + 6, h + 6)
-            .render(graphics);
+        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE)
+            .at(x - 3, y - 3, 90).withBounds(w + 6, h + 6).render(graphics);
 
         ClientFontHelper.drawSplitString(graphics, font, desc, x, y, w, UIRenderHelper.COLOR_TEXT.getFirst().getRGB());
         poseStack.popMatrix();
     }
 
     protected void renderItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        if (items.isEmpty())
+        if (items.isEmpty()) {
             return;
+        }
 
         int x = (int) (width * itemXmult);
         int y = getItemsY();
@@ -209,10 +218,17 @@ public class PonderTagScreen extends AbstractPonderScreen {
         poseStack.pushMatrix();
         poseStack.translate(x, y);
         new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE)
-            .at((windowWidth - stringWidth) / 2f - 5, itemArea.getY() - 21, 100).withBounds(stringWidth + 10, 10).render(graphics);
+            .at((windowWidth - stringWidth) / 2f - 5, itemArea.getY() - 21, 100).withBounds(stringWidth + 10, 10)
+            .render(graphics);
 
         //		UIRenderHelper.streak(0, itemArea.getX() - 10, itemArea.getY() - 20, 20, 180, 0x101010);
-        graphics.drawCenteredString(font, relatedTitle, windowWidth / 2, itemArea.getY() - 20, UIRenderHelper.COLOR_TEXT.getFirst().getRGB());
+        graphics.drawCenteredString(
+            font,
+            relatedTitle,
+            windowWidth / 2,
+            itemArea.getY() - 20,
+            UIRenderHelper.COLOR_TEXT.getFirst().getRGB()
+        );
 
         UIRenderHelper.streak(graphics, 0, 0, 0, itemArea.getHeight() + 10, itemArea.getWidth() / 2 + 75);
         UIRenderHelper.streak(graphics, 180, 0, 0, itemArea.getHeight() + 10, itemArea.getWidth() / 2 + 75);
@@ -226,8 +242,9 @@ public class PonderTagScreen extends AbstractPonderScreen {
     }
 
     protected void renderChapters(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        if (chapters.isEmpty())
+        if (chapters.isEmpty()) {
             return;
+        }
 
         int chapterX = (int) (width * chapterXmult);
         int chapterY = (int) (height * chapterYmult);
@@ -267,8 +284,9 @@ public class PonderTagScreen extends AbstractPonderScreen {
 
     @Override
     public boolean isEquivalentTo(NavigatableSimiScreen other) {
-        if (other instanceof PonderTagScreen)
+        if (other instanceof PonderTagScreen) {
             return tag == ((PonderTagScreen) other).tag;
+        }
         return super.isEquivalentTo(other);
     }
 

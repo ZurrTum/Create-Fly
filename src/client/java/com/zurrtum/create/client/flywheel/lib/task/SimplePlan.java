@@ -29,13 +29,20 @@ public record SimplePlan<C>(List<RunnableWithContext<C>> parallelTasks) implemen
             return;
         }
 
-        taskExecutor.execute(() -> Distribute.tasks(taskExecutor, context, onCompletion, parallelTasks, RunnableWithContext::run));
+        taskExecutor.execute(() -> Distribute.tasks(
+            taskExecutor,
+            context,
+            onCompletion,
+            parallelTasks,
+            RunnableWithContext::run
+        ));
     }
 
     @Override
     public Plan<C> and(Plan<C> plan) {
         if (plan instanceof SimplePlan<C> simple) {
-            return of(ImmutableList.<RunnableWithContext<C>>builder().addAll(parallelTasks).addAll(simple.parallelTasks).build());
+            return of(ImmutableList.<RunnableWithContext<C>>builder().addAll(parallelTasks).addAll(simple.parallelTasks)
+                .build());
         }
         return SimplyComposedPlan.super.and(plan);
     }

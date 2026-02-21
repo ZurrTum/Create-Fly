@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.mechanicalArm;
 
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
@@ -23,7 +24,6 @@ import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import net.minecraft.core.BlockPos;
@@ -71,7 +71,11 @@ public class AllArmInteractionPointTypes {
     public static final RespawnAnchorType RESPAWN_ANCHOR = register("respawn_anchor", new RespawnAnchorType());
 
     private static <T extends ArmInteractionPointType> T register(String name, T type) {
-        return Registry.register(CreateRegistries.ARM_INTERACTION_POINT_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), type);
+        return Registry.register(
+            CreateRegistries.ARM_INTERACTION_POINT_TYPE,
+            Identifier.fromNamespaceAndPath(MOD_ID, name),
+            type
+        );
     }
 
     public static void register() {
@@ -177,8 +181,8 @@ public class AllArmInteractionPointTypes {
     public static class FunnelType extends ArmInteractionPointType {
         @Override
         public boolean canCreatePoint(Level level, BlockPos pos, BlockState state) {
-            return state.getBlock() instanceof AbstractFunnelBlock && !(state.hasProperty(FunnelBlock.EXTRACTING) && state.getValue(FunnelBlock.EXTRACTING)) && !(state.hasProperty(
-                BeltFunnelBlock.SHAPE) && state.getValue(BeltFunnelBlock.SHAPE) == Shape.PUSHING);
+            return state.getBlock() instanceof AbstractFunnelBlock && !(state.hasProperty(FunnelBlock.EXTRACTING) && state.getValue(
+                FunnelBlock.EXTRACTING)) && !(state.hasProperty(BeltFunnelBlock.SHAPE) && state.getValue(BeltFunnelBlock.SHAPE) == Shape.PUSHING);
         }
 
         @Override
@@ -275,7 +279,12 @@ public class AllArmInteractionPointTypes {
     //
 
     public static class DepositOnlyArmInteractionPoint extends ArmInteractionPoint {
-        public DepositOnlyArmInteractionPoint(ArmInteractionPointType type, Level level, BlockPos pos, BlockState state) {
+        public DepositOnlyArmInteractionPoint(
+            ArmInteractionPointType type,
+            Level level,
+            BlockPos pos,
+            BlockState state
+        ) {
             super(type, level, pos, state);
         }
 
@@ -314,15 +323,18 @@ public class AllArmInteractionPointTypes {
         public void keepAlive() {
             super.keepAlive();
             BeltBlockEntity beltBE = BeltHelper.getSegmentBE(level, pos);
-            if (beltBE == null)
+            if (beltBE == null) {
                 return;
+            }
             TransportedItemStackHandlerBehaviour transport = beltBE.getBehaviour(TransportedItemStackHandlerBehaviour.TYPE);
-            if (transport == null)
+            if (transport == null) {
                 return;
+            }
             MutableBoolean found = new MutableBoolean(false);
             transport.handleProcessingOnAllItems(tis -> {
-                if (found.isTrue())
+                if (found.isTrue()) {
                     return TransportedResult.doNothing();
+                }
                 tis.lockedExternally = true;
                 found.setTrue();
                 return TransportedResult.doNothing();
@@ -349,8 +361,9 @@ public class AllArmInteractionPointTypes {
             if (input.isEmpty()) {
                 return remainder;
             } else {
-                if (!simulate)
+                if (!simulate) {
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), remainder);
+                }
                 return input;
             }
         }
@@ -368,22 +381,25 @@ public class AllArmInteractionPointTypes {
 
         @Override
         protected Vec3 getInteractionPositionVector() {
-            return super.getInteractionPositionVector().add(Vec3.atLowerCornerOf(getInteractionDirection().getUnitVec3i()).scale(.5f));
+            return super.getInteractionPositionVector()
+                .add(Vec3.atLowerCornerOf(getInteractionDirection().getUnitVec3i()).scale(.5f));
         }
 
         @Override
         public void updateCachedState() {
             BlockState oldState = cachedState;
             super.updateCachedState();
-            if (oldState != cachedState)
+            if (oldState != cachedState) {
                 cachedAngles = null;
+            }
         }
 
         @Override
         public ItemStack extract(ArmBlockEntity armBlockEntity, int slot, int amount, boolean simulate) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (!(be instanceof MechanicalCrafterBlockEntity crafter))
+            if (!(be instanceof MechanicalCrafterBlockEntity crafter)) {
                 return ItemStack.EMPTY;
+            }
             CrafterItemHandler inventory = crafter.getInventory();
             ItemStack stack = inventory.getStack();
             int count = stack.getCount();
@@ -413,15 +429,17 @@ public class AllArmInteractionPointTypes {
 
         @Override
         protected Vec3 getInteractionPositionVector() {
-            return super.getInteractionPositionVector().add(Vec3.atLowerCornerOf(getInteractionDirection().getUnitVec3i()).scale(.65f));
+            return super.getInteractionPositionVector()
+                .add(Vec3.atLowerCornerOf(getInteractionDirection().getUnitVec3i()).scale(.65f));
         }
 
         @Override
         public void updateCachedState() {
             BlockState oldState = cachedState;
             super.updateCachedState();
-            if (oldState != cachedState)
+            if (oldState != cachedState) {
                 cachedAngles = null;
+            }
         }
     }
 
@@ -458,29 +476,35 @@ public class AllArmInteractionPointTypes {
         public void updateCachedState() {
             BlockState oldState = cachedState;
             super.updateCachedState();
-            if (oldState != cachedState)
+            if (oldState != cachedState) {
                 cachedAngles = null;
+            }
         }
 
         @Override
         public ItemStack insert(ArmBlockEntity armBlockEntity, ItemStack stack, boolean simulate) {
             ServerFilteringBehaviour filtering = BlockEntityBehaviour.get(level, pos, ServerFilteringBehaviour.TYPE);
             InvManipulationBehaviour inserter = BlockEntityBehaviour.get(level, pos, InvManipulationBehaviour.TYPE);
-            if (cachedState.getValueOrElse(BlockStateProperties.POWERED, false))
+            if (cachedState.getValueOrElse(BlockStateProperties.POWERED, false)) {
                 return stack;
-            if (inserter == null)
+            }
+            if (inserter == null) {
                 return stack;
-            if (filtering != null && !filtering.test(stack))
+            }
+            if (filtering != null && !filtering.test(stack)) {
                 return stack;
-            if (simulate)
+            }
+            if (simulate) {
                 inserter.simulate();
+            }
             ItemStack insert = inserter.insert(stack);
             if (!simulate && insert.getCount() != stack.getCount()) {
                 BlockEntity blockEntity = level.getBlockEntity(pos);
                 if (blockEntity instanceof FunnelBlockEntity funnelBlockEntity) {
                     funnelBlockEntity.onTransfer(stack);
-                    if (funnelBlockEntity.hasFlap())
+                    if (funnelBlockEntity.hasFlap()) {
                         funnelBlockEntity.flap(true);
+                    }
                 }
             }
             return insert;
@@ -495,10 +519,12 @@ public class AllArmInteractionPointTypes {
         @Override
         public ItemStack insert(ArmBlockEntity armBlockEntity, ItemStack stack, boolean simulate) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (!(blockEntity instanceof CampfireBlockEntity campfireBE))
+            if (!(blockEntity instanceof CampfireBlockEntity campfireBE)) {
                 return stack;
-            if (!level.recipeAccess().propertySet(RecipePropertySet.CAMPFIRE_INPUT).test(stack))
+            }
+            if (!level.recipeAccess().propertySet(RecipePropertySet.CAMPFIRE_INPUT).test(stack)) {
                 return stack;
+            }
             if (simulate) {
                 boolean hasSpace = false;
                 for (ItemStack campfireStack : campfireBE.getItems()) {
@@ -507,8 +533,9 @@ public class AllArmInteractionPointTypes {
                         break;
                     }
                 }
-                if (!hasSpace)
+                if (!hasSpace) {
                     return stack;
+                }
                 ItemStack remainder = stack.copy();
                 remainder.shrink(1);
                 return remainder;
@@ -539,8 +566,9 @@ public class AllArmInteractionPointTypes {
         @Override
         public ItemStack extract(ArmBlockEntity armBlockEntity, int slot, int amount, boolean simulate) {
             Container handler = getHandler(armBlockEntity);
-            if (handler == null)
+            if (handler == null) {
                 return ItemStack.EMPTY;
+            }
             if (simulate) {
                 return handler.count(stack -> true, amount, Direction.DOWN);
             }
@@ -565,29 +593,37 @@ public class AllArmInteractionPointTypes {
 
         @Override
         public ItemStack insert(ArmBlockEntity armBlockEntity, ItemStack stack, boolean simulate) {
-            if (stack.get(DataComponents.JUKEBOX_PLAYABLE) == null)
+            if (stack.get(DataComponents.JUKEBOX_PLAYABLE) == null) {
                 return stack;
-            if (cachedState.getValueOrElse(JukeboxBlock.HAS_RECORD, true))
+            }
+            if (cachedState.getValueOrElse(JukeboxBlock.HAS_RECORD, true)) {
                 return stack;
-            if (!(level.getBlockEntity(pos) instanceof JukeboxBlockEntity jukeboxBE))
+            }
+            if (!(level.getBlockEntity(pos) instanceof JukeboxBlockEntity jukeboxBE)) {
                 return stack;
-            if (!jukeboxBE.getTheItem().isEmpty())
+            }
+            if (!jukeboxBE.getTheItem().isEmpty()) {
                 return stack;
+            }
             ItemStack remainder = stack.copy();
             ItemStack toInsert = remainder.split(1);
-            if (!simulate)
+            if (!simulate) {
                 jukeboxBE.setTheItem(toInsert);
+            }
             return remainder;
         }
 
         @Override
         public ItemStack extract(ArmBlockEntity armBlockEntity, int slot, int amount, boolean simulate) {
-            if (!cachedState.getValueOrElse(JukeboxBlock.HAS_RECORD, false))
+            if (!cachedState.getValueOrElse(JukeboxBlock.HAS_RECORD, false)) {
                 return ItemStack.EMPTY;
-            if (!(level.getBlockEntity(pos) instanceof JukeboxBlockEntity jukeboxBE))
+            }
+            if (!(level.getBlockEntity(pos) instanceof JukeboxBlockEntity jukeboxBE)) {
                 return ItemStack.EMPTY;
-            if (!simulate)
+            }
+            if (!simulate) {
                 return jukeboxBE.removeItem(slot, amount);
+            }
             return jukeboxBE.getTheItem();
         }
     }
@@ -604,12 +640,15 @@ public class AllArmInteractionPointTypes {
 
         @Override
         public ItemStack insert(ArmBlockEntity armBlockEntity, ItemStack stack, boolean simulate) {
-            if (!stack.is(Items.GLOWSTONE))
+            if (!stack.is(Items.GLOWSTONE)) {
                 return stack;
-            if (cachedState.getValueOrElse(RespawnAnchorBlock.CHARGE, 4) == 4)
+            }
+            if (cachedState.getValueOrElse(RespawnAnchorBlock.CHARGE, 4) == 4) {
                 return stack;
-            if (!simulate)
+            }
+            if (!simulate) {
                 RespawnAnchorBlock.charge(null, level, pos, cachedState);
+            }
             ItemStack remainder = stack.copy();
             remainder.shrink(1);
             return remainder;

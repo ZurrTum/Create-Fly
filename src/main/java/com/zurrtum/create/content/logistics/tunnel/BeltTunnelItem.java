@@ -23,23 +23,31 @@ public class BeltTunnelItem extends BlockItem {
     @Override
     protected boolean canPlace(BlockPlaceContext ctx, BlockState state) {
         Player playerentity = ctx.getPlayer();
-        CollisionContext iselectioncontext = playerentity == null ? CollisionContext.empty() : CollisionContext.of(playerentity);
+        CollisionContext iselectioncontext = playerentity == null ? CollisionContext.empty() : CollisionContext.of(
+            playerentity);
         Level world = ctx.getLevel();
         BlockPos pos = ctx.getClickedPos();
-        return (!mustSurvive() || AllBlocks.ANDESITE_TUNNEL.isValidPositionForPlacement(state, world, pos)) && world.isUnobstructed(
+        return (!mustSurvive() || AllBlocks.ANDESITE_TUNNEL.isValidPositionForPlacement(
             state,
-            pos,
-            iselectioncontext
-        );
+            world,
+            pos
+        )) && world.isUnobstructed(state, pos, iselectioncontext);
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, Player p_195943_3_, ItemStack p_195943_4_, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(
+        BlockPos pos,
+        Level world,
+        Player p_195943_3_,
+        ItemStack p_195943_4_,
+        BlockState state
+    ) {
         boolean flag = super.updateCustomBlockEntityTag(pos, world, p_195943_3_, p_195943_4_, state);
         if (!world.isClientSide()) {
             BeltBlockEntity belt = BeltHelper.getSegmentBE(world, pos.below());
-            if (belt != null && belt.casing == CasingType.NONE)
+            if (belt != null && belt.casing == CasingType.NONE) {
                 belt.setCasingType(state.is(AllBlocks.ANDESITE_TUNNEL) ? CasingType.ANDESITE : CasingType.BRASS);
+            }
         }
         return flag;
     }

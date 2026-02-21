@@ -30,7 +30,8 @@ public class CartAssemblerBlockItem extends BlockItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (tryPlaceAssembler(context)) {
-            context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1, 1);
+            context.getLevel()
+                .playSound(null, context.getClickedPos(), SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1, 1);
             return InteractionResult.SUCCESS;
         }
         return super.useOn(context);
@@ -43,38 +44,49 @@ public class CartAssemblerBlockItem extends BlockItem {
         Block block = state.getBlock();
         Player player = context.getPlayer();
 
-        if (player == null)
+        if (player == null) {
             return false;
+        }
         if (!(block instanceof BaseRailBlock abstractRailBlock)) {
             player.displayClientMessage(Component.translatable("create.block.cart_assembler.invalid"), true);
             return false;
         }
 
         RailShape shape = state.getValue(abstractRailBlock.getShapeProperty());
-        if (shape != RailShape.EAST_WEST && shape != RailShape.NORTH_SOUTH)
+        if (shape != RailShape.EAST_WEST && shape != RailShape.NORTH_SOUTH) {
             return false;
+        }
 
-        BlockState newState = AllBlocks.CART_ASSEMBLER.defaultBlockState().setValue(CartAssemblerBlock.RAIL_SHAPE, shape);
+        BlockState newState = AllBlocks.CART_ASSEMBLER.defaultBlockState()
+            .setValue(CartAssemblerBlock.RAIL_SHAPE, shape);
         CartAssembleRailType newType = null;
-        for (CartAssembleRailType type : CartAssembleRailType.values())
-            if (type.matches(state))
+        for (CartAssembleRailType type : CartAssembleRailType.values()) {
+            if (type.matches(state)) {
                 newType = type;
-        if (newType == null)
+            }
+        }
+        if (newType == null) {
             return false;
-        if (world.isClientSide())
+        }
+        if (world.isClientSide()) {
             return true;
+        }
 
         newState = newState.setValue(CartAssemblerBlock.RAIL_TYPE, newType);
-        if (state.hasProperty(ControllerRailBlock.BACKWARDS))
+        if (state.hasProperty(ControllerRailBlock.BACKWARDS)) {
             newState = newState.setValue(CartAssemblerBlock.BACKWARDS, state.getValue(ControllerRailBlock.BACKWARDS));
-        else {
+        } else {
             Direction direction = player.getMotionDirection();
-            newState = newState.setValue(CartAssemblerBlock.BACKWARDS, direction.getAxisDirection() == AxisDirection.POSITIVE);
+            newState = newState.setValue(
+                CartAssemblerBlock.BACKWARDS,
+                direction.getAxisDirection() == AxisDirection.POSITIVE
+            );
         }
 
         world.setBlockAndUpdate(pos, newState);
-        if (!player.isCreative())
+        if (!player.isCreative()) {
             context.getItemInHand().shrink(1);
+        }
 
         AdvancementBehaviour.setPlacedBy(world, pos, player);
         return true;

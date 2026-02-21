@@ -28,11 +28,18 @@ public class OrientedRotatingVisual<T extends KineticBlockEntity> extends Kineti
      * @param to    The orientation to rotate to.
      * @param model The model to spin.
      */
-    public OrientedRotatingVisual(VisualizationContext context, T blockEntity, float partialTick, Direction from, Direction to, Model model) {
+    public OrientedRotatingVisual(
+        VisualizationContext context,
+        T blockEntity,
+        float partialTick,
+        Direction from,
+        Direction to,
+        Model model
+    ) {
         super(context, blockEntity, partialTick);
 
-        rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, model).createInstance().rotateToFace(from, to).setup(blockEntity)
-            .setPosition(getVisualPosition());
+        rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, model).createInstance()
+            .rotateToFace(from, to).setup(blockEntity).setPosition(getVisualPosition());
 
         rotatingModel.setChanged();
     }
@@ -40,14 +47,29 @@ public class OrientedRotatingVisual<T extends KineticBlockEntity> extends Kineti
     public static <T extends KineticBlockEntity> SimpleBlockEntityVisualizer.Factory<T> of(PartialModel partial) {
         return (context, blockEntity, partialTick) -> {
             Direction facing = blockEntity.getBlockState().getValue(BlockStateProperties.FACING);
-            return new OrientedRotatingVisual<>(context, blockEntity, partialTick, Direction.SOUTH, facing, Models.partial(partial));
+            return new OrientedRotatingVisual<>(
+                context,
+                blockEntity,
+                partialTick,
+                Direction.SOUTH,
+                facing,
+                Models.partial(partial)
+            );
         };
     }
 
     public static <T extends KineticBlockEntity> SimpleBlockEntityVisualizer.Factory<T> backHorizontal(PartialModel partial) {
         return (context, blockEntity, partialTick) -> {
-            Direction facing = blockEntity.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
-            return new OrientedRotatingVisual<>(context, blockEntity, partialTick, Direction.SOUTH, facing, Models.partial(partial));
+            Direction facing = blockEntity.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)
+                .getOpposite();
+            return new OrientedRotatingVisual<>(
+                context,
+                blockEntity,
+                partialTick,
+                Direction.SOUTH,
+                facing,
+                Models.partial(partial)
+            );
         };
     }
 

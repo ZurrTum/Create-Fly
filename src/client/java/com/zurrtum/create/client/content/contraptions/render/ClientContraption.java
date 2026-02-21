@@ -100,7 +100,8 @@ public class ClientContraption {
 
     public void invalidateStructure() {
         for (ChunkSectionLayer renderType : ChunkSectionLayer.values()) {
-            SuperByteBufferCache.getInstance().invalidate(ContraptionEntityRenderer.CONTRAPTION, Pair.of(contraption, renderType));
+            SuperByteBufferCache.getInstance()
+                .invalidate(ContraptionEntityRenderer.CONTRAPTION, Pair.of(contraption, renderType));
         }
 
         structureVersion++;
@@ -110,7 +111,11 @@ public class ClientContraption {
         for (StructureBlockInfo info : contraption.getBlocks().values()) {
             renderLevel.setBlock(info.pos(), info.state(), 0);
 
-            BlockEntity blockEntity = readBlockEntity(renderLevel, info, contraption.getIsLegacy().getBoolean(info.pos()));
+            BlockEntity blockEntity = readBlockEntity(
+                renderLevel,
+                info,
+                contraption.getIsLegacy().getBoolean(info.pos())
+            );
 
             if (blockEntity != null) {
                 renderLevel.setBlockEntity(blockEntity);
@@ -139,8 +144,9 @@ public class ClientContraption {
 
         if (legacy) {
             // for contraptions that were assembled pre-updateTags, we need to use the old strategy.
-            if (nbt == null)
+            if (nbt == null) {
                 return null;
+            }
 
             nbt.putInt("x", pos.getX());
             nbt.putInt("y", pos.getY());
@@ -151,13 +157,17 @@ public class ClientContraption {
             return be;
         }
 
-        if (!state.hasBlockEntity() || !(state.getBlock() instanceof EntityBlock entityBlock))
+        if (!state.hasBlockEntity() || !(state.getBlock() instanceof EntityBlock entityBlock)) {
             return null;
+        }
 
         BlockEntity be = entityBlock.newBlockEntity(pos, state);
         postprocessReadBlockEntity(level, be, state);
         if (be != null && nbt != null) {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(be.problemPath(), LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                be.problemPath(),
+                LOGGER
+            )) {
                 be.loadWithComponents(TagValueInput.create(logging, level.registryAccess(), nbt));
             }
         }

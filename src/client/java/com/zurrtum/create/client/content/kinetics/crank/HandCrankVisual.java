@@ -26,11 +26,17 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
     public HandCrankVisual(VisualizationContext modelManager, HandCrankBlockEntity blockEntity, float partialTick) {
         super(modelManager, blockEntity, partialTick);
 
-        crank = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.HAND_CRANK_HANDLE)).createInstance();
+        crank = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.HAND_CRANK_HANDLE)
+        ).createInstance();
 
         rotateCrank(partialTick);
 
-        rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.HAND_CRANK_BASE)).createInstance();
+        rotatingModel = instancerProvider().instancer(
+            AllInstanceTypes.ROTATING,
+            Models.partial(AllPartialModels.HAND_CRANK_BASE)
+        ).createInstance();
 
         rotatingModel.setup(HandCrankVisual.this.blockEntity).setPosition(getVisualPosition())
             .rotateToFace(blockState.getValue(BlockStateProperties.FACING)).setChanged();
@@ -47,7 +53,8 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
 
         crank.setIdentityTransform().translate(getVisualPosition()).center()
             .rotate(angle, Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()))
-            .rotate(new Quaternionf().rotateTo(0, 0, -1, facing.getStepX(), facing.getStepY(), facing.getStepZ())).uncenter().setChanged();
+            .rotate(new Quaternionf().rotateTo(0, 0, -1, facing.getStepX(), facing.getStepY(), facing.getStepZ()))
+            .uncenter().setChanged();
     }
 
     @Override

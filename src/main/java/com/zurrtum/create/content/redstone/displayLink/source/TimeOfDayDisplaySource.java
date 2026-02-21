@@ -18,12 +18,15 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        if (!(context.level() instanceof ServerLevel sLevel))
+        if (!(context.level() instanceof ServerLevel sLevel)) {
             return EMPTY_TIME;
-        if (!(context.getSourceBlockEntity() instanceof CuckooClockBlockEntity ccbe))
+        }
+        if (!(context.getSourceBlockEntity() instanceof CuckooClockBlockEntity ccbe)) {
             return EMPTY_TIME;
-        if (ccbe.getSpeed() == 0)
+        }
+        if (ccbe.getSpeed() == 0) {
             return EMPTY_TIME;
+        }
 
         boolean c12 = context.sourceConfig().getIntOr("Cycle", 0) == 0;
 
@@ -35,8 +38,9 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
         minutes = minutes / 5 * 5;
         if (c12) {
             hours %= 12;
-            if (hours == 0)
+            if (hours == 0) {
                 hours = 12;
+            }
         }
 
         MutableComponent component = Component.literal((hours < 10 ? " " : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + (c12 ? " " : ""));

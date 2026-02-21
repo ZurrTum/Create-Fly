@@ -63,8 +63,9 @@ public class GlobalRailwayManager {
     }
 
     private void loadTrackData(MinecraftServer server) {
-        if (savedData != null)
+        if (savedData != null) {
             return;
+        }
         savedData = RailwaySavedData.load(server);
         trains = savedData.getTrains();
         trackNetworks = savedData.getTrackNetworks();
@@ -83,8 +84,9 @@ public class GlobalRailwayManager {
     }
 
     public void markTracksDirty() {
-        if (savedData != null)
+        if (savedData != null) {
             savedData.setDirty();
+        }
     }
 
     public void addTrain(Train train) {
@@ -94,8 +96,9 @@ public class GlobalRailwayManager {
 
     public void removeTrain(UUID id) {
         Train removed = trains.remove(id);
-        if (removed == null)
+        if (removed == null) {
             return;
+        }
         movingTrains.remove(removed);
         waitingTrains.remove(removed);
     }
@@ -149,27 +152,34 @@ public class GlobalRailwayManager {
 
     @Nullable
     public TrackGraph getGraph(TrackNodeLocation vertex) {
-        if (trackNetworks == null)
+        if (trackNetworks == null) {
             return null;
-        for (TrackGraph railGraph : trackNetworks.values())
-            if (railGraph.locateNode(vertex) != null)
+        }
+        for (TrackGraph railGraph : trackNetworks.values()) {
+            if (railGraph.locateNode(vertex) != null) {
                 return railGraph;
+            }
+        }
         return null;
     }
 
     public List<TrackGraph> getGraphs(TrackNodeLocation vertex) {
-        if (trackNetworks == null)
+        if (trackNetworks == null) {
             return Collections.emptyList();
+        }
         ArrayList<TrackGraph> intersecting = new ArrayList<>();
-        for (TrackGraph railGraph : trackNetworks.values())
-            if (railGraph.locateNode(vertex) != null)
+        for (TrackGraph railGraph : trackNetworks.values()) {
+            if (railGraph.locateNode(vertex) != null) {
                 intersecting.add(railGraph);
+            }
+        }
         return intersecting;
     }
 
     public void tick(ServerLevel level) {
-        if (level.dimension() != Level.OVERWORLD)
+        if (level.dimension() != Level.OVERWORLD) {
             return;
+        }
 
         for (SignalEdgeGroup group : signalEdgeGroups.values()) {
             group.trains.clear();
@@ -189,8 +199,9 @@ public class GlobalRailwayManager {
         }
 
         GlobalTrainDisplayData.updateTick = level.getGameTime() % 100 == 0;
-        if (GlobalTrainDisplayData.updateTick)
+        if (GlobalTrainDisplayData.updateTick) {
             GlobalTrainDisplayData.refresh();
+        }
 
         //		if (AllKeys.isKeyDown(GLFW.GLFW_KEY_H) && AllKeys.altDown())
         //			for (TrackGraph trackGraph : trackNetworks.values())
@@ -202,14 +213,18 @@ public class GlobalRailwayManager {
 
     private void tickTrains(Level level) {
         // keeping two lists ensures a tick order starting at longest waiting
-        for (Train train : waitingTrains)
+        for (Train train : waitingTrains) {
             train.earlyTick(level);
-        for (Train train : movingTrains)
+        }
+        for (Train train : movingTrains) {
             train.earlyTick(level);
-        for (Train train : waitingTrains)
+        }
+        for (Train train : waitingTrains) {
             train.tick(level);
-        for (Train train : movingTrains)
+        }
+        for (Train train : movingTrains) {
             train.tick(level);
+        }
 
         PlayerList playerManager = level.getServer().getPlayerList();
         for (Iterator<Train> iterator = waitingTrains.iterator(); iterator.hasNext(); ) {
@@ -222,8 +237,9 @@ public class GlobalRailwayManager {
                 continue;
             }
 
-            if (train.navigation.waitingForSignal != null)
+            if (train.navigation.waitingForSignal != null) {
                 continue;
+            }
             movingTrains.add(train);
             iterator.remove();
         }
@@ -238,8 +254,9 @@ public class GlobalRailwayManager {
                 continue;
             }
 
-            if (train.navigation.waitingForSignal == null)
+            if (train.navigation.waitingForSignal == null) {
                 continue;
+            }
             waitingTrains.add(train);
             iterator.remove();
         }
@@ -247,8 +264,9 @@ public class GlobalRailwayManager {
     }
 
     public GlobalRailwayManager sided(LevelAccessor level) {
-        if (level != null && !level.isClientSide())
+        if (level != null && !level.isClientSide()) {
             return this;
+        }
         return AllClientHandle.INSTANCE.getGlobalRailwayManager();
     }
 

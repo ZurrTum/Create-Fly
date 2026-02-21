@@ -10,7 +10,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record SoulPulseEffectPacket(BlockPos pos, int distance, boolean canOverlap) implements Packet<ClientGamePacketListener> {
+public record SoulPulseEffectPacket(BlockPos pos, int distance,
+                                    boolean canOverlap) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, SoulPulseEffectPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         SoulPulseEffectPacket::pos,

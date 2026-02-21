@@ -93,8 +93,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         for (int size = 3; size > 0; size--) {
             this.size = size;
             updateFacingWithBoundingBox(facing, verticalOrientation);
-            if (survives())
+            if (survives()) {
                 break;
+            }
         }
     }
 
@@ -154,18 +155,20 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
     @Override
     protected AABB calculateBoundingBox(BlockPos blockPos, Direction direction) {
-        Vec3 pos = Vec3.atLowerCornerOf(getPos()).add(.5, .5, .5).subtract(Vec3.atLowerCornerOf(direction.getUnitVec3i()).scale(0.46875));
+        Vec3 pos = Vec3.atLowerCornerOf(getPos()).add(.5, .5, .5)
+            .subtract(Vec3.atLowerCornerOf(direction.getUnitVec3i()).scale(0.46875));
         double d1 = pos.x;
         double d2 = pos.y;
         double d3 = pos.z;
         setPosRaw(d1, d2, d3);
 
         Axis axis = direction.getAxis();
-        if (size == 2)
+        if (size == 2) {
             pos = pos.add(Vec3.atLowerCornerOf(axis.isHorizontal() ? direction.getCounterClockWise()
                     .getUnitVec3i() : verticalOrientation.getClockWise().getUnitVec3i()).scale(0.5))
                 .add(Vec3.atLowerCornerOf(axis.isHorizontal() ? Direction.UP.getUnitVec3i() : direction == Direction.UP ? verticalOrientation.getUnitVec3i() : verticalOrientation.getOpposite()
                     .getUnitVec3i()).scale(0.5));
+        }
 
         d1 = pos.x;
         d2 = pos.y;
@@ -210,8 +213,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
     @Override
     public boolean survives() {
         Level world = level();
-        if (!world.noCollision(this))
+        if (!world.noCollision(this)) {
             return false;
+        }
 
         int i = Math.max(1, getEntityWidth() / 16);
         int j = Math.max(1, getEntityHeight() / 16);
@@ -219,7 +223,8 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         BlockPos blockpos = pos.relative(direction.getOpposite());
         Direction upDirection = direction.getAxis()
             .isHorizontal() ? Direction.UP : direction == Direction.UP ? verticalOrientation : verticalOrientation.getOpposite();
-        Direction newDirection = direction.getAxis().isVertical() ? verticalOrientation.getClockWise() : direction.getCounterClockWise();
+        Direction newDirection = direction.getAxis()
+            .isVertical() ? verticalOrientation.getClockWise() : direction.getCounterClockWise();
         BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();
 
         for (int k = 0; k < i; ++k) {
@@ -228,8 +233,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
                 int j1 = (j - 1) / -2;
                 blockpos$mutable.set(blockpos).move(newDirection, k + i1).move(upDirection, l + j1);
                 BlockState blockstate = world.getBlockState(blockpos$mutable);
-                if (Block.canSupportCenter(world, blockpos$mutable, direction))
+                if (Block.canSupportCenter(world, blockpos$mutable, direction)) {
                     continue;
+                }
                 if (!blockstate.isSolid() && !DiodeBlock.isDiode(blockstate)) {
                     return false;
                 }
@@ -249,8 +255,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
     @Override
     public boolean skipAttackInteraction(Entity source) {
-        if (!(source instanceof Player player) || level().isClientSide())
+        if (!(source instanceof Player player) || level().isClientSide()) {
             return super.skipAttackInteraction(source);
+        }
 
         double attrib = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + (player.isCreative() ? 0 : -0.5F);
 
@@ -259,30 +266,35 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         Vec3 target = eyePos.add(look.scale(attrib));
 
         Optional<Vec3> rayTrace = getBoundingBox().clip(eyePos, target);
-        if (!rayTrace.isPresent())
+        if (!rayTrace.isPresent()) {
             return super.skipAttackInteraction(source);
+        }
 
         Vec3 hitVec = rayTrace.get();
         BlueprintSection sectionAt = getSectionAt(hitVec.subtract(position()));
         ItemStackHandler items = sectionAt.getItems();
 
-        if (items.getItem(9).isEmpty())
+        if (items.getItem(9).isEmpty()) {
             return super.skipAttackInteraction(source);
-        for (int i = 0, size = items.getContainerSize(); i < size; i++)
+        }
+        for (int i = 0, size = items.getContainerSize(); i < size; i++) {
             items.setItem(i, ItemStack.EMPTY);
+        }
         sectionAt.save(items);
         return true;
     }
 
     @Override
     public void dropItem(ServerLevel world, @Nullable Entity p_110128_1_) {
-        if (!world.getGameRules().get(GameRules.ENTITY_DROPS))
+        if (!world.getGameRules().get(GameRules.ENTITY_DROPS)) {
             return;
+        }
 
         playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
         if (p_110128_1_ instanceof Player playerentity) {
-            if (playerentity.getAbilities().instabuild)
+            if (playerentity.getAbilities().instabuild) {
                 return;
+            }
         }
 
         spawnAtLocation(world, AllItems.CRAFTING_BLUEPRINT.getDefaultInstance());
@@ -316,7 +328,10 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entityTrackerEntry) {
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            problemPath(),
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
             addAdditionalSaveData(view);
             return new NbtSpawnPacket(this, entityTrackerEntry, view.buildResult());
@@ -330,15 +345,19 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         if (nbt == null) {
             return;
         }
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            problemPath(),
+            Create.LOGGER
+        )) {
             readAdditionalSaveData(TagValueInput.create(logging, registryAccess(), nbt));
         }
     }
 
     @Override
     public InteractionResult interactAt(Player player, Vec3 vec, InteractionHand hand) {
-        if (FakePlayerHandler.has(player))
+        if (FakePlayerHandler.has(player)) {
             return InteractionResult.PASS;
+        }
 
         boolean holdingWrench = player.getItemInHand(hand).is(AllItems.WRENCH);
         BlueprintSection section = getSectionAt(vec);
@@ -373,8 +392,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
                     for (int slot = 0; slot < size; slot++) {
                         ItemStack stack = playerInv.getItem(slot);
-                        if (!requestedItem.test(world, stack))
+                        if (!requestedItem.test(world, stack)) {
                             continue;
+                        }
                         int used = stacksTaken[slot];
                         if (stack.getCount() == used) {
                             continue;
@@ -393,7 +413,8 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
                 if (success) {
                     CraftingInput input = CraftingInput.of(3, 3, craftingStacks);
-                    recipe = ((ServerLevel) world).recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, world, recipe).orElse(null);
+                    recipe = ((ServerLevel) world).recipeAccess()
+                        .getRecipeFor(RecipeType.CRAFTING, input, world, recipe).orElse(null);
                     if (recipe == null) {
                         success = false;
                     } else {
@@ -468,7 +489,12 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         return InteractionResult.SUCCESS;
     }
 
-    public static BlueprintPreviewPacket getPreview(BlueprintEntity be, int index, ServerPlayer player, boolean sneaking) {
+    public static BlueprintPreviewPacket getPreview(
+        BlueprintEntity be,
+        int index,
+        ServerPlayer player,
+        boolean sneaking
+    ) {
         try {
             return PREVIEW_CACHE.get(
                 be.getId() + "_" + index + "_" + player.getId() + (sneaking ? "_sneaking" : ""),
@@ -480,7 +506,12 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         }
     }
 
-    private static BlueprintPreviewPacket createPreview(BlueprintEntity be, int index, ServerPlayer player, boolean sneaking) {
+    private static BlueprintPreviewPacket createPreview(
+        BlueprintEntity be,
+        int index,
+        ServerPlayer player,
+        boolean sneaking
+    ) {
         BlueprintSection section = be.getSection(index);
         ItemStackHandler items = section.getItems();
         if (items.isEmpty()) {
@@ -505,8 +536,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
             requestedItems.add(requestedItem);
             for (int slot = 0; slot < size; slot++) {
                 ItemStack stack = playerInv.getItem(slot);
-                if (!requestedItem.test(world, stack))
+                if (!requestedItem.test(world, stack)) {
                     continue;
+                }
                 int used = stacksTaken[slot];
                 if (stack.getCount() == used) {
                     continue;
@@ -533,7 +565,8 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
             int craftingCount = resultStack.getCount();
             if (craftingCount < max) {
                 int count = craftingCount;
-                Object2IntLinkedOpenCustomHashMap<ItemStack> ingredients = BlueprintPreviewPacket.createMap(availableStacks);
+                Object2IntLinkedOpenCustomHashMap<ItemStack> ingredients = BlueprintPreviewPacket.createMap(
+                    availableStacks);
                 Outer:
                 while (count + craftingCount <= max) {
                     Search:
@@ -544,8 +577,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
                         }
                         for (int slot = 0; slot < size; slot++) {
                             ItemStack stack = playerInv.getItem(slot);
-                            if (!requestedItem.test(world, stack))
+                            if (!requestedItem.test(world, stack)) {
                                 continue;
+                            }
                             int used = stacksTaken[slot];
                             if (stack.getCount() == used) {
                                 continue;
@@ -555,7 +589,8 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
                         }
                         break Outer;
                     }
-                    ObjectBidirectionalIterator<Object2IntMap.Entry<ItemStack>> iterator = availableStacks.object2IntEntrySet().fastIterator();
+                    ObjectBidirectionalIterator<Object2IntMap.Entry<ItemStack>> iterator = availableStacks.object2IntEntrySet()
+                        .fastIterator();
                     do {
                         Object2IntMap.Entry<ItemStack> entry = iterator.next();
                         entry.setValue(entry.getIntValue() + ingredients.getInt(entry.getKey()));
@@ -574,8 +609,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
             vec = VecHelper.rotate(vec, getYRot(), Axis.Y);
             vec = VecHelper.rotate(vec, -getXRot(), Axis.X);
             vec = vec.add(0.5, 0.5, 0);
-            if (size == 3)
+            if (size == 3) {
                 vec = vec.add(1, 1, 0);
+            }
             int x = Mth.clamp(Mth.floor(vec.x), 0, size - 1);
             int y = Mth.clamp(Mth.floor(vec.y), 0, size - 1);
             index = x + y * size;
@@ -611,8 +647,9 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         }
 
         public Couple<ItemStack> getDisplayItems() {
-            if (cachedDisplayItems != null)
+            if (cachedDisplayItems != null) {
                 return cachedDisplayItems;
+            }
             return getRecipeCompound(index).flatMap(nbt -> nbt.read("Inventory", CreateCodecs.ITEM_LIST_CODEC)
                 .map(items -> Couple.create(items.get(9), items.get(10)))).orElse(EMPTY_DISPLAY);
         }
@@ -621,7 +658,10 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
             ItemStackHandler newInv = new ItemStackHandler(11);
             getRecipeCompound(index).ifPresentOrElse(
                 nbt -> {
-                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                        problemPath(),
+                        Create.LOGGER
+                    )) {
                         ValueInput view = TagValueInput.create(logging, registryAccess(), nbt);
                         newInv.readSlots(view);
                         inferredIcon = view.getBooleanOr("InferredIcon", false);
@@ -634,7 +674,10 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
         public void save(ItemStackHandler inventory) {
             cachedDisplayItems = null;
             if (!level().isClientSide()) {
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    problemPath(),
+                    Create.LOGGER
+                )) {
                     TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
                     inventory.writeSlots(view);
                     view.putBoolean("InferredIcon", inferredIcon);

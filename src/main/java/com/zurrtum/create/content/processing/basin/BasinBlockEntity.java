@@ -126,8 +126,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
         view.read("Overflow", CreateCodecs.ITEM_LIST_CODEC).ifPresent(spoutputBuffer::addAll);
         view.read("FluidOverflow", CreateCodecs.FLUID_LIST_CODEC).ifPresent(spoutputFluidBuffer::addAll);
 
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
+        }
 
         view.listOrEmpty("VisualizedItems", ItemStack.OPTIONAL_CODEC).stream()
             .forEach(stack -> visualizedOutputItems.add(IntAttached.with(OUTPUT_ANIMATION_TIME, stack)));
@@ -140,14 +141,16 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
         super.write(view, clientPacket);
         itemCapability.write(view);
 
-        if (preferredSpoutput != null)
+        if (preferredSpoutput != null) {
             view.store("PreferredSpoutput", Direction.CODEC, preferredSpoutput);
+        }
         view.store("DisabledSpoutput", CreateCodecs.DIRECTION_LIST_CODEC, disabledSpoutputs);
         view.store("Overflow", CreateCodecs.ITEM_LIST_CODEC, spoutputBuffer);
         view.store("FluidOverflow", CreateCodecs.FLUID_LIST_CODEC, spoutputFluidBuffer);
 
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
+        }
 
         ValueOutput.TypedOutputList<ItemStack> items = view.list("VisualizedItems", ItemStack.OPTIONAL_CODEC);
         visualizedOutputItems.stream().map(IntAttached::getValue).forEach(items::add);
@@ -187,11 +190,13 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
 
         if (!level.isClientSide()) {
             updateSpoutput();
-            if (recipeBackupCheck-- > 0)
+            if (recipeBackupCheck-- > 0) {
                 return;
+            }
             recipeBackupCheck = 20;
-            if (isEmpty())
+            if (isEmpty()) {
                 return;
+            }
             notifyChangeOfContents();
             return;
         }
@@ -215,11 +220,13 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
 
         disabledSpoutputs.remove(face);
         if (currentFacing == face) {
-            if (preferredSpoutput == face)
+            if (preferredSpoutput == face) {
                 preferredSpoutput = null;
+            }
             disabledSpoutputs.add(face);
-        } else
+        } else {
             preferredSpoutput = face;
+        }
 
         updateSpoutput();
     }
@@ -230,25 +237,34 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
         Direction newFacing = Direction.DOWN;
         for (Direction test : Iterate.horizontalDirections) {
             boolean canOutputTo = BasinBlock.canOutputTo(level, worldPosition, test);
-            if (canOutputTo && !disabledSpoutputs.contains(test))
+            if (canOutputTo && !disabledSpoutputs.contains(test)) {
                 newFacing = test;
+            }
         }
 
-        if (preferredSpoutput != null && BasinBlock.canOutputTo(level, worldPosition, preferredSpoutput) && preferredSpoutput != Direction.UP)
+        if (preferredSpoutput != null && BasinBlock.canOutputTo(
+            level,
+            worldPosition,
+            preferredSpoutput
+        ) && preferredSpoutput != Direction.UP) {
             newFacing = preferredSpoutput;
+        }
 
-        if (newFacing == currentFacing)
+        if (newFacing == currentFacing) {
             return;
+        }
 
         level.setBlockAndUpdate(worldPosition, blockState.setValue(BasinBlock.FACING, newFacing));
 
-        if (newFacing.getAxis().isVertical())
+        if (newFacing.getAxis().isVertical()) {
             return;
+        }
 
         for (int slot = 9; slot < 18; slot++) {
             ItemStack stack = itemCapability.getItem(slot);
-            if (stack.isEmpty())
+            if (stack.isEmpty()) {
                 continue;
+            }
             if (acceptOutputs(ImmutableList.of(stack), Collections.emptyList(), true)) {
                 acceptOutputs(ImmutableList.of(stack), Collections.emptyList(), false);
                 itemCapability.setItem(slot, ItemStack.EMPTY);
@@ -258,8 +274,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
         FluidInventory handler = outputTank.getCapability();
         for (int slot = 0; slot < 2; slot++) {
             FluidStack fs = handler.getStack(slot);
-            if (fs.isEmpty())
+            if (fs.isEmpty()) {
                 continue;
+            }
             fs = fs.copy();
             if (acceptOutputs(Collections.emptyList(), ImmutableList.of(fs), true)) {
                 handler.setStack(slot, FluidStack.EMPTY);
@@ -283,10 +300,12 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             ingredientRotation.setValue(ingredientRotation.getValue() + ingredientRotationSpeed.getValue());
         }
 
-        if ((!spoutputBuffer.isEmpty() || !spoutputFluidBuffer.isEmpty()) && !level.isClientSide())
+        if ((!spoutputBuffer.isEmpty() || !spoutputFluidBuffer.isEmpty()) && !level.isClientSide()) {
             tryClearingSpoutputOverflow();
-        if (!contentsChanged)
+        }
+        if (!contentsChanged) {
             return;
+        }
 
         contentsChanged = false;
         getOperator().ifPresent(be -> be.basinChecker.scheduleUpdate());
@@ -296,16 +315,18 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             BlockState stateToUpdate = level.getBlockState(toUpdate);
             if (stateToUpdate.getBlock() instanceof BasinBlock && stateToUpdate.getValue(BasinBlock.FACING) == offset.getOpposite()) {
                 BlockEntity be = level.getBlockEntity(toUpdate);
-                if (be instanceof BasinBlockEntity)
+                if (be instanceof BasinBlockEntity) {
                     ((BasinBlockEntity) be).contentsChanged = true;
+                }
             }
         }
     }
 
     private void tryClearingSpoutputOverflow() {
         BlockState blockState = getBlockState();
-        if (!(blockState.getBlock() instanceof BasinBlock))
+        if (!(blockState.getBlock() instanceof BasinBlock)) {
             return;
+        }
         Direction direction = blockState.getValue(BasinBlock.FACING);
         BlockEntity be = level.getBlockEntity(worldPosition.below().relative(direction));
 
@@ -316,8 +337,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             inserter = BlockEntityBehaviour.get(level, be.getBlockPos(), InvManipulationBehaviour.TYPE);
         }
 
-        if (filter != null && filter.isRecipeFilter())
+        if (filter != null && filter.isRecipeFilter()) {
             filter = null; // Do not test spout outputs against the recipe filter
+        }
 
         Direction opposite = direction.getOpposite();
         Container targetInv = be == null ? null : ItemHelper.getInventory(level, be.getBlockPos(), null, be, opposite);
@@ -325,7 +347,13 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             targetInv = inserter.getInventory();
         }
 
-        FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(level, be.getBlockPos(), null, be, opposite);
+        FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(
+            level,
+            be.getBlockPos(),
+            null,
+            be,
+            opposite
+        );
 
         boolean update = false;
 
@@ -339,24 +367,29 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
                 continue;
             }
 
-            if (targetInv == null)
+            if (targetInv == null) {
                 break;
+            }
 
-            if (targetInv.countSpace(itemStack, 1) == 0)
+            if (targetInv.countSpace(itemStack, 1) == 0) {
                 continue;
-            if (filter != null && !filter.test(itemStack))
+            }
+            if (filter != null && !filter.test(itemStack)) {
                 continue;
+            }
 
-            if (visualizedOutputItems.size() < 3)
+            if (visualizedOutputItems.size() < 3) {
                 visualizedOutputItems.add(IntAttached.withZero(itemStack));
+            }
             update = true;
 
             int count = itemStack.getCount();
             int insert = targetInv.insertExist(itemStack, opposite);
-            if (insert == count)
+            if (insert == count) {
                 iterator.remove();
-            else
+            } else {
                 itemStack.shrink(insert);
+            }
         }
 
         for (Iterator<FluidStack> iterator = spoutputFluidBuffer.iterator(); iterator.hasNext(); ) {
@@ -368,8 +401,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
                 continue;
             }
 
-            if (targetTank == null)
+            if (targetTank == null) {
                 break;
+            }
 
             if (targetTank instanceof SmartFluidTankBehaviour.InternalFluidHandler) {
                 if (!targetTank.forcePreciseInsert(fluidStack)) {
@@ -380,8 +414,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
             }
             update = true;
             iterator.remove();
-            if (visualizedOutputFluids.size() < 3)
+            if (visualizedOutputFluids.size() < 3) {
                 visualizedOutputFluids.add(IntAttached.withZero(fluidStack));
+            }
         }
 
         if (update) {
@@ -395,32 +430,39 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
         float totalUnits = 0;
 
         for (SmartFluidTankBehaviour behaviour : getTanks()) {
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             for (TankSegment tankSegment : behaviour.getTanks()) {
-                if (tankSegment.getRenderedFluid().isEmpty())
+                if (tankSegment.getRenderedFluid().isEmpty()) {
                     continue;
+                }
                 float units = tankSegment.getTotalUnits(partialTicks);
-                if (units < 1)
+                if (units < 1) {
                     continue;
+                }
                 totalUnits += units;
                 renderedFluids++;
             }
         }
 
-        if (renderedFluids == 0)
+        if (renderedFluids == 0) {
             return 0;
-        if (totalUnits < 1)
+        }
+        if (totalUnits < 1) {
             return 0;
+        }
         return totalUnits;
     }
 
     private Optional<BasinOperatingBlockEntity> getOperator() {
-        if (level == null)
+        if (level == null) {
             return Optional.empty();
+        }
         BlockEntity be = level.getBlockEntity(worldPosition.above(2));
-        if (be instanceof BasinOperatingBlockEntity)
+        if (be instanceof BasinOperatingBlockEntity) {
             return Optional.of((BasinOperatingBlockEntity) be);
+        }
         return Optional.empty();
     }
 
@@ -447,53 +489,84 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
 
     private boolean acceptOutputsInner(List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {
         BlockState blockState = getBlockState();
-        if (!(blockState.getBlock() instanceof BasinBlock))
+        if (!(blockState.getBlock() instanceof BasinBlock)) {
             return false;
+        }
 
         Direction direction = blockState.getValue(BasinBlock.FACING);
         if (direction != Direction.DOWN) {
 
             BlockEntity be = level.getBlockEntity(worldPosition.below().relative(direction));
 
-            InvManipulationBehaviour inserter = be == null ? null : BlockEntityBehaviour.get(level, be.getBlockPos(), InvManipulationBehaviour.TYPE);
+            InvManipulationBehaviour inserter = be == null ? null : BlockEntityBehaviour.get(
+                level,
+                be.getBlockPos(),
+                InvManipulationBehaviour.TYPE
+            );
             Direction opposite = direction.getOpposite();
-            Container targetInv = be == null ? null : ItemHelper.getInventory(level, be.getBlockPos(), null, be, opposite);
+            Container targetInv = be == null ? null : ItemHelper.getInventory(
+                level,
+                be.getBlockPos(),
+                null,
+                be,
+                opposite
+            );
             if (targetInv == null && inserter != null) {
                 targetInv = inserter.getInventory();
             }
-            FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(level, be.getBlockPos(), null, be, opposite);
+            FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(
+                level,
+                be.getBlockPos(),
+                null,
+                be,
+                opposite
+            );
             boolean externalTankNotPresent = targetTank == null;
 
-            if (!outputItems.isEmpty() && targetInv == null)
+            if (!outputItems.isEmpty() && targetInv == null) {
                 return false;
+            }
             if (!outputFluids.isEmpty() && externalTankNotPresent) {
                 // Special case - fluid outputs but output only accepts items
                 targetTank = outputTank.getCapability();
-                if (targetTank == null)
+                if (targetTank == null) {
                     return false;
-                if (!acceptFluidOutputsIntoBasin(outputFluids, simulate, targetTank))
+                }
+                if (!acceptFluidOutputsIntoBasin(outputFluids, simulate, targetTank)) {
                     return false;
+                }
             }
 
-            if (simulate)
+            if (simulate) {
                 return true;
-            for (ItemStack itemStack : outputItems)
-                if (!itemStack.isEmpty())
+            }
+            for (ItemStack itemStack : outputItems) {
+                if (!itemStack.isEmpty()) {
                     spoutputBuffer.add(itemStack.copy());
-            if (!externalTankNotPresent)
-                for (FluidStack fluidStack : outputFluids)
+                }
+            }
+            if (!externalTankNotPresent) {
+                for (FluidStack fluidStack : outputFluids) {
                     spoutputFluidBuffer.add(fluidStack.copy());
+                }
+            }
             return true;
         }
 
-        if (!acceptItemOutputsIntoBasin(outputItems, simulate, itemCapability))
+        if (!acceptItemOutputsIntoBasin(outputItems, simulate, itemCapability)) {
             return false;
-        if (outputFluids.isEmpty())
+        }
+        if (outputFluids.isEmpty()) {
             return true;
+        }
         return acceptFluidOutputsIntoBasin(outputFluids, simulate, outputTank.getCapability());
     }
 
-    private boolean acceptFluidOutputsIntoBasin(List<FluidStack> outputFluids, boolean simulate, FluidInventory targetTank) {
+    private boolean acceptFluidOutputsIntoBasin(
+        List<FluidStack> outputFluids,
+        boolean simulate,
+        FluidInventory targetTank
+    ) {
         if (simulate) {
             return targetTank.countSpace(outputFluids);
         } else {
@@ -516,8 +589,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public static HeatLevel getHeatLevelOf(BlockState state) {
-        if (state.hasProperty(BlazeBurnerBlock.HEAT_LEVEL))
+        if (state.hasProperty(BlazeBurnerBlock.HEAT_LEVEL)) {
             return state.getValue(BlazeBurnerBlock.HEAT_LEVEL);
+        }
         return state.is(AllBlockTags.PASSIVE_BOILER_HEATERS) && BlockHelper.isNotUnheated(state) ? HeatLevel.SMOULDERING : HeatLevel.NONE;
     }
 
@@ -618,8 +692,9 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
 
     @NotNull HeatLevel getHeatLevel() {
         if (cachedHeatLevel == null) {
-            if (level == null)
+            if (level == null) {
                 return HeatLevel.NONE;
+            }
 
             cachedHeatLevel = getHeatLevelOf(level.getBlockState(getBlockPos().below(1)));
         }

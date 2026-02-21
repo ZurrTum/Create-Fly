@@ -18,13 +18,38 @@ import java.util.function.BiFunction;
 public class ItemStackMixin {
     @SuppressWarnings("removal")
     @Inject(method = "<init>(Lnet/minecraft/world/level/ItemLike;ILnet/minecraft/core/component/PatchedDataComponentMap;)V", at = @At("TAIL"))
-    private void create$migrateOldClipboardComponents(ItemLike item, int count, PatchedDataComponentMap components, CallbackInfo ci) {
+    private void create$migrateOldClipboardComponents(
+        ItemLike item,
+        int count,
+        PatchedDataComponentMap components,
+        CallbackInfo ci
+    ) {
         ClipboardContent content = ClipboardContent.EMPTY;
 
-        content = create$migrateComponent(content, components, AllDataComponents.CLIPBOARD_PAGES, ClipboardContent::setPages);
-        content = create$migrateComponent(content, components, AllDataComponents.CLIPBOARD_TYPE, ClipboardContent::setType);
-        content = create$migrateComponent(content, components, AllDataComponents.CLIPBOARD_READ_ONLY, (c, v) -> c.setReadOnly(true));
-        content = create$migrateComponent(content, components, AllDataComponents.CLIPBOARD_COPIED_VALUES, ClipboardContent::setCopiedValues);
+        content = create$migrateComponent(
+            content,
+            components,
+            AllDataComponents.CLIPBOARD_PAGES,
+            ClipboardContent::setPages
+        );
+        content = create$migrateComponent(
+            content,
+            components,
+            AllDataComponents.CLIPBOARD_TYPE,
+            ClipboardContent::setType
+        );
+        content = create$migrateComponent(
+            content,
+            components,
+            AllDataComponents.CLIPBOARD_READ_ONLY,
+            (c, v) -> c.setReadOnly(true)
+        );
+        content = create$migrateComponent(
+            content,
+            components,
+            AllDataComponents.CLIPBOARD_COPIED_VALUES,
+            ClipboardContent::setCopiedValues
+        );
         content = create$migrateComponent(
             content,
             components,

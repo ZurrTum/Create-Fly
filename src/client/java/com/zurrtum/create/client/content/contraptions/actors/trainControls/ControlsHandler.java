@@ -5,6 +5,10 @@ import com.zurrtum.create.client.foundation.utility.ControlsUtil;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.infrastructure.packet.c2s.ControlsInputPacket;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -12,11 +16,6 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 
 public class ControlsHandler {
 
@@ -35,19 +34,35 @@ public class ControlsHandler {
         currentlyPressed.clear();
     }
 
-    public static void startControlling(LocalPlayer player, AbstractContraptionEntity entity, BlockPos controllerLocalPos) {
+    public static void startControlling(
+        LocalPlayer player,
+        AbstractContraptionEntity entity,
+        BlockPos controllerLocalPos
+    ) {
         entityRef = new WeakReference<>(entity);
         controlsPos = controllerLocalPos;
 
-        player.displayClientMessage(CreateLang.translateDirect("contraption.controls.start_controlling", entity.getContraptionName()), true);
+        player.displayClientMessage(
+            CreateLang.translateDirect(
+                "contraption.controls.start_controlling",
+                entity.getContraptionName()
+            ), true
+        );
     }
 
     public static void stopControlling(LocalPlayer player) {
         ControlsUtil.getControls().forEach(kb -> kb.setDown(ControlsUtil.isActuallyPressed(kb)));
         AbstractContraptionEntity abstractContraptionEntity = entityRef.get();
 
-        if (!currentlyPressed.isEmpty() && abstractContraptionEntity != null)
-            player.connection.send(new ControlsInputPacket(currentlyPressed, false, abstractContraptionEntity.getId(), controlsPos, false));
+        if (!currentlyPressed.isEmpty() && abstractContraptionEntity != null) {
+            player.connection.send(new ControlsInputPacket(
+                currentlyPressed,
+                false,
+                abstractContraptionEntity.getId(),
+                controlsPos,
+                false
+            ));
+        }
 
         packetCooldown = 0;
         entityRef = new WeakReference<>(null);
@@ -59,10 +74,12 @@ public class ControlsHandler {
 
     public static void tick(Minecraft mc) {
         AbstractContraptionEntity entity = entityRef.get();
-        if (entity == null)
+        if (entity == null) {
             return;
-        if (packetCooldown > 0)
+        }
+        if (packetCooldown > 0) {
             packetCooldown--;
+        }
 
         if (entity.isRemoved() || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
             BlockPos pos = controlsPos;
@@ -74,8 +91,9 @@ public class ControlsHandler {
         List<KeyMapping> controls = ControlsUtil.getControls();
         Collection<Integer> pressedKeys = new HashSet<>();
         for (int i = 0; i < controls.size(); i++) {
-            if (ControlsUtil.isActuallyPressed(controls.get(i)))
+            if (ControlsUtil.isActuallyPressed(controls.get(i))) {
                 pressedKeys.add(i);
+            }
         }
 
         Collection<Integer> newKeys = new HashSet<>(pressedKeys);

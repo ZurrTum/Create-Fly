@@ -42,8 +42,9 @@ public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         BlockState newState = super.getStateForPlacement(ctx);
-        if (newState == null)
+        if (newState == null) {
             return null;
+        }
 
         Level world = ctx.getLevel();
         BlockPos pos = ctx.getClickedPos();
@@ -61,20 +62,32 @@ public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity
         BlockState facingState,
         RandomSource random
     ) {
-        BlockState newState = super.updateShape(state, world, tickView, currentPos, facing, facingPos, facingState, random);
-        if (facing != Direction.DOWN)
+        BlockState newState = super.updateShape(
+            state,
+            world,
+            tickView,
+            currentPos,
+            facing,
+            facingPos,
+            facingState,
+            random
+        );
+        if (facing != Direction.DOWN) {
             return newState;
+        }
 
         return tryConvert((LevelAccessor) world, currentPos, newState, facingState);
     }
 
     protected BlockState tryConvert(LevelAccessor world, BlockPos pos, BlockState state, BlockState underState) {
-        if (!state.is(AllBlocks.PECULIAR_BELL))
+        if (!state.is(AllBlocks.PECULIAR_BELL)) {
             return state;
+        }
 
         Block underBlock = underState.getBlock();
-        if (!(Blocks.SOUL_FIRE.equals(underBlock) || Blocks.SOUL_CAMPFIRE.equals(underBlock)))
+        if (!(Blocks.SOUL_FIRE.equals(underBlock) || Blocks.SOUL_CAMPFIRE.equals(underBlock))) {
             return state;
+        }
 
         if (world.isClientSide()) {
             spawnConversionParticles(world, pos);
@@ -83,7 +96,8 @@ public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity
         }
 
         return AllBlocks.HAUNTED_BELL.defaultBlockState().setValue(HauntedBellBlock.FACING, state.getValue(FACING))
-            .setValue(HauntedBellBlock.ATTACHMENT, state.getValue(ATTACHMENT)).setValue(HauntedBellBlock.POWERED, state.getValue(POWERED));
+            .setValue(HauntedBellBlock.ATTACHMENT, state.getValue(ATTACHMENT))
+            .setValue(HauntedBellBlock.POWERED, state.getValue(POWERED));
     }
 
     public void spawnConversionParticles(LevelAccessor world, BlockPos blockPos) {

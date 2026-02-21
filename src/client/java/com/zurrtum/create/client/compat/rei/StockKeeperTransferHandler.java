@@ -40,7 +40,8 @@ public class StockKeeperTransferHandler implements TransferHandler {
 
     @Override
     public ApplicabilityResult checkApplicable(Context context) {
-        if (context.getContainerScreen() instanceof StockKeeperRequestScreen && context.getDisplay().getDisplayLocation().isPresent()) {
+        if (context.getContainerScreen() instanceof StockKeeperRequestScreen && context.getDisplay()
+            .getDisplayLocation().isPresent()) {
             return ApplicabilityResult.createApplicable();
         }
         return ApplicabilityResult.createNotApplicable();
@@ -60,7 +61,10 @@ public class StockKeeperTransferHandler implements TransferHandler {
             return Result.createFailed(CreateLang.translateDirect("gui.stock_keeper.slots_full"));
         }
         CraftableInput inputs = CraftableInput.create(display.getCategoryIdentifier().equals(BuiltinPlugin.CRAFTING));
-        List<InputIngredient<EntryStack<?>>> inputIngredients = display.getInputIngredients(context.getMenu(), context.getMinecraft().player);
+        List<InputIngredient<EntryStack<?>>> inputIngredients = display.getInputIngredients(
+            context.getMenu(),
+            context.getMinecraft().player
+        );
         for (InputIngredient<EntryStack<?>> input : inputIngredients) {
             List<EntryStack<?>> ingredient = input.get();
             int size = ingredient.size();
@@ -105,7 +109,13 @@ public class StockKeeperTransferHandler implements TransferHandler {
                         if (widget instanceof Slot slot && slot.getNoticeMark() == Slot.INPUT) {
                             if (missingIndices.contains(i++)) {
                                 Rectangle innerBounds = slot.getInnerBounds();
-                                graphics.fill(innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), 0x40ff0000);
+                                graphics.fill(
+                                    innerBounds.x,
+                                    innerBounds.y,
+                                    innerBounds.getMaxX(),
+                                    innerBounds.getMaxY(),
+                                    0x40ff0000
+                                );
                             }
                         }
                     }

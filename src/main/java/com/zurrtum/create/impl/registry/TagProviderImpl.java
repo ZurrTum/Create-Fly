@@ -1,15 +1,14 @@
 package com.zurrtum.create.impl.registry;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Function;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
 
 public class TagProviderImpl<K, V> implements SimpleRegistry.Provider<K, V> {
     private final TagKey<K> tag;
@@ -25,8 +24,9 @@ public class TagProviderImpl<K, V> implements SimpleRegistry.Provider<K, V> {
     // eye of the beholder? check the nametag, buddy
     public static Holder<BlockEntityType<?>> getBeHolder(BlockEntityType<?> type) {
         Identifier key = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type);
-        if (key == null)
+        if (key == null) {
             throw new IllegalStateException("Unregistered BlockEntityType: " + type);
+        }
 
         return BuiltInRegistries.BLOCK_ENTITY_TYPE.get(key).orElseThrow();
     }

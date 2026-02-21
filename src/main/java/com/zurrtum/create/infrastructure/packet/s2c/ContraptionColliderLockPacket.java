@@ -9,7 +9,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record ContraptionColliderLockPacket(int contraption, double offset, int sender) implements Packet<ClientGamePacketListener> {
+public record ContraptionColliderLockPacket(int contraption, double offset,
+                                            int sender) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, ContraptionColliderLockPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT,
         ContraptionColliderLockPacket::contraption,

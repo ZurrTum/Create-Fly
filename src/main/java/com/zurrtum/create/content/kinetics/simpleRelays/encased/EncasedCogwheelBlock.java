@@ -67,32 +67,41 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        BlockState placedOn = context.getLevel().getBlockState(context.getClickedPos().relative(context.getClickedFace().getOpposite()));
+        BlockState placedOn = context.getLevel()
+            .getBlockState(context.getClickedPos().relative(context.getClickedFace().getOpposite()));
         BlockState stateForPlacement = super.getStateForPlacement(context);
-        if (ICogWheel.isSmallCog(placedOn))
-            stateForPlacement = stateForPlacement.setValue(AXIS, ((IRotate) placedOn.getBlock()).getRotationAxis(placedOn));
+        if (ICogWheel.isSmallCog(placedOn)) {
+            stateForPlacement = stateForPlacement.setValue(
+                AXIS,
+                ((IRotate) placedOn.getBlock()).getRotationAxis(placedOn)
+            );
+        }
         return stateForPlacement;
     }
 
     @Override
     public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pDirection) {
-        return pState.getBlock() == pAdjacentBlockState.getBlock() && pState.getValue(AXIS) == pAdjacentBlockState.getValue(AXIS);
+        return pState.getBlock() == pAdjacentBlockState.getBlock() && pState.getValue(AXIS) == pAdjacentBlockState.getValue(
+            AXIS);
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        if (context.getClickedFace().getAxis() != state.getValue(AXIS))
+        if (context.getClickedFace().getAxis() != state.getValue(AXIS)) {
             return super.onWrenched(state, context);
+        }
 
         Level level = context.getLevel();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         BlockPos pos = context.getClickedPos();
         KineticBlockEntity.switchToBlockState(
             level,
             pos,
-            state.cycle(context.getClickedFace().getAxisDirection() == AxisDirection.POSITIVE ? TOP_SHAFT : BOTTOM_SHAFT)
+            state.cycle(context.getClickedFace()
+                .getAxisDirection() == AxisDirection.POSITIVE ? TOP_SHAFT : BOTTOM_SHAFT)
         );
         IWrenchable.playRotateSound(level, pos);
         return InteractionResult.SUCCESS;
@@ -103,19 +112,22 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
         originalState = swapShaftsForRotation(originalState, Rotation.CLOCKWISE_90, targetedFace.getAxis());
         return originalState.setValue(
             RotatedPillarKineticBlock.AXIS,
-            VoxelShaper.axisAsFace(originalState.getValue(RotatedPillarKineticBlock.AXIS)).getClockWise(targetedFace.getAxis()).getAxis()
+            VoxelShaper.axisAsFace(originalState.getValue(RotatedPillarKineticBlock.AXIS))
+                .getClockWise(targetedFace.getAxis()).getAxis()
         );
     }
 
     @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
-        if (context.getLevel().isClientSide())
+        if (context.getLevel().isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         context.getLevel().levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, context.getClickedPos(), Block.getId(state));
         KineticBlockEntity.switchToBlockState(
             context.getLevel(),
             context.getClickedPos(),
-            (isLarge ? AllBlocks.LARGE_COGWHEEL : AllBlocks.COGWHEEL).defaultBlockState().setValue(AXIS, state.getValue(AXIS))
+            (isLarge ? AllBlocks.LARGE_COGWHEEL : AllBlocks.COGWHEEL).defaultBlockState()
+                .setValue(AXIS, state.getValue(AXIS))
         );
         return InteractionResult.SUCCESS;
     }
@@ -128,10 +140,12 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
     @Override
     protected boolean areStatesKineticallyEquivalent(BlockState oldState, BlockState newState) {
         if (newState.getBlock() instanceof EncasedCogwheelBlock && oldState.getBlock() instanceof EncasedCogwheelBlock) {
-            if (newState.getValue(TOP_SHAFT) != oldState.getValue(TOP_SHAFT))
+            if (newState.getValue(TOP_SHAFT) != oldState.getValue(TOP_SHAFT)) {
                 return false;
-            if (newState.getValue(BOTTOM_SHAFT) != oldState.getValue(BOTTOM_SHAFT))
+            }
+            if (newState.getValue(BOTTOM_SHAFT) != oldState.getValue(BOTTOM_SHAFT)) {
                 return false;
+            }
         }
         return super.areStatesKineticallyEquivalent(oldState, newState);
     }
@@ -229,7 +243,10 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
 
     @Override
     public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
-        return ItemRequirement.of(isLarge ? AllBlocks.LARGE_COGWHEEL.defaultBlockState() : AllBlocks.COGWHEEL.defaultBlockState(), be);
+        return ItemRequirement.of(
+            isLarge ? AllBlocks.LARGE_COGWHEEL.defaultBlockState() : AllBlocks.COGWHEEL.defaultBlockState(),
+            be
+        );
     }
 
     @Override
@@ -261,10 +278,12 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
 
         for (Direction d : Iterate.directionsInAxis(state.getValue(AXIS))) {
             BlockState adjacentState = level.getBlockState(pos.relative(d));
-            if (!(adjacentState.getBlock() instanceof IRotate def))
+            if (!(adjacentState.getBlock() instanceof IRotate def)) {
                 continue;
-            if (!def.hasShaftTowards(level, pos.relative(d), adjacentState, d.getOpposite()))
+            }
+            if (!def.hasShaftTowards(level, pos.relative(d), adjacentState, d.getOpposite())) {
                 continue;
+            }
             encasedState = encasedState.cycle(d.getAxisDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT);
         }
 

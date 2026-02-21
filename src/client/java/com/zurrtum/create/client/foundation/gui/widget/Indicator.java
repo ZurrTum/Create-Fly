@@ -18,8 +18,9 @@ public class Indicator extends AbstractSimiWidget {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        if (!visible)
+        if (!visible) {
             return;
+        }
         AllGuiTextures toDraw = switch (state) {
             case ON -> AllGuiTextures.INDICATOR_WHITE;
             case OFF -> AllGuiTextures.INDICATOR;
@@ -31,11 +32,7 @@ public class Indicator extends AbstractSimiWidget {
     }
 
     public enum State {
-        OFF,
-        ON,
-        RED,
-        YELLOW,
-        GREEN;
+        OFF, ON, RED, YELLOW, GREEN;
     }
 
 }

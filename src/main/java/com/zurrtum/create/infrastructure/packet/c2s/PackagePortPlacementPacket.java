@@ -11,7 +11,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record PackagePortPlacementPacket(PackagePortTarget target, BlockPos pos) implements Packet<ServerGamePacketListener> {
+public record PackagePortPlacementPacket(PackagePortTarget target,
+                                         BlockPos pos) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, PackagePortPlacementPacket> CODEC = StreamCodec.composite(
         PackagePortTarget.PACKET_CODEC,
         PackagePortPlacementPacket::target,

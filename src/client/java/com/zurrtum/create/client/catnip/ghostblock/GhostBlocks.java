@@ -2,15 +2,14 @@ package com.zurrtum.create.client.catnip.ghostblock;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GhostBlocks {
 
@@ -46,8 +45,9 @@ public class GhostBlocks {
     }
 
     private Entry refresh(Object slot, GhostBlockRenderer ghost, GhostBlockParams params, int ttl) {
-        if (!ghosts.containsKey(slot))
+        if (!ghosts.containsKey(slot)) {
             ghosts.put(slot, new Entry(ghost, params, ttl));
+        }
 
         Entry e = ghosts.get(slot);
         e.ticksToLive = ttl;

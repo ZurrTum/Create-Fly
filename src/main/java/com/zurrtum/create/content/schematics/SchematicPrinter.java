@@ -13,11 +13,6 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -41,12 +36,14 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 public class SchematicPrinter {
 
     public enum PrintStage implements StringRepresentable {
-        BLOCKS,
-        DEFERRED_BLOCKS,
-        ENTITIES;
+        BLOCKS, DEFERRED_BLOCKS, ENTITIES;
 
         public static final Codec<PrintStage> CODEC = StringRepresentable.fromEnum(PrintStage::values);
 
@@ -89,18 +86,21 @@ public class SchematicPrinter {
     }
 
     public void write(ValueOutput view) {
-        if (currentPos != null)
+        if (currentPos != null) {
             view.store("CurrentPos", BlockPos.CODEC, currentPos);
-        if (schematicAnchor != null)
+        }
+        if (schematicAnchor != null) {
             view.store("Anchor", BlockPos.CODEC, schematicAnchor);
+        }
         view.putInt("EntityProgress", printingEntityIndex);
         view.store("PrintStage", PrintStage.CODEC, printStage);
         view.store("DeferredBlocks", CreateCodecs.BLOCK_POS_LIST_CODEC, deferredBlocks);
     }
 
     public void loadSchematic(ItemStack blueprint, Level originalWorld, boolean processNBT) {
-        if (!blueprint.has(AllDataComponents.SCHEMATIC_ANCHOR) || !blueprint.has(AllDataComponents.SCHEMATIC_DEPLOYED))
+        if (!blueprint.has(AllDataComponents.SCHEMATIC_ANCHOR) || !blueprint.has(AllDataComponents.SCHEMATIC_DEPLOYED)) {
             return;
+        }
 
         StructureTemplate activeTemplate = SchematicItem.loadSchematic(originalWorld, blueprint);
         StructurePlaceSettings settings = SchematicItem.getSettings(blueprint, processNBT);
@@ -109,7 +109,14 @@ public class SchematicPrinter {
         blockReader = new SchematicLevel(schematicAnchor, originalWorld);
 
         try {
-            activeTemplate.placeInWorld(blockReader, schematicAnchor, schematicAnchor, settings, blockReader.getRandom(), Block.UPDATE_CLIENTS);
+            activeTemplate.placeInWorld(
+                blockReader,
+                schematicAnchor,
+                schematicAnchor,
+                settings,
+                blockReader.getRandom(),
+                Block.UPDATE_CLIENTS
+            );
         } catch (Exception e) {
             Create.LOGGER.error("Failed to load Schematic for Printing", e);
             schematicLoaded = true;
@@ -117,7 +124,10 @@ public class SchematicPrinter {
             return;
         }
 
-        BlockPos extraBounds = StructureTemplate.calculateRelativePosition(settings, new BlockPos(activeTemplate.getSize()).offset(-1, -1, -1));
+        BlockPos extraBounds = StructureTemplate.calculateRelativePosition(
+            settings,
+            new BlockPos(activeTemplate.getSize()).offset(-1, -1, -1)
+        );
         blockReader.setBounds(BBHelper.encapsulate(blockReader.getBounds(), extraBounds));
 
         StructureTransform transform = new StructureTransform(
@@ -126,8 +136,9 @@ public class SchematicPrinter {
             settings.getRotation(),
             settings.getMirror()
         );
-        for (BlockEntity be : blockReader.getBlockEntities())
+        for (BlockEntity be : blockReader.getBlockEntities()) {
             transform.apply(be);
+        }
 
         printingEntityIndex = -1;
         printStage = PrintStage.BLOCKS;
@@ -157,8 +168,9 @@ public class SchematicPrinter {
     }
 
     public BlockPos getCurrentTarget() {
-        if (!isLoaded() || isErrored())
+        if (!isLoaded() || isErrored()) {
             return null;
+        }
         return schematicAnchor.offset(currentPos);
     }
 
@@ -215,11 +227,13 @@ public class SchematicPrinter {
     }
 
     public boolean shouldPlaceCurrent(Level world, PlacementPredicate predicate) {
-        if (world == null)
+        if (world == null) {
             return false;
+        }
 
-        if (printStage == PrintStage.ENTITIES)
+        if (printStage == PrintStage.ENTITIES) {
             return true;
+        }
 
         return shouldPlaceBlock(world, predicate, getCurrentTarget());
     }
@@ -233,38 +247,55 @@ public class SchematicPrinter {
         BlockState toReplaceOther = null;
 
         if (state.hasProperty(BlockStateProperties.BED_PART) && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) && state.getValue(
-            BlockStateProperties.BED_PART) == BedPart.FOOT)
+            BlockStateProperties.BED_PART) == BedPart.FOOT) {
             toReplaceOther = world.getBlockState(pos.relative(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
-        if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER)
+        }
+        if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER) {
             toReplaceOther = world.getBlockState(pos.above());
+        }
 
-        boolean mergeTEs = blockEntity != null && toReplaceBE instanceof IMergeableBE && toReplaceBE.getType().equals(blockEntity.getType());
+        boolean mergeTEs = blockEntity != null && toReplaceBE instanceof IMergeableBE && toReplaceBE.getType()
+            .equals(blockEntity.getType());
 
-        if (!world.isLoaded(pos))
+        if (!world.isLoaded(pos)) {
             return false;
-        if (!world.getWorldBorder().isWithinBounds(pos))
+        }
+        if (!world.getWorldBorder().isWithinBounds(pos)) {
             return false;
-        if (toReplace == state && !mergeTEs)
+        }
+        if (toReplace == state && !mergeTEs) {
             return false;
-        if (toReplace.getDestroySpeed(world, pos) == -1 || (toReplaceOther != null && toReplaceOther.getDestroySpeed(world, pos) == -1))
+        }
+        if (toReplace.getDestroySpeed(world, pos) == -1 || (toReplaceOther != null && toReplaceOther.getDestroySpeed(world,
+            pos
+        ) == -1)) {
             return false;
+        }
 
         boolean isNormalCube = state.isRedstoneConductor(blockReader, currentPos);
         return predicate.shouldPlace(pos, state, blockEntity, toReplace, toReplaceOther, isNormalCube);
     }
 
     public ItemRequirement getCurrentRequirement() {
-        if (printStage == PrintStage.ENTITIES)
+        if (printStage == PrintStage.ENTITIES) {
             return ItemRequirement.of(blockReader.getEntityList().get(printingEntityIndex));
+        }
 
         BlockPos target = getCurrentTarget();
         BlockState blockState = BlockHelper.setZeroAge(blockReader.getBlockState(target));
         BlockEntity blockEntity = null;
         if (blockState.hasBlockEntity()) {
             blockEntity = ((EntityBlock) blockState.getBlock()).newBlockEntity(target, blockState);
-            CompoundTag data = BlockHelper.prepareBlockEntityData(blockReader, blockState, blockReader.getBlockEntity(target));
+            CompoundTag data = BlockHelper.prepareBlockEntityData(
+                blockReader,
+                blockState,
+                blockReader.getBlockEntity(target)
+            );
             if (blockEntity != null && data != null) {
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), Create.LOGGER)) {
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    blockEntity.problemPath(),
+                    Create.LOGGER
+                )) {
                     blockEntity.loadWithComponents(TagValueInput.create(logging, blockReader.registryAccess(), data));
                 }
             }
@@ -283,13 +314,16 @@ public class SchematicPrinter {
                 checklist.warnBlockNotLoaded();
                 continue;
             }
-            if (!shouldPlaceBlock(world, predicate, relPos))
+            if (!shouldPlaceBlock(world, predicate, relPos)) {
                 continue;
+            }
             ItemRequirement requirement = ItemRequirement.of(required, requiredBE);
-            if (requirement.isEmpty())
+            if (requirement.isEmpty()) {
                 continue;
-            if (requirement.isInvalid())
+            }
+            if (requirement.isInvalid()) {
                 continue;
+            }
             checklist.require(requirement);
             blocksToPlace++;
         }
@@ -299,10 +333,12 @@ public class SchematicPrinter {
     public void markAllEntityRequirements(MaterialChecklist checklist) {
         for (Entity entity : blockReader.getEntityList()) {
             ItemRequirement requirement = ItemRequirement.of(entity);
-            if (requirement.isEmpty())
+            if (requirement.isEmpty()) {
                 return;
-            if (requirement.isInvalid())
+            }
+            if (requirement.isInvalid()) {
                 return;
+            }
             checklist.require(requirement);
         }
     }
@@ -345,10 +381,12 @@ public class SchematicPrinter {
         BoundingBox bounds = blockReader.getBounds();
         BlockPos posInBounds = currentPos.offset(-bounds.minX(), -bounds.minY(), -bounds.minZ());
 
-        if (posInBounds.getX() > bounds.getXSpan())
+        if (posInBounds.getX() > bounds.getXSpan()) {
             currentPos = new BlockPos(bounds.minX(), currentPos.getY(), currentPos.getZ() + 1).west();
-        if (posInBounds.getZ() > bounds.getZSpan())
+        }
+        if (posInBounds.getZ() > bounds.getZSpan()) {
             currentPos = new BlockPos(currentPos.getX(), currentPos.getY() + 1, bounds.minZ()).west();
+        }
 
         // End of blocks reached
         if (currentPos.getY() > bounds.getYSpan()) {
@@ -360,14 +398,19 @@ public class SchematicPrinter {
     }
 
     public static boolean shouldDeferBlock(BlockState state) {
-        return state.is(AllBlocks.GANTRY_CARRIAGE) || state.is(AllBlocks.MECHANICAL_ARM) || BlockMovementChecks.isBrittle(state);
+        return state.is(AllBlocks.GANTRY_CARRIAGE) || state.is(AllBlocks.MECHANICAL_ARM) || BlockMovementChecks.isBrittle(
+            state);
     }
 
     public void sendBlockUpdates(Level level) {
         BoundingBox bounds = blockReader.getBounds();
         BlockPos.betweenClosedStream(bounds.inflatedBy(1)).filter(pos -> !bounds.isInside(pos))
-            .filter(pos -> level.isLoaded(pos.offset(schematicAnchor)) && level.getFluidState(pos.offset(schematicAnchor)).is(Fluids.WATER))
-            .forEach(pos -> level.scheduleTick(pos.offset(schematicAnchor), Fluids.WATER, Fluids.WATER.getTickDelay(level)));
+            .filter(pos -> level.isLoaded(pos.offset(schematicAnchor)) && level.getFluidState(pos.offset(schematicAnchor))
+                .is(Fluids.WATER)).forEach(pos -> level.scheduleTick(
+                pos.offset(schematicAnchor),
+                Fluids.WATER,
+                Fluids.WATER.getTickDelay(level)
+            ));
     }
 
 }

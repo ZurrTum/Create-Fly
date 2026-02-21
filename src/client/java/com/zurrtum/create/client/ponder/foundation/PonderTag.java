@@ -77,11 +77,13 @@ public class PonderTag implements ScreenElement {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
+        }
 
-        if (!(other instanceof PonderTag otherTag))
+        if (!(other instanceof PonderTag otherTag)) {
             return false;
+        }
 
         return getId().equals(otherTag.getId());
     }

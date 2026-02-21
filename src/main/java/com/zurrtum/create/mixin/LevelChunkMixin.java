@@ -38,7 +38,11 @@ public abstract class LevelChunkMixin {
     }
 
     @WrapOperation(method = "getBlockEntity(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/chunk/LevelChunk$EntityCreationType;)Lnet/minecraft/world/level/block/entity/BlockEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;isRemoved()Z"))
-    private boolean onRemoveBlockEntity(BlockEntity instance, Operation<Boolean> original, @Local(argsOnly = true) BlockPos pos) {
+    private boolean onRemoveBlockEntity(
+        BlockEntity instance,
+        Operation<Boolean> original,
+        @Local(argsOnly = true) BlockPos pos
+    ) {
         if (original.call(instance)) {
             ItemHelper.invalidateInventoryCache(pos);
             FluidHelper.invalidateInventoryCache(pos);

@@ -15,9 +15,6 @@ import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruc
 import com.zurrtum.create.content.trains.schedule.destination.ScheduleInstruction;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-
-import java.util.*;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
@@ -32,15 +29,15 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+import java.util.*;
+
 public class ScheduleRuntime {
 
     private static final int TBD = -1;
     private static final int INVALID = -2;
 
     public enum State implements StringRepresentable {
-        PRE_TRANSIT,
-        IN_TRANSIT,
-        POST_TRANSIT;
+        PRE_TRANSIT, IN_TRANSIT, POST_TRANSIT;
 
         public static final Codec<State> CODEC = StringRepresentable.fromEnum(State::values);
 
@@ -81,24 +78,28 @@ public class ScheduleRuntime {
     }
 
     public void destinationReached() {
-        if (state != State.IN_TRANSIT)
+        if (state != State.IN_TRANSIT) {
             return;
+        }
         state = State.POST_TRANSIT;
         conditionProgress.clear();
         conditionContext.clear();
         displayLinkUpdateRequested = true;
-        for (Carriage carriage : train.carriages)
+        for (Carriage carriage : train.carriages) {
             carriage.storage.resetIdleCargoTracker();
+        }
 
         if (ticksInTransit > 0) {
             int current = predictionTicks.get(currentEntry);
-            if (current > 0)
+            if (current > 0) {
                 ticksInTransit = (current + ticksInTransit) / 2;
+            }
             predictionTicks.set(currentEntry, ticksInTransit);
         }
 
-        if (currentEntry >= schedule.entries.size())
+        if (currentEntry >= schedule.entries.size()) {
             return;
+        }
         List<List<ScheduleWaitCondition>> conditions = schedule.entries.get(currentEntry).conditions;
         for (int i = 0; i < conditions.size(); i++) {
             conditionProgress.add(0);
@@ -107,38 +108,46 @@ public class ScheduleRuntime {
     }
 
     public void transitInterrupted() {
-        if (schedule == null || state != State.IN_TRANSIT)
+        if (schedule == null || state != State.IN_TRANSIT) {
             return;
+        }
         state = State.PRE_TRANSIT;
         cooldown = 0;
     }
 
     public void tick(Level level) {
-        if (schedule == null)
+        if (schedule == null) {
             return;
-        if (paused)
+        }
+        if (paused) {
             return;
-        if (train.derailed)
+        }
+        if (train.derailed) {
             return;
+        }
         if (train.navigation.destination != null) {
             ticksInTransit++;
             return;
         }
 
-        if (checkEndOfScheduleReached())
+        if (checkEndOfScheduleReached()) {
             return;
-        if (cooldown-- > 0)
+        }
+        if (cooldown-- > 0) {
             return;
-        if (state == State.IN_TRANSIT)
+        }
+        if (state == State.IN_TRANSIT) {
             return;
+        }
         if (state == State.POST_TRANSIT) {
             tickConditions(level);
             return;
         }
 
         DiscoveredPath nextPath = startCurrentInstruction(level);
-        if (nextPath == null)
+        if (nextPath == null) {
             return;
+        }
 
         train.status.successfulNavigation();
         if (nextPath.destination == train.getCurrentStation()) {
@@ -153,8 +162,9 @@ public class ScheduleRuntime {
     }
 
     private boolean checkEndOfScheduleReached() {
-        if (currentEntry < schedule.entries.size())
+        if (currentEntry < schedule.entries.size()) {
             return false;
+        }
 
         currentEntry = 0;
         if (!schedule.cyclic) {
@@ -197,13 +207,15 @@ public class ScheduleRuntime {
             displayLinkUpdateRequested |= i == 0 && prevVersion != tag.getIntOr("StatusVersion", 0);
         }
 
-        for (Carriage carriage : train.carriages)
+        for (Carriage carriage : train.carriages) {
             carriage.storage.tickIdleCargoTracker();
+        }
     }
 
     public DiscoveredPath startCurrentInstruction(Level level) {
-        if (checkEndOfScheduleReached())
+        if (checkEndOfScheduleReached()) {
             return null;
+        }
 
         ScheduleEntry entry = schedule.entries.get(currentEntry);
         ScheduleInstruction instruction = entry.instruction;
@@ -253,24 +265,33 @@ public class ScheduleRuntime {
         // Current
         if (state == State.POST_TRANSIT || current >= entryCount) {
             GlobalStation currentStation = train.getCurrentStation();
-            if (currentStation != null)
+            if (currentStation != null) {
                 predictions.add(createPrediction(current, currentStation.name, currentTitle, 0));
+            }
             int departureTime = estimateStayDuration(current);
-            if (departureTime == INVALID)
+            if (departureTime == INVALID) {
                 accumulatedTime = INVALID;
-            else
+            } else {
                 accumulatedTime += departureTime;
+            }
 
         } else {
             GlobalStation destination = train.navigation.destination;
             if (destination != null) {
-                double speed = Math.min(train.throttle * train.maxSpeed(), (train.maxSpeed() + train.maxTurnSpeed()) / 2);
+                double speed = Math.min(
+                    train.throttle * train.maxSpeed(),
+                    (train.maxSpeed() + train.maxTurnSpeed()) / 2
+                );
                 int timeRemaining = (int) (train.navigation.distanceToDestination / speed) * 2;
 
                 if (predictionTicks.size() > current && train.navigation.distanceStartedAt != 0) {
                     float predictedTime = predictionTicks.get(current);
                     if (predictedTime > 0) {
-                        predictedTime *= Mth.clamp(train.navigation.distanceToDestination / train.navigation.distanceStartedAt, 0, 1);
+                        predictedTime *= Mth.clamp(
+                            train.navigation.distanceToDestination / train.navigation.distanceStartedAt,
+                            0,
+                            1
+                        );
                         timeRemaining = (timeRemaining + (int) predictedTime) / 2;
                     }
                 }
@@ -279,21 +300,24 @@ public class ScheduleRuntime {
                 predictions.add(createPrediction(current, destination.name, currentTitle, accumulatedTime));
 
                 int departureTime = estimateStayDuration(current);
-                if (departureTime != INVALID)
+                if (departureTime != INVALID) {
                     accumulatedTime += departureTime;
-                else
+                } else {
                     accumulatedTime = INVALID;
+                }
 
-            } else
+            } else {
                 predictForEntry(current, currentTitle, accumulatedTime, predictions);
+            }
         }
 
         // Upcoming
         String currentTitle = this.currentTitle;
         for (int i = 1; i < entryCount; i++) {
             int index = (i + current) % entryCount;
-            if (index == 0 && !schedule.cyclic)
+            if (index == 0 && !schedule.cyclic) {
                 break;
+            }
 
             if (schedule.entries.get(index).instruction instanceof ChangeTitleInstruction title) {
                 currentTitle = title.getScheduleTitle();
@@ -307,12 +331,19 @@ public class ScheduleRuntime {
         return predictions;
     }
 
-    private int predictForEntry(int index, String currentTitle, int accumulatedTime, Collection<TrainDeparturePrediction> predictions) {
+    private int predictForEntry(
+        int index,
+        String currentTitle,
+        int accumulatedTime,
+        Collection<TrainDeparturePrediction> predictions
+    ) {
         ScheduleEntry entry = schedule.entries.get(index);
-        if (!(entry.instruction instanceof DestinationInstruction filter))
+        if (!(entry.instruction instanceof DestinationInstruction filter)) {
             return accumulatedTime;
-        if (predictionTicks.size() <= currentEntry)
+        }
+        if (predictionTicks.size() <= currentEntry) {
             return accumulatedTime;
+        }
 
         int departureTime = estimateStayDuration(index);
 
@@ -324,24 +355,28 @@ public class ScheduleRuntime {
         int predictedTime = predictionTicks.get(index);
         accumulatedTime += predictedTime;
 
-        if (predictedTime == TBD)
+        if (predictedTime == TBD) {
             accumulatedTime = TBD;
+        }
 
         predictions.add(createPrediction(index, filter.getFilter(), currentTitle, accumulatedTime));
 
-        if (accumulatedTime != TBD)
+        if (accumulatedTime != TBD) {
             accumulatedTime += departureTime;
+        }
 
-        if (departureTime == INVALID)
+        if (departureTime == INVALID) {
             accumulatedTime = INVALID;
+        }
 
         return accumulatedTime;
     }
 
     private int estimateStayDuration(int index) {
         if (index >= schedule.entries.size()) {
-            if (!schedule.cyclic)
+            if (!schedule.cyclic) {
                 return INVALID;
+            }
             index = 0;
         }
 
@@ -350,8 +385,9 @@ public class ScheduleRuntime {
         for (List<ScheduleWaitCondition> list : scheduleEntry.conditions) {
             int total = 0;
             for (ScheduleWaitCondition condition : list) {
-                if (!(condition instanceof ScheduledDelay wait))
+                if (!(condition instanceof ScheduledDelay wait)) {
                     continue Columns;
+                }
                 total += wait.totalWaitTicks();
             }
             return total;
@@ -361,8 +397,9 @@ public class ScheduleRuntime {
     }
 
     private TrainDeparturePrediction createPrediction(int index, String destination, String currentTitle, int time) {
-        if (time == INVALID)
+        if (time == INVALID) {
             return null;
+        }
 
         int size = schedule.entries.size();
         if (index >= size) {
@@ -377,8 +414,9 @@ public class ScheduleRuntime {
             for (int i = 1; i < size; i++) {
                 int j = (index + i) % size;
                 ScheduleEntry scheduleEntry = schedule.entries.get(j);
-                if (!(scheduleEntry.instruction instanceof DestinationInstruction instruction))
+                if (!(scheduleEntry.instruction instanceof DestinationInstruction instruction)) {
                     continue;
+                }
                 text = instruction.getFilter().replaceAll("\\*", "").trim();
                 break;
             }
@@ -392,8 +430,9 @@ public class ScheduleRuntime {
         view.putBoolean("AutoSchedule", isAutoSchedule);
         view.putBoolean("Paused", paused);
         view.putBoolean("Completed", completed);
-        if (schedule != null)
+        if (schedule != null) {
             schedule.write(view.child("Schedule"));
+        }
         view.store("State", State.CODEC, state);
         view.putIntArray("ConditionProgress", conditionProgress.stream().mapToInt(Integer::intValue).toArray());
         view.store("ConditionContext", CreateCodecs.NBT_COMPOUND_LIST_CODEC, conditionContext);
@@ -406,8 +445,9 @@ public class ScheduleRuntime {
         map.add("AutoSchedule", ops.createBoolean(input.isAutoSchedule));
         map.add("Paused", ops.createBoolean(input.paused));
         map.add("Completed", ops.createBoolean(input.completed));
-        if (input.schedule != null)
+        if (input.schedule != null) {
             map.add("Schedule", Schedule.encode(input.schedule, ops, empty));
+        }
         map.add("State", input.state, State.CODEC);
         map.add("ConditionProgress", ops.createIntList(input.conditionProgress.stream().mapToInt(Integer::intValue)));
         map.add("ConditionContext", input.conditionContext, CreateCodecs.NBT_COMPOUND_LIST_CODEC);
@@ -449,10 +489,13 @@ public class ScheduleRuntime {
         completed = ops.getBooleanValue(map.get("Completed")).result().orElse(false);
         isAutoSchedule = ops.getBooleanValue(map.get("AutoSchedule")).result().orElse(false);
         currentEntry = Math.max(0, ops.getNumberValue(map.get("CurrentEntry"), 0).intValue());
-        Optional.ofNullable(map.get("Schedule")).ifPresent(scheduleView -> schedule = Schedule.decode(ops, scheduleView));
+        Optional.ofNullable(map.get("Schedule"))
+            .ifPresent(scheduleView -> schedule = Schedule.decode(ops, scheduleView));
         state = State.CODEC.parse(ops, map.get("State")).result().orElse(State.PRE_TRANSIT);
-        ops.getIntStream(map.get("ConditionProgress")).ifSuccess(stream -> stream.forEach(i -> conditionProgress.add(i)));
-        CreateCodecs.NBT_COMPOUND_LIST_CODEC.parse(ops, map.get("ConditionContext")).ifSuccess(list -> conditionContext.addAll(list));
+        ops.getIntStream(map.get("ConditionProgress"))
+            .ifSuccess(stream -> stream.forEach(i -> conditionProgress.add(i)));
+        CreateCodecs.NBT_COMPOUND_LIST_CODEC.parse(ops, map.get("ConditionContext"))
+            .ifSuccess(list -> conditionContext.addAll(list));
 
         if (schedule != null) {
             schedule.entries.forEach($ -> predictionTicks.add(TBD));
@@ -468,11 +511,15 @@ public class ScheduleRuntime {
     }
 
     public ItemStack returnSchedule(HolderLookup.Provider registries) {
-        if (schedule == null)
+        if (schedule == null) {
             return ItemStack.EMPTY;
+        }
         ItemStack stack = AllItems.SCHEDULE.getDefaultInstance();
         schedule.savedProgress = currentEntry;
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "Schedule", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "Schedule",
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, registries);
             schedule.write(view);
             stack.set(AllDataComponents.TRAIN_SCHEDULE, view.buildResult());
@@ -488,13 +535,15 @@ public class ScheduleRuntime {
 
     public MutableComponent getWaitingStatus(Level level) {
         List<List<ScheduleWaitCondition>> conditions = schedule.entries.get(currentEntry).conditions;
-        if (conditions.isEmpty() || conditionProgress.isEmpty() || conditionContext.isEmpty())
+        if (conditions.isEmpty() || conditionProgress.isEmpty() || conditionContext.isEmpty()) {
             return Component.empty();
+        }
 
         List<ScheduleWaitCondition> list = conditions.getFirst();
         int progress = conditionProgress.getFirst();
-        if (progress >= list.size())
+        if (progress >= list.size()) {
             return Component.empty();
+        }
 
         CompoundTag tag = conditionContext.getFirst();
         ScheduleWaitCondition condition = list.get(progress);

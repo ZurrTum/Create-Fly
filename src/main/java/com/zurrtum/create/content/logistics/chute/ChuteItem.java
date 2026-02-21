@@ -23,30 +23,31 @@ public class ChuteItem extends BlockItem {
         Level world = context.getLevel();
         BlockState placedOnState = world.getBlockState(placedOnPos);
 
-        if (!AbstractChuteBlock.isChute(placedOnState) || context.isSecondaryUseActive())
+        if (!AbstractChuteBlock.isChute(placedOnState) || context.isSecondaryUseActive()) {
             return super.place(context);
-        if (face.getAxis().isVertical())
+        }
+        if (face.getAxis().isVertical()) {
             return super.place(context);
+        }
 
         BlockPos correctPos = context.getClickedPos().above();
 
         BlockState blockState = world.getBlockState(correctPos);
-        if (blockState.canBeReplaced())
+        if (blockState.canBeReplaced()) {
             context = BlockPlaceContext.at(context, correctPos, face);
-        else {
-            if (!(blockState.getBlock() instanceof ChuteBlock block) || world.isClientSide())
+        } else {
+            if (!(blockState.getBlock() instanceof ChuteBlock block) || world.isClientSide()) {
                 return InteractionResult.FAIL;
+            }
             if (block.getFacing(blockState) == Direction.DOWN) {
                 world.setBlockAndUpdate(
                     correctPos, ProperWaterloggedBlock.withWater(
-                        world,
-                        block.updateChuteState(
+                        world, block.updateChuteState(
                             blockState.setValue(ChuteBlock.FACING, face),
                             world.getBlockState(correctPos.above()),
                             world,
                             correctPos
-                        ),
-                        correctPos
+                        ), correctPos
                     )
                 );
                 return InteractionResult.SUCCESS;

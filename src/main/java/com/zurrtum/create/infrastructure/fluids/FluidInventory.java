@@ -6,6 +6,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.world.Clearable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -13,14 +16,13 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.core.Direction;
-import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.world.Clearable;
-
 public interface FluidInventory extends Clearable, Iterable<FluidStack> {
     Hash.Strategy<FluidStack> FLUID_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
         public boolean equals(FluidStack stack, FluidStack other) {
-            return stack == other || stack != null && other != null && FluidStack.areFluidsAndComponentsEqual(stack, other);
+            return stack == other || stack != null && other != null && FluidStack.areFluidsAndComponentsEqual(
+                stack,
+                other
+            );
         }
 
         public int hashCode(FluidStack stack) {
@@ -224,7 +226,8 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
             int amount = stack.getAmount();
             return countSpace(stack, amount) == amount;
         }
-        Object2IntLinkedOpenCustomHashMap<FluidStack> map = new Object2IntLinkedOpenCustomHashMap<>(FLUID_STACK_HASH_STRATEGY);
+        Object2IntLinkedOpenCustomHashMap<FluidStack> map = new Object2IntLinkedOpenCustomHashMap<>(
+            FLUID_STACK_HASH_STRATEGY);
         for (FluidStack stack : stacks) {
             map.merge(stack, stack.getAmount(), Integer::sum);
         }
@@ -567,7 +570,8 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
             }
             return List.of(stack.directCopy(amount - insert));
         }
-        Object2IntLinkedOpenCustomHashMap<FluidStack> map = new Object2IntLinkedOpenCustomHashMap<>(FLUID_STACK_HASH_STRATEGY);
+        Object2IntLinkedOpenCustomHashMap<FluidStack> map = new Object2IntLinkedOpenCustomHashMap<>(
+            FLUID_STACK_HASH_STRATEGY);
         for (FluidStack stack : stacks) {
             map.merge(stack, stack.getAmount(), Integer::sum);
         }
@@ -889,7 +893,8 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
         if (listSize == 1) {
             return preciseInsert(stacks.getFirst());
         }
-        Object2IntLinkedOpenCustomHashMap<FluidStack> map = new Object2IntLinkedOpenCustomHashMap<>(FLUID_STACK_HASH_STRATEGY);
+        Object2IntLinkedOpenCustomHashMap<FluidStack> map = new Object2IntLinkedOpenCustomHashMap<>(
+            FLUID_STACK_HASH_STRATEGY);
         for (FluidStack stack : stacks) {
             map.merge(stack, stack.getAmount(), Integer::sum);
         }

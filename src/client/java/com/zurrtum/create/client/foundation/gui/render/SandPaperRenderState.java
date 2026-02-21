@@ -6,7 +6,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record SandPaperRenderState(Matrix3x2f pose, ItemStack stack, int x0, int y0, ScreenRectangle bounds) implements PictureInPictureRenderState {
+public record SandPaperRenderState(Matrix3x2f pose, ItemStack stack, int x0, int y0,
+                                   ScreenRectangle bounds) implements PictureInPictureRenderState {
     public SandPaperRenderState(Matrix3x2f pose, ItemStack stack, int x, int y) {
         this(pose, stack, x, y, new ScreenRectangle(x, y, 28, 29).transformMaxBounds(pose));
     }

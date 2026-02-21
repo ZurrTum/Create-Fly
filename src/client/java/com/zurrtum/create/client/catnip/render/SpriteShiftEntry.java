@@ -1,11 +1,10 @@
 package com.zurrtum.create.client.catnip.render;
 
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.Identifier;
 
 public class SpriteShiftEntry {
     @Nullable

@@ -8,15 +8,14 @@ import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShifter;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
-import net.minecraft.world.level.block.state.properties.WoodType;
 
 public class AllSpriteShifts {
 
@@ -24,10 +23,14 @@ public class AllSpriteShifts {
     public static final Map<WeatherState, CTSpriteShiftEntry> COPPER_SHINGLES = new EnumMap<>(WeatherState.class);
     public static final Map<WeatherState, CTSpriteShiftEntry> COPPER_TILES = new EnumMap<>(WeatherState.class);
 
-    public static final Map<DyeColor, SpriteShiftEntry> DYED_BELTS = new EnumMap<>(DyeColor.class), DYED_OFFSET_BELTS = new EnumMap<>(DyeColor.class), DYED_DIAGONAL_BELTS = new EnumMap<>(
-        DyeColor.class);
+    public static final Map<DyeColor, SpriteShiftEntry> DYED_BELTS = new EnumMap<>(DyeColor.class), DYED_OFFSET_BELTS = new EnumMap<>(
+        DyeColor.class), DYED_DIAGONAL_BELTS = new EnumMap<>(DyeColor.class);
 
-    public static final SpriteShiftEntry BURNER_FLAME = get("block/blaze_burner_flame", "block/blaze_burner_flame_scroll"), SUPER_BURNER_FLAME = get("block/blaze_burner_flame",
+    public static final SpriteShiftEntry BURNER_FLAME = get(
+        "block/blaze_burner_flame",
+        "block/blaze_burner_flame_scroll"
+    ), SUPER_BURNER_FLAME = get(
+        "block/blaze_burner_flame",
         "block/blaze_burner_flame_superheated_scroll"
     );
 
@@ -45,8 +48,14 @@ public class AllSpriteShifts {
         AllCTTypes.HORIZONTAL_KRYPPERS,
         "palettes/framed_glass",
         "palettes/horizontal_framed_glass"
-    ), VERTICAL_FRAMED_GLASS = getCT(AllCTTypes.VERTICAL, "palettes/framed_glass", "palettes/vertical_framed_glass"), ORNATE_IRON_WINDOW = vertical(
-        "palettes/ornate_iron_window"), INDUSTRIAL_IRON_WINDOW = getCT(AllCTTypes.RECTANGLE, "palettes/industrial_iron_window"),
+    ), VERTICAL_FRAMED_GLASS = getCT(
+        AllCTTypes.VERTICAL,
+        "palettes/framed_glass",
+        "palettes/vertical_framed_glass"
+    ), ORNATE_IRON_WINDOW = vertical("palettes/ornate_iron_window"), INDUSTRIAL_IRON_WINDOW = getCT(
+        AllCTTypes.RECTANGLE,
+        "palettes/industrial_iron_window"
+    ),
 
     OLD_FACTORY_WINDOW_1 = getCT(
         AllCTTypes.RECTANGLE,
@@ -60,30 +69,35 @@ public class AllSpriteShifts {
         AllCTTypes.RECTANGLE,
         "palettes/weathered_iron_window",
         "palettes/weathered_iron_window_3"
-    ), OLD_FACTORY_WINDOW_4 = getCT(AllCTTypes.RECTANGLE, "palettes/weathered_iron_window", "palettes/weathered_iron_window_4");
+    ), OLD_FACTORY_WINDOW_4 = getCT(
+        AllCTTypes.RECTANGLE,
+        "palettes/weathered_iron_window",
+        "palettes/weathered_iron_window_4"
+    );
 
-    public static final CTSpriteShiftEntry CRAFTER_SIDE = vertical("crafter_side"), CRAFTER_OTHERSIDE = horizontal("crafter_side"), ANDESITE_ENCASED_COGWHEEL_SIDE = vertical(
-        "andesite_encased_cogwheel_side"), ANDESITE_ENCASED_COGWHEEL_OTHERSIDE = horizontal("andesite_encased_cogwheel_side"), BRASS_ENCASED_COGWHEEL_SIDE = vertical(
-        "brass_encased_cogwheel_side"), BRASS_ENCASED_COGWHEEL_OTHERSIDE = horizontal("brass_encased_cogwheel_side"), GIRDER_POLE = vertical(
-        "girder_pole_side");
+    public static final CTSpriteShiftEntry CRAFTER_SIDE = vertical("crafter_side"), CRAFTER_OTHERSIDE = horizontal(
+        "crafter_side"), ANDESITE_ENCASED_COGWHEEL_SIDE = vertical("andesite_encased_cogwheel_side"), ANDESITE_ENCASED_COGWHEEL_OTHERSIDE = horizontal(
+        "andesite_encased_cogwheel_side"), BRASS_ENCASED_COGWHEEL_SIDE = vertical("brass_encased_cogwheel_side"), BRASS_ENCASED_COGWHEEL_OTHERSIDE = horizontal(
+        "brass_encased_cogwheel_side"), GIRDER_POLE = vertical("girder_pole_side");
 
     public static final CTSpriteShiftEntry ANDESITE_CASING = omni("andesite_casing"), BRASS_CASING = omni("brass_casing"), COPPER_CASING = omni(
-        "copper_casing"), SHADOW_STEEL_CASING = omni("shadow_steel_casing"), REFINED_RADIANCE_CASING = omni("refined_radiance_casing"), RAILWAY_CASING = omni(
-        "railway_casing"), RAILWAY_CASING_SIDE = omni("railway_casing_side"), CREATIVE_CASING = getCT(AllCTTypes.RECTANGLE, "creative_casing");
+        "copper_casing"), SHADOW_STEEL_CASING = omni("shadow_steel_casing"), REFINED_RADIANCE_CASING = omni(
+        "refined_radiance_casing"), RAILWAY_CASING = omni("railway_casing"), RAILWAY_CASING_SIDE = omni(
+        "railway_casing_side"), CREATIVE_CASING = getCT(AllCTTypes.RECTANGLE, "creative_casing");
 
-    public static final CTSpriteShiftEntry CHASSIS_SIDE = omni("linear_chassis_side"), SECONDARY_CHASSIS_SIDE = omni("secondary_linear_chassis_side"), CHASSIS = omni(
-        "linear_chassis_end"), CHASSIS_STICKY = omni("linear_chassis_end_sticky");
+    public static final CTSpriteShiftEntry CHASSIS_SIDE = omni("linear_chassis_side"), SECONDARY_CHASSIS_SIDE = omni(
+        "secondary_linear_chassis_side"), CHASSIS = omni("linear_chassis_end"), CHASSIS_STICKY = omni(
+        "linear_chassis_end_sticky");
 
-    public static final CTSpriteShiftEntry BRASS_TUNNEL_TOP = vertical("tunnel/brass_tunnel_top"), FLUID_TANK = getCT(
-        AllCTTypes.RECTANGLE,
+    public static final CTSpriteShiftEntry BRASS_TUNNEL_TOP = vertical("tunnel/brass_tunnel_top"), FLUID_TANK = getCT(AllCTTypes.RECTANGLE,
         "fluid_tank"
     ), FLUID_TANK_TOP = getCT(AllCTTypes.RECTANGLE, "fluid_tank_top"), FLUID_TANK_INNER = getCT(
         AllCTTypes.RECTANGLE,
         "fluid_tank_inner"
     ), CREATIVE_FLUID_TANK = getCT(AllCTTypes.RECTANGLE, "creative_fluid_tank");
 
-    public static final Couple<CTSpriteShiftEntry> VAULT_TOP = vault("top"), VAULT_FRONT = vault("front"), VAULT_SIDE = vault("side"), VAULT_BOTTOM = vault(
-        "bottom");
+    public static final Couple<CTSpriteShiftEntry> VAULT_TOP = vault("top"), VAULT_FRONT = vault("front"), VAULT_SIDE = vault(
+        "side"), VAULT_BOTTOM = vault("bottom");
 
     public static final SpriteShiftEntry ELEVATOR_BELT = get(
         "block/elevator_pulley_belt",
@@ -98,11 +112,9 @@ public class AllSpriteShifts {
         "block/factory_panel_connections_animated"
     );
 
-    public static final SpriteShiftEntry BELT = get("block/belt", "block/belt_scroll"), BELT_OFFSET = get(
-        "block/belt_offset",
+    public static final SpriteShiftEntry BELT = get("block/belt", "block/belt_scroll"), BELT_OFFSET = get("block/belt_offset",
         "block/belt_scroll"
-    ), BELT_DIAGONAL = get("block/belt_diagonal", "block/belt_diagonal_scroll"), ANDESIDE_BELT_CASING = get(
-        "block/belt/brass_belt_casing",
+    ), BELT_DIAGONAL = get("block/belt_diagonal", "block/belt_diagonal_scroll"), ANDESIDE_BELT_CASING = get("block/belt/brass_belt_casing",
         "block/belt/andesite_belt_casing"
     ), CRAFTER_THINGIES = get("block/crafter_thingies", "block/crafter_thingies");
 
@@ -113,8 +125,21 @@ public class AllSpriteShifts {
     }
 
     private static void populateMaps() {
-        WoodType[] supportedWoodTypes = new WoodType[]{WoodType.OAK, WoodType.SPRUCE, WoodType.BIRCH, WoodType.ACACIA, WoodType.JUNGLE, WoodType.DARK_OAK, WoodType.MANGROVE, WoodType.CRIMSON, WoodType.WARPED, WoodType.CHERRY, WoodType.BAMBOO};
-        Arrays.stream(supportedWoodTypes).forEach(woodType -> WOODEN_WINDOWS.put(woodType, vertical("palettes/" + woodType.name() + "_window")));
+        WoodType[] supportedWoodTypes = new WoodType[]{
+            WoodType.OAK,
+            WoodType.SPRUCE,
+            WoodType.BIRCH,
+            WoodType.ACACIA,
+            WoodType.JUNGLE,
+            WoodType.DARK_OAK,
+            WoodType.MANGROVE,
+            WoodType.CRIMSON,
+            WoodType.WARPED,
+            WoodType.CHERRY,
+            WoodType.BAMBOO
+        };
+        Arrays.stream(supportedWoodTypes)
+            .forEach(woodType -> WOODEN_WINDOWS.put(woodType, vertical("palettes/" + woodType.name() + "_window")));
 
         for (DyeColor color : DyeColor.values()) {
             String id = color.getSerializedName();

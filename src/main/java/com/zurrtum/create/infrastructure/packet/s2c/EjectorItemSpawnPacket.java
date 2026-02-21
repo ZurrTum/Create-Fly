@@ -18,8 +18,7 @@ public class EjectorItemSpawnPacket extends ClientboundAddEntityPacket {
     private final boolean hasLauncher;
     private final EntityLauncher launcher;
     private final Direction direction;
-    public static final StreamCodec<RegistryFriendlyByteBuf, EjectorItemSpawnPacket> CODEC = Packet.codec(
-        EjectorItemSpawnPacket::write,
+    public static final StreamCodec<RegistryFriendlyByteBuf, EjectorItemSpawnPacket> CODEC = Packet.codec(EjectorItemSpawnPacket::write,
         EjectorItemSpawnPacket::new
     );
 

@@ -12,9 +12,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record RotationIndicatorParticleData(
-    int color, float speed, float radius1, float radius2, int lifeSpan, Direction.Axis axis
-) implements ParticleOptions {
+public record RotationIndicatorParticleData(int color, float speed, float radius1, float radius2, int lifeSpan,
+                                            Direction.Axis axis) implements ParticleOptions {
 
     public static final MapCodec<RotationIndicatorParticleData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
         Codec.INT.fieldOf("color").forGetter(RotationIndicatorParticleData::color),

@@ -38,8 +38,15 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public abstract class CreateView extends AbstractList<IEivViewRecipe> implements IEivViewRecipe {
-    public static final OptionalSlotRenderer SLOT = (context, x, y, pt) -> AllGuiTextures.JEI_SLOT.render(context, 0, 0);
-    public static final OptionalSlotRenderer CHANCE_SLOT = (context, x, y, pt) -> AllGuiTextures.JEI_CHANCE_SLOT.render(context, 0, 0);
+    public static final OptionalSlotRenderer SLOT = (context, x, y, pt) -> AllGuiTextures.JEI_SLOT.render(
+        context,
+        0,
+        0
+    );
+    public static final OptionalSlotRenderer CHANCE_SLOT = (context, x, y, pt) -> AllGuiTextures.JEI_CHANCE_SLOT.render(context,
+        0,
+        0
+    );
     public static final AdditionalStackModifier NOT_CONSUMED = (stack, tooltip) -> tooltip.add(CreateLang.translateDirect(
         "recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD));
 
@@ -65,8 +72,10 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
     }
 
     public void bindChanceSlot(SlotFillContext slotFillContext, int i, SlotContent content, float chance) {
-        Component text = CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100))
-            .withStyle(ChatFormatting.GOLD);
+        Component text = CreateLang.translateDirect(
+            "recipe.processing.chance",
+            chance < 0.01 ? "<1" : (int) (chance * 100)
+        ).withStyle(ChatFormatting.GOLD);
         slotFillContext.bindOptionalSlot(i, content, CHANCE_SLOT);
         slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(text));
     }
@@ -138,7 +147,11 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
         return false;
     }
 
-    private static boolean matchEnchantments(Set<Holder<Enchantment>> entries, ItemEnchantments enchantments, ItemEnchantments validEnchantments) {
+    private static boolean matchEnchantments(
+        Set<Holder<Enchantment>> entries,
+        ItemEnchantments enchantments,
+        ItemEnchantments validEnchantments
+    ) {
         for (Holder<Enchantment> enchantment : entries) {
             if (validEnchantments.getLevel(enchantment) != enchantments.getLevel(enchantment)) {
                 return false;
@@ -194,10 +207,14 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
         }
         PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
         BottleType bottleType = stack.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
-        Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getDescriptionId() + ".effect.");
+        Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType)
+            .getDescriptionId() + ".effect.");
         stack.set(DataComponents.ITEM_NAME, name);
         if (!stack.has(DataComponents.POTION_DURATION_SCALE) && bottleType == BottleType.LINGERING) {
-            stack.set(DataComponents.POTION_DURATION_SCALE, Items.LINGERING_POTION.components().get(DataComponents.POTION_DURATION_SCALE));
+            stack.set(
+                DataComponents.POTION_DURATION_SCALE,
+                Items.LINGERING_POTION.components().get(DataComponents.POTION_DURATION_SCALE)
+            );
         }
     }
 

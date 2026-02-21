@@ -1,8 +1,8 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -34,15 +34,17 @@ public class AnimatedContainerBehaviour<M extends MenuBase<? extends SmartBlockE
     @Override
     public void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             openCount = view.getIntOr("OpenCount", 0);
+        }
     }
 
     @Override
     public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             view.putInt("OpenCount", openCount);
+        }
     }
 
     @Override
@@ -53,48 +55,61 @@ public class AnimatedContainerBehaviour<M extends MenuBase<? extends SmartBlockE
 
     void updateOpenCount() {
         Level level = getLevel();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (openCount == 0)
+        }
+        if (openCount == 0) {
             return;
+        }
 
         int prevOpenCount = openCount;
         openCount = 0;
 
-        for (Player playerentity : level.getEntitiesOfClass(Player.class, new AABB(getPos()).inflate(8)))
-            if (menuClass.isInstance(playerentity.containerMenu) && menuClass.cast(playerentity.containerMenu).contentHolder == blockEntity)
+        for (Player playerentity : level.getEntitiesOfClass(Player.class, new AABB(getPos()).inflate(8))) {
+            if (menuClass.isInstance(playerentity.containerMenu) && menuClass.cast(playerentity.containerMenu).contentHolder == blockEntity) {
                 openCount++;
+            }
+        }
 
         if (prevOpenCount != openCount) {
-            if (openChanged != null && prevOpenCount == 0 && openCount > 0)
+            if (openChanged != null && prevOpenCount == 0 && openCount > 0) {
                 openChanged.accept(true);
-            if (openChanged != null && prevOpenCount > 0 && openCount == 0)
+            }
+            if (openChanged != null && prevOpenCount > 0 && openCount == 0) {
                 openChanged.accept(false);
+            }
             blockEntity.sendData();
         }
     }
 
     public void startOpen(Player player) {
-        if (player.isSpectator())
+        if (player.isSpectator()) {
             return;
-        if (getLevel().isClientSide())
+        }
+        if (getLevel().isClientSide()) {
             return;
-        if (openCount < 0)
+        }
+        if (openCount < 0) {
             openCount = 0;
+        }
         openCount++;
-        if (openCount == 1 && openChanged != null)
+        if (openCount == 1 && openChanged != null) {
             openChanged.accept(true);
+        }
         blockEntity.sendData();
     }
 
     public void stopOpen(Player player) {
-        if (player.isSpectator())
+        if (player.isSpectator()) {
             return;
-        if (getLevel().isClientSide())
+        }
+        if (getLevel().isClientSide()) {
             return;
+        }
         openCount--;
-        if (openCount == 0 && openChanged != null)
+        if (openCount == 0 && openChanged != null) {
             openChanged.accept(false);
+        }
         blockEntity.sendData();
     }
 

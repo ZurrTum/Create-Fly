@@ -25,7 +25,8 @@ import java.util.List;
 
 public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     private static final Comparator<InstancedDraw> DRAW_COMPARATOR = Comparator.comparingInt(InstancedDraw::bias)
-        .thenComparingInt(InstancedDraw::indexOfMeshInModel).thenComparing(InstancedDraw::material, MaterialRenderState.COMPARATOR);
+        .thenComparingInt(InstancedDraw::indexOfMeshInModel)
+        .thenComparing(InstancedDraw::material, MaterialRenderState.COMPARATOR);
 
     private final List<InstancedDraw> allDraws = new ArrayList<>();
     private boolean needSort = false;
@@ -142,7 +143,12 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
             var groupKey = drawCall.groupKey;
             var environment = groupKey.environment();
 
-            var program = programs.get(groupKey.instanceType(), environment.contextShader(), material, PipelineCompiler.OitMode.OFF);
+            var program = programs.get(
+                groupKey.instanceType(),
+                environment.contextShader(),
+                material,
+                PipelineCompiler.OitMode.OFF
+            );
             program.bind();
 
             environment.setupDraw(program);
@@ -267,7 +273,12 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
 
                     for (InstancedDraw draw : instancer.draws()) {
                         CommonCrumbling.applyCrumblingProperties(crumblingMaterial, draw.material());
-                        var program = programs.get(shader.instanceType(), ContextShader.CRUMBLING, crumblingMaterial, PipelineCompiler.OitMode.OFF);
+                        var program = programs.get(
+                            shader.instanceType(),
+                            ContextShader.CRUMBLING,
+                            crumblingMaterial,
+                            PipelineCompiler.OitMode.OFF
+                        );
                         program.bind();
                         program.setInt("_flw_baseInstance", index);
                         uploadMaterialUniform(program, crumblingMaterial);

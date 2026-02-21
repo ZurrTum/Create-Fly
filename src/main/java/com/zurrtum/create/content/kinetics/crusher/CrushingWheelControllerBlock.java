@@ -82,9 +82,17 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
     }
 
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, InsideBlockEffectApplier handler, boolean bl) {
-        if (!state.getValue(VALID))
+    public void entityInside(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Entity entityIn,
+        InsideBlockEffectApplier handler,
+        boolean bl
+    ) {
+        if (!state.getValue(VALID)) {
             return;
+        }
 
         Direction facing = state.getValue(FACING);
         Axis axis = facing.getAxis();
@@ -95,8 +103,7 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
             worldIn, pos, be -> {
                 if (be.processingEntity == entityIn) {
                     entityIn.makeStuckInBlock(
-                        state,
-                        new Vec3(
+                        state, new Vec3(
                             axis == Axis.X ? (double) 0.05F : 0.25D,
                             axis == Axis.Y ? (double) 0.05F : 0.25D,
                             axis == Axis.Z ? (double) 0.05F : 0.25D
@@ -109,24 +116,30 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
 
     public void checkEntityForProcessing(Level worldIn, BlockPos pos, Entity entityIn) {
         CrushingWheelControllerBlockEntity be = getBlockEntity(worldIn, pos);
-        if (be == null)
+        if (be == null) {
             return;
-        if (be.crushingspeed == 0)
+        }
+        if (be.crushingspeed == 0) {
             return;
+        }
         //		if (entityIn instanceof ItemEntity)
         //			((ItemEntity) entityIn).setPickUpDelay(10);
         if (entityIn instanceof ItemEntity) {
             Optional<BlockPos> value = AllSynchedDatas.BYPASS_CRUSHING_WHEEL.get(entityIn);
-            if (value.isPresent() && pos.equals(value.get()))
+            if (value.isPresent() && pos.equals(value.get())) {
                 return;
+            }
         }
-        if (be.isOccupied())
+        if (be.isOccupied()) {
             return;
+        }
         if (entityIn instanceof Player player) {
-            if (player.isCreative())
+            if (player.isCreative()) {
                 return;
-            if (entityIn.level().getDifficulty() == Difficulty.PEACEFUL)
+            }
+            if (entityIn.level().getDifficulty() == Difficulty.PEACEFUL) {
                 return;
+            }
         }
 
         be.startCrushing(entityIn);
@@ -140,10 +153,12 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
 
     @Override
     public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, RandomSource rand) {
-        if (!stateIn.getValue(VALID))
+        if (!stateIn.getValue(VALID)) {
             return;
-        if (rand.nextInt(1) != 0)
+        }
+        if (rand.nextInt(1) != 0) {
             return;
+        }
         double d0 = (float) pos.getX() + rand.nextFloat();
         double d1 = (float) pos.getY() + rand.nextFloat();
         double d2 = (float) pos.getZ() + rand.nextFloat();
@@ -178,19 +193,23 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
 
                 for (Direction d : Iterate.directions) {
                     BlockState neighbour = world.getBlockState(pos.relative(d));
-                    if (!neighbour.is(AllBlocks.CRUSHING_WHEEL))
+                    if (!neighbour.is(AllBlocks.CRUSHING_WHEEL)) {
                         continue;
-                    if (neighbour.getValue(BlockStateProperties.AXIS) == d.getAxis())
+                    }
+                    if (neighbour.getValue(BlockStateProperties.AXIS) == d.getAxis()) {
                         continue;
+                    }
                     BlockEntity adjBE = world.getBlockEntity(pos.relative(d));
-                    if (!(adjBE instanceof CrushingWheelBlockEntity cwbe))
+                    if (!(adjBE instanceof CrushingWheelBlockEntity cwbe)) {
                         continue;
+                    }
                     be.crushingspeed = Math.abs(cwbe.getSpeed() / 50f);
                     be.sendData();
 
                     cwbe.award(AllAdvancements.CRUSHING_WHEEL);
-                    if (Math.abs(cwbe.getSpeed()) > AllConfigs.server().kinetics.maxRotationSpeed.get() - 1)
+                    if (Math.abs(cwbe.getSpeed()) > AllConfigs.server().kinetics.maxRotationSpeed.get() - 1) {
                         cwbe.award(AllAdvancements.CRUSHER_MAXED);
+                    }
 
                     break;
                 }
@@ -202,23 +221,29 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
     public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         VoxelShape standardShape = AllShapes.CRUSHING_WHEEL_CONTROLLER_COLLISION.get(state.getValue(FACING));
 
-        if (!state.getValue(VALID))
+        if (!state.getValue(VALID)) {
             return standardShape;
-        if (!(context instanceof EntityCollisionContext entityShapeContext))
+        }
+        if (!(context instanceof EntityCollisionContext entityShapeContext)) {
             return standardShape;
+        }
         Entity entity = entityShapeContext.getEntity();
-        if (entity == null)
+        if (entity == null) {
             return standardShape;
+        }
 
         if (entity instanceof ItemEntity && state.getValue(FACING) != Direction.UP) {
             Optional<BlockPos> value = AllSynchedDatas.BYPASS_CRUSHING_WHEEL.get(entity);
             if (value.isPresent() && pos.equals(value.get())) // Allow output items to land on top of the block rather
+            {
                 return Shapes.empty();                    // than falling back through.
+            }
         }
 
         CrushingWheelControllerBlockEntity be = getBlockEntity(worldIn, pos);
-        if (be != null && be.processingEntity == entity)
+        if (be != null && be.processingEntity == entity) {
             return Shapes.empty();
+        }
 
         return standardShape;
     }

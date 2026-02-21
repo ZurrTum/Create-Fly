@@ -6,6 +6,11 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 
 public class StatTrackingDisplaySourceRender extends ScoreboardDisplaySourceRender {
     @Override
-    public void initConfigurationWidgets(DisplaySource source, DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
+    public void initConfigurationWidgets(
+        DisplaySource source,
+        DisplayLinkContext context,
+        ModularGuiLineBuilder builder,
+        boolean isFirstLine
+    ) {
     }
 }

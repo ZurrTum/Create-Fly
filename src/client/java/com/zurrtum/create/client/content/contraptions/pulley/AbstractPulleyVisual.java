@@ -50,7 +50,8 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
         float blockStateAngle = AngleHelper.horizontalAngle(rotatingAbout);
         Quaternionfc rotation = new Quaternionf().rotationY(Mth.DEG_TO_RAD * blockStateAngle);
 
-        coil = getCoilModel().createInstance().rotation(rotation).position(getVisualPosition()).setSpriteShift(getCoilAnimation());
+        coil = getCoilModel().createInstance().rotation(rotation).position(getVisualPosition())
+            .setSpriteShift(getCoilAnimation());
 
         coil.setChanged();
 
@@ -112,8 +113,8 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
             float f = offset % 1;
             float halfRopeNudge = f > .75f ? f - 1 : f;
 
-            rope.get(true).setIdentityTransform().translate(getVisualPosition()).translate(0, -halfRopeNudge, 0).light(lightCache.getPackedLight(0))
-                .setChanged();
+            rope.get(true).setIdentityTransform().translate(getVisualPosition()).translate(0, -halfRopeNudge, 0)
+                .light(lightCache.getPackedLight(0)).setChanged();
         }
 
         if (isRunning()) {
@@ -177,7 +178,10 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
                 data.size(size);
                 update();
 
-                int sectionCount = MoreMath.ceilingDiv(size + 15 - pos.getY() + pos.getY() / 4 * 4, SectionPos.SECTION_SIZE);
+                int sectionCount = MoreMath.ceilingDiv(
+                    size + 15 - pos.getY() + pos.getY() / 4 * 4,
+                    SectionPos.SECTION_SIZE
+                );
                 if (sectionCount != this.sectionCount) {
                     this.sectionCount = sectionCount;
                     sections.clear();

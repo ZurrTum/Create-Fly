@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.decoration.slidingDoor;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -18,8 +18,9 @@ public class DoorControlBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
     }
 
     public void set(DoorControl mode) {
-        if (this.mode == mode)
+        if (this.mode == mode) {
             return;
+        }
         this.mode = mode;
         blockEntity.notifyUpdate();
     }

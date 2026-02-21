@@ -36,8 +36,8 @@ public class AutoMixingDisplay extends CreateDisplay {
     @Nullable
     public static AutoMixingDisplay of(RecipeHolder<CraftingRecipe> entry) {
         CraftingRecipe recipe = entry.value();
-        if (!(recipe instanceof ShapelessRecipe shapelessRecipe) || MechanicalPressBlockEntity.canCompress(shapelessRecipe) || AllRecipeTypes.shouldIgnoreInAutomation(
-            entry) || shapelessRecipe.ingredients.size() == 1) {
+        if (!(recipe instanceof ShapelessRecipe shapelessRecipe) || MechanicalPressBlockEntity.canCompress(
+            shapelessRecipe) || AllRecipeTypes.shouldIgnoreInAutomation(entry) || shapelessRecipe.ingredients.size() == 1) {
             return null;
         }
         Object2IntMap<Ingredient> map = new Object2IntArrayMap<>();

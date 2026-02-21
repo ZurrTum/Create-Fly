@@ -2,20 +2,19 @@ package com.zurrtum.create.infrastructure.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.Objects;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Objects;
+
 public record SandPaperItemComponent(ItemStack item) {
 
-    public static final Codec<SandPaperItemComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(ItemStack.OPTIONAL_CODEC.fieldOf(
-        "item").forGetter(SandPaperItemComponent::item)).apply(instance, SandPaperItemComponent::new));
+    public static final Codec<SandPaperItemComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            ItemStack.OPTIONAL_CODEC.fieldOf("item").forGetter(SandPaperItemComponent::item))
+        .apply(instance, SandPaperItemComponent::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, SandPaperItemComponent> STREAM_CODEC = StreamCodec.composite(
-        ItemStack.OPTIONAL_STREAM_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, SandPaperItemComponent> STREAM_CODEC = StreamCodec.composite(ItemStack.OPTIONAL_STREAM_CODEC,
         SandPaperItemComponent::item,
         SandPaperItemComponent::new
     );

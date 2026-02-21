@@ -91,9 +91,15 @@ public class PackageEntity extends LivingEntity {
         packageEntity.setDeltaMovement(originalEntity.getDeltaMovement().scale(1.5f));
         packageEntity.originalEntity = originalEntity;
 
-        if (world != null && !world.isClientSide())
-            if (ChuteBlock.isChute(world.getBlockState(BlockPos.containing(position.x, position.y + .5f, position.z))))
+        if (world != null && !world.isClientSide()) {
+            if (ChuteBlock.isChute(world.getBlockState(BlockPos.containing(
+                position.x,
+                position.y + .5f,
+                position.z
+            )))) {
                 packageEntity.setYRot(((int) packageEntity.getYRot()) / 90 * 90);
+            }
+        }
 
         return packageEntity;
     }
@@ -128,12 +134,15 @@ public class PackageEntity extends LivingEntity {
     public void travel(Vec3 p_213352_1_) {
         super.travel(p_213352_1_);
 
-        if (!level().isClientSide())
+        if (!level().isClientSide()) {
             return;
-        if (getDeltaMovement().length() < 1 / 128f)
+        }
+        if (getDeltaMovement().length() < 1 / 128f) {
             return;
-        if (tickCount >= 20)
+        }
+        if (tickCount >= 20) {
             return;
+        }
 
         Vec3 motion = getDeltaMovement().scale(.75f);
         AABB bb = getBoundingBox();
@@ -141,12 +150,15 @@ public class PackageEntity extends LivingEntity {
         motion = collideBoundingBox(this, motion, bb, level(), entityStream);
 
         Vec3 clientPos = position().add(motion);
-        if (isInterpolating())
+        if (isInterpolating()) {
             clientPos = VecHelper.lerp(Math.min(1, tickCount / 20f), clientPos, getInterpolation().position());
-        if (tickCount < 5)
+        }
+        if (tickCount < 5) {
             setPos(clientPos.x, clientPos.y, clientPos.z);
-        if (tickCount < 20)
+        }
+        if (tickCount < 20) {
             getInterpolation().interpolateTo(clientPos, getYRot(), getXRot());
+        }
     }
 
     @Override
@@ -174,8 +186,9 @@ public class PackageEntity extends LivingEntity {
         insertionDelay = Math.min(insertionDelay + 1, 30);
         super.tick();
 
-        if (!PackageItem.isPackage(box))
+        if (!PackageItem.isPackage(box)) {
             discard();
+        }
     }
 
     /*
@@ -184,21 +197,28 @@ public class PackageEntity extends LivingEntity {
      * from such a fake item
      */
     protected void verifyInitialEntity() {
-        if (!(originalEntity instanceof ItemEntity itemEntity))
+        if (!(originalEntity instanceof ItemEntity itemEntity)) {
             return;
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+        }
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            problemPath(),
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
             itemEntity.addAdditionalSaveData(view);
             if (view.buildResult().getIntOr("PickupDelay", 0) != 32767) // See: ItemEntity#setDespawnImmediately
+            {
                 return;
+            }
             discard();
         }
     }
 
     @Override
     protected EntityDimensions getDefaultDimensions(Pose pose) {
-        if (box == null)
+        if (box == null) {
             return super.getDefaultDimensions(pose);
+        }
         return EntityDimensions.fixed(PackageItem.getWidth(box), PackageItem.getHeight(box));
     }
 
@@ -207,8 +227,9 @@ public class PackageEntity extends LivingEntity {
     }
 
     public static boolean centerPackage(Entity entity, Vec3 target) {
-        if (!(entity instanceof PackageEntity packageEntity))
+        if (!(entity instanceof PackageEntity packageEntity)) {
             return true;
+        }
         return packageEntity.decreaseInsertionTimer(target);
     }
 
@@ -241,12 +262,21 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public InteractionResult interact(Player pPlayer, InteractionHand pHand) {
-        if (!pPlayer.getItemInHand(pHand).isEmpty())
+        if (!pPlayer.getItemInHand(pHand).isEmpty()) {
             return super.interact(pPlayer, pHand);
-        if (pPlayer.level().isClientSide())
+        }
+        if (pPlayer.level().isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         pPlayer.setItemInHand(pHand, box);
-        level().playSound(null, blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, .75f + level().random.nextFloat());
+        level().playSound(
+            null,
+            blockPosition(),
+            SoundEvents.ITEM_PICKUP,
+            SoundSource.PLAYERS,
+            .2f,
+            .75f + level().random.nextFloat()
+        );
         remove(RemovalReason.DISCARDED);
         return InteractionResult.SUCCESS;
     }
@@ -255,12 +285,14 @@ public class PackageEntity extends LivingEntity {
     public void push(Entity entityIn) {
         boolean isOtherPackage = entityIn instanceof PackageEntity;
 
-        if (!isOtherPackage && tossedBy.get() != null)
+        if (!isOtherPackage && tossedBy.get() != null) {
             tossedBy = new WeakReference<>(null); // no nudging
+        }
 
         if (isOtherPackage) {
-            if (entityIn.getBoundingBox().minY < this.getBoundingBox().maxY)
+            if (entityIn.getBoundingBox().minY < this.getBoundingBox().maxY) {
                 super.push(entityIn);
+            }
         } else if (entityIn.getBoundingBox().minY <= this.getBoundingBox().minY) {
             super.push(entityIn);
         }
@@ -279,9 +311,11 @@ public class PackageEntity extends LivingEntity {
     @Override
     protected void onInsideBlock(BlockState state) {
         super.onInsideBlock(state);
-        if (!isAlive())
+        if (!isAlive()) {
             return;
-        if (state.getBlock() == Blocks.WATER || (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED))) {
+        }
+        if (state.getBlock() == Blocks.WATER || (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(
+            BlockStateProperties.WATERLOGGED))) {
             destroy(damageSources().drown());
             remove(RemovalReason.KILLED);
         }
@@ -289,22 +323,26 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
-        if (level().isClientSide() || !this.isAlive())
+        if (level().isClientSide() || !this.isAlive()) {
             return false;
+        }
 
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             this.remove(RemovalReason.KILLED);
             return false;
         }
 
-        if (source.equals(damageSources().inWall()) && (isPassenger() || insertionDelay < 20))
+        if (source.equals(damageSources().inWall()) && (isPassenger() || insertionDelay < 20)) {
             return false;
+        }
 
-        if (source.is(DamageTypeTags.IS_FALL))
+        if (source.is(DamageTypeTags.IS_FALL)) {
             return false;
+        }
 
-        if (this.isInvulnerableTo((ServerLevel) level(), source))
+        if (this.isInvulnerableTo((ServerLevel) level(), source)) {
             return false;
+        }
 
         if (source.is(DamageTypeTags.IS_EXPLOSION)) {
             this.destroy(source);
@@ -328,8 +366,9 @@ public class PackageEntity extends LivingEntity {
             shotCanPierce = false;
         }
 
-        if (source.getEntity() instanceof Player player && !player.getAbilities().mayBuild)
+        if (source.getEntity() instanceof Player player && !player.getAbilities().mayBuild) {
             return false;
+        }
 
         this.destroy(source);
         this.remove(RemovalReason.KILLED);
@@ -351,7 +390,8 @@ public class PackageEntity extends LivingEntity {
         AllSoundEvents.PACKAGE_POP.playOnServer(level(), blockPosition());
         if (level() instanceof ServerLevel serverLevel) {
             this.dropAllDeathLoot(serverLevel, source);
-            serverLevel.getChunkSource().sendToTrackingPlayers(this, new PackageDestroyPacket(getBoundingBox().getCenter(), box));
+            serverLevel.getChunkSource()
+                .sendToTrackingPlayers(this, new PackageDestroyPacket(getBoundingBox().getCenter(), box));
         }
     }
 
@@ -364,13 +404,23 @@ public class PackageEntity extends LivingEntity {
 
             if (itemstack.getItem() instanceof SpawnEggItem sei) {
                 EntityType<?> entitytype = sei.getType(itemstack);
-                Entity entity = entitytype.spawn(level, itemstack, null, blockPosition(), EntitySpawnReason.SPAWN_ITEM_USE, false, false);
-                if (entity != null)
+                Entity entity = entitytype.spawn(
+                    level,
+                    itemstack,
+                    null,
+                    blockPosition(),
+                    EntitySpawnReason.SPAWN_ITEM_USE,
+                    false,
+                    false
+                );
+                if (entity != null) {
                     itemstack.shrink(1);
+                }
             }
 
-            if (itemstack.isEmpty())
+            if (itemstack.isEmpty()) {
                 continue;
+            }
             ItemEntity entityIn = new ItemEntity(level, getX(), getY(), getZ(), itemstack);
             level.addFreshEntity(entityIn);
         }
@@ -393,15 +443,17 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public ItemStack getItemBySlot(EquipmentSlot pSlot) {
-        if (pSlot == EquipmentSlot.MAINHAND)
+        if (pSlot == EquipmentSlot.MAINHAND) {
             return getBox();
+        }
         return ItemStack.EMPTY;
     }
 
     @Override
     public void setItemSlot(EquipmentSlot pSlot, ItemStack pStack) {
-        if (pSlot == EquipmentSlot.MAINHAND)
+        if (pSlot == EquipmentSlot.MAINHAND) {
             setBox(pStack);
+        }
     }
 
     @Override

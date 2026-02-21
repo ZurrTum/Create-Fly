@@ -29,11 +29,18 @@ public class TrainTrapdoorBlock extends TrapDoorBlock implements IWrenchable {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
         state = state.cycle(OPEN);
         level.setBlock(pos, state, UPDATE_CLIENTS);
-        if (state.getValue(WATERLOGGED))
+        if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
         playSound(player, level, pos, state.getValue(OPEN));
         return InteractionResult.SUCCESS;
     }
@@ -51,16 +58,21 @@ public class TrainTrapdoorBlock extends TrapDoorBlock implements IWrenchable {
         Half half = state.getValue(HALF);
         Direction facing = state.getValue(FACING);
 
-        if (open != other.getValue(OPEN))
+        if (open != other.getValue(OPEN)) {
             return false;
-        if (!open && half == other.getValue(HALF))
+        }
+        if (!open && half == other.getValue(HALF)) {
             return pDirection.getAxis() != Axis.Y;
-        if (!open && half != other.getValue(HALF) && pDirection.getAxis() == Axis.Y)
+        }
+        if (!open && half != other.getValue(HALF) && pDirection.getAxis() == Axis.Y) {
             return true;
-        if (open && facing.getOpposite() == other.getValue(FACING) && pDirection.getAxis() == facing.getAxis())
+        }
+        if (open && facing.getOpposite() == other.getValue(FACING) && pDirection.getAxis() == facing.getAxis()) {
             return true;
-        if ((open ? state.setValue(HALF, Half.TOP) : state) != (open ? other.setValue(HALF, Half.TOP) : other))
+        }
+        if ((open ? state.setValue(HALF, Half.TOP) : state) != (open ? other.setValue(HALF, Half.TOP) : other)) {
             return false;
+        }
 
         return pDirection.getAxis() != facing.getAxis();
     }

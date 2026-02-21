@@ -75,7 +75,8 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     protected FluidTankBlock(Properties p_i48440_1_, boolean creative) {
         super(p_i48440_1_);
         this.creative = creative;
-        registerDefaultState(defaultBlockState().setValue(TOP, true).setValue(BOTTOM, true).setValue(SHAPE, Shape.WINDOW).setValue(LIGHT_LEVEL, 0));
+        registerDefaultState(defaultBlockState().setValue(TOP, true).setValue(BOTTOM, true)
+            .setValue(SHAPE, Shape.WINDOW).setValue(LIGHT_LEVEL, 0));
     }
 
     public static boolean isTank(BlockState state) {
@@ -84,10 +85,12 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved) {
-        if (oldState.getBlock() == state.getBlock())
+        if (oldState.getBlock() == state.getBlock()) {
             return;
-        if (moved)
+        }
+        if (moved) {
             return;
+        }
         withBlockEntityDo(world, pos, FluidTankBlockEntity::updateConnectivity);
 
         // updateConnectivity may have changed the in-world block state, which prevents the call to markAndNotifyBlock
@@ -116,9 +119,15 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     static final VoxelShape CAMPFIRE_SMOKE_CLIP = Block.box(0, 4, 0, 16, 16, 16);
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        if (pContext == CollisionContext.empty())
+    public VoxelShape getCollisionShape(
+        BlockState pState,
+        BlockGetter pLevel,
+        BlockPos pPos,
+        CollisionContext pContext
+    ) {
+        if (pContext == CollisionContext.empty()) {
             return CAMPFIRE_SMOKE_CLIP;
+        }
         return pState.getShape(pLevel, pPos);
     }
 
@@ -138,8 +147,9 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         BlockState pNeighborState,
         RandomSource random
     ) {
-        if (pDirection == Direction.DOWN && pNeighborState.getBlock() != this)
+        if (pDirection == Direction.DOWN && pNeighborState.getBlock() != this) {
             withBlockEntityDo(pLevel, pCurrentPos, FluidTankBlockEntity::updateBoilerTemperature);
+        }
         return pState;
     }
 
@@ -169,32 +179,41 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     ) {
         boolean onClient = level.isClientSide();
 
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (!player.isCreative() && !creative)
+        }
+        if (!player.isCreative() && !creative) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         FluidExchange exchange = null;
         FluidTankBlockEntity be = ConnectivityHandler.partAt(getBlockEntityType(), level, pos);
-        if (be == null)
+        if (be == null) {
             return InteractionResult.FAIL;
+        }
 
         if (!(state.getBlock() instanceof FluidInventoryProvider<?> provider)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         FluidInventory tankCapability = provider.getFluidInventory(state, level, pos, be, null);
-        if (tankCapability == null)
+        if (tankCapability == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         FluidStack prevFluidInTank = tankCapability.getStack(0).copy();
 
-        if (FluidHelper.tryEmptyItemIntoBE(level, player, hand, stack, be))
+        if (FluidHelper.tryEmptyItemIntoBE(level, player, hand, stack, be)) {
             exchange = FluidExchange.ITEM_TO_TANK;
-        else if (FluidHelper.tryFillItemFromBE(level, player, hand, stack, be))
+        } else if (FluidHelper.tryFillItemFromBE(level, player, hand, stack, be)) {
             exchange = FluidExchange.TANK_TO_ITEM;
+        }
 
         if (exchange == null) {
-            if (GenericItemEmptying.canItemBeEmptied(level, stack) || GenericItemFilling.canItemBeFilled(level, stack))
+            if (GenericItemEmptying.canItemBeEmptied(level, stack) || GenericItemFilling.canItemBeFilled(
+                level,
+                stack
+            )) {
                 return InteractionResult.SUCCESS;
+            }
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
@@ -217,9 +236,11 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         }
 
         if (exchange == FluidExchange.TANK_TO_ITEM) {
-            if (creative && !onClient)
-                if (tankCapability instanceof CreativeFluidTankInventory)
+            if (creative && !onClient) {
+                if (tankCapability instanceof CreativeFluidTankInventory) {
                     tankCapability.setStack(0, FluidStack.EMPTY);
+                }
+            }
 
             Fluid fluid = prevFluidInTank.getFluid();
             fluidState = fluid.defaultFluidState().createLegacyBlock();
@@ -227,7 +248,11 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         }
 
         if (soundevent != null && !onClient) {
-            float pitch = Mth.clamp(1 - (1f * fluidInTank.getAmount() / (FluidTankBlockEntity.getCapacityMultiplier() * 16)), 0, 1);
+            float pitch = Mth.clamp(
+                1 - (1f * fluidInTank.getAmount() / (FluidTankBlockEntity.getCapacityMultiplier() * 16)),
+                0,
+                1
+            );
             pitch /= 1.5f;
             pitch += .5f;
             pitch += (level.random.nextFloat() - .5f) / 4f;
@@ -245,11 +270,16 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
                     //                    boolean reversed = fluidInTank.getFluid()
                     //                        .getFluidType()
                     //                        .isLighterThanAir();
-                    if (false/*reversed*/)
+                    if (false/*reversed*/) {
                         fluidLevel = 1 - fluidLevel;
+                    }
 
                     Vec3 vec = hitResult.getLocation();
-                    vec = new Vec3(vec.x, controllerBE.getBlockPos().getY() + fluidLevel * (controllerBE.height - .5f) + .25f, vec.z);
+                    vec = new Vec3(
+                        vec.x,
+                        controllerBE.getBlockPos().getY() + fluidLevel * (controllerBE.height - .5f) + .25f,
+                        vec.z
+                    );
                     Vec3 motion = player.position().subtract(vec).scale(1 / 20f);
                     vec = vec.add(motion);
                     level.addParticle(blockParticleData, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);
@@ -276,8 +306,9 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        if (mirror == Mirror.NONE)
+        if (mirror == Mirror.NONE) {
             return state;
+        }
         boolean x = mirror == Mirror.FRONT_BACK;
         switch (state.getValue(SHAPE)) {
             case WINDOW_NE:
@@ -295,8 +326,9 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
-        for (int i = 0; i < rotation.ordinal(); i++)
+        for (int i = 0; i < rotation.ordinal(); i++) {
             state = rotateOnce(state);
+        }
         return state;
     }
 
@@ -316,12 +348,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     }
 
     public enum Shape implements StringRepresentable {
-        PLAIN,
-        WINDOW,
-        WINDOW_NW,
-        WINDOW_SW,
-        WINDOW_NE,
-        WINDOW_SE;
+        PLAIN, WINDOW, WINDOW_NW, WINDOW_SW, WINDOW_NE, WINDOW_SE;
 
         @Override
         public String getSerializedName() {
@@ -342,14 +369,17 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
 
     public static void updateBoilerState(BlockState pState, Level pLevel, BlockPos tankPos) {
         BlockState tankState = pLevel.getBlockState(tankPos);
-        if (!(tankState.getBlock() instanceof FluidTankBlock tank))
+        if (!(tankState.getBlock() instanceof FluidTankBlock tank)) {
             return;
+        }
         FluidTankBlockEntity tankBE = tank.getBlockEntity(pLevel, tankPos);
-        if (tankBE == null)
+        if (tankBE == null) {
             return;
+        }
         FluidTankBlockEntity controllerBE = tankBE.getControllerBE();
-        if (controllerBE == null)
+        if (controllerBE == null) {
             return;
+        }
         controllerBE.updateBoilerState();
     }
 

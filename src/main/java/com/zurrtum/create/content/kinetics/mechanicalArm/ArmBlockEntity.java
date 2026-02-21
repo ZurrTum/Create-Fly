@@ -6,6 +6,7 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.math.AngleHelper;
@@ -14,7 +15,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.AllArmInteractionPointTypes.JukeboxPoint;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint.Mode;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
@@ -76,11 +76,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     protected boolean redstoneLocked;
 
     public enum Phase implements StringRepresentable {
-        SEARCH_INPUTS,
-        MOVE_TO_INPUT,
-        SEARCH_OUTPUTS,
-        MOVE_TO_OUTPUT,
-        DANCING;
+        SEARCH_INPUTS, MOVE_TO_INPUT, SEARCH_OUTPUTS, MOVE_TO_OUTPUT, DANCING;
 
         public static final Codec<Phase> CODEC = StringRepresentable.fromEnum(Phase::values);
 
@@ -137,42 +133,51 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         initInteractionPoints();
         boolean targetReached = tickMovementProgress();
 
-        if (tooltipWarmup > 0)
+        if (tooltipWarmup > 0) {
             tooltipWarmup--;
+        }
         if (chasedPointProgress < 1) {
             if (phase == Phase.MOVE_TO_INPUT) {
                 ArmInteractionPoint point = getTargetedInteractionPoint();
-                if (point != null)
+                if (point != null) {
                     point.keepAlive();
+                }
             }
             return;
         }
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
-        if (phase == Phase.MOVE_TO_INPUT)
+        if (phase == Phase.MOVE_TO_INPUT) {
             collectItem();
-        else if (phase == Phase.MOVE_TO_OUTPUT)
+        } else if (phase == Phase.MOVE_TO_OUTPUT) {
             depositItem();
-        else if (phase == Phase.SEARCH_INPUTS || phase == Phase.DANCING)
+        } else if (phase == Phase.SEARCH_INPUTS || phase == Phase.DANCING) {
             searchForItem();
+        }
 
-        if (targetReached)
+        if (targetReached) {
             lazyTick();
+        }
     }
 
     @Override
     public void lazyTick() {
         super.lazyTick();
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (chasedPointProgress < .5f)
+        }
+        if (chasedPointProgress < .5f) {
             return;
-        if (phase == Phase.SEARCH_INPUTS || phase == Phase.DANCING)
+        }
+        if (phase == Phase.SEARCH_INPUTS || phase == Phase.DANCING) {
             checkForMusic();
-        if (phase == Phase.SEARCH_OUTPUTS)
+        }
+        if (phase == Phase.SEARCH_OUTPUTS) {
             searchForDestination();
+        }
     }
 
     private void checkForMusic() {
@@ -191,11 +196,13 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 
     private boolean checkForMusicAmong(List<ArmInteractionPoint> list) {
         for (ArmInteractionPoint armInteractionPoint : list) {
-            if (!(armInteractionPoint instanceof JukeboxPoint))
+            if (!(armInteractionPoint instanceof JukeboxPoint)) {
                 continue;
+            }
             BlockState state = level.getBlockState(armInteractionPoint.getPos());
-            if (state.getValueOrElse(JukeboxBlock.HAS_RECORD, false))
+            if (state.getValueOrElse(JukeboxBlock.HAS_RECORD, false)) {
                 return true;
+            }
         }
         return false;
     }
@@ -203,15 +210,16 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     private boolean tickMovementProgress() {
         boolean targetReachedPreviously = chasedPointProgress >= 1;
         chasedPointProgress += Math.min(256, Math.abs(getSpeed())) / 1024f;
-        if (chasedPointProgress > 1)
+        if (chasedPointProgress > 1) {
             chasedPointProgress = 1;
-        if (!level.isClientSide())
+        }
+        if (!level.isClientSide()) {
             return !targetReachedPreviously && chasedPointProgress >= 1;
+        }
 
         ArmInteractionPoint targetedInteractionPoint = getTargetedInteractionPoint();
         ArmAngleTarget previousTarget = this.previousTarget;
-        ArmAngleTarget target = targetedInteractionPoint == null ? ArmAngleTarget.NO_TARGET : targetedInteractionPoint.getTargetAngles(
-            worldPosition,
+        ArmAngleTarget target = targetedInteractionPoint == null ? ArmAngleTarget.NO_TARGET : targetedInteractionPoint.getTargetAngles(worldPosition,
             isOnCeiling()
         );
 
@@ -222,10 +230,11 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         ));
 
         // Arm's angles first backup to resting position and then continue
-        if (chasedPointProgress < .5f)
+        if (chasedPointProgress < .5f) {
             target = ArmAngleTarget.NO_TARGET;
-        else
+        } else {
             previousTarget = ArmAngleTarget.NO_TARGET;
+        }
         float progress = chasedPointProgress == 1 ? 1 : (chasedPointProgress % .5f) * 2;
 
         lowerArmAngle.setValue(Mth.lerp(progress, previousTarget.lowerArmAngle, target.lowerArmAngle));
@@ -243,24 +252,29 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     @Override
     public void destroy() {
         super.destroy();
-        if (!heldItem.isEmpty())
+        if (!heldItem.isEmpty()) {
             Block.popResource(level, worldPosition, heldItem);
+        }
     }
 
     @Nullable
     private ArmInteractionPoint getTargetedInteractionPoint() {
-        if (chasedPointIndex == -1)
+        if (chasedPointIndex == -1) {
             return null;
-        if (phase == Phase.MOVE_TO_INPUT && chasedPointIndex < inputs.size())
+        }
+        if (phase == Phase.MOVE_TO_INPUT && chasedPointIndex < inputs.size()) {
             return inputs.get(chasedPointIndex);
-        if (phase == Phase.MOVE_TO_OUTPUT && chasedPointIndex < outputs.size())
+        }
+        if (phase == Phase.MOVE_TO_OUTPUT && chasedPointIndex < outputs.size()) {
             return outputs.get(chasedPointIndex);
+        }
         return null;
     }
 
     protected void searchForItem() {
-        if (redstoneLocked)
+        if (redstoneLocked) {
             return;
+        }
 
         boolean foundInput = false;
         // for round robin, we start looking after the last used index, for default we
@@ -270,17 +284,20 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         // if we enforce round robin, only look at the next input in the list,
         // otherwise, look at all inputs
         int scanRange = selectionMode.get() == SelectionMode.FORCED_ROUND_ROBIN ? lastInputIndex + 2 : inputs.size();
-        if (scanRange > inputs.size())
+        if (scanRange > inputs.size()) {
             scanRange = inputs.size();
+        }
 
         InteractionPoints:
         for (int i = startIndex; i < scanRange; i++) {
             ArmInteractionPoint armInteractionPoint = inputs.get(i);
-            if (!armInteractionPoint.isValid())
+            if (!armInteractionPoint.isValid()) {
                 continue;
+            }
             for (int j = 0; j < armInteractionPoint.getSlotCount(this); j++) {
-                if (getDistributableAmount(armInteractionPoint, j) == 0)
+                if (getDistributableAmount(armInteractionPoint, j) == 0) {
                     continue;
+                }
 
                 selectIndex(true, i);
                 foundInput = true;
@@ -309,17 +326,20 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         // if we enforce round robin, only look at the next index in the list,
         // otherwise, look at all
         int scanRange = selectionMode.get() == SelectionMode.FORCED_ROUND_ROBIN ? lastOutputIndex + 2 : outputs.size();
-        if (scanRange > outputs.size())
+        if (scanRange > outputs.size()) {
             scanRange = outputs.size();
+        }
 
         for (int i = startIndex; i < scanRange; i++) {
             ArmInteractionPoint armInteractionPoint = outputs.get(i);
-            if (!armInteractionPoint.isValid())
+            if (!armInteractionPoint.isValid()) {
                 continue;
+            }
 
             ItemStack remainder = armInteractionPoint.insert(this, held, true);
-            if (ItemStack.matches(remainder, heldItem))
+            if (ItemStack.matches(remainder, heldItem)) {
                 continue;
+            }
 
             selectIndex(false, i);
             foundOutput = true;
@@ -342,10 +362,11 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         phase = input ? Phase.MOVE_TO_INPUT : Phase.MOVE_TO_OUTPUT;
         chasedPointIndex = index;
         chasedPointProgress = 0;
-        if (input)
+        if (input) {
             lastInputIndex = index;
-        else
+        } else {
             lastOutputIndex = index;
+        }
         sendData();
         setChanged();
     }
@@ -362,10 +383,12 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 
     private ItemStack simulateInsertion(ItemStack stack) {
         for (ArmInteractionPoint armInteractionPoint : outputs) {
-            if (armInteractionPoint.isValid())
+            if (armInteractionPoint.isValid()) {
                 stack = armInteractionPoint.insert(this, stack, true);
-            if (stack.isEmpty())
+            }
+            if (stack.isEmpty()) {
                 break;
+            }
         }
         return stack;
     }
@@ -377,8 +400,9 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
             ItemStack remainder = armInteractionPoint.insert(this, toInsert, false);
             heldItem = remainder;
 
-            if (armInteractionPoint instanceof JukeboxPoint && remainder.isEmpty())
+            if (armInteractionPoint instanceof JukeboxPoint && remainder.isEmpty()) {
                 award(AllAdvancements.MUSICAL_ARM);
+            }
         }
 
         phase = heldItem.isEmpty() ? Phase.SEARCH_INPUTS : Phase.SEARCH_OUTPUTS;
@@ -387,17 +411,19 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         sendData();
         setChanged();
 
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             award(AllAdvancements.MECHANICAL_ARM);
+        }
     }
 
     protected void collectItem() {
         ArmInteractionPoint armInteractionPoint = getTargetedInteractionPoint();
-        if (armInteractionPoint != null && armInteractionPoint.isValid())
+        if (armInteractionPoint != null && armInteractionPoint.isValid()) {
             for (int i = 0; i < armInteractionPoint.getSlotCount(this); i++) {
                 int amountExtracted = getDistributableAmount(armInteractionPoint, i);
-                if (amountExtracted == 0)
+                if (amountExtracted == 0) {
                     continue;
+                }
 
                 ItemStack prevHeld = heldItem;
                 heldItem = armInteractionPoint.extract(this, i, amountExtracted, false);
@@ -407,10 +433,19 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
                 sendData();
                 setChanged();
 
-                if (!ItemStack.isSameItem(heldItem, prevHeld))
-                    level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, .125f, .5f + level.random.nextFloat() * .25f);
+                if (!ItemStack.isSameItem(heldItem, prevHeld)) {
+                    level.playSound(
+                        null,
+                        worldPosition,
+                        SoundEvents.ITEM_PICKUP,
+                        SoundSource.BLOCKS,
+                        .125f,
+                        .5f + level.random.nextFloat() * .25f
+                    );
+                }
                 return;
             }
+        }
 
         phase = Phase.SEARCH_INPUTS;
         chasedPointProgress = 0;
@@ -420,21 +455,25 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     }
 
     public void redstoneUpdate() {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         boolean blockPowered = level.hasNeighborSignal(worldPosition);
-        if (blockPowered == redstoneLocked)
+        if (blockPowered == redstoneLocked) {
             return;
+        }
         redstoneLocked = blockPowered;
         sendData();
-        if (!redstoneLocked)
+        if (!redstoneLocked) {
             searchForItem();
+        }
     }
 
     @Override
     public void transform(BlockEntity be, StructureTransform transform) {
-        if (interactionPointTag == null)
+        if (interactionPointTag == null) {
             return;
+        }
 
         for (Tag tag : interactionPointTag) {
             ArmInteractionPoint.transformPos((CompoundTag) tag, transform);
@@ -479,10 +518,12 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     }
 
     protected void initInteractionPoints() {
-        if (!updateInteractionPoints || interactionPointTag == null)
+        if (!updateInteractionPoints || interactionPointTag == null) {
             return;
-        if (!isAreaActuallyLoaded(worldPosition, getRange() + 1))
+        }
+        if (!isAreaActuallyLoaded(worldPosition, getRange() + 1)) {
             return;
+        }
         inputs.clear();
         outputs.clear();
 
@@ -492,24 +533,28 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         }
         for (Tag tag : interactionPointTag) {
             ArmInteractionPoint point = decodePoint(tag);
-            if (point == null)
+            if (point == null) {
                 continue;
+            }
             BlockState state = level.getBlockState(point.pos);
             if (!point.type.canCreatePoint(level, point.pos, state)) {
                 continue;
             }
-            if (point.getMode() == Mode.DEPOSIT)
+            if (point.getMode() == Mode.DEPOSIT) {
                 outputs.add(point);
-            else if (point.getMode() == Mode.TAKE)
+            } else if (point.getMode() == Mode.TAKE) {
                 inputs.add(point);
+            }
             hasBlazeBurner |= point instanceof AllArmInteractionPointTypes.BlazeBurnerPoint;
         }
 
         if (!level.isClientSide()) {
-            if (outputs.size() >= 10)
+            if (outputs.size() >= 10) {
                 award(AllAdvancements.ARM_MANY_TARGETS);
-            if (hasBlazeBurner)
+            }
+            if (hasBlazeBurner) {
                 award(AllAdvancements.ARM_BLAZE_BURNER);
+            }
         }
 
         updateInteractionPoints = false;
@@ -532,12 +577,19 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         view.store("InteractionPoints", CreateCodecs.NBT_LIST_CODEC, list);
     }
 
-    public static void appendEncodedPoints(List<ArmInteractionPoint> points, Codec<ArmInteractionPoint> pointCodec, ListTag list) {
+    public static void appendEncodedPoints(
+        List<ArmInteractionPoint> points,
+        Codec<ArmInteractionPoint> pointCodec,
+        ListTag list
+    ) {
         for (ArmInteractionPoint point : points) {
             switch (pointCodec.encodeStart(NbtOps.INSTANCE, point)) {
                 case DataResult.Success<Tag> success -> list.add(success.value());
-                case DataResult.Error<Tag> error ->
-                    Create.LOGGER.warn("Failed to append value '{}' to list 'InteractionPoints': {}", point, error.message());
+                case DataResult.Error<Tag> error -> Create.LOGGER.warn(
+                    "Failed to append value '{}' to list 'InteractionPoints': {}",
+                    point,
+                    error.message()
+                );
             }
         }
     }
@@ -546,7 +598,11 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         return switch (pointCodec.parse(NbtOps.INSTANCE, tag)) {
             case DataResult.Success<ArmInteractionPoint> success -> success.value();
             case DataResult.Error<ArmInteractionPoint> error -> {
-                Create.LOGGER.warn("Failed to decode value '{}' from field 'InteractionPoints': {}", tag, error.message());
+                Create.LOGGER.warn(
+                    "Failed to decode value '{}' from field 'InteractionPoints': {}",
+                    tag,
+                    error.message()
+                );
                 yield null;
             }
         };
@@ -592,28 +648,37 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         boolean hadGoggles = goggles;
         goggles = view.getBooleanOr("Goggles", false);
 
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
+        }
 
-        if (hadGoggles != goggles && level.isClientSide())
+        if (hadGoggles != goggles && level.isClientSide()) {
             AllClientHandle.INSTANCE.queueUpdate(this);
+        }
 
         boolean ceiling = isOnCeiling();
-        if (interactionPointTagBefore == null || interactionPointTagBefore.size() != interactionPointTag.size())
+        if (interactionPointTagBefore == null || interactionPointTagBefore.size() != interactionPointTag.size()) {
             updateInteractionPoints = true;
+        }
         if (previousIndex != chasedPointIndex || (previousPhase != phase)) {
             ArmInteractionPoint previousPoint = null;
-            if (previousPhase == Phase.MOVE_TO_INPUT && previousIndex < inputs.size())
+            if (previousPhase == Phase.MOVE_TO_INPUT && previousIndex < inputs.size()) {
                 previousPoint = inputs.get(previousIndex);
-            if (previousPhase == Phase.MOVE_TO_OUTPUT && previousIndex < outputs.size())
+            }
+            if (previousPhase == Phase.MOVE_TO_OUTPUT && previousIndex < outputs.size()) {
                 previousPoint = outputs.get(previousIndex);
-            previousTarget = previousPoint == null ? ArmAngleTarget.NO_TARGET : previousPoint.getTargetAngles(worldPosition, ceiling);
-            if (previousPoint != null)
+            }
+            previousTarget = previousPoint == null ? ArmAngleTarget.NO_TARGET : previousPoint.getTargetAngles(worldPosition,
+                ceiling
+            );
+            if (previousPoint != null) {
                 previousBaseAngle = previousTarget.baseAngle;
+            }
 
             ArmInteractionPoint targetedPoint = getTargetedInteractionPoint();
-            if (targetedPoint != null)
+            if (targetedPoint != null) {
                 targetedPoint.updateCachedState();
+            }
         }
     }
 
@@ -632,8 +697,6 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     }
 
     public enum SelectionMode {
-        ROUND_ROBIN,
-        FORCED_ROUND_ROBIN,
-        PREFER_FIRST
+        ROUND_ROBIN, FORCED_ROUND_ROBIN, PREFER_FIRST
     }
 }

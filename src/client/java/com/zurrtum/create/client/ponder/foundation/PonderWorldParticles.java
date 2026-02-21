@@ -99,7 +99,17 @@ public class PonderWorldParticles {
         if (particleFactory == null) {
             return null;
         }
-        Particle particle = particleFactory.createParticle(parameters, asClientWorld.get(), x, y, z, velocityX, velocityY, velocityZ, world.random);
+        Particle particle = particleFactory.createParticle(
+            parameters,
+            asClientWorld.get(),
+            x,
+            y,
+            z,
+            velocityX,
+            velocityY,
+            velocityZ,
+            world.random
+        );
         if (particle == null) {
             return null;
         }
@@ -107,7 +117,13 @@ public class PonderWorldParticles {
         return particle;
     }
 
-    public void renderParticles(PoseStack ms, SubmitNodeStorage queue, Camera camera, CameraRenderState cameraRenderState, float tickProgress) {
+    public void renderParticles(
+        PoseStack ms,
+        SubmitNodeStorage queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        float tickProgress
+    ) {
         Matrix4fStack stack = RenderSystem.getModelViewStack();
         stack.pushMatrix();
         stack.mul(ms.last().pose());

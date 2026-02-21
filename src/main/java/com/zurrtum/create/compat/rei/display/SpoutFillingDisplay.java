@@ -30,9 +30,8 @@ import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record SpoutFillingDisplay(
-    EntryIngredient input, EntryIngredient fluid, EntryIngredient output, Optional<Identifier> location
-) implements Display {
+public record SpoutFillingDisplay(EntryIngredient input, EntryIngredient fluid, EntryIngredient output,
+                                  Optional<Identifier> location) implements Display {
     public static final Identifier POTIONS = Identifier.fromNamespaceAndPath(MOD_ID, "potions");
     public static final DisplaySerializer<SpoutFillingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -66,7 +65,11 @@ public record SpoutFillingDisplay(
         );
     }
 
-    public static void register(Stream<EntryStack<?>> itemStream, Stream<EntryStack<?>> fluidStream, DisplayConsumer registry) {
+    public static void register(
+        Stream<EntryStack<?>> itemStream,
+        Stream<EntryStack<?>> fluidStream,
+        DisplayConsumer registry
+    ) {
         List<FluidStack> fluids = fluidStream.map(entry -> {
             dev.architectury.fluid.FluidStack stack = entry.castValue();
             return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getComponents().asPatch());
@@ -89,7 +92,10 @@ public record SpoutFillingDisplay(
                 int size = capability.size();
                 FluidStack existingFluid = size == 1 ? capability.getStack(0) : FluidStack.EMPTY;
                 for (FluidStack fluid : fluids) {
-                    if (size == 1 && !existingFluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqual(existingFluid, fluid)) {
+                    if (size == 1 && !existingFluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqual(
+                        existingFluid,
+                        fluid
+                    )) {
                         continue;
                     }
                     int insert = capability.insert(fluid, 81000);
@@ -108,7 +114,11 @@ public record SpoutFillingDisplay(
                             );
                             registry.add(new SpoutFillingDisplay(
                                 EntryIngredients.of(stack),
-                                EntryIngredients.of(dev.architectury.fluid.FluidStack.create(fluid.getFluid(), insert, fluid.getComponentChanges())),
+                                EntryIngredients.of(dev.architectury.fluid.FluidStack.create(
+                                    fluid.getFluid(),
+                                    insert,
+                                    fluid.getComponentChanges()
+                                )),
                                 EntryIngredients.of(result),
                                 Optional.of(id)
                             ));

@@ -31,7 +31,10 @@ import java.util.stream.Stream;
 
 public class GhostIngredientHandler<T extends GhostItemMenu<?>> implements DraggableStackVisitor<AbstractSimiContainerScreen<T>> {
     @Override
-    public DraggedAcceptorResult acceptDraggedStack(DraggingContext<AbstractSimiContainerScreen<T>> context, DraggableStack stack) {
+    public DraggedAcceptorResult acceptDraggedStack(
+        DraggingContext<AbstractSimiContainerScreen<T>> context,
+        DraggableStack stack
+    ) {
         Stream<BoundsProvider> bounds = getDraggableAcceptingBounds(context, stack);
         Point cursor = context.getCurrentPosition();
         if (cursor != null) {
@@ -57,19 +60,24 @@ public class GhostIngredientHandler<T extends GhostItemMenu<?>> implements Dragg
     }
 
     @Override
-    public Stream<BoundsProvider> getDraggableAcceptingBounds(DraggingContext<AbstractSimiContainerScreen<T>> context, DraggableStack stack) {
+    public Stream<BoundsProvider> getDraggableAcceptingBounds(
+        DraggingContext<AbstractSimiContainerScreen<T>> context,
+        DraggableStack stack
+    ) {
         List<BoundsProvider> targets = new ArrayList<>();
         AbstractSimiContainerScreen<T> gui = context.getScreen();
 
         if (stack.getStack().getValue() instanceof ItemStack) {
             List<Slot> slots = gui.getMenu().slots;
             if (gui instanceof AttributeFilterScreen) {
-                if (slots.get(36).isActive())
+                if (slots.get(36).isActive()) {
                     targets.add(new GhostTarget<>(gui, 0, true));
+                }
             } else {
                 for (int i = 36; i < slots.size(); i++) {
-                    if (slots.get(i).isActive())
+                    if (slots.get(i).isActive()) {
                         targets.add(new GhostTarget<>(gui, i - 36, false));
+                    }
                 }
             }
         }
@@ -103,8 +111,9 @@ public class GhostIngredientHandler<T extends GhostItemMenu<?>> implements Dragg
             stack.setCount(1);
             gui.getMenu().ghostInventory.setItem(slotIndex, stack);
 
-            if (isAttributeFilter)
+            if (isAttributeFilter) {
                 return;
+            }
 
             // sync new filter contents with server
             LocalPlayer player = Minecraft.getInstance().player;

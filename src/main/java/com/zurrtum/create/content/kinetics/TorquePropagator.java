@@ -3,11 +3,10 @@ package com.zurrtum.create.content.kinetics;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.levelWrappers.WorldHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import net.minecraft.world.level.LevelAccessor;
 
 public class TorquePropagator {
 
@@ -27,8 +26,9 @@ public class TorquePropagator {
         Long id = be.network;
         KineticNetwork network;
         Map<Long, KineticNetwork> map = networks.computeIfAbsent(be.getLevel(), $ -> new HashMap<>());
-        if (id == null)
+        if (id == null) {
             return null;
+        }
 
         if (!map.containsKey(id)) {
             network = new KineticNetwork();

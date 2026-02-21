@@ -24,11 +24,10 @@ import java.util.Map;
  * For use in custom model loaders which want to respect these properties but create the quads from
  * something other than the vanilla elements spec.
  */
-public record StandardModelParameters(
-    @Nullable Identifier parent, TextureSlots.Data textures, @Nullable ItemTransforms itemTransforms, @Nullable Boolean ambientOcclusion,
-    @Nullable UnbakedModel.GuiLight guiLight, @Nullable Transformation rootTransform, @Nullable ChunkSectionLayer layer,
-    Map<String, Boolean> partVisibility
-) {
+public record StandardModelParameters(@Nullable Identifier parent, TextureSlots.Data textures,
+                                      @Nullable ItemTransforms itemTransforms, @Nullable Boolean ambientOcclusion,
+                                      @Nullable UnbakedModel.GuiLight guiLight, @Nullable Transformation rootTransform,
+                                      @Nullable ChunkSectionLayer layer, Map<String, Boolean> partVisibility) {
     public static StandardModelParameters parse(JsonObject jsonObject, JsonDeserializationContext context) {
         String parentName = GsonHelper.getAsString(jsonObject, "parent", "");
         Identifier parent = parentName.isEmpty() ? null : Identifier.parse(parentName);
@@ -59,6 +58,15 @@ public record StandardModelParameters(
         ChunkSectionLayer layer = NeoForgeModelProperties.deserializeRenderType(jsonObject);
         Map<String, Boolean> partVisibility = NeoForgeModelProperties.deserializePartVisibility(jsonObject);
 
-        return new StandardModelParameters(parent, textures, itemTransforms, ambientOcclusion, guiLight, rootTransform, layer, partVisibility);
+        return new StandardModelParameters(
+            parent,
+            textures,
+            itemTransforms,
+            ambientOcclusion,
+            guiLight,
+            rootTransform,
+            layer,
+            partVisibility
+        );
     }
 }

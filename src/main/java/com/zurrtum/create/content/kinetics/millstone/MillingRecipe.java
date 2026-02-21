@@ -17,7 +17,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
 
-public record MillingRecipe(int time, List<ProcessingOutput> results, Ingredient ingredient) implements CreateSingleStackRollableRecipe, TimedRecipe {
+public record MillingRecipe(int time, List<ProcessingOutput> results,
+                            Ingredient ingredient) implements CreateSingleStackRollableRecipe, TimedRecipe {
     @Override
     public RecipeSerializer<MillingRecipe> getSerializer() {
         return AllRecipeSerializers.MILLING;

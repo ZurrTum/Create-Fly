@@ -82,7 +82,11 @@ public class SpoutFillingDisplay extends CreateDisplay {
             if (result.is(Items.BUCKET)) {
                 return;
             }
-            FluidIngredient ingredient = new FluidStackIngredient(fluid, DataComponentPatch.EMPTY, BucketFluidInventory.CAPACITY);
+            FluidIngredient ingredient = new FluidStackIngredient(
+                fluid,
+                DataComponentPatch.EMPTY,
+                BucketFluidInventory.CAPACITY
+            );
             recipes.add(new SpoutFillingDisplay(result, ingredient, List.of(item)));
         }
     }

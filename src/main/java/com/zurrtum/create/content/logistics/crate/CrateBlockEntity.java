@@ -1,13 +1,12 @@
 package com.zurrtum.create.content.logistics.crate;
 
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public abstract class CrateBlockEntity extends SmartBlockEntity {
 

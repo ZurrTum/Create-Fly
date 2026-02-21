@@ -23,8 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class ScheduleInstruction extends ScheduleDataEntry {
-    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleInstruction> STREAM_CODEC = StreamCodec.of(
-        ScheduleInstruction::encode,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleInstruction> STREAM_CODEC = StreamCodec.of(ScheduleInstruction::encode,
         ScheduleInstruction::decode
     );
 
@@ -39,7 +38,10 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
 
     public final void write(ValueOutput view) {
         view.store("Id", Identifier.CODEC, id);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleInstruction",
+            Create.LOGGER
+        )) {
             TagValueOutput writeView = new TagValueOutput(logging, ((TagValueOutput) view).ops, data);
             writeAdditional(writeView);
             view.store("Data", CompoundTag.CODEC, writeView.buildResult());
@@ -50,7 +52,10 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
     public static <T> DataResult<T> encode(final ScheduleInstruction input, final DynamicOps<T> ops, final T empty) {
         RecordBuilder<T> map = ops.mapBuilder();
         map.add("Id", input.id, Identifier.CODEC);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleInstruction",
+            Create.LOGGER
+        )) {
             TagValueOutput view = new TagValueOutput(logging, (DynamicOps<Tag>) ops, input.data);
             input.writeAdditional(view);
             map.add("Data", view.buildResult(), CompoundTag.CODEC);
@@ -78,7 +83,10 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
             return fallback(location);
         }
         scheduleDestination.data = CompoundTag.CODEC.parse(ops, map.get("Data")).result().orElseGet(CompoundTag::new);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleInstruction",
+            Create.LOGGER
+        )) {
             TagValueInput view = new TagValueInput(logging, new NbtReadContext(ops), scheduleDestination.data);
             scheduleDestination.readAdditional(view);
         }
@@ -91,7 +99,10 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
     }
 
     private static void encode(RegistryFriendlyByteBuf buf, ScheduleInstruction value) {
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleInstruction",
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, buf.registryAccess());
             value.write(view);
             buf.writeNbt(view.buildResult());
@@ -99,7 +110,10 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
     }
 
     private static ScheduleInstruction decode(RegistryFriendlyByteBuf buf) {
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleInstruction",
+            Create.LOGGER
+        )) {
             ValueInput view = TagValueInput.create(logging, buf.registryAccess(), buf.readNbt());
             return ScheduleInstruction.read(view);
         }

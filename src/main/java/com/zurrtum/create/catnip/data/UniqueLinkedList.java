@@ -22,45 +22,53 @@ public class UniqueLinkedList<E> extends LinkedList<E> {
 
     @Override
     public boolean add(E e) {
-        if (contained.add(e))
+        if (contained.add(e)) {
             return super.add(e);
-        else
+        } else {
             return false;
+        }
     }
 
     @Override
     public void add(int index, E element) {
-        if (contained.add(element))
+        if (contained.add(element)) {
             super.add(index, element);
+        }
     }
 
     @Override
     public void addFirst(E e) {
-        if (contained.add(e))
+        if (contained.add(e)) {
             super.addFirst(e);
+        }
     }
 
     @Override
     public void addLast(E e) {
-        if (contained.add(e))
+        if (contained.add(e)) {
             super.addLast(e);
+        }
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
         List<E> filtered = new ArrayList<>();
-        for (E i : c)
-            if (!contained.contains(i))
+        for (E i : c) {
+            if (!contained.contains(i)) {
                 filtered.add(i);
+            }
+        }
         return super.addAll(filtered);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         List<E> filtered = new ArrayList<>();
-        for (E i : c)
-            if (!contained.contains(i))
+        for (E i : c) {
+            if (!contained.contains(i)) {
                 filtered.add(i);
+            }
+        }
         return super.addAll(index, filtered);
     }
 

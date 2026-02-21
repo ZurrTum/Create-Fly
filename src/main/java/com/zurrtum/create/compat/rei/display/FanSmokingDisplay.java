@@ -17,7 +17,8 @@ import net.minecraft.world.item.crafting.SmokingRecipe;
 import java.util.List;
 import java.util.Optional;
 
-public record FanSmokingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record FanSmokingDisplay(EntryIngredient input, EntryIngredient output,
+                                Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanSmokingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanSmokingDisplay::input),

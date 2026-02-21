@@ -111,7 +111,10 @@ public class FlywheelLevelRendererMixin {
     }
 
     @WrapOperation(method = "extractVisibleEntities(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/culling/Frustum;Lnet/minecraft/client/DeltaTracker;Lnet/minecraft/client/renderer/state/LevelRenderState;)V", at = @At(value = "INVOKE", target = "Ljava/lang/Iterable;iterator()Ljava/util/Iterator;", remap = false))
-    private Iterator<Entity> flywheel$decideNotToRenderEntity(Iterable<Entity> instance, Operation<Iterator<Entity>> original) {
+    private Iterator<Entity> flywheel$decideNotToRenderEntity(
+        Iterable<Entity> instance,
+        Operation<Iterator<Entity>> original
+    ) {
         return VisualizationHelper.skipVanillaRender(level, original.call(instance));
     }
 }

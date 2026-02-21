@@ -65,7 +65,8 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 
     public static final Compartment<Pair<Integer, Integer>> PONDER_WORLD_SECTION = new Compartment<>();
 
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
 
     @Nullable List<BlockEntity> renderedBlockEntities;
     @Nullable List<Pair<BlockEntity, Consumer<Level>>> tickableBlockEntities;
@@ -92,10 +93,11 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     @Override
     public void mergeOnto(WorldSectionElement other) {
         setVisible(false);
-        if (other.isEmpty())
+        if (other.isEmpty()) {
             other.set(section);
-        else
+        } else {
             other.add(section);
+        }
     }
 
     @Override
@@ -170,8 +172,9 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     @Override
     public void setAnimatedRotation(Vec3 eulerAngles, boolean force) {
         this.animatedRotation = eulerAngles;
-        if (force)
+        if (force) {
             prevAnimatedRotation = animatedRotation;
+        }
     }
 
     @Override
@@ -182,8 +185,9 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     @Override
     public void setAnimatedOffset(Vec3 offset, boolean force) {
         this.animatedOffset = offset;
-        if (force)
+        if (force) {
             prevAnimatedOffset = animatedOffset;
+        }
     }
 
     @Override
@@ -209,7 +213,8 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         ));
         world.clearMask();
 
-        double t = rayTraceBlocks.getLocation().subtract(transformedTarget).lengthSqr() / source.subtract(target).lengthSqr();
+        double t = rayTraceBlocks.getLocation().subtract(transformedTarget).lengthSqr() / source.subtract(target)
+            .lengthSqr();
         Vec3 actualHit = VecHelper.lerp((float) t, target, source);
         return Pair.of(actualHit, rayTraceBlocks);
     }
@@ -246,12 +251,12 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             double rotZ = Mth.lerp(pt, prevAnimatedRotation.z, animatedRotation.z);
             double rotY = Mth.lerp(pt, prevAnimatedRotation.y, animatedRotation.y);
 
-            TransformStack.of(ms).translate(centerOfRotation).rotateXDegrees((float) rotX).rotateYDegrees((float) rotY).rotateZDegrees((float) rotZ)
-                .translateBack(centerOfRotation);
+            TransformStack.of(ms).translate(centerOfRotation).rotateXDegrees((float) rotX).rotateYDegrees((float) rotY)
+                .rotateZDegrees((float) rotZ).translateBack(centerOfRotation);
 
             if (stabilizationAnchor != null) {
-                TransformStack.of(ms).translate(stabilizationAnchor).rotateXDegrees((float) -rotX).rotateYDegrees((float) -rotY)
-                    .rotateZDegrees((float) -rotZ).translateBack(stabilizationAnchor);
+                TransformStack.of(ms).translate(stabilizationAnchor).rotateXDegrees((float) -rotX)
+                    .rotateYDegrees((float) -rotY).rotateZDegrees((float) -rotZ).translateBack(stabilizationAnchor);
             }
         }
     }
@@ -260,11 +265,13 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     public void tick(PonderScene scene) {
         prevAnimatedOffset = animatedOffset;
         prevAnimatedRotation = animatedRotation;
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
         loadBEsIfMissing(scene.getLevel());
         renderedBlockEntities.removeIf(be -> scene.getLevel().getBlockEntity(be.getBlockPos()) != be);
-        tickableBlockEntities.removeIf(be -> scene.getLevel().getBlockEntity(be.getFirst().getBlockPos()) != be.getFirst());
+        tickableBlockEntities.removeIf(be -> scene.getLevel()
+            .getBlockEntity(be.getFirst().getBlockPos()) != be.getFirst());
         tickableBlockEntities.forEach(be -> be.getSecond().accept(scene.getLevel()));
     }
 
@@ -279,22 +286,26 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 
     @SuppressWarnings("deprecation")
     protected void loadBEsIfMissing(PonderLevel world) {
-        if (renderedBlockEntities != null)
+        if (renderedBlockEntities != null) {
             return;
+        }
         tickableBlockEntities = new ArrayList<>();
         renderedBlockEntities = new ArrayList<>();
         section.forEach(pos -> {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             BlockState blockState = world.getBlockState(pos);
             Block block = blockState.getBlock();
-            if (blockEntity == null)
+            if (blockEntity == null) {
                 return;
-            if (!(block instanceof EntityBlock provider))
+            }
+            if (!(block instanceof EntityBlock provider)) {
                 return;
+            }
             blockEntity.setBlockState(world.getBlockState(pos));
             BlockEntityTicker<?> ticker = provider.getTicker(world, blockState, blockEntity.getType());
-            if (ticker != null)
+            if (ticker != null) {
                 addTicker(blockEntity, ticker);
+            }
             renderedBlockEntities.add(blockEntity);
         });
     }
@@ -303,7 +314,12 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     private <T extends BlockEntity> void addTicker(T blockEntity, BlockEntityTicker<?> ticker) {
         tickableBlockEntities.add(Pair.of(
             blockEntity,
-            w -> ((BlockEntityTicker<T>) ticker).tick(w, blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity)
+            w -> ((BlockEntityTicker<T>) ticker).tick(
+                w,
+                blockEntity.getBlockPos(),
+                blockEntity.getBlockState(),
+                blockEntity
+            )
         ));
     }
 
@@ -321,8 +337,9 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         float pt
     ) {
         int light = -1;
-        if (fade != 1)
+        if (fade != 1) {
             light = Mth.lerpInt(fade, 5, 15);
+        }
         if (redraw) {
             renderedBlockEntities = null;
             tickableBlockEntities = null;
@@ -339,8 +356,9 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 
         for (Map.Entry<BlockPos, Integer> entry : blockBreakingProgressions.entrySet()) {
             BlockPos pos = entry.getKey();
-            if (!section.test(pos))
+            if (!section.test(pos)) {
                 continue;
+            }
 
             if (overlayMS == null) {
                 overlayMS = new PoseStack();
@@ -350,9 +368,8 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             }
 
             VertexConsumer builder = new SheetedDecalTextureGenerator(
-                buffer.getBuffer(ModelBakery.DESTROY_TYPES.get(entry.getValue())),
-                overlayMS.last(),
-                1
+                buffer.getBuffer(ModelBakery.DESTROY_TYPES.get(
+                    entry.getValue())), overlayMS.last(), 1
             );
 
             poseStack.pushPose();
@@ -365,19 +382,32 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     }
 
     @Override
-    protected void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer type, PoseStack poseStack, float fade, float pt) {
+    protected void renderLayer(
+        PonderLevel world,
+        MultiBufferSource buffer,
+        ChunkSectionLayer type,
+        PoseStack poseStack,
+        float fade,
+        float pt
+    ) {
         SuperByteBufferCache bufferCache = SuperByteBufferCache.getInstance();
 
         int code = hashCode() ^ world.hashCode();
         Pair<Integer, Integer> key = Pair.of(code, type.ordinal());
 
-        if (redraw)
+        if (redraw) {
             bufferCache.invalidate(PONDER_WORLD_SECTION, key);
+        }
 
         SodiumCompat.markPonderSpriteActive(world, section);
-        SuperByteBuffer structureBuffer = bufferCache.get(PONDER_WORLD_SECTION, key, () -> buildStructureBuffer(world, type));
-        if (structureBuffer.isEmpty())
+        SuperByteBuffer structureBuffer = bufferCache.get(
+            PONDER_WORLD_SECTION,
+            key,
+            () -> buildStructureBuffer(world, type)
+        );
+        if (structureBuffer.isEmpty()) {
             return;
+        }
 
         transformMS(structureBuffer.getTransforms(), pt);
 
@@ -405,15 +435,18 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         float pt
     ) {
         redraw = false;
-        if (selectedBlock == null)
+        if (selectedBlock == null) {
             return;
+        }
         BlockState blockState = world.getBlockState(selectedBlock);
-        if (blockState.isAir())
+        if (blockState.isAir()) {
             return;
+        }
         Minecraft mc = Minecraft.getInstance();
         VoxelShape shape = blockState.getShape(world, selectedBlock, CollisionContext.of(mc.player));
-        if (shape.isEmpty())
+        if (shape.isEmpty()) {
             return;
+        }
 
         poseStack.pushPose();
         transformMS(poseStack, pt);

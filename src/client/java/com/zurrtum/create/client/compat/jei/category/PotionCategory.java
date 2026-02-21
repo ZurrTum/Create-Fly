@@ -64,13 +64,24 @@ public class PotionCategory extends CreateCategory<RecipeHolder<PotionRecipe>> {
     }
 
     @Override
-    public void draw(RecipeHolder<PotionRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<PotionRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         HeatCondition requiredHeat = HeatCondition.HEATED;
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
         Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 80);
         AllGuiTextures.JEI_LIGHT.render(graphics, 81, 88);
-        graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(pose, 91, 69, requiredHeat.visualizeAsBlazeBurner()));
+        graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(
+            pose,
+            91,
+            69,
+            requiredHeat.visualizeAsBlazeBurner()
+        ));
         graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 91, -5));
         graphics.drawString(
             graphics.minecraft.font,

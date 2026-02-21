@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.infrastructure.model;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.AllPartialModels;
@@ -8,7 +9,6 @@ import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour.AttachmentTypes;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour.AttachmentTypes.ComponentPartials;
 import com.zurrtum.create.content.fluids.pipes.FluidPipeBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
@@ -30,14 +30,22 @@ public class PipeAttachmentModel extends WrapperBlockStateModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         if (model instanceof WrapperBlockStateModel wrapper) {
             wrapper.addPartsWithInfo(world, pos, state, random, parts);
         } else {
             model.collectParts(random, parts);
         }
-        Optional.ofNullable(BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE)).map(BracketedBlockEntityBehaviour::getBracket)
-            .map(bracket -> Minecraft.getInstance().getBlockRenderer().getBlockModel(bracket)).ifPresent(model -> model.collectParts(random, parts));
+        Optional.ofNullable(BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE))
+            .map(BracketedBlockEntityBehaviour::getBracket)
+            .map(bracket -> Minecraft.getInstance().getBlockRenderer().getBlockModel(bracket))
+            .ifPresent(model -> model.collectParts(random, parts));
         FluidTransportBehaviour transport = BlockEntityBehaviour.get(world, pos, FluidTransportBehaviour.TYPE);
         if (transport != null) {
             for (Direction direction : Iterate.directions) {

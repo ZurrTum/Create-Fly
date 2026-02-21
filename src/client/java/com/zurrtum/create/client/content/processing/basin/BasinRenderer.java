@@ -64,7 +64,12 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
     }
 
     @Override
-    public void submit(BasinRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BasinRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.fluids != null) {
             queue.submitCustomGeometry(matrices, state.layer, state);
@@ -102,8 +107,9 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
 
     public float updateFluids(BasinBlockEntity basin, BasinRenderState state, float partialTicks) {
         float totalUnits = basin.getTotalFluidUnits(partialTicks);
-        if (totalUnits < 1)
+        if (totalUnits < 1) {
             return 0;
+        }
         float xMin = 2 / 16f;
         float xMax = 2 / 16f;
         List<FluidRenderData> fluids = new ArrayList<>();
@@ -111,19 +117,27 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
             basin.getBehaviour(SmartFluidTankBehaviour.INPUT),
             basin.getBehaviour(SmartFluidTankBehaviour.OUTPUT)
         )) {
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             for (TankSegment tankSegment : behaviour.getTanks()) {
                 FluidStack renderedFluid = tankSegment.getRenderedFluid();
-                if (renderedFluid.isEmpty())
+                if (renderedFluid.isEmpty()) {
                     continue;
+                }
                 float units = tankSegment.getTotalUnits(partialTicks);
-                if (units < 1)
+                if (units < 1) {
                     continue;
+                }
 
                 float partial = Mth.clamp(units / totalUnits, 0, 1);
                 xMax += partial * 12 / 16f;
-                fluids.add(new FluidRenderData(renderedFluid.getFluid(), renderedFluid.getComponentChanges(), xMin, xMax));
+                fluids.add(new FluidRenderData(
+                    renderedFluid.getFluid(),
+                    renderedFluid.getComponentChanges(),
+                    xMin,
+                    xMax
+                ));
 
                 xMin = xMax;
             }
@@ -168,9 +182,17 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         IngredientRenderData[] ingredients = new IngredientRenderData[itemCount];
         for (int i = 0, size = itemCount; i < size; i++) {
             ItemStack stack = stacks.get(i);
-            Vec3 itemPosition = VecHelper.rotate(baseVector, anglePartition * itemCount, net.minecraft.core.Direction.Axis.Y);
+            Vec3 itemPosition = VecHelper.rotate(
+                baseVector,
+                anglePartition * itemCount,
+                net.minecraft.core.Direction.Axis.Y
+            );
             if (fluidLevel > 0) {
-                itemPosition = itemPosition.add(0, (Mth.sin(time / 12f + anglePartition * itemCount) + 1.5f) * 1 / 32f, 0);
+                itemPosition = itemPosition.add(
+                    0,
+                    (Mth.sin(time / 12f + anglePartition * itemCount) + 1.5f) * 1 / 32f,
+                    0
+                );
             }
             float yRot = Mth.DEG_TO_RAD * (anglePartition * itemCount + 35);
             ItemStackRenderState renderState = new ItemStackRenderState();
@@ -211,11 +233,19 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
             if (!outToBasin && progress > .35f) {
                 continue;
             }
-            Vec3 offset = outVec.add(0, Math.max(-.55f, -(progress * progress * 2)), 0).add(directionVec.scale(progress * .5f));
+            Vec3 offset = outVec.add(0, Math.max(-.55f, -(progress * progress * 2)), 0)
+                .add(directionVec.scale(progress * .5f));
             float xRot = Mth.DEG_TO_RAD * progress * 180;
             ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.GROUND;
-            itemModelManager.appendItemLayers(renderState, intAttached.getValue(), renderState.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(
+                renderState,
+                intAttached.getValue(),
+                renderState.displayContext,
+                world,
+                null,
+                0
+            );
             outputs.add(new OutputItemRenderData(renderState, offset, xRot));
         }
         if (outputs.isEmpty()) {
@@ -264,7 +294,8 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
     public record FluidRenderData(Fluid fluid, DataComponentPatch changes, float xMin, float xMax) {
     }
 
-    public record IngredientRenderData(ItemStackRenderState renderState, Vec3 itemPosition, float yRot, Vec3[] offsets) {
+    public record IngredientRenderData(ItemStackRenderState renderState, Vec3 itemPosition, float yRot,
+                                       Vec3[] offsets) {
     }
 
     public record OutputItemRenderData(ItemStackRenderState renderState, Vec3 offset, float xRot) {

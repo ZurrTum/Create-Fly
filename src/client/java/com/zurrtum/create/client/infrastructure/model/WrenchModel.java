@@ -45,7 +45,10 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
     private final ModelRenderProperties gearSettings;
     private final Supplier<Vector3fc[]> gearVector;
 
-    public WrenchModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> gear) {
+    public WrenchModel(
+        Tuple<List<BakedQuad>, ModelRenderProperties> item,
+        Tuple<List<BakedQuad>, ModelRenderProperties> gear
+    ) {
         itemQuads = item.getA();
         itemSettings = item.getB();
         itemVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(itemQuads));
@@ -104,7 +107,17 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         matrices.translate(0.5625f, 0.5f, 0.5f);
         matrices.mulPose(Axis.YP.rotationDegrees(ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks())));
         matrices.translate(-0.5625f, -0.5f, -0.5f);
-        queue.submitItem(matrices, displayContext, light, overlay, 0, layer.tintLayers, layer.prepareQuadList(), layer.renderType, layer.foilType);
+        queue.submitItem(
+            matrices,
+            displayContext,
+            light,
+            overlay,
+            0,
+            layer.tintLayers,
+            layer.prepareQuadList(),
+            layer.renderType,
+            layer.foilType
+        );
         matrices.popPose();
     }
 
@@ -119,7 +132,8 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked::new);
 
         @Override
         public MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> type() {

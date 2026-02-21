@@ -25,7 +25,10 @@ public class RedstonePowerDisplaySource extends PercentOrProgressBarDisplaySourc
     @Override
     protected Float getProgress(DisplayLinkContext context) {
         BlockState blockState = context.level().getBlockState(context.getSourcePos());
-        return Math.max(context.level().getDirectSignalTo(context.getSourcePos()), blockState.getValueOrElse(BlockStateProperties.POWER, 0)) / 15f;
+        return Math.max(
+            context.level().getDirectSignalTo(context.getSourcePos()),
+            blockState.getValueOrElse(BlockStateProperties.POWER, 0)
+        ) / 15f;
     }
 
     @Override

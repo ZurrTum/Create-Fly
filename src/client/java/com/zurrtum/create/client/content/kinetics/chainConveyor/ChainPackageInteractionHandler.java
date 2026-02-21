@@ -26,38 +26,53 @@ public class ChainPackageInteractionHandler {
             return false;
         }
         double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
-        for (Map.Entry<Integer, ChainConveyorPackagePhysicsData> entry : ChainConveyorClientBehaviour.physicsDataCache.get(mc.level).asMap()
-            .entrySet()) {
+        for (Map.Entry<Integer, ChainConveyorPackagePhysicsData> entry : ChainConveyorClientBehaviour.physicsDataCache.get(
+            mc.level).asMap().entrySet()) {
             ChainConveyorPackagePhysicsData data = entry.getValue();
-            if (data == null || data.targetPos == null || data.beReference == null)
+            if (data == null || data.targetPos == null || data.beReference == null) {
                 continue;
-            AABB bounds = new AABB(data.targetPos, data.targetPos).move(0, -.25, 0).expandTowards(0, 0.5, 0).inflate(0.45);
+            }
+            AABB bounds = new AABB(data.targetPos, data.targetPos).move(0, -.25, 0).expandTowards(0, 0.5, 0)
+                .inflate(0.45);
 
             Vec3 from = player.getEyePosition();
             Vec3 to = RaycastHelper.getTraceTarget(player, range, from);
 
-            if (bounds.clip(from, to).isEmpty())
+            if (bounds.clip(from, to).isEmpty()) {
                 continue;
+            }
 
             ChainConveyorBlockEntity ccbe = data.beReference.get();
-            if (ccbe == null || ccbe.isRemoved())
+            if (ccbe == null || ccbe.isRemoved()) {
                 continue;
+            }
 
             int i = entry.getKey();
             for (ChainConveyorPackage pckg : ccbe.getLoopingPackages()) {
                 if (pckg.netId == i) {
-                    player.connection.send(new ChainPackageInteractionPacket(ccbe.getBlockPos(), BlockPos.ZERO, pckg.chainPosition, true));
+                    player.connection.send(new ChainPackageInteractionPacket(
+                        ccbe.getBlockPos(),
+                        BlockPos.ZERO,
+                        pckg.chainPosition,
+                        true
+                    ));
                     return true;
                 }
             }
 
             for (BlockPos connection : ccbe.connections) {
                 List<ChainConveyorPackage> list = ccbe.getTravellingPackages().get(connection);
-                if (list == null)
+                if (list == null) {
                     continue;
+                }
                 for (ChainConveyorPackage pckg : list) {
                     if (pckg.netId == i) {
-                        player.connection.send(new ChainPackageInteractionPacket(ccbe.getBlockPos(), connection, pckg.chainPosition, true));
+                        player.connection.send(new ChainPackageInteractionPacket(
+                            ccbe.getBlockPos(),
+                            connection,
+                            pckg.chainPosition,
+                            true
+                        ));
                         return true;
                     }
                 }

@@ -22,36 +22,44 @@ public class PotionFluidHandler {
     private static final Component NO_EFFECT = Component.translatable("effect.none").withStyle(ChatFormatting.GRAY);
 
     public static boolean isPotionItem(ItemStack stack) {
-        return stack.getItem() instanceof PotionItem && !(stack.getItem().getCraftingRemainder().getItem() instanceof BucketItem) && !stack.is(
-            AllItemTags.NOT_POTION);
+        return stack.getItem() instanceof PotionItem && !(stack.getItem().getCraftingRemainder()
+            .getItem() instanceof BucketItem) && !stack.is(AllItemTags.NOT_POTION);
     }
 
     public static Pair<FluidStack, ItemStack> emptyPotion(ItemStack stack, boolean simulate) {
         FluidStack fluid = getFluidFromPotionItem(stack);
-        if (!simulate)
+        if (!simulate) {
             stack.shrink(1);
+        }
         return Pair.of(fluid, new ItemStack(Items.GLASS_BOTTLE));
     }
 
     public static FluidStack getFluidFromPotionItem(ItemStack stack) {
         PotionContents potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
         BottleType bottleTypeFromItem = bottleTypeFromItem(stack.getItem());
-        if (potion.is(Potions.WATER) && potion.customEffects().isEmpty() && bottleTypeFromItem == BottleType.REGULAR)
+        if (potion.is(Potions.WATER) && potion.customEffects().isEmpty() && bottleTypeFromItem == BottleType.REGULAR) {
             return new FluidStack(Fluids.WATER, BottleFluidInventory.CAPACITY);
+        }
         FluidStack fluid = getFluidFromPotion(potion, bottleTypeFromItem, BottleFluidInventory.CAPACITY);
         fluid.set(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, bottleTypeFromItem);
         return fluid;
     }
 
-    public static FluidIngredient getFluidIngredientFromPotion(PotionContents potionContents, BottleType bottleType, int amount) {
-        if (potionContents.is(Potions.WATER) && bottleType == BottleType.REGULAR)
+    public static FluidIngredient getFluidIngredientFromPotion(
+        PotionContents potionContents,
+        BottleType bottleType,
+        int amount
+    ) {
+        if (potionContents.is(Potions.WATER) && bottleType == BottleType.REGULAR) {
             return new FluidStackIngredient(Fluids.WATER, DataComponentPatch.EMPTY, amount);
+        }
         return getFluidIngredient(amount, potionContents, bottleType);
     }
 
     public static FluidStack getFluidFromPotion(PotionContents potionContents, BottleType bottleType, int amount) {
-        if (potionContents.is(Potions.WATER) && bottleType == BottleType.REGULAR)
+        if (potionContents.is(Potions.WATER) && bottleType == BottleType.REGULAR) {
             return new FluidStack(Fluids.WATER, amount);
+        }
         return getFluidStack(amount, potionContents, bottleType);
     }
 
@@ -80,10 +88,12 @@ public class PotionFluidHandler {
     }
 
     public static BottleType bottleTypeFromItem(Item item) {
-        if (item == Items.LINGERING_POTION)
+        if (item == Items.LINGERING_POTION) {
             return BottleType.LINGERING;
-        if (item == Items.SPLASH_POTION)
+        }
+        if (item == Items.SPLASH_POTION) {
             return BottleType.SPLASH;
+        }
         return BottleType.REGULAR;
     }
 

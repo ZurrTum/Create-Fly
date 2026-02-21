@@ -37,8 +37,9 @@ public class CurvedTrackInteraction {
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
 
-        if (!player.getAbilities().mayBuild)
+        if (!player.getAbilities().mayBuild) {
             return;
+        }
 
         if (mc.options.keyAttack.isDown() && result != null) {
             breakPos = result.blockEntity().getBlockPos();
@@ -74,24 +75,32 @@ public class CurvedTrackInteraction {
             player.swing(InteractionHand.MAIN_HAND);
 
             if (breakProgress >= 1) {
-                player.connection.send(new CurvedTrackDestroyPacket(breakPos, result.loc().curveTarget(), BlockPos.containing(result.vec()), false));
+                player.connection.send(new CurvedTrackDestroyPacket(
+                    breakPos,
+                    result.loc().curveTarget(),
+                    BlockPos.containing(result.vec()),
+                    false
+                ));
                 resetBreakProgress(level, player);
             }
 
             return;
         }
 
-        if (breakTimeout == 0)
+        if (breakTimeout == 0) {
             return;
-        if (--breakTimeout > 0)
+        }
+        if (--breakTimeout > 0) {
             return;
+        }
 
         resetBreakProgress(level, player);
     }
 
     private static void resetBreakProgress(ClientLevel level, LocalPlayer player) {
-        if (breakPos != null && level != null)
+        if (breakPos != null && level != null) {
             level.destroyBlockProgress(player.getId(), breakPos, -1);
+        }
 
         breakProgress = 0;
         breakTicks = 0;
@@ -100,23 +109,30 @@ public class CurvedTrackInteraction {
 
     public static boolean onClickInput(Minecraft mc, boolean attack) {
         BezierPointSelection result = TrackBlockOutline.result;
-        if (result == null)
+        if (result == null) {
             return false;
+        }
 
         LocalPlayer player = mc.player;
-        if (player == null)
+        if (player == null) {
             return false;
+        }
         ClientLevel level = mc.level;
-        if (level == null)
+        if (level == null) {
             return false;
+        }
 
-        if (attack)
+        if (attack) {
             return true;
+        }
 
         ItemStack heldItem = player.getMainHandItem();
         Item item = heldItem.getItem();
         if (heldItem.is(AllItemTags.TRACKS)) {
-            player.displayClientMessage(CreateLang.translateDirect("track.turn_start").withStyle(ChatFormatting.RED), true);
+            player.displayClientMessage(
+                CreateLang.translateDirect("track.turn_start").withStyle(ChatFormatting.RED),
+                true
+            );
             return true;
         }
         if (item instanceof TrackTargetingBlockItem) {

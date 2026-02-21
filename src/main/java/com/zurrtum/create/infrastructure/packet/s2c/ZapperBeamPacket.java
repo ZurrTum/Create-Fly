@@ -12,7 +12,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
 
-public record ZapperBeamPacket(Vec3 location, InteractionHand hand, boolean self, Vec3 target) implements Packet<ClientGamePacketListener> {
+public record ZapperBeamPacket(Vec3 location, InteractionHand hand, boolean self,
+                               Vec3 target) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ZapperBeamPacket> CODEC = StreamCodec.composite(
         Vec3.STREAM_CODEC,
         ZapperBeamPacket::location,

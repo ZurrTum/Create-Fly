@@ -41,33 +41,47 @@ import java.util.stream.Stream;
 import static com.zurrtum.create.Create.LOGGER;
 
 public class ClipboardValueSettingsClientHandler {
-    public static boolean drawCustomBlockSelection(Minecraft mc, BlockPos pos, MultiBufferSource vertexConsumerProvider, Vec3 camPos, PoseStack ms) {
+    public static boolean drawCustomBlockSelection(
+        Minecraft mc,
+        BlockPos pos,
+        MultiBufferSource vertexConsumerProvider,
+        Vec3 camPos,
+        PoseStack ms
+    ) {
         LocalPlayer player = mc.player;
-        if (player == null || player.isSpectator())
+        if (player == null || player.isSpectator()) {
             return false;
-        if (!player.getMainHandItem().is(AllItems.CLIPBOARD))
+        }
+        if (!player.getMainHandItem().is(AllItems.CLIPBOARD)) {
             return false;
+        }
         ClientLevel world = mc.level;
-        if (!world.getWorldBorder().isWithinBounds(pos))
+        if (!world.getWorldBorder().isWithinBounds(pos)) {
             return false;
+        }
         BlockState blockstate = world.getBlockState(pos);
 
-        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
+        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE)) {
             return false;
+        }
         if (!(smartBE instanceof ClipboardBlockEntity) && !(smartBE instanceof ClipboardCloneable)) {
             if (mc.hitResult instanceof BlockHitResult target) {
                 RegistryAccess registryManager = world.registryAccess();
                 Direction side = target.getDirection();
                 if (Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
-                    .noneMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(registryManager, side))) {
+                    .noneMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(
+                        registryManager,
+                        side
+                    ))) {
                     return false;
                 }
             }
         }
 
         VoxelShape shape = blockstate.getShape(world, pos);
-        if (shape.isEmpty())
+        if (shape.isEmpty()) {
             return false;
+        }
 
         VertexConsumer vb = vertexConsumerProvider.getBuffer(RenderTypes.lines());
 
@@ -79,16 +93,19 @@ public class ClipboardValueSettingsClientHandler {
     }
 
     public static void clientTick(Minecraft mc) {
-        if (!(mc.hitResult instanceof BlockHitResult target))
+        if (!(mc.hitResult instanceof BlockHitResult target)) {
             return;
+        }
         LocalPlayer player = mc.player;
         ItemStack stack = player.getMainHandItem();
-        if (!stack.is(AllItems.CLIPBOARD))
+        if (!stack.is(AllItems.CLIPBOARD)) {
             return;
+        }
         BlockPos pos = target.getBlockPos();
         ClientLevel level = mc.level;
-        if (!(level.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
+        if (!(level.getBlockEntity(pos) instanceof SmartBlockEntity smartBE)) {
             return;
+        }
 
         if (smartBE instanceof ClipboardBlockEntity) {
             List<MutableComponent> tip = new ArrayList<>();
@@ -100,7 +117,11 @@ public class ClipboardValueSettingsClientHandler {
 
 
         Direction side = target.getDirection();
-        boolean canCopy = Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
+        boolean canCopy = Stream.of(
+                ServerScrollValueBehaviour.TYPE,
+                ServerFilteringBehaviour.TYPE,
+                ServerLinkBehaviour.TYPE
+            )
             .anyMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(
                 level.registryAccess(),
                 side
@@ -115,9 +136,16 @@ public class ClipboardValueSettingsClientHandler {
         if (tagElement == null) {
             canPaste = false;
         } else {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(smartBE.problemPath(), LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                smartBE.problemPath(),
+                LOGGER
+            )) {
                 ValueInput view = TagValueInput.create(logging, level.registryAccess(), tagElement);
-                canPaste = (Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
+                canPaste = (Stream.of(
+                        ServerScrollValueBehaviour.TYPE,
+                        ServerFilteringBehaviour.TYPE,
+                        ServerLinkBehaviour.TYPE
+                    )
                     .anyMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && view.child(cc.getClipboardKey())
                         .map(v -> cc.readFromClipboard(v, player, side, true))
                         .orElse(false)) || smartBE instanceof ClipboardCloneable ccbe && view.child(ccbe.getClipboardKey())
@@ -125,15 +153,18 @@ public class ClipboardValueSettingsClientHandler {
             }
         }
 
-        if (!canCopy && !canPaste)
+        if (!canCopy && !canPaste) {
             return;
+        }
 
         List<MutableComponent> tip = new ArrayList<>();
         tip.add(CreateLang.translateDirect("clipboard.actions"));
-        if (canCopy)
+        if (canCopy) {
             tip.add(CreateLang.translateDirect("clipboard.to_copy", Component.keybind("key.use")));
-        if (canPaste)
+        }
+        if (canPaste) {
             tip.add(CreateLang.translateDirect("clipboard.to_paste", Component.keybind("key.attack")));
+        }
 
         Create.VALUE_SETTINGS_HANDLER.showHoverTip(mc, tip);
     }

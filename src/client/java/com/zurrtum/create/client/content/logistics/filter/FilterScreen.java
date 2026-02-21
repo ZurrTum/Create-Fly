@@ -92,19 +92,28 @@ public class FilterScreen extends AbstractFilterScreen<FilterMenu> {
 
     @Override
     protected List<MutableComponent> getTooltipDescriptions() {
-        return Arrays.asList(denyDESC.plainCopy(), allowDESC.plainCopy(), respectDataDESC.plainCopy(), ignoreDataDESC.plainCopy());
+        return Arrays.asList(
+            denyDESC.plainCopy(),
+            allowDESC.plainCopy(),
+            respectDataDESC.plainCopy(),
+            ignoreDataDESC.plainCopy()
+        );
     }
 
     @Override
     protected boolean isButtonEnabled(IconButton button) {
-        if (button == blacklist)
+        if (button == blacklist) {
             return !menu.blacklist;
-        if (button == whitelist)
+        }
+        if (button == whitelist) {
             return menu.blacklist;
-        if (button == respectNBT)
+        }
+        if (button == respectNBT) {
             return !menu.respectNBT;
-        if (button == ignoreNBT)
+        }
+        if (button == ignoreNBT) {
             return menu.respectNBT;
+        }
         return true;
     }
 

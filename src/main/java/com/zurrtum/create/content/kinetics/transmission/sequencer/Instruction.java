@@ -4,15 +4,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-
-import java.util.List;
-import java.util.Vector;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+
+import java.util.List;
+import java.util.Vector;
 
 public class Instruction {
     public static final Codec<Instruction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -125,8 +124,9 @@ public class Instruction {
     }
 
     public static Vector<Instruction> deserializeAll(ListTag list) {
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             return createDefault();
+        }
         Vector<Instruction> instructions = new Vector<>(5);
         list.forEach(inbt -> instructions.add(deserialize((CompoundTag) inbt)));
         return instructions;

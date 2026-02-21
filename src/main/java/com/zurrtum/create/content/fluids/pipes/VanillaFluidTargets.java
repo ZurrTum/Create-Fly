@@ -16,33 +16,40 @@ import net.minecraft.world.level.material.Fluids;
 public class VanillaFluidTargets {
 
     public static boolean canProvideFluidWithoutCapability(BlockState state) {
-        if (state.hasProperty(BlockStateProperties.LEVEL_HONEY))
+        if (state.hasProperty(BlockStateProperties.LEVEL_HONEY)) {
             return true;
-        if (state.is(Blocks.CAULDRON))
+        }
+        if (state.is(Blocks.CAULDRON)) {
             return true;
-        if (state.is(Blocks.LAVA_CAULDRON))
+        }
+        if (state.is(Blocks.LAVA_CAULDRON)) {
             return true;
+        }
         return state.is(Blocks.WATER_CAULDRON);
     }
 
     public static FluidStack drainBlock(Level level, BlockPos pos, BlockState state, boolean simulate) {
         if (state.hasProperty(BlockStateProperties.LEVEL_HONEY) && state.getValue(BlockStateProperties.LEVEL_HONEY) >= 5) {
-            if (!simulate)
+            if (!simulate) {
                 level.setBlock(pos, state.setValue(BlockStateProperties.LEVEL_HONEY, 0), Block.UPDATE_ALL);
+            }
             return new FluidStack(AllFluids.HONEY, BottleFluidInventory.CAPACITY);
         }
 
         if (state.is(Blocks.LAVA_CAULDRON)) {
-            if (!simulate)
+            if (!simulate) {
                 level.setBlock(pos, Blocks.CAULDRON.defaultBlockState(), Block.UPDATE_ALL);
+            }
             return new FluidStack(Fluids.LAVA, BucketFluidInventory.CAPACITY);
         }
 
         if (state.is(Blocks.WATER_CAULDRON) && state.getBlock() instanceof LayeredCauldronBlock lcb) {
-            if (!lcb.isFull(state))
+            if (!lcb.isFull(state)) {
                 return FluidStack.EMPTY;
-            if (!simulate)
+            }
+            if (!simulate) {
                 level.setBlock(pos, Blocks.CAULDRON.defaultBlockState(), Block.UPDATE_ALL);
+            }
             return new FluidStack(Fluids.WATER, BucketFluidInventory.CAPACITY);
         }
 

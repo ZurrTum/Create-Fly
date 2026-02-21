@@ -79,8 +79,8 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
         longNameInput.setValue(longName);
         longNameInput.setResponder(s -> longName = s);
 
-        MutableComponent rmbToEdit = CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-            .component();
+        MutableComponent rmbToEdit = CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY)
+            .style(ChatFormatting.ITALIC).component();
 
         addRenderableOnly(new TooltipArea(x + 21, y + 23, 30, 18).withTooltip(ImmutableList.of(
             CreateLang.translate(
@@ -163,8 +163,9 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
             shortNameInput.setCursorPosition(length);
         }
 
-        if (shortNameInput.isHoveredOrFocused())
+        if (shortNameInput.isHoveredOrFocused()) {
             longNameInput.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+        }
 
         if (!consumed && click.x() > guiLeft + 22 && click.y() > guiTop + 24 && click.x() < guiLeft + 50 && click.y() < guiTop + 40) {
             setFocused(shortNameInput);
@@ -177,8 +178,9 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (super.keyPressed(input))
+        if (super.keyPressed(input)) {
             return true;
+        }
         int keyCode = input.key();
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             confirm();

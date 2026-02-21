@@ -14,28 +14,33 @@ public abstract class PercentOrProgressBarDisplaySource extends NumericSingleLin
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         Float rawProgress = this.getProgress(context);
-        if (rawProgress == null)
+        if (rawProgress == null) {
             return EMPTY_LINE;
+        }
 
-        if (!progressBarActive(context))
+        if (!progressBarActive(context)) {
             return formatNumeric(context, rawProgress);
+        }
 
         String label = context.sourceConfig().getStringOr("Label", "");
 
         int labelSize = label.isEmpty() ? 0 : label.length() + 1;
         int length = Math.min(stats.maxColumns() - labelSize, 128);
 
-        if (context.getTargetBlockEntity() instanceof SignBlockEntity)
+        if (context.getTargetBlockEntity() instanceof SignBlockEntity) {
             length = (int) (length * 6f / 9f);
-        if (context.getTargetBlockEntity() instanceof FlapDisplayBlockEntity)
+        }
+        if (context.getTargetBlockEntity() instanceof FlapDisplayBlockEntity) {
             length = sizeForWideChars(length);
+        }
 
         // clamp just in case - #7371
         float currentLevel = Mth.clamp(rawProgress, 0, 1);
         int filledLength = (int) (currentLevel * length);
 
-        if (length < 1)
+        if (length < 1) {
             return EMPTY_LINE;
+        }
 
         int emptySpaces = length - filledLength;
         String s = "█".repeat(Math.max(0, filledLength)) + "▒".repeat(Math.max(0, emptySpaces));

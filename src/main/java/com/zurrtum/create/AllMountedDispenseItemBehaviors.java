@@ -42,13 +42,22 @@ public class AllMountedDispenseItemBehaviors {
     private static final MountedDispenseBehavior SPAWN_EGG = new DefaultMountedDispenseBehavior() {
         @Override
         protected ItemStack execute(ItemStack stack, MovementContext context, BlockPos pos, Vec3 facing) {
-            if (!(stack.getItem() instanceof SpawnEggItem egg))
+            if (!(stack.getItem() instanceof SpawnEggItem egg)) {
                 return super.execute(stack, context, pos, facing);
+            }
 
             if (context.world instanceof ServerLevel serverLevel) {
                 EntityType<?> type = egg.getType(stack);
                 BlockPos offset = BlockPos.containing(facing.x + .7, facing.y + .7, facing.z + .7);
-                Entity entity = type.spawn(serverLevel, stack, null, pos.offset(offset), EntitySpawnReason.DISPENSER, facing.y < .5, false);
+                Entity entity = type.spawn(
+                    serverLevel,
+                    stack,
+                    null,
+                    pos.offset(offset),
+                    EntitySpawnReason.DISPENSER,
+                    facing.y < .5,
+                    false
+                );
                 if (entity != null) {
                     entity.setDeltaMovement(context.motion.scale(2));
                 }
@@ -67,7 +76,16 @@ public class AllMountedDispenseItemBehaviors {
             PrimedTnt tnt = new PrimedTnt(context.world, x, y, z, null);
             tnt.push(context.motion.x, context.motion.y, context.motion.z);
             context.world.addFreshEntity(tnt);
-            context.world.playSound(null, tnt.getX(), tnt.getY(), tnt.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1, 1);
+            context.world.playSound(
+                null,
+                tnt.getX(),
+                tnt.getY(),
+                tnt.getZ(),
+                SoundEvents.TNT_PRIMED,
+                SoundSource.BLOCKS,
+                1,
+                1
+            );
             stack.shrink(1);
             return stack;
         }
@@ -132,7 +150,14 @@ public class AllMountedDispenseItemBehaviors {
     };
     private static final MountedDispenseBehavior SPLASH_POTIONS = new MountedProjectileDispenseBehavior() {
         @Override
-        protected Projectile getProjectile(Level level, double x, double y, double z, ItemStack stack, Direction facing) {
+        protected Projectile getProjectile(
+            Level level,
+            double x,
+            double y,
+            double z,
+            ItemStack stack,
+            Direction facing
+        ) {
             return new ThrownSplashPotion(level, x, y, z, stack);
         }
 
@@ -148,7 +173,14 @@ public class AllMountedDispenseItemBehaviors {
     };
     private static final MountedDispenseBehavior LINGERING_POTIONS = new MountedProjectileDispenseBehavior() {
         @Override
-        protected Projectile getProjectile(Level level, double x, double y, double z, ItemStack stack, Direction facing) {
+        protected Projectile getProjectile(
+            Level level,
+            double x,
+            double y,
+            double z,
+            ItemStack stack,
+            Direction facing
+        ) {
             return new ThrownLingeringPotion(level, x, y, z, stack);
         }
 
@@ -171,7 +203,13 @@ public class AllMountedDispenseItemBehaviors {
             Block block = state.getBlock();
 
             if (block instanceof BeehiveBlock hive && state.is(BlockTags.BEEHIVES) && state.getValue(BeehiveBlock.HONEY_LEVEL) >= 5) {
-                hive.releaseBeesAndResetHoneyLevel(context.world, state, interactionPos, null, BeehiveBlockEntity.BeeReleaseStatus.BEE_RELEASED);
+                hive.releaseBeesAndResetHoneyLevel(
+                    context.world,
+                    state,
+                    interactionPos,
+                    null,
+                    BeehiveBlockEntity.BeeReleaseStatus.BEE_RELEASED
+                );
                 MountedDispenseBehavior.placeItemInInventory(new ItemStack(Items.HONEY_BOTTLE), context, pos);
                 stack.shrink(1);
                 return stack;

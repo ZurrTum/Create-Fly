@@ -21,13 +21,21 @@ public class CauldronSpoutingBehavior implements BlockSpoutingBehaviour {
     });
 
     @Override
-    public int fillBlock(Level level, BlockPos pos, SpoutBlockEntity spout, FluidStack availableFluid, boolean simulate) {
+    public int fillBlock(
+        Level level,
+        BlockPos pos,
+        SpoutBlockEntity spout,
+        FluidStack availableFluid,
+        boolean simulate
+    ) {
         CauldronInfo info = CAULDRON_INFO.get(availableFluid.getFluid());
-        if (info == null)
+        if (info == null) {
             return 0;
+        }
 
-        if (availableFluid.getAmount() < info.amount)
+        if (availableFluid.getAmount() < info.amount) {
             return 0;
+        }
 
         if (!simulate) {
             level.setBlockAndUpdate(pos, info.cauldron);

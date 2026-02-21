@@ -7,9 +7,6 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.foundation.block.IBE;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -30,14 +27,15 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Locale;
+
 public class GaugeBlock extends DirectionalAxisKineticBlock implements IBE<GaugeBlockEntity> {
 
     public static final GaugeShaper GAUGE = GaugeShaper.make();
     protected Type type;
 
     public enum Type implements StringRepresentable {
-        SPEED,
-        STRESS;
+        SPEED, STRESS;
 
         @Override
         public String getSerializedName() {
@@ -72,12 +70,14 @@ public class GaugeBlock extends DirectionalAxisKineticBlock implements IBE<Gauge
             Direction nearestLookingDirection = context.getNearestLookingDirection();
             boolean lookPositive = nearestLookingDirection.getAxisDirection() == AxisDirection.POSITIVE;
             if (face.getAxis() == Axis.X) {
-                toPlace = toPlace.setValue(FACING, lookPositive ? Direction.NORTH : Direction.SOUTH).setValue(AXIS_ALONG_FIRST_COORDINATE, true);
+                toPlace = toPlace.setValue(FACING, lookPositive ? Direction.NORTH : Direction.SOUTH)
+                    .setValue(AXIS_ALONG_FIRST_COORDINATE, true);
             } else if (face.getAxis() == Axis.Y) {
                 toPlace = toPlace.setValue(FACING, horizontalFacing.getOpposite())
                     .setValue(AXIS_ALONG_FIRST_COORDINATE, horizontalFacing.getAxis() == Axis.X);
             } else {
-                toPlace = toPlace.setValue(FACING, lookPositive ? Direction.WEST : Direction.EAST).setValue(AXIS_ALONG_FIRST_COORDINATE, false);
+                toPlace = toPlace.setValue(FACING, lookPositive ? Direction.WEST : Direction.EAST)
+                    .setValue(AXIS_ALONG_FIRST_COORDINATE, false);
             }
 
             return toPlace;
@@ -97,43 +97,63 @@ public class GaugeBlock extends DirectionalAxisKineticBlock implements IBE<Gauge
     }
 
     public boolean shouldRenderHeadOnFace(Level world, BlockPos pos, BlockState state, Direction face) {
-        if (face.getAxis().isVertical())
+        if (face.getAxis().isVertical()) {
             return false;
-        if (face == state.getValue(FACING).getOpposite())
+        }
+        if (face == state.getValue(FACING).getOpposite()) {
             return false;
-        if (face.getAxis() == getRotationAxis(state))
+        }
+        if (face.getAxis() == getRotationAxis(state)) {
             return false;
-        if (getRotationAxis(state) == Axis.Y && face != state.getValue(FACING))
+        }
+        if (getRotationAxis(state) == Axis.Y && face != state.getValue(FACING)) {
             return false;
-        return Block.shouldRenderFace(state, world.getBlockState(pos.relative(face)), face) || world instanceof WrappedLevel;
+        }
+        return Block.shouldRenderFace(
+            state,
+            world.getBlockState(pos.relative(face)),
+            face
+        ) || world instanceof WrappedLevel;
     }
 
     @Override
     public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, RandomSource rand) {
         BlockEntity be = worldIn.getBlockEntity(pos);
-        if (!(be instanceof GaugeBlockEntity gaugeBE))
+        if (!(be instanceof GaugeBlockEntity gaugeBE)) {
             return;
-        if (gaugeBE.dialTarget == 0)
+        }
+        if (gaugeBE.dialTarget == 0) {
             return;
+        }
         int color = gaugeBE.color;
 
         for (Direction face : Iterate.directions) {
-            if (!shouldRenderHeadOnFace(worldIn, pos, stateIn, face))
+            if (!shouldRenderHeadOnFace(worldIn, pos, stateIn, face)) {
                 continue;
+            }
 
             Vec3 faceVec = Vec3.atLowerCornerOf(face.getUnitVec3i());
             Direction positiveFacing = Direction.get(AxisDirection.POSITIVE, face.getAxis());
             Vec3 positiveFaceVec = Vec3.atLowerCornerOf(positiveFacing.getUnitVec3i());
             int particleCount = gaugeBE.dialTarget > 1 ? 4 : 1;
 
-            if (particleCount == 1 && rand.nextFloat() > 1 / 4f)
+            if (particleCount == 1 && rand.nextFloat() > 1 / 4f) {
                 continue;
+            }
 
             for (int i = 0; i < particleCount; i++) {
-                Vec3 mul = VecHelper.offsetRandomly(Vec3.ZERO, rand, .25f).multiply(new Vec3(1, 1, 1).subtract(positiveFaceVec)).normalize()
-                    .scale(.3f);
+                Vec3 mul = VecHelper.offsetRandomly(Vec3.ZERO, rand, .25f)
+                    .multiply(new Vec3(1, 1, 1).subtract(positiveFaceVec)).normalize().scale(.3f);
                 Vec3 offset = VecHelper.getCenterOf(pos).add(faceVec.scale(.55)).add(mul);
-                worldIn.addParticle(new DustParticleOptions(color, 1), offset.x, offset.y, offset.z, mul.x, mul.y, mul.z);
+                worldIn.addParticle(
+                    new DustParticleOptions(color, 1),
+                    offset.x,
+                    offset.y,
+                    offset.z,
+                    mul.x,
+                    mul.y,
+                    mul.z
+                );
             }
 
         }

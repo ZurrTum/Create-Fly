@@ -14,9 +14,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.List;
 
-public record RedstoneRequesterConfigurationPacket(
-    BlockPos pos, String address, boolean allowPartial, List<Integer> amounts
-) implements Packet<ServerGamePacketListener> {
+public record RedstoneRequesterConfigurationPacket(BlockPos pos, String address, boolean allowPartial,
+                                                   List<Integer> amounts) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, RedstoneRequesterConfigurationPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         RedstoneRequesterConfigurationPacket::pos,

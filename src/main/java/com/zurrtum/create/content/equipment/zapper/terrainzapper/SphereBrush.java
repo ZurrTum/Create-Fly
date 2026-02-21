@@ -2,15 +2,14 @@ package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
 
 public class SphereBrush extends ShapedBrush {
 
@@ -26,7 +25,8 @@ public class SphereBrush extends ShapedBrush {
             List<BlockPos> positions = BlockPos.betweenClosedStream(
                     BlockPos.ZERO.offset(-i - 1, -i - 1, -i - 1),
                     BlockPos.ZERO.offset(i + 1, i + 1, i + 1)
-                ).map(BlockPos::new).filter(p -> VecHelper.getCenterOf(p).distanceTo(VecHelper.getCenterOf(BlockPos.ZERO)) < radius + .5f)
+                ).map(BlockPos::new)
+                .filter(p -> VecHelper.getCenterOf(p).distanceTo(VecHelper.getCenterOf(BlockPos.ZERO)) < radius + .5f)
                 .collect(Collectors.toList());
             cachedBrushes.put(i, positions);
         }
@@ -34,8 +34,9 @@ public class SphereBrush extends ShapedBrush {
 
     @Override
     public BlockPos getOffset(Vec3 ray, Direction face, PlacementOptions option) {
-        if (option == PlacementOptions.Merged)
+        if (option == PlacementOptions.Merged) {
             return BlockPos.ZERO;
+        }
 
         int offset = option == PlacementOptions.Attached ? 0 : -1;
         int r = (param0 + 1 + offset);

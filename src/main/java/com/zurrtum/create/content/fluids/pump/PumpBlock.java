@@ -55,17 +55,31 @@ public class PumpBlock extends DirectionalKineticBlock implements SimpleWaterlog
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState state,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return AllShapes.PUMP.get(state.getValue(FACING));
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos neighborPos, boolean isMoving) {
+    public void neighborUpdate(
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        Block otherBlock,
+        BlockPos neighborPos,
+        boolean isMoving
+    ) {
         Direction d = FluidPropagator.validateNeighbourChange(state, world, pos, otherBlock, neighborPos, isMoving);
-        if (d == null)
+        if (d == null) {
             return;
-        if (!isOpenAt(state, d))
+        }
+        if (!isOpenAt(state, d)) {
             return;
+        }
         world.scheduleTick(pos, this, 1, TickPriority.HIGH);
     }
 
@@ -102,8 +116,9 @@ public class PumpBlock extends DirectionalKineticBlock implements SimpleWaterlog
         BlockState neighbourState,
         RandomSource random
     ) {
-        if (state.getValue(BlockStateProperties.WATERLOGGED))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+        }
         return state;
     }
 
@@ -124,17 +139,21 @@ public class PumpBlock extends DirectionalKineticBlock implements SimpleWaterlog
         for (Direction d : Iterate.directions) {
             BlockPos adjPos = pos.relative(d);
             BlockState adjState = level.getBlockState(adjPos);
-            if (!FluidPipeBlock.canConnectTo(level, adjPos, adjState, d))
+            if (!FluidPipeBlock.canConnectTo(level, adjPos, adjState, d)) {
                 continue;
-            double distance = Vec3.atLowerCornerOf(d.getUnitVec3i()).distanceTo(Vec3.atLowerCornerOf(targetDirection.getUnitVec3i()));
-            if (distance > bestDistance)
+            }
+            double distance = Vec3.atLowerCornerOf(d.getUnitVec3i())
+                .distanceTo(Vec3.atLowerCornerOf(targetDirection.getUnitVec3i()));
+            if (distance > bestDistance) {
                 continue;
+            }
             bestDistance = distance;
             bestConnectedDirection = d;
         }
 
-        if (bestConnectedDirection != null && bestConnectedDirection.getAxis() != targetDirection.getAxis() && !isShiftKeyDown)
+        if (bestConnectedDirection != null && bestConnectedDirection.getAxis() != targetDirection.getAxis() && !isShiftKeyDown) {
             return toPlace.setValue(FACING, bestConnectedDirection);
+        }
 
         return toPlace;
     }
@@ -146,15 +165,18 @@ public class PumpBlock extends DirectionalKineticBlock implements SimpleWaterlog
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, world, pos, oldState, isMoving);
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
-        if (state != oldState)
+        }
+        if (state != oldState) {
             world.scheduleTick(pos, this, 1, TickPriority.HIGH);
+        }
 
         if (isPump(state) && isPump(oldState) && state.getValue(FACING) == oldState.getValue(FACING).getOpposite()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (!(blockEntity instanceof PumpBlockEntity pump))
+            if (!(blockEntity instanceof PumpBlockEntity pump)) {
                 return;
+            }
             pump.pressureUpdate = true;
         }
     }

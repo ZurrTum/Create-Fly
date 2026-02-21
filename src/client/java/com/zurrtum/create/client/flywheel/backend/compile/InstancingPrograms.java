@@ -36,12 +36,22 @@ public class InstancingPrograms extends AtomicReferenceCounted {
         return extensions.build();
     }
 
-    static void reload(ShaderSources sources, List<SourceComponent> vertexComponents, List<SourceComponent> fragmentComponents) {
+    static void reload(
+        ShaderSources sources,
+        List<SourceComponent> vertexComponents,
+        List<SourceComponent> fragmentComponents
+    ) {
         if (!GlCompat.SUPPORTS_INSTANCING) {
             return;
         }
 
-        var pipelineCompiler = PipelineCompiler.create(sources, Pipelines.INSTANCING, vertexComponents, fragmentComponents, EXTENSIONS);
+        var pipelineCompiler = PipelineCompiler.create(
+            sources,
+            Pipelines.INSTANCING,
+            vertexComponents,
+            fragmentComponents,
+            EXTENSIONS
+        );
         var fullscreen = OitPrograms.createFullscreenCompiler(sources);
         InstancingPrograms newInstance = new InstancingPrograms(pipelineCompiler, fullscreen);
 
@@ -71,7 +81,12 @@ public class InstancingPrograms extends AtomicReferenceCounted {
         setInstance(null);
     }
 
-    public GlProgram get(InstanceType<?> instanceType, ContextShader contextShader, Material material, PipelineCompiler.OitMode mode) {
+    public GlProgram get(
+        InstanceType<?> instanceType,
+        ContextShader contextShader,
+        Material material,
+        PipelineCompiler.OitMode mode
+    ) {
         return pipeline.get(instanceType, contextShader, material, mode);
     }
 

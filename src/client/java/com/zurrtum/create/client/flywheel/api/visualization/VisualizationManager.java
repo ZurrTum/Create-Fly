@@ -4,16 +4,15 @@ import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.internal.FlwApiLink;
 import com.zurrtum.create.client.flywheel.api.visual.Effect;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.SortedSet;
-
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.SortedSet;
 
 @ApiStatus.NonExtendable
 public interface VisualizationManager {
@@ -72,6 +71,9 @@ public interface VisualizationManager {
          *
          * @param destructionProgress The destruction progress map from {@link net.minecraft.client.renderer.LevelRenderer LevelRenderer}.
          */
-        void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress);
+        void beforeCrumbling(
+            RenderContext ctx,
+            Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress
+        );
     }
 }

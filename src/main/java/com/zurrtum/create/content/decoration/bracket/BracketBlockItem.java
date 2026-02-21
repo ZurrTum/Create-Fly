@@ -1,9 +1,6 @@
 package com.zurrtum.create.content.decoration.bracket;
 
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -15,6 +12,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Optional;
 
 public class BracketBlockItem extends BlockItem {
 
@@ -30,26 +29,39 @@ public class BracketBlockItem extends BlockItem {
         BracketBlock bracketBlock = getBracketBlock();
         Player player = context.getPlayer();
 
-        BracketedBlockEntityBehaviour behaviour = BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE);
+        BracketedBlockEntityBehaviour behaviour = BlockEntityBehaviour.get(
+            world,
+            pos,
+            BracketedBlockEntityBehaviour.TYPE
+        );
 
-        if (behaviour == null)
+        if (behaviour == null) {
             return InteractionResult.FAIL;
-        if (!behaviour.canHaveBracket())
+        }
+        if (!behaviour.canHaveBracket()) {
             return InteractionResult.FAIL;
-        if (world.isClientSide())
+        }
+        if (world.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         Optional<BlockState> suitableBracket = bracketBlock.getSuitableBracket(state, context.getClickedFace());
-        if (!suitableBracket.isPresent() && player != null)
-            suitableBracket = bracketBlock.getSuitableBracket(state, Direction.orderedByNearest(player)[0].getOpposite());
-        if (!suitableBracket.isPresent())
+        if (!suitableBracket.isPresent() && player != null) {
+            suitableBracket = bracketBlock.getSuitableBracket(
+                state,
+                Direction.orderedByNearest(player)[0].getOpposite()
+            );
+        }
+        if (!suitableBracket.isPresent()) {
             return InteractionResult.SUCCESS;
+        }
 
         BlockState bracket = behaviour.getBracket();
         BlockState newBracket = suitableBracket.get();
 
-        if (bracket == newBracket)
+        if (bracket == newBracket) {
             return InteractionResult.SUCCESS;
+        }
 
         world.playSound(null, pos, newBracket.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 0.75f, 1);
         behaviour.applyBracket(newBracket);
@@ -58,10 +70,11 @@ public class BracketBlockItem extends BlockItem {
             context.getItemInHand().shrink(1);
             if (bracket != null) {
                 ItemStack returnedStack = new ItemStack(bracket.getBlock());
-                if (player == null)
+                if (player == null) {
                     Block.popResource(world, pos, returnedStack);
-                else
+                } else {
                     player.getInventory().placeItemBackInInventory(returnedStack);
+                }
             }
         }
         return InteractionResult.SUCCESS;

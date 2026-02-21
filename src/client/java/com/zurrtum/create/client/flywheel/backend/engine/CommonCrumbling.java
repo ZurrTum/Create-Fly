@@ -11,8 +11,9 @@ import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 
 public class CommonCrumbling {
     public static void applyCrumblingProperties(SimpleMaterial.Builder crumblingMaterial, Material baseMaterial) {
-        crumblingMaterial.copyFrom(baseMaterial).fog(FogShaders.NONE).cutout(CutoutShaders.ONE_TENTH).light(LightShaders.SMOOTH_WHEN_EMBEDDED)
-            .polygonOffset(true).transparency(Transparency.CRUMBLING).writeMask(WriteMask.COLOR).useOverlay(false).useLight(false)
+        crumblingMaterial.copyFrom(baseMaterial).fog(FogShaders.NONE).cutout(CutoutShaders.ONE_TENTH)
+            .light(LightShaders.SMOOTH_WHEN_EMBEDDED).polygonOffset(true).transparency(Transparency.CRUMBLING)
+            .writeMask(WriteMask.COLOR).useOverlay(false).useLight(false)
             .cardinalLightingMode(CardinalLightingMode.OFF);
     }
 }

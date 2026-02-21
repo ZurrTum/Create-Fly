@@ -8,16 +8,15 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.block.entity.LecternBlockEntity;
 
 import static com.zurrtum.create.content.trains.display.FlapDisplaySection.MONOSPACE;
 
@@ -31,17 +30,20 @@ public abstract class ValueListDisplaySource extends DisplaySource {
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
         boolean isBook = context.getTargetBlockEntity() instanceof LecternBlockEntity;
 
-        List<MutableComponent> list = provideEntries(context, stats.maxRows() * (isBook ? ENTRIES_PER_PAGE : 1)).map(e -> createComponentsFromEntry(context,
-            e
-        )).map(l -> {
+        List<MutableComponent> list = provideEntries(
+            context,
+            stats.maxRows() * (isBook ? ENTRIES_PER_PAGE : 1)
+        ).map(e -> createComponentsFromEntry(context, e)).map(l -> {
             MutableComponent combined = l.get(0).append(l.get(1));
-            if (l.size() > 2)
+            if (l.size() > 2) {
                 combined.append(l.get(2));
+            }
             return combined;
         }).toList();
 
-        if (isBook)
+        if (isBook) {
             list = condensePages(list);
+        }
 
         return list;
     }
@@ -64,8 +66,9 @@ public abstract class ValueListDisplaySource extends DisplaySource {
             }
         }
 
-        if (current != null)
+        if (current != null) {
             condensed.add(current);
+        }
         return condensed;
     }
 
@@ -79,7 +82,10 @@ public abstract class ValueListDisplaySource extends DisplaySource {
         }).toList();
     }
 
-    protected List<MutableComponent> createComponentsFromEntry(DisplayLinkContext context, IntAttached<MutableComponent> entry) {
+    protected List<MutableComponent> createComponentsFromEntry(
+        DisplayLinkContext context,
+        IntAttached<MutableComponent> entry
+    ) {
         int number = entry.getFirst();
         MutableComponent name = entry.getSecond().append(WHITESPACE);
 
@@ -97,26 +103,42 @@ public abstract class ValueListDisplaySource extends DisplaySource {
     }
 
     @Override
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout
+    ) {
 
         boolean valueFirst = valueFirst();
         boolean shortenNumbers = shortenNumbers(context);
-        int valueFormat = shortenNumbers ? 0 : Math.max(4, 1 + (int) Math.log10(((MutableInt) context.flapDisplayContext).intValue()));
+        int valueFormat = shortenNumbers ? 0 : Math.max(
+            4,
+            1 + (int) Math.log10(((MutableInt) context.flapDisplayContext).intValue())
+        );
 
         String layoutKey = "ValueList_" + valueFirst + "_" + valueFormat;
-        if (layout.isLayout(layoutKey))
+        if (layout.isLayout(layoutKey)) {
             return;
+        }
 
         int maxCharCount = flapDisplay.getMaxCharCount(1);
         int numberLength = Math.min(maxCharCount, Math.max(3, valueFormat));
         int nameLength = Math.max(maxCharCount - numberLength - (shortenNumbers ? 1 : 0), 0);
 
         FlapDisplaySection name = new FlapDisplaySection(MONOSPACE * nameLength, "alphabet", false, !valueFirst);
-        FlapDisplaySection value = new FlapDisplaySection(MONOSPACE * numberLength, "number", false, !shortenNumbers && valueFirst).rightAligned();
+        FlapDisplaySection value = new FlapDisplaySection(
+            MONOSPACE * numberLength,
+            "number",
+            false,
+            !shortenNumbers && valueFirst
+        ).rightAligned();
 
         if (shortenNumbers) {
             FlapDisplaySection suffix = new FlapDisplaySection(MONOSPACE, "shortened_numbers", false, valueFirst);
-            layout.configure(layoutKey, valueFirst ? Arrays.asList(value, suffix, name) : Arrays.asList(name, value, suffix));
+            layout.configure(
+                layoutKey,
+                valueFirst ? Arrays.asList(value, suffix, name) : Arrays.asList(name, value, suffix)
+            );
             return;
         }
 

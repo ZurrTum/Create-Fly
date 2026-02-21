@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class FluidInventoryStorageImpl extends CombinedStorage<FluidVariant, SingleSlotStorage<FluidVariant>> implements FluidInventoryStorage {
-    private static final Map<FluidInventory, FluidInventoryStorageImpl> WRAPPERS = new MapMaker().weakValues().makeMap();
+    private static final Map<FluidInventory, FluidInventoryStorageImpl> WRAPPERS = new MapMaker().weakValues()
+        .makeMap();
 
     public static FluidInventoryStorage of(FluidInventory inventory) {
         FluidInventoryStorageImpl storage = WRAPPERS.computeIfAbsent(inventory, FluidInventoryStorageImpl::new);

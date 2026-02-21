@@ -15,7 +15,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.List;
 
-public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<String>>> floors) implements Packet<ClientGamePacketListener> {
+public record ElevatorFloorListPacket(int entityId,
+                                      List<IntAttached<Couple<String>>> floors) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ElevatorFloorListPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         ElevatorFloorListPacket::entityId,

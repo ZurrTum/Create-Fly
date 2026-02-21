@@ -36,7 +36,13 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, FrogportBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        FrogportBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.inventory;
     }
 
@@ -48,8 +54,9 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
     @Override
     public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
-        if (pPlacer == null)
+        if (pPlacer == null) {
             return;
+        }
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
         withBlockEntityDo(
             pLevel, pPos, be -> {

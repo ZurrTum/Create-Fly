@@ -14,9 +14,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
 
-public record DeployerApplicationRecipe(
-    List<ProcessingOutput> results, boolean keepHeldItem, Ingredient target, Ingredient ingredient
-) implements ItemApplicationRecipe {
+public record DeployerApplicationRecipe(List<ProcessingOutput> results, boolean keepHeldItem, Ingredient target,
+                                        Ingredient ingredient) implements ItemApplicationRecipe {
     @Override
     public RecipeSerializer<DeployerApplicationRecipe> getSerializer() {
         return AllRecipeSerializers.DEPLOYING;
@@ -28,8 +27,9 @@ public record DeployerApplicationRecipe(
     }
 
     public static Component getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
-        return Ingredient.CODEC.parse(ops, object.get("ingredient")).result()
-            .map(ingredient -> Component.translatable("create.recipe.assembly.deploying_item", new IngredientText(ingredient)))
-            .orElseGet(() -> Component.literal("Invalid"));
+        return Ingredient.CODEC.parse(ops, object.get("ingredient")).result().map(ingredient -> Component.translatable(
+            "create.recipe.assembly.deploying_item",
+            new IngredientText(ingredient)
+        )).orElseGet(() -> Component.literal("Invalid"));
     }
 }

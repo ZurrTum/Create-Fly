@@ -29,50 +29,57 @@ public class TrainStatus {
     }
 
     public void failedNavigation() {
-        if (navigation)
+        if (navigation) {
             return;
+        }
         displayInformation("no_path", false);
         navigation = true;
     }
 
     public void failedNavigationNoTarget(String filter) {
-        if (navigation)
+        if (navigation) {
             return;
+        }
         displayInformation("no_match", false, filter);
         navigation = true;
     }
 
     public void failedPackageNoTarget(String address) {
-        if (navigation)
+        if (navigation) {
             return;
+        }
         displayInformation("no_package_target", false, address);
         navigation = true;
     }
 
     public void successfulNavigation() {
-        if (!navigation)
+        if (!navigation) {
             return;
+        }
         displayInformation("navigation_success", true);
         navigation = false;
     }
 
     public void foundConductor() {
-        if (!conductor)
+        if (!conductor) {
             return;
+        }
         displayInformation("found_driver", true);
         conductor = false;
     }
 
     public void missingConductor() {
-        if (conductor)
+        if (conductor) {
             return;
+        }
         displayInformation("missing_driver", false);
         conductor = true;
     }
 
     public void missingCorrectConductor() {
-        if (conductor)
+        if (conductor) {
             return;
+        }
         displayInformation("opposite_driver", false);
         conductor = true;
     }
@@ -82,29 +89,33 @@ public class TrainStatus {
     }
 
     public void failedMigration() {
-        if (track)
+        if (track) {
             return;
+        }
         displayInformation("track_missing", false);
         track = true;
     }
 
     public void highStress() {
-        if (track)
+        if (track) {
             return;
+        }
         displayInformation("coupling_stress", false);
         track = true;
     }
 
     public void doublePortal() {
-        if (track)
+        if (track) {
             return;
+        }
         displayInformation("double_portal", false);
         track = true;
     }
 
     public void endOfTrack() {
-        if (track)
+        if (track) {
             return;
+        }
         displayInformation("end_of_track", false);
         track = true;
     }
@@ -120,13 +131,15 @@ public class TrainStatus {
                 train.getPositionInDimension(key).get().toShortString()
             ).withColor(0xFFD3B4));
         });
-        addMessage(new StatusMessage(Streams.concat(Stream.of(component), locationComponents).toArray(Component[]::new)));
+        addMessage(new StatusMessage(Streams.concat(Stream.of(component), locationComponents)
+            .toArray(Component[]::new)));
 
     }
 
     public void successfulMigration() {
-        if (!track)
+        if (!track) {
             return;
+        }
         displayInformation("back_on_track", true);
         track = false;
     }
@@ -136,13 +149,16 @@ public class TrainStatus {
     }
 
     public void tick(Level level) {
-        if (queued.isEmpty())
+        if (queued.isEmpty()) {
             return;
+        }
         LivingEntity owner = train.getOwner(level);
-        if (owner == null)
+        if (owner == null) {
             return;
+        }
         if (owner instanceof Player player) {
-            player.displayClientMessage(Component.translatable("create.train.status", train.name).withStyle(ChatFormatting.GOLD), false);
+            player.displayClientMessage(
+                Component.translatable("create.train.status", train.name).withStyle(ChatFormatting.GOLD), false);
             queued.forEach(message -> message.displayToPlayer(player));
         }
         queued.clear();
@@ -150,15 +166,17 @@ public class TrainStatus {
 
     public void displayInformation(String key, boolean itsAGoodThing, Object... args) {
         MutableComponent component = Component.literal(" - ").withStyle(ChatFormatting.GRAY)
-            .append(Component.translatable("create.train.status." + key, args).withColor(itsAGoodThing ? 0xD5ECC2 : 0xFFD3B4));
+            .append(Component.translatable("create.train.status." + key, args)
+                .withColor(itsAGoodThing ? 0xD5ECC2 : 0xFFD3B4));
         addMessage(new StatusMessage(component));
     }
 
     public void addMessage(StatusMessage message) {
         queued.add(message);
 
-        if (queued.size() > 3)
+        if (queued.size() > 3) {
             queued.remove(0);
+        }
     }
 
     public void newSchedule() {

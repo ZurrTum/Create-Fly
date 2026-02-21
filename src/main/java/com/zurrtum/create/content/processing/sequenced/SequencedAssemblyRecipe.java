@@ -38,9 +38,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public record SequencedAssemblyRecipe(
-    Ingredient ingredient, ItemStack transitionalItem, ProcessingOutput result, List<ProcessingOutput> junks, int loops, List<Recipe<?>> sequence
-) implements CreateRecipe<SingleRecipeInput> {
+public record SequencedAssemblyRecipe(Ingredient ingredient, ItemStack transitionalItem, ProcessingOutput result,
+                                      List<ProcessingOutput> junks, int loops,
+                                      List<Recipe<?>> sequence) implements CreateRecipe<SingleRecipeInput> {
     @Override
     public RecipeType<SequencedAssemblyRecipe> getType() {
         return AllRecipeTypes.SEQUENCED_ASSEMBLY;
@@ -78,7 +78,11 @@ public record SequencedAssemblyRecipe(
         public static final Map<Identifier, Recipe<?>> GENERATE_RECIPES = new HashMap<>();
         public static final MapCodec<SequencedAssemblyRecipe> CODEC = new MapCodec<>() {
             @Override
-            public <T> RecordBuilder<T> encode(SequencedAssemblyRecipe input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
+            public <T> RecordBuilder<T> encode(
+                SequencedAssemblyRecipe input,
+                DynamicOps<T> ops,
+                RecordBuilder<T> prefix
+            ) {
                 prefix.add("raw", ops.createBoolean(true));
                 return RAW_CODEC.encode(input, ops, prefix);
             }
@@ -91,16 +95,20 @@ public record SequencedAssemblyRecipe(
                         throw new UnsupportedOperationException("ops must be a JsonOps");
                     }
                     DynamicOps<JsonElement> ops = (DynamicOps<JsonElement>) dynamicOps;
-                    int loops = Optional.ofNullable(input.get("loops")).map(value -> dynamicOps.getNumberValue(value, 1).intValue()).orElse(1);
+                    int loops = Optional.ofNullable(input.get("loops"))
+                        .map(value -> dynamicOps.getNumberValue(value, 1).intValue()).orElse(1);
                     int sequenceSize = sequenceJson.size();
                     int size = sequenceSize * loops;
                     if (size <= 1) {
                         throw new UnsupportedOperationException("sequence must have at least two steps");
                     }
 
-                    ItemStack transitionalItem = ItemStack.CODEC.parse(dynamicOps, input.get("transitional_item")).getOrThrow();
-                    ProcessingOutput result = ProcessingOutput.CODEC.parse(dynamicOps, input.get("result")).getOrThrow();
-                    List<ProcessingOutput> junks = JUNKS_CODEC.parse(dynamicOps, input.get("junks")).result().orElse(List.of());
+                    ItemStack transitionalItem = ItemStack.CODEC.parse(dynamicOps, input.get("transitional_item"))
+                        .getOrThrow();
+                    ProcessingOutput result = ProcessingOutput.CODEC.parse(dynamicOps, input.get("result"))
+                        .getOrThrow();
+                    List<ProcessingOutput> junks = JUNKS_CODEC.parse(dynamicOps, input.get("junks")).result()
+                        .orElse(List.of());
 
                     List<Component> RecipeName = new ArrayList<>(sequenceSize);
                     for (int i = 0; i < sequenceSize; i++) {
@@ -134,22 +142,27 @@ public record SequencedAssemblyRecipe(
                         int index = step.getAndIncrement();
                         List<Component> lore = new ArrayList<>(6);
                         lore.add(CommonComponents.EMPTY);
-                        lore.add(Component.translatable("create.recipe.sequenced_assembly").withStyle(ChatFormatting.GRAY)
-                            .withStyle(style -> style.withItalic(false)));
-                        lore.add(Component.translatable("create.recipe.assembly.progress", index, size).withStyle(ChatFormatting.DARK_GRAY)
-                            .withStyle(style -> style.withItalic(false)));
-                        lore.add(Component.translatable("create.recipe.assembly.next", RecipeName.get(index % sequenceSize))
-                            .withStyle(ChatFormatting.AQUA).withStyle(style -> style.withItalic(false)));
+                        lore.add(Component.translatable("create.recipe.sequenced_assembly")
+                            .withStyle(ChatFormatting.GRAY).withStyle(style -> style.withItalic(false)));
+                        lore.add(Component.translatable("create.recipe.assembly.progress", index, size)
+                            .withStyle(ChatFormatting.DARK_GRAY).withStyle(style -> style.withItalic(false)));
+                        lore.add(Component.translatable(
+                            "create.recipe.assembly.next",
+                            RecipeName.get(index % sequenceSize)
+                        ).withStyle(ChatFormatting.AQUA).withStyle(style -> style.withItalic(false)));
                         for (int i = index + 1, end = Math.min(i + 2, size); i < end; i++) {
-                            lore.add(Component.literal("-> ").append(RecipeName.get(i % sequenceSize)).withStyle(ChatFormatting.DARK_AQUA)
-                                .withStyle(style -> style.withItalic(false)));
+                            lore.add(Component.literal("-> ").append(RecipeName.get(i % sequenceSize))
+                                .withStyle(ChatFormatting.DARK_AQUA).withStyle(style -> style.withItalic(false)));
                         }
                         transitional.set(AllDataComponents.SEQUENCED_ASSEMBLY_PROGRESS, (float) index / size);
                         transitional.set(DataComponents.LORE, new ItemLore(lore, lore));
                         return ItemStack.CODEC.encodeStart(ops, transitional).getOrThrow();
                     };
                     Supplier<JsonElement> transitionalJsonChanceResult = () -> {
-                        transitional.set(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK, new SequencedAssemblyJunk(result.chance(), junks));
+                        transitional.set(
+                            AllDataComponents.SEQUENCED_ASSEMBLY_JUNK,
+                            new SequencedAssemblyJunk(result.chance(), junks)
+                        );
                         JsonElement element = transitionalJsonResult.get();
                         transitional.remove(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
                         return element;
@@ -157,7 +170,8 @@ public record SequencedAssemblyRecipe(
                     JsonElement jsonResult = ItemStack.CODEC.encodeStart(ops, result.create()).getOrThrow();
 
                     Identifier id = Identifier.parse(AllRecipeTypes.SEQUENCED_ASSEMBLY.toString())
-                        .withSuffix("_" + idGenerator.incrementAndGet() + "_" + BuiltInRegistries.ITEM.getKey(result.item().value()).getPath() + "_");
+                        .withSuffix("_" + idGenerator.incrementAndGet() + "_" + BuiltInRegistries.ITEM.getKey(result.item()
+                            .value()).getPath() + "_");
                     List<Recipe<?>> sequence = new ArrayList<>(size);
                     TriConsumer<Integer, JsonElement, JsonElement> recipeAdd = (i, ingredientJson, resultJson) -> {
                         JsonObject object = sequenceJsonFactory.get(i % sequenceSize).apply(ingredientJson, resultJson);
@@ -167,12 +181,20 @@ public record SequencedAssemblyRecipe(
                     };
 
                     JsonElement ingredientJson = (JsonElement) input.get("ingredient");
-                    recipeAdd.accept(0, ingredientJson, size == 2 ? transitionalJsonChanceResult.get() : transitionalJsonResult.get());
+                    recipeAdd.accept(
+                        0,
+                        ingredientJson,
+                        size == 2 ? transitionalJsonChanceResult.get() : transitionalJsonResult.get()
+                    );
                     for (int i = 1, end = size - 2; i < end; i++) {
                         recipeAdd.accept(i, transitionalJsonIngredient.get(), transitionalJsonResult.get());
                     }
                     if (size > 2) {
-                        recipeAdd.accept(size - 2, transitionalJsonIngredient.get(), transitionalJsonChanceResult.get());
+                        recipeAdd.accept(
+                            size - 2,
+                            transitionalJsonIngredient.get(),
+                            transitionalJsonChanceResult.get()
+                        );
                     }
                     recipeAdd.accept(size - 1, transitionalJsonIngredient.get(), jsonResult);
                     return DataResult.success(new SequencedAssemblyRecipe(
@@ -226,7 +248,8 @@ public record SequencedAssemblyRecipe(
             }
 
             private static boolean match(JsonElement target, String id) {
-                return target instanceof JsonPrimitive primitive && primitive.isString() && primitive.getAsString().equals(id);
+                return target instanceof JsonPrimitive primitive && primitive.isString() && primitive.getAsString()
+                    .equals(id);
             }
 
             @Override

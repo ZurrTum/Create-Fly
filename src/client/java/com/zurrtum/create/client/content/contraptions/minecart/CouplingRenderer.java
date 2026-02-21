@@ -39,23 +39,35 @@ public class CouplingRenderer {
         ClientLevel world = mc.level;
         CouplingHandler.forEachLoadedCoupling(
             world, c -> {
-                if (c.getFirst().hasContraptionCoupling(true))
+                if (c.getFirst().hasContraptionCoupling(true)) {
                     return;
+                }
                 CouplingRenderer.renderCoupling(world, ms, buffer, camera, c.map(MinecartController::cart));
             }
         );
     }
 
     public static void tickDebugModeRenders(Minecraft mc) {
-        if (KineticDebugger.isActive())
+        if (KineticDebugger.isActive()) {
             CouplingHandler.forEachLoadedCoupling(mc.level, CouplingRenderer::doDebugRender);
+        }
     }
 
-    public static void renderCoupling(ClientLevel world, PoseStack ms, MultiBufferSource buffer, Vec3 camera, Couple<AbstractMinecart> carts) {
-        if (carts.getFirst() == null || carts.getSecond() == null)
+    public static void renderCoupling(
+        ClientLevel world,
+        PoseStack ms,
+        MultiBufferSource buffer,
+        Vec3 camera,
+        Couple<AbstractMinecart> carts
+    ) {
+        if (carts.getFirst() == null || carts.getSecond() == null) {
             return;
+        }
 
-        Couple<Integer> lightValues = carts.map(c -> LevelRenderer.getLightColor(world, BlockPos.containing(c.getBoundingBox().getCenter())));
+        Couple<Integer> lightValues = carts.map(c -> LevelRenderer.getLightColor(
+            world,
+            BlockPos.containing(c.getBoundingBox().getCenter())
+        ));
 
         Vec3 center = carts.getFirst().position().add(carts.getSecond().position()).scale(.5f);
 
@@ -92,7 +104,8 @@ public class CouplingRenderer {
         int meanSkyLight = (((l1 >> 20) & 0xf) + ((l2 >> 20) & 0xf)) / 2;
 
         ms.pushPose();
-        msr.translate(firstEndpoint.subtract(camera)).rotateYDegrees((float) connectorYaw).rotateZDegrees((float) connectorPitch);
+        msr.translate(firstEndpoint.subtract(camera)).rotateYDegrees((float) connectorYaw)
+            .rotateZDegrees((float) connectorPitch);
         ms.scale((float) endPointDiff.length(), 1, 1);
 
         connector.light(meanSkyLight << 20 | meanBlockLight << 4).renderInto(ms.last(), builder);
@@ -111,8 +124,9 @@ public class CouplingRenderer {
         float roll = cart.getHurtTime() - pt;
 
         float rollAmplifier = cart.getDamage() - pt;
-        if (rollAmplifier < 0.0F)
+        if (rollAmplifier < 0.0F) {
             rollAmplifier = 0.0F;
+        }
         roll = roll > 0 ? Mth.sin(roll) * roll * rollAmplifier / 10.0F * cart.getHurtDir() : 0;
 
         Vec3 frontVec, backVec;
@@ -175,7 +189,17 @@ public class CouplingRenderer {
             backVec = pos.add(VecHelper.rotate(new Vec3(-.5, 0, 0), yaw, Direction.Axis.Y));
         }
         boolean isBackFaceCloser = frontVec.distanceToSqr(centerOfCoupling) > backVec.distanceToSqr(centerOfCoupling);
-        return new CartEndpoint(x, y, z, yaw, -pitch, roll, isBackFaceCloser ? -13 / 16f : 13 / 16f, isBackFaceCloser, old);
+        return new CartEndpoint(
+            x,
+            y,
+            z,
+            yaw,
+            -pitch,
+            roll,
+            isBackFaceCloser ? -13 / 16f : 13 / 16f,
+            isBackFaceCloser,
+            old
+        );
     }
 
     static class CartEndpoint {
@@ -190,7 +214,17 @@ public class CouplingRenderer {
         boolean flip;
         boolean old;
 
-        public CartEndpoint(double x, double y, double z, float yaw, float pitch, float roll, float offset, boolean flip, boolean old) {
+        public CartEndpoint(
+            double x,
+            double y,
+            double z,
+            float yaw,
+            float pitch,
+            float roll,
+            float offset,
+            boolean flip,
+            boolean old
+        ) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -241,13 +275,19 @@ public class CouplingRenderer {
         int color = Color.mixColors(
             0xabf0e9,
             0xee8572,
-            (float) Mth.clamp(Math.abs(first.getCouplingLength(true) - connectedCenter.distanceTo(mainCenter)) * 8, 0, 1)
+            (float) Mth.clamp(
+                Math.abs(first.getCouplingLength(true) - connectedCenter.distanceTo(mainCenter)) * 8,
+                0,
+                1
+            )
         );
 
-        Outliner.getInstance().showLine(mainCart.getId() + "", mainCenter, connectedCenter).colored(color).lineWidth(1 / 8f);
+        Outliner.getInstance().showLine(mainCart.getId() + "", mainCenter, connectedCenter).colored(color)
+            .lineWidth(1 / 8f);
 
         Vec3 point = mainCart.position().add(0, yOffset, 0);
-        Outliner.getInstance().showLine(mainCart.getId() + "_dot", point, point.add(0, 1 / 128f, 0)).colored(0xffffff).lineWidth(1 / 4f);
+        Outliner.getInstance().showLine(mainCart.getId() + "_dot", point, point.add(0, 1 / 128f, 0)).colored(0xffffff)
+            .lineWidth(1 / 4f);
     }
 
 }

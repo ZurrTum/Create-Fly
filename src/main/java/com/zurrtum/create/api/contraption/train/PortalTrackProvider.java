@@ -63,7 +63,13 @@ public interface PortalTrackProvider {
      * @param portal          The portal
      * @return A found exit, or null if one wasn't found
      */
-    static Exit fromPortal(ServerLevel level, BlockFace face, ResourceKey<Level> firstDimension, ResourceKey<Level> secondDimension, Portal portal) {
+    static Exit fromPortal(
+        ServerLevel level,
+        BlockFace face,
+        ResourceKey<Level> firstDimension,
+        ResourceKey<Level> secondDimension,
+        Portal portal
+    ) {
         return AllPortalTracks.fromPortal(level, face, firstDimension, secondDimension, portal);
     }
 

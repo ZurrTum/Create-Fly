@@ -10,7 +10,10 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record HighlightPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, HighlightPacket> CODEC = BlockPos.STREAM_CODEC.map(HighlightPacket::new, HighlightPacket::pos);
+    public static final StreamCodec<ByteBuf, HighlightPacket> CODEC = BlockPos.STREAM_CODEC.map(
+        HighlightPacket::new,
+        HighlightPacket::pos
+    );
 
     @Override
     public void handle(ClientGamePacketListener listener) {

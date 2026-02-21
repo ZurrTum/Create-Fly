@@ -3,6 +3,7 @@ package com.zurrtum.create.content.kinetics.fan;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessing;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -49,12 +49,14 @@ public class AirCurrent {
     }
 
     public void tick() {
-        if (direction == null)
+        if (direction == null) {
             rebuild();
+        }
         Level world = source.getAirCurrentWorld();
         if (world != null && world.isClientSide()) {
             float offset = pushing ? 0.5f : maxDistance + .5f;
-            Vec3 pos = VecHelper.getCenterOf(source.getAirCurrentPos()).add(Vec3.atLowerCornerOf(direction.getUnitVec3i()).scale(offset));
+            Vec3 pos = VecHelper.getCenterOf(source.getAirCurrentPos())
+                .add(Vec3.atLowerCornerOf(direction.getUnitVec3i()).scale(offset));
             AllClientHandle.INSTANCE.addAirFlowParticle(world, source.getAirCurrentPos(), pos.x, pos.y, pos.z);
         }
 
@@ -73,7 +75,11 @@ public class AirCurrent {
             Vec3i flow = (pushing ? direction : direction.getOpposite()).getUnitVec3i();
             float speed = Math.abs(source.getSpeed());
             float sneakModifier = entity.isShiftKeyDown() ? 4096f : 512f;
-            double entityDistance = VecHelper.alignedDistanceToFace(entity.position(), source.getAirCurrentPos(), direction);
+            double entityDistance = VecHelper.alignedDistanceToFace(
+                entity.position(),
+                source.getAirCurrentPos(),
+                direction
+            );
             // entityDistanceOld should be removed eventually. Remember that entityDistanceOld cannot be 0 while entityDistance can,
             // so division by 0 must be avoided.
             double entityDistanceOld = entity.position().distanceTo(VecHelper.getCenterOf(source.getAirCurrentPos()));
@@ -91,27 +97,35 @@ public class AirCurrent {
                 AllClientHandle.INSTANCE.enableClientPlayerSound(entity, Mth.clamp(speed / 128f * .4f, 0.01f, .4f));
             }
 
-            if (entity instanceof ServerPlayer serverPlayer)
+            if (entity instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.aboveGroundTickCount = 0;
+            }
 
             FanProcessingType processingType = getTypeAt((float) entityDistance);
 
-            if (processingType == null)
+            if (processingType == null) {
                 continue;
+            }
 
             if (entity instanceof ItemEntity itemEntity) {
                 if (world != null && world.isClientSide()) {
                     processingType.spawnProcessingParticles(world, entity.position());
                     continue;
                 }
-                if (FanProcessing.canProcess(itemEntity, processingType))
-                    if (FanProcessing.applyProcessing(itemEntity, processingType) && source instanceof EncasedFanBlockEntity fan)
+                if (FanProcessing.canProcess(itemEntity, processingType)) {
+                    if (FanProcessing.applyProcessing(
+                        itemEntity,
+                        processingType
+                    ) && source instanceof EncasedFanBlockEntity fan) {
                         fan.award(AllAdvancements.FAN_PROCESSING);
+                    }
+                }
                 continue;
             }
 
-            if (world != null)
+            if (world != null) {
                 processingType.affectEntity(entity, world);
+            }
         }
     }
 
@@ -127,8 +141,9 @@ public class AirCurrent {
             TransportedItemStackHandlerBehaviour handler = pair.getKey();
             Level world = handler.getLevel();
             FanProcessingType processingType = pair.getRight();
-            if (processingType == null)
+            if (processingType == null) {
                 continue;
+            }
 
             handler.handleProcessingOnAllItems(transported -> {
                 if (world.isClientSide()) {
@@ -136,8 +151,9 @@ public class AirCurrent {
                     return TransportedResult.doNothing();
                 }
                 TransportedResult applyProcessing = FanProcessing.applyProcessing(transported, world, processingType);
-                if (!applyProcessing.doesNothing() && source instanceof EncasedFanBlockEntity fan)
+                if (!applyProcessing.doesNothing() && source instanceof EncasedFanBlockEntity fan) {
                     fan.award(AllAdvancements.FAN_PROCESSING);
+                }
                 return applyProcessing;
             });
         }
@@ -197,14 +213,14 @@ public class AirCurrent {
         }
 
         // Build Bounding Box
-        if (maxDistance < 0.25f)
+        if (maxDistance < 0.25f) {
             bounds = new AABB(0, 0, 0, 0, 0, 0);
-        else {
+        } else {
             float factor = maxDistance - 1;
             Vec3 scale = directionVec.scale(factor);
-            if (factor > 0)
+            if (factor > 0) {
                 bounds = new AABB(start.relative(direction)).expandTowards(scale);
-            else {
+            } else {
                 bounds = new AABB(start.relative(direction)).contract(scale.x, scale.y, scale.z).move(scale);
             }
         }
@@ -242,7 +258,9 @@ public class AirCurrent {
         return max;
     }
 
-    private static final double[][] DEPTH_TEST_COORDINATES = {{0.25, 0.25}, {0.25, 0.75}, {0.5, 0.5}, {0.75, 0.25}, {0.75, 0.75}};
+    private static final double[][] DEPTH_TEST_COORDINATES = {
+        {0.25, 0.25}, {0.25, 0.75}, {0.5, 0.5}, {0.75, 0.25}, {0.75, 0.75}
+    };
 
     // Finds the maximum depth of the shape when traveling in the given direction.
     // The result is always positive.
@@ -297,15 +315,21 @@ public class AirCurrent {
             FanProcessingType segmentType = getTypeAt(i - 1);
             for (int offset : Iterate.zeroAndOne) {
                 BlockPos pos = start.relative(direction, i).below(offset);
-                TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(world, pos, TransportedItemStackHandlerBehaviour.TYPE);
+                TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(
+                    world,
+                    pos,
+                    TransportedItemStackHandlerBehaviour.TYPE
+                );
                 if (behaviour != null) {
                     FanProcessingType type = FanProcessingType.getAt(world, pos);
-                    if (type == null)
+                    if (type == null) {
                         type = segmentType;
+                    }
                     affectedItemHandlers.add(Pair.of(behaviour, type));
                 }
-                if (direction.getAxis().isVertical())
+                if (direction.getAxis().isVertical()) {
                     break;
+                }
             }
         }
     }

@@ -35,15 +35,21 @@ public class CuckooClockBlock extends HorizontalKineticBlock implements IBE<Cuck
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState p_220053_1_,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return AllShapes.CUCKOO_CLOCK;
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredHorizontalFacing(context);
-        if (preferred != null)
+        if (preferred != null) {
             return defaultBlockState().setValue(HORIZONTAL_FACING, preferred.getOpposite());
+        }
         return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 

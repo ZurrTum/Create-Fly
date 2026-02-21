@@ -20,8 +20,16 @@ public class ControlledContraptionEntityRenderer extends ContraptionEntityRender
     }
 
     @Override
-    public void extractRenderState(ControlledContraptionEntity entity, ControlledContraptionState state, float tickProgress) {
-        state.angle = Mth.DEG_TO_RAD * (tickProgress == 1.0F ? entity.angle : AngleHelper.angleLerp(tickProgress, entity.prevAngle, entity.angle));
+    public void extractRenderState(
+        ControlledContraptionEntity entity,
+        ControlledContraptionState state,
+        float tickProgress
+    ) {
+        state.angle = Mth.DEG_TO_RAD * (tickProgress == 1.0F ? entity.angle : AngleHelper.angleLerp(
+            tickProgress,
+            entity.prevAngle,
+            entity.angle
+        ));
         state.axis = entity.getRotationAxis();
         state.seed = entity.getId();
         super.extractRenderState(entity, state, tickProgress);

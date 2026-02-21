@@ -40,7 +40,11 @@ import java.util.Objects;
 
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeModeInventoryScreenMixin extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu> implements FabricCreativeInventoryScreen {
-    public CreativeModeInventoryScreenMixin(CreativeModeInventoryScreen.ItemPickerMenu screenHandler, Inventory playerInventory, Component text) {
+    public CreativeModeInventoryScreenMixin(
+        CreativeModeInventoryScreen.ItemPickerMenu screenHandler,
+        Inventory playerInventory,
+        Component text
+    ) {
         super(screenHandler, playerInventory, text);
     }
 
@@ -61,8 +65,18 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
         int xpos = leftPos + 171;
         int ypos = topPos + 4;
 
-        addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos + 10, ypos, FabricCreativeGuiComponents.Type.NEXT, this));
-        addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos, ypos, FabricCreativeGuiComponents.Type.PREVIOUS, this));
+        addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(
+            xpos + 10,
+            ypos,
+            FabricCreativeGuiComponents.Type.NEXT,
+            this
+        ));
+        addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(
+            xpos,
+            ypos,
+            FabricCreativeGuiComponents.Type.PREVIOUS,
+            this
+        ));
     }
 
     @Inject(method = "selectTab", at = @At("HEAD"), cancellable = true)
@@ -73,7 +87,13 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
     }
 
     @Inject(method = "checkTabHovering", at = @At("HEAD"), cancellable = true)
-    private void renderTabTooltipIfHovered(GuiGraphics drawContext, CreativeModeTab itemGroup, int mx, int my, CallbackInfoReturnable<Boolean> info) {
+    private void renderTabTooltipIfHovered(
+        GuiGraphics drawContext,
+        CreativeModeTab itemGroup,
+        int mx,
+        int my,
+        CallbackInfoReturnable<Boolean> info
+    ) {
         if (!isGroupVisible(itemGroup)) {
             info.setReturnValue(false);
         }
@@ -87,7 +107,13 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
     }
 
     @Inject(method = "renderTabButton", at = @At("HEAD"), cancellable = true)
-    private void renderTabIcon(GuiGraphics graphics, int mouseX, int mouseY, CreativeModeTab itemGroup, CallbackInfo info) {
+    private void renderTabIcon(
+        GuiGraphics graphics,
+        int mouseX,
+        int mouseY,
+        CreativeModeTab itemGroup,
+        CallbackInfo info
+    ) {
         if (!isGroupVisible(itemGroup)) {
             info.cancel();
         }
@@ -139,7 +165,8 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
 
     @Override
     public boolean fabric_hasAdditionalPages() {
-        return CreativeModeTabs.tabs().size() > (Objects.requireNonNull(CreativeModeTabs.CACHED_PARAMETERS).hasPermissions() ? 14 : 13);
+        return CreativeModeTabs.tabs().size() > (Objects.requireNonNull(CreativeModeTabs.CACHED_PARAMETERS)
+            .hasPermissions() ? 14 : 13);
     }
 
     @Override
@@ -155,8 +182,8 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
     @Unique
     private void updateSelection() {
         if (!isGroupVisible(selectedTab)) {
-            CreativeModeTabs.allTabs().stream().filter(this::isGroupVisible).min((a, b) -> Boolean.compare(a.isAlignedRight(), b.isAlignedRight()))
-                .ifPresent(this::selectTab);
+            CreativeModeTabs.allTabs().stream().filter(this::isGroupVisible)
+                .min((a, b) -> Boolean.compare(a.isAlignedRight(), b.isAlignedRight())).ifPresent(this::selectTab);
         }
     }
 

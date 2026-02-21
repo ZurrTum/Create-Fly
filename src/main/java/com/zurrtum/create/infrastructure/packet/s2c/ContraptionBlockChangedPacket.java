@@ -12,7 +12,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.level.block.state.BlockState;
 
-public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos, BlockState newState) implements Packet<ClientGamePacketListener> {
+public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos,
+                                            BlockState newState) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, ContraptionBlockChangedPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         ContraptionBlockChangedPacket::entityId,

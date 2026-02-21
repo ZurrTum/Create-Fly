@@ -17,21 +17,28 @@ public class MechanicalBearingTooltipBehaviour extends GeneratingKineticTooltipB
 
     @Override
     public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if (super.addToTooltip(tooltip, isPlayerSneaking))
+        if (super.addToTooltip(tooltip, isPlayerSneaking)) {
             return true;
-        if (isPlayerSneaking)
+        }
+        if (isPlayerSneaking) {
             return false;
-        if (!blockEntity.isWindmill() && blockEntity.getSpeed() == 0)
+        }
+        if (!blockEntity.isWindmill() && blockEntity.getSpeed() == 0) {
             return false;
-        if (blockEntity.isRunning())
+        }
+        if (blockEntity.isRunning()) {
             return false;
+        }
         BlockState state = blockEntity.getBlockState();
-        if (!(state.getBlock() instanceof BearingBlock))
+        if (!(state.getBlock() instanceof BearingBlock)) {
             return false;
+        }
 
-        BlockState attachedState = blockEntity.getLevel().getBlockState(blockEntity.getBlockPos().relative(state.getValue(BearingBlock.FACING)));
-        if (attachedState.canBeReplaced())
+        BlockState attachedState = blockEntity.getLevel()
+            .getBlockState(blockEntity.getBlockPos().relative(state.getValue(BearingBlock.FACING)));
+        if (attachedState.canBeReplaced()) {
             return false;
+        }
         TooltipHelper.addHint(tooltip, "hint.empty_bearing");
         return true;
     }

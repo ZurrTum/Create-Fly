@@ -71,7 +71,12 @@ public abstract class EntityMixin {
     }
 
     @Inject(method = "updateFluidHeightAndDoFluidPushing(Lnet/minecraft/tags/TagKey;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;getHeight(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F"))
-    private void checkFluid(TagKey<Fluid> tag, double speed, CallbackInfoReturnable<Boolean> cir, @Local FluidState state) {
+    private void checkFluid(
+        TagKey<Fluid> tag,
+        double speed,
+        CallbackInfoReturnable<Boolean> cir,
+        @Local FluidState state
+    ) {
         if (!inModFluid) {
             inModFluid = state.getType() instanceof FlowableFluid;
         }
@@ -86,15 +91,19 @@ public abstract class EntityMixin {
 
     @Unique
     private Stream<AbstractContraptionEntity> create$getIntersectionContraptionsStream() {
-        return (level.isClientSide() ? ContraptionHandlerClient.loadedContraptions : ContraptionHandler.loadedContraptions).get(level).values()
-            .stream().map(Reference::get).filter(cEntity -> cEntity != null && cEntity.collidingEntities.containsKey((Entity) (Object) this));
+        return (level.isClientSide() ? ContraptionHandlerClient.loadedContraptions : ContraptionHandler.loadedContraptions).get(
+                level).values().stream().map(Reference::get)
+            .filter(cEntity -> cEntity != null && cEntity.collidingEntities.containsKey((Entity) (Object) this));
     }
 
     @Unique
     private Set<AbstractContraptionEntity> create$getIntersectingContraptions() {
         Set<AbstractContraptionEntity> contraptions = create$getIntersectionContraptionsStream().collect(Collectors.toSet());
 
-        contraptions.addAll(level.getEntitiesOfClass(AbstractContraptionEntity.class, ((Entity) (Object) this).getBoundingBox().inflate(1f)));
+        contraptions.addAll(level.getEntitiesOfClass(
+            AbstractContraptionEntity.class,
+            ((Entity) (Object) this).getBoundingBox().inflate(1f)
+        ));
         return contraptions;
     }
 
@@ -135,20 +144,24 @@ public abstract class EntityMixin {
             }
         );
 
-        if (stepped.booleanValue())
+        if (stepped.booleanValue()) {
             nextStep = nextStep();
+        }
     }
 
     // involves client-side view bobbing animation on contraptions
     @Inject(method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", at = @At(value = "TAIL"))
     private void create$onMove(MoverType type, Vec3 movement, CallbackInfo ci) {
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
         Entity self = (Entity) (Object) this;
-        if (self.onGround())
+        if (self.onGround()) {
             return;
-        if (self.isPassenger())
+        }
+        if (self.isPassenger()) {
             return;
+        }
 
         Vec3 worldPos = position.add(0, -0.2, 0);
         boolean onAtLeastOneContraption = create$getIntersectionContraptionsStream().anyMatch(cEntity -> {
@@ -158,15 +171,17 @@ public abstract class EntityMixin {
             Contraption contraption = cEntity.getContraption();
             StructureTemplate.StructureBlockInfo info = contraption.getBlocks().get(blockPos);
 
-            if (info == null)
+            if (info == null) {
                 return false;
+            }
 
             cEntity.registerColliding(self);
             return true;
         });
 
-        if (!onAtLeastOneContraption)
+        if (!onAtLeastOneContraption) {
             return;
+        }
 
         self.setOnGround(true);
         AllSynchedDatas.CONTRAPTION_GROUNDED.set(self, true);
@@ -204,7 +219,12 @@ public abstract class EntityMixin {
     }
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z"))
-    private void onMount(Entity entity, boolean force, boolean sendEventAndTriggers, CallbackInfoReturnable<Boolean> cir) {
+    private void onMount(
+        Entity entity,
+        boolean force,
+        boolean sendEventAndTriggers,
+        CallbackInfoReturnable<Boolean> cir
+    ) {
         CameraDistanceModifier.onMount((Entity) (Object) this, entity, true);
     }
 

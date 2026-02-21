@@ -6,9 +6,8 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record BasinBlazeBurnerRenderState(
-    Matrix3x2f pose, int x0, int y0, ScreenRectangle bounds, HeatLevel heat
-) implements PictureInPictureRenderState {
+public record BasinBlazeBurnerRenderState(Matrix3x2f pose, int x0, int y0, ScreenRectangle bounds,
+                                          HeatLevel heat) implements PictureInPictureRenderState {
     public BasinBlazeBurnerRenderState(Matrix3x2f pose, int x, int y, HeatLevel heat) {
         this(pose, x, y, new ScreenRectangle(x, y, 30, 30).transformMaxBounds(pose), heat);
     }

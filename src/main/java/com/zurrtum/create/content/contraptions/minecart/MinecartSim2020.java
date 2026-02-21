@@ -19,8 +19,9 @@ public class MinecartSim2020 {
     }
 
     public static boolean canAddMotion(AbstractMinecart c) {
-        if (c instanceof MinecartFurnace furnace)
+        if (c instanceof MinecartFurnace furnace) {
             return Mth.equal(furnace.push.x, 0) && Mth.equal(furnace.push.z, 0);
+        }
 
         return AllSynchedDatas.MINECART_CONTROLLER.get(c).map(controller -> !controller.isStalled()).orElse(true);
     }

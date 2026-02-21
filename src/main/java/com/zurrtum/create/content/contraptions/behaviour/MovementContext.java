@@ -68,12 +68,15 @@ public class MovementContext {
     public float getAnimationSpeed() {
         int modifier = 1000;
         double length = -motion.length();
-        if (disabled)
+        if (disabled) {
             return 0;
-        if (world.isClientSide() && contraption.stalled)
+        }
+        if (world.isClientSide() && contraption.stalled) {
             return 700;
-        if (Math.abs(length) < 1 / 512f)
+        }
+        if (Math.abs(length) < 1 / 512f) {
             return 0;
+        }
         return (((int) (length * modifier + 100 * Math.signum(length))) / 100) * 100;
     }
 
@@ -91,16 +94,18 @@ public class MovementContext {
     public void write(ValueOutput view) {
         view.store("Motion", Vec3.CODEC, motion);
         view.store("RelativeMotion", Vec3.CODEC, relativeMotion);
-        if (position != null)
+        if (position != null) {
             view.store("Position", Vec3.CODEC, position);
+        }
         view.putBoolean("Stall", stall);
         view.putBoolean("FirstMovement", firstMovement);
         view.store("Data", CompoundTag.CODEC, data);
     }
 
     public FilterItemStack getFilterFromBE() {
-        if (filter != null)
+        if (filter != null) {
             return filter;
+        }
         RegistryOps<Tag> ops = world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         return filter = blockEntityData.read("Filter", FilterItemStack.CODEC, ops).orElseGet(FilterItemStack::empty);
     }

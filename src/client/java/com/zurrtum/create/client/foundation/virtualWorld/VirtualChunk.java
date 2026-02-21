@@ -175,7 +175,10 @@ public class VirtualChunk extends LevelChunk {
     }
 
     @Override
-    public void findBlocks(@NotNull Predicate<BlockState> roughFilter, @NotNull BiConsumer<BlockPos, BlockState> output) {
+    public void findBlocks(
+        @NotNull Predicate<BlockState> roughFilter,
+        @NotNull BiConsumer<BlockPos, BlockState> output
+    ) {
         world.blockStates.forEach((blockPos, state) -> {
             if (SectionPos.blockToSectionCoord(blockPos.getX()) == chunkPos.x && SectionPos.blockToSectionCoord(blockPos.getZ()) == chunkPos.z) {
                 if (roughFilter.test(state)) {

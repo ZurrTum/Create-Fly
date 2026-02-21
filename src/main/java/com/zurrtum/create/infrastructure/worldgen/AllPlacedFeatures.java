@@ -1,20 +1,20 @@
 package com.zurrtum.create.infrastructure.worldgen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -37,9 +37,14 @@ public class AllPlacedFeatures {
         addFeature(registryManager, LevelStem.NETHER, index, List.of(striatedNether));
     }
 
-    private static void addFeature(RegistryAccess registryManager, ResourceKey<LevelStem> options, int index, List<Holder<PlacedFeature>> entries) {
-        registryManager.lookupOrThrow(Registries.LEVEL_STEM).getValue(options).generator().getBiomeSource().possibleBiomes().stream()
-            .map(Holder::value).map(Biome::getGenerationSettings).forEach(settings -> {
+    private static void addFeature(
+        RegistryAccess registryManager,
+        ResourceKey<LevelStem> options,
+        int index,
+        List<Holder<PlacedFeature>> entries
+    ) {
+        registryManager.lookupOrThrow(Registries.LEVEL_STEM).getValue(options).generator().getBiomeSource()
+            .possibleBiomes().stream().map(Holder::value).map(Biome::getGenerationSettings).forEach(settings -> {
                 if (!(settings.features instanceof ArrayList<HolderSet<PlacedFeature>>)) {
                     settings.features = new ArrayList<>(settings.features);
                 }

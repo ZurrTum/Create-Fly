@@ -4,11 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.transform.Transform;
+import net.minecraft.util.Mth;
 import org.joml.*;
 
 import java.lang.Math;
-
-import net.minecraft.util.Mth;
 
 public class PosedInstance extends ColoredLitOverlayInstance implements Transform<PosedInstance> {
     public final Matrix4f pose = new Matrix4f();

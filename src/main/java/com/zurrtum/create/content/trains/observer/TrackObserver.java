@@ -5,6 +5,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.logistics.filter.FilterItemStack;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.graph.DimensionPalette;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.signal.SignalPropagator;
 import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
@@ -39,18 +39,24 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
     @Override
     public void blockEntityAdded(BlockEntity blockEntity, boolean front) {
         super.blockEntityAdded(blockEntity, front);
-        ServerFilteringBehaviour filteringBehaviour = BlockEntityBehaviour.get(blockEntity, ServerFilteringBehaviour.TYPE);
-        if (filteringBehaviour != null)
+        ServerFilteringBehaviour filteringBehaviour = BlockEntityBehaviour.get(
+            blockEntity,
+            ServerFilteringBehaviour.TYPE
+        );
+        if (filteringBehaviour != null) {
             setFilterAndNotify(blockEntity.getLevel(), filteringBehaviour.getFilter());
+        }
     }
 
     @Override
     public void tick(MinecraftServer server, TrackGraph graph, boolean preTrains) {
         super.tick(server, graph, preTrains);
-        if (isActivated())
+        if (isActivated()) {
             activated--;
-        if (!isActivated())
+        }
+        if (!isActivated()) {
             currentTrain = null;
+        }
     }
 
     public void setFilterAndNotify(Level level, ItemStack filter) {
@@ -60,11 +66,13 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
 
     private void notifyTrains(Level level) {
         TrackGraph graph = Create.RAILWAYS.sided(level).getGraph(edgeLocation.getFirst());
-        if (graph == null)
+        if (graph == null) {
             return;
+        }
         TrackEdge edge = graph.getConnection(edgeLocation.map(graph::locateNode));
-        if (edge == null)
+        if (edge == null) {
             return;
+        }
         SignalPropagator.notifyTrains(graph, edge);
     }
 
@@ -107,8 +115,9 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
         super.write(view, dimensions);
         view.putInt("Activated", activated);
         view.store("Filter", FilterItemStack.CODEC, filter);
-        if (currentTrain != null)
+        if (currentTrain != null) {
             view.store("TrainId", UUIDUtil.CODEC, currentTrain);
+        }
     }
 
     @Override
@@ -117,8 +126,9 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
         RecordBuilder<T> map = ops.mapBuilder();
         map.add("Activated", ops.createInt(activated));
         map.add("Filter", filter, FilterItemStack.CODEC);
-        if (currentTrain != null)
+        if (currentTrain != null) {
             map.add("TrainId", currentTrain, UUIDUtil.CODEC);
+        }
         return map.build(prefix);
     }
 }

@@ -26,8 +26,10 @@ import java.util.function.Supplier;
 
 public class TextWindowElement extends AnimatedOverlayElementBase {
 
-    public static final Couple<Color> COLOR_WINDOW_BORDER = Couple.create(new Color(0x607a6000, true), new Color(0x207a6000, true))
-        .map(Color::setImmutable);
+    public static final Couple<Color> COLOR_WINDOW_BORDER = Couple.create(
+        new Color(0x607a6000, true),
+        new Color(0x207a6000, true)
+    ).map(Color::setImmutable);
 
     Supplier<String> textGetter = () -> "(?) No text was provided";
     @Nullable String bakedText;
@@ -119,11 +121,13 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
 
     @Override
     public void render(PonderScene scene, PonderUI screen, GuiGraphics graphics, float partialTicks, float fade) {
-        if (bakedText == null)
+        if (bakedText == null) {
             bakedText = textGetter.get();
+        }
 
-        if (fade < 1 / 16f)
+        if (fade < 1 / 16f) {
             return;
+        }
         SceneTransform transform = scene.getTransform();
         Vec2 sceneToScreen = vec != null ? transform.sceneToScreen(vec, partialTicks) : new Vec2(
             screen.width / 2f,
@@ -136,11 +140,13 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         float yDiff = (screen.height / 2f - sceneToScreen.y - 10) / 100f;
         float targetX = (screen.width * Mth.lerp(yDiff * yDiff, 6f / 8, 5f / 8));
 
-        if (nearScene)
+        if (nearScene) {
             targetX = Math.min(targetX, sceneToScreen.x + 50);
+        }
 
-        if (settled)
+        if (settled) {
             targetX = (int) targetX;
+        }
 
         int textWidth = (int) Math.min(screen.width - targetX, 180);
 
@@ -148,8 +154,9 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         List<FormattedText> lines = fontRenderer.getSplitter().splitLines(bakedText, textWidth, Style.EMPTY);
 
         int boxWidth = 0;
-        for (FormattedText line : lines)
+        for (FormattedText line : lines) {
             boxWidth = Math.max(boxWidth, fontRenderer.width(line));
+        }
 
         int boxHeight = fontRenderer.wordWrapHeight(Component.literal(bakedText), boxWidth);
 
@@ -157,8 +164,8 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         poseStack.pushMatrix();
         poseStack.translate(0, pY);
 
-        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(COLOR_WINDOW_BORDER).at(targetX - 10, 3, -101)
-            .withBounds(boxWidth, boxHeight - 1).render(graphics);
+        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(COLOR_WINDOW_BORDER)
+            .at(targetX - 10, 3, -101).withBounds(boxWidth, boxHeight - 1).render(graphics);
 
         Color brighter = palette.getColorObject().mixWith(new Color(0xff_ffffdd), 0.5f).setImmutable();
         Color c1 = new Color(0xff_494949);

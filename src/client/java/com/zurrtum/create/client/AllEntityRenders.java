@@ -33,9 +33,21 @@ public class AllEntityRenders {
 
     public static void register() {
         render(AllEntityTypes.EJECTOR_ITEM, EjectorItemEntityRenderer::new);
-        visual(AllEntityTypes.ORIENTED_CONTRAPTION, OrientedContraptionEntityRenderer::new, OrientedContraptionVisual::new);
-        visual(AllEntityTypes.CONTROLLED_CONTRAPTION, ControlledContraptionEntityRenderer::new, ControlledContraptionVisual::new);
-        visual(AllEntityTypes.CARRIAGE_CONTRAPTION, CarriageContraptionEntityRenderer::new, CarriageContraptionVisual::new);
+        visual(
+            AllEntityTypes.ORIENTED_CONTRAPTION,
+            OrientedContraptionEntityRenderer::new,
+            OrientedContraptionVisual::new
+        );
+        visual(
+            AllEntityTypes.CONTROLLED_CONTRAPTION,
+            ControlledContraptionEntityRenderer::new,
+            ControlledContraptionVisual::new
+        );
+        visual(
+            AllEntityTypes.CARRIAGE_CONTRAPTION,
+            CarriageContraptionEntityRenderer::new,
+            CarriageContraptionVisual::new
+        );
         render(AllEntityTypes.SUPER_GLUE, SuperGlueRenderer::new);
         visual(AllEntityTypes.GANTRY_CONTRAPTION, ContraptionEntityRenderer::new, ContraptionVisual::new);
         render(AllEntityTypes.SEAT, SeatRenderer::new);

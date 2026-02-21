@@ -1,10 +1,9 @@
 package com.zurrtum.create.client.catnip.render;
 
 import com.mojang.blaze3d.vertex.MeshData;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 
 import java.nio.ByteBuffer;
-
-import net.minecraft.client.renderer.texture.OverlayTexture;
 
 public class MutableTemplateMesh extends TemplateMesh {
     public MutableTemplateMesh() {

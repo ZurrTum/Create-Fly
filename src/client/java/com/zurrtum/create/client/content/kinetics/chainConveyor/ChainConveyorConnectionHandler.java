@@ -42,32 +42,44 @@ public class ChainConveyorConnectionHandler {
     private static ResourceKey<Level> firstDim;
 
     public static boolean onRightClick(Minecraft mc) {
-        if (!isChain(mc.player.getMainHandItem()))
+        if (!isChain(mc.player.getMainHandItem())) {
             return false;
-        if (firstPos == null)
+        }
+        if (firstPos == null) {
             return false;
+        }
         boolean missed = false;
-        if (mc.hitResult instanceof BlockHitResult bhr && bhr.getType() != Type.MISS)
-            if (!(mc.level.getBlockEntity(bhr.getBlockPos()) instanceof ChainConveyorBlockEntity))
+        if (mc.hitResult instanceof BlockHitResult bhr && bhr.getType() != Type.MISS) {
+            if (!(mc.level.getBlockEntity(bhr.getBlockPos()) instanceof ChainConveyorBlockEntity)) {
                 missed = true;
-        if (!mc.player.isShiftKeyDown() && !missed)
+            }
+        }
+        if (!mc.player.isShiftKeyDown() && !missed) {
             return false;
+        }
         firstPos = null;
         CreateLang.translate("chain_conveyor.selection_cleared").sendStatus(mc.player);
         return true;
     }
 
-    public static InteractionResult onItemUsedOnBlock(Level level, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
+    public static InteractionResult onItemUsedOnBlock(
+        Level level,
+        LocalPlayer player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
         ItemStack itemStack = player.getItemInHand(hand);
         BlockPos pos = ray.getBlockPos();
         BlockState blockState = level.getBlockState(pos);
 
-        if (!blockState.is(AllBlocks.CHAIN_CONVEYOR) || !isChain(itemStack) || !player.mayBuild() || FakePlayerHandler.has(player)) {
+        if (!blockState.is(AllBlocks.CHAIN_CONVEYOR) || !isChain(itemStack) || !player.mayBuild() || FakePlayerHandler.has(
+            player)) {
             return null;
         }
 
         if (level.getBlockEntity(pos) instanceof ChainConveyorBlockEntity ccbe && ccbe.connections.size() >= AllConfigs.server().kinetics.maxChainConveyorConnections.get()) {
-            CreateLang.translate("chain_conveyor.cannot_add_more_connections").style(ChatFormatting.RED).sendStatus(player);
+            CreateLang.translate("chain_conveyor.cannot_add_more_connections").style(ChatFormatting.RED)
+                .sendStatus(player);
             return InteractionResult.CONSUME;
         }
 
@@ -87,7 +99,7 @@ public class ChainConveyorConnectionHandler {
         }
 
         SoundType soundtype = Blocks.IRON_CHAIN.defaultBlockState().getSoundType();
-        if (soundtype != null)
+        if (soundtype != null) {
             level.playSound(
                 player,
                 pos,
@@ -96,6 +108,7 @@ public class ChainConveyorConnectionHandler {
                 (soundtype.getVolume() + 1.0F) / 2.0F,
                 soundtype.getPitch() * 0.8F
             );
+        }
         return InteractionResult.CONSUME;
     }
 
@@ -104,8 +117,9 @@ public class ChainConveyorConnectionHandler {
     }
 
     public static void clientTick(Minecraft mc) {
-        if (firstPos == null)
+        if (firstPos == null) {
             return;
+        }
 
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
@@ -122,8 +136,9 @@ public class ChainConveyorConnectionHandler {
 
         if (!isChain(stack)) {
             stack = player.getOffhandItem();
-            if (!isChain(stack))
+            if (!isChain(stack)) {
                 return;
+            }
         }
 
         if (hitResult == null || hitResult.getType() != Type.BLOCK) {
@@ -148,8 +163,9 @@ public class ChainConveyorConnectionHandler {
 
         boolean success = validateAndConnect(level, pos, player, stack, true);
 
-        if (success)
+        if (success) {
             CreateLang.translate("chain_conveyor.valid_connection").style(ChatFormatting.GREEN).sendStatus(player);
+        }
 
         int color = success ? 0x95CD41 : 0xEA5C2B;
 
@@ -160,73 +176,95 @@ public class ChainConveyorConnectionHandler {
         Vec3 to = Vec3.atCenterOf(firstPos);
         Vec3 diff = from.subtract(to);
 
-        if (diff.length() < 1)
+        if (diff.length() < 1) {
             return;
+        }
 
         from = from.subtract(diff.normalize().scale(.5));
         to = to.add(diff.normalize().scale(.5));
 
         Vec3 normal = diff.cross(new Vec3(0, 1, 0)).normalize().scale(.875);
 
-        Outliner.getInstance().showLine("chain_connect_line", from.add(normal), to.add(normal)).lineWidth(1 / 16f).colored(color);
-        Outliner.getInstance().showLine("chain_connect_line_1", from.subtract(normal), to.subtract(normal)).lineWidth(1 / 16f).colored(color);
+        Outliner.getInstance().showLine("chain_connect_line", from.add(normal), to.add(normal)).lineWidth(1 / 16f)
+            .colored(color);
+        Outliner.getInstance().showLine("chain_connect_line_1", from.subtract(normal), to.subtract(normal))
+            .lineWidth(1 / 16f).colored(color);
 
     }
 
     private static void highlightConveyor(BlockPos pos, int color, String key) {
         for (int y : Iterate.zeroAndOne) {
-            Vec3 prevV = VecHelper.rotate(new Vec3(0, .125 + y * .75, 1.25), -22.5, Axis.Y).add(Vec3.atBottomCenterOf(pos));
+            Vec3 prevV = VecHelper.rotate(new Vec3(0, .125 + y * .75, 1.25), -22.5, Axis.Y)
+                .add(Vec3.atBottomCenterOf(pos));
             for (int i = 0; i < 8; i++) {
-                Vec3 v = VecHelper.rotate(new Vec3(0, .125 + y * .75, 1.25), 22.5 + i * 45, Axis.Y).add(Vec3.atBottomCenterOf(pos));
+                Vec3 v = VecHelper.rotate(new Vec3(0, .125 + y * .75, 1.25), 22.5 + i * 45, Axis.Y)
+                    .add(Vec3.atBottomCenterOf(pos));
                 Outliner.getInstance().showLine(key + y + i, prevV, v).lineWidth(1 / 16f).colored(color);
                 prevV = v;
             }
         }
     }
 
-    public static boolean validateAndConnect(LevelAccessor level, BlockPos pos, LocalPlayer player, ItemStack chain, boolean simulate) {
+    public static boolean validateAndConnect(
+        LevelAccessor level,
+        BlockPos pos,
+        LocalPlayer player,
+        ItemStack chain,
+        boolean simulate
+    ) {
         if (!simulate && player.isShiftKeyDown()) {
             CreateLang.translate("chain_conveyor.selection_cleared").sendStatus(player);
             return false;
         }
 
-        if (pos.equals(firstPos))
+        if (pos.equals(firstPos)) {
             return false;
-        if (!pos.closerThan(firstPos, AllConfigs.server().kinetics.maxChainConveyorLength.get()))
+        }
+        if (!pos.closerThan(firstPos, AllConfigs.server().kinetics.maxChainConveyorLength.get())) {
             return fail("chain_conveyor.too_far", player);
-        if (pos.closerThan(firstPos, 2.5))
+        }
+        if (pos.closerThan(firstPos, 2.5)) {
             return fail("chain_conveyor.too_close", player);
+        }
 
         Vec3 diff = Vec3.atLowerCornerOf(pos.subtract(firstPos));
         double horizontalDistance = diff.multiply(1, 0, 1).length() - 1.5;
 
-        if (horizontalDistance <= 0)
+        if (horizontalDistance <= 0) {
             return fail("chain_conveyor.cannot_connect_vertically", player);
-        if (Math.abs(diff.y) / horizontalDistance > 1)
+        }
+        if (Math.abs(diff.y) / horizontalDistance > 1) {
             return fail("chain_conveyor.too_steep", player);
+        }
 
         ChainConveyorBlock chainConveyorBlock = AllBlocks.CHAIN_CONVEYOR;
         ChainConveyorBlockEntity sourceLift = chainConveyorBlock.getBlockEntity(level, firstPos);
         ChainConveyorBlockEntity targetLift = chainConveyorBlock.getBlockEntity(level, pos);
 
-        if (targetLift.connections.size() >= AllConfigs.server().kinetics.maxChainConveyorConnections.get())
+        if (targetLift.connections.size() >= AllConfigs.server().kinetics.maxChainConveyorConnections.get()) {
             return fail("chain_conveyor.cannot_add_more_connections", player);
-        if (targetLift.connections.contains(firstPos.subtract(pos)))
+        }
+        if (targetLift.connections.contains(firstPos.subtract(pos))) {
             return fail("chain_conveyor.already_connected", player);
-        if (sourceLift == null || targetLift == null)
+        }
+        if (sourceLift == null || targetLift == null) {
             return fail("chain_conveyor.blocks_invalid", player);
+        }
 
         if (!player.isCreative()) {
             int chainCost = ChainConveyorBlockEntity.getChainCost(pos.subtract(firstPos));
             boolean hasEnough = ChainConveyorBlockEntity.getChainsFromInventory(player, chain, chainCost, true);
-            if (simulate)
+            if (simulate) {
                 BlueprintOverlayRenderer.displayChainRequirements(chain.getItem(), chainCost, hasEnough);
-            if (!hasEnough)
+            }
+            if (!hasEnough) {
                 return fail("chain_conveyor.not_enough_chains", player);
+            }
         }
 
-        if (simulate)
+        if (simulate) {
             return true;
+        }
 
         player.connection.send(new ChainConveyorConnectionPacket(firstPos, pos, chain, true));
 

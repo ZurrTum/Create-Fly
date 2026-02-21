@@ -11,8 +11,9 @@ public class ConnectedGlassPaneBlock extends GlassPaneBlock {
 
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
-        if (side.getAxis().isVertical())
+        if (side.getAxis().isVertical()) {
             return adjacentBlockState == state;
+        }
         return super.skipRendering(state, adjacentBlockState, side);
     }
 

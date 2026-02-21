@@ -57,7 +57,8 @@ public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEn
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             super.render(matricesEntry, vertexConsumer);
-            wheel.light(lightCoords).rotateCentered(wheelAngle, direction).color(color).renderInto(matricesEntry, vertexConsumer);
+            wheel.light(lightCoords).rotateCentered(wheelAngle, direction).color(color)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

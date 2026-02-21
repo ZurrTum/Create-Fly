@@ -38,8 +38,9 @@ public class DeployTool extends PlacementToolBase {
     public void renderTool(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
         super.renderTool(mc, ms, buffer, camera);
 
-        if (selectedPos == null)
+        if (selectedPos == null) {
             return;
+        }
 
         ms.pushPose();
         float pt = AnimationTickHolder.getPartialTicks();
@@ -58,8 +59,8 @@ public class DeployTool extends PlacementToolBase {
         Vec3 origin = new Vec3(xOrigin, 0, zOrigin);
 
         ms.translate(x - centerX - camera.x, y - camera.y, z - centerZ - camera.z);
-        TransformStack.of(ms).translate(origin).translate(rotationOffset).rotateYDegrees(transformation.getCurrentRotation())
-            .translateBack(rotationOffset).translateBack(origin);
+        TransformStack.of(ms).translate(origin).translate(rotationOffset)
+            .rotateYDegrees(transformation.getCurrentRotation()).translateBack(rotationOffset).translateBack(origin);
 
         AABBOutline outline = schematicHandler.getOutline();
         outline.render(mc, ms, buffer, Vec3.ZERO, pt);
@@ -69,8 +70,9 @@ public class DeployTool extends PlacementToolBase {
 
     @Override
     public boolean handleMouseWheel(double delta) {
-        if (!selectIgnoreBlocks)
+        if (!selectIgnoreBlocks) {
             return super.handleMouseWheel(delta);
+        }
         selectionRange += delta;
         selectionRange = Mth.clamp(selectionRange, 1, 100);
         return true;
@@ -78,8 +80,9 @@ public class DeployTool extends PlacementToolBase {
 
     @Override
     public boolean handleRightClick(Minecraft mc) {
-        if (selectedPos == null)
+        if (selectedPos == null) {
             return super.handleRightClick(mc);
+        }
         Vec3 center = schematicHandler.getBounds().getCenter();
         BlockPos target = selectedPos.offset(-((int) center.x), 0, -((int) center.z));
 

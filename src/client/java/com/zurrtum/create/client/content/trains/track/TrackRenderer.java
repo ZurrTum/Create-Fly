@@ -90,7 +90,10 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                 if (tracks == null) {
                     tracks = new IdentityHashMap<>();
                 }
-                TrackSegmentRenderState renderState = tracks.computeIfAbsent(bc.getMaterial(), TrackSegmentRenderState::create);
+                TrackSegmentRenderState renderState = tracks.computeIfAbsent(
+                    bc.getMaterial(),
+                    TrackSegmentRenderState::create
+                );
                 for (int i = 1; i < length; i++) {
                     renderState.add(
                         LevelRenderer.getLightColor(world, segment.lightPosition[i].offset(bePosition)),
@@ -111,7 +114,12 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
     }
 
     @Override
-    public void submit(TrackRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        TrackRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -133,11 +141,16 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
         double yaw = Mth.atan2(diffX, diffZ);
         double pitch = Mth.atan2(len, diffY) - Math.PI * .5;
 
-        Vec3 yawPitchNormal = VecHelper.rotate(VecHelper.rotate(new Vec3(0, 1, 0), AngleHelper.deg(pitch), Axis.X), AngleHelper.deg(yaw), Axis.Y);
+        Vec3 yawPitchNormal = VecHelper.rotate(
+            VecHelper.rotate(new Vec3(0, 1, 0), AngleHelper.deg(pitch), Axis.X),
+            AngleHelper.deg(yaw),
+            Axis.Y
+        );
 
         double signum = Math.signum(yawPitchNormal.dot(normal));
-        if (Math.abs(signum) < 0.5f)
+        if (Math.abs(signum) < 0.5f) {
             signum = yawPitchNormal.distanceToSqr(normal) < 0.5f ? -1 : 1;
+        }
         double dot = diff.cross(normal).normalize().dot(yawPitchNormal);
         double roll = Math.acos(Mth.clamp(dot, -1, 1)) * signum;
         return new Vec3(pitch, yaw, roll);
@@ -183,8 +196,9 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                 railTransforms[i] = Couple.create(null, null);
 
                 PoseStack poseStack = new PoseStack();
-                TransformStack.of(poseStack).translate(prevMiddle).rotateY((float) tieAngles.y).rotateX((float) tieAngles.x)
-                    .rotateZ((float) tieAngles.z).translate(-1 / 2f, -2 / 16f - 1 / 256f, 0);
+                TransformStack.of(poseStack).translate(prevMiddle).rotateY((float) tieAngles.y)
+                    .rotateX((float) tieAngles.x).rotateZ((float) tieAngles.z)
+                    .translate(-1 / 2f, -2 / 16f - 1 / 256f, 0);
                 tieTransform[i] = poseStack.last();
 
                 // Rails
@@ -196,8 +210,9 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                     Vec3 anglesI = TrackRenderer.getModelAngles(segment.normal, diff);
 
                     poseStack = new PoseStack();
-                    TransformStack.of(poseStack).translate(prevI).rotateY((float) anglesI.y).rotateX((float) anglesI.x).rotateZ((float) anglesI.z)
-                        .translate(0, -2 / 16f - 1 / 256f, -1 / 32f).scale(1, 1, (float) diff.length() * scale);
+                    TransformStack.of(poseStack).translate(prevI).rotateY((float) anglesI.y).rotateX((float) anglesI.x)
+                        .rotateZ((float) anglesI.z).translate(0, -2 / 16f - 1 / 256f, -1 / 32f)
+                        .scale(1, 1, (float) diff.length() * scale);
                     railTransforms[i].set(first, poseStack.last());
                 }
 
@@ -239,7 +254,10 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
                 lightPosition[i] = BlockPos.containing(leftGirder.add(rightGirder).scale(.5));
 
-                Couple<Couple<Vec3>> offsets = Couple.create(Couple.create(leftTop, rightTop), Couple.create(leftBottom, rightBottom));
+                Couple<Couple<Vec3>> offsets = Couple.create(
+                    Couple.create(leftTop, rightTop),
+                    Couple.create(leftBottom, rightBottom)
+                );
 
                 if (previousOffsets == null) {
                     previousOffsets = offsets;
@@ -254,13 +272,15 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
                     // Middle
                     Vec3 currentBeam = offsets.getFirst().get(first).add(offsets.getSecond().get(first)).scale(.5);
-                    Vec3 previousBeam = previousOffsets.getFirst().get(first).add(previousOffsets.getSecond().get(first)).scale(.5);
+                    Vec3 previousBeam = previousOffsets.getFirst().get(first)
+                        .add(previousOffsets.getSecond().get(first)).scale(.5);
                     Vec3 beamDiff = currentBeam.subtract(previousBeam);
                     Vec3 beamAngles = TrackRenderer.getModelAngles(segment.normal, beamDiff);
 
                     PoseStack poseStack = new PoseStack();
-                    TransformStack.of(poseStack).translate(previousBeam).rotateY((float) beamAngles.y).rotateX((float) beamAngles.x)
-                        .rotateZ((float) beamAngles.z).translate(0, 2 / 16f + (segment.index % 2 == 0 ? 1 : -1) / 2048f - 1 / 1024f, -1 / 32f)
+                    TransformStack.of(poseStack).translate(previousBeam).rotateY((float) beamAngles.y)
+                        .rotateX((float) beamAngles.x).rotateZ((float) beamAngles.z)
+                        .translate(0, 2 / 16f + (segment.index % 2 == 0 ? 1 : -1) / 2048f - 1 / 1024f, -1 / 32f)
                         .scale(1, 1, (float) beamDiff.length() * scale);
                     beams[i].set(first, poseStack.last());
 
@@ -272,8 +292,9 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                         Vec3 capAngles = TrackRenderer.getModelAngles(segment.normal, diff);
 
                         poseStack = new PoseStack();
-                        TransformStack.of(poseStack).translate(previous).rotateY((float) capAngles.y).rotateX((float) capAngles.x)
-                            .rotateZ((float) capAngles.z).translate(0, 2 / 16f + (segment.index % 2 == 0 ? 1 : -1) / 2048f - 1 / 1024f, -1 / 32f)
+                        TransformStack.of(poseStack).translate(previous).rotateY((float) capAngles.y)
+                            .rotateX((float) capAngles.x).rotateZ((float) capAngles.z)
+                            .translate(0, 2 / 16f + (segment.index % 2 == 0 ? 1 : -1) / 2048f - 1 / 1024f, -1 / 32f)
                             .rotateZ(0).scale(1, 1, (float) diff.length() * scale);
                         beamCaps[i].get(top).set(first, poseStack.last());
                     }
@@ -304,9 +325,8 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
         }
     }
 
-    public record GirderRenderState(
-        SuperByteBuffer girderMiddle, SuperByteBuffer girderTop, SuperByteBuffer girderBottom, List<GirderSegmentData> girders
-    ) {
+    public record GirderRenderState(SuperByteBuffer girderMiddle, SuperByteBuffer girderTop,
+                                    SuperByteBuffer girderBottom, List<GirderSegmentData> girders) {
         public static GirderRenderState create() {
             BlockState air = Blocks.AIR.defaultBlockState();
             SuperByteBuffer middle = CachedBuffers.partial(AllPartialModels.GIRDER_SEGMENT_MIDDLE, air);
@@ -327,20 +347,20 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                         .renderInto(matricesEntry, vertexConsumer);
                     for (boolean top : Iterate.trueAndFalse) {
                         Pose beamCapTransform = girder.beamCaps.get(top).get(first);
-                        (top ? girderTop : girderBottom).mulPose(beamCapTransform.pose()).mulNormal(beamCapTransform.normal()).light(girder.light)
+                        (top ? girderTop : girderBottom).mulPose(beamCapTransform.pose())
+                            .mulNormal(beamCapTransform.normal()).light(girder.light)
                             .renderInto(matricesEntry, vertexConsumer);
                     }
                 }
             }
         }
 
-        public record GirderSegmentData(
-            int light, Couple<Pose> beam, Couple<Couple<Pose>> beamCaps
-        ) {
+        public record GirderSegmentData(int light, Couple<Pose> beam, Couple<Couple<Pose>> beamCaps) {
         }
     }
 
-    public record TrackSegmentRenderState(SuperByteBuffer tie, SuperByteBuffer left, SuperByteBuffer right, List<TrackSegmentData> tracks) {
+    public record TrackSegmentRenderState(SuperByteBuffer tie, SuperByteBuffer left, SuperByteBuffer right,
+                                          List<TrackSegmentData> tracks) {
         public static TrackSegmentRenderState create(TrackMaterial material) {
             TrackModelHolder modelHolder = material.getModelHolder();
             BlockState air = Blocks.AIR.defaultBlockState();
@@ -366,9 +386,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
             }
         }
 
-        public record TrackSegmentData(
-            int light, Pose tieTransform, Couple<Pose> railTransforms
-        ) {
+        public record TrackSegmentData(int light, Pose tieTransform, Couple<Pose> railTransforms) {
         }
     }
 }

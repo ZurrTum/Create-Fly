@@ -74,8 +74,10 @@ public class SchematicPromptScreen extends AbstractSimiScreen {
         convert.setToolTip(convertLabel);
         addRenderableWidget(convert);
 
-        renderedItem = new ElementWidget(x + background.getWidth() + 6, guiTop + background.getHeight() - 38).showingElement(GuiGameElement.of(
-            AllItems.SCHEMATIC_AND_QUILL.getDefaultInstance()).scale(3));
+        renderedItem = new ElementWidget(
+            x + background.getWidth() + 6,
+            guiTop + background.getHeight() - 38
+        ).showingElement(GuiGameElement.of(AllItems.SCHEMATIC_AND_QUILL.getDefaultInstance()).scale(3));
         addRenderableWidget(renderedItem);
     }
 
@@ -91,7 +93,14 @@ public class SchematicPromptScreen extends AbstractSimiScreen {
         int y = guiTop;
 
         background.render(graphics, x, y);
-        graphics.drawString(font, title, x + (background.getWidth() - 8 - font.width(title)) / 2, y + 4, 0xFF505050, false);
+        graphics.drawString(
+            font,
+            title,
+            x + (background.getWidth() - 8 - font.width(title)) / 2,
+            y + 4,
+            0xFF505050,
+            false
+        );
 
         graphics.renderItem(AllItems.SCHEMATIC.getDefaultInstance(), x + 22, y + 24);
     }

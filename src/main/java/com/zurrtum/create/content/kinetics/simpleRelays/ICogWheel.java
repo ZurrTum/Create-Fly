@@ -31,22 +31,25 @@ public interface ICogWheel extends IRotate {
 
     static boolean isDedicatedCogItem(ItemStack test) {
         Item item = test.getItem();
-        if (!(item instanceof BlockItem))
+        if (!(item instanceof BlockItem)) {
             return false;
+        }
         return isDedicatedCogWheel(((BlockItem) item).getBlock());
     }
 
     static boolean isSmallCogItem(ItemStack test) {
         Item item = test.getItem();
-        if (!(item instanceof BlockItem))
+        if (!(item instanceof BlockItem)) {
             return false;
+        }
         return isSmallCog(((BlockItem) item).getBlock());
     }
 
     static boolean isLargeCogItem(ItemStack test) {
         Item item = test.getItem();
-        if (!(item instanceof BlockItem))
+        if (!(item instanceof BlockItem)) {
             return false;
+        }
         return isLargeCog(((BlockItem) item).getBlock());
     }
 

@@ -22,16 +22,19 @@ public class WrenchEventHandler {
         BlockHitResult hitVec,
         BlockPos pos
     ) {
-        if (world == null || player == null || !player.mayBuild() || itemStack.isEmpty() || itemStack.is(AllItems.WRENCH))
+        if (world == null || player == null || !player.mayBuild() || itemStack.isEmpty() || itemStack.is(AllItems.WRENCH)) {
             return null;
-        if (!itemStack.is(AllItemTags.TOOLS_WRENCH))
+        }
+        if (!itemStack.is(AllItemTags.TOOLS_WRENCH)) {
             return null;
+        }
 
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 
-        if (!(block instanceof IWrenchable actor))
+        if (!(block instanceof IWrenchable actor)) {
             return null;
+        }
 
         UseOnContext context = new UseOnContext(player, hand, hitVec);
         return player.isShiftKeyDown() ? actor.onSneakWrenched(state, context) : actor.onWrenched(state, context);

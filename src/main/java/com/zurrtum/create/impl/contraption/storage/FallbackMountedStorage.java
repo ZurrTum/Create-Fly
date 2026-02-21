@@ -4,10 +4,9 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllMountedStorageTypes;
 import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStorage;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+import net.minecraft.world.Container;
 
 import java.util.Optional;
-
-import net.minecraft.world.Container;
 
 /**
  * A fallback mounted storage impl that will try to be used when no type is

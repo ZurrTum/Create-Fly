@@ -38,20 +38,23 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         Level world = context.world;
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
 
         BlockState stateVisited = world.getBlockState(pos);
-        if (stateVisited.isAir() || stateVisited.is(AllBlockTags.NON_HARVESTABLE))
+        if (stateVisited.isAir() || stateVisited.is(AllBlockTags.NON_HARVESTABLE)) {
             return;
+        }
 
         boolean notCropButCuttable = false;
 
         if (!isValidCrop(world, pos, stateVisited)) {
-            if (isValidOther(world, pos, stateVisited))
+            if (isValidOther(world, pos, stateVisited)) {
                 notCropButCuttable = true;
-            else
+            } else {
                 return;
+            }
         }
 
         ItemStack item = ItemStack.EMPTY;
@@ -66,8 +69,7 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         BlockState state = stateVisited;
         BlockHelper.destroyBlockAs(
             world, pos, null, item, effectChance, stack -> {
-                if (AllConfigs.server().kinetics.harvesterReplants.get() && !seedSubtracted.getValue() && ItemHelper.sameItem(
-                    stack,
+                if (AllConfigs.server().kinetics.harvesterReplants.get() && !seedSubtracted.getValue() && ItemHelper.sameItem(stack,
                     new ItemStack(state.getBlock())
                 )) {
                     stack.shrink(1);
@@ -86,22 +88,27 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         boolean replant = AllConfigs.server().kinetics.harvesterReplants.get();
 
         if (state.getBlock() instanceof CropBlock crop) {
-            if (harvestPartial)
+            if (harvestPartial) {
                 return state != crop.getStateForAge(0) || !replant;
+            }
             return crop.isMaxAge(state);
         }
 
         if (state.getCollisionShape(world, pos).isEmpty() || state.getBlock() instanceof CocoaBlock) {
             for (Property<?> property : state.getProperties()) {
-                if (!(property instanceof IntegerProperty ageProperty))
+                if (!(property instanceof IntegerProperty ageProperty)) {
                     continue;
-                if (!property.getName().equals(BlockStateProperties.AGE_1.getName()))
+                }
+                if (!property.getName().equals(BlockStateProperties.AGE_1.getName())) {
                     continue;
+                }
                 int age = state.getValue(ageProperty);
-                if (state.getBlock() instanceof SweetBerryBushBlock && age <= 1 && replant)
+                if (state.getBlock() instanceof SweetBerryBushBlock && age <= 1 && replant) {
                     continue;
-                if (age == 0 && replant || !harvestPartial && (ageProperty.getPossibleValues().size() - 1 != age))
+                }
+                if (age == 0 && replant || !harvestPartial && (ageProperty.getPossibleValues().size() - 1 != age)) {
                     continue;
+                }
                 return true;
             }
         }
@@ -110,24 +117,31 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
     }
 
     public boolean isValidOther(Level world, BlockPos pos, BlockState state) {
-        if (state.getBlock() instanceof CropBlock)
+        if (state.getBlock() instanceof CropBlock) {
             return false;
-        if (state.getBlock() instanceof SugarCaneBlock)
+        }
+        if (state.getBlock() instanceof SugarCaneBlock) {
             return true;
-        if (state.is(BlockTags.LEAVES))
+        }
+        if (state.is(BlockTags.LEAVES)) {
             return true;
-        if (state.getBlock() instanceof CocoaBlock)
+        }
+        if (state.getBlock() instanceof CocoaBlock) {
             return state.getValue(CocoaBlock.AGE) == CocoaBlock.MAX_AGE;
+        }
 
         if (state.getCollisionShape(world, pos).isEmpty()) {
-            if (state.getBlock() instanceof GrowingPlantHeadBlock)
+            if (state.getBlock() instanceof GrowingPlantHeadBlock) {
                 return true;
+            }
 
             for (Property<?> property : state.getProperties()) {
-                if (!(property instanceof IntegerProperty))
+                if (!(property instanceof IntegerProperty)) {
                     continue;
-                if (!property.getName().equals(BlockStateProperties.AGE_1.getName()))
+                }
+                if (!property.getName().equals(BlockStateProperties.AGE_1.getName())) {
                     continue;
+                }
                 return false;
             }
 
@@ -144,16 +158,18 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
 
     private BlockState cutCrop(Level world, BlockPos pos, BlockState state) {
         if (!AllConfigs.server().kinetics.harvesterReplants.get()) {
-            if (state.getFluidState().isEmpty())
+            if (state.getFluidState().isEmpty()) {
                 return Blocks.AIR.defaultBlockState();
+            }
             return state.getFluidState().createLegacyBlock();
         }
 
         Block block = state.getBlock();
         if (block instanceof CropBlock crop) {
             BlockState newState = crop.getStateForAge(0);
-            if (!newState.is(block))
+            if (!newState.is(block)) {
                 return newState;
+            }
             IntegerProperty ageProperty = crop.getAgeProperty();
             return state.setValue(ageProperty, 0);
         }
@@ -161,22 +177,26 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
             return state.setValue(BlockStateProperties.AGE_3, 1);
         }
         if (state.is(AllBlockTags.SUGAR_CANE_VARIANTS) || block instanceof GrowingPlantHeadBlock) {
-            if (state.getFluidState().isEmpty())
+            if (state.getFluidState().isEmpty()) {
                 return Blocks.AIR.defaultBlockState();
+            }
             return state.getFluidState().createLegacyBlock();
         }
         if (state.getCollisionShape(world, pos).isEmpty() || block instanceof CocoaBlock) {
             for (Property<?> property : state.getProperties()) {
-                if (!(property instanceof IntegerProperty))
+                if (!(property instanceof IntegerProperty)) {
                     continue;
-                if (!property.getName().equals(BlockStateProperties.AGE_1.getName()))
+                }
+                if (!property.getName().equals(BlockStateProperties.AGE_1.getName())) {
                     continue;
+                }
                 return state.setValue((IntegerProperty) property, 0);
             }
         }
 
-        if (state.getFluidState().isEmpty())
+        if (state.getFluidState().isEmpty()) {
             return Blocks.AIR.defaultBlockState();
+        }
         return state.getFluidState().createLegacyBlock();
     }
 

@@ -25,12 +25,15 @@ public class SeatInteractionBehaviour extends MovingInteractionBehaviour {
     public void handleEntityCollision(Entity entity, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
         Contraption contraption = contraptionEntity.getContraption();
         int index = contraption.getSeats().indexOf(localPos);
-        if (index == -1)
+        if (index == -1) {
             return;
-        if (!SeatBlock.canBePickedUp(entity))
+        }
+        if (!SeatBlock.canBePickedUp(entity)) {
             return;
-        if (entity instanceof Leashable leashable && leashable.isLeashed())
+        }
+        if (entity instanceof Leashable leashable && leashable.isLeashed()) {
             return;
+        }
         contraptionEntity.addSittingPassenger(entity, index);
     }
 

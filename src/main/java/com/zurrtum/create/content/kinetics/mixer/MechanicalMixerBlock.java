@@ -32,8 +32,9 @@ public class MechanicalMixerBlock extends KineticBlock implements IBE<Mechanical
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() instanceof Player)
+        if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() instanceof Player) {
             return AllShapes.CASING_14PX.get(Direction.DOWN);
+        }
 
         return AllShapes.MECHANICAL_PROCESSOR_SHAPE;
     }

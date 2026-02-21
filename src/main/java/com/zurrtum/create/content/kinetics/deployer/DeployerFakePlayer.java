@@ -111,8 +111,9 @@ public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlay
     @Override
     public void remove(Entity.RemovalReason reason) {
         ServerLevel world = level();
-        if (blockBreakingProgress != null && !world.isClientSide())
+        if (blockBreakingProgress != null && !world.isClientSide()) {
             world.destroyBlockProgress(getId(), blockBreakingProgress.getKey(), -1);
+        }
         super.remove(reason);
     }
 }

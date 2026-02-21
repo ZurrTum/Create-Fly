@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import java.util.Map;
-
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.resources.Identifier;
+
+import java.util.Map;
 
 public final class PartialModelEventHandler {
     private PartialModelEventHandler() {

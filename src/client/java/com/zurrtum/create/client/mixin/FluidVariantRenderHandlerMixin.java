@@ -14,7 +14,10 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(FluidVariantRenderHandler.class)
 public interface FluidVariantRenderHandlerMixin {
     @ModifyReturnValue(method = "getSprites(Lnet/fabricmc/fabric/api/transfer/v1/fluid/FluidVariant;)[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", at = @At(value = "RETURN", ordinal = 1))
-    private TextureAtlasSprite[] getSprites(TextureAtlasSprite[] original, @Local(argsOnly = true) FluidVariant variant) {
+    private TextureAtlasSprite[] getSprites(
+        TextureAtlasSprite[] original,
+        @Local(argsOnly = true) FluidVariant variant
+    ) {
         if (original != null) {
             return original;
         }

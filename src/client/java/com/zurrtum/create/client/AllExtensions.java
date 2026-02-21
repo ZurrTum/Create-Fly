@@ -40,8 +40,9 @@ public class AllExtensions {
         );
         MULTI_POS.put(
             AllBlocks.WATER_WHEEL_STRUCTURAL, (level, pos, state, progress) -> {
-                if (!AllBlocks.WATER_WHEEL_STRUCTURAL.stillValid(level, pos, state, false))
+                if (!AllBlocks.WATER_WHEEL_STRUCTURAL.stillValid(level, pos, state, false)) {
                     return null;
+                }
                 HashSet<BlockPos> set = new HashSet<>();
                 set.add(WaterWheelStructuralBlock.getMaster(level, pos, state));
                 return set;

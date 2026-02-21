@@ -96,7 +96,13 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     @Nullable
-    public static TextDrawableState createTextDrawable(Font textRenderer, String text, int y, int flickeringBrightColor, int darkColor) {
+    public static TextDrawableState createTextDrawable(
+        Font textRenderer,
+        String text,
+        int y,
+        int flickeringBrightColor,
+        int darkColor
+    ) {
         int code = visit(text);
         if (code == ' ') {
             return null;
@@ -107,7 +113,15 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             return null;
         }
         TextRenderable dark = glyph.createGlyph(0, 0, darkColor, 0, Style.EMPTY, 0, 0);
-        TextRenderable mix = glyph.createGlyph(0, 0, Color.mixColors(darkColor, 0xFF000000, .35f), 0, Style.EMPTY, 0, 0);
+        TextRenderable mix = glyph.createGlyph(
+            0,
+            0,
+            Color.mixColors(darkColor, 0xFF000000, .35f),
+            0,
+            Style.EMPTY,
+            0,
+            0
+        );
         float x = (textRenderer.width(text) - .5f) / -2f;
         return new TextDrawableState(bright.renderType(DisplayMode.NORMAL), x, y, bright, dark, mix);
     }
@@ -212,7 +226,10 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                 }
                 right.layer = CreateRenderTypes.additive2();
                 right.layer2 = CreateRenderTypes.additive();
-                right.signal = CachedBuffers.partial(yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE, state.blockState);
+                right.signal = CachedBuffers.partial(
+                    yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE,
+                    state.blockState
+                );
             } else {
                 right.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
             }
@@ -221,10 +238,11 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                 NixieTubeBlockEntity.ComputerSignal.TubeDisplay tubeDisplay = first ? be.computerSignal.first : be.computerSignal.second;
 
                 SignalDrawableState cState = new SignalDrawableState();
-                if (first)
+                if (first) {
                     data.left = cState;
-                else
+                } else {
                     data.right = cState;
+                }
 
                 cState.light = state.lightCoords;
                 cState.layer = CreateRenderTypes.translucent();
@@ -263,12 +281,34 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     @Override
-    public void submit(NixieTubeRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        NixieTubeRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         state.data.render(matrices, queue);
     }
 
-    public static void drawInWorldString(Font fontRenderer, PoseStack ms, MultiBufferSource buffer, String c, int color) {
-        fontRenderer.drawInBatch(c, 0, 0, color, false, ms.last().pose(), buffer, DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+    public static void drawInWorldString(
+        Font fontRenderer,
+        PoseStack ms,
+        MultiBufferSource buffer,
+        String c,
+        int color
+    ) {
+        fontRenderer.drawInBatch(
+            c,
+            0,
+            0,
+            color,
+            false,
+            ms.last().pose(),
+            buffer,
+            DisplayMode.NORMAL,
+            0,
+            LightTexture.FULL_BRIGHT
+        );
     }
 
     @Override
@@ -329,9 +369,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         }
     }
 
-    public record TextDrawableState(
-        RenderType layer, float x, int y, TextRenderable bright, TextRenderable dark, TextRenderable mix
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record TextDrawableState(RenderType layer, float x, int y, TextRenderable bright, TextRenderable dark,
+                                    TextRenderable mix) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             Matrix4f pose = matricesEntry.pose();
@@ -423,7 +462,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         }
 
         public void renderCube(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            cube.light(LightTexture.FULL_BRIGHT).disableDiffuse().scale(cubeX, cubeY, 1).renderInto(matricesEntry, vertexConsumer);
+            cube.light(LightTexture.FULL_BRIGHT).disableDiffuse().scale(cubeX, cubeY, 1)
+                .renderInto(matricesEntry, vertexConsumer);
         }
 
         public void renderAdditive(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer, int color) {

@@ -44,7 +44,11 @@ public class ArmAngleTarget {
         float a2 = a * a;
         float b = 15 / 16f; // upper arm length
         float b2 = b * b;
-        float diffLength = Mth.clamp(Mth.sqrt((float) (diff.y * diff.y + horizontalDistance * horizontalDistance)), 1 / 8f, a + b);
+        float diffLength = Mth.clamp(
+            Mth.sqrt((float) (diff.y * diff.y + horizontalDistance * horizontalDistance)),
+            1 / 8f,
+            a + b
+        );
         float diffLength2 = diffLength * diffLength;
 
         float alphaRatio = (-b2 + a2 + diffLength2) / (2 * a * diffLength);
@@ -52,10 +56,12 @@ public class ArmAngleTarget {
         float betaRatio = (-diffLength2 + a2 + b2) / (2 * b * a);
         float beta = AngleHelper.deg(Math.acos(betaRatio));
 
-        if (Float.isNaN(alpha))
+        if (Float.isNaN(alpha)) {
             alpha = 0;
-        if (Float.isNaN(beta))
+        }
+        if (Float.isNaN(beta)) {
             beta = 0;
+        }
 
         Vec3 headPos = new Vec3(0, 0, 0);
         headPos = VecHelper.rotate(headPos.add(0, b, 0), beta + 180, Axis.X);
@@ -65,8 +71,9 @@ public class ArmAngleTarget {
         headPos = headPos.add(origin);
         Vec3 headDiff = clawTarget.subtract(headPos);
 
-        if (ceiling)
+        if (ceiling) {
             headDiff = headDiff.multiply(1, -1, 1);
+        }
 
         float horizontalHeadDistance = (float) headDiff.multiply(1, 0, 1).length();
         float headAngle = (float) (alpha + beta + 135 - AngleHelper.deg(Mth.atan2(headDiff.y, horizontalHeadDistance)));

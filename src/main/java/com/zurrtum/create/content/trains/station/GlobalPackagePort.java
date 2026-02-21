@@ -30,8 +30,9 @@ public class GlobalPackagePort {
     }
 
     public void restoreOfflineBuffer(Container inventory) {
-        if (!primed)
+        if (!primed) {
             return;
+        }
 
         restoring = true;
 
@@ -50,8 +51,9 @@ public class GlobalPackagePort {
          * overwriting later slots which haven't been restored yet and
          * to avoid unnecessary work.
          */
-        if (restoring)
+        if (restoring) {
             return;
+        }
 
         // TODO: Call save method on individual slots rather than iterating
         for (int slot = 0, size = inventory.getContainerSize(); slot < size; slot++) {

@@ -1,9 +1,6 @@
 package com.zurrtum.create.content.logistics.tunnel;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -18,6 +15,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
+import java.util.List;
+
 public class BrassTunnelBlock extends BeltTunnelBlock {
 
     public BrassTunnelBlock(Properties properties) {
@@ -25,7 +24,13 @@ public class BrassTunnelBlock extends BeltTunnelBlock {
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, BeltTunnelBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        BeltTunnelBlockEntity blockEntity,
+        Direction context
+    ) {
         if (blockEntity instanceof BrassTunnelBlockEntity brassTunnelBlockEntity) {
             return brassTunnelBlockEntity.tunnelCapability;
         }
@@ -33,19 +38,36 @@ public class BrassTunnelBlock extends BeltTunnelBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
         return onBlockEntityUse(
             level, pos, be -> {
-                if (!(be instanceof BrassTunnelBlockEntity bte))
+                if (!(be instanceof BrassTunnelBlockEntity bte)) {
                     return InteractionResult.PASS;
+                }
                 List<ItemStack> stacksOfGroup = bte.grabAllStacksOfGroup(level.isClientSide());
-                if (stacksOfGroup.isEmpty())
+                if (stacksOfGroup.isEmpty()) {
                     return InteractionResult.PASS;
-                if (level.isClientSide())
+                }
+                if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
-                for (ItemStack itemStack : stacksOfGroup)
+                }
+                for (ItemStack itemStack : stacksOfGroup) {
                     player.getInventory().placeItemBackInInventory(itemStack.copy());
-                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + level.random.nextFloat());
+                }
+                level.playSound(
+                    null,
+                    pos,
+                    SoundEvents.ITEM_PICKUP,
+                    SoundSource.PLAYERS,
+                    .2f,
+                    1f + level.random.nextFloat()
+                );
                 return InteractionResult.SUCCESS;
             }
         );

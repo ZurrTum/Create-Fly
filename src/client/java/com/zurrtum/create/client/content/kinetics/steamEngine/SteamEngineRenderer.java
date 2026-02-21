@@ -77,7 +77,12 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
     }
 
     @Override
-    public void submit(SteamEngineRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SteamEngineRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.layer != null) {
             queue.submitCustomGeometry(matrices, state.layer, state);
         }
@@ -91,25 +96,30 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
     @Nullable
     public static Float getTargetAngle(SteamEngineBlockEntity be) {
         BlockState blockState = be.getBlockState();
-        if (!blockState.is(AllBlocks.STEAM_ENGINE))
+        if (!blockState.is(AllBlocks.STEAM_ENGINE)) {
             return null;
+        }
 
         Direction facing = SteamEngineBlock.getFacing(blockState);
         PoweredShaftBlockEntity shaft = be.getShaft();
         Axis facingAxis = facing.getAxis();
 
-        if (shaft == null)
+        if (shaft == null) {
             return null;
+        }
 
         Axis axis = KineticBlockEntityRenderer.getRotationAxisOf(shaft);
         float angle = KineticBlockEntityRenderer.getAngleForBe(shaft, shaft.getBlockPos(), axis);
 
-        if (axis == facingAxis)
+        if (axis == facingAxis) {
             return null;
-        if (axis.isHorizontal() && (facingAxis == Axis.X ^ facing.getAxisDirection() == Direction.AxisDirection.POSITIVE))
+        }
+        if (axis.isHorizontal() && (facingAxis == Axis.X ^ facing.getAxisDirection() == Direction.AxisDirection.POSITIVE)) {
             angle *= -1;
-        if (axis == Axis.X && facing == Direction.DOWN)
+        }
+        if (axis == Axis.X && facing == Direction.DOWN) {
             angle *= -1;
+        }
         return angle;
     }
 
@@ -127,13 +137,14 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            piston.center().rotateYDegrees(yRot).rotateXDegrees(xRot).rotateYDegrees(roll).uncenter().translate(0, pistonTranslate, 0)
-                .light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-            linkage.center().rotateYDegrees(yRot).rotateXDegrees(xRot).rotateYDegrees(roll).translate(0, 1, 0).uncenter()
-                .translate(0, pistonTranslate, 0).translate(0, 0.25f, 0.5f).rotateX(linkageRotate).translate(0, -0.25f, -0.5f).light(lightCoords)
+            piston.center().rotateYDegrees(yRot).rotateXDegrees(xRot).rotateYDegrees(roll).uncenter()
+                .translate(0, pistonTranslate, 0).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            linkage.center().rotateYDegrees(yRot).rotateXDegrees(xRot).rotateYDegrees(roll).translate(0, 1, 0)
+                .uncenter().translate(0, pistonTranslate, 0).translate(0, 0.25f, 0.5f).rotateX(linkageRotate)
+                .translate(0, -0.25f, -0.5f).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            connector.center().rotateYDegrees(yRot).rotateXDegrees(xRot).rotateYDegrees(roll).uncenter()
+                .translate(0, 2, 0).center().rotateX(connectorRotate).uncenter().light(lightCoords)
                 .renderInto(matricesEntry, vertexConsumer);
-            connector.center().rotateYDegrees(yRot).rotateXDegrees(xRot).rotateYDegrees(roll).uncenter().translate(0, 2, 0).center()
-                .rotateX(connectorRotate).uncenter().light(lightCoords).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

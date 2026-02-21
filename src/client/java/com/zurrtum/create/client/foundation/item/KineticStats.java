@@ -11,17 +11,16 @@ import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.config.CKinetics;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.minecraft.ChatFormatting.DARK_GRAY;
 import static net.minecraft.ChatFormatting.GRAY;
@@ -78,12 +77,14 @@ public class KineticStats implements TooltipModifier {
             double impact = BlockStressValues.getImpact(block);
             StressImpact impactId = impact >= config.highStressImpact.get() ? StressImpact.HIGH : (impact >= config.mediumStressImpact.get() ? StressImpact.MEDIUM : StressImpact.LOW);
             LangBuilder builder = CreateLang.builder()
-                .add(CreateLang.text(TooltipHelper.makeProgressBar(3, impactId.ordinal() + 1)).style(impactId.getAbsoluteColor()));
+                .add(CreateLang.text(TooltipHelper.makeProgressBar(3, impactId.ordinal() + 1))
+                    .style(impactId.getAbsoluteColor()));
 
             if (hasGoggles) {
                 builder.add(CreateLang.number(impact)).text("x ").add(rpmUnit).addTo(list);
-            } else
+            } else {
                 builder.translate("tooltip.stressImpact." + Lang.asId(impactId.name())).addTo(list);
+            }
         }
 
         if (hasStressCapacity) {
@@ -95,18 +96,21 @@ public class KineticStats implements TooltipModifier {
             StressImpact impactId = capacity >= config.highCapacity.get() ? StressImpact.HIGH : (capacity >= config.mediumCapacity.get() ? StressImpact.MEDIUM : StressImpact.LOW);
             StressImpact opposite = StressImpact.values()[StressImpact.values().length - 2 - impactId.ordinal()];
             LangBuilder builder = CreateLang.builder()
-                .add(CreateLang.text(TooltipHelper.makeProgressBar(3, impactId.ordinal() + 1)).style(opposite.getAbsoluteColor()));
+                .add(CreateLang.text(TooltipHelper.makeProgressBar(3, impactId.ordinal() + 1))
+                    .style(opposite.getAbsoluteColor()));
 
             if (hasGoggles) {
                 builder.add(CreateLang.number(capacity)).text("x ").add(rpmUnit).addTo(list);
 
                 if (generatedRPM != null) {
                     LangBuilder amount = CreateLang.number(capacity * generatedRPM.value()).add(suUnit);
-                    CreateLang.text(" -> ").add(generatedRPM.mayGenerateLess() ? CreateLang.translate("tooltip.up_to", amount) : amount)
+                    CreateLang.text(" -> ")
+                        .add(generatedRPM.mayGenerateLess() ? CreateLang.translate("tooltip.up_to", amount) : amount)
                         .style(DARK_GRAY).addTo(list);
                 }
-            } else
+            } else {
                 builder.translate("tooltip.capacityProvided." + Lang.asId(impactId.name())).addTo(list);
+            }
         }
 
         return list;

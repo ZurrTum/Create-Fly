@@ -3,11 +3,10 @@ package com.zurrtum.create.api.contraption;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.contraptions.Contraption;
-
-import java.util.function.Supplier;
-
 import net.minecraft.core.Holder;
 import net.minecraft.tags.TagKey;
+
+import java.util.function.Supplier;
 
 public final class ContraptionType {
     public static final Codec<ContraptionType> CODEC = CreateRegistries.CONTRAPTION_TYPE.byNameCodec();

@@ -140,8 +140,11 @@ public class PonderSceneBuildingUtil implements SceneBuildingUtil {
         @Override
         public Selection layers(int y, int height) {
             return cuboid(
-                new BlockPos(0, y, 0),
-                new Vec3i(sceneBounds.getXSpan() - 1, Math.min(sceneBounds.getYSpan() - y, height) - 1, sceneBounds.getZSpan() - 1)
+                new BlockPos(0, y, 0), new Vec3i(
+                    sceneBounds.getXSpan() - 1,
+                    Math.min(sceneBounds.getYSpan() - y, height) - 1,
+                    sceneBounds.getZSpan() - 1
+                )
             );
         }
 

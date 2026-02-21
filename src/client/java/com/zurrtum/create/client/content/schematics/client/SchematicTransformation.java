@@ -115,8 +115,9 @@ public class SchematicTransformation {
             i += 180;
         }
         i = i % 360;
-        if (i < 0)
+        if (i < 0) {
             i += 360;
+        }
 
         Rotation rotation = Rotation.NONE;
         switch (i) {
@@ -133,10 +134,12 @@ public class SchematicTransformation {
         }
 
         settings.setRotation(rotation);
-        if (mirrorfb)
+        if (mirrorfb) {
             settings.setMirror(Mirror.FRONT_BACK);
-        if (mirrorlr)
+        }
+        if (mirrorlr) {
             settings.setMirror(Mirror.LEFT_RIGHT);
+        }
 
         return settings;
     }
@@ -169,8 +172,9 @@ public class SchematicTransformation {
     }
 
     public int getMirrorModifier(Axis axis) {
-        if (axis == Axis.Z)
+        if (axis == Axis.Z) {
             return (int) getScaleLR().getChaseTarget();
+        }
         return (int) getScaleFB().getChaseTarget();
     }
 
@@ -188,10 +192,12 @@ public class SchematicTransformation {
     }
 
     public void flip(Axis axis) {
-        if (axis == Axis.X)
+        if (axis == Axis.X) {
             getScaleLR().updateChaseTarget(getScaleLR().getChaseTarget() * -1);
-        if (axis == Axis.Z)
+        }
+        if (axis == Axis.Z) {
             getScaleFB().updateChaseTarget(getScaleFB().getChaseTarget() * -1);
+        }
     }
 
     public void rotate90(boolean clockwise) {

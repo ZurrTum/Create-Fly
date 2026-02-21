@@ -29,12 +29,23 @@ public class SpoutBlock extends Block implements IWrenchable, IBE<SpoutBlockEnti
     }
 
     @Override
-    public FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, SpoutBlockEntity blockEntity, Direction context) {
+    public FluidInventory getFluidInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        SpoutBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.tank.getCapability();
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState p_220053_1_,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return AllShapes.SPOUT;
     }
 

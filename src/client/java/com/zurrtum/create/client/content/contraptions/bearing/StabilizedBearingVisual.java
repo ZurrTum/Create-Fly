@@ -27,7 +27,11 @@ public class StabilizedBearingVisual extends ActorVisual {
     final Axis rotationAxis;
     final Quaternionf blockOrientation;
 
-    public StabilizedBearingVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public StabilizedBearingVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         super(visualizationContext, simulationWorld, movementContext);
 
         BlockState blockState = movementContext.state;
@@ -37,17 +41,21 @@ public class StabilizedBearingVisual extends ActorVisual {
 
         blockOrientation = BearingVisual.getBlockStateOrientation(facing);
 
-        topInstance = instancerProvider.instancer(InstanceTypes.ORIENTED, Models.partial(AllPartialModels.BEARING_TOP)).createInstance();
+        topInstance = instancerProvider.instancer(InstanceTypes.ORIENTED, Models.partial(AllPartialModels.BEARING_TOP))
+            .createInstance();
 
         int blockLight = localBlockLight();
         topInstance.position(movementContext.localPos).rotation(blockOrientation).light(blockLight, 0).setChanged();
 
-        shaft = instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF)).createInstance();
+        shaft = instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF))
+            .createInstance();
 
         // not rotating so no need to set speed.
         var axis = KineticBlockEntityVisual.rotationAxis(blockState);
-        shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(blockState, axis, movementContext.localPos))
-            .setPosition(movementContext.localPos).rotateToFace(Direction.SOUTH, blockState.getValue(BlockStateProperties.FACING).getOpposite())
+        shaft.setRotationAxis(axis)
+            .setRotationOffset(KineticBlockEntityVisual.rotationOffset(blockState, axis, movementContext.localPos))
+            .setPosition(movementContext.localPos)
+            .rotateToFace(Direction.SOUTH, blockState.getValue(BlockStateProperties.FACING).getOpposite())
             .light(blockLight, 0).setChanged();
     }
 

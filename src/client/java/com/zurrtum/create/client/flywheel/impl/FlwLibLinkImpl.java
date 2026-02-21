@@ -6,12 +6,11 @@ import com.zurrtum.create.client.flywheel.impl.compat.IrisCompat;
 import com.zurrtum.create.client.flywheel.impl.extension.PoseStackExtension;
 import com.zurrtum.create.client.flywheel.lib.internal.FlwLibLink;
 import com.zurrtum.create.client.flywheel.lib.transform.PoseTransformStack;
+import net.minecraft.client.model.geom.ModelPart;
 import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.client.model.geom.ModelPart;
 
 public class FlwLibLinkImpl implements FlwLibLink {
     @Override
@@ -30,7 +29,14 @@ public class FlwLibLinkImpl implements FlwLibLink {
     }
 
     @Override
-    public void compileModelPart(ModelPart part, PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay, int color) {
+    public void compileModelPart(
+        ModelPart part,
+        PoseStack.Pose pose,
+        VertexConsumer consumer,
+        int light,
+        int overlay,
+        int color
+    ) {
         part.compile(pose, consumer, light, overlay, color);
     }
 

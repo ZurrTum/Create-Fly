@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.trains.bogey;
 
-import java.util.List;
-
 import net.minecraft.resources.Identifier;
+
+import java.util.List;
 
 public record BogeySize(Identifier id, float wheelRadius) {
     public BogeySize nextBySize() {

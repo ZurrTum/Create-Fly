@@ -63,10 +63,12 @@ public class EncasedFanRenderer implements BlockEntityRenderer<EncasedFanBlockEn
         state.fanInner = CachedBuffers.partialFacing(AllPartialModels.ENCASED_FAN_INNER, state.blockState, opposite);
         float time = AnimationTickHolder.getRenderTime(world);
         float speed = be.getSpeed() * 5;
-        if (speed > 0)
+        if (speed > 0) {
             speed = Mth.clamp(speed, 80, 64 * 20);
-        if (speed < 0)
+        }
+        if (speed < 0) {
             speed = Mth.clamp(speed, -64 * 20, -80);
+        }
         float angle = (time * speed * 3 / 10f) % 360;
         Direction.Axis axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);
         state.angle = KineticBlockEntityRenderer.getAngleForBe(be, state.blockPos, axis);
@@ -76,7 +78,12 @@ public class EncasedFanRenderer implements BlockEntityRenderer<EncasedFanBlockEn
     }
 
     @Override
-    public void submit(EncasedFanRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        EncasedFanRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 

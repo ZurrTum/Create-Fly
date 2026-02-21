@@ -26,15 +26,25 @@ public class MouseHandlerMixin {
             return;
         }
         int button = input.button();
-        if (Create.SCHEMATIC_HANDLER.onMouseInput(minecraft, button) || Create.SCHEMATIC_AND_QUILL_HANDLER.onMouseInput(minecraft, button)) {
+        if (Create.SCHEMATIC_HANDLER.onMouseInput(minecraft, button) || Create.SCHEMATIC_AND_QUILL_HANDLER.onMouseInput(minecraft,
+            button
+        )) {
             ci.cancel();
         }
     }
 
     @Inject(method = "onScroll(JDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getInventory()Lnet/minecraft/world/entity/player/Inventory;"), cancellable = true)
-    private void onMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci, @Local(ordinal = 4) double delta) {
-        if (Create.SCHEMATIC_HANDLER.mouseScrolled(delta) || Create.SCHEMATIC_AND_QUILL_HANDLER.mouseScrolled(minecraft, delta) || TrainHUD.onScroll(
-            delta) || ElevatorControlsHandler.onScroll(minecraft, delta)) {
+    private void onMouseScroll(
+        long window,
+        double horizontal,
+        double vertical,
+        CallbackInfo ci,
+        @Local(ordinal = 4) double delta
+    ) {
+        if (Create.SCHEMATIC_HANDLER.mouseScrolled(delta) || Create.SCHEMATIC_AND_QUILL_HANDLER.mouseScrolled(
+            minecraft,
+            delta
+        ) || TrainHUD.onScroll(delta) || ElevatorControlsHandler.onScroll(minecraft, delta)) {
             ci.cancel();
         }
     }

@@ -48,7 +48,12 @@ public class TrainScenes {
         scene.idle(15);
 
         BlockPos initialControlsPos = util.grid().at(3, 3, 4);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, train, new AABB(initialControlsPos).contract(-6 / 16f, 2 / 16f, 0), 85);
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.WHITE,
+            train,
+            new AABB(initialControlsPos).contract(-6 / 16f, 2 / 16f, 0),
+            85
+        );
         scene.idle(15);
 
         scene.overlay().showText(70).pointAt(util.vector().of(3.35f, 3.75f, 5)).placeNearTarget().attachKeyFrame()
@@ -165,12 +170,13 @@ public class TrainScenes {
         scene.world().animateTrainStation(stationPos, true);
         scene.idle(10);
 
-        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(3, 3, 4), Direction.WEST)).placeNearTarget().attachKeyFrame()
-            .text("Schedules allow Trains to be controlled by other Drivers");
+        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(3, 3, 4), Direction.WEST))
+            .placeNearTarget().attachKeyFrame().text("Schedules allow Trains to be controlled by other Drivers");
         scene.idle(80);
 
         Vec3 target = util.vector().topOf(util.grid().at(4, 0, 2));
-        scene.overlay().showControls(target, Pointing.RIGHT, 80).rightClick().withItem(AllItems.SCHEDULE.getDefaultInstance());
+        scene.overlay().showControls(target, Pointing.RIGHT, 80).rightClick()
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.overlay().showText(80).pointAt(target).placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
             .text("Right-click with the item in hand to open its Interface");
         scene.idle(100);
@@ -179,7 +185,8 @@ public class TrainScenes {
             .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
         scene.world().conductorBlaze(util.grid().at(3, 3, 4), true);
-        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(3, 3, 4), Direction.WEST)).placeNearTarget().attachKeyFrame()
+        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(3, 3, 4), Direction.WEST))
+            .placeNearTarget().attachKeyFrame()
             .text("Once programmed, the Schedule can be handed off to a Train Driver");
         scene.idle(80);
 
@@ -201,10 +208,12 @@ public class TrainScenes {
             .text("Any mob or blaze burner sitting in front of Train Controls is an eligible conductor");
         scene.idle(80);
 
-        scene.overlay().showControls(util.vector().centerOf(util.grid().at(3, 1, 7)), Pointing.DOWN, 30).withItem(new ItemStack(Items.LEAD));
+        scene.overlay().showControls(util.vector().centerOf(util.grid().at(3, 1, 7)), Pointing.DOWN, 30)
+            .withItem(new ItemStack(Items.LEAD));
         scene.idle(40);
         target = util.vector().centerOf(util.grid().at(3, 3, 4));
-        scene.overlay().showControls(target.add(0.5, 0, 0), Pointing.RIGHT, 30).rightClick().withItem(new ItemStack(Items.LEAD));
+        scene.overlay().showControls(target.add(0.5, 0, 0), Pointing.RIGHT, 30).rightClick()
+            .withItem(new ItemStack(Items.LEAD));
         scene.idle(6);
         scene.special().moveParrot(birb, target.subtract(birbVec), 5);
         scene.effects().indicateSuccess(util.grid().at(3, 3, 4));
@@ -231,8 +240,8 @@ public class TrainScenes {
         scene.special().conductorBirb(birb, false);
         scene.special().movePointOfInterest(util.grid().at(3, 4, 1));
         scene.idle(19);
-        scene.overlay().showText(70).pointAt(target.add(3, 0, 0)).placeNearTarget().colored(PonderPalette.BLUE).attachKeyFrame()
-            .text("Schedules can be retrieved from Drivers at any moment");
+        scene.overlay().showText(70).pointAt(target.add(3, 0, 0)).placeNearTarget().colored(PonderPalette.BLUE)
+            .attachKeyFrame().text("Schedules can be retrieved from Drivers at any moment");
         scene.idle(80);
 
     }

@@ -12,9 +12,8 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.item.ItemStack;
 
-public record ChainConveyorConnectionPacket(
-    BlockPos pos, BlockPos targetPos, ItemStack chain, boolean connect
-) implements Packet<ServerGamePacketListener> {
+public record ChainConveyorConnectionPacket(BlockPos pos, BlockPos targetPos, ItemStack chain,
+                                            boolean connect) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ChainConveyorConnectionPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         ChainConveyorConnectionPacket::pos,

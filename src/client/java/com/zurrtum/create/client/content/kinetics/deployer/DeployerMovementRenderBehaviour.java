@@ -39,7 +39,11 @@ import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.F
 public class DeployerMovementRenderBehaviour implements MovementRenderBehaviour {
     @Nullable
     @Override
-    public ActorVisual createVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public ActorVisual createVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         return new DeployerActorVisual(visualizationContext, simulationWorld, movementContext);
     }
 
@@ -123,16 +127,17 @@ public class DeployerMovementRenderBehaviour implements MovementRenderBehaviour 
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            shaft.center().rotateY(yRot).rotateZ(zRot).uncenter().rotateCentered(angle, Direction.UP).light(light).useLevelLight(world, worldMatrix4f)
-                .renderInto(matricesEntry, vertexConsumer);
+            shaft.center().rotateY(yRot).rotateZ(zRot).uncenter().rotateCentered(angle, Direction.UP).light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
             if (offset != null) {
                 pole.translate(offset);
                 hand.translate(offset);
             }
-            pole.rotateCentered(upAngle, Direction.UP).rotateCentered(eastAngle, Direction.EAST).rotateCentered(southAngle, Direction.SOUTH)
-                .light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
-            hand.rotateCentered(upAngle, Direction.UP).rotateCentered(eastAngle, Direction.EAST).light(light).useLevelLight(world, worldMatrix4f)
+            pole.rotateCentered(upAngle, Direction.UP).rotateCentered(eastAngle, Direction.EAST)
+                .rotateCentered(southAngle, Direction.SOUTH).light(light).useLevelLight(world, worldMatrix4f)
                 .renderInto(matricesEntry, vertexConsumer);
+            hand.rotateCentered(upAngle, Direction.UP).rotateCentered(eastAngle, Direction.EAST).light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

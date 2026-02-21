@@ -24,10 +24,9 @@ import com.zurrtum.create.client.flywheel.backend.glsl.generate.FnSignature;
 import com.zurrtum.create.client.flywheel.backend.glsl.generate.GlslExpr;
 import com.zurrtum.create.client.flywheel.lib.material.CutoutShaders;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
+import net.minecraft.resources.Identifier;
 
 import java.util.*;
-
-import net.minecraft.resources.Identifier;
 
 public final class PipelineCompiler {
     private static final Set<PipelineCompiler> ALL = Collections.newSetFromMap(new WeakHashMap<>());
@@ -91,7 +90,8 @@ public final class PipelineCompiler {
     ) {
         // We could technically compile every version of light smoothness ahead of time,
         // but that seems unnecessary as I doubt most folks will be changing this option often.
-        var harness = PIPELINE.program().link(PIPELINE.shader(GlCompat.MAX_GLSL_VERSION, ShaderType.VERTEX).nameMapper(key -> {
+        var harness = PIPELINE.program()
+            .link(PIPELINE.shader(GlCompat.MAX_GLSL_VERSION, ShaderType.VERTEX).nameMapper(key -> {
                     var instance = ResourceUtil.toDebugFileNameNoExtension(key.instanceType().vertexShader());
 
                     var material = ResourceUtil.toDebugFileNameNoExtension(key.materialShaders().vertexSource());
@@ -99,19 +99,23 @@ public final class PipelineCompiler {
                     var debug = key.debugEnabled() ? "_debug" : "";
                     return "pipeline/" + pipeline.compilerMarker() + "/" + instance + "/" + material + "_" + context + debug;
                 }).requireExtensions(extensions).onCompile((rl, compilation) -> {
-                    if (GlCompat.MAX_GLSL_VERSION.compareTo(GlslVersion.V400) < 0 && !extensions.contains("GL_ARB_gpu_shader5")) {
+                    if (GlCompat.MAX_GLSL_VERSION.compareTo(GlslVersion.V400) < 0 && !extensions.contains(
+                        "GL_ARB_gpu_shader5")) {
                         // Only define fma if it wouldn't be declared by gpu shader 5
                         compilation.define("fma(a, b, c) ((a) * (b) + (c))");
                     }
                 }).onCompile((key, comp) -> key.contextShader().onCompile(comp))
-                .onCompile((key, comp) -> BackendConfig.INSTANCE.lightSmoothness().onCompile(comp)).onCompile((key, comp) -> {
+                .onCompile((key, comp) -> BackendConfig.INSTANCE.lightSmoothness().onCompile(comp))
+                .onCompile((key, comp) -> {
                     if (key.debugEnabled()) {
                         comp.define("_FLW_DEBUG");
                     }
                 }).withResource(API_IMPL_VERT).withComponent(key -> new InstanceStructComponent(key.instanceType()))
-                .withResource(key -> key.instanceType().vertexShader()).withResource(key -> key.materialShaders().vertexSource())
-                .withComponents(vertexComponents).withResource(InternalVertex.LAYOUT_SHADER)
-                .withComponent(key -> pipeline.assembler().assemble(key.instanceType())).withResource(pipeline.vertexMain()))
+                .withResource(key -> key.instanceType().vertexShader())
+                .withResource(key -> key.materialShaders().vertexSource()).withComponents(vertexComponents)
+                .withResource(InternalVertex.LAYOUT_SHADER)
+                .withComponent(key -> pipeline.assembler().assemble(key.instanceType()))
+                .withResource(pipeline.vertexMain()))
             .link(PIPELINE.shader(GlCompat.MAX_GLSL_VERSION, ShaderType.FRAGMENT).nameMapper(key -> {
                     var context = key.contextShader().nameLowerCase();
 
@@ -122,13 +126,16 @@ public final class PipelineCompiler {
                     var cutout = key.useCutout() ? "_cutout" : "";
                     var oit = key.oit().name;
                     return "pipeline/" + pipeline.compilerMarker() + "/frag/" + material + "/" + light + "_" + context + cutout + debug + oit;
-                }).requireExtensions(extensions).enableExtension("GL_ARB_conservative_depth").onCompile((rl, compilation) -> {
-                    if (GlCompat.MAX_GLSL_VERSION.compareTo(GlslVersion.V400) < 0 && !extensions.contains("GL_ARB_gpu_shader5")) {
+                }).requireExtensions(extensions).enableExtension("GL_ARB_conservative_depth")
+                .onCompile((rl, compilation) -> {
+                    if (GlCompat.MAX_GLSL_VERSION.compareTo(GlslVersion.V400) < 0 && !extensions.contains(
+                        "GL_ARB_gpu_shader5")) {
                         // Only define fma if it wouldn't be declared by gpu shader 5
                         compilation.define("fma(a, b, c) ((a) * (b) + (c))");
                     }
                 }).onCompile((key, comp) -> key.contextShader().onCompile(comp))
-                .onCompile((key, comp) -> BackendConfig.INSTANCE.lightSmoothness().onCompile(comp)).onCompile((key, comp) -> {
+                .onCompile((key, comp) -> BackendConfig.INSTANCE.lightSmoothness().onCompile(comp))
+                .onCompile((key, comp) -> {
                     if (key.debugEnabled()) {
                         comp.define("_FLW_DEBUG");
                     }
@@ -141,10 +148,10 @@ public final class PipelineCompiler {
                         comp.define("_FLW_OIT");
                         comp.define(key.oit().define);
                     }
-                }).withResource(API_IMPL_FRAG).withResource(key -> key.materialShaders().fragmentSource()).withComponents(fragmentComponents)
-                .withComponent(key -> FOG).withResource(key -> key.light().source())
-                .with((key, fetcher) -> (key.useCutout() ? CUTOUT : fetcher.get(CutoutShaders.OFF.source()))).withResource(pipeline.fragmentMain()))
-            .preLink((key, program) -> {
+                }).withResource(API_IMPL_FRAG).withResource(key -> key.materialShaders().fragmentSource())
+                .withComponents(fragmentComponents).withComponent(key -> FOG).withResource(key -> key.light().source())
+                .with((key, fetcher) -> (key.useCutout() ? CUTOUT : fetcher.get(CutoutShaders.OFF.source())))
+                .withResource(pipeline.fragmentMain())).preLink((key, program) -> {
                 program.bindAttribLocation("_flw_aPos", 0);
                 program.bindAttribLocation("_flw_aColor", 1);
                 program.bindAttribLocation("_flw_aTexCoord", 2);
@@ -172,15 +179,20 @@ public final class PipelineCompiler {
     }
 
     public static void createFogComponent() {
-        FOG = UberShaderComponent.builder(ResourceUtil.rl("fog")).materialSources(MaterialShaderIndices.fogSources().all())
-            .adapt(FnSignature.create().returnType("vec4").name("flw_fogFilter").arg("vec4", "color").build(), GlslExpr.variable("color"))
-            .switchOn(GlslExpr.variable("_flw_uberFogIndex")).build(FlwPrograms.SOURCES);
+        FOG = UberShaderComponent.builder(ResourceUtil.rl("fog"))
+            .materialSources(MaterialShaderIndices.fogSources().all())
+            .adapt(
+                FnSignature.create().returnType("vec4").name("flw_fogFilter").arg("vec4", "color").build(),
+                GlslExpr.variable("color")
+            ).switchOn(GlslExpr.variable("_flw_uberFogIndex")).build(FlwPrograms.SOURCES);
     }
 
     private static void createCutoutComponent() {
-        CUTOUT = UberShaderComponent.builder(ResourceUtil.rl("cutout")).materialSources(MaterialShaderIndices.cutoutSources().all())
-            .adapt(FnSignature.create().returnType("bool").name("flw_discardPredicate").arg("vec4", "color").build(), GlslExpr.boolLiteral(false))
-            .switchOn(GlslExpr.variable("_flw_uberCutoutIndex")).build(FlwPrograms.SOURCES);
+        CUTOUT = UberShaderComponent.builder(ResourceUtil.rl("cutout"))
+            .materialSources(MaterialShaderIndices.cutoutSources().all()).adapt(
+                FnSignature.create().returnType("bool").name("flw_discardPredicate").arg("vec4", "color").build(),
+                GlslExpr.boolLiteral(false)
+            ).switchOn(GlslExpr.variable("_flw_uberCutoutIndex")).build(FlwPrograms.SOURCES);
     }
 
     /**
@@ -190,17 +202,16 @@ public final class PipelineCompiler {
      * @param contextShader The context shader to use.
      * @param light         The light shader to use.
      */
-    public record PipelineProgramKey(
-        InstanceType<?> instanceType, ContextShader contextShader, LightShader light, MaterialShaders materialShaders, boolean useCutout,
-        boolean debugEnabled, OitMode oit
-    ) {
+    public record PipelineProgramKey(InstanceType<?> instanceType, ContextShader contextShader, LightShader light,
+                                     MaterialShaders materialShaders, boolean useCutout, boolean debugEnabled,
+                                     OitMode oit) {
     }
 
     public enum OitMode {
-        OFF("", ""),
-        DEPTH_RANGE("_FLW_DEPTH_RANGE", "_depth_range"),
-        GENERATE_COEFFICIENTS("_FLW_COLLECT_COEFFS", "_generate_coefficients"),
-        EVALUATE("_FLW_EVALUATE", "_resolve"),
+        OFF("", ""), DEPTH_RANGE("_FLW_DEPTH_RANGE", "_depth_range"), GENERATE_COEFFICIENTS(
+            "_FLW_COLLECT_COEFFS",
+            "_generate_coefficients"
+        ), EVALUATE("_FLW_EVALUATE", "_resolve"),
         ;
 
         public final String define;

@@ -58,7 +58,10 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
         Level world = be.getLevel();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        state.lightCoords = world != null ? LevelRenderer.getLightColor(
+            world,
+            state.blockPos
+        ) : LightTexture.FULL_BRIGHT;
         DepotBehaviour depotBehaviour = be.depotBehaviour;
         state.incoming = createIncomingStateList(depotBehaviour, itemModelManager, tickProgress, world);
         state.outputs = createOutputStateList(depotBehaviour, itemModelManager, world);
@@ -89,7 +92,11 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
     }
 
     @Nullable
-    public static List<DepotOutputItemState> createOutputStateList(DepotBehaviour depotBehaviour, ItemModelResolver itemModelManager, Level world) {
+    public static List<DepotOutputItemState> createOutputStateList(
+        DepotBehaviour depotBehaviour,
+        ItemModelResolver itemModelManager,
+        Level world
+    ) {
         List<DepotOutputItemState> outputs = null;
         for (ItemStack stack : depotBehaviour.processingOutputBuffer) {
             if (stack.isEmpty()) {
@@ -104,9 +111,22 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
     }
 
     @Override
-    public void submit(DepotRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        DepotRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.incoming != null || state.outputs != null) {
-            renderItemsOf(state.incoming, state.outputs, state.blockPos, cameraState.pos, queue, matrices, state.lightCoords);
+            renderItemsOf(
+                state.incoming,
+                state.outputs,
+                state.blockPos,
+                cameraState.pos,
+                queue,
+                matrices,
+                state.lightCoords
+            );
         }
     }
 
@@ -164,8 +184,9 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
                 boolean renderUpright = item.upright;
                 msr.rotateYDegrees(360 / 8f * i);
                 ms.translate(.35f, 0, 0);
-                if (renderUpright)
+                if (renderUpright) {
                     msr.rotateYDegrees(-(360 / 8f * i));
+                }
                 Random r = new Random(i + 1);
                 int angle = (int) (360 * r.nextFloat());
                 renderItem(
@@ -224,8 +245,9 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
 
         for (int i = 0; i <= count; i++) {
             ms.pushPose();
-            if (blockItem && r != null)
+            if (blockItem && r != null) {
                 ms.translate(r.nextFloat() * .0625f * i, 0, r.nextFloat() * .0625f * i);
+            }
 
             if (box && !alwaysUpright) {
                 ms.translate(0, 4 / 16f, 0);
@@ -233,8 +255,9 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
             } else if (blockItem && alwaysUpright) {
                 ms.translate(0, 1 / 16f, 0);
                 ms.scale(.755f, .755f, .755f);
-            } else
+            } else {
                 ms.scale(.5f, .5f, .5f);
+            }
 
             if (!blockItem && !renderUpright) {
                 ms.translate(0, -3 / 16f, 0);
@@ -244,11 +267,13 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
             ms.popPose();
 
             if (!renderUpright) {
-                if (!blockItem)
+                if (!blockItem) {
                     msr.rotateYDegrees(10);
+                }
                 ms.translate(0, blockItem ? 1 / 64d : 1 / 16d, 0);
-            } else
+            } else {
                 ms.translate(0, 0, -1 / 16f);
+            }
         }
 
         ms.popPose();
@@ -259,15 +284,22 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         public List<DepotOutputItemState> outputs;
     }
 
-    public record DepotItemState(ItemStackRenderState state, int angle, Vec3 offset, boolean upright, boolean box, int count) {
-        public static DepotItemState create(ItemModelResolver itemModelManager, TransportedItemStack tis, float partialTicks, Level world) {
+    public record DepotItemState(ItemStackRenderState state, int angle, Vec3 offset, boolean upright, boolean box,
+                                 int count) {
+        public static DepotItemState create(
+            ItemModelResolver itemModelManager,
+            TransportedItemStack tis,
+            float partialTicks,
+            Level world
+        ) {
             Vec3 offsetVec;
             if (tis.insertedFrom.getAxis().isHorizontal()) {
                 float offset = Mth.lerp(partialTicks, tis.prevBeltPosition, tis.beltPosition);
                 float sideOffset = Mth.lerp(partialTicks, tis.prevSideOffset, tis.sideOffset);
                 boolean alongX = tis.insertedFrom.getClockWise().getAxis() == Direction.Axis.X;
-                if (!alongX)
+                if (!alongX) {
                     sideOffset *= -1;
+                }
                 offsetVec = Vec3.atLowerCornerOf(tis.insertedFrom.getOpposite().getUnitVec3i()).scale(.5f - offset)
                     .add(alongX ? sideOffset : 0, 0, alongX ? 0 : sideOffset);
             } else {

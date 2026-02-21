@@ -70,7 +70,10 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
         if (entity == null) {
             return null;
         }
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(entity.problemPath(), Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            entity.problemPath(),
+            Create.LOGGER
+        )) {
             ValueInput view = TagValueInput.create(logging, extraData.registryAccess(), extraData.readNbt());
             entity.readClient(view);
             return type.create(ToolboxScreen::new, syncId, inventory, title, entity);
@@ -86,7 +89,11 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
 
         color = menu.contentHolder.getColor();
 
-        confirmButton = new IconButton(leftPos + 30 + BG.getWidth() - 33, topPos + BG.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            leftPos + 30 + BG.getWidth() - 33,
+            topPos + BG.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(() -> {
             minecraft.player.closeContainer();
         });
@@ -99,31 +106,43 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
         disposeButton.setToolTip(CreateLang.translateDirect("toolbox.depositBox"));
         addRenderableWidget(disposeButton);
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + 30 + BG.getWidth(), topPos + BG.getHeight() - 15 - 34 - 6, 72, 68));
+        extraAreas = ImmutableList.of(new Rect2i(
+            leftPos + 30 + BG.getWidth(),
+            topPos + BG.getHeight() - 15 - 34 - 6,
+            72,
+            68
+        ));
 
         int x1 = leftPos + imageWidth - 1;
         int y1 = topPos + BG.getHeight() - 13;
-        renderedTopDrawer = new ElementWidget(x1, y1).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER).scale(3.125F)
-            .transform(this::transformTopDrawer).atLocal(-0.2f, 0.4f));
+        renderedTopDrawer = new ElementWidget(x1, y1).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER)
+            .scale(3.125F).transform(this::transformTopDrawer).atLocal(-0.2f, 0.4f));
         addRenderableWidget(renderedTopDrawer);
         renderedItem = new ElementWidget(
             leftPos + imageWidth + 5,
             topPos + BG.getHeight() - 54
-        ).showingElement(GuiGameElement.of(menu.contentHolder.getBlockState().getBlock().defaultBlockState()).scale(3.125F).rotate(-22, -202, 0)
-            .padding(12));
+        ).showingElement(GuiGameElement.of(menu.contentHolder.getBlockState().getBlock().defaultBlockState())
+            .scale(3.125F).rotate(-22, -202, 0).padding(12));
         addRenderableWidget(renderedItem);
         renderedLid = new ElementWidget(
             leftPos + imageWidth + 10,
             topPos + BG.getHeight() - 58
-        ).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_LIDS.get(color)).scale(3.125F).transform(this::transformLid).padding(6));
+        ).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_LIDS.get(color)).scale(3.125F)
+            .transform(this::transformLid).padding(6));
         addRenderableWidget(renderedLid);
-        renderedBottomDrawer = new ElementWidget(x1, topPos + BG.getHeight() - 7).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER)
-            .scale(3.125F).transform(this::transformBottomDrawer).atLocal(-0.2f, 0.4f));
+        renderedBottomDrawer = new ElementWidget(x1, topPos + BG.getHeight() - 7).showingElement(GuiGameElement.of(
+            AllPartialModels.TOOLBOX_DRAWER).scale(3.125F).transform(this::transformBottomDrawer).atLocal(-0.2f, 0.4f));
         addRenderableWidget(renderedBottomDrawer);
-        renderedTopLeftDrawer = new ElementWidget(x1, y1).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER).scale(3.125F)
+        renderedTopLeftDrawer = new ElementWidget(
+            x1,
+            y1
+        ).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER).scale(3.125F)
             .transform(this::transformTopDrawer).atLocal(-0.2f, 0.4f)).withScissor(0, 0, 15, 50);
         addRenderableWidget(renderedTopLeftDrawer);
-        renderedTopBottomDrawer = new ElementWidget(x1, y1).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER).scale(3.125F)
+        renderedTopBottomDrawer = new ElementWidget(
+            x1,
+            y1
+        ).showingElement(GuiGameElement.of(AllPartialModels.TOOLBOX_DRAWER).scale(3.125F)
             .transform(this::transformTopDrawer).atLocal(-0.2f, 0.4f)).withScissor(0, 6, 50, 44);
         addRenderableWidget(renderedTopBottomDrawer);
     }
@@ -137,7 +156,8 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
 
     private void transformTopDrawer(PoseStack ms, float partialTicks) {
         ms.translate(1.02F, 0.384F, 0);
-        TransformStack.of(ms).rotateXDegrees(-22).rotateYDegrees(-202).translate(0, 0, menu.contentHolder.drawers.getValue(partialTicks) * -.175f);
+        TransformStack.of(ms).rotateXDegrees(-22).rotateYDegrees(-202)
+            .translate(0, 0, menu.contentHolder.drawers.getValue(partialTicks) * -.175f);
         ms.scale(1, -1, 1);
     }
 
@@ -193,8 +213,9 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
             int i = slot.x + this.leftPos;
             int j = slot.y + topPos;
 
-            if (itemstack.isEmpty())
+            if (itemstack.isEmpty()) {
                 itemstack = menu.getFilter(compartment);
+            }
 
             if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
                 hoveredToolboxSlot = slot;
@@ -213,8 +234,9 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
 
     @Override
     protected void renderForeground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        if (hoveredToolboxSlot != null)
+        if (hoveredToolboxSlot != null) {
             hoveredSlot = hoveredToolboxSlot;
+        }
         super.renderForeground(graphics, mouseX, mouseY, partialTicks);
     }
 

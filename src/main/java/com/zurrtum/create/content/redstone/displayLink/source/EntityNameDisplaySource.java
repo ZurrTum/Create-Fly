@@ -15,14 +15,16 @@ public class EntityNameDisplaySource extends SingleLineDisplaySource {
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         List<SeatEntity> seats = context.level().getEntitiesOfClass(SeatEntity.class, new AABB(context.getSourcePos()));
 
-        if (seats.isEmpty())
+        if (seats.isEmpty()) {
             return EMPTY_LINE;
+        }
 
         SeatEntity seatEntity = seats.getFirst();
         List<Entity> passengers = seatEntity.getPassengers();
 
-        if (passengers.isEmpty())
+        if (passengers.isEmpty()) {
             return EMPTY_LINE;
+        }
 
         return Component.literal(passengers.getFirst().getDisplayName().getString());
     }

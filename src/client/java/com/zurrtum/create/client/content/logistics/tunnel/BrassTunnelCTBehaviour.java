@@ -16,8 +16,9 @@ public class BrassTunnelCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     @Override
     public @Nullable CTType getDataType(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction direction) {
-        if (!(world.getBlockEntity(pos) instanceof BrassTunnelBlockEntity tunnelBE) || !tunnelBE.hasDistributionBehaviour())
+        if (!(world.getBlockEntity(pos) instanceof BrassTunnelBlockEntity tunnelBE) || !tunnelBE.hasDistributionBehaviour()) {
             return null;
+        }
         return super.getDataType(world, pos, state, direction);
     }
 
@@ -32,14 +33,23 @@ public class BrassTunnelCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
         int yDiff = otherPos.getY() - pos.getY();
         int zDiff = otherPos.getZ() - pos.getZ();
-        if (yDiff != 0)
+        if (yDiff != 0) {
             return false;
+        }
 
-        if (!(reader.getBlockEntity(pos) instanceof BrassTunnelBlockEntity tunnelBE))
+        if (!(reader.getBlockEntity(pos) instanceof BrassTunnelBlockEntity tunnelBE)) {
             return false;
+        }
         boolean leftSide = zDiff > 0;
         return tunnelBE.isConnected(leftSide);
     }

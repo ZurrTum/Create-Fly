@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.content.contraptions.actors.contraptionControls.ControlsSlot;
 import com.zurrtum.create.client.content.contraptions.actors.roller.RollerValueBox;
 import com.zurrtum.create.client.content.fluids.pipes.SmartPipeFilterSlot;
@@ -33,7 +34,6 @@ import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockE
 import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.core.Direction;
@@ -117,13 +117,19 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
     }
 
     public static BlockEntityBehaviour<SmartBlockEntity> observer(TrackObserverBlockEntity blockEntity) {
-        FilteringBehaviour<ServerFilteringBehaviour> filter = new FilteringBehaviour<>(blockEntity, new ObserverFilterSlot());
+        FilteringBehaviour<ServerFilteringBehaviour> filter = new FilteringBehaviour<>(
+            blockEntity,
+            new ObserverFilterSlot()
+        );
         filter.setLabel(CreateLang.translateDirect("logistics.train_observer.cargo_filter"));
         return filter;
     }
 
     public static BlockEntityBehaviour<SmartBlockEntity> roller(RollerBlockEntity blockEntity) {
-        FilteringBehaviour<ServerFilteringBehaviour> filter = new FilteringBehaviour<>(blockEntity, new RollerValueBox(3));
+        FilteringBehaviour<ServerFilteringBehaviour> filter = new FilteringBehaviour<>(
+            blockEntity,
+            new RollerValueBox(3)
+        );
         filter.setLabel(CreateLang.translateDirect("contraptions.mechanical_roller.pave_material"));
         return filter;
     }
@@ -180,13 +186,15 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
     }
 
     public MutableComponent getLabel() {
-        if (customLabel != null)
+        if (customLabel != null) {
             return customLabel;
+        }
         return CreateLang.translateDirect(behaviour.isRecipeFilter() ? "logistics.recipe_filter" : behaviour.fluidFilter ? "logistics.fluid_filter" : "logistics.filter");
     }
 
     public MutableComponent getTip() {
-        return CreateLang.translateDirect(behaviour.getFilter().isEmpty() ? "logistics.filter.click_to_set" : "logistics.filter.click_to_replace");
+        return CreateLang.translateDirect(behaviour.getFilter()
+            .isEmpty() ? "logistics.filter.click_to_set" : "logistics.filter.click_to_replace");
     }
 
     public MutableComponent getAmountTip() {
@@ -216,8 +224,9 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
     }
 
     public MutableComponent formatValue(ValueSettings value) {
-        if (value.row() == 0 && value.value() == behaviour.getMaxStackSize())
+        if (value.row() == 0 && value.value() == behaviour.getMaxStackSize()) {
             return CreateLang.translateDirect("logistics.filter.any_amount_short");
+        }
         return Component.literal(((value.row() == 0) ? "≤" : "=") + Math.max(1, value.value()));
     }
 

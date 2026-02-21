@@ -20,27 +20,33 @@ public class PackageAddressDisplaySource extends SingleLineDisplaySource {
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
-        if (!(sourceBE instanceof SmartObserverBlockEntity cobe))
+        if (!(sourceBE instanceof SmartObserverBlockEntity cobe)) {
             return EMPTY_LINE;
+        }
 
         InvManipulationBehaviour invManipulationBehaviour = cobe.getBehaviour(InvManipulationBehaviour.TYPE);
         ServerFilteringBehaviour filteringBehaviour = cobe.getBehaviour(ServerFilteringBehaviour.TYPE);
         Container handler = invManipulationBehaviour.getInventory();
 
         if (handler == null) {
-            BlockPos targetPos = cobe.getBlockPos().relative(SmartObserverBlock.getTargetDirection(cobe.getBlockState()));
+            BlockPos targetPos = cobe.getBlockPos()
+                .relative(SmartObserverBlock.getTargetDirection(cobe.getBlockState()));
 
-            if (context.level().getBlockEntity(targetPos) instanceof ChainConveyorBlockEntity ccbe)
-                for (ChainConveyorPackage box : ccbe.getLoopingPackages())
-                    if (filteringBehaviour.test(box.item))
+            if (context.level().getBlockEntity(targetPos) instanceof ChainConveyorBlockEntity ccbe) {
+                for (ChainConveyorPackage box : ccbe.getLoopingPackages()) {
+                    if (filteringBehaviour.test(box.item)) {
                         return Component.literal(PackageItem.getAddress(box.item));
+                    }
+                }
+            }
 
             return EMPTY_LINE;
         }
 
         for (ItemStack stack : handler) {
-            if (PackageItem.isPackage(stack) && filteringBehaviour.test(stack))
+            if (PackageItem.isPackage(stack) && filteringBehaviour.test(stack)) {
                 return Component.literal(PackageItem.getAddress(stack));
+            }
         }
 
         return EMPTY_LINE;

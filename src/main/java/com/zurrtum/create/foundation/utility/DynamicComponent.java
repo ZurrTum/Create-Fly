@@ -17,8 +17,9 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class DynamicComponent {
     public static Component parseCustomText(Level level, BlockPos pos, Component customText) {
-        if (!(level instanceof ServerLevel serverLevel))
+        if (!(level instanceof ServerLevel serverLevel)) {
             return null;
+        }
         try {
             return ComponentUtils.updateForEntity(getCommandSource(serverLevel, pos), customText, null, 0);
         } catch (JsonParseException | CommandSyntaxException e) {

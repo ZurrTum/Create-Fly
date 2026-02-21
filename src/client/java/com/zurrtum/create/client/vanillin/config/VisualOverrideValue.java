@@ -3,8 +3,7 @@ package com.zurrtum.create.client.vanillin.config;
 import org.jetbrains.annotations.Nullable;
 
 public enum VisualOverrideValue {
-    DEFAULT,
-    DISABLE;
+    DEFAULT, DISABLE;
 
     @Nullable
     public static VisualOverrideValue parse(String string) {

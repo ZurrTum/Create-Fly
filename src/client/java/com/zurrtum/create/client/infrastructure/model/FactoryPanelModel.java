@@ -31,13 +31,23 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         model.collectParts(random, parts);
         boolean ponder = world instanceof PonderLevel;
         for (PanelSlot slot : PanelSlot.values()) {
-            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(world, new FactoryPanelPosition(pos, slot));
-            if (behaviour == null)
+            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(
+                world,
+                new FactoryPanelPosition(pos, slot)
+            );
+            if (behaviour == null) {
                 continue;
+            }
             addPanel(parts, state, slot, behaviour, ponder);
         }
     }
@@ -51,7 +61,13 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
         return vertex.toVector3f();
     }
 
-    public void addPanel(List<BlockModelPart> parts, BlockState state, PanelSlot slot, ServerFactoryPanelBehaviour behaviour, boolean ponder) {
+    public void addPanel(
+        List<BlockModelPart> parts,
+        BlockState state,
+        PanelSlot slot,
+        ServerFactoryPanelBehaviour behaviour,
+        boolean ponder
+    ) {
         PartialModel factoryPanel;
         if (behaviour.panelBE().restocker) {
             factoryPanel = behaviour.count == 0 ? AllPartialModels.FACTORY_PANEL_RESTOCKER : AllPartialModels.FACTORY_PANEL_RESTOCKER_WITH_BULB;

@@ -101,8 +101,15 @@ public class AllItems {
     public static final BlockItem SEQUENCED_GEARSHIFT = register(AllBlocks.SEQUENCED_GEARSHIFT);
     public static final BlockItem STEAM_ENGINE = register(AllBlocks.STEAM_ENGINE);
     public static final BlockItem GANTRY_CARRIAGE = register(AllBlocks.GANTRY_CARRIAGE);
-    public static final LargeWaterWheelBlockItem LARGE_WATER_WHEEL = register(AllBlocks.LARGE_WATER_WHEEL, LargeWaterWheelBlockItem::new);
-    public static final BlockItem CREATIVE_MOTOR = register(AllBlocks.CREATIVE_MOTOR, BlockItem::new, new Item.Properties().rarity(Rarity.EPIC));
+    public static final LargeWaterWheelBlockItem LARGE_WATER_WHEEL = register(
+        AllBlocks.LARGE_WATER_WHEEL,
+        LargeWaterWheelBlockItem::new
+    );
+    public static final BlockItem CREATIVE_MOTOR = register(
+        AllBlocks.CREATIVE_MOTOR,
+        BlockItem::new,
+        new Item.Properties().rarity(Rarity.EPIC)
+    );
     public static final BlockItem ROTATION_SPEED_CONTROLLER = register(AllBlocks.ROTATION_SPEED_CONTROLLER);
     public static final BlockItem GEARBOX = register(AllBlocks.GEARBOX);
     public static final BlockItem WATER_WHEEL = register(AllBlocks.WATER_WHEEL);
@@ -149,14 +156,20 @@ public class AllItems {
     public static final BlockItem SAIL = register(AllBlocks.SAIL, BlankSailBlockItem::new);
     public static final BlockItem FLUID_PIPE = register(AllBlocks.FLUID_PIPE);
     public static final BlockItem MECHANICAL_PUMP = register(AllBlocks.MECHANICAL_PUMP);
-    public static final BlazeBurnerBlockItem BLAZE_BURNER = register(AllBlocks.BLAZE_BURNER, BlazeBurnerBlockItem::withBlaze);
+    public static final BlazeBurnerBlockItem BLAZE_BURNER = register(
+        AllBlocks.BLAZE_BURNER,
+        BlazeBurnerBlockItem::withBlaze
+    );
     public static final FluidTankItem FLUID_TANK = register(AllBlocks.FLUID_TANK, FluidTankItem::new);
     public static final FluidTankItem CREATIVE_FLUID_TANK = register(
         AllBlocks.CREATIVE_FLUID_TANK,
         FluidTankItem::new,
         new Item.Properties().rarity(Rarity.EPIC)
     );
-    public static final AssemblyOperatorBlockItem MECHANICAL_PRESS = register(AllBlocks.MECHANICAL_PRESS, AssemblyOperatorBlockItem::new);
+    public static final AssemblyOperatorBlockItem MECHANICAL_PRESS = register(
+        AllBlocks.MECHANICAL_PRESS,
+        AssemblyOperatorBlockItem::new
+    );
     public static final EjectorItem WEIGHTED_EJECTOR = register(AllBlocks.WEIGHTED_EJECTOR, EjectorItem::new);
     public static final BlockItem ROPE_PULLEY = register(AllBlocks.ROPE_PULLEY);
     public static final BlockItem MILLSTONE = register(AllBlocks.MILLSTONE);
@@ -177,7 +190,10 @@ public class AllItems {
     public static final BeltTunnelItem BRASS_TUNNEL = register(AllBlocks.BRASS_TUNNEL, BeltTunnelItem::new);
     public static final ChuteItem CHUTE = register(AllBlocks.CHUTE, ChuteItem::new);
     public static final BlockItem SMART_CHUTE = register(AllBlocks.SMART_CHUTE);
-    public static final CartAssemblerBlockItem CART_ASSEMBLER = register(AllBlocks.CART_ASSEMBLER, CartAssemblerBlockItem::new);
+    public static final CartAssemblerBlockItem CART_ASSEMBLER = register(
+        AllBlocks.CART_ASSEMBLER,
+        CartAssemblerBlockItem::new
+    );
     public static final BlockItem CONTROLLER_RAIL = register(AllBlocks.CONTROLLER_RAIL);
     public static final BlockItem MECHANICAL_PLOUGH = register(AllBlocks.MECHANICAL_PLOUGH);
     public static final BlockItem MECHANICAL_HARVESTER = register(AllBlocks.MECHANICAL_HARVESTER);
@@ -187,12 +203,18 @@ public class AllItems {
     public static final BlockItem STRESSOMETER = register(AllBlocks.STRESSOMETER);
     public static final BlockItem CUCKOO_CLOCK = register(AllBlocks.CUCKOO_CLOCK);
     public static final BlockItem MYSTERIOUS_CUCKOO_CLOCK = register(AllBlocks.MYSTERIOUS_CUCKOO_CLOCK);
-    public static final BlockItem MECHANICAL_MIXER = register(AllBlocks.MECHANICAL_MIXER, AssemblyOperatorBlockItem::new);
+    public static final BlockItem MECHANICAL_MIXER = register(
+        AllBlocks.MECHANICAL_MIXER,
+        AssemblyOperatorBlockItem::new
+    );
     public static final BlockItem HOSE_PULLEY = register(AllBlocks.HOSE_PULLEY);
     public static final AssemblyOperatorBlockItem SPOUT = register(AllBlocks.SPOUT, AssemblyOperatorBlockItem::new);
     public static final BlockItem ITEM_DRAIN = register(AllBlocks.ITEM_DRAIN);
     public static final BlockItem STEAM_WHISTLE = register(AllBlocks.STEAM_WHISTLE);
-    public static final AssemblyOperatorBlockItem DEPLOYER = register(AllBlocks.DEPLOYER, AssemblyOperatorBlockItem::new);
+    public static final AssemblyOperatorBlockItem DEPLOYER = register(
+        AllBlocks.DEPLOYER,
+        AssemblyOperatorBlockItem::new
+    );
     public static final BlockItem TURNTABLE = register(AllBlocks.TURNTABLE);
     public static final BlockItem MECHANICAL_DRILL = register(AllBlocks.MECHANICAL_DRILL);
     public static final BlockItem CLOCKWORK_BEARING = register(AllBlocks.CLOCKWORK_BEARING);
@@ -212,7 +234,10 @@ public class AllItems {
     public static final BlockItem FLUID_VALVE = register(AllBlocks.FLUID_VALVE);
     public static final BlockItem SMART_FLUID_PIPE = register(AllBlocks.SMART_FLUID_PIPE);
     public static final BlockItem ANALOG_LEVER = register(AllBlocks.ANALOG_LEVER);
-    public static final RedstoneContactItem REDSTONE_CONTACT = register(AllBlocks.REDSTONE_CONTACT, RedstoneContactItem::new);
+    public static final RedstoneContactItem REDSTONE_CONTACT = register(
+        AllBlocks.REDSTONE_CONTACT,
+        RedstoneContactItem::new
+    );
     public static final BlockItem REDSTONE_LINK = register(AllBlocks.REDSTONE_LINK);
     public static final BlockItem PULSE_REPEATER = register(AllBlocks.PULSE_REPEATER);
     public static final BlockItem PULSE_EXTENDER = register(AllBlocks.PULSE_EXTENDER);
@@ -234,13 +259,26 @@ public class AllItems {
     public static final BlockItem NOZZLE = register(AllBlocks.NOZZLE);
     public static final BlockItem DESK_BELL = register(AllBlocks.DESK_BELL);
     public static final BlockItem MECHANICAL_CRAFTER = register(AllBlocks.MECHANICAL_CRAFTER);
-    public static final BlockItem CREATIVE_CRATE = register(AllBlocks.CREATIVE_CRATE, BlockItem::new, new Item.Properties().rarity(Rarity.EPIC));
+    public static final BlockItem CREATIVE_CRATE = register(
+        AllBlocks.CREATIVE_CRATE,
+        BlockItem::new,
+        new Item.Properties().rarity(Rarity.EPIC)
+    );
     public static final ItemVaultItem ITEM_VAULT = register(AllBlocks.ITEM_VAULT, ItemVaultItem::new);
     public static final TrackBlockItem TRACK = register(AllBlocks.TRACK, TrackBlockItem::new);
     public static final BlockItem TRAIN_CONTROLS = register(AllBlocks.TRAIN_CONTROLS);
-    public static final TrackTargetingBlockItem TRACK_STATION = register(AllBlocks.TRACK_STATION, TrackTargetingBlockItem::station);
-    public static final TrackTargetingBlockItem TRACK_SIGNAL = register(AllBlocks.TRACK_SIGNAL, TrackTargetingBlockItem::signal);
-    public static final TrackTargetingBlockItem TRACK_OBSERVER = register(AllBlocks.TRACK_OBSERVER, TrackTargetingBlockItem::observer);
+    public static final TrackTargetingBlockItem TRACK_STATION = register(
+        AllBlocks.TRACK_STATION,
+        TrackTargetingBlockItem::station
+    );
+    public static final TrackTargetingBlockItem TRACK_SIGNAL = register(
+        AllBlocks.TRACK_SIGNAL,
+        TrackTargetingBlockItem::signal
+    );
+    public static final TrackTargetingBlockItem TRACK_OBSERVER = register(
+        AllBlocks.TRACK_OBSERVER,
+        TrackTargetingBlockItem::observer
+    );
     public static final BlockItem WHITE_SEAT = register(AllBlocks.WHITE_SEAT);
     public static final BlockItem ORANGE_SEAT = register(AllBlocks.ORANGE_SEAT);
     public static final BlockItem MAGENTA_SEAT = register(AllBlocks.MAGENTA_SEAT);
@@ -260,38 +298,110 @@ public class AllItems {
     public static final RollerBlockItem MECHANICAL_ROLLER = register(AllBlocks.MECHANICAL_ROLLER, RollerBlockItem::new);
     public static final BlockItem PACKAGER = register(AllBlocks.PACKAGER);
     public static final BlockItem CARDBOARD_BLOCK = register(AllBlocks.CARDBOARD_BLOCK);
-    public static final LogisticallyLinkedBlockItem STOCK_LINK = register(AllBlocks.STOCK_LINK, LogisticallyLinkedBlockItem::new);
-    public static final RedstoneRequesterBlockItem REDSTONE_REQUESTER = register(AllBlocks.REDSTONE_REQUESTER, RedstoneRequesterBlockItem::new);
+    public static final LogisticallyLinkedBlockItem STOCK_LINK = register(
+        AllBlocks.STOCK_LINK,
+        LogisticallyLinkedBlockItem::new
+    );
+    public static final RedstoneRequesterBlockItem REDSTONE_REQUESTER = register(
+        AllBlocks.REDSTONE_REQUESTER,
+        RedstoneRequesterBlockItem::new
+    );
     public static final BlockItem REPACKAGER = register(AllBlocks.REPACKAGER);
-    public static final LogisticallyLinkedBlockItem STOCK_TICKER = register(AllBlocks.STOCK_TICKER, LogisticallyLinkedBlockItem::new);
-    public static final TableClothBlockItem WHITE_TABLE_CLOTH = register(AllBlocks.WHITE_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem ORANGE_TABLE_CLOTH = register(AllBlocks.ORANGE_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem MAGENTA_TABLE_CLOTH = register(AllBlocks.MAGENTA_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem LIGHT_BLUE_TABLE_CLOTH = register(AllBlocks.LIGHT_BLUE_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem YELLOW_TABLE_CLOTH = register(AllBlocks.YELLOW_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem LIME_TABLE_CLOTH = register(AllBlocks.LIME_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem PINK_TABLE_CLOTH = register(AllBlocks.PINK_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem GRAY_TABLE_CLOTH = register(AllBlocks.GRAY_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem LIGHT_GRAY_TABLE_CLOTH = register(AllBlocks.LIGHT_GRAY_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem CYAN_TABLE_CLOTH = register(AllBlocks.CYAN_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem PURPLE_TABLE_CLOTH = register(AllBlocks.PURPLE_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem BLUE_TABLE_CLOTH = register(AllBlocks.BLUE_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem BROWN_TABLE_CLOTH = register(AllBlocks.BROWN_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem GREEN_TABLE_CLOTH = register(AllBlocks.GREEN_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem RED_TABLE_CLOTH = register(AllBlocks.RED_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem BLACK_TABLE_CLOTH = register(AllBlocks.BLACK_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem ANDESITE_TABLE_CLOTH = register(AllBlocks.ANDESITE_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem BRASS_TABLE_CLOTH = register(AllBlocks.BRASS_TABLE_CLOTH, TableClothBlockItem::new);
-    public static final TableClothBlockItem COPPER_TABLE_CLOTH = register(AllBlocks.COPPER_TABLE_CLOTH, TableClothBlockItem::new);
+    public static final LogisticallyLinkedBlockItem STOCK_TICKER = register(
+        AllBlocks.STOCK_TICKER,
+        LogisticallyLinkedBlockItem::new
+    );
+    public static final TableClothBlockItem WHITE_TABLE_CLOTH = register(
+        AllBlocks.WHITE_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem ORANGE_TABLE_CLOTH = register(
+        AllBlocks.ORANGE_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem MAGENTA_TABLE_CLOTH = register(
+        AllBlocks.MAGENTA_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem LIGHT_BLUE_TABLE_CLOTH = register(
+        AllBlocks.LIGHT_BLUE_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem YELLOW_TABLE_CLOTH = register(
+        AllBlocks.YELLOW_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem LIME_TABLE_CLOTH = register(
+        AllBlocks.LIME_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem PINK_TABLE_CLOTH = register(
+        AllBlocks.PINK_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem GRAY_TABLE_CLOTH = register(
+        AllBlocks.GRAY_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem LIGHT_GRAY_TABLE_CLOTH = register(
+        AllBlocks.LIGHT_GRAY_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem CYAN_TABLE_CLOTH = register(
+        AllBlocks.CYAN_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem PURPLE_TABLE_CLOTH = register(
+        AllBlocks.PURPLE_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem BLUE_TABLE_CLOTH = register(
+        AllBlocks.BLUE_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem BROWN_TABLE_CLOTH = register(
+        AllBlocks.BROWN_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem GREEN_TABLE_CLOTH = register(
+        AllBlocks.GREEN_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem RED_TABLE_CLOTH = register(
+        AllBlocks.RED_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem BLACK_TABLE_CLOTH = register(
+        AllBlocks.BLACK_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem ANDESITE_TABLE_CLOTH = register(
+        AllBlocks.ANDESITE_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem BRASS_TABLE_CLOTH = register(
+        AllBlocks.BRASS_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
+    public static final TableClothBlockItem COPPER_TABLE_CLOTH = register(
+        AllBlocks.COPPER_TABLE_CLOTH,
+        TableClothBlockItem::new
+    );
     public static final PackagePortItem WHITE_POSTBOX = register(AllBlocks.WHITE_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem ORANGE_POSTBOX = register(AllBlocks.ORANGE_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem MAGENTA_POSTBOX = register(AllBlocks.MAGENTA_POSTBOX, PackagePortItem::new);
-    public static final PackagePortItem LIGHT_BLUE_POSTBOX = register(AllBlocks.LIGHT_BLUE_POSTBOX, PackagePortItem::new);
+    public static final PackagePortItem LIGHT_BLUE_POSTBOX = register(
+        AllBlocks.LIGHT_BLUE_POSTBOX,
+        PackagePortItem::new
+    );
     public static final PackagePortItem YELLOW_POSTBOX = register(AllBlocks.YELLOW_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem LIME_POSTBOX = register(AllBlocks.LIME_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem PINK_POSTBOX = register(AllBlocks.PINK_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem GRAY_POSTBOX = register(AllBlocks.GRAY_POSTBOX, PackagePortItem::new);
-    public static final PackagePortItem LIGHT_GRAY_POSTBOX = register(AllBlocks.LIGHT_GRAY_POSTBOX, PackagePortItem::new);
+    public static final PackagePortItem LIGHT_GRAY_POSTBOX = register(
+        AllBlocks.LIGHT_GRAY_POSTBOX,
+        PackagePortItem::new
+    );
     public static final PackagePortItem CYAN_POSTBOX = register(AllBlocks.CYAN_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem PURPLE_POSTBOX = register(AllBlocks.PURPLE_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem BLUE_POSTBOX = register(AllBlocks.BLUE_POSTBOX, PackagePortItem::new);
@@ -300,26 +410,77 @@ public class AllItems {
     public static final PackagePortItem RED_POSTBOX = register(AllBlocks.RED_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem BLACK_POSTBOX = register(AllBlocks.BLACK_POSTBOX, PackagePortItem::new);
     public static final PackagePortItem PACKAGE_FROGPORT = register(AllBlocks.PACKAGE_FROGPORT, PackagePortItem::new);
-    public static final FactoryPanelBlockItem FACTORY_GAUGE = register(AllBlocks.FACTORY_GAUGE, FactoryPanelBlockItem::new);
+    public static final FactoryPanelBlockItem FACTORY_GAUGE = register(
+        AllBlocks.FACTORY_GAUGE,
+        FactoryPanelBlockItem::new
+    );
     public static final BlockItem FLYWHEEL = register(AllBlocks.FLYWHEEL);
     public static final BlockItem ITEM_HATCH = register(AllBlocks.ITEM_HATCH);
     public static final BlockItem PLACARD = register(AllBlocks.PLACARD);
-    public static final UncontainableBlockItem WHITE_TOOLBOX = register(AllBlocks.WHITE_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem ORANGE_TOOLBOX = register(AllBlocks.ORANGE_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem MAGENTA_TOOLBOX = register(AllBlocks.MAGENTA_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem LIGHT_BLUE_TOOLBOX = register(AllBlocks.LIGHT_BLUE_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem YELLOW_TOOLBOX = register(AllBlocks.YELLOW_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem LIME_TOOLBOX = register(AllBlocks.LIME_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem PINK_TOOLBOX = register(AllBlocks.PINK_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem GRAY_TOOLBOX = register(AllBlocks.GRAY_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem LIGHT_GRAY_TOOLBOX = register(AllBlocks.LIGHT_GRAY_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem CYAN_TOOLBOX = register(AllBlocks.CYAN_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem PURPLE_TOOLBOX = register(AllBlocks.PURPLE_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem BLUE_TOOLBOX = register(AllBlocks.BLUE_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem BROWN_TOOLBOX = register(AllBlocks.BROWN_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem GREEN_TOOLBOX = register(AllBlocks.GREEN_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem RED_TOOLBOX = register(AllBlocks.RED_TOOLBOX, UncontainableBlockItem::new);
-    public static final UncontainableBlockItem BLACK_TOOLBOX = register(AllBlocks.BLACK_TOOLBOX, UncontainableBlockItem::new);
+    public static final UncontainableBlockItem WHITE_TOOLBOX = register(
+        AllBlocks.WHITE_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem ORANGE_TOOLBOX = register(
+        AllBlocks.ORANGE_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem MAGENTA_TOOLBOX = register(
+        AllBlocks.MAGENTA_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem LIGHT_BLUE_TOOLBOX = register(
+        AllBlocks.LIGHT_BLUE_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem YELLOW_TOOLBOX = register(
+        AllBlocks.YELLOW_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem LIME_TOOLBOX = register(
+        AllBlocks.LIME_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem PINK_TOOLBOX = register(
+        AllBlocks.PINK_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem GRAY_TOOLBOX = register(
+        AllBlocks.GRAY_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem LIGHT_GRAY_TOOLBOX = register(
+        AllBlocks.LIGHT_GRAY_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem CYAN_TOOLBOX = register(
+        AllBlocks.CYAN_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem PURPLE_TOOLBOX = register(
+        AllBlocks.PURPLE_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem BLUE_TOOLBOX = register(
+        AllBlocks.BLUE_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem BROWN_TOOLBOX = register(
+        AllBlocks.BROWN_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem GREEN_TOOLBOX = register(
+        AllBlocks.GREEN_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem RED_TOOLBOX = register(
+        AllBlocks.RED_TOOLBOX,
+        UncontainableBlockItem::new
+    );
+    public static final UncontainableBlockItem BLACK_TOOLBOX = register(
+        AllBlocks.BLACK_TOOLBOX,
+        UncontainableBlockItem::new
+    );
     public static final BlockItem SCHEMATIC_TABLE = register(AllBlocks.SCHEMATIC_TABLE);
     public static final BlockItem SCHEMATICANNON = register(AllBlocks.SCHEMATICANNON);
     public static final BlockItem ANDESITE_ENCASED_SHAFT = register(AllBlocks.ANDESITE_ENCASED_SHAFT);
@@ -328,9 +489,18 @@ public class AllItems {
     public static final BlockItem ANDESITE_LADDER = register(AllBlocks.ANDESITE_LADDER);
     public static final BlockItem BRASS_LADDER = register(AllBlocks.BRASS_LADDER);
     public static final BlockItem COPPER_LADDER = register(AllBlocks.COPPER_LADDER);
-    public static final MetalScaffoldingBlockItem ANDESITE_SCAFFOLD = register(AllBlocks.ANDESITE_SCAFFOLD, MetalScaffoldingBlockItem::new);
-    public static final MetalScaffoldingBlockItem BRASS_SCAFFOLD = register(AllBlocks.BRASS_SCAFFOLD, MetalScaffoldingBlockItem::new);
-    public static final MetalScaffoldingBlockItem COPPER_SCAFFOLD = register(AllBlocks.COPPER_SCAFFOLD, MetalScaffoldingBlockItem::new);
+    public static final MetalScaffoldingBlockItem ANDESITE_SCAFFOLD = register(
+        AllBlocks.ANDESITE_SCAFFOLD,
+        MetalScaffoldingBlockItem::new
+    );
+    public static final MetalScaffoldingBlockItem BRASS_SCAFFOLD = register(
+        AllBlocks.BRASS_SCAFFOLD,
+        MetalScaffoldingBlockItem::new
+    );
+    public static final MetalScaffoldingBlockItem COPPER_SCAFFOLD = register(
+        AllBlocks.COPPER_SCAFFOLD,
+        MetalScaffoldingBlockItem::new
+    );
     public static final BlockItem ANDESITE_BARS = register(AllBlocks.ANDESITE_BARS);
     public static final BlockItem BRASS_BARS = register(AllBlocks.BRASS_BARS);
     public static final BlockItem COPPER_BARS = register(AllBlocks.COPPER_BARS);
@@ -694,24 +864,41 @@ public class AllItems {
     public static final GogglesItem GOGGLES = register(
         "goggles",
         GogglesItem::new,
-        new Item.Properties().stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).build())
+        new Item.Properties().stacksTo(1)
+            .component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).build())
     );
     public static final Item BRASS_HAND = register("brass_hand");
     public static final Item ANDESITE_ALLOY = register("andesite_alloy");
     public static final WrenchItem WRENCH = register("wrench", WrenchItem::new, new Item.Properties().stacksTo(1));
     public static final BeltConnectorItem BELT_CONNECTOR = register("belt_connector", BeltConnectorItem::new);
-    public static final SuperGlueItem SUPER_GLUE = register("super_glue", SuperGlueItem::new, new Item.Properties().durability(99));
-    public static final BlazeBurnerBlockItem EMPTY_BLAZE_BURNER = register("empty_blaze_burner", BlazeBurnerBlockItem::empty);
+    public static final SuperGlueItem SUPER_GLUE = register(
+        "super_glue",
+        SuperGlueItem::new,
+        new Item.Properties().durability(99)
+    );
+    public static final BlazeBurnerBlockItem EMPTY_BLAZE_BURNER = register(
+        "empty_blaze_burner",
+        BlazeBurnerBlockItem::empty
+    );
     public static final BuildersTeaItem BUILDERS_TEA = register(
         "builders_tea", BuildersTeaItem::new, new Item.Properties().stacksTo(16).food(
             new FoodProperties.Builder().nutrition(1).saturationModifier(.6F).alwaysEdible().build(),
-            Consumable.builder().consumeSeconds(2.1F).animation(ItemUseAnimation.DRINK).sound(SoundEvents.GENERIC_DRINK).hasConsumeParticles(false)
-                .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.HASTE, 3 * 60 * 20, 0, false, false))).build()
+            Consumable.builder().consumeSeconds(2.1F).animation(ItemUseAnimation.DRINK).sound(SoundEvents.GENERIC_DRINK)
+                .hasConsumeParticles(false).onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(
+                    MobEffects.HASTE,
+                    3 * 60 * 20,
+                    0,
+                    false,
+                    false
+                ))).build()
         )
     );
     public static final Item BLAZE_CAKE_BASE = register("blaze_cake_base");
     public static final Item BLAZE_CAKE = register("blaze_cake");
-    public static final Item CREATIVE_BLAZE_CAKE = register("creative_blaze_cake", new Item.Properties().rarity(Rarity.EPIC));
+    public static final Item CREATIVE_BLAZE_CAKE = register(
+        "creative_blaze_cake",
+        new Item.Properties().rarity(Rarity.EPIC)
+    );
     public static final Item COPPER_SHEET = register("copper_sheet");
     public static final Item BRASS_SHEET = register("brass_sheet");
     public static final Item IRON_SHEET = register("iron_sheet");
@@ -731,13 +918,22 @@ public class AllItems {
     public static final ListFilterItem FILTER = register("filter", FilterItem::regular);
     public static final AttributeFilterItem ATTRIBUTE_FILTER = register("attribute_filter", FilterItem::attribute);
     public static final PackageFilterItem PACKAGE_FILTER = register("package_filter", FilterItem::address);
-    public static final MinecartCouplingItem MINECART_COUPLING = register("minecart_coupling", MinecartCouplingItem::new);
-    public static final MinecartContraptionItem MINECART_CONTRAPTION = register("minecart_contraption", MinecartContraptionItem::rideable);
+    public static final MinecartCouplingItem MINECART_COUPLING = register(
+        "minecart_coupling",
+        MinecartCouplingItem::new
+    );
+    public static final MinecartContraptionItem MINECART_CONTRAPTION = register(
+        "minecart_contraption",
+        MinecartContraptionItem::rideable
+    );
     public static final MinecartContraptionItem FURNACE_MINECART_CONTRAPTION = register(
         "furnace_minecart_contraption",
         MinecartContraptionItem::furnace
     );
-    public static final MinecartContraptionItem CHEST_MINECART_CONTRAPTION = register("chest_minecart_contraption", MinecartContraptionItem::chest);
+    public static final MinecartContraptionItem CHEST_MINECART_CONTRAPTION = register(
+        "chest_minecart_contraption",
+        MinecartContraptionItem::chest
+    );
     public static final Item CINDER_FLOUR = register("cinder_flour");
     public static final Item BAR_OF_CHOCOLATE = register(
         "bar_of_chocolate",
@@ -761,8 +957,8 @@ public class AllItems {
         "copper_diving_helmet",
         DivingHelmetItem::new,
         new Item.Properties().durability(ArmorType.HELMET.getDurability(AllArmorMaterials.COPPER.durability()))
-            .attributes(DivingHelmetItem.createAttributeModifiers(AllArmorMaterials.COPPER)).enchantable(AllArmorMaterials.COPPER.enchantmentValue())
-            .component(
+            .attributes(DivingHelmetItem.createAttributeModifiers(AllArmorMaterials.COPPER))
+            .enchantable(AllArmorMaterials.COPPER.enchantmentValue()).component(
                 DataComponents.EQUIPPABLE,
                 Equippable.builder(EquipmentSlot.HEAD).setEquipSound(AllArmorMaterials.COPPER.equipSound())
                     .setAsset(AllArmorMaterials.COPPER.assetId()).build()
@@ -801,7 +997,11 @@ public class AllItems {
     );
     public static final Item ROSE_QUARTZ = register("rose_quartz");
     public static final Item POLISHED_ROSE_QUARTZ = register("polished_rose_quartz");
-    public static final SandPaperItem SAND_PAPER = register("sand_paper", SandPaperItem::new, new Item.Properties().durability(8).enchantable(1));
+    public static final SandPaperItem SAND_PAPER = register(
+        "sand_paper",
+        SandPaperItem::new,
+        new Item.Properties().durability(8).enchantable(1)
+    );
     public static final SandPaperItem RED_SAND_PAPER = register(
         "red_sand_paper",
         SandPaperItem::new,
@@ -920,17 +1120,21 @@ public class AllItems {
         PackageItem.styled(AllPackageStyles.RARE_VECTOR),
         new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
-    public static final ShoppingListItem SHOPPING_LIST = register("shopping_list", ShoppingListItem::new, new Item.Properties().stacksTo(1));
+    public static final ShoppingListItem SHOPPING_LIST = register(
+        "shopping_list",
+        ShoppingListItem::new,
+        new Item.Properties().stacksTo(1)
+    );
     public static final CardboardArmorItem CARDBOARD_HELMET = register(
         "cardboard_helmet",
         CardboardArmorItem::new,
         new Item.Properties().durability(ArmorType.HELMET.getDurability(AllArmorMaterials.CARDBOARD.durability()))
-            .attributes(AllArmorMaterials.CARDBOARD.createAttributes(ArmorType.HELMET)).enchantable(AllArmorMaterials.CARDBOARD.enchantmentValue())
-            .component(
+            .attributes(AllArmorMaterials.CARDBOARD.createAttributes(ArmorType.HELMET))
+            .enchantable(AllArmorMaterials.CARDBOARD.enchantmentValue()).component(
                 DataComponents.EQUIPPABLE,
                 Equippable.builder(ArmorType.HELMET.getSlot()).setEquipSound(AllArmorMaterials.CARDBOARD.equipSound())
-                    .setAsset(AllArmorMaterials.CARDBOARD.assetId()).setCameraOverlay(Identifier.fromNamespaceAndPath(MOD_ID, "misc/package_blur"))
-                    .build()
+                    .setAsset(AllArmorMaterials.CARDBOARD.assetId())
+                    .setCameraOverlay(Identifier.fromNamespaceAndPath(MOD_ID, "misc/package_blur")).build()
             ).repairable(AllArmorMaterials.CARDBOARD.repairIngredient())
     );
     public static final CardboardArmorItem CARDBOARD_CHESTPLATE = register(
@@ -952,14 +1156,15 @@ public class AllItems {
     public static final CardboardSwordItem CARDBOARD_SWORD = register(
         "cardboard_sword",
         CardboardSwordItem::new,
-        new Item.Properties().durability(AllToolMaterials.CARDBOARD.durability()).repairable(AllToolMaterials.CARDBOARD.repairItems())
+        new Item.Properties().durability(AllToolMaterials.CARDBOARD.durability())
+            .repairable(AllToolMaterials.CARDBOARD.repairItems())
             .enchantable(AllToolMaterials.CARDBOARD.enchantmentValue()).component(
                 DataComponents.TOOL, new Tool(
                     List.of(
                         Tool.Rule.minesAndDrops(HolderSet.direct(Blocks.COBWEB.builtInRegistryHolder()), 15.0F),
                         Tool.Rule.overrideSpeed(
-                            BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK).getOrThrow(BlockTags.SWORD_INSTANTLY_MINES),
-                            Float.MAX_VALUE
+                            BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK)
+                                .getOrThrow(BlockTags.SWORD_INSTANTLY_MINES), Float.MAX_VALUE
                         ),
                         Tool.Rule.overrideSpeed(
                             BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK)
@@ -968,13 +1173,11 @@ public class AllItems {
                     ), 1.0F, 2, false
                 )
             ).attributes(ItemAttributeModifiers.builder().add(
-                Attributes.ATTACK_DAMAGE,
-                new AttributeModifier(
+                Attributes.ATTACK_DAMAGE, new AttributeModifier(
                     Item.BASE_ATTACK_DAMAGE_ID,
                     3.0F + AllToolMaterials.CARDBOARD.attackDamageBonus(),
                     AttributeModifier.Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.MAINHAND
+                ), EquipmentSlotGroup.MAINHAND
             ).add(
                 Attributes.ATTACK_SPEED,
                 new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, 1.0F, AttributeModifier.Operation.ADD_VALUE),
@@ -995,20 +1198,36 @@ public class AllItems {
         SchematicAndQuillItem::new,
         new Item.Properties().stacksTo(1)
     );
-    public static final SchematicItem SCHEMATIC = register("schematic", SchematicItem::new, new Item.Properties().stacksTo(1));
+    public static final SchematicItem SCHEMATIC = register(
+        "schematic",
+        SchematicItem::new,
+        new Item.Properties().stacksTo(1)
+    );
     public static final WorldshaperItem WORLDSHAPER = register(
         "handheld_worldshaper",
         WorldshaperItem::new,
         new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)
     );
-    public static final TagDependentIngredientItem CRUSHED_RAW_OSMIUM = register("crushed_raw_osmium", TagDependentIngredientItem.tag("ores/osmium"));
+    public static final TagDependentIngredientItem CRUSHED_RAW_OSMIUM = register(
+        "crushed_raw_osmium",
+        TagDependentIngredientItem.tag("ores/osmium")
+    );
     public static final TagDependentIngredientItem CRUSHED_RAW_PLATINUM = register(
         "crushed_raw_platinum",
         TagDependentIngredientItem.tag("ores/platinum")
     );
-    public static final TagDependentIngredientItem CRUSHED_RAW_SILVER = register("crushed_raw_silver", TagDependentIngredientItem.tag("ores/silver"));
-    public static final TagDependentIngredientItem CRUSHED_RAW_TIN = register("crushed_raw_tin", TagDependentIngredientItem.tag("ores/tin"));
-    public static final TagDependentIngredientItem CRUSHED_RAW_LEAD = register("crushed_raw_lead", TagDependentIngredientItem.tag("ores/lead"));
+    public static final TagDependentIngredientItem CRUSHED_RAW_SILVER = register(
+        "crushed_raw_silver",
+        TagDependentIngredientItem.tag("ores/silver")
+    );
+    public static final TagDependentIngredientItem CRUSHED_RAW_TIN = register(
+        "crushed_raw_tin",
+        TagDependentIngredientItem.tag("ores/tin")
+    );
+    public static final TagDependentIngredientItem CRUSHED_RAW_LEAD = register(
+        "crushed_raw_lead",
+        TagDependentIngredientItem.tag("ores/lead")
+    );
     public static final TagDependentIngredientItem CRUSHED_RAW_QUICKSILVER = register(
         "crushed_raw_quicksilver",
         TagDependentIngredientItem.tag("ores/quicksilver")
@@ -1021,9 +1240,15 @@ public class AllItems {
         "crushed_raw_uranium",
         TagDependentIngredientItem.tag("ores/uranium")
     );
-    public static final TagDependentIngredientItem CRUSHED_RAW_NICKEL = register("crushed_raw_nickel", TagDependentIngredientItem.tag("ores/nickel"));
+    public static final TagDependentIngredientItem CRUSHED_RAW_NICKEL = register(
+        "crushed_raw_nickel",
+        TagDependentIngredientItem.tag("ores/nickel")
+    );
 
-    private static <T extends BucketItem> T register(FlowableFluid fluid, BiFunction<Fluid, Item.Properties, T> factory) {
+    private static <T extends BucketItem> T register(
+        FlowableFluid fluid,
+        BiFunction<Fluid, Item.Properties, T> factory
+    ) {
         T bucket = register(
             BuiltInRegistries.FLUID.getKey(fluid).withSuffix("_bucket"),
             settings -> factory.apply(fluid, settings),
@@ -1042,7 +1267,11 @@ public class AllItems {
     }
 
     @SuppressWarnings("deprecation")
-    private static <T extends Block, U extends Item> U register(T block, BiFunction<T, Item.Properties, U> factory, Item.Properties settings) {
+    private static <T extends Block, U extends Item> U register(
+        T block,
+        BiFunction<T, Item.Properties, U> factory,
+        Item.Properties settings
+    ) {
         return register(
             block.builtInRegistryHolder().key().identifier(),
             itemSettings -> factory.apply(block, itemSettings),
@@ -1062,11 +1291,19 @@ public class AllItems {
         return register(Identifier.fromNamespaceAndPath(MOD_ID, id), factory, new Item.Properties());
     }
 
-    private static <T extends Item> T register(String id, Function<Item.Properties, T> factory, Item.Properties settings) {
+    private static <T extends Item> T register(
+        String id,
+        Function<Item.Properties, T> factory,
+        Item.Properties settings
+    ) {
         return register(Identifier.fromNamespaceAndPath(MOD_ID, id), factory, settings);
     }
 
-    private static <T extends Item> T register(Identifier id, Function<Item.Properties, T> factory, Item.Properties settings) {
+    private static <T extends Item> T register(
+        Identifier id,
+        Function<Item.Properties, T> factory,
+        Item.Properties settings
+    ) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);
         T item = factory.apply(settings.setId(key));
         if (item instanceof BlockItem blockItem) {

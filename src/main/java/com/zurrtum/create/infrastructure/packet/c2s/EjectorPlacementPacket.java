@@ -12,7 +12,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record EjectorPlacementPacket(int h, int v, BlockPos pos, Direction facing) implements Packet<ServerGamePacketListener> {
+public record EjectorPlacementPacket(int h, int v, BlockPos pos,
+                                     Direction facing) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, EjectorPlacementPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         EjectorPlacementPacket::h,

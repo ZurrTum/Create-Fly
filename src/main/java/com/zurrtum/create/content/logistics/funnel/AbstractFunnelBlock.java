@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.logistics.funnel;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import net.minecraft.core.BlockPos;
@@ -40,7 +40,13 @@ public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlo
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return withWater(defaultBlockState().setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos())), context);
+        return withWater(
+            defaultBlockState().setValue(
+                POWERED,
+                context.getLevel().hasNeighborSignal(context.getClickedPos())
+            ),
+            context
+        );
     }
 
     @Override
@@ -74,46 +80,69 @@ public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlo
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (level.isClientSide())
+    public void neighborUpdate(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos fromPos,
+        boolean isMoving
+    ) {
+        if (level.isClientSide()) {
             return;
+        }
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(level, pos, InvManipulationBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.onNeighborChanged(fromPos);
+        }
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation wireOrientation, boolean isMoving) {
-        if (level.isClientSide())
+    public void neighborChanged(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Block block,
+        @Nullable Orientation wireOrientation,
+        boolean isMoving
+    ) {
+        if (level.isClientSide()) {
             return;
-        if (!level.getBlockTicks().willTickThisTick(pos, this))
+        }
+        if (!level.getBlockTicks().willTickThisTick(pos, this)) {
             level.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource r) {
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
             worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
+        }
     }
 
     public static ItemStack tryInsert(Level worldIn, BlockPos pos, ItemStack toInsert, boolean simulate) {
         ServerFilteringBehaviour filter = BlockEntityBehaviour.get(worldIn, pos, ServerFilteringBehaviour.TYPE);
         InvManipulationBehaviour inserter = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
-        if (inserter == null)
+        if (inserter == null) {
             return toInsert;
-        if (filter != null && !filter.test(toInsert))
+        }
+        if (filter != null && !filter.test(toInsert)) {
             return toInsert;
-        if (simulate)
+        }
+        if (simulate) {
             inserter.simulate();
+        }
         ItemStack insert = inserter.insert(toInsert);
 
         if (!simulate && insert.getCount() != toInsert.getCount()) {
             BlockEntity blockEntity = worldIn.getBlockEntity(pos);
             if (blockEntity instanceof FunnelBlockEntity funnelBlockEntity) {
                 funnelBlockEntity.onTransfer(toInsert);
-                if (funnelBlockEntity.hasFlap())
+                if (funnelBlockEntity.hasFlap()) {
                     funnelBlockEntity.flap(true);
+                }
             }
         }
         return insert;
@@ -131,8 +160,9 @@ public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlo
 
     @Nullable
     public static Direction getFunnelFacing(BlockState state) {
-        if (!(state.getBlock() instanceof AbstractFunnelBlock))
+        if (!(state.getBlock() instanceof AbstractFunnelBlock)) {
             return null;
+        }
         return ((AbstractFunnelBlock) state.getBlock()).getFacing(state);
     }
 

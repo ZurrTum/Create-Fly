@@ -73,44 +73,54 @@ public class StructureTransform {
         }
 
         angle %= 360;
-        if (angle < -90)
+        if (angle < -90) {
             angle += 360;
+        }
 
         this.rotation = Rotation.NONE;
-        if (angle == -90 || angle == 270)
+        if (angle == -90 || angle == 270) {
             this.rotation = Rotation.CLOCKWISE_90;
-        if (angle == 90)
+        }
+        if (angle == 90) {
             this.rotation = Rotation.COUNTERCLOCKWISE_90;
-        if (angle == 180)
+        }
+        if (angle == 180) {
             this.rotation = Rotation.CLOCKWISE_180;
+        }
 
         mirror = Mirror.NONE;
     }
 
     public Vec3 applyWithoutOffsetUncentered(Vec3 localVec) {
         Vec3 vec = localVec;
-        if (mirror != null)
+        if (mirror != null) {
             vec = VecHelper.mirror(vec, mirror);
-        if (rotationAxis != null)
+        }
+        if (rotationAxis != null) {
             vec = VecHelper.rotate(vec, angle, rotationAxis);
+        }
         return vec;
     }
 
     public Vec3 applyWithoutOffset(Vec3 localVec) {
         Vec3 vec = localVec;
-        if (mirror != null)
+        if (mirror != null) {
             vec = VecHelper.mirrorCentered(vec, mirror);
-        if (rotationAxis != null)
+        }
+        if (rotationAxis != null) {
             vec = VecHelper.rotateCentered(vec, angle, rotationAxis);
+        }
         return vec;
     }
 
     public Vec3 unapplyWithoutOffset(Vec3 globalVec) {
         Vec3 vec = globalVec;
-        if (rotationAxis != null)
+        if (rotationAxis != null) {
             vec = VecHelper.rotateCentered(vec, -angle, rotationAxis);
-        if (mirror != null)
+        }
+        if (mirror != null) {
             vec = VecHelper.mirrorCentered(vec, mirror);
+        }
 
         return vec;
     }
@@ -158,13 +168,15 @@ public class StructureTransform {
             return transformable.transform(state, this);
         }
 
-        if (mirror != null)
+        if (mirror != null) {
             state = state.mirror(mirror);
+        }
 
         if (rotationAxis == Axis.Y) {
             if (block instanceof BellBlock) {
-                if (state.getValue(BlockStateProperties.BELL_ATTACHMENT) == BellAttachType.DOUBLE_WALL)
+                if (state.getValue(BlockStateProperties.BELL_ATTACHMENT) == BellAttachType.DOUBLE_WALL) {
                     state = state.setValue(BlockStateProperties.BELL_ATTACHMENT, BellAttachType.SINGLE_WALL);
+                }
                 return state.setValue(BellBlock.FACING, rotation.rotate(state.getValue(BellBlock.FACING)));
             }
 
@@ -179,8 +191,9 @@ public class StructureTransform {
             boolean z = rotationAxis == Axis.Z;
             Direction forcedAxis = z ? Direction.WEST : Direction.SOUTH;
 
-            if (stateFacing.getAxis() == rotationAxis && stateFace == AttachFace.WALL)
+            if (stateFacing.getAxis() == rotationAxis && stateFace == AttachFace.WALL) {
                 return state;
+            }
 
             for (int i = 0; i < rotation.ordinal(); i++) {
                 stateFace = state.getValue(faceProperty);
@@ -217,14 +230,19 @@ public class StructureTransform {
         } else if (halfTurn) {
             if (state.hasProperty(HORIZONTAL_FACING)) {
                 Direction stateFacing = state.getValue(HORIZONTAL_FACING);
-                if (stateFacing.getAxis() == rotationAxis)
+                if (stateFacing.getAxis() == rotationAxis) {
                     return state;
+                }
             }
 
             state = state.rotate(rotation);
 
-            if (state.hasProperty(SlabBlock.TYPE) && state.getValue(SlabBlock.TYPE) != SlabType.DOUBLE)
-                state = state.setValue(SlabBlock.TYPE, state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM ? SlabType.TOP : SlabType.BOTTOM);
+            if (state.hasProperty(SlabBlock.TYPE) && state.getValue(SlabBlock.TYPE) != SlabType.DOUBLE) {
+                state = state.setValue(
+                    SlabBlock.TYPE,
+                    state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM ? SlabType.TOP : SlabType.BOTTOM
+                );
+            }
         }
 
         return state;
@@ -235,10 +253,11 @@ public class StructureTransform {
             for (int i = 0; i < rotation.ordinal(); i++) {
                 Direction direction = state.getValue(StairBlock.FACING);
                 Half half = state.getValue(StairBlock.HALF);
-                if (direction.getAxisDirection() == AxisDirection.POSITIVE ^ half == Half.BOTTOM ^ direction.getAxis() == Axis.Z)
+                if (direction.getAxisDirection() == AxisDirection.POSITIVE ^ half == Half.BOTTOM ^ direction.getAxis() == Axis.Z) {
                     state = state.cycle(StairBlock.HALF);
-                else
+                } else {
                     state = state.setValue(StairBlock.FACING, direction.getOpposite());
+                }
             }
         } else {
             if (halfTurn) {
@@ -249,8 +268,9 @@ public class StructureTransform {
     }
 
     public Direction mirrorFacing(Direction facing) {
-        if (mirror != null)
+        if (mirror != null) {
             return mirror.mirror(facing);
+        }
         return facing;
     }
 
@@ -260,8 +280,9 @@ public class StructureTransform {
     }
 
     public Direction rotateFacing(Direction facing) {
-        for (int i = 0; i < rotation.ordinal(); i++)
+        for (int i = 0; i < rotation.ordinal(); i++) {
             facing = facing.getClockWise(rotationAxis);
+        }
         return facing;
     }
 }

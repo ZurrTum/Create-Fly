@@ -16,7 +16,13 @@ import net.minecraft.world.level.block.FenceBlock;
 import org.joml.Matrix3f;
 
 public class ValueBoxRenderer {
-    public static void renderItemIntoValueBox(ItemStackRenderState state, SubmitNodeCollector queue, PoseStack ms, int light, float offset) {
+    public static void renderItemIntoValueBox(
+        ItemStackRenderState state,
+        SubmitNodeCollector queue,
+        PoseStack ms,
+        int light,
+        float offset
+    ) {
         boolean blockItem = state.usesBlockLight();
         float scale = (!blockItem ? .5f : 1f) + 1 / 64f;
         float zOffset = (!blockItem ? -.15f : 0) + offset;
@@ -25,7 +31,12 @@ public class ValueBoxRenderer {
         state.submit(ms, queue, light, OverlayTexture.NO_OVERLAY, 0);
     }
 
-    public static void renderFlatItemIntoValueBox(ItemStackRenderState state, SubmitNodeCollector queue, PoseStack ms, int light) {
+    public static void renderFlatItemIntoValueBox(
+        ItemStackRenderState state,
+        SubmitNodeCollector queue,
+        PoseStack ms,
+        int light
+    ) {
         int bl = light >> 4 & 0xf;
         int sl = light >> 20 & 0xf;
         int itemLight = Mth.floor(sl + .5) << 20 | (Mth.floor(bl + .5) & 0xf) << 4;
@@ -52,14 +63,18 @@ public class ValueBoxRenderer {
         float nudge = -.1f;
         if (item instanceof BlockItem) {
             Block block = ((BlockItem) item).getBlock();
-            if (block instanceof AbstractSimpleShaftBlock)
+            if (block instanceof AbstractSimpleShaftBlock) {
                 return nudge;
-            if (block instanceof FenceBlock)
+            }
+            if (block instanceof FenceBlock) {
                 return nudge;
-            if (block.builtInRegistryHolder().is(BlockTags.BUTTONS))
+            }
+            if (block.builtInRegistryHolder().is(BlockTags.BUTTONS)) {
                 return nudge;
-            if (block == Blocks.END_ROD)
+            }
+            if (block == Blocks.END_ROD) {
                 return nudge;
+            }
         }
         return 0;
     }

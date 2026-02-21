@@ -4,10 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -15,6 +11,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.function.Function;
 
 public abstract class ValueBoxTransform {
 
@@ -26,15 +25,17 @@ public abstract class ValueBoxTransform {
 
     public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
         Vec3 offset = getLocalOffset(state);
-        if (offset == null)
+        if (offset == null) {
             return false;
+        }
         return localHit.distanceTo(offset) < scale / 2;
     }
 
     public void transform(BlockState state, PoseStack ms) {
         Vec3 position = getLocalOffset(state);
-        if (position == null)
+        if (position == null) {
             return;
+        }
         ms.translate(position.x, position.y, position.z);
         rotate(state, ms);
         ms.scale(scale, scale, scale);
@@ -50,10 +51,12 @@ public abstract class ValueBoxTransform {
 
     protected Vec3 rotateHorizontally(BlockState state, Vec3 vec) {
         float yRot = 0;
-        if (state.hasProperty(BlockStateProperties.FACING))
+        if (state.hasProperty(BlockStateProperties.FACING)) {
             yRot = AngleHelper.horizontalAngle(state.getValue(BlockStateProperties.FACING));
-        if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
+        }
+        if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
             yRot = AngleHelper.horizontalAngle(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
+        }
         return VecHelper.rotateCentered(vec, yRot, Axis.Y);
     }
 
@@ -84,8 +87,9 @@ public abstract class ValueBoxTransform {
         @Override
         public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
             Vec3 offset = getLocalOffset(state);
-            if (offset == null)
+            if (offset == null) {
                 return false;
+            }
             return localHit.distanceTo(offset) < scale / 3.5f;
         }
 

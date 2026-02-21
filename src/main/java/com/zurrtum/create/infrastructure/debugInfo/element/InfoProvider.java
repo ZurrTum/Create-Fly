@@ -1,10 +1,9 @@
 package com.zurrtum.create.infrastructure.debugInfo.element;
 
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-
-import net.minecraft.world.entity.player.Player;
 
 /**
  * A supplier of debug information. May be queried on the client or server.

@@ -1,18 +1,17 @@
 package com.zurrtum.create.client.catnip.lang;
 
-import org.joml.Matrix4f;
 import com.mojang.blaze3d.vertex.PoseStack;
-
-import java.text.BreakIterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import org.joml.Matrix4f;
+
+import java.text.BreakIterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 public class ClientFontHelper {
 
@@ -55,7 +54,15 @@ public class ClientFontHelper {
         return lines;
     }
 
-    public static void drawSplitString(GuiGraphics graphics, Font font, String text, int x, int y, int width, int color) {
+    public static void drawSplitString(
+        GuiGraphics graphics,
+        Font font,
+        String text,
+        int x,
+        int y,
+        int width,
+        int color
+    ) {
         List<String> list = cutString(font, text, width);
 
         boolean rightToLeft = font.isBidirectional();
@@ -77,7 +84,16 @@ public class ClientFontHelper {
         }
     }
 
-    public static void drawSplitString(MultiBufferSource buffer, PoseStack matrixStack, Font font, String text, int x, int y, int width, int color) {
+    public static void drawSplitString(
+        MultiBufferSource buffer,
+        PoseStack matrixStack,
+        Font font,
+        String text,
+        int x,
+        int y,
+        int width,
+        int color
+    ) {
         List<String> list = cutString(font, text, width);
         Matrix4f matrix4f = matrixStack.last().pose();
 
@@ -94,7 +110,26 @@ public class ClientFontHelper {
         }
     }
 
-    private static void draw(MultiBufferSource buffer, Font font, String text, int x, int y, int color, Matrix4f matrix4f) {
-        font.drawInBatch(text, x, y, color, false, matrix4f, buffer, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+    private static void draw(
+        MultiBufferSource buffer,
+        Font font,
+        String text,
+        int x,
+        int y,
+        int color,
+        Matrix4f matrix4f
+    ) {
+        font.drawInBatch(
+            text,
+            x,
+            y,
+            color,
+            false,
+            matrix4f,
+            buffer,
+            Font.DisplayMode.NORMAL,
+            0,
+            LightTexture.FULL_BRIGHT
+        );
     }
 }

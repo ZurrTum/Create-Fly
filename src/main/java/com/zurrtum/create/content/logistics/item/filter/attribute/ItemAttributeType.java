@@ -1,14 +1,13 @@
 package com.zurrtum.create.content.logistics.item.filter.attribute;
 
 import com.mojang.serialization.MapCodec;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public interface ItemAttributeType {
     @NotNull ItemAttribute createAttribute();

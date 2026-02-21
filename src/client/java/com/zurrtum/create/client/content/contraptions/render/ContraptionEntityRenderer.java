@@ -54,7 +54,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S extends ContraptionEntityRenderer.AbstractContraptionState> extends EntityRenderer<C, S> {
     public static final SuperByteBufferCache.Compartment<Pair<Contraption, ChunkSectionLayer>> CONTRAPTION = new SuperByteBufferCache.Compartment<>();
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
     private final PoseStack matrixStack;
 
     public ContraptionEntityRenderer(EntityRendererProvider.Context context) {
@@ -68,8 +69,11 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         VirtualRenderWorld renderWorld,
         ChunkSectionLayer renderType
     ) {
-        return SuperByteBufferCache.getInstance()
-            .get(CONTRAPTION, Pair.of(contraption, renderType), () -> buildStructureBuffer(clientContraption, renderWorld, renderType));
+        return SuperByteBufferCache.getInstance().get(
+            CONTRAPTION,
+            Pair.of(contraption, renderType),
+            () -> buildStructureBuffer(clientContraption, renderWorld, renderType)
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -127,7 +131,16 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
                     } else {
                         model.collectParts(random, parts);
                     }
-                    renderer.tesselateBlock(renderWorld, parts, state, pos, poseStack, sbbBuilder, true, OverlayTexture.NO_OVERLAY);
+                    renderer.tesselateBlock(
+                        renderWorld,
+                        parts,
+                        state,
+                        pos,
+                        poseStack,
+                        sbbBuilder,
+                        true,
+                        OverlayTexture.NO_OVERLAY
+                    );
                     poseStack.popPose();
                 }
             }
@@ -139,12 +152,15 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
 
     @Override
     public boolean shouldRender(C entity, Frustum frustum, double cameraX, double cameraY, double cameraZ) {
-        if (entity.getContraption() == null)
+        if (entity.getContraption() == null) {
             return false;
-        if (!entity.isAliveOrStale())
+        }
+        if (!entity.isAliveOrStale()) {
             return false;
-        if (!entity.isReadyForRender())
+        }
+        if (!entity.isReadyForRender()) {
             return false;
+        }
 
         return super.shouldRender(entity, frustum, cameraX, cameraY, cameraZ);
     }
@@ -271,9 +287,8 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         };
     }
 
-    public record ContraptionBlockLayer(
-        RenderType renderLayer, SuperByteBuffer buffer, Level world, Matrix4f lightTransform
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record ContraptionBlockLayer(RenderType renderLayer, SuperByteBuffer buffer, Level world,
+                                        Matrix4f lightTransform) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             buffer.useLevelLight(world, lightTransform).renderInto(matricesEntry, vertexConsumer);
@@ -304,7 +319,13 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
                 if (render == null || contraption.isHiddenInPortal(context.localPos)) {
                     continue;
                 }
-                MovementRenderState renderState = render.getRenderState(camera, textRenderer, context, renderWorld, worldMatrix4f);
+                MovementRenderState renderState = render.getRenderState(
+                    camera,
+                    textRenderer,
+                    context,
+                    renderWorld,
+                    worldMatrix4f
+                );
                 if (renderState != null) {
                     actors.add(renderState);
                 }

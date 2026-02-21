@@ -7,7 +7,11 @@ import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import net.minecraft.core.Direction.Axis;
 
 public class ControlledContraptionVisual extends ContraptionVisual<ControlledContraptionEntity> {
-    public ControlledContraptionVisual(VisualizationContext ctx, ControlledContraptionEntity entity, float partialTick) {
+    public ControlledContraptionVisual(
+        VisualizationContext ctx,
+        ControlledContraptionEntity entity,
+        float partialTick
+    ) {
         super(ctx, entity, partialTick);
     }
 

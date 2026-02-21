@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
+import com.mojang.blaze3d.opengl.GlDevice;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -17,12 +18,12 @@ import org.lwjgl.opengl.GL46;
 
 import static com.mojang.blaze3d.opengl.GlConst.*;
 
-import com.mojang.blaze3d.opengl.GlDevice;
-
 public class OitFramebuffer {
     public static final float[] CLEAR_TO_ZERO = {0, 0, 0, 0};
     public static final int[] DEPTH_RANGE_DRAW_BUFFERS = {GL46.GL_COLOR_ATTACHMENT0};
-    public static final int[] RENDER_TRANSMITTANCE_DRAW_BUFFERS = {GL46.GL_COLOR_ATTACHMENT1, GL46.GL_COLOR_ATTACHMENT2, GL46.GL_COLOR_ATTACHMENT3, GL46.GL_COLOR_ATTACHMENT4};
+    public static final int[] RENDER_TRANSMITTANCE_DRAW_BUFFERS = {
+        GL46.GL_COLOR_ATTACHMENT1, GL46.GL_COLOR_ATTACHMENT2, GL46.GL_COLOR_ATTACHMENT3, GL46.GL_COLOR_ATTACHMENT4
+    };
     public static final int[] ACCUMULATE_DRAW_BUFFERS = {GL46.GL_COLOR_ATTACHMENT5};
     public static final int[] DEPTH_ONLY_DRAW_BUFFERS = {};
 
@@ -74,7 +75,12 @@ public class OitFramebuffer {
         GlStateManager._bindTexture(((GlTexture) NoiseTextures.BLUE_NOISE.getTexture()).glId());
 
         GlStateManager._glBindFramebuffer(GL32.GL_FRAMEBUFFER, fbo);
-        GL32.glFramebufferTexture(GL32.GL_FRAMEBUFFER, GL32.GL_DEPTH_ATTACHMENT, ((GlTexture) renderTarget.getDepthTexture()).glId(), 0);
+        GL32.glFramebufferTexture(
+            GL32.GL_FRAMEBUFFER,
+            GL32.GL_DEPTH_ATTACHMENT,
+            ((GlTexture) renderTarget.getDepthTexture()).glId(),
+            0
+        );
     }
 
     /**
@@ -303,7 +309,18 @@ public class OitFramebuffer {
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_WRAP_T, GL32.GL_CLAMP_TO_EDGE);
 
             GL32.glBindTexture(GL32.GL_TEXTURE_2D_ARRAY, coefficients);
-            GL32.glTexImage3D(GL32.GL_TEXTURE_2D_ARRAY, 0, GL32.GL_RGBA16F, width, height, 4, 0, GL46.GL_RGBA, GL46.GL_BYTE, 0);
+            GL32.glTexImage3D(
+                GL32.GL_TEXTURE_2D_ARRAY,
+                0,
+                GL32.GL_RGBA16F,
+                width,
+                height,
+                4,
+                0,
+                GL46.GL_RGBA,
+                GL46.GL_BYTE,
+                0
+            );
 
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D_ARRAY, GL32.GL_TEXTURE_MIN_FILTER, GL32.GL_NEAREST);
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D_ARRAY, GL32.GL_TEXTURE_MAG_FILTER, GL32.GL_NEAREST);

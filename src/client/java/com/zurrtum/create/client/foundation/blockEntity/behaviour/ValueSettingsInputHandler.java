@@ -2,6 +2,7 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.content.logistics.factoryBoard.FactoryPanelBehaviour;
@@ -11,7 +12,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.Sc
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -23,15 +23,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class ValueSettingsInputHandler {
-    public static InteractionResult onBlockActivated(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
-        if (!canInteract(player))
+    public static InteractionResult onBlockActivated(
+        Level world,
+        LocalPlayer player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
+        if (!canInteract(player)) {
             return null;
+        }
         ItemStack stack = player.getMainHandItem();
-        if (stack.is(AllItems.CLIPBOARD))
+        if (stack.is(AllItems.CLIPBOARD)) {
             return null;
+        }
         BlockPos pos = ray.getBlockPos();
-        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity sbe))
+        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity sbe)) {
             return null;
+        }
 
         if (Create.VALUE_SETTINGS_HANDLER.cancelIfWarmupAlreadyStarted(pos)) {
             return InteractionResult.FAIL;
@@ -39,7 +47,16 @@ public class ValueSettingsInputHandler {
 
         if (sbe instanceof FactoryPanelBlockEntity fpbe) {
             for (FilteringBehaviour<?> behaviour : FactoryPanelBehaviour.allBehaviours(fpbe)) {
-                InteractionResult result = handleInteraction(behaviour, behaviour.getType(), player, hand, ray, stack, pos, sbe);
+                InteractionResult result = handleInteraction(
+                    behaviour,
+                    behaviour.getType(),
+                    player,
+                    hand,
+                    ray,
+                    stack,
+                    pos,
+                    sbe
+                );
                 if (result != null) {
                     return result;
                 }
@@ -47,7 +64,16 @@ public class ValueSettingsInputHandler {
         } else {
             ScrollValueBehaviour<?, ?> scrollValueBehaviour = sbe.getBehaviour(ScrollValueBehaviour.TYPE);
             if (scrollValueBehaviour != null) {
-                InteractionResult result = handleInteraction(scrollValueBehaviour, ScrollValueBehaviour.TYPE, player, hand, ray, stack, pos, sbe);
+                InteractionResult result = handleInteraction(
+                    scrollValueBehaviour,
+                    ScrollValueBehaviour.TYPE,
+                    player,
+                    hand,
+                    ray,
+                    stack,
+                    pos,
+                    sbe
+                );
                 if (result != null) {
                     return result;
                 }
@@ -57,7 +83,16 @@ public class ValueSettingsInputHandler {
                 filteringBehaviour = sidedBehaviour.get(ray.getDirection());
             }
             if (filteringBehaviour != null) {
-                return handleInteraction(filteringBehaviour, FilteringBehaviour.TYPE, player, hand, ray, stack, pos, sbe);
+                return handleInteraction(
+                    filteringBehaviour,
+                    FilteringBehaviour.TYPE,
+                    player,
+                    hand,
+                    ray,
+                    stack,
+                    pos,
+                    sbe
+                );
             }
         }
         return null;
@@ -74,28 +109,44 @@ public class ValueSettingsInputHandler {
         SmartBlockEntity sbe
     ) {
         ValueSettingsBehaviour valueSettingsBehaviour = (ValueSettingsBehaviour) behaviour;
-        if (valueSettingsBehaviour.bypassesInput(stack))
+        if (valueSettingsBehaviour.bypassesInput(stack)) {
             return null;
-        if (!valueSettingsBehaviour.mayInteract(player))
+        }
+        if (!valueSettingsBehaviour.mayInteract(player)) {
             return null;
+        }
 
-        if (!valueSettingsBehaviour.isActive())
+        if (!valueSettingsBehaviour.isActive()) {
             return null;
-        if (valueSettingsBehaviour.onlyVisibleWithWrench() && !player.getItemInHand(hand).getItemHolder().is(AllItemTags.TOOLS_WRENCH))
+        }
+        if (valueSettingsBehaviour.onlyVisibleWithWrench() && !player.getItemInHand(hand).getItemHolder()
+            .is(AllItemTags.TOOLS_WRENCH)) {
             return null;
+        }
         if (valueSettingsBehaviour.getSlotPositioning() instanceof ValueBoxTransform.Sided sidedSlot) {
-            if (!sidedSlot.isSideActive(sbe.getBlockState(), ray.getDirection()))
+            if (!sidedSlot.isSideActive(sbe.getBlockState(), ray.getDirection())) {
                 return null;
+            }
             sidedSlot.fromSide(ray.getDirection());
         }
 
         boolean fakePlayer = FakePlayerHandler.has(player);
-        if (!valueSettingsBehaviour.testHit(ray.getLocation()))
+        if (!valueSettingsBehaviour.testHit(ray.getLocation())) {
             return null;
+        }
 
         if (!valueSettingsBehaviour.acceptsValueSettings() || fakePlayer) {
             valueSettingsBehaviour.onShortInteract(player, hand, ray.getDirection(), ray);
-            player.connection.send(new ValueSettingsPacket(pos, 0, 0, hand, ray, ray.getDirection(), false, valueSettingsBehaviour.netId()));
+            player.connection.send(new ValueSettingsPacket(
+                pos,
+                0,
+                0,
+                hand,
+                ray,
+                ray.getDirection(),
+                false,
+                valueSettingsBehaviour.netId()
+            ));
             return InteractionResult.SUCCESS;
         }
 

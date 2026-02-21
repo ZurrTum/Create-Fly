@@ -27,8 +27,9 @@ public class FluidThresholdCondition extends CargoThresholdCondition {
         int foundFluid = 0;
         for (Carriage carriage : train.carriages) {
             for (FluidStack fluidInTank : carriage.storage.getFluids()) {
-                if (!compareStack.test(level, fluidInTank))
+                if (!compareStack.test(level, fluidInTank)) {
                     continue;
+                }
                 foundFluid += fluidInTank.getAmount();
             }
         }
@@ -51,8 +52,9 @@ public class FluidThresholdCondition extends CargoThresholdCondition {
     @Override
     public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
         int lastDisplaySnapshot = getLastDisplaySnapshot(tag);
-        if (lastDisplaySnapshot == -1)
+        if (lastDisplaySnapshot == -1) {
             return Component.empty();
+        }
         int offset = getOperator() == Ops.LESS ? -1 : getOperator() == Ops.GREATER ? 1 : 0;
         return Component.translatable(
             "create.schedule.condition.threshold.status",

@@ -30,7 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 
 final class BakedModelBufferer {
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
 
     private BakedModelBufferer() {
     }
@@ -57,11 +58,27 @@ final class BakedModelBufferer {
         MeshEmitterManager<VanillinMeshEmitter> emitters = objects.emitters;
         emitters.prepare(blockMaterialFunction);
         ModelBlockRenderer blockRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
-        ChunkSectionLayer renderType = LayerBakedModel.getBlockRenderLayer(model, () -> ItemBlockRenderTypes.getChunkRenderType(state));
+        ChunkSectionLayer renderType = LayerBakedModel.getBlockRenderLayer(
+            model,
+            () -> ItemBlockRenderTypes.getChunkRenderType(state)
+        );
         VanillinMeshEmitter emitter = emitters.getEmitter(renderType);
-        emitter.prepareForModelLayer(Minecraft.useAmbientOcclusion() && model.useAmbientOcclusion() && isDark(level, pos, state));
+        emitter.prepareForModelLayer(Minecraft.useAmbientOcclusion() && model.useAmbientOcclusion() && isDark(
+            level,
+            pos,
+            state
+        ));
         poseStack.pushPose();
-        blockRenderer.tesselateBlock(level, List.of(model), state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
+        blockRenderer.tesselateBlock(
+            level,
+            List.of(model),
+            state,
+            pos,
+            poseStack,
+            emitter,
+            false,
+            OverlayTexture.NO_OVERLAY
+        );
         poseStack.popPose();
         return emitters.end();
     }
@@ -94,9 +111,22 @@ final class BakedModelBufferer {
         boolean aoEnabled = Minecraft.useAmbientOcclusion();
         if (size == 1) {
             VanillinMeshEmitter emitter = emitters.getEmitter(firstLayer);
-            emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion() && isDark(level, pos, state));
+            emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion() && isDark(
+                level,
+                pos,
+                state
+            ));
             poseStack.pushPose();
-            blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
+            blockRenderer.tesselateBlock(
+                level,
+                parts,
+                state,
+                pos,
+                poseStack,
+                emitter,
+                false,
+                OverlayTexture.NO_OVERLAY
+            );
             poseStack.popPose();
         } else {
             ChunkSectionLayer[] renderLayers = new ChunkSectionLayer[size];
@@ -109,9 +139,22 @@ final class BakedModelBufferer {
             }
             if (simple) {
                 VanillinMeshEmitter emitter = emitters.getEmitter(firstLayer);
-                emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion() && isDark(level, pos, state));
+                emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion() && isDark(
+                    level,
+                    pos,
+                    state
+                ));
                 poseStack.pushPose();
-                blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
+                blockRenderer.tesselateBlock(
+                    level,
+                    parts,
+                    state,
+                    pos,
+                    poseStack,
+                    emitter,
+                    false,
+                    OverlayTexture.NO_OVERLAY
+                );
                 poseStack.popPose();
             } else {
                 renderLayers[0] = firstLayer;
@@ -123,7 +166,16 @@ final class BakedModelBufferer {
                     VanillinMeshEmitter emitter = emitters.getEmitter(renderLayers[i]);
                     emitter.prepareForModelLayer(aoEnabled && part.useAmbientOcclusion());
                     poseStack.pushPose();
-                    blockRenderer.tesselateBlock(level, List.of(part), state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
+                    blockRenderer.tesselateBlock(
+                        level,
+                        List.of(part),
+                        state,
+                        pos,
+                        poseStack,
+                        emitter,
+                        false,
+                        OverlayTexture.NO_OVERLAY
+                    );
                     poseStack.popPose();
                 }
             }
@@ -170,7 +222,11 @@ final class BakedModelBufferer {
                         transformingWrapper.prepare(bufferBuilder, poseStack);
 
                         poseStack.pushPose();
-                        poseStack.translate(pos.getX() - (pos.getX() & 0xF), pos.getY() - (pos.getY() & 0xF), pos.getZ() - (pos.getZ() & 0xF));
+                        poseStack.translate(
+                            pos.getX() - (pos.getX() & 0xF),
+                            pos.getY() - (pos.getY() & 0xF),
+                            pos.getZ() - (pos.getZ() & 0xF)
+                        );
                         renderDispatcher.renderLiquid(pos, level, transformingWrapper, state, fluidState);
                         poseStack.popPose();
                     }
@@ -192,7 +248,16 @@ final class BakedModelBufferer {
                     emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion());
                     poseStack.pushPose();
                     poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
-                    blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, true, OverlayTexture.NO_OVERLAY);
+                    blockRenderer.tesselateBlock(
+                        level,
+                        parts,
+                        state,
+                        pos,
+                        poseStack,
+                        emitter,
+                        true,
+                        OverlayTexture.NO_OVERLAY
+                    );
                     poseStack.popPose();
                 }
             }

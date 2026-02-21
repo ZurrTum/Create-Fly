@@ -23,15 +23,19 @@ public class FluidFX {
     static RandomSource r = RandomSource.create();
 
     public static void splash(BlockPos pos, Fluid fluid) {
-        if (fluid == Fluids.EMPTY)
+        if (fluid == Fluids.EMPTY) {
             return;
+        }
 
         FluidState defaultState = fluid.defaultFluidState();
         if (defaultState == null || defaultState.isEmpty()) {
             return;
         }
 
-        BlockParticleOption blockParticleData = new BlockParticleOption(ParticleTypes.BLOCK, defaultState.createLegacyBlock());
+        BlockParticleOption blockParticleData = new BlockParticleOption(
+            ParticleTypes.BLOCK,
+            defaultState.createLegacyBlock()
+        );
         Vec3 center = VecHelper.getCenterOf(pos);
 
         for (int i = 0; i < 20; i++) {
@@ -47,16 +51,30 @@ public class FluidFX {
 
     public static ParticleOptions getDrippingParticle(FluidStack fluid) {
         ParticleOptions particle = null;
-        if (FluidHelper.isWater(fluid.getFluid()))
+        if (FluidHelper.isWater(fluid.getFluid())) {
             particle = ParticleTypes.DRIPPING_WATER;
-        if (FluidHelper.isLava(fluid.getFluid()))
+        }
+        if (FluidHelper.isLava(fluid.getFluid())) {
             particle = ParticleTypes.DRIPPING_LAVA;
-        if (particle == null)
-            particle = new FluidParticleData(AllParticleTypes.FLUID_DRIP, fluid.getFluid(), fluid.getComponentChanges());
+        }
+        if (particle == null) {
+            particle = new FluidParticleData(
+                AllParticleTypes.FLUID_DRIP,
+                fluid.getFluid(),
+                fluid.getComponentChanges()
+            );
+        }
         return particle;
     }
 
-    public static void spawnRimParticles(Level world, BlockPos pos, Direction side, int amount, ParticleOptions particle, float rimRadius) {
+    public static void spawnRimParticles(
+        Level world,
+        BlockPos pos,
+        Direction side,
+        int amount,
+        ParticleOptions particle,
+        float rimRadius
+    ) {
         Vec3 directionVec = Vec3.atLowerCornerOf(side.getUnitVec3i());
         for (int i = 0; i < amount; i++) {
             Vec3 vec = VecHelper.offsetRandomly(Vec3.ZERO, r, 1).normalize();
@@ -80,7 +98,8 @@ public class FluidFX {
     ) {
         for (int i = 0; i < amount; i++) {
             Vec3 vec = VecHelper.offsetRandomly(Vec3.ZERO, r, rimRadius * .75f);
-            vec = vec.multiply(VecHelper.axisAlingedPlaneOf(directionVec)).add(directionVec.scale(.5 + r.nextFloat() / 4f));
+            vec = vec.multiply(VecHelper.axisAlingedPlaneOf(directionVec))
+                .add(directionVec.scale(.5 + r.nextFloat() / 4f));
             Vec3 m = vec.scale(1 / 4f);
             Vec3 centerOf = VecHelper.getCenterOf(pos);
             vec = vec.add(centerOf);

@@ -5,10 +5,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.TextureFormat;
 
-public record GpuTexture(
-    int width, int height, com.mojang.blaze3d.textures.GpuTexture texture, GpuTextureView textureView,
-    com.mojang.blaze3d.textures.GpuTexture depthTexture, GpuTextureView depthTextureView
-) {
+public record GpuTexture(int width, int height, com.mojang.blaze3d.textures.GpuTexture texture,
+                         GpuTextureView textureView, com.mojang.blaze3d.textures.GpuTexture depthTexture,
+                         GpuTextureView depthTextureView) {
     public static GpuTexture create(int size) {
         return create(size, size);
     }

@@ -36,12 +36,14 @@ public class BearingContraption extends Contraption {
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         BlockPos offset = pos.relative(facing);
-        if (!searchMovedStructure(world, offset, null))
+        if (!searchMovedStructure(world, offset, null)) {
             return false;
+        }
         startMoving(world);
         expandBoundsAroundAxis(facing.getAxis());
-        if (isWindmill && sailBlocks < AllConfigs.server().kinetics.minimumWindmillSails.get())
+        if (isWindmill && sailBlocks < AllConfigs.server().kinetics.minimumWindmillSails.get()) {
             throw AssemblyException.notEnoughSails(sailBlocks);
+        }
         return !blocks.isEmpty();
     }
 
@@ -58,15 +60,17 @@ public class BearingContraption extends Contraption {
     @Override
     public void addBlock(Level level, BlockPos pos, Pair<StructureBlockInfo, BlockEntity> capture) {
         BlockPos localPos = pos.subtract(anchor);
-        if (!getBlocks().containsKey(localPos) && getSailBlock(capture).is(AllBlockTags.WINDMILL_SAILS))
+        if (!getBlocks().containsKey(localPos) && getSailBlock(capture).is(AllBlockTags.WINDMILL_SAILS)) {
             sailBlocks++;
+        }
         super.addBlock(level, pos, capture);
     }
 
     private BlockState getSailBlock(Pair<StructureBlockInfo, BlockEntity> capture) {
         BlockState state = capture.getKey().state();
-        if (state.is(AllBlocks.COPYCAT_PANEL) && capture.getRight() instanceof CopycatBlockEntity cbe)
+        if (state.is(AllBlocks.COPYCAT_PANEL) && capture.getRight() instanceof CopycatBlockEntity cbe) {
             return cbe.getMaterial();
+        }
         return state;
     }
 
@@ -94,8 +98,9 @@ public class BearingContraption extends Contraption {
 
     @Override
     public boolean canBeStabilized(Direction facing, BlockPos localPos) {
-        if (facing.getOpposite() == this.facing && BlockPos.ZERO.equals(localPos))
+        if (facing.getOpposite() == this.facing && BlockPos.ZERO.equals(localPos)) {
             return false;
+        }
         return facing.getAxis() == this.facing.getAxis();
     }
 

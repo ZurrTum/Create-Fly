@@ -5,19 +5,18 @@ import com.zurrtum.create.AllContraptionTypes;
 import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Queue;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Queue;
+import java.util.Set;
 
 public class ClockworkContraption extends Contraption {
 
@@ -32,8 +31,9 @@ public class ClockworkContraption extends Contraption {
     }
 
     private void ignoreBlocks(Set<BlockPos> blocks, BlockPos anchor) {
-        for (BlockPos blockPos : blocks)
+        for (BlockPos blockPos : blocks) {
             ignoreBlocks.add(anchor.offset(blockPos));
+        }
     }
 
     @Override
@@ -53,12 +53,14 @@ public class ClockworkContraption extends Contraption {
 
         hourArm.facing = direction;
         hourArm.handType = HandType.HOUR;
-        if (!hourArm.assemble(world, pos))
+        if (!hourArm.assemble(world, pos)) {
             return null;
+        }
         for (int i = 0; i < 16; i++) {
             BlockPos offsetPos = BlockPos.ZERO.relative(direction, i);
-            if (hourArm.getBlocks().containsKey(offsetPos))
+            if (hourArm.getBlocks().containsKey(offsetPos)) {
                 continue;
+            }
             hourArmBlocks = i;
             break;
         }
@@ -69,10 +71,12 @@ public class ClockworkContraption extends Contraption {
             minuteArm.handType = HandType.MINUTE;
             minuteArm.offset = hourArmBlocks;
             minuteArm.ignoreBlocks(hourArm.getBlocks().keySet(), hourArm.anchor);
-            if (!minuteArm.assemble(world, pos))
+            if (!minuteArm.assemble(world, pos)) {
                 return null;
-            if (minuteArm.getBlocks().isEmpty())
+            }
+            if (minuteArm.getBlocks().isEmpty()) {
                 minuteArm = null;
+            }
         }
 
         hourArm.startMoving(world);
@@ -95,7 +99,12 @@ public class ClockworkContraption extends Contraption {
     }
 
     @Override
-    protected boolean moveBlock(Level world, Direction direction, Queue<BlockPos> frontier, Set<BlockPos> visited) throws AssemblyException {
+    protected boolean moveBlock(
+        Level world,
+        Direction direction,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited
+    ) throws AssemblyException {
         if (ignoreBlocks.contains(frontier.peek())) {
             frontier.poll();
             return true;
@@ -121,14 +130,14 @@ public class ClockworkContraption extends Contraption {
 
     @Override
     public boolean canBeStabilized(Direction facing, BlockPos localPos) {
-        if (BlockPos.ZERO.equals(localPos) || BlockPos.ZERO.equals(localPos.relative(facing)))
+        if (BlockPos.ZERO.equals(localPos) || BlockPos.ZERO.equals(localPos.relative(facing))) {
             return false;
+        }
         return facing.getAxis() == this.facing.getAxis();
     }
 
     public enum HandType implements StringRepresentable {
-        HOUR,
-        MINUTE;
+        HOUR, MINUTE;
 
         public static final Codec<HandType> CODEC = StringRepresentable.fromEnum(HandType::values);
 

@@ -5,13 +5,12 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache.Compartment;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.function.Supplier;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.function.Supplier;
 
 public class CachedBuffers {
 
@@ -38,17 +37,28 @@ public class CachedBuffers {
      * @return the cached SuperByteBuffer
      */
     public static SuperByteBuffer block(Compartment<BlockState> compartment, BlockState toRender) {
-        return SuperByteBufferCache.getInstance().get(compartment, toRender, () -> SuperBufferFactory.getInstance().createForBlock(toRender));
+        return SuperByteBufferCache.getInstance()
+            .get(compartment, toRender, () -> SuperBufferFactory.getInstance().createForBlock(toRender));
     }
 
     public static SuperByteBuffer partial(PartialModel partial, BlockState referenceState) {
-        return SuperByteBufferCache.getInstance()
-            .get(PARTIAL, partial, () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState));
+        return SuperByteBufferCache.getInstance().get(
+            PARTIAL,
+            partial,
+            () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState)
+        );
     }
 
-    public static SuperByteBuffer partial(PartialModel partial, BlockState referenceState, Supplier<PoseStack> modelTransform) {
-        return SuperByteBufferCache.getInstance()
-            .get(PARTIAL, partial, () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState, modelTransform.get()));
+    public static SuperByteBuffer partial(
+        PartialModel partial,
+        BlockState referenceState,
+        Supplier<PoseStack> modelTransform
+    ) {
+        return SuperByteBufferCache.getInstance().get(
+            PARTIAL,
+            partial,
+            () -> SuperBufferFactory.getInstance().createForBlock(partial.get(), referenceState, modelTransform.get())
+        );
     }
 
     public static SuperByteBuffer partialFacing(PartialModel partial, BlockState referenceState) {
@@ -60,7 +70,11 @@ public class CachedBuffers {
         return partialDirectional(partial, referenceState, facing, rotateToFace(facing));
     }
 
-    public static SuperByteBuffer partialFacingVertical(PartialModel partial, BlockState referenceState, Direction facing) {
+    public static SuperByteBuffer partialFacingVertical(
+        PartialModel partial,
+        BlockState referenceState,
+        Direction facing
+    ) {
         return partialDirectional(partial, referenceState, facing, rotateToFaceVertical(facing));
     }
 
@@ -80,8 +94,8 @@ public class CachedBuffers {
     public static Supplier<PoseStack> rotateToFace(Direction facing) {
         return () -> {
             PoseStack stack = new PoseStack();
-            TransformStack.of(stack).center().rotateYDegrees(AngleHelper.horizontalAngle(facing)).rotateXDegrees(AngleHelper.verticalAngle(facing))
-                .uncenter();
+            TransformStack.of(stack).center().rotateYDegrees(AngleHelper.horizontalAngle(facing))
+                .rotateXDegrees(AngleHelper.verticalAngle(facing)).uncenter();
             return stack;
         };
     }

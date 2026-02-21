@@ -3,11 +3,6 @@ package com.zurrtum.create.client.catnip.gui;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
-import org.joml.Matrix3x2fStack;
-
-import java.util.Collection;
-import java.util.List;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -17,6 +12,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+
+import java.util.Collection;
+import java.util.List;
 
 public abstract class AbstractSimiScreen extends Screen {
 
@@ -99,7 +98,8 @@ public abstract class AbstractSimiScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        partialTicks = NavigatableSimiScreen.currentlyRenderingPreviousScreen ? 0 : AnimationTickHolder.getPartialTicksUI(minecraft.getDeltaTracker());
+        partialTicks = NavigatableSimiScreen.currentlyRenderingPreviousScreen ? 0 : AnimationTickHolder.getPartialTicksUI(
+            minecraft.getDeltaTracker());
         Matrix3x2fStack poseStack = graphics.pose();
 
         poseStack.pushMatrix();
@@ -109,8 +109,9 @@ public abstract class AbstractSimiScreen extends Screen {
         renderWindowBackground(graphics, mouseX, mouseY, partialTicks);
         renderWindow(graphics, mouseX, mouseY, partialTicks);
 
-        for (Renderable renderable : getRenderables())
+        for (Renderable renderable : getRenderables()) {
             renderable.render(graphics, mouseX, mouseY, partialTicks);
+        }
 
         renderWindowForeground(graphics, mouseX, mouseY, partialTicks);
 
@@ -122,8 +123,9 @@ public abstract class AbstractSimiScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent input) {
         boolean keyPressed = super.keyPressed(input);
-        if (keyPressed || getFocused() != null)
+        if (keyPressed || getFocused() != null) {
             return keyPressed;
+        }
 
         if (this.minecraft.options.keyInventory.matches(input)) {
             this.onClose();
@@ -134,8 +136,9 @@ public abstract class AbstractSimiScreen extends Screen {
 
         for (GuiEventListener widget : children()) {
             if (widget instanceof AbstractSimiWidget simiWidget) {
-                if (simiWidget.keyPressed(input))
+                if (simiWidget.keyPressed(input)) {
                     consumed = true;
+                }
             }
         }
 
@@ -169,8 +172,9 @@ public abstract class AbstractSimiScreen extends Screen {
     @Override
     public GuiEventListener getFocused() {
         GuiEventListener focused = super.getFocused();
-        if (focused instanceof AbstractWidget && !focused.isFocused())
+        if (focused instanceof AbstractWidget && !focused.isFocused()) {
             focused = null;
+        }
         setFocused(focused);
         return focused;
     }

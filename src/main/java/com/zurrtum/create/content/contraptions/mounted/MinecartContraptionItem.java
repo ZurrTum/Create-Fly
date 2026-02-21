@@ -97,7 +97,8 @@ public class MinecartContraptionItem extends Item {
             double d2 = vec3.z() + (double) direction.getStepZ() * 1.125D;
             BlockPos blockpos = source.pos().relative(direction);
             BlockState blockstate = world.getBlockState(blockpos);
-            RailShape railshape = blockstate.getBlock() instanceof BaseRailBlock abstractRailBlock ? blockstate.getValue(abstractRailBlock.getShapeProperty()) : RailShape.NORTH_SOUTH;
+            RailShape railshape = blockstate.getBlock() instanceof BaseRailBlock abstractRailBlock ? blockstate.getValue(
+                abstractRailBlock.getShapeProperty()) : RailShape.NORTH_SOUTH;
             double d3;
             if (blockstate.is(BlockTags.RAILS)) {
                 if (railshape.isSlope()) {
@@ -111,7 +112,8 @@ public class MinecartContraptionItem extends Item {
                 }
 
                 BlockState blockstate1 = world.getBlockState(blockpos.below());
-                RailShape railshape1 = blockstate1.getBlock() instanceof BaseRailBlock abstractRailBlock ? blockstate1.getValue(abstractRailBlock.getShapeProperty()) : RailShape.NORTH_SOUTH;
+                RailShape railshape1 = blockstate1.getBlock() instanceof BaseRailBlock abstractRailBlock ? blockstate1.getValue(
+                    abstractRailBlock.getShapeProperty()) : RailShape.NORTH_SOUTH;
                 if (direction != Direction.DOWN && railshape1.isSlope()) {
                     d3 = -0.4D;
                 } else {
@@ -129,8 +131,9 @@ public class MinecartContraptionItem extends Item {
                 stack,
                 null
             );
-            if (stack.has(DataComponents.CUSTOM_NAME))
+            if (stack.has(DataComponents.CUSTOM_NAME)) {
                 abstractminecartentity.setCustomName(stack.getHoverName());
+            }
             world.addFreshEntity(abstractminecartentity);
             addContraptionToMinecart(world, stack, abstractminecartentity, direction);
 
@@ -155,7 +158,8 @@ public class MinecartContraptionItem extends Item {
         } else {
             ItemStack itemstack = context.getItemInHand();
             if (world instanceof ServerLevel serverlevel) {
-                RailShape railshape = blockstate.getBlock() instanceof BaseRailBlock abstractRailBlock ? blockstate.getValue(abstractRailBlock.getShapeProperty()) : RailShape.NORTH_SOUTH;
+                RailShape railshape = blockstate.getBlock() instanceof BaseRailBlock abstractRailBlock ? blockstate.getValue(
+                    abstractRailBlock.getShapeProperty()) : RailShape.NORTH_SOUTH;
                 double d0 = 0.0D;
                 if (railshape.isSlope()) {
                     d0 = 0.5D;
@@ -171,11 +175,17 @@ public class MinecartContraptionItem extends Item {
                     itemstack,
                     null
                 );
-                if (itemstack.has(DataComponents.CUSTOM_NAME))
+                if (itemstack.has(DataComponents.CUSTOM_NAME)) {
                     abstractminecartentity.setCustomName(itemstack.getHoverName());
+                }
                 Player player = context.getPlayer();
                 world.addFreshEntity(abstractminecartentity);
-                addContraptionToMinecart(world, itemstack, abstractminecartentity, player == null ? null : player.getDirection());
+                addContraptionToMinecart(
+                    world,
+                    itemstack,
+                    abstractminecartentity,
+                    player == null ? null : player.getDirection()
+                );
             }
 
             itemstack.shrink(1);
@@ -183,13 +193,22 @@ public class MinecartContraptionItem extends Item {
         }
     }
 
-    public static void addContraptionToMinecart(Level world, ItemStack itemstack, AbstractMinecart cart, @Nullable Direction newFacing) {
+    public static void addContraptionToMinecart(
+        Level world,
+        ItemStack itemstack,
+        AbstractMinecart cart,
+        @Nullable Direction newFacing
+    ) {
         if (itemstack.has(AllDataComponents.MINECRAFT_CONTRAPTION_DATA)) {
             CompoundTag contraptionTag = itemstack.get(AllDataComponents.MINECRAFT_CONTRAPTION_DATA);
 
-            Direction intialOrientation = contraptionTag.read("InitialOrientation", Direction.CODEC).orElse(Direction.DOWN);
+            Direction intialOrientation = contraptionTag.read("InitialOrientation", Direction.CODEC)
+                .orElse(Direction.DOWN);
 
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(cart.problemPath(), LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                cart.problemPath(),
+                LOGGER
+            )) {
                 Contraption mountedContraption = Contraption.fromData(
                     world,
                     TagValueInput.create(logging, world.registryAccess(), contraptionTag),
@@ -213,34 +232,49 @@ public class MinecartContraptionItem extends Item {
         }
     }
 
-    public static InteractionResult wrenchCanBeUsedToPickUpMinecartContraptions(Player player, InteractionHand hand, Entity entity) {
-        if (player == null || entity == null)
+    public static InteractionResult wrenchCanBeUsedToPickUpMinecartContraptions(
+        Player player,
+        InteractionHand hand,
+        Entity entity
+    ) {
+        if (player == null || entity == null) {
             return null;
-        if (!AllConfigs.server().kinetics.survivalContraptionPickup.get() && !player.isCreative())
+        }
+        if (!AllConfigs.server().kinetics.survivalContraptionPickup.get() && !player.isCreative()) {
             return null;
+        }
 
         ItemStack wrench = player.getItemInHand(hand);
-        if (!wrench.is(AllItems.WRENCH))
+        if (!wrench.is(AllItems.WRENCH)) {
             return null;
-        if (entity instanceof AbstractContraptionEntity)
+        }
+        if (entity instanceof AbstractContraptionEntity) {
             entity = entity.getVehicle();
-        if (!(entity instanceof AbstractMinecart cart))
+        }
+        if (!(entity instanceof AbstractMinecart cart)) {
             return null;
-        if (!entity.isAlive())
+        }
+        if (!entity.isAlive()) {
             return null;
-        if (player instanceof DeployerPlayer dfp && dfp.isOnMinecartContraption())
+        }
+        if (player instanceof DeployerPlayer dfp && dfp.isOnMinecartContraption()) {
             return null;
+        }
         EntityType<?> type = cart.getType();
-        if (type != EntityType.MINECART && type != EntityType.FURNACE_MINECART && type != EntityType.CHEST_MINECART)
+        if (type != EntityType.MINECART && type != EntityType.FURNACE_MINECART && type != EntityType.CHEST_MINECART) {
             return null;
+        }
         List<Entity> passengers = cart.getPassengers();
-        if (passengers.isEmpty() || !(passengers.getFirst() instanceof OrientedContraptionEntity oce))
+        if (passengers.isEmpty() || !(passengers.getFirst() instanceof OrientedContraptionEntity oce)) {
             return null;
+        }
         Contraption contraption = oce.getContraption();
 
         if (ContraptionMovementSetting.isNoPickup(contraption.getBlocks().values())) {
             player.displayClientMessage(
-                Component.translatable("create.contraption.minecart_contraption_illegal_pickup").withStyle(ChatFormatting.RED), true);
+                Component.translatable("create.contraption.minecart_contraption_illegal_pickup")
+                    .withStyle(ChatFormatting.RED), true
+            );
             return null;
         }
 
@@ -251,27 +285,30 @@ public class MinecartContraptionItem extends Item {
 
         contraption.stop(world);
 
-        for (MutablePair<StructureBlockInfo, MovementContext> pair : contraption.getActors())
-            if (MovementBehaviour.REGISTRY.get(pair.left.state()) instanceof PortableStorageInterfaceMovement psim)
+        for (MutablePair<StructureBlockInfo, MovementContext> pair : contraption.getActors()) {
+            if (MovementBehaviour.REGISTRY.get(pair.left.state()) instanceof PortableStorageInterfaceMovement psim) {
                 psim.reset(pair.right);
+            }
+        }
 
         ItemStack generatedStack = create(type, oce);
         generatedStack.set(DataComponents.CUSTOM_NAME, entity.getCustomName());
 
         if (!generatedStack.isEmpty()) {
-            Optional<Tag> result = ItemStack.CODEC.encodeStart(world.registryAccess().createSerializationContext(NbtOps.INSTANCE), generatedStack)
-                .result();
+            Optional<Tag> result = ItemStack.CODEC.encodeStart(
+                world.registryAccess().createSerializationContext(NbtOps.INSTANCE), generatedStack).result();
             if (result.isPresent() && ContraptionPickupLimiting.isTooLargeForPickup(result.get())) {
                 player.displayClientMessage(
-                    Component.translatable("create.contraption.minecart_contraption_too_big").withStyle(ChatFormatting.RED),
-                    true
+                    Component.translatable("create.contraption.minecart_contraption_too_big")
+                        .withStyle(ChatFormatting.RED), true
                 );
                 return null;
             }
         }
 
-        if (contraption.getBlocks().size() > 200 && player instanceof ServerPlayer serverPlayer)
+        if (contraption.getBlocks().size() > 200 && player instanceof ServerPlayer serverPlayer) {
             AllAdvancements.CART_PICKUP.trigger(serverPlayer);
+        }
 
         player.getInventory().placeItemBackInInventory(generatedStack);
         oce.discard();
@@ -290,10 +327,14 @@ public class MinecartContraptionItem extends Item {
             stack = AllItems.CHEST_MINECART_CONTRAPTION.getDefaultInstance();
         }
 
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
             return stack;
+        }
 
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(entity.problemPath(), LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            entity.problemPath(),
+            LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, entity.registryAccess());
             entity.getContraption().write(view, false);
             view.discard("UUID");

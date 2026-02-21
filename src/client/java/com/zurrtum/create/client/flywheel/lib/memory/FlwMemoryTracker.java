@@ -31,7 +31,8 @@ public final class FlwMemoryTracker {
     public static long realloc(long ptr, long size) {
         long newPtr = MemoryUtil.nmemRealloc(ptr, size);
         if (newPtr == MemoryUtil.NULL) {
-            throw new OutOfMemoryError("Failed to reallocate " + size + " bytes for address " + StringUtil.formatAddress(ptr));
+            throw new OutOfMemoryError("Failed to reallocate " + size + " bytes for address " + StringUtil.formatAddress(
+                ptr));
         }
         return newPtr;
     }

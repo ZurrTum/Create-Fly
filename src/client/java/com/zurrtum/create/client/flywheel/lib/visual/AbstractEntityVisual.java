@@ -64,7 +64,11 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
     public Vector3f getVisualPosition() {
         Vec3 pos = entity.position();
         var renderOrigin = renderOrigin();
-        return new Vector3f((float) (pos.x - renderOrigin.getX()), (float) (pos.y - renderOrigin.getY()), (float) (pos.z - renderOrigin.getZ()));
+        return new Vector3f(
+            (float) (pos.x - renderOrigin.getX()),
+            (float) (pos.y - renderOrigin.getY()),
+            (float) (pos.z - renderOrigin.getZ())
+        );
     }
 
     /**
@@ -85,7 +89,8 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
     }
 
     public boolean isVisible(FrustumIntersection frustum) {
-        return !Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity).affectedByCulling(entity) || visibilityTester.check(frustum);
+        return !Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity)
+            .affectedByCulling(entity) || visibilityTester.check(frustum);
     }
 
     protected int computePackedLight(float partialTick) {

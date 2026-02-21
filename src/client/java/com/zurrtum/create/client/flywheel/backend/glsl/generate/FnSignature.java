@@ -29,11 +29,13 @@ public record FnSignature(String returnType, String name, ImmutableList<Pair<Str
     }
 
     public String fullDeclaration() {
-        return returnType + ' ' + name + '(' + args.stream().map(p -> p.getFirst() + ' ' + p.getSecond()).collect(Collectors.joining(", ")) + ')';
+        return returnType + ' ' + name + '(' + args.stream().map(p -> p.getFirst() + ' ' + p.getSecond())
+            .collect(Collectors.joining(", ")) + ')';
     }
 
     public String signatureDeclaration() {
-        return returnType + ' ' + name + '(' + args.stream().map(Pair::getFirst).collect(Collectors.joining(", ")) + ')';
+        return returnType + ' ' + name + '(' + args.stream().map(Pair::getFirst)
+            .collect(Collectors.joining(", ")) + ')';
     }
 
     public static class Builder {

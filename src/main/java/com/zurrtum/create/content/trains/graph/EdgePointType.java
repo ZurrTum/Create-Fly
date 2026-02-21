@@ -5,13 +5,12 @@ import com.zurrtum.create.content.trains.observer.TrackObserver;
 import com.zurrtum.create.content.trains.signal.SignalBoundary;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.content.trains.station.GlobalStation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -21,9 +20,24 @@ public class EdgePointType<T extends TrackEdgePoint> {
     private final Identifier id;
     private final Supplier<T> factory;
 
-    public static final EdgePointType<SignalBoundary> SIGNAL = register(Identifier.fromNamespaceAndPath(MOD_ID, "signal"), SignalBoundary::new);
-    public static final EdgePointType<GlobalStation> STATION = register(Identifier.fromNamespaceAndPath(MOD_ID, "station"), GlobalStation::new);
-    public static final EdgePointType<TrackObserver> OBSERVER = register(Identifier.fromNamespaceAndPath(MOD_ID, "observer"), TrackObserver::new);
+    public static final EdgePointType<SignalBoundary> SIGNAL = register(
+        Identifier.fromNamespaceAndPath(
+            MOD_ID,
+            "signal"
+        ), SignalBoundary::new
+    );
+    public static final EdgePointType<GlobalStation> STATION = register(
+        Identifier.fromNamespaceAndPath(
+            MOD_ID,
+            "station"
+        ), GlobalStation::new
+    );
+    public static final EdgePointType<TrackObserver> OBSERVER = register(
+        Identifier.fromNamespaceAndPath(
+            MOD_ID,
+            "observer"
+        ), TrackObserver::new
+    );
 
     public static <T extends TrackEdgePoint> EdgePointType<T> register(Identifier id, Supplier<T> factory) {
         EdgePointType<T> type = new EdgePointType<>(id, factory);

@@ -20,8 +20,9 @@ public class PonderRenderTypes {
 
     private static final RenderType OUTLINE_SOLID = RenderType.create(
         createLayerName("outline_solid"),
-        RenderSetup.builder(RenderPipelines.ENTITY_SOLID).bufferSize(256).withTexture("Sampler0", PonderSpecialTextures.BLANK.getLocation())
-            .useLightmap().useOverlay().createRenderSetup()
+        RenderSetup.builder(RenderPipelines.ENTITY_SOLID).bufferSize(256)
+            .withTexture("Sampler0", PonderSpecialTextures.BLANK.getLocation()).useLightmap().useOverlay()
+            .createRenderSetup()
     );
 
     private static final BiFunction<Identifier, Boolean, RenderType> OUTLINE_TRANSLUCENT = Util.memoize((texture, cull) -> RenderType.create(

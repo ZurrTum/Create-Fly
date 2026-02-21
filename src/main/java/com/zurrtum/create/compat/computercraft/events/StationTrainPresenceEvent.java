@@ -6,9 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public class StationTrainPresenceEvent implements ComputerEvent {
 
     public enum Type {
-        IMMINENT("train_imminent"),
-        ARRIVAL("train_arrival"),
-        DEPARTURE("train_departure");
+        IMMINENT("train_imminent"), ARRIVAL("train_arrival"), DEPARTURE("train_departure");
 
         public final String name;
 

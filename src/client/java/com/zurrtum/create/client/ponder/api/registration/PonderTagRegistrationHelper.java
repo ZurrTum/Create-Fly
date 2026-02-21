@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
-import java.util.function.Function;
-
 import net.minecraft.resources.Identifier;
+
+import java.util.function.Function;
 
 public interface PonderTagRegistrationHelper<T> {
 

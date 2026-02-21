@@ -30,8 +30,9 @@ public class WrenchableDirectionalBlock extends DirectionalBlock implements IWre
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
         Direction facing = originalState.getValue(FACING);
 
-        if (facing.getAxis() == targetedFace.getAxis())
+        if (facing.getAxis() == targetedFace.getAxis()) {
             return originalState;
+        }
 
         Direction newFacing = facing.getClockWise(targetedFace.getAxis());
 

@@ -24,7 +24,8 @@ public class ConfigurationProtocolsMixin {
         Operation<SimpleUnboundProtocol<ClientConfigurationPacketListener, RegistryFriendlyByteBuf>> original
     ) {
         return original.call(
-            type, (Consumer<ProtocolInfoBuilder<ClientConfigurationPacketListener, RegistryFriendlyByteBuf, Unit>>) (builder -> {
+            type,
+            (Consumer<ProtocolInfoBuilder<ClientConfigurationPacketListener, RegistryFriendlyByteBuf, Unit>>) (builder -> {
                 registrar.accept(builder);
                 AllPackets.S2C_CONFIG.forEach(builder::addPacket);
             })

@@ -53,8 +53,9 @@ public class ContraptionHandlerClient {
         Map<Integer, WeakReference<AbstractContraptionEntity>> map = loadedContraptions.get(world);
         List<AbstractContraptionEntity> queued = queuedAdditions.get(world);
 
-        for (AbstractContraptionEntity contraptionEntity : queued)
+        for (AbstractContraptionEntity contraptionEntity : queued) {
             map.put(contraptionEntity.getId(), new WeakReference<>(contraptionEntity));
+        }
         queued.clear();
 
         Collection<WeakReference<AbstractContraptionEntity>> values = map.values();
@@ -75,17 +76,26 @@ public class ContraptionHandlerClient {
     }
 
     public static void addSpawnedContraptionsToCollisionList(Entity entity, Level world) {
-        if (entity instanceof AbstractContraptionEntity)
+        if (entity instanceof AbstractContraptionEntity) {
             queuedAdditions.get(world).add((AbstractContraptionEntity) entity);
+        }
     }
 
     public static void entitiesWhoJustDismountedGetSentToTheRightLocation(LivingEntity entityLiving, Level world) {
-        if (!world.isClientSide())
+        if (!world.isClientSide()) {
             return;
+        }
 
         AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.get(entityLiving).ifPresent(position -> {
-            if (entityLiving.getVehicle() == null)
-                entityLiving.absSnapTo(position.x, position.y, position.z, entityLiving.getYRot(), entityLiving.getXRot());
+            if (entityLiving.getVehicle() == null) {
+                entityLiving.absSnapTo(
+                    position.x,
+                    position.y,
+                    position.z,
+                    entityLiving.getYRot(),
+                    entityLiving.getXRot()
+                );
+            }
             AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.set(entityLiving, Optional.empty());
             entityLiving.setOnGround(false);
         });
@@ -93,8 +103,9 @@ public class ContraptionHandlerClient {
 
     public static void preventRemotePlayersWalkingAnimations(RemotePlayer remotePlayer) {
         int lastOverride = AllSynchedDatas.LAST_OVERRIDE_LIMB_SWING_UPDATE.get(remotePlayer);
-        if (lastOverride == -1)
+        if (lastOverride == -1) {
             return;
+        }
 
         if (lastOverride > 5) {
             AllSynchedDatas.LAST_OVERRIDE_LIMB_SWING_UPDATE.set(remotePlayer, -1);
@@ -111,19 +122,23 @@ public class ContraptionHandlerClient {
     public static boolean rightClickingOnContraptionsGetsHandledLocally(Minecraft mc, InteractionHand hand) {
         LocalPlayer player = mc.player;
 
-        if (player == null)
+        if (player == null) {
             return false;
-        if (player.isSpectator())
+        }
+        if (player.isSpectator()) {
             return false;
-        if (mc.level == null)
+        }
+        if (mc.level == null) {
             return false;
+        }
 
         Couple<Vec3> rayInputs = getRayInputs(mc, player);
         Vec3 origin = rayInputs.getFirst();
         Vec3 target = rayInputs.getSecond();
         AABB aabb = new AABB(origin, target).inflate(16);
 
-        Collection<WeakReference<AbstractContraptionEntity>> contraptions = ContraptionHandlerClient.loadedContraptions.get(mc.level).values();
+        Collection<WeakReference<AbstractContraptionEntity>> contraptions = ContraptionHandlerClient.loadedContraptions.get(
+            mc.level).values();
 
         double bestDistance = Double.MAX_VALUE;
         BlockHitResult bestResult = null;
@@ -131,34 +146,40 @@ public class ContraptionHandlerClient {
 
         for (WeakReference<AbstractContraptionEntity> ref : contraptions) {
             AbstractContraptionEntity contraptionEntity = ref.get();
-            if (contraptionEntity == null)
+            if (contraptionEntity == null) {
                 continue;
-            if (!contraptionEntity.getBoundingBox().intersects(aabb))
+            }
+            if (!contraptionEntity.getBoundingBox().intersects(aabb)) {
                 continue;
+            }
 
             BlockHitResult rayTraceResult = rayTraceContraption(origin, target, contraptionEntity);
-            if (rayTraceResult == null)
+            if (rayTraceResult == null) {
                 continue;
+            }
 
             double distance = contraptionEntity.toGlobalVector(rayTraceResult.getLocation(), 1).distanceTo(origin);
-            if (distance > bestDistance)
+            if (distance > bestDistance) {
                 continue;
+            }
 
             bestResult = rayTraceResult;
             bestDistance = distance;
             bestEntity = contraptionEntity;
         }
 
-        if (bestResult == null)
+        if (bestResult == null) {
             return false;
+        }
 
         Direction face = bestResult.getDirection();
         BlockPos pos = bestResult.getBlockPos();
 
         if (bestEntity.handlePlayerInteraction(player, pos, face, hand)) {
             player.connection.send(new ContraptionInteractionPacket(bestEntity, hand, pos, face));
-        } else
+        } else {
             handleSpecialInteractions(bestEntity, player, pos, face, hand);
+        }
         return true;
     }
 
@@ -169,22 +190,29 @@ public class ContraptionHandlerClient {
         Direction side,
         InteractionHand interactionHand
     ) {
-        if (player.getItemInHand(interactionHand).is(AllItems.WRENCH) && contraptionEntity instanceof CarriageContraptionEntity car)
+        if (player.getItemInHand(interactionHand)
+            .is(AllItems.WRENCH) && contraptionEntity instanceof CarriageContraptionEntity car) {
             return TrainRelocatorClient.carriageWrenched(car.toGlobalVector(VecHelper.getCenterOf(localPos), 1), car);
+        }
         return false;
     }
 
     public static Couple<Vec3> getRayInputs(Minecraft mc, LocalPlayer player) {
         Vec3 origin = player.getEyePosition();
         double reach = player.blockInteractionRange();
-        if (mc.hitResult != null && mc.hitResult.getLocation() != null)
+        if (mc.hitResult != null && mc.hitResult.getLocation() != null) {
             reach = Math.min(mc.hitResult.getLocation().distanceTo(origin), reach);
+        }
         Vec3 target = RaycastHelper.getTraceTarget(player, reach, origin);
         return Couple.create(origin, target);
     }
 
     @Nullable
-    public static BlockHitResult rayTraceContraption(Vec3 origin, Vec3 target, AbstractContraptionEntity contraptionEntity) {
+    public static BlockHitResult rayTraceContraption(
+        Vec3 origin,
+        Vec3 target,
+        AbstractContraptionEntity contraptionEntity
+    ) {
         Vec3 localOrigin = contraptionEntity.toLocalVector(origin, 1);
         Vec3 localTarget = contraptionEntity.toLocalVector(target, 1);
         Contraption contraption = contraptionEntity.getContraption();
@@ -193,18 +221,22 @@ public class ContraptionHandlerClient {
         PredicateTraceResult predicateResult = RaycastHelper.rayTraceUntil(
             localOrigin, localTarget, p -> {
                 for (Direction d : Iterate.directions) {
-                    if (d == Direction.UP)
+                    if (d == Direction.UP) {
                         continue;
+                    }
                     BlockPos pos = d == Direction.DOWN ? p : p.relative(d);
                     StructureBlockInfo blockInfo = contraption.getBlocks().get(pos);
-                    if (blockInfo == null)
+                    if (blockInfo == null) {
                         continue;
+                    }
                     BlockState state = blockInfo.state();
                     VoxelShape raytraceShape = state.getShape(contraption.getContraptionWorld(), BlockPos.ZERO.below());
-                    if (raytraceShape.isEmpty())
+                    if (raytraceShape.isEmpty()) {
                         continue;
-                    if (contraption.isHiddenInPortal(pos))
+                    }
+                    if (contraption.isHiddenInPortal(pos)) {
                         continue;
+                    }
                     BlockHitResult rayTrace = raytraceShape.clip(localOrigin, localTarget, pos);
                     if (rayTrace != null) {
                         mutableResult.setValue(rayTrace);
@@ -215,8 +247,9 @@ public class ContraptionHandlerClient {
             }
         );
 
-        if (predicateResult == null || predicateResult.missed())
+        if (predicateResult == null || predicateResult.missed()) {
             return null;
+        }
 
         BlockHitResult rayTraceResult = mutableResult.getValue();
         return rayTraceResult;

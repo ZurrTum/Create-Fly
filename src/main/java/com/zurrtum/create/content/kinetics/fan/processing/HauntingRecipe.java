@@ -15,7 +15,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
 
-public record HauntingRecipe(List<ProcessingOutput> results, Ingredient ingredient) implements CreateSingleStackRollableRecipe {
+public record HauntingRecipe(List<ProcessingOutput> results,
+                             Ingredient ingredient) implements CreateSingleStackRollableRecipe {
     @Override
     public RecipeSerializer<HauntingRecipe> getSerializer() {
         return AllRecipeSerializers.HAUNTING;

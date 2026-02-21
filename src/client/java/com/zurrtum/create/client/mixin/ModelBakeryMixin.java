@@ -23,7 +23,11 @@ public class ModelBakeryMixin {
     ) {
         return ParallelMapTransform.schedule(
             PartialModelEventHandler.getRegisterAdditional(), (id, model) -> {
-                SimpleModelWrapper bakedModel = (SimpleModelWrapper) SimpleModelWrapper.bake(baker, id, BlockModelRotation.IDENTITY);
+                SimpleModelWrapper bakedModel = (SimpleModelWrapper) SimpleModelWrapper.bake(
+                    baker,
+                    id,
+                    BlockModelRotation.IDENTITY
+                );
                 PartialModelEventHandler.onBakingCompleted(model, bakedModel);
                 return bakedModel;
             }, taskExecutor

@@ -170,7 +170,9 @@ public class SpoutRenderer extends PictureInPictureRenderer<SpoutRenderState> {
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+            TextureSetup.singleTexture(texture.textureView(),
+                RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)
+            ),
             item.pose(),
             item.x0(),
             item.y0(),

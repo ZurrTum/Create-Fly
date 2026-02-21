@@ -33,7 +33,8 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
 
     public BrassDiodeBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(POWERING, false).setValue(INVERTED, false));
+        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(POWERING, false)
+            .setValue(INVERTED, false));
     }
 
     @Override
@@ -49,15 +50,25 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
         return toggle(level, pos, state, player, hand);
     }
 
-    public InteractionResult toggle(Level pLevel, BlockPos pPos, BlockState pState, Player player, InteractionHand pHand) {
-        if (!player.mayBuild())
+    public InteractionResult toggle(
+        Level pLevel,
+        BlockPos pPos,
+        BlockState pState,
+        Player player,
+        InteractionHand pHand
+    ) {
+        if (!player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.getItemInHand(pHand).is(AllItems.WRENCH))
+        }
+        if (player.getItemInHand(pHand).is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (pLevel.isClientSide())
+        }
+        if (pLevel.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         pLevel.setBlock(pPos, pState.cycle(INVERTED), Block.UPDATE_ALL);
         float f = !pState.getValue(INVERTED) ? 0.6F : 0.5F;
         pLevel.playSound(null, pPos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, f);
@@ -87,8 +98,9 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
 
     @Override
     public boolean canConnectRedstone(BlockState state, Direction side) {
-        if (side == null)
+        if (side == null) {
             return false;
+        }
         return side.getAxis() == state.getValue(FACING).getAxis();
     }
 

@@ -2,17 +2,16 @@ package com.zurrtum.create.content.redstone.link;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelSupportBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
 
 public class RedstoneLinkBlockEntity extends SmartBlockEntity {
 
@@ -45,7 +44,10 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
     }
 
     protected void createLink() {
-        link = transmitter ? ServerLinkBehaviour.transmitter(this, this::getSignal) : ServerLinkBehaviour.receiver(this, this::setSignal);
+        link = transmitter ? ServerLinkBehaviour.transmitter(this, this::getSignal) : ServerLinkBehaviour.receiver(
+            this,
+            this::setSignal
+        );
     }
 
     public int getSignal() {
@@ -53,15 +55,17 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
     }
 
     public void setSignal(int power) {
-        if (receivedSignal != power)
+        if (receivedSignal != power) {
             receivedSignalChanged = true;
+        }
         receivedSignal = power;
     }
 
     public void transmit(int strength) {
         transmittedSignal = strength;
-        if (link != null)
+        if (link != null) {
             link.notifySignalChange();
+        }
     }
 
     @Override
@@ -80,8 +84,9 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
 
         receivedSignal = view.getIntOr("Receive", 0);
         receivedSignalChanged = view.getBooleanOr("ReceivedChanged", false);
-        if (level == null || level.isClientSide() || !link.newPosition)
+        if (level == null || level.isClientSide() || !link.newPosition) {
             transmittedSignal = view.getIntOr("Transmit", 0);
+        }
     }
 
     @Override
@@ -97,14 +102,17 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
             attachBehaviourLate(link);
         }
 
-        if (transmitter)
+        if (transmitter) {
             return;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return;
+        }
 
         BlockState blockState = getBlockState();
-        if (!blockState.is(AllBlocks.REDSTONE_LINK))
+        if (!blockState.is(AllBlocks.REDSTONE_LINK)) {
             return;
+        }
 
         if ((getReceivedSignal() > 0) != blockState.getValue(RedstoneLinkBlock.POWERED)) {
             receivedSignalChanged = true;

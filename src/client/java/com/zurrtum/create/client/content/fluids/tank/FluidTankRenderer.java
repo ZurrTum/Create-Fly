@@ -131,7 +131,12 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
     }
 
     @Override
-    public void submit(FluidTankRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        FluidTankRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.data != null) {
             state.data.translate(matrices);
             queue.submitCustomGeometry(matrices, state.layer, state.data);
@@ -167,7 +172,21 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            FluidRenderHelper.renderFluidBox(fluid, changes, xMin, yMin, zMin, xMax, yMax, zMax, vertexConsumer, matricesEntry, light, false, true);
+            FluidRenderHelper.renderFluidBox(
+                fluid,
+                changes,
+                xMin,
+                yMin,
+                zMin,
+                xMax,
+                yMax,
+                zMax,
+                vertexConsumer,
+                matricesEntry,
+                light,
+                false,
+                true
+            );
         }
     }
 
@@ -183,9 +202,11 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
         }
 
         public void render(int yRot, PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            gauge.rotateYDegrees(yRot).uncenter().translate(translateX, 0, 0).light(light).renderInto(matricesEntry, vertexConsumer);
-            gaugeDial.rotateYDegrees(yRot).uncenter().translate(translateX, 0, 0).translate(0, dialPivotY, dialPivotZ).rotateXDegrees(progress)
-                .translate(0, -dialPivotY, -dialPivotZ).light(light).renderInto(matricesEntry, vertexConsumer);
+            gauge.rotateYDegrees(yRot).uncenter().translate(translateX, 0, 0).light(light)
+                .renderInto(matricesEntry, vertexConsumer);
+            gaugeDial.rotateYDegrees(yRot).uncenter().translate(translateX, 0, 0).translate(0, dialPivotY, dialPivotZ)
+                .rotateXDegrees(progress).translate(0, -dialPivotY, -dialPivotZ).light(light)
+                .renderInto(matricesEntry, vertexConsumer);
         }
 
         @Override

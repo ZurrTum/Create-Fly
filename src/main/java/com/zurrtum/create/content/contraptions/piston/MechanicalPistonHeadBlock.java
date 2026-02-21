@@ -59,11 +59,14 @@ public class MechanicalPistonHeadBlock extends WrenchableDirectionalBlock implem
             BlockPos currentPos = pos.relative(direction.getOpposite(), offset);
             BlockState block = worldIn.getBlockState(currentPos);
 
-            if (isExtensionPole(block) && direction.getAxis() == block.getValue(BlockStateProperties.FACING).getAxis())
+            if (isExtensionPole(block) && direction.getAxis() == block.getValue(BlockStateProperties.FACING)
+                .getAxis()) {
                 continue;
+            }
 
-            if (MechanicalPistonBlock.isPiston(block) && block.getValue(BlockStateProperties.FACING) == direction)
+            if (MechanicalPistonBlock.isPiston(block) && block.getValue(BlockStateProperties.FACING) == direction) {
                 pistonBase = currentPos;
+            }
 
             break;
         }
@@ -72,7 +75,10 @@ public class MechanicalPistonHeadBlock extends WrenchableDirectionalBlock implem
             final BlockPos basePos = pistonBase;
             BlockPos.betweenClosedStream(pistonBase, pistonHead).filter(p -> !p.equals(pos) && !p.equals(basePos))
                 .forEach(p -> worldIn.destroyBlock(p, !player.isCreative()));
-            worldIn.setBlockAndUpdate(basePos, worldIn.getBlockState(basePos).setValue(MechanicalPistonBlock.STATE, PistonState.RETRACTED));
+            worldIn.setBlockAndUpdate(
+                basePos,
+                worldIn.getBlockState(basePos).setValue(MechanicalPistonBlock.STATE, PistonState.RETRACTED)
+            );
             if (worldIn.getBlockEntity(basePos) instanceof MechanicalPistonBlockEntity baseBE) {
                 baseBE.onLengthBroken();
             }
@@ -102,15 +108,17 @@ public class MechanicalPistonHeadBlock extends WrenchableDirectionalBlock implem
         BlockState neighbourState,
         RandomSource random
     ) {
-        if (state.getValue(BlockStateProperties.WATERLOGGED))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+        }
         return state;
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState FluidState = context.getLevel().getFluidState(context.getClickedPos());
-        return super.getStateForPlacement(context).setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
+        return super.getStateForPlacement(context)
+            .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
     }
 
     @Override

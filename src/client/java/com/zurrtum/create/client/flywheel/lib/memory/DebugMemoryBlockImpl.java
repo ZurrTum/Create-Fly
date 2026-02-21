@@ -82,8 +82,8 @@ class DebugMemoryBlockImpl extends AbstractMemoryBlockImpl {
         public void run() {
             if (!freed) {
                 StringBuilder builder = new StringBuilder();
-                builder.append("Reclaimed ").append(size).append(" bytes at address ").append(StringUtil.formatAddress(ptr))
-                    .append(" that were leaked from allocation site:");
+                builder.append("Reclaimed ").append(size).append(" bytes at address ")
+                    .append(StringUtil.formatAddress(ptr)).append(" that were leaked from allocation site:");
                 for (StackWalker.StackFrame frame : allocationSite) {
                     builder.append("\n\t");
                     builder.append(frame);

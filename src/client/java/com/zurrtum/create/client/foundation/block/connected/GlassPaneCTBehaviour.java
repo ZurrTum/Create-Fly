@@ -18,14 +18,22 @@ public class GlassPaneCTBehaviour extends SimpleCTBehaviour {
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
         return state.getBlock() == other.getBlock();
     }
 
     @Override
     protected boolean reverseUVsHorizontally(BlockState state, Direction face) {
-        if (face.getAxisDirection() == AxisDirection.NEGATIVE)
+        if (face.getAxisDirection() == AxisDirection.NEGATIVE) {
             return true;
+        }
         return super.reverseUVsHorizontally(state, face);
     }
 }

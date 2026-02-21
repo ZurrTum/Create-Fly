@@ -1,11 +1,11 @@
 package com.zurrtum.create;
 
-import static com.zurrtum.create.Create.MOD_ID;
-
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
+
+import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllDamageTypes {
     public static final ResourceKey<DamageType> CRUSH = register("crush");

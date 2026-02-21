@@ -1,15 +1,14 @@
 package com.zurrtum.create.foundation.utility;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class AbstractBlockBreakQueue {
     protected Consumer<BlockPos> makeCallbackFor(
@@ -20,7 +19,14 @@ public abstract class AbstractBlockBreakQueue {
         BiConsumer<BlockPos, ItemStack> drop
     ) {
         return pos -> {
-            BlockHelper.destroyBlockAs(world, pos, playerEntity, toDamage, effectChance, stack -> drop.accept(pos, stack));
+            BlockHelper.destroyBlockAs(
+                world,
+                pos,
+                playerEntity,
+                toDamage,
+                effectChance,
+                stack -> drop.accept(pos, stack)
+            );
         };
     }
 
@@ -30,5 +36,10 @@ public abstract class AbstractBlockBreakQueue {
         destroyBlocks(world, toDamage, playerEntity, drop);
     }
 
-    public abstract void destroyBlocks(Level world, ItemStack toDamage, @Nullable Player playerEntity, BiConsumer<BlockPos, ItemStack> drop);
+    public abstract void destroyBlocks(
+        Level world,
+        ItemStack toDamage,
+        @Nullable Player playerEntity,
+        BiConsumer<BlockPos, ItemStack> drop
+    );
 }

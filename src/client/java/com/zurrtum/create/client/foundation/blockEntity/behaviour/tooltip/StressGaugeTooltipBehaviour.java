@@ -21,8 +21,9 @@ public class StressGaugeTooltipBehaviour extends GaugeTooltipBehaviour<StressGau
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if (!StressImpact.isEnabled())
+        if (!StressImpact.isEnabled()) {
             return false;
+        }
 
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
@@ -32,27 +33,31 @@ public class StressGaugeTooltipBehaviour extends GaugeTooltipBehaviour<StressGau
 
         CreateLang.translate("gui.stressometer.title").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
-        if (blockEntity.getTheoreticalSpeed() == 0)
-            CreateLang.text(TooltipHelper.makeProgressBar(3, 0)).translate("gui.stressometer.no_rotation").style(ChatFormatting.DARK_GRAY)
-                .forGoggles(tooltip);
-        else {
+        if (blockEntity.getTheoreticalSpeed() == 0) {
+            CreateLang.text(TooltipHelper.makeProgressBar(3, 0)).translate("gui.stressometer.no_rotation")
+                .style(ChatFormatting.DARK_GRAY).forGoggles(tooltip);
+        } else {
             getFormattedStressText(stressFraction).forGoggles(tooltip);
             CreateLang.translate("gui.stressometer.capacity").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
             double remainingCapacity = capacity - networkStress;
 
             LangBuilder su = CreateLang.translate("generic.unit.stress");
-            LangBuilder stressTip = CreateLang.number(remainingCapacity).add(su).style(StressImpact.of(stressFraction).getRelativeColor());
+            LangBuilder stressTip = CreateLang.number(remainingCapacity).add(su)
+                .style(StressImpact.of(stressFraction).getRelativeColor());
 
-            if (remainingCapacity != capacity)
-                stressTip.text(ChatFormatting.GRAY, " / ").add(CreateLang.number(capacity).add(su).style(ChatFormatting.DARK_GRAY));
+            if (remainingCapacity != capacity) {
+                stressTip.text(ChatFormatting.GRAY, " / ")
+                    .add(CreateLang.number(capacity).add(su).style(ChatFormatting.DARK_GRAY));
+            }
 
             stressTip.forGoggles(tooltip, 1);
         }
 
         BlockPos pos = blockEntity.getBlockPos();
-        if (!pos.equals(StressGaugeBlockEntity.lastSent))
+        if (!pos.equals(StressGaugeBlockEntity.lastSent)) {
             Minecraft.getInstance().player.connection.send(new GaugeObservedPacket(StressGaugeBlockEntity.lastSent = pos));
+        }
 
         return true;
     }
@@ -60,7 +65,7 @@ public class StressGaugeTooltipBehaviour extends GaugeTooltipBehaviour<StressGau
     public static LangBuilder getFormattedStressText(double stressPercent) {
         StressImpact stressLevel = StressImpact.of(stressPercent);
         return CreateLang.text(TooltipHelper.makeProgressBar(3, Math.min(stressLevel.ordinal() + 1, 3)))
-            .translate("tooltip.stressImpact." + Lang.asId(stressLevel.name())).text(String.format(" (%s%%) ", (int) (stressPercent * 100)))
-            .style(stressLevel.getRelativeColor());
+            .translate("tooltip.stressImpact." + Lang.asId(stressLevel.name()))
+            .text(String.format(" (%s%%) ", (int) (stressPercent * 100))).style(stressLevel.getRelativeColor());
     }
 }

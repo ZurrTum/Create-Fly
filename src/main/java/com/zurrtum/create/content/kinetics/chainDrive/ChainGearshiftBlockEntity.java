@@ -35,11 +35,13 @@ public class ChainGearshiftBlockEntity extends KineticBlockEntity {
     }
 
     public void neighbourChanged() {
-        if (!hasLevel())
+        if (!hasLevel()) {
             return;
+        }
         int power = level.getBestNeighborSignal(worldPosition);
-        if (power != signal)
+        if (power != signal) {
             signalChanged = true;
+        }
     }
 
     @Override
@@ -51,8 +53,9 @@ public class ChainGearshiftBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         if (signalChanged) {
             signalChanged = false;
             analogSignalChanged(level.getBestNeighborSignal(worldPosition));
@@ -67,8 +70,9 @@ public class ChainGearshiftBlockEntity extends KineticBlockEntity {
     }
 
     protected float getModifierForSignal(int newPower) {
-        if (newPower == 0)
+        if (newPower == 0) {
             return 1;
+        }
         return 1 + ((newPower + 1) / 16f);
     }
 

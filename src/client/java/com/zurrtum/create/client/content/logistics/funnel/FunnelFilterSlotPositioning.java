@@ -58,8 +58,9 @@ public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
         if (isBeltFunnel && state.getValue(BeltFunnelBlock.SHAPE) != Shape.EXTENDED) {
             Shape shape = state.getValue(BeltFunnelBlock.SHAPE);
             super.rotate(state, ms);
-            if (shape == Shape.PULLING || shape == Shape.PUSHING)
+            if (shape == Shape.PULLING || shape == Shape.PUSHING) {
                 TransformStack.of(ms).rotateXDegrees(-22.5f);
+            }
             return;
         }
 
@@ -77,12 +78,15 @@ public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
     protected boolean isSideActive(BlockState state, Direction direction) {
         Direction facing = FunnelBlock.getFunnelFacing(state);
 
-        if (facing == null)
+        if (facing == null) {
             return false;
-        if (facing.getAxis().isVertical())
+        }
+        if (facing.getAxis().isVertical()) {
             return direction.getAxis().isHorizontal();
-        if (state.getBlock() instanceof BeltFunnelBlock && state.getValue(BeltFunnelBlock.SHAPE) == Shape.EXTENDED)
+        }
+        if (state.getBlock() instanceof BeltFunnelBlock && state.getValue(BeltFunnelBlock.SHAPE) == Shape.EXTENDED) {
             return direction == Direction.UP;
+        }
         return direction == facing;
     }
 

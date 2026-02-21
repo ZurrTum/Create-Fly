@@ -14,11 +14,6 @@ import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.infrastructure.packet.c2s.ElevatorTargetFloorPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.ContraptionDisableActorPacket;
-import org.apache.commons.lang3.tuple.MutablePair;
-
-import java.util.Iterator;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
@@ -28,6 +23,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.MutablePair;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class ContraptionControlsMovingInteraction extends MovingInteractionBehaviour {
     @Override
@@ -40,16 +39,23 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
         Contraption contraption = contraptionEntity.getContraption();
 
         MutablePair<StructureBlockInfo, MovementContext> actor = contraption.getActorAt(localPos);
-        if (actor == null)
+        if (actor == null) {
             return false;
+        }
         MovementContext ctx = actor.right;
-        if (ctx == null)
+        if (ctx == null) {
             return false;
-        if (contraption instanceof ElevatorContraption ec)
+        }
+        if (contraption instanceof ElevatorContraption ec) {
             return elevatorInteraction(player, localPos, contraptionEntity, ec, ctx);
+        }
         if (contraptionEntity.level().isClientSide()) {
-            if (AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
+            if (AllClientHandle.INSTANCE.getBlockEntityClientSide(
+                contraption,
+                ctx.localPos
+            ) instanceof ContraptionControlsBlockEntity cbe) {
                 cbe.pressButton();
+            }
             return true;
         }
 
@@ -64,12 +70,14 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
             if (presentFilter.isEmpty()) {
                 iterator.remove();
                 disable = false;
-                if (!sameFilter)
+                if (!sameFilter) {
                     invert = true;
+                }
                 continue;
             }
-            if (!sameFilter)
+            if (!sameFilter) {
                 continue;
+            }
             iterator.remove();
             disable = false;
             break;
@@ -78,24 +86,30 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
         if (invert) {
             for (MutablePair<StructureBlockInfo, MovementContext> pair : contraption.getActors()) {
                 MovementBehaviour behaviour = MovementBehaviour.REGISTRY.get(pair.left.state());
-                if (behaviour == null)
+                if (behaviour == null) {
                     continue;
+                }
                 ItemStack behaviourStack = behaviour.canBeDisabledVia(pair.right);
-                if (behaviourStack == null)
+                if (behaviourStack == null) {
                     continue;
-                if (ContraptionControlsMovement.isSameFilter(behaviourStack, filter))
+                }
+                if (ContraptionControlsMovement.isSameFilter(behaviourStack, filter)) {
                     continue;
-                if (contraption.isActorTypeDisabled(behaviourStack))
+                }
+                if (contraption.isActorTypeDisabled(behaviourStack)) {
                     continue;
+                }
                 disabledActors.add(behaviourStack);
                 send(contraptionEntity, behaviourStack, true);
             }
         }
 
-        if (filter.isEmpty())
+        if (filter.isEmpty()) {
             disabledActors.clear();
-        if (disable)
+        }
+        if (disable) {
             disabledActors.add(filter);
+        }
 
         contraption.setActorsActive(filter, !disable);
         ContraptionControlsBlockEntity.sendStatus(player, filter, !disable);
@@ -109,18 +123,21 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
             disable ? 0.8f : 1.5f
         );
 
-        if (!(contraptionEntity instanceof CarriageContraptionEntity cce))
+        if (!(contraptionEntity instanceof CarriageContraptionEntity cce)) {
             return true;
-        if (!filter.is(ItemTags.DOORS))
+        }
+        if (!filter.is(ItemTags.DOORS)) {
             return true;
+        }
 
         // Special case: Doors are toggled on all carriages of a train
         Carriage carriage = cce.getCarriage();
         Train train = carriage.train;
         for (Carriage c : train.carriages) {
             CarriageContraptionEntity anyAvailableEntity = c.anyAvailableEntity();
-            if (anyAvailableEntity == null)
+            if (anyAvailableEntity == null) {
                 continue;
+            }
             Contraption cpt = anyAvailableEntity.getContraption();
             cpt.setActorsActive(filter, !disable);
             ContraptionControlsBlockEntity.sendStatus(player, filter, !disable);
@@ -132,8 +149,10 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
 
     private void send(AbstractContraptionEntity contraptionEntity, ItemStack filter, boolean disable) {
         ServerLevel world = (ServerLevel) contraptionEntity.level();
-        world.getChunkSource()
-            .sendToTrackingPlayers(contraptionEntity, new ContraptionDisableActorPacket(contraptionEntity.getId(), filter, !disable));
+        world.getChunkSource().sendToTrackingPlayers(
+            contraptionEntity,
+            new ContraptionDisableActorPacket(contraptionEntity.getId(), filter, !disable)
+        );
     }
 
     private boolean elevatorInteraction(
@@ -150,14 +169,23 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
             AllSoundEvents.CONTRAPTION_ASSEMBLE.play(level, null, pos, 0.75f, 0.8f);
             return true;
         }
-        if (!(ctx.temporaryData instanceof ElevatorFloorSelection efs))
+        if (!(ctx.temporaryData instanceof ElevatorFloorSelection efs)) {
             return false;
-        if (efs.currentTargetY == contraption.clientYTarget)
+        }
+        if (efs.currentTargetY == contraption.clientYTarget) {
             return true;
+        }
 
-        AllClientHandle.INSTANCE.sendPacket(player, new ElevatorTargetFloorPacket(contraptionEntity, efs.currentTargetY));
-        if (AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
+        AllClientHandle.INSTANCE.sendPacket(
+            player,
+            new ElevatorTargetFloorPacket(contraptionEntity, efs.currentTargetY)
+        );
+        if (AllClientHandle.INSTANCE.getBlockEntityClientSide(
+            contraption,
+            ctx.localPos
+        ) instanceof ContraptionControlsBlockEntity cbe) {
             cbe.pressButton();
+        }
         return true;
     }
 

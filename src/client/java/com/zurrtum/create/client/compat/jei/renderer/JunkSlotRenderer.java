@@ -22,8 +22,8 @@ public class JunkSlotRenderer implements IIngredientRenderer<ItemStack> {
     private static final JunkSlotRenderer INSTANCE = new JunkSlotRenderer();
 
     public static IRecipeSlotBuilder addSlot(IRecipeLayoutBuilder builder, int x, int y) {
-        return builder.addSlot(RecipeIngredientRole.RENDER_ONLY, x, y).setCustomRenderer(VanillaTypes.ITEM_STACK, INSTANCE)
-            .add(Items.BARRIER.getDefaultInstance());
+        return builder.addSlot(RecipeIngredientRole.RENDER_ONLY, x, y)
+            .setCustomRenderer(VanillaTypes.ITEM_STACK, INSTANCE).add(Items.BARRIER.getDefaultInstance());
     }
 
     @Override

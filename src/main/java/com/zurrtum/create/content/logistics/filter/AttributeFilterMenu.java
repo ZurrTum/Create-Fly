@@ -36,7 +36,10 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
     protected void init(Inventory inv, ItemStack contentHolder) {
         super.init(inv, contentHolder);
         ItemStack stack = new ItemStack(Items.NAME_TAG);
-        stack.set(DataComponents.CUSTOM_NAME, Component.literal("Selected Tags").withStyle(ChatFormatting.RESET, ChatFormatting.BLUE));
+        stack.set(
+            DataComponents.CUSTOM_NAME,
+            Component.literal("Selected Tags").withStyle(ChatFormatting.RESET, ChatFormatting.BLUE)
+        );
         ghostInventory.setItem(1, stack);
     }
 
@@ -73,22 +76,25 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
 
     @Override
     public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        if (slotId == 37)
+        if (slotId == 37) {
             return;
+        }
         super.clicked(slotId, dragType, clickTypeIn, player);
     }
 
     @Override
     public boolean canDragTo(Slot slotIn) {
-        if (slotIn.index == 37)
+        if (slotIn.index == 37) {
             return false;
+        }
         return super.canDragTo(slotIn);
     }
 
     @Override
     public boolean canTakeItemForPickAll(ItemStack stack, Slot slotIn) {
-        if (slotIn.index == 37)
+        if (slotIn.index == 37) {
             return false;
+        }
         return super.canTakeItemForPickAll(stack, slotIn);
     }
 
@@ -106,8 +112,14 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
     protected void initAndReadInventory(ItemStack filterItem) {
         super.initAndReadInventory(filterItem);
         selectedAttributes = new ArrayList<>();
-        whitelistMode = filterItem.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, AttributeFilterWhitelistMode.WHITELIST_DISJ);
-        List<ItemAttributeEntry> attributes = filterItem.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, List.of());
+        whitelistMode = filterItem.getOrDefault(
+            AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+            AttributeFilterWhitelistMode.WHITELIST_DISJ
+        );
+        List<ItemAttributeEntry> attributes = filterItem.getOrDefault(
+            AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES,
+            List.of()
+        );
         selectedAttributes.addAll(attributes);
     }
 
@@ -116,8 +128,9 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
         filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, whitelistMode);
         List<ItemAttributeEntry> attributes = new ArrayList<>();
         selectedAttributes.forEach(at -> {
-            if (at == null)
+            if (at == null) {
                 return;
+            }
             attributes.add(new ItemAttributeEntry(at.attribute(), at.inverted()));
         });
         filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, attributes);

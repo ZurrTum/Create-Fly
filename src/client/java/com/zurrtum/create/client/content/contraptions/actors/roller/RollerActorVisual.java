@@ -15,19 +15,26 @@ public class RollerActorVisual extends HarvesterActorVisual {
 
     TransformedInstance frame;
 
-    public RollerActorVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public RollerActorVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         super(visualizationContext, simulationWorld, movementContext);
 
-        frame = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ROLLER_FRAME)).createInstance();
+        frame = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ROLLER_FRAME))
+            .createInstance();
         frame.light(localBlockLight(), 0);
     }
 
     @Override
     public void beginFrame() {
-        harvester.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle).uncenter().translate(0, -.25, 17 / 16f)
-            .rotateXDegrees((float) getRotation()).translate(0, -.5, .5).rotateYDegrees(90).setChanged();
+        harvester.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle).uncenter()
+            .translate(0, -.25, 17 / 16f).rotateXDegrees((float) getRotation()).translate(0, -.5, .5).rotateYDegrees(90)
+            .setChanged();
 
-        frame.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle + 180).uncenter().setChanged();
+        frame.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle + 180)
+            .uncenter().setChanged();
     }
 
     @Override

@@ -52,9 +52,20 @@ public class PressingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_SHADOW.render(context, 61, 45);
         AllGuiTextures.JEI_LONG_ARROW.render(context, 52, 58);
-        context.guiRenderState.submitPicturesInPictureState(new PressRenderState(new Matrix3x2f(context.pose()), 73, -12));
+        context.guiRenderState.submitPicturesInPictureState(new PressRenderState(
+            new Matrix3x2f(context.pose()),
+            73,
+            -12
+        ));
     }
 }

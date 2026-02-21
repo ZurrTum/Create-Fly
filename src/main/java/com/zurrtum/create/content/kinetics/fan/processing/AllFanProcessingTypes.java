@@ -58,7 +58,11 @@ public class AllFanProcessingTypes {
     public static final SplashingType SPLASHING = register("splashing", new SplashingType());
 
     private static <T extends FanProcessingType> T register(String name, T type) {
-        return Registry.register(CreateRegistries.FAN_PROCESSING_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), type);
+        return Registry.register(
+            CreateRegistries.FAN_PROCESSING_TYPE,
+            Identifier.fromNamespaceAndPath(MOD_ID, name),
+            type
+        );
     }
 
     public static void register() {
@@ -88,17 +92,25 @@ public class AllFanProcessingTypes {
         public boolean canProcess(ItemStack stack, Level level) {
             SingleRecipeInput input = new SingleRecipeInput(stack);
             RecipeManager recipeManager = ((ServerLevel) level).recipeAccess();
-            Optional<RecipeHolder<SmeltingRecipe>> smeltingRecipe = recipeManager.getRecipeFor(RecipeType.SMELTING, input, level)
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+            Optional<RecipeHolder<SmeltingRecipe>> smeltingRecipe = recipeManager.getRecipeFor(
+                RecipeType.SMELTING,
+                input,
+                level
+            ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
 
-            if (smeltingRecipe.isPresent())
+            if (smeltingRecipe.isPresent()) {
                 return true;
+            }
 
-            Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = recipeManager.getRecipeFor(RecipeType.BLASTING, input, level)
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+            Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = recipeManager.getRecipeFor(
+                RecipeType.BLASTING,
+                input,
+                level
+            ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
 
-            if (blastingRecipe.isPresent())
+            if (blastingRecipe.isPresent()) {
                 return true;
+            }
 
             return !stack.has(DataComponents.DAMAGE_RESISTANT);
         }
@@ -116,15 +128,20 @@ public class AllFanProcessingTypes {
             ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
 
             if (smeltingRecipe.isEmpty()) {
-                smeltingRecipe = recipeManager.getRecipeFor(RecipeType.BLASTING, input, level).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+                smeltingRecipe = recipeManager.getRecipeFor(RecipeType.BLASTING, input, level)
+                    .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             }
 
             if (smeltingRecipe.isPresent()) {
-                Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = recipeManager.getRecipeFor(RecipeType.SMOKING, input, level)
-                    .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+                Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = recipeManager.getRecipeFor(
+                    RecipeType.SMOKING,
+                    input,
+                    level
+                ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
                 RegistryAccess registryAccess = level.registryAccess();
                 ItemStack result = smeltingRecipe.get().value().assemble(input, registryAccess);
-                if (smokingRecipe.isEmpty() || !ItemStack.isSameItem(smokingRecipe.get().value().assemble(input, registryAccess), result)) {
+                if (smokingRecipe.isEmpty() || !ItemStack.isSameItem(
+                    smokingRecipe.get().value().assemble(input, registryAccess), result)) {
                     return ItemHelper.multipliedOutput(result, stack.getCount());
                 }
             }
@@ -134,8 +151,9 @@ public class AllFanProcessingTypes {
 
         @Override
         public void spawnProcessingParticles(Level level, Vec3 pos) {
-            if (level.random.nextInt(8) != 0)
+            if (level.random.nextInt(8) != 0) {
                 return;
+            }
             level.addParticle(ParticleTypes.LARGE_SMOKE, pos.x, pos.y + .25f, pos.z, 0, 1 / 16f, 0);
         }
 
@@ -143,16 +161,24 @@ public class AllFanProcessingTypes {
         public void morphAirFlow(AirFlowParticleAccess particleAccess, RandomSource random) {
             particleAccess.setColor(Color.mixColors(0xFF4400, 0xFF8855, random.nextFloat()));
             particleAccess.setAlpha(.5f);
-            if (random.nextFloat() < 1 / 32f)
+            if (random.nextFloat() < 1 / 32f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.FLAME, .25f);
-            if (random.nextFloat() < 1 / 16f)
-                particleAccess.spawnExtraParticle(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.LAVA.defaultBlockState()), .25f);
+            }
+            if (random.nextFloat() < 1 / 16f) {
+                particleAccess.spawnExtraParticle(
+                    new BlockParticleOption(
+                        ParticleTypes.BLOCK,
+                        Blocks.LAVA.defaultBlockState()
+                    ), .25f
+                );
+            }
         }
 
         @Override
         public void affectEntity(Entity entity, Level level) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return;
+            }
 
             if (!entity.fireImmune()) {
                 entity.igniteForSeconds(10);
@@ -170,10 +196,12 @@ public class AllFanProcessingTypes {
             }
             BlockState blockState = level.getBlockState(pos);
             if (blockState.is(AllBlockTags.FAN_PROCESSING_CATALYSTS_HAUNTING)) {
-                if (blockState.is(BlockTags.CAMPFIRES) && blockState.hasProperty(CampfireBlock.LIT) && !blockState.getValue(CampfireBlock.LIT)) {
+                if (blockState.is(BlockTags.CAMPFIRES) && blockState.hasProperty(CampfireBlock.LIT) && !blockState.getValue(
+                    CampfireBlock.LIT)) {
                     return false;
                 }
-                return !blockState.hasProperty(LitBlazeBurnerBlock.FLAME_TYPE) || blockState.getValue(LitBlazeBurnerBlock.FLAME_TYPE) == LitBlazeBurnerBlock.FlameType.SOUL;
+                return !blockState.hasProperty(LitBlazeBurnerBlock.FLAME_TYPE) || blockState.getValue(
+                    LitBlazeBurnerBlock.FLAME_TYPE) == LitBlazeBurnerBlock.FlameType.SOUL;
             }
             return false;
         }
@@ -192,28 +220,39 @@ public class AllFanProcessingTypes {
         @Nullable
         public List<ItemStack> process(ItemStack stack, Level level) {
             SingleRecipeInput input = new SingleRecipeInput(stack);
-            Optional<RecipeHolder<HauntingRecipe>> recipe = ((ServerLevel) level).recipeAccess().getRecipeFor(AllRecipeTypes.HAUNTING, input, level);
-            return recipe.map(entry -> RecipeApplier.applyRecipeOn(level.getRandom(), stack.getCount(), input, entry.value())).orElse(null);
+            Optional<RecipeHolder<HauntingRecipe>> recipe = ((ServerLevel) level).recipeAccess()
+                .getRecipeFor(AllRecipeTypes.HAUNTING, input, level);
+            return recipe.map(entry -> RecipeApplier.applyRecipeOn(
+                level.getRandom(),
+                stack.getCount(),
+                input,
+                entry.value()
+            )).orElse(null);
         }
 
         @Override
         public void spawnProcessingParticles(Level level, Vec3 pos) {
-            if (level.random.nextInt(8) != 0)
+            if (level.random.nextInt(8) != 0) {
                 return;
-            pos = pos.add(VecHelper.offsetRandomly(Vec3.ZERO, level.random, 1).multiply(1, 0.05f, 1).normalize().scale(0.15f));
+            }
+            pos = pos.add(VecHelper.offsetRandomly(Vec3.ZERO, level.random, 1).multiply(1, 0.05f, 1).normalize()
+                .scale(0.15f));
             level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, pos.x, pos.y + .45f, pos.z, 0, 0, 0);
-            if (level.random.nextInt(2) == 0)
+            if (level.random.nextInt(2) == 0) {
                 level.addParticle(ParticleTypes.SMOKE, pos.x, pos.y + .25f, pos.z, 0, 0, 0);
+            }
         }
 
         @Override
         public void morphAirFlow(AirFlowParticleAccess particleAccess, RandomSource random) {
             particleAccess.setColor(Color.mixColors(0x0, 0x126568, random.nextFloat()));
             particleAccess.setAlpha(1f);
-            if (random.nextFloat() < 1 / 128f)
+            if (random.nextFloat() < 1 / 128f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.SOUL_FIRE_FLAME, .125f);
-            if (random.nextFloat() < 1 / 32f)
+            }
+            if (random.nextFloat() < 1 / 32f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.SMOKE, .125f);
+            }
         }
 
         @Override
@@ -221,9 +260,11 @@ public class AllFanProcessingTypes {
             if (level.isClientSide()) {
                 if (entity instanceof Horse) {
                     Vec3 p = entity.getPosition(0);
-                    Vec3 v = p.add(0, 0.5f, 0).add(VecHelper.offsetRandomly(Vec3.ZERO, level.random, 1).multiply(1, 0.2f, 1).normalize().scale(1f));
+                    Vec3 v = p.add(0, 0.5f, 0)
+                        .add(VecHelper.offsetRandomly(Vec3.ZERO, level.random, 1).multiply(1, 0.2f, 1).normalize()
+                            .scale(1f));
                     level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, v.x, v.y, v.z, 0, 0.1f, 0);
-                    if (level.random.nextInt(3) == 0)
+                    if (level.random.nextInt(3) == 0) {
                         level.addParticle(
                             ParticleTypes.LARGE_SMOKE,
                             p.x,
@@ -233,6 +274,7 @@ public class AllFanProcessingTypes {
                             0.1f,
                             (level.random.nextFloat() - .5f) * .5f
                         );
+                    }
                 }
                 return;
             }
@@ -258,19 +300,30 @@ public class AllFanProcessingTypes {
                     return;
                 }
 
-                level.playSound(null, entity.blockPosition(), SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.NEUTRAL, 1.25f, 0.65f);
+                level.playSound(
+                    null,
+                    entity.blockPosition(),
+                    SoundEvents.GENERIC_EXTINGUISH_FIRE,
+                    SoundSource.NEUTRAL,
+                    1.25f,
+                    0.65f
+                );
 
                 SkeletonHorse skeletonHorse = EntityType.SKELETON_HORSE.create(level, EntitySpawnReason.NATURAL);
                 RegistryAccess registryManager = level.registryAccess();
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(skeletonHorse.problemPath(), LOGGER)) {
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    skeletonHorse.problemPath(),
+                    LOGGER
+                )) {
                     TagValueOutput view = TagValueOutput.createWithContext(logging, registryManager);
                     horse.saveWithoutId(view);
                     CompoundTag serializeNBT = view.buildResult();
                     serializeNBT.remove("UUID");
                     skeletonHorse.load(TagValueInput.create(logging, registryManager, serializeNBT));
                 }
-                if (!horse.getBodyArmorItem().isEmpty())
+                if (!horse.getBodyArmorItem().isEmpty()) {
                     horse.spawnAtLocation((ServerLevel) level, horse.getBodyArmorItem());
+                }
                 skeletonHorse.setPos(horse.getPosition(0));
                 level.addFreshEntity(skeletonHorse);
                 horse.discard();
@@ -287,7 +340,8 @@ public class AllFanProcessingTypes {
             }
             BlockState blockState = level.getBlockState(pos);
             if (blockState.is(AllBlockTags.FAN_PROCESSING_CATALYSTS_SMOKING)) {
-                if (blockState.is(BlockTags.CAMPFIRES) && blockState.hasProperty(CampfireBlock.LIT) && !blockState.getValue(CampfireBlock.LIT)) {
+                if (blockState.is(BlockTags.CAMPFIRES) && blockState.hasProperty(CampfireBlock.LIT) && !blockState.getValue(
+                    CampfireBlock.LIT)) {
                     return false;
                 }
                 if (blockState.hasProperty(LitBlazeBurnerBlock.FLAME_TYPE) && blockState.getValue(LitBlazeBurnerBlock.FLAME_TYPE) != LitBlazeBurnerBlock.FlameType.REGULAR) {
@@ -305,7 +359,8 @@ public class AllFanProcessingTypes {
 
         @Override
         public boolean canProcess(ItemStack stack, Level level) {
-            return ((ServerLevel) level).recipeAccess().getRecipeFor(RecipeType.SMOKING, new SingleRecipeInput(stack), level)
+            return ((ServerLevel) level).recipeAccess()
+                .getRecipeFor(RecipeType.SMOKING, new SingleRecipeInput(stack), level)
                 .filter(AllRecipeTypes.CAN_BE_AUTOMATED).isPresent();
         }
 
@@ -313,14 +368,18 @@ public class AllFanProcessingTypes {
         @Nullable
         public List<ItemStack> process(ItemStack stack, Level level) {
             SingleRecipeInput input = new SingleRecipeInput(stack);
-            return ((ServerLevel) level).recipeAccess().getRecipeFor(RecipeType.SMOKING, input, level).filter(AllRecipeTypes.CAN_BE_AUTOMATED)
-                .map(entry -> ItemHelper.multipliedOutput(entry.value().assemble(input, level.registryAccess()), stack.getCount())).orElse(null);
+            return ((ServerLevel) level).recipeAccess().getRecipeFor(RecipeType.SMOKING, input, level)
+                .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(entry -> ItemHelper.multipliedOutput(
+                    entry.value().assemble(input, level.registryAccess()),
+                    stack.getCount()
+                )).orElse(null);
         }
 
         @Override
         public void spawnProcessingParticles(Level level, Vec3 pos) {
-            if (level.random.nextInt(8) != 0)
+            if (level.random.nextInt(8) != 0) {
                 return;
+            }
             level.addParticle(ParticleTypes.POOF, pos.x, pos.y + .25f, pos.z, 0, 1 / 16f, 0);
         }
 
@@ -328,16 +387,19 @@ public class AllFanProcessingTypes {
         public void morphAirFlow(AirFlowParticleAccess particleAccess, RandomSource random) {
             particleAccess.setColor(Color.mixColors(0x0, 0x555555, random.nextFloat()));
             particleAccess.setAlpha(1f);
-            if (random.nextFloat() < 1 / 32f)
+            if (random.nextFloat() < 1 / 32f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.SMOKE, .125f);
-            if (random.nextFloat() < 1 / 32f)
+            }
+            if (random.nextFloat() < 1 / 32f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.LARGE_SMOKE, .125f);
+            }
         }
 
         @Override
         public void affectEntity(Entity entity, Level level) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return;
+            }
 
             if (!entity.fireImmune()) {
                 entity.igniteForSeconds(2);
@@ -372,13 +434,15 @@ public class AllFanProcessingTypes {
         public List<ItemStack> process(ItemStack stack, Level level) {
             SingleRecipeInput input = new SingleRecipeInput(stack);
             return ((ServerLevel) level).recipeAccess().getRecipeFor(AllRecipeTypes.SPLASHING, input, level)
-                .map(entry -> RecipeApplier.applyRecipeOn(level.getRandom(), stack.getCount(), input, entry.value())).orElse(null);
+                .map(entry -> RecipeApplier.applyRecipeOn(level.getRandom(), stack.getCount(), input, entry.value()))
+                .orElse(null);
         }
 
         @Override
         public void spawnProcessingParticles(Level level, Vec3 pos) {
-            if (level.random.nextInt(8) != 0)
+            if (level.random.nextInt(8) != 0) {
                 return;
+            }
             level.addParticle(
                 new DustParticleOptions(0x0055FF, 1),
                 pos.x + (level.random.nextFloat() - .5f) * .5f,
@@ -403,16 +467,19 @@ public class AllFanProcessingTypes {
         public void morphAirFlow(AirFlowParticleAccess particleAccess, RandomSource random) {
             particleAccess.setColor(Color.mixColors(0x4499FF, 0x2277FF, random.nextFloat()));
             particleAccess.setAlpha(1f);
-            if (random.nextFloat() < 1 / 32f)
+            if (random.nextFloat() < 1 / 32f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.BUBBLE, .125f);
-            if (random.nextFloat() < 1 / 32f)
+            }
+            if (random.nextFloat() < 1 / 32f) {
                 particleAccess.spawnExtraParticle(ParticleTypes.BUBBLE_POP, .125f);
+            }
         }
 
         @Override
         public void affectEntity(Entity entity, Level level) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return;
+            }
 
             if (entity instanceof EnderMan || entity.getType() == EntityType.SNOW_GOLEM || entity.getType() == EntityType.BLAZE) {
                 entity.hurtServer((ServerLevel) level, entity.damageSources().drown(), 2);

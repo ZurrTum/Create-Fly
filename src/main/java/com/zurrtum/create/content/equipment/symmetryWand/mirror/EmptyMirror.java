@@ -2,15 +2,14 @@ package com.zurrtum.create.content.equipment.symmetryWand.mirror;
 
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
-
-import java.util.Map;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Map;
+import java.util.Set;
 
 public class EmptyMirror extends SymmetryMirror {
 

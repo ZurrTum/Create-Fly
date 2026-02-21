@@ -6,6 +6,15 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllRecipeSets;
 import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeManager.IngredientExtractor;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipePropertySet;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,16 +24,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Stream;
-
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeManager.IngredientExtractor;
-import net.minecraft.world.item.crafting.RecipeMap;
-import net.minecraft.world.item.crafting.RecipePropertySet;
 
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {

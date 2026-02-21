@@ -36,8 +36,9 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
     @Override
     public InteractionResult useOn(UseOnContext pContext) {
         Player player = pContext.getPlayer();
-        if (player == null)
+        if (player == null) {
             return InteractionResult.FAIL;
+        }
         ItemStack stack = pContext.getItemInHand();
         BlockPos pos = pContext.getClickedPos();
         Level level = pContext.getLevel();
@@ -46,8 +47,9 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
         int maxDistance = getMaxDistanceFromSelection();
 
         if (player.isShiftKeyDown() && stack.has(AllDataComponents.CLICK_TO_LINK_DATA)) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
+            }
             player.displayClientMessage(Component.translatable("create." + msgKey + ".clear"), true);
             stack.remove(AllDataComponents.CLICK_TO_LINK_DATA);
             stack.remove(DataComponents.BLOCK_ENTITY_DATA);
@@ -60,8 +62,9 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
             if (!isValidTarget(level, pos)) {
                 if (placeWhenInvalid()) {
                     InteractionResult useOn = super.useOn(pContext);
-                    if (level.isClientSide() || useOn == InteractionResult.FAIL)
+                    if (level.isClientSide() || useOn == InteractionResult.FAIL) {
                         return useOn;
+                    }
 
                     ItemStack itemInHand = player.getItemInHand(pContext.getHand());
                     if (!itemInHand.isEmpty()) {
@@ -71,14 +74,16 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
                     return useOn;
                 }
 
-                if (level.isClientSide())
+                if (level.isClientSide()) {
                     AllSoundEvents.DENY.playFrom(player);
+                }
                 player.displayClientMessage(Component.translatable("create." + msgKey + ".invalid"), true);
                 return InteractionResult.FAIL;
             }
 
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
+            }
 
             player.displayClientMessage(Component.translatable("create." + msgKey + ".set"), true);
             stack.set(AllDataComponents.CLICK_TO_LINK_DATA, new ClickToLinkData(pos, placedDim));
@@ -92,25 +97,31 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
         BlockPos placedPos = pos.relative(pContext.getClickedFace(), state.canBeReplaced() ? 0 : 1);
 
         if (maxDistance != -1 && (!selectedPos.closerThan(placedPos, maxDistance) || !selectedDim.equals(placedDim))) {
-            player.displayClientMessage(Component.translatable("create." + msgKey + ".too_far").withStyle(ChatFormatting.RED), true);
+            player.displayClientMessage(
+                Component.translatable("create." + msgKey + ".too_far").withStyle(ChatFormatting.RED), true);
             return InteractionResult.FAIL;
         }
 
         CompoundTag beTag = new CompoundTag();
         beTag.store("TargetOffset", BlockPos.CODEC, selectedPos.subtract(placedPos));
         beTag.store("TargetDimension", Identifier.CODEC, selectedDim);
-        stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), beTag));
+        stack.set(
+            DataComponents.BLOCK_ENTITY_DATA,
+            TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), beTag)
+        );
 
         InteractionResult useOn = super.useOn(pContext);
-        if (level.isClientSide() || useOn == InteractionResult.FAIL)
+        if (level.isClientSide() || useOn == InteractionResult.FAIL) {
             return useOn;
+        }
 
         ItemStack itemInHand = player.getItemInHand(pContext.getHand());
         if (!itemInHand.isEmpty()) {
             stack.remove(AllDataComponents.CLICK_TO_LINK_DATA);
             stack.remove(DataComponents.BLOCK_ENTITY_DATA);
         }
-        player.displayClientMessage(Component.translatable("create." + msgKey + ".success").withStyle(ChatFormatting.GREEN), true);
+        player.displayClientMessage(
+            Component.translatable("create." + msgKey + ".success").withStyle(ChatFormatting.GREEN), true);
         return useOn;
     }
 

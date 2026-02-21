@@ -33,15 +33,17 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     @Override
     public void onSpeedChanged(float prevSpeed) {
         super.onSpeedChanged(prevSpeed);
-        if (destroyProgress == -1)
+        if (destroyProgress == -1) {
             destroyNextTick();
+        }
     }
 
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (ticksUntilNextProgress == -1)
+        if (ticksUntilNextProgress == -1) {
             destroyNextTick();
+        }
     }
 
     public void destroyNextTick() {
@@ -58,8 +60,9 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("Progress", destroyProgress);
         view.putInt("NextTick", ticksUntilNextProgress);
-        if (breakingPos != null)
+        if (breakingPos != null) {
             view.store("Breaking", BlockPos.CODEC, breakingPos);
+        }
         super.write(view, clientPacket);
     }
 
@@ -74,27 +77,33 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     @Override
     public void invalidate() {
         super.invalidate();
-        if (!level.isClientSide() && destroyProgress != 0)
+        if (!level.isClientSide() && destroyProgress != 0) {
             level.destroyBlockProgress(breakerId, breakingPos, -1);
+        }
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (!shouldRun())
+        }
+        if (!shouldRun()) {
             return;
-        if (getSpeed() == 0)
+        }
+        if (getSpeed() == 0) {
             return;
+        }
 
         breakingPos = getBreakingPos();
 
-        if (ticksUntilNextProgress < 0)
+        if (ticksUntilNextProgress < 0) {
             return;
-        if (ticksUntilNextProgress-- > 0)
+        }
+        if (ticksUntilNextProgress-- > 0) {
             return;
+        }
 
         BlockState stateToBreak = level.getBlockState(breakingPos);
         float blockHardness = stateToBreak.getDestroySpeed(level, breakingPos);
@@ -128,17 +137,20 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     }
 
     public static boolean isBreakable(BlockState stateToBreak, float blockHardness) {
-        return !(stateToBreak.liquid() || stateToBreak.getBlock() instanceof AirBlock || blockHardness == -1 || stateToBreak.is(AllBlockTags.NON_BREAKABLE));
+        return !(stateToBreak.liquid() || stateToBreak.getBlock() instanceof AirBlock || blockHardness == -1 || stateToBreak.is(
+            AllBlockTags.NON_BREAKABLE));
     }
 
     public void onBlockBroken(BlockState stateToBreak) {
         Vec3 vec = VecHelper.offsetRandomly(VecHelper.getCenterOf(breakingPos), level.random, .125f);
         BlockHelper.destroyBlock(
             level, breakingPos, 1f, (stack) -> {
-                if (stack.isEmpty())
+                if (stack.isEmpty()) {
                     return;
-                if (!((ServerLevel) level).getGameRules().get(GameRules.BLOCK_DROPS))
+                }
+                if (!((ServerLevel) level).getGameRules().get(GameRules.BLOCK_DROPS)) {
                     return;
+                }
 
                 ItemEntity itementity = new ItemEntity(level, vec.x, vec.y, vec.z, stack);
                 itementity.setDefaultPickUpDelay();

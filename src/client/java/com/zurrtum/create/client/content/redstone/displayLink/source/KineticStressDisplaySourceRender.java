@@ -7,10 +7,16 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 
 public class KineticStressDisplaySourceRender extends SingleLineDisplaySourceRender {
     @Override
-    public void initConfigurationWidgets(DisplaySource source, DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
+    public void initConfigurationWidgets(
+        DisplaySource source,
+        DisplayLinkContext context,
+        ModularGuiLineBuilder builder,
+        boolean isFirstLine
+    ) {
         super.initConfigurationWidgets(source, context, builder, isFirstLine);
-        if (isFirstLine)
+        if (isFirstLine) {
             return;
+        }
         builder.addSelectionScrollInput(
             0,
             120,

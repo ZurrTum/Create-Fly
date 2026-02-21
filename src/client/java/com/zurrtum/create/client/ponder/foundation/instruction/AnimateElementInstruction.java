@@ -3,11 +3,10 @@ package com.zurrtum.create.client.ponder.foundation.instruction;
 import com.zurrtum.create.client.ponder.api.element.ElementLink;
 import com.zurrtum.create.client.ponder.api.element.PonderSceneElement;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import net.minecraft.world.phys.Vec3;
 
 public class AnimateElementInstruction<T extends PonderSceneElement> extends TickingInstruction {
 
@@ -20,7 +19,13 @@ public class AnimateElementInstruction<T extends PonderSceneElement> extends Tic
     private final BiConsumer<T, Vec3> setter;
     private final Function<T, Vec3> getter;
 
-    protected AnimateElementInstruction(ElementLink<T> link, Vec3 totalDelta, int ticks, BiConsumer<T, Vec3> setter, Function<T, Vec3> getter) {
+    protected AnimateElementInstruction(
+        ElementLink<T> link,
+        Vec3 totalDelta,
+        int ticks,
+        BiConsumer<T, Vec3> setter,
+        Function<T, Vec3> getter
+    ) {
         super(false, ticks);
         this.link = link;
         this.setter = setter;
@@ -34,16 +39,18 @@ public class AnimateElementInstruction<T extends PonderSceneElement> extends Tic
     protected final void firstTick(PonderScene scene) {
         super.firstTick(scene);
         element = scene.resolve(link);
-        if (element == null)
+        if (element == null) {
             return;
+        }
         target = getter.apply(element).add(totalDelta);
     }
 
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
-        if (element == null)
+        if (element == null) {
             return;
+        }
         if (remainingTicks == 0) {
             setter.accept(element, target);
             setter.accept(element, target);

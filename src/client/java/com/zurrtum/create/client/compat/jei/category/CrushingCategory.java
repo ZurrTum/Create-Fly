@@ -56,7 +56,11 @@ public class CrushingCategory extends CreateCategory<RecipeHolder<? extends Crea
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends CreateSingleStackRollableRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<? extends CreateSingleStackRollableRecipe> entry,
+        IFocusGroup focuses
+    ) {
         CreateSingleStackRollableRecipe recipe = entry.value();
         builder.addInputSlot(51, 3).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         List<ProcessingOutput> results = recipe.results();
@@ -74,6 +78,10 @@ public class CrushingCategory extends CreateCategory<RecipeHolder<? extends Crea
         double mouseY
     ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 72, 7);
-        graphics.guiRenderState.submitPicturesInPictureState(new CrushWheelRenderState(new Matrix3x2f(graphics.pose()), 42, 24));
+        graphics.guiRenderState.submitPicturesInPictureState(new CrushWheelRenderState(
+            new Matrix3x2f(graphics.pose()),
+            42,
+            24
+        ));
     }
 }

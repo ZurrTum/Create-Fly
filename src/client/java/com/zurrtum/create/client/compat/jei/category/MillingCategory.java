@@ -67,10 +67,20 @@ public class MillingCategory extends CreateCategory<RecipeHolder<MillingRecipe>>
     }
 
     @Override
-    public void draw(RecipeHolder<MillingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<MillingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         AllGuiTextures.JEI_ARROW.render(graphics, 85, 32);
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 43, 4);
         AllGuiTextures.JEI_SHADOW.render(graphics, 32, 40);
-        graphics.guiRenderState.submitPicturesInPictureState(new MillstoneRenderState(new Matrix3x2f(graphics.pose()), 42, 19));
+        graphics.guiRenderState.submitPicturesInPictureState(new MillstoneRenderState(
+            new Matrix3x2f(graphics.pose()),
+            42,
+            19
+        ));
     }
 }

@@ -54,24 +54,31 @@ public class TrainSignalScenes {
         AABB bb = new AABB(marker, marker);
         AABB bb3 = bb.move(3, 0, 0);
 
-        scene.overlay().showControls(marker, Pointing.DOWN, 40).rightClick().withItem(AllItems.TRACK_SIGNAL.getDefaultInstance());
+        scene.overlay().showControls(marker, Pointing.DOWN, 40).rightClick()
+            .withItem(AllItems.TRACK_SIGNAL.getDefaultInstance());
         scene.idle(6);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.move(0, -1 / 16f, 0), 1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.move(0, -1 / 16f, 0).inflate(.45f, 1 / 16f, .45f), 100);
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.GREEN,
+            bb,
+            bb.move(0, -1 / 16f, 0).inflate(.45f, 1 / 16f, .45f),
+            100
+        );
         scene.idle(10);
 
         scene.overlay().showText(70).pointAt(marker).placeNearTarget().colored(PonderPalette.GREEN)
             .text("Select a Train Track then place the Signal nearby");
         scene.idle(60);
 
-        ElementLink<WorldSectionElement> signalElement = scene.world().showIndependentSection(fakeSignal, Direction.DOWN);
+        ElementLink<WorldSectionElement> signalElement = scene.world()
+            .showIndependentSection(fakeSignal, Direction.DOWN);
         scene.world().moveSection(signalElement, util.vector().of(1, 0, 0), 0);
         scene.idle(15);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, new AABB(signalPos), 20);
         scene.idle(25);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(signalPos, Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .text("Signals control the flow of Trains not driven by players");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(signalPos, Direction.WEST)).attachKeyFrame()
+            .placeNearTarget().text("Signals control the flow of Trains not driven by players");
         scene.idle(70);
 
         ElementLink<WorldSectionElement> trainElement = scene.world().showIndependentSection(train, Direction.DOWN);
@@ -83,11 +90,12 @@ public class TrainSignalScenes {
 
         scene.idle(10);
 
-        scene.overlay().showText(80).pointAt(marker.add(-.45, 0, 0)).attachKeyFrame().placeNearTarget().colored(PonderPalette.RED)
-            .text("Scheduled Trains will never cross signals in the opposite direction");
+        scene.overlay().showText(80).pointAt(marker.add(-.45, 0, 0)).attachKeyFrame().placeNearTarget()
+            .colored(PonderPalette.RED).text("Scheduled Trains will never cross signals in the opposite direction");
         scene.idle(90);
 
-        scene.overlay().showControls(birbVec.add(0, 0.5, 0), Pointing.DOWN, 40).withItem(AllItems.SCHEDULE.getDefaultInstance());
+        scene.overlay().showControls(birbVec.add(0, 0.5, 0), Pointing.DOWN, 40)
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
         scene.special().movePointOfInterest(util.grid().at(19, 4, 6));
 
@@ -108,10 +116,12 @@ public class TrainSignalScenes {
         scene.special().movePointOfInterest(util.grid().at(5, 1, 4));
         scene.idle(20);
 
-        scene.overlay().showControls(marker, Pointing.DOWN, 40).rightClick().withItem(AllItems.TRACK_SIGNAL.getDefaultInstance());
+        scene.overlay().showControls(marker, Pointing.DOWN, 40).rightClick()
+            .withItem(AllItems.TRACK_SIGNAL.getDefaultInstance());
         scene.idle(6);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.move(0, -1 / 16f, 0), 1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.move(0, -1 / 16f, 0).inflate(.45f, 1 / 16f, .45f), 70);
+        scene.overlay()
+            .chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.move(0, -1 / 16f, 0).inflate(.45f, 1 / 16f, .45f), 70);
         scene.idle(30);
         scene.world().showSection(secondSignal, Direction.DOWN);
         scene.idle(10);
@@ -119,12 +129,13 @@ public class TrainSignalScenes {
         scene.world().showIndependentSectionImmediately(firstSignal);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, new AABB(util.grid().at(8, 1, 9)), 40);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(8, 1, 9), Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .text("...unless a second signal is added facing the opposite way.");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(8, 1, 9), Direction.WEST))
+            .attachKeyFrame().placeNearTarget().text("...unless a second signal is added facing the opposite way.");
         scene.idle(90);
         scene.world().hideIndependentSection(signalElement, null);
 
-        scene.overlay().showControls(birbVec.add(0, 0.5, 0), Pointing.DOWN, 40).withItem(AllItems.SCHEDULE.getDefaultInstance());
+        scene.overlay().showControls(birbVec.add(0, 0.5, 0), Pointing.DOWN, 40)
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
         scene.special().movePointOfInterest(util.grid().at(19, 4, 6));
 
@@ -172,7 +183,8 @@ public class TrainSignalScenes {
         scene.world().showSection(thirdNixie, Direction.SOUTH);
         scene.idle(15);
 
-        scene.overlay().showText(100).pointAt(util.vector().blockSurface(util.grid().at(8, 2, 9), Direction.SOUTH)).attachKeyFrame().placeNearTarget()
+        scene.overlay().showText(100).pointAt(util.vector().blockSurface(util.grid().at(8, 2, 9), Direction.SOUTH))
+            .attachKeyFrame().placeNearTarget()
             .text("Nixie tubes can be attached to make a signal's lights more visible");
         scene.idle(70);
     }
@@ -255,7 +267,8 @@ public class TrainSignalScenes {
         scene.idle(40);
 
         ElementLink<WorldSectionElement> trainElement = scene.world().showIndependentSection(train1, null);
-        ElementLink<ParrotElement> birb1 = scene.special().createBirb(util.vector().centerOf(18, 3, 7), ParrotPose.FacePointOfInterestPose::new);
+        ElementLink<ParrotElement> birb1 = scene.special()
+            .createBirb(util.vector().centerOf(18, 3, 7), ParrotPose.FacePointOfInterestPose::new);
         scene.world().moveSection(trainElement, util.vector().of(4, 0, 0), 0);
         scene.world().moveSection(trainElement, util.vector().of(-9, 0, 0), 45);
         scene.world().animateBogey(util.grid().at(13, 2, 7), 9f, 45);
@@ -270,12 +283,14 @@ public class TrainSignalScenes {
         scene.overlay().showBigLine(PonderPalette.RED, m4.add(.45, 0, -.45), m3.add(-.45, 0, .45), 220);
         scene.idle(25);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(s1Pos.above(), Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .colored(PonderPalette.RED).text("If a Segment is occupied, no other Trains will be allowed entry");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(s1Pos.above(), Direction.WEST)).attachKeyFrame()
+            .placeNearTarget().colored(PonderPalette.RED)
+            .text("If a Segment is occupied, no other Trains will be allowed entry");
         scene.idle(50);
 
         ElementLink<WorldSectionElement> trainElement2 = scene.world().showIndependentSection(train3, null);
-        ElementLink<ParrotElement> birb2 = scene.special().createBirb(util.vector().centerOf(18, 3, 7), ParrotPose.FacePointOfInterestPose::new);
+        ElementLink<ParrotElement> birb2 = scene.special()
+            .createBirb(util.vector().centerOf(18, 3, 7), ParrotPose.FacePointOfInterestPose::new);
         scene.world().moveSection(trainElement2, util.vector().of(4, 0, 6), 0);
         scene.world().moveSection(trainElement2, util.vector().of(-4.5, 0, 0), 35);
         scene.world().animateBogey(util.grid().at(13, 2, 1), 4.5f, 35);
@@ -284,8 +299,9 @@ public class TrainSignalScenes {
         scene.special().movePointOfInterest(s1Pos.above(2));
         scene.idle(10);
 
-        scene.overlay().showText(80).pointAt(util.vector().topOf(util.grid().at(9, 0, 6))).attachKeyFrame().placeNearTarget()
-            .colored(PonderPalette.RED).text("Thus, each Segment will contain only one Train at a time");
+        scene.overlay().showText(80).pointAt(util.vector().topOf(util.grid().at(9, 0, 6))).attachKeyFrame()
+            .placeNearTarget().colored(PonderPalette.RED)
+            .text("Thus, each Segment will contain only one Train at a time");
         scene.idle(90);
 
         scene.world().hideIndependentSection(trainElement, Direction.UP);
@@ -304,8 +320,8 @@ public class TrainSignalScenes {
         scene.world().cycleBlockProperty(s1Pos, SignalBlock.TYPE);
         scene.idle(15);
 
-        scene.overlay().showText(60).pointAt(util.vector().blockSurface(s1Pos, Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .text("A second Signal mode is available via the Wrench");
+        scene.overlay().showText(60).pointAt(util.vector().blockSurface(s1Pos, Direction.WEST)).attachKeyFrame()
+            .placeNearTarget().text("A second Signal mode is available via the Wrench");
         scene.idle(70);
 
         AABB bb = new AABB(m1, m1);
@@ -323,12 +339,12 @@ public class TrainSignalScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, bb3, bb3.inflate(.45f, 0, .45f), 120);
         scene.idle(10);
 
-        scene.overlay().showText(60).pointAt(util.vector().blockSurface(s2Pos, Direction.WEST)).placeNearTarget().colored(PonderPalette.BLUE)
-            .text("Segments of a brass signal usually lead into standard signals");
+        scene.overlay().showText(60).pointAt(util.vector().blockSurface(s2Pos, Direction.WEST)).placeNearTarget()
+            .colored(PonderPalette.BLUE).text("Segments of a brass signal usually lead into standard signals");
         scene.idle(70);
 
-        scene.overlay().showText(60).pointAt(util.vector().blockSurface(s1Pos, Direction.WEST)).placeNearTarget().attachKeyFrame()
-            .text("This special Signal can stop trains under a second condition");
+        scene.overlay().showText(60).pointAt(util.vector().blockSurface(s1Pos, Direction.WEST)).placeNearTarget()
+            .attachKeyFrame().text("This special Signal can stop trains under a second condition");
         scene.idle(60);
 
         trainElement = scene.world().showIndependentSection(train1, Direction.DOWN);
@@ -372,8 +388,12 @@ public class TrainSignalScenes {
         AABB trainBB = new AABB(util.grid().at(13, 2, 7)).inflate(1, 1, .25f);
         for (int i = 1; i < 14; i++) {
             scene.idle(2);
-            scene.overlay()
-                .chaseBoundingBoxOutline(i == 13 ? PonderPalette.RED : PonderPalette.OUTPUT, trainBB, trainBB.move(-i * .5, 0, 0), i == 13 ? 100 : 5);
+            scene.overlay().chaseBoundingBoxOutline(
+                i == 13 ? PonderPalette.RED : PonderPalette.OUTPUT,
+                trainBB,
+                trainBB.move(-i * .5, 0, 0),
+                i == 13 ? 100 : 5
+            );
         }
 
         scene.special().movePointOfInterest(util.grid().at(5, 3, 7));
@@ -389,7 +409,8 @@ public class TrainSignalScenes {
         scene.world().moveSection(trainElement3a, util.vector().of(4, 0, -6), 0);
         scene.world().moveSection(trainElement3a, util.vector().of(-20, 0, 20), 40);
         scene.world().animateBogey(util.grid().at(13, 2, 4), -20f, 40);
-        ElementLink<ParrotElement> birb3 = scene.special().createBirb(util.vector().of(18, 3.5, -2), ParrotPose.FacePointOfInterestPose::new);
+        ElementLink<ParrotElement> birb3 = scene.special()
+            .createBirb(util.vector().of(18, 3.5, -2), ParrotPose.FacePointOfInterestPose::new);
         scene.special().moveParrot(birb3, util.vector().of(-20, 0, 20), 40);
         scene.idle(5);
 
@@ -419,8 +440,8 @@ public class TrainSignalScenes {
         scene.overlay().showBigLine(PonderPalette.GREEN, m2.add(.45, 0, 0), m1.add(-.45, 0, 0), 100);
         scene.overlay().showBigLine(PonderPalette.GREEN, m4.add(.45, 0, -.45), m3.add(-.45, 0, .45), 100);
         scene.idle(15);
-        scene.overlay().showText(80).pointAt(util.vector().topOf(util.grid().at(9, 0, 6))).placeNearTarget().colored(PonderPalette.GREEN)
-            .text("This helps keeping queued Trains out of a busy Segment");
+        scene.overlay().showText(80).pointAt(util.vector().topOf(util.grid().at(9, 0, 6))).placeNearTarget()
+            .colored(PonderPalette.GREEN).text("This helps keeping queued Trains out of a busy Segment");
         scene.idle(60);
     }
 
@@ -450,8 +471,8 @@ public class TrainSignalScenes {
         scene.world().showSection(lever, Direction.EAST);
         scene.idle(15);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(3, 2, 3), Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .text("Signals can be forced red by a redstone signal");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(3, 2, 3), Direction.WEST))
+            .attachKeyFrame().placeNearTarget().text("Signals can be forced red by a redstone signal");
         scene.idle(40);
 
         scene.world().toggleRedstonePower(lever);
@@ -466,12 +487,13 @@ public class TrainSignalScenes {
 
         scene.world().hideSection(lever, Direction.SOUTH);
         scene.idle(15);
-        ElementLink<WorldSectionElement> comparatorElement = scene.world().showIndependentSection(comparator, Direction.SOUTH);
+        ElementLink<WorldSectionElement> comparatorElement = scene.world()
+            .showIndependentSection(comparator, Direction.SOUTH);
         scene.world().moveSection(comparatorElement, util.vector().of(0, 0, 2), 0);
         scene.idle(15);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(3, 2, 3), Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .text("Conversely, red signals emit a comparator output");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(3, 2, 3), Direction.WEST))
+            .attachKeyFrame().placeNearTarget().text("Conversely, red signals emit a comparator output");
         scene.idle(40);
 
         scene.world().toggleControls(util.grid().at(6, 3, 5));

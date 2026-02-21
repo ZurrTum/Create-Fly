@@ -13,7 +13,10 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import java.util.UUID;
 
 public record RemoveTrainPacket(UUID id) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, RemoveTrainPacket> CODEC = UUIDUtil.STREAM_CODEC.map(RemoveTrainPacket::new, RemoveTrainPacket::id);
+    public static final StreamCodec<ByteBuf, RemoveTrainPacket> CODEC = UUIDUtil.STREAM_CODEC.map(
+        RemoveTrainPacket::new,
+        RemoveTrainPacket::id
+    );
 
     public RemoveTrainPacket(Train train) {
         this(train.id);

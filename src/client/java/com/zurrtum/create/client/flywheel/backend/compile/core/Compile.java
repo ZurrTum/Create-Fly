@@ -8,14 +8,13 @@ import com.zurrtum.create.client.flywheel.backend.glsl.GlslVersion;
 import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
+import net.minecraft.resources.Identifier;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import net.minecraft.resources.Identifier;
 
 /**
  * A typed provider for shader compiler builders.

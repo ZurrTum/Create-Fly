@@ -59,7 +59,11 @@ public class PotionCategory extends CreateCategory<PotionDisplay> {
                 bounds.y + 74,
                 requiredHeat.visualizeAsBlazeBurner()
             ));
-            graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, bounds.x + 96, bounds.y));
+            graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(
+                pose,
+                bounds.x + 96,
+                bounds.y
+            ));
             graphics.drawString(
                 Minecraft.getInstance().font,
                 CreateLang.translateDirect(requiredHeat.getTranslationKey()),
@@ -72,7 +76,10 @@ public class PotionCategory extends CreateCategory<PotionDisplay> {
         widgets.add(createInputSlot(input).entries(display.input()));
         widgets.add(createInputSlot(fluid).entries(getRenderEntryStack(display.getInputEntries().getLast())));
         widgets.add(createOutputSlot(output).entries(getRenderEntryStack(display.getOutputEntries().getFirst())));
-        widgets.add(createSlot(new Point(bounds.x + 139, bounds.y + 86)).entries(EntryIngredients.of(AllItems.BLAZE_BURNER)));
+        widgets.add(createSlot(new Point(
+            bounds.x + 139,
+            bounds.y + 86
+        )).entries(EntryIngredients.of(AllItems.BLAZE_BURNER)));
     }
 
     @Override

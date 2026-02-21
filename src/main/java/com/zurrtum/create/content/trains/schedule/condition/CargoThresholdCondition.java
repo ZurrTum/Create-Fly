@@ -8,9 +8,7 @@ import net.minecraft.world.level.Level;
 
 public abstract class CargoThresholdCondition extends LazyTickedScheduleCondition {
     public enum Ops {
-        GREATER(">"),
-        LESS("<"),
-        EQUAL("=");
+        GREATER(">"), LESS("<"), EQUAL("=");
 
         public final String formatted;
 
@@ -36,10 +34,12 @@ public abstract class CargoThresholdCondition extends LazyTickedScheduleConditio
     public boolean lazyTickCompletion(Level level, Train train, CompoundTag context) {
         int lastChecked = context.contains("LastChecked") ? context.getIntOr("LastChecked", 0) : -1;
         int status = 0;
-        for (Carriage carriage : train.carriages)
+        for (Carriage carriage : train.carriages) {
             status += carriage.storage.getVersion();
-        if (status == lastChecked)
+        }
+        if (status == lastChecked) {
             return false;
+        }
         context.putInt("LastChecked", status);
         return test(level, train, context);
     }
@@ -50,8 +50,9 @@ public abstract class CargoThresholdCondition extends LazyTickedScheduleConditio
     }
 
     protected int getLastDisplaySnapshot(CompoundTag context) {
-        if (!context.contains("CurrentDisplay"))
+        if (!context.contains("CurrentDisplay")) {
             return -1;
+        }
         return context.getIntOr("CurrentDisplay", 0);
     }
 

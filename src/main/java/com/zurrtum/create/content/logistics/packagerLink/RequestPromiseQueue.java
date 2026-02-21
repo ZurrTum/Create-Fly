@@ -2,15 +2,15 @@ package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.*;
-
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.*;
+
 public class RequestPromiseQueue {
-    public static final Codec<RequestPromiseQueue> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.list(RequestPromise.CODEC)
-        .fieldOf("List").forGetter(i -> i.flatten(false))).apply(instance, RequestPromiseQueue::new));
+    public static final Codec<RequestPromiseQueue> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.list(
+            RequestPromise.CODEC).fieldOf("List").forGetter(i -> i.flatten(false)))
+        .apply(instance, RequestPromiseQueue::new));
     private final Map<Item, List<RequestPromise>> promisesByItem;
     private Runnable onChanged;
 
@@ -21,7 +21,10 @@ public class RequestPromiseQueue {
 
     private RequestPromiseQueue(List<RequestPromise> list) {
         this((Runnable) null);
-        list.forEach(promise -> promisesByItem.computeIfAbsent(promise.promisedStack.stack.getItem(), $ -> new LinkedList<>()).add(promise));
+        list.forEach(promise -> promisesByItem.computeIfAbsent(
+            promise.promisedStack.stack.getItem(),
+            $ -> new LinkedList<>()
+        ).add(promise));
     }
 
     public void add(RequestPromise promise) {
@@ -36,13 +39,15 @@ public class RequestPromiseQueue {
     public int getTotalPromisedAndRemoveExpired(ItemStack stack, int expiryTime) {
         int promised = 0;
         List<RequestPromise> list = promisesByItem.get(stack.getItem());
-        if (list == null)
+        if (list == null) {
             return promised;
+        }
 
         for (Iterator<RequestPromise> iterator = list.iterator(); iterator.hasNext(); ) {
             RequestPromise promise = iterator.next();
-            if (!ItemStack.isSameItemSameComponents(promise.promisedStack.stack, stack))
+            if (!ItemStack.isSameItemSameComponents(promise.promisedStack.stack, stack)) {
                 continue;
+            }
             if (expiryTime != -1 && promise.ticksExisted >= expiryTime) {
                 iterator.remove();
                 onChanged.run();
@@ -56,30 +61,35 @@ public class RequestPromiseQueue {
 
     public void forceClear(ItemStack stack) {
         List<RequestPromise> list = promisesByItem.get(stack.getItem());
-        if (list == null)
+        if (list == null) {
             return;
+        }
 
         for (Iterator<RequestPromise> iterator = list.iterator(); iterator.hasNext(); ) {
             RequestPromise promise = iterator.next();
-            if (!ItemStack.isSameItemSameComponents(promise.promisedStack.stack, stack))
+            if (!ItemStack.isSameItemSameComponents(promise.promisedStack.stack, stack)) {
                 continue;
+            }
             iterator.remove();
             onChanged.run();
         }
 
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             promisesByItem.remove(stack.getItem());
+        }
     }
 
     public void itemEnteredSystem(ItemStack stack, int amount) {
         List<RequestPromise> list = promisesByItem.get(stack.getItem());
-        if (list == null)
+        if (list == null) {
             return;
+        }
 
         for (Iterator<RequestPromise> iterator = list.iterator(); iterator.hasNext(); ) {
             RequestPromise requestPromise = iterator.next();
-            if (!ItemStack.isSameItemSameComponents(requestPromise.promisedStack.stack, stack))
+            if (!ItemStack.isSameItemSameComponents(requestPromise.promisedStack.stack, stack)) {
                 continue;
+            }
 
             int toSubtract = Math.min(amount, requestPromise.promisedStack.count);
             amount -= toSubtract;
@@ -89,19 +99,22 @@ public class RequestPromiseQueue {
                 iterator.remove();
                 onChanged.run();
             }
-            if (amount <= 0)
+            if (amount <= 0) {
                 break;
+            }
         }
 
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             promisesByItem.remove(stack.getItem());
+        }
     }
 
     public List<RequestPromise> flatten(boolean sorted) {
         List<RequestPromise> all = new ArrayList<>();
         promisesByItem.forEach((key, list) -> all.addAll(list));
-        if (sorted)
+        if (sorted) {
             all.sort(RequestPromise.ageComparator());
+        }
         return all;
     }
 

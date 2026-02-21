@@ -41,7 +41,19 @@ public abstract class ClientPackSourceMixin {
                     PackLocationInfo info = createInfo(id, metadata.getName(), id, directory, version);
                     BuiltInMetadata meta = createMeta(Component.translatable("advancement.create.root"));
                     PackSelectionConfig position = new PackSelectionConfig(true, Pack.Position.BOTTOM, false);
-                    return createPacket(rootPaths, directory, info, meta, position, id, "minecraft", "flywheel", "vanillin", "ponder", "fabric");
+                    return createPacket(
+                        rootPaths,
+                        directory,
+                        info,
+                        meta,
+                        position,
+                        id,
+                        "minecraft",
+                        "flywheel",
+                        "vanillin",
+                        "ponder",
+                        "fabric"
+                    );
                 }
             );
         }
@@ -69,14 +81,22 @@ public abstract class ClientPackSourceMixin {
 
     @Unique
     private static PackLocationInfo createInfo(String id, String name, String namespace, String path, String version) {
-        return new PackLocationInfo(id, Component.literal(name), PackSource.BUILT_IN, Optional.of(new KnownPack(namespace, path, version)));
+        return new PackLocationInfo(
+            id,
+            Component.literal(name),
+            PackSource.BUILT_IN,
+            Optional.of(new KnownPack(namespace, path, version))
+        );
     }
 
     @Unique
     private static BuiltInMetadata createMeta(Component description) {
         return BuiltInMetadata.of(
             PackMetadataSection.CLIENT_TYPE,
-            new PackMetadataSection(description, SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).minorRange())
+            new PackMetadataSection(
+                description,
+                SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).minorRange()
+            )
         );
     }
 
@@ -89,7 +109,8 @@ public abstract class ClientPackSourceMixin {
         PackSelectionConfig position,
         String... namespace
     ) {
-        VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(meta).exposeNamespace(namespace);
+        VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(meta)
+            .exposeNamespace(namespace);
         for (Path path : rootPaths) {
             builder.pushAssetPath(PackType.CLIENT_RESOURCES, path.resolve(directory));
         }

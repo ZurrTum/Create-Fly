@@ -71,10 +71,21 @@ public class MillingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_ARROW.render(context, 78, 28);
         AllGuiTextures.JEI_DOWN_ARROW.render(context, 36, 0);
         AllGuiTextures.JEI_SHADOW.render(context, 25, 36);
-        context.guiRenderState.submitPicturesInPictureState(new MillstoneRenderState(new Matrix3x2f(context.pose()), 35, 15));
+        context.guiRenderState.submitPicturesInPictureState(new MillstoneRenderState(
+            new Matrix3x2f(context.pose()),
+            35,
+            15
+        ));
     }
 }

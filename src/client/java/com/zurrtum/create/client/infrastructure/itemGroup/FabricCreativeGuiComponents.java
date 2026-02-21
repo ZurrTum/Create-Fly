@@ -33,7 +33,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class FabricCreativeGuiComponents {
-    private static final Identifier BUTTON_TEX = Identifier.fromNamespaceAndPath("fabric", "textures/gui/creative_buttons.png");
+    private static final Identifier BUTTON_TEX = Identifier.fromNamespaceAndPath(
+        "fabric",
+        "textures/gui/creative_buttons.png"
+    );
     private static final double TABS_PER_PAGE = FabricItemGroupImpl.TABS_PER_PAGE;
     public static final Set<CreativeModeTab> COMMON_GROUPS = Set.of(
         CreativeModeTabs.SEARCH,
@@ -43,8 +46,8 @@ public class FabricCreativeGuiComponents {
     ).stream().map(BuiltInRegistries.CREATIVE_MODE_TAB::getValueOrThrow).collect(Collectors.toSet());
 
     public static int getPageCount() {
-        return (int) Math.ceil((CreativeModeTabs.tabs().size() - COMMON_GROUPS.stream().filter(CreativeModeTab::shouldDisplay)
-            .count()) / TABS_PER_PAGE);
+        return (int) Math.ceil((CreativeModeTabs.tabs().size() - COMMON_GROUPS.stream()
+            .filter(CreativeModeTab::shouldDisplay).count()) / TABS_PER_PAGE);
     }
 
     public static class ItemGroupButtonWidget extends Button {
@@ -84,7 +87,11 @@ public class FabricCreativeGuiComponents {
             if (this.isHovered()) {
                 drawContext.setTooltipForNextFrame(
                     Minecraft.getInstance().font,
-                    Component.translatable("fabric.gui.creativeTabPage", screen.fabric_getCurrentPage() + 1, getPageCount()),
+                    Component.translatable(
+                        "fabric.gui.creativeTabPage",
+                        screen.fabric_getCurrentPage() + 1,
+                        getPageCount()
+                    ),
                     mouseX,
                     mouseY
                 );
@@ -97,14 +104,21 @@ public class FabricCreativeGuiComponents {
             Component.literal(">"),
             FabricCreativeInventoryScreen::fabric_switchToNextPage,
             screen -> screen.fabric_getCurrentPage() + 1 < screen.fabric_getPageCount()
-        ),
-        PREVIOUS(Component.literal("<"), FabricCreativeInventoryScreen::fabric_switchToPreviousPage, screen -> screen.fabric_getCurrentPage() != 0);
+        ), PREVIOUS(
+            Component.literal("<"),
+            FabricCreativeInventoryScreen::fabric_switchToPreviousPage,
+            screen -> screen.fabric_getCurrentPage() != 0
+        );
 
         final Component text;
         final Consumer<FabricCreativeInventoryScreen> clickConsumer;
         final Predicate<FabricCreativeInventoryScreen> isEnabled;
 
-        Type(Component text, Consumer<FabricCreativeInventoryScreen> clickConsumer, Predicate<FabricCreativeInventoryScreen> isEnabled) {
+        Type(
+            Component text,
+            Consumer<FabricCreativeInventoryScreen> clickConsumer,
+            Predicate<FabricCreativeInventoryScreen> isEnabled
+        ) {
             this.text = text;
             this.clickConsumer = clickConsumer;
             this.isEnabled = isEnabled;

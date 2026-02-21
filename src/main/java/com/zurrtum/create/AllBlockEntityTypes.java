@@ -113,15 +113,14 @@ import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import com.zurrtum.create.content.trains.track.FakeTrackBlockEntity;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
-
-import java.util.Set;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+
+import java.util.Set;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -133,9 +132,12 @@ public class AllBlockEntityTypes {
         AllBlocks.COGWHEEL,
         AllBlocks.LARGE_COGWHEEL
     );
-    public static final BlockEntityType<CreativeMotorBlockEntity> MOTOR = register("motor", CreativeMotorBlockEntity::new, AllBlocks.CREATIVE_MOTOR);
-    public static final BlockEntityType<SequencedGearshiftBlockEntity> SEQUENCED_GEARSHIFT = register(
-        "sequenced_gearshift",
+    public static final BlockEntityType<CreativeMotorBlockEntity> MOTOR = register(
+        "motor",
+        CreativeMotorBlockEntity::new,
+        AllBlocks.CREATIVE_MOTOR
+    );
+    public static final BlockEntityType<SequencedGearshiftBlockEntity> SEQUENCED_GEARSHIFT = register("sequenced_gearshift",
         SequencedGearshiftBlockEntity::new,
         AllBlocks.SEQUENCED_GEARSHIFT
     );
@@ -159,12 +161,15 @@ public class AllBlockEntityTypes {
         GantryCarriageBlockEntity::new,
         AllBlocks.GANTRY_CARRIAGE
     );
-    public static final BlockEntityType<SpeedControllerBlockEntity> ROTATION_SPEED_CONTROLLER = register(
-        "rotation_speed_controller",
+    public static final BlockEntityType<SpeedControllerBlockEntity> ROTATION_SPEED_CONTROLLER = register("rotation_speed_controller",
         SpeedControllerBlockEntity::new,
         AllBlocks.ROTATION_SPEED_CONTROLLER
     );
-    public static final BlockEntityType<GearboxBlockEntity> GEARBOX = register("gearbox", GearboxBlockEntity::new, AllBlocks.GEARBOX);
+    public static final BlockEntityType<GearboxBlockEntity> GEARBOX = register(
+        "gearbox",
+        GearboxBlockEntity::new,
+        AllBlocks.GEARBOX
+    );
     public static final BlockEntityType<WaterWheelBlockEntity> WATER_WHEEL = register(
         "water_wheel",
         WaterWheelBlockEntity::new,
@@ -175,12 +180,32 @@ public class AllBlockEntityTypes {
         LargeWaterWheelBlockEntity::new,
         AllBlocks.LARGE_WATER_WHEEL
     );
-    public static final BlockEntityType<ItemVaultBlockEntity> ITEM_VAULT = register("item_vault", ItemVaultBlockEntity::new, AllBlocks.ITEM_VAULT);
-    public static final BlockEntityType<ArmBlockEntity> MECHANICAL_ARM = register("mechanical_arm", ArmBlockEntity::new, AllBlocks.MECHANICAL_ARM);
-    public static final BlockEntityType<DepotBlockEntity> DEPOT = register("depot", DepotBlockEntity::new, AllBlocks.DEPOT);
+    public static final BlockEntityType<ItemVaultBlockEntity> ITEM_VAULT = register(
+        "item_vault",
+        ItemVaultBlockEntity::new,
+        AllBlocks.ITEM_VAULT
+    );
+    public static final BlockEntityType<ArmBlockEntity> MECHANICAL_ARM = register(
+        "mechanical_arm",
+        ArmBlockEntity::new,
+        AllBlocks.MECHANICAL_ARM
+    );
+    public static final BlockEntityType<DepotBlockEntity> DEPOT = register(
+        "depot",
+        DepotBlockEntity::new,
+        AllBlocks.DEPOT
+    );
     public static final BlockEntityType<BeltBlockEntity> BELT = register("belt", BeltBlockEntity::new, AllBlocks.BELT);
-    public static final BlockEntityType<ClutchBlockEntity> CLUTCH = register("clutch", ClutchBlockEntity::new, AllBlocks.CLUTCH);
-    public static final BlockEntityType<GearshiftBlockEntity> GEARSHIFT = register("gearshift", GearshiftBlockEntity::new, AllBlocks.GEARSHIFT);
+    public static final BlockEntityType<ClutchBlockEntity> CLUTCH = register(
+        "clutch",
+        ClutchBlockEntity::new,
+        AllBlocks.CLUTCH
+    );
+    public static final BlockEntityType<GearshiftBlockEntity> GEARSHIFT = register(
+        "gearshift",
+        GearshiftBlockEntity::new,
+        AllBlocks.GEARSHIFT
+    );
     public static final BlockEntityType<KineticBlockEntity> ENCASED_SHAFT = register(
         "encased_shaft",
         KineticBlockEntity::encased,
@@ -189,8 +214,7 @@ public class AllBlockEntityTypes {
         AllBlocks.ENCASED_CHAIN_DRIVE,
         AllBlocks.METAL_GIRDER_ENCASED_SHAFT
     );
-    public static final BlockEntityType<ChainGearshiftBlockEntity> ADJUSTABLE_CHAIN_GEARSHIFT = register(
-        "adjustable_chain_gearshift",
+    public static final BlockEntityType<ChainGearshiftBlockEntity> ADJUSTABLE_CHAIN_GEARSHIFT = register("adjustable_chain_gearshift",
         ChainGearshiftBlockEntity::new,
         AllBlocks.ADJUSTABLE_CHAIN_GEARSHIFT
     );
@@ -211,7 +235,11 @@ public class AllBlockEntityTypes {
         AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL,
         AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL
     );
-    public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register("hand_crank", HandCrankBlockEntity::new, AllBlocks.HAND_CRANK);
+    public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register(
+        "hand_crank",
+        HandCrankBlockEntity::new,
+        AllBlocks.HAND_CRANK
+    );
     public static final BlockEntityType<ValveHandleBlockEntity> VALVE_HANDLE = register(
         "valve_handle",
         ValveHandleBlockEntity::new,
@@ -261,7 +289,11 @@ public class AllBlockEntityTypes {
         PumpBlockEntity::new,
         AllBlocks.MECHANICAL_PUMP
     );
-    public static final BlockEntityType<FluidPipeBlockEntity> FLUID_PIPE = register("fluid_pipe", FluidPipeBlockEntity::pipe, AllBlocks.FLUID_PIPE);
+    public static final BlockEntityType<FluidPipeBlockEntity> FLUID_PIPE = register(
+        "fluid_pipe",
+        FluidPipeBlockEntity::pipe,
+        AllBlocks.FLUID_PIPE
+    );
     public static final BlockEntityType<FluidPipeBlockEntity> ENCASED_FLUID_PIPE = register(
         "encased_fluid_pipe",
         FluidPipeBlockEntity::encased,
@@ -277,9 +309,12 @@ public class AllBlockEntityTypes {
         BlazeBurnerBlockEntity::new,
         AllBlocks.BLAZE_BURNER
     );
-    public static final BlockEntityType<FluidTankBlockEntity> FLUID_TANK = register("fluid_tank", FluidTankBlockEntity::tank, AllBlocks.FLUID_TANK);
-    public static final BlockEntityType<CreativeFluidTankBlockEntity> CREATIVE_FLUID_TANK = register(
-        "creative_fluid_tank",
+    public static final BlockEntityType<FluidTankBlockEntity> FLUID_TANK = register(
+        "fluid_tank",
+        FluidTankBlockEntity::tank,
+        AllBlocks.FLUID_TANK
+    );
+    public static final BlockEntityType<CreativeFluidTankBlockEntity> CREATIVE_FLUID_TANK = register("creative_fluid_tank",
         CreativeFluidTankBlockEntity::new,
         AllBlocks.CREATIVE_FLUID_TANK
     );
@@ -293,8 +328,16 @@ public class AllBlockEntityTypes {
         EjectorBlockEntity::new,
         AllBlocks.WEIGHTED_EJECTOR
     );
-    public static final BlockEntityType<PulleyBlockEntity> ROPE_PULLEY = register("rope_pulley", PulleyBlockEntity::new, AllBlocks.ROPE_PULLEY);
-    public static final BlockEntityType<MillstoneBlockEntity> MILLSTONE = register("millstone", MillstoneBlockEntity::new, AllBlocks.MILLSTONE);
+    public static final BlockEntityType<PulleyBlockEntity> ROPE_PULLEY = register(
+        "rope_pulley",
+        PulleyBlockEntity::new,
+        AllBlocks.ROPE_PULLEY
+    );
+    public static final BlockEntityType<MillstoneBlockEntity> MILLSTONE = register(
+        "millstone",
+        MillstoneBlockEntity::new,
+        AllBlocks.MILLSTONE
+    );
     public static final BlockEntityType<EncasedFanBlockEntity> ENCASED_FAN = register(
         "encased_fan",
         EncasedFanBlockEntity::new,
@@ -310,8 +353,16 @@ public class AllBlockEntityTypes {
         HauntedBellBlockEntity::new,
         AllBlocks.HAUNTED_BELL
     );
-    public static final BlockEntityType<SawBlockEntity> SAW = register("saw", SawBlockEntity::new, AllBlocks.MECHANICAL_SAW);
-    public static final BlockEntityType<BasinBlockEntity> BASIN = register("basin", BasinBlockEntity::new, AllBlocks.BASIN);
+    public static final BlockEntityType<SawBlockEntity> SAW = register(
+        "saw",
+        SawBlockEntity::new,
+        AllBlocks.MECHANICAL_SAW
+    );
+    public static final BlockEntityType<BasinBlockEntity> BASIN = register(
+        "basin",
+        BasinBlockEntity::new,
+        AllBlocks.BASIN
+    );
     public static final BlockEntityType<FunnelBlockEntity> FUNNEL = register(
         "funnel",
         FunnelBlockEntity::new,
@@ -330,7 +381,11 @@ public class AllBlockEntityTypes {
         BrassTunnelBlockEntity::new,
         AllBlocks.BRASS_TUNNEL
     );
-    public static final BlockEntityType<ChuteBlockEntity> CHUTE = register("chute", ChuteBlockEntity::new, AllBlocks.CHUTE);
+    public static final BlockEntityType<ChuteBlockEntity> CHUTE = register(
+        "chute",
+        ChuteBlockEntity::new,
+        AllBlocks.CHUTE
+    );
     public static final BlockEntityType<SmartChuteBlockEntity> SMART_CHUTE = register(
         "smart_chute",
         SmartChuteBlockEntity::new,
@@ -346,13 +401,11 @@ public class AllBlockEntityTypes {
         HarvesterBlockEntity::new,
         AllBlocks.MECHANICAL_HARVESTER
     );
-    public static final BlockEntityType<PortableFluidInterfaceBlockEntity> PORTABLE_FLUID_INTERFACE = register(
-        "portable_fluid_interface",
+    public static final BlockEntityType<PortableFluidInterfaceBlockEntity> PORTABLE_FLUID_INTERFACE = register("portable_fluid_interface",
         PortableFluidInterfaceBlockEntity::new,
         AllBlocks.PORTABLE_FLUID_INTERFACE
     );
-    public static final BlockEntityType<PortableItemInterfaceBlockEntity> PORTABLE_STORAGE_INTERFACE = register(
-        "portable_storage_interface",
+    public static final BlockEntityType<PortableItemInterfaceBlockEntity> PORTABLE_STORAGE_INTERFACE = register("portable_storage_interface",
         PortableItemInterfaceBlockEntity::new,
         AllBlocks.PORTABLE_STORAGE_INTERFACE
     );
@@ -382,8 +435,16 @@ public class AllBlockEntityTypes {
         HosePulleyBlockEntity::new,
         AllBlocks.HOSE_PULLEY
     );
-    public static final BlockEntityType<SpoutBlockEntity> SPOUT = register("spout", SpoutBlockEntity::new, AllBlocks.SPOUT);
-    public static final BlockEntityType<ItemDrainBlockEntity> ITEM_DRAIN = register("item_drain", ItemDrainBlockEntity::new, AllBlocks.ITEM_DRAIN);
+    public static final BlockEntityType<SpoutBlockEntity> SPOUT = register(
+        "spout",
+        SpoutBlockEntity::new,
+        AllBlocks.SPOUT
+    );
+    public static final BlockEntityType<ItemDrainBlockEntity> ITEM_DRAIN = register(
+        "item_drain",
+        ItemDrainBlockEntity::new,
+        AllBlocks.ITEM_DRAIN
+    );
     public static final BlockEntityType<WhistleBlockEntity> STEAM_WHISTLE = register(
         "steam_whistle",
         WhistleBlockEntity::new,
@@ -395,9 +456,21 @@ public class AllBlockEntityTypes {
         AllBlocks.COPPER_BACKTANK,
         AllBlocks.NETHERITE_BACKTANK
     );
-    public static final BlockEntityType<DeployerBlockEntity> DEPLOYER = register("deployer", DeployerBlockEntity::new, AllBlocks.DEPLOYER);
-    public static final BlockEntityType<TurntableBlockEntity> TURNTABLE = register("turntable", TurntableBlockEntity::new, AllBlocks.TURNTABLE);
-    public static final BlockEntityType<DrillBlockEntity> DRILL = register("drill", DrillBlockEntity::new, AllBlocks.MECHANICAL_DRILL);
+    public static final BlockEntityType<DeployerBlockEntity> DEPLOYER = register(
+        "deployer",
+        DeployerBlockEntity::new,
+        AllBlocks.DEPLOYER
+    );
+    public static final BlockEntityType<TurntableBlockEntity> TURNTABLE = register(
+        "turntable",
+        TurntableBlockEntity::new,
+        AllBlocks.TURNTABLE
+    );
+    public static final BlockEntityType<DrillBlockEntity> DRILL = register(
+        "drill",
+        DrillBlockEntity::new,
+        AllBlocks.MECHANICAL_DRILL
+    );
     public static final BlockEntityType<ClockworkBearingBlockEntity> CLOCKWORK_BEARING = register(
         "clockwork_bearing",
         ClockworkBearingBlockEntity::new,
@@ -408,8 +481,7 @@ public class AllBlockEntityTypes {
         CrushingWheelBlockEntity::new,
         AllBlocks.CRUSHING_WHEEL
     );
-    public static final BlockEntityType<CrushingWheelControllerBlockEntity> CRUSHING_WHEEL_CONTROLLER = register(
-        "crushing_wheel_controller",
+    public static final BlockEntityType<CrushingWheelControllerBlockEntity> CRUSHING_WHEEL_CONTROLLER = register("crushing_wheel_controller",
         CrushingWheelControllerBlockEntity::new,
         AllBlocks.CRUSHING_WHEEL_CONTROLLER
     );
@@ -418,7 +490,11 @@ public class AllBlockEntityTypes {
         FlapDisplayBlockEntity::new,
         AllBlocks.DISPLAY_BOARD
     );
-    public static final BlockEntityType<ClipboardBlockEntity> CLIPBOARD = register("clipboard", ClipboardBlockEntity::new, AllBlocks.CLIPBOARD);
+    public static final BlockEntityType<ClipboardBlockEntity> CLIPBOARD = register(
+        "clipboard",
+        ClipboardBlockEntity::new,
+        AllBlocks.CLIPBOARD
+    );
     public static final BlockEntityType<DisplayLinkBlockEntity> DISPLAY_LINK = register(
         "display_link",
         DisplayLinkBlockEntity::new,
@@ -489,9 +565,12 @@ public class AllBlockEntityTypes {
         ThresholdSwitchBlockEntity::new,
         AllBlocks.THRESHOLD_SWITCH
     );
-    public static final BlockEntityType<StickerBlockEntity> STICKER = register("sticker", StickerBlockEntity::new, AllBlocks.STICKER);
-    public static final BlockEntityType<ContraptionControlsBlockEntity> CONTRAPTION_CONTROLS = register(
-        "contraption_controls",
+    public static final BlockEntityType<StickerBlockEntity> STICKER = register(
+        "sticker",
+        StickerBlockEntity::new,
+        AllBlocks.STICKER
+    );
+    public static final BlockEntityType<ContraptionControlsBlockEntity> CONTRAPTION_CONTROLS = register("contraption_controls",
         ContraptionControlsBlockEntity::new,
         AllBlocks.CONTRAPTION_CONTROLS
     );
@@ -514,8 +593,16 @@ public class AllBlockEntityTypes {
         AllBlocks.TRAIN_DOOR,
         AllBlocks.FRAMED_GLASS_DOOR
     );
-    public static final BlockEntityType<NozzleBlockEntity> NOZZLE = register("nozzle", NozzleBlockEntity::new, AllBlocks.NOZZLE);
-    public static final BlockEntityType<DeskBellBlockEntity> DESK_BELL = register("desk_bell", DeskBellBlockEntity::new, AllBlocks.DESK_BELL);
+    public static final BlockEntityType<NozzleBlockEntity> NOZZLE = register(
+        "nozzle",
+        NozzleBlockEntity::new,
+        AllBlocks.NOZZLE
+    );
+    public static final BlockEntityType<DeskBellBlockEntity> DESK_BELL = register(
+        "desk_bell",
+        DeskBellBlockEntity::new,
+        AllBlocks.DESK_BELL
+    );
     public static final BlockEntityType<MechanicalCrafterBlockEntity> MECHANICAL_CRAFTER = register(
         "mechanical_crafter",
         MechanicalCrafterBlockEntity::new,
@@ -526,15 +613,27 @@ public class AllBlockEntityTypes {
         CreativeCrateBlockEntity::new,
         AllBlocks.CREATIVE_CRATE
     );
-    public static final BlockEntityType<TrackBlockEntity> TRACK = register("track", TrackBlockEntity::new, TrackMaterial.allBlocks());
-    public static final BlockEntityType<FakeTrackBlockEntity> FAKE_TRACK = register("fake_track", FakeTrackBlockEntity::new, AllBlocks.FAKE_TRACK);
+    public static final BlockEntityType<TrackBlockEntity> TRACK = register(
+        "track",
+        TrackBlockEntity::new,
+        TrackMaterial.allBlocks()
+    );
+    public static final BlockEntityType<FakeTrackBlockEntity> FAKE_TRACK = register(
+        "fake_track",
+        FakeTrackBlockEntity::new,
+        AllBlocks.FAKE_TRACK
+    );
     public static final BlockEntityType<StandardBogeyBlockEntity> BOGEY = register(
         "bogey",
         StandardBogeyBlockEntity::new,
         AllBlocks.SMALL_BOGEY,
         AllBlocks.LARGE_BOGEY
     );
-    public static final BlockEntityType<SignalBlockEntity> TRACK_SIGNAL = register("track_signal", SignalBlockEntity::new, AllBlocks.TRACK_SIGNAL);
+    public static final BlockEntityType<SignalBlockEntity> TRACK_SIGNAL = register(
+        "track_signal",
+        SignalBlockEntity::new,
+        AllBlocks.TRACK_SIGNAL
+    );
     public static final BlockEntityType<StationBlockEntity> TRACK_STATION = register(
         "track_station",
         StationBlockEntity::new,
@@ -555,7 +654,11 @@ public class AllBlockEntityTypes {
         LecternControllerBlockEntity::new,
         AllBlocks.LECTERN_CONTROLLER
     );
-    public static final BlockEntityType<PackagerBlockEntity> PACKAGER = register("packager", PackagerBlockEntity::new, AllBlocks.PACKAGER);
+    public static final BlockEntityType<PackagerBlockEntity> PACKAGER = register(
+        "packager",
+        PackagerBlockEntity::new,
+        AllBlocks.PACKAGER
+    );
     public static final BlockEntityType<PackagerLinkBlockEntity> PACKAGER_LINK = register(
         "packager_link",
         PackagerLinkBlockEntity::new,
@@ -566,7 +669,11 @@ public class AllBlockEntityTypes {
         RedstoneRequesterBlockEntity::new,
         AllBlocks.REDSTONE_REQUESTER
     );
-    public static final BlockEntityType<RepackagerBlockEntity> REPACKAGER = register("repackager", RepackagerBlockEntity::new, AllBlocks.REPACKAGER);
+    public static final BlockEntityType<RepackagerBlockEntity> REPACKAGER = register(
+        "repackager",
+        RepackagerBlockEntity::new,
+        AllBlocks.REPACKAGER
+    );
     public static final BlockEntityType<StockTickerBlockEntity> STOCK_TICKER = register(
         "stock_ticker",
         StockTickerBlockEntity::new,
@@ -625,9 +732,21 @@ public class AllBlockEntityTypes {
         FactoryPanelBlockEntity::new,
         AllBlocks.FACTORY_GAUGE
     );
-    public static final BlockEntityType<FlywheelBlockEntity> FLYWHEEL = register("flywheel", FlywheelBlockEntity::new, AllBlocks.FLYWHEEL);
-    public static final BlockEntityType<ItemHatchBlockEntity> ITEM_HATCH = register("item_hatch", ItemHatchBlockEntity::new, AllBlocks.ITEM_HATCH);
-    public static final BlockEntityType<PlacardBlockEntity> PLACARD = register("placard", PlacardBlockEntity::new, AllBlocks.PLACARD);
+    public static final BlockEntityType<FlywheelBlockEntity> FLYWHEEL = register(
+        "flywheel",
+        FlywheelBlockEntity::new,
+        AllBlocks.FLYWHEEL
+    );
+    public static final BlockEntityType<ItemHatchBlockEntity> ITEM_HATCH = register(
+        "item_hatch",
+        ItemHatchBlockEntity::new,
+        AllBlocks.ITEM_HATCH
+    );
+    public static final BlockEntityType<PlacardBlockEntity> PLACARD = register(
+        "placard",
+        PlacardBlockEntity::new,
+        AllBlocks.PLACARD
+    );
     public static final BlockEntityType<ToolboxBlockEntity> TOOLBOX = register(
         "toolbox",
         ToolboxBlockEntity::new,
@@ -665,7 +784,11 @@ public class AllBlockEntityTypes {
         AllBlocks.COPYCAT_PANEL
     );
 
-    private static <T extends BlockEntity> BlockEntityType<T> register(String id, BlockEntityType.BlockEntitySupplier<T> factory, Block... blocks) {
+    private static <T extends BlockEntity> BlockEntityType<T> register(
+        String id,
+        BlockEntityType.BlockEntitySupplier<T> factory,
+        Block... blocks
+    ) {
         return Registry.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE,
             Identifier.fromNamespaceAndPath(MOD_ID, id),

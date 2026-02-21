@@ -26,7 +26,13 @@ public final class Distribute {
      * @param <C>          The context type.
      * @param <T>          The object type.
      */
-    public static <C, T> void tasks(TaskExecutor taskExecutor, C context, Runnable onCompletion, List<T> list, BiConsumer<T, C> action) {
+    public static <C, T> void tasks(
+        TaskExecutor taskExecutor,
+        C context,
+        Runnable onCompletion,
+        List<T> list,
+        BiConsumer<T, C> action
+    ) {
         final int size = list.size();
 
         if (size == 0) {
@@ -87,7 +93,13 @@ public final class Distribute {
      * @param <C>          The context type.
      * @param <T>          The object type.
      */
-    public static <C, T> void slices(TaskExecutor taskExecutor, C context, Runnable onCompletion, List<T> list, BiConsumer<List<T>, C> action) {
+    public static <C, T> void slices(
+        TaskExecutor taskExecutor,
+        C context,
+        Runnable onCompletion,
+        List<T> list,
+        BiConsumer<List<T>, C> action
+    ) {
         final int size = list.size();
 
         if (size == 0) {

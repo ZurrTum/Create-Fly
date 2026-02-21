@@ -62,7 +62,12 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
     }
 
     @Override
-    public void submit(ItemDrainRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ItemDrainRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.process != null) {
             queue.submitCustomGeometry(matrices, state.process.layer, state.process);
         }
@@ -152,8 +157,9 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
         float sideOffset = Mth.lerp(tickProgress, transported.prevSideOffset, transported.sideOffset);
         item.offsetVec = Vec3.atLowerCornerOf(insertedFrom.getOpposite().getUnitVec3i()).scale(.5f - offset);
         boolean alongX = insertedFrom.getClockWise().getAxis() == Axis.X;
-        if (!alongX)
+        if (!alongX) {
             sideOffset *= -1;
+        }
         item.translate = item.offsetVec.add(alongX ? sideOffset : 0, 0, alongX ? 0 : sideOffset);
         ItemStack itemStack = transported.stack;
         item.count = Mth.log2(itemStack.getCount()) / 2;
@@ -172,18 +178,31 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
         public HeldItemRenderState item;
     }
 
-    public record FluidRenderState(
-        RenderType layer, Fluid fluid, DataComponentPatch changes, float min, float max, float yMin, float yMax, float offset, int light
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record FluidRenderState(RenderType layer, Fluid fluid, DataComponentPatch changes, float min, float max,
+                                   float yMin, float yMax, float offset,
+                                   int light) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            FluidRenderHelper.renderFluidBox(fluid, changes, min, yMin, min, max, yMax, max, vertexConsumer, matricesEntry, light, false, false);
+            FluidRenderHelper.renderFluidBox(
+                fluid,
+                changes,
+                min,
+                yMin,
+                min,
+                max,
+                yMax,
+                max,
+                vertexConsumer,
+                matricesEntry,
+                light,
+                false,
+                false
+            );
         }
     }
 
-    public record ProcessRenderState(
-        RenderType layer, Fluid fluid, DataComponentPatch changes, AABB box, int light
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record ProcessRenderState(RenderType layer, Fluid fluid, DataComponentPatch changes, AABB box,
+                                     int light) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             FluidRenderHelper.renderFluidBox(

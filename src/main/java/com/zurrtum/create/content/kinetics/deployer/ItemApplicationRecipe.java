@@ -44,9 +44,8 @@ public interface ItemApplicationRecipe extends CreateRollableRecipe<ItemApplicat
         return outputs;
     }
 
-    record Serializer<T extends ItemApplicationRecipe>(
-        MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec
-    ) implements RecipeSerializer<T> {
+    record Serializer<T extends ItemApplicationRecipe>(MapCodec<T> codec,
+                                                       StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) implements RecipeSerializer<T> {
         public Serializer(Factory<T> factory) {
             this(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(

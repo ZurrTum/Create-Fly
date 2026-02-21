@@ -12,10 +12,6 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruction;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
-
-import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -40,6 +36,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopying {
 
     public ScheduleItem(Properties pProperties) {
@@ -48,45 +47,58 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getPlayer() == null)
+        if (context.getPlayer() == null) {
             return InteractionResult.PASS;
+        }
         return use(context.getLevel(), context.getPlayer(), context.getHand());
     }
 
     @Override
     public InteractionResult use(Level world, Player player, InteractionHand hand) {
         if (!player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
-            if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer)
+            if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer) {
                 openHandledScreen(serverPlayer);
+            }
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
 
-    public InteractionResult handScheduleTo(ItemStack pStack, Player pPlayer, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult handScheduleTo(
+        ItemStack pStack,
+        Player pPlayer,
+        LivingEntity pInteractionTarget,
+        InteractionHand pUsedHand
+    ) {
         InteractionResult pass = InteractionResult.PASS;
 
         Schedule schedule = getSchedule(pPlayer.registryAccess(), pStack);
-        if (schedule == null)
+        if (schedule == null) {
             return pass;
-        if (pInteractionTarget == null)
+        }
+        if (pInteractionTarget == null) {
             return pass;
+        }
         Entity rootVehicle = pInteractionTarget.getRootVehicle();
-        if (!(rootVehicle instanceof CarriageContraptionEntity entity))
+        if (!(rootVehicle instanceof CarriageContraptionEntity entity)) {
             return pass;
-        if (pPlayer.level().isClientSide())
+        }
+        if (pPlayer.level().isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         Contraption contraption = entity.getContraption();
         if (contraption instanceof CarriageContraption cc) {
 
             Train train = entity.getCarriage().train;
-            if (train == null)
+            if (train == null) {
                 return InteractionResult.SUCCESS;
+            }
 
             Integer seatIndex = contraption.getSeatMapping().get(pInteractionTarget.getUUID());
-            if (seatIndex == null)
+            if (seatIndex == null) {
                 return InteractionResult.SUCCESS;
+            }
             BlockPos seatPos = contraption.getSeats().get(seatIndex);
             Couple<Boolean> directions = cc.conductorSeats.get(seatPos);
             if (directions == null) {
@@ -110,7 +122,8 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
             train.runtime.setSchedule(schedule, false);
             AllAdvancements.CONDUCTOR.trigger((ServerPlayer) pPlayer);
             AllSoundEvents.CONFIRM.playOnServer(pPlayer.level(), pPlayer.blockPosition(), 1, 1);
-            pPlayer.displayClientMessage(Component.translatable("create.schedule.applied_to_train").withStyle(ChatFormatting.GREEN), true);
+            pPlayer.displayClientMessage(
+                Component.translatable("create.schedule.applied_to_train").withStyle(ChatFormatting.GREEN), true);
             pStack.shrink(1);
             pPlayer.setItemInHand(pUsedHand, pStack.isEmpty() ? ItemStack.EMPTY : pStack);
         }
@@ -127,8 +140,9 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
         TooltipFlag flagIn
     ) {
         Schedule schedule = getSchedule(context.registries(), stack);
-        if (schedule == null || schedule.entries.isEmpty())
+        if (schedule == null || schedule.entries.isEmpty()) {
             return;
+        }
 
         MutableComponent caret = Component.literal("> ").withStyle(ChatFormatting.GRAY);
         MutableComponent arrow = Component.literal("-> ").withStyle(ChatFormatting.GRAY);
@@ -137,8 +151,9 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
         for (int i = 0; i < entries.size(); i++) {
             boolean current = i == schedule.savedProgress && schedule.entries.size() > 1;
             ScheduleEntry entry = entries.get(i);
-            if (!(entry.instruction instanceof DestinationInstruction destination))
+            if (!(entry.instruction instanceof DestinationInstruction destination)) {
                 continue;
+            }
             ChatFormatting format = current ? ChatFormatting.YELLOW : ChatFormatting.GOLD;
             MutableComponent prefix = current ? arrow : caret;
             tooltip.accept(prefix.copy().append(Component.literal(destination.getFilter()).withStyle(format)));
@@ -146,9 +161,13 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
     }
 
     public static Schedule getSchedule(HolderLookup.Provider registries, ItemStack pStack) {
-        if (!pStack.has(AllDataComponents.TRAIN_SCHEDULE))
+        if (!pStack.has(AllDataComponents.TRAIN_SCHEDULE)) {
             return null;
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleItem", Create.LOGGER)) {
+        }
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleItem",
+            Create.LOGGER
+        )) {
             ValueInput view = TagValueInput.create(logging, registries, pStack.get(AllDataComponents.TRAIN_SCHEDULE));
             return Schedule.read(view);
         }

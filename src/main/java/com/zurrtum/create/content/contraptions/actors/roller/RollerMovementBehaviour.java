@@ -51,8 +51,7 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public boolean isActive(MovementContext context) {
-        return super.isActive(context) && !(context.contraption instanceof PulleyContraption) && VecHelper.isVecPointingTowards(
-            context.relativeMotion,
+        return super.isActive(context) && !(context.contraption instanceof PulleyContraption) && VecHelper.isVecPointingTowards(context.relativeMotion,
             context.state.getValue(RollerBlock.FACING)
         );
     }
@@ -64,7 +63,8 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public Vec3 getActiveAreaOffset(MovementContext context) {
-        return Vec3.atLowerCornerOf(context.state.getValue(RollerBlock.FACING).getUnitVec3i()).scale(.45).subtract(0, 2, 0);
+        return Vec3.atLowerCornerOf(context.state.getValue(RollerBlock.FACING).getUnitVec3i()).scale(.45)
+            .subtract(0, 2, 0);
     }
 
     @Override
@@ -74,11 +74,14 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public boolean canBreak(Level world, BlockPos breakingPos, BlockState state) {
-        for (Direction side : Iterate.directions)
-            if (world.getBlockState(breakingPos.relative(side)).is(BlockTags.PORTALS))
+        for (Direction side : Iterate.directions) {
+            if (world.getBlockState(breakingPos.relative(side)).is(BlockTags.PORTALS)) {
                 return false;
+            }
+        }
 
-        return super.canBreak(world, breakingPos, state) && !state.getCollisionShape(world, breakingPos).isEmpty() && !state.is(AllBlockTags.TRACKS);
+        return super.canBreak(world, breakingPos, state) && !state.getCollisionShape(world, breakingPos)
+            .isEmpty() && !state.is(AllBlockTags.TRACKS);
     }
 
     @Override
@@ -90,10 +93,12 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         Level world = context.world;
         BlockState stateVisited = world.getBlockState(pos);
-        if (!stateVisited.isRedstoneConductor(world, pos))
+        if (!stateVisited.isRedstoneConductor(world, pos)) {
             damageEntities(context, pos, world);
-        if (world.isClientSide())
+        }
+        if (world.isClientSide()) {
             return;
+        }
 
         List<BlockPos> positionsToBreak = getPositionsToBreak(context, pos);
         if (positionsToBreak.isEmpty()) {
@@ -105,8 +110,9 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         double max = -1;
         for (BlockPos toBreak : positionsToBreak) {
             float hardness = context.world.getBlockState(toBreak).getDestroySpeed(world, toBreak);
-            if (hardness < max)
+            if (hardness < max) {
                 continue;
+            }
             max = hardness;
             argMax = toBreak;
         }
@@ -124,13 +130,16 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
     @Override
     protected void onBlockBroken(MovementContext context, BlockPos pos, BlockState brokenState) {
         super.onBlockBroken(context, pos, brokenState);
-        if (!context.data.contains("ReferencePos"))
+        if (!context.data.contains("ReferencePos")) {
             return;
+        }
 
         BlockPos referencePos = context.data.read("ReferencePos", BlockPos.CODEC).orElse(BlockPos.ZERO);
-        for (BlockPos otherPos : getPositionsToBreak(context, referencePos))
-            if (!otherPos.equals(pos))
+        for (BlockPos otherPos : getPositionsToBreak(context, referencePos)) {
+            if (!otherPos.equals(pos)) {
                 destroyBlock(context, otherPos);
+            }
+        }
 
         triggerPaver(context, referencePos);
         context.data.remove("ReferencePos");
@@ -139,12 +148,14 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
     @Override
     protected void destroyBlock(MovementContext context, BlockPos breakingPos) {
         BlockState blockState = context.world.getBlockState(breakingPos);
-        boolean noHarvest = blockState.is(BlockTags.NEEDS_IRON_TOOL) || blockState.is(BlockTags.NEEDS_STONE_TOOL) || blockState.is(BlockTags.NEEDS_DIAMOND_TOOL);
+        boolean noHarvest = blockState.is(BlockTags.NEEDS_IRON_TOOL) || blockState.is(BlockTags.NEEDS_STONE_TOOL) || blockState.is(
+            BlockTags.NEEDS_DIAMOND_TOOL);
 
         BlockHelper.destroyBlock(
             context.world, breakingPos, 1f, stack -> {
-                if (noHarvest || context.world.random.nextBoolean())
+                if (noHarvest || context.world.random.nextBoolean()) {
                     return;
+                }
                 this.collectOrDropItem(context, stack);
             }
         );
@@ -158,8 +169,9 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         ArrayList<BlockPos> positions = new ArrayList<>();
 
         RollingMode mode = getMode(context);
-        if (mode != RollingMode.TUNNEL_PAVE)
+        if (mode != RollingMode.TUNNEL_PAVE) {
             return positions;
+        }
 
         int startingY = 1;
         if (!getStateToPaveWith(context).isAir()) {
@@ -179,19 +191,24 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
                 BlockPos targetPosition = BlockPos.containing(coords.getFirst(), height, coords.getSecond());
                 boolean shouldPlaceSlab = height > Math.floor(height) + .45;
                 if (startingY == 1 && shouldPlaceSlab && context.world.getBlockState(targetPosition.above())
-                    .getValueOrElse(SlabBlock.TYPE, SlabType.DOUBLE) == SlabType.BOTTOM)
+                    .getValueOrElse(SlabBlock.TYPE, SlabType.DOUBLE) == SlabType.BOTTOM) {
                     startingY = 2;
-                for (int i = startingY; i <= (shouldPlaceSlab ? 3 : 2); i++)
-                    if (testBreakerTarget(context, targetPosition.above(i), i))
+                }
+                for (int i = startingY; i <= (shouldPlaceSlab ? 3 : 2); i++) {
+                    if (testBreakerTarget(context, targetPosition.above(i), i)) {
                         positions.add(targetPosition.above(i));
+                    }
+                }
             }
             return positions;
         }
 
         // Otherwise
-        for (int i = startingY; i <= 2; i++)
-            if (testBreakerTarget(context, visitedPos.above(i), i))
+        for (int i = startingY; i <= 2; i++) {
+            if (testBreakerTarget(context, visitedPos.above(i), i)) {
                 positions.add(visitedPos.above(i));
+            }
+        }
 
         return positions;
     }
@@ -200,25 +217,31 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         BlockState stateToPaveWith = getStateToPaveWith(context);
         BlockState stateToPaveWithAsSlab = getStateToPaveWithAsSlab(context);
         BlockState stateAbove = context.world.getBlockState(target);
-        if (columnY == 0 && stateAbove.is(stateToPaveWith.getBlock()))
+        if (columnY == 0 && stateAbove.is(stateToPaveWith.getBlock())) {
             return false;
-        if (stateToPaveWithAsSlab != null && columnY == 1 && stateAbove.is(stateToPaveWithAsSlab.getBlock()))
+        }
+        if (stateToPaveWithAsSlab != null && columnY == 1 && stateAbove.is(stateToPaveWithAsSlab.getBlock())) {
             return false;
+        }
         return canBreak(context.world, target, stateAbove);
     }
 
     @Nullable
     protected PaveTask createHeightProfileForTracks(MovementContext context) {
-        if (context.contraption == null)
+        if (context.contraption == null) {
             return null;
-        if (!(context.contraption.entity instanceof CarriageContraptionEntity cce))
+        }
+        if (!(context.contraption.entity instanceof CarriageContraptionEntity cce)) {
             return null;
+        }
         Carriage carriage = cce.getCarriage();
-        if (carriage == null)
+        if (carriage == null) {
             return null;
+        }
         Train train = carriage.train;
-        if (train == null || train.graph == null)
+        if (train == null || train.graph == null) {
             return null;
+        }
 
         CarriageBogey mainBogey = carriage.bogeys.getFirst();
         TravellingPoint point = mainBogey.trailing();
@@ -230,8 +253,9 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
 
         Axis axis = Axis.X;
         StructureBlockInfo info = context.contraption.getBlocks().get(BlockPos.ZERO);
-        if (info != null && info.state().hasProperty(StandardBogeyBlock.AXIS))
+        if (info != null && info.state().hasProperty(StandardBogeyBlock.AXIS)) {
             axis = info.state().getValue(StandardBogeyBlock.AXIS);
+        }
 
         Direction orientation = cce.getInitialOrientation();
         Direction rollerFacing = context.state.getValue(RollerBlock.FACING);
@@ -240,8 +264,9 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         double widthWiseOffset = axis.choose(-context.localPos.getZ(), 0, -context.localPos.getX()) * step;
         double lengthWiseOffset = axis.choose(-context.localPos.getX(), 0, context.localPos.getZ()) * step - 1;
 
-        if (rollerFacing == orientation.getClockWise())
+        if (rollerFacing == orientation.getClockWise()) {
             lengthWiseOffset += 1;
+        }
 
         double distanceToTravel = 2;
         PaveTask heightProfile = new PaveTask(widthWiseOffset, widthWiseOffset);
@@ -252,18 +277,22 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         rollerScout.travel(train.graph, lengthWiseOffset + 1, steering);
 
         rollerScout.traversalCallback = (edge, coords) -> {
-            if (edge == null)
+            if (edge == null) {
                 return;
-            if (edge.isInterDimensional())
+            }
+            if (edge.isInterDimensional()) {
                 return;
-            if (edge.node1.getLocation().dimension != context.world.dimension())
+            }
+            if (edge.node1.getLocation().dimension != context.world.dimension()) {
                 return;
+            }
             TrackPaverV2.pave(heightProfile, train.graph, edge, coords.getFirst(), coords.getSecond());
         };
         rollerScout.travel(train.graph, distanceToTravel, steering);
 
-        for (Couple<Integer> entry : heightProfile.keys())
+        for (Couple<Integer> entry : heightProfile.keys()) {
             heightProfile.put(entry.getFirst(), entry.getSecond(), context.localPos.getY() + heightProfile.get(entry));
+        }
 
         return heightProfile;
     }
@@ -273,28 +302,32 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         BlockState stateToPaveWithAsSlab = getStateToPaveWithAsSlab(context);
         RollingMode mode = getMode(context);
 
-        if (mode != RollingMode.TUNNEL_PAVE && stateToPaveWith.isAir())
+        if (mode != RollingMode.TUNNEL_PAVE && stateToPaveWith.isAir()) {
             return;
+        }
 
-        Vec3 directionVec = Vec3.atLowerCornerOf(context.state.getValue(RollerBlock.FACING).getClockWise().getUnitVec3i());
+        Vec3 directionVec = Vec3.atLowerCornerOf(context.state.getValue(RollerBlock.FACING).getClockWise()
+            .getUnitVec3i());
         directionVec = context.rotation.apply(directionVec);
         PaveResult paveResult = PaveResult.PASS;
         int yOffset = 0;
 
         List<Pair<BlockPos, Boolean>> paveSet = new ArrayList<>();
         PaveTask profileForTracks = createHeightProfileForTracks(context);
-        if (profileForTracks == null)
+        if (profileForTracks == null) {
             paveSet.add(Pair.of(pos, false));
-        else
+        } else {
             for (Couple<Integer> coords : profileForTracks.keys()) {
                 float height = profileForTracks.get(coords);
                 boolean shouldPlaceSlab = height > Math.floor(height) + .45;
                 BlockPos targetPosition = BlockPos.containing(coords.getFirst(), height, coords.getSecond());
                 paveSet.add(Pair.of(targetPosition, shouldPlaceSlab));
             }
+        }
 
-        if (paveSet.isEmpty())
+        if (paveSet.isEmpty()) {
             return;
+        }
 
         while (paveResult == PaveResult.PASS) {
             if (yOffset > AllConfigs.server().kinetics.rollerFillDepth.get()) {
@@ -306,39 +339,51 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
             if (mode == RollingMode.WIDE_FILL) {
                 for (Pair<BlockPos, Boolean> anchor : paveSet) {
                     int radius = (yOffset + 1) / 2;
-                    for (int i = -radius; i <= radius; i++)
-                        for (int j = -radius; j <= radius; j++)
-                            if (BlockPos.ZERO.distManhattan(new BlockPos(i, 0, j)) <= radius)
+                    for (int i = -radius; i <= radius; i++) {
+                        for (int j = -radius; j <= radius; j++) {
+                            if (BlockPos.ZERO.distManhattan(new BlockPos(i, 0, j)) <= radius) {
                                 currentLayer.add(Pair.of(anchor.getFirst().offset(i, -yOffset, j), anchor.getSecond()));
+                            }
+                        }
+                    }
                 }
-            } else
-                for (Pair<BlockPos, Boolean> anchor : paveSet)
+            } else {
+                for (Pair<BlockPos, Boolean> anchor : paveSet) {
                     currentLayer.add(Pair.of(anchor.getFirst().below(yOffset), anchor.getSecond()));
+                }
+            }
 
             boolean completelyBlocked = true;
             boolean anyBlockPlaced = false;
 
             for (Pair<BlockPos, Boolean> currentPos : currentLayer) {
-                if (stateToPaveWithAsSlab != null && yOffset == 0 && currentPos.getSecond())
+                if (stateToPaveWithAsSlab != null && yOffset == 0 && currentPos.getSecond()) {
                     tryFill(context, currentPos.getFirst().above(), stateToPaveWithAsSlab);
+                }
                 paveResult = tryFill(context, currentPos.getFirst(), stateToPaveWith);
-                if (paveResult != PaveResult.FAIL)
+                if (paveResult != PaveResult.FAIL) {
                     completelyBlocked = false;
-                if (paveResult == PaveResult.SUCCESS)
+                }
+                if (paveResult == PaveResult.SUCCESS) {
                     anyBlockPlaced = true;
+                }
             }
 
-            if (anyBlockPlaced)
+            if (anyBlockPlaced) {
                 paveResult = PaveResult.SUCCESS;
-            else if (!completelyBlocked || yOffset == 0)
+            } else if (!completelyBlocked || yOffset == 0) {
                 paveResult = PaveResult.PASS;
+            }
 
-            if (paveResult == PaveResult.SUCCESS && stateToPaveWith.getBlock() instanceof FallingBlock)
+            if (paveResult == PaveResult.SUCCESS && stateToPaveWith.getBlock() instanceof FallingBlock) {
                 paveResult = PaveResult.PASS;
-            if (paveResult != PaveResult.PASS)
+            }
+            if (paveResult != PaveResult.PASS) {
                 break;
-            if (mode == RollingMode.TUNNEL_PAVE)
+            }
+            if (mode == RollingMode.TUNNEL_PAVE) {
                 break;
+            }
 
             yOffset++;
         }
@@ -353,8 +398,9 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
     public static BlockState getStateToPaveWith(ItemStack itemStack) {
         if (itemStack.getItem() instanceof BlockItem bi) {
             BlockState defaultBlockState = bi.getBlock().defaultBlockState();
-            if (defaultBlockState.hasProperty(SlabBlock.TYPE))
+            if (defaultBlockState.hasProperty(SlabBlock.TYPE)) {
                 defaultBlockState = defaultBlockState.setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+            }
             return defaultBlockState;
         }
         return Blocks.AIR.defaultBlockState();
@@ -362,18 +408,21 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     protected BlockState getStateToPaveWith(MovementContext context) {
         RegistryOps<Tag> ops = context.world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
-        ItemStack filter = context.blockEntityData.read("Filter", ItemStack.OPTIONAL_CODEC, ops).orElse(ItemStack.EMPTY);
+        ItemStack filter = context.blockEntityData.read("Filter", ItemStack.OPTIONAL_CODEC, ops)
+            .orElse(ItemStack.EMPTY);
         return getStateToPaveWith(filter);
     }
 
     protected BlockState getStateToPaveWithAsSlab(MovementContext context) {
         BlockState stateToPaveWith = getStateToPaveWith(context);
-        if (stateToPaveWith.hasProperty(SlabBlock.TYPE))
+        if (stateToPaveWith.hasProperty(SlabBlock.TYPE)) {
             return stateToPaveWith.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+        }
 
         Block block = stateToPaveWith.getBlock();
-        if (block == null)
+        if (block == null) {
             return null;
+        }
 
         Identifier rl = BuiltInRegistries.BLOCK.getKey(block);
         String namespace = rl.getNamespace();
@@ -383,15 +432,21 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         List<String> possibleSlabLocations = new ArrayList<>();
         possibleSlabLocations.add(blockName + "_slab");
 
-        if (blockName.endsWith("s") && nameLength > 1)
+        if (blockName.endsWith("s") && nameLength > 1) {
             possibleSlabLocations.add(blockName.substring(0, nameLength - 1) + "_slab");
-        if (blockName.endsWith("planks") && nameLength > 7)
+        }
+        if (blockName.endsWith("planks") && nameLength > 7) {
             possibleSlabLocations.add(blockName.substring(0, nameLength - 7) + "_slab");
+        }
 
         for (String locationAttempt : possibleSlabLocations) {
-            Optional<Block> result = BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath(namespace, locationAttempt));
-            if (result.isEmpty())
+            Optional<Block> result = BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath(
+                namespace,
+                locationAttempt
+            ));
+            if (result.isEmpty()) {
                 continue;
+            }
             return result.get().defaultBlockState();
         }
 
@@ -424,27 +479,31 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
     }
 
     protected enum PaveResult {
-        FAIL,
-        PASS,
-        SUCCESS;
+        FAIL, PASS, SUCCESS;
     }
 
     protected PaveResult tryFill(MovementContext context, BlockPos targetPos, BlockState toPlace) {
         Level level = context.world;
-        if (!level.isLoaded(targetPos))
+        if (!level.isLoaded(targetPos)) {
             return PaveResult.FAIL;
+        }
         BlockState existing = level.getBlockState(targetPos);
-        if (existing.is(toPlace.getBlock()))
+        if (existing.is(toPlace.getBlock())) {
             return PaveResult.PASS;
-        if (!existing.is(BlockTags.LEAVES) && !existing.canBeReplaced() && (!existing.getCollisionShape(level, targetPos).isEmpty() || existing.is(
-            BlockTags.PORTALS)))
+        }
+        if (!existing.is(BlockTags.LEAVES) && !existing.canBeReplaced() && (!existing.getCollisionShape(
+            level,
+            targetPos
+        ).isEmpty() || existing.is(BlockTags.PORTALS))) {
             return PaveResult.FAIL;
+        }
 
         FilterItemStack filter = context.getFilterFromBE();
         Container inventory = context.contraption.getStorage().getAllItems();
         ItemStack held = inventory.extract(stack -> filter.test(context.world, stack), 1);
-        if (held.isEmpty())
+        if (held.isEmpty()) {
             return PaveResult.FAIL;
+        }
 
         level.setBlockAndUpdate(targetPos, toPlace);
         return PaveResult.SUCCESS;

@@ -27,18 +27,21 @@ public class MotorValueBox extends ValueBoxTransform.Sided {
     public void rotate(BlockState state, PoseStack ms) {
         super.rotate(state, ms);
         Direction facing = state.getValue(CreativeMotorBlock.FACING);
-        if (facing.getAxis() == Direction.Axis.Y)
+        if (facing.getAxis() == Direction.Axis.Y) {
             return;
-        if (getSide() != Direction.UP)
+        }
+        if (getSide() != Direction.UP) {
             return;
+        }
         TransformStack.of(ms).rotateZDegrees(-AngleHelper.horizontalAngle(facing) + 180);
     }
 
     @Override
     protected boolean isSideActive(BlockState state, Direction direction) {
         Direction facing = state.getValue(CreativeMotorBlock.FACING);
-        if (facing.getAxis() != Direction.Axis.Y && direction == Direction.DOWN)
+        if (facing.getAxis() != Direction.Axis.Y && direction == Direction.DOWN) {
             return false;
+        }
         return direction.getAxis() != facing.getAxis();
     }
 }

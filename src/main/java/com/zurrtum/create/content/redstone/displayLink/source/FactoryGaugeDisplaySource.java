@@ -4,25 +4,25 @@ import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-
 public class FactoryGaugeDisplaySource extends ValueListDisplaySource {
 
     @Override
     protected Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows) {
         List<FactoryPanelPosition> panels = context.blockEntity().factoryPanelSupport.getLinkedPanels();
-        if (panels.isEmpty())
+        if (panels.isEmpty()) {
             return Stream.empty();
+        }
         return panels.stream().map(fpp -> createEntry(context.level(), fpp))
             //			.sorted(IntAttached.comparator())
             .filter(Objects::nonNull).limit(maxRows);
@@ -31,8 +31,9 @@ public class FactoryGaugeDisplaySource extends ValueListDisplaySource {
     @Nullable
     public IntAttached<MutableComponent> createEntry(Level level, FactoryPanelPosition pos) {
         ServerFactoryPanelBehaviour panel = ServerFactoryPanelBehaviour.at(level, pos);
-        if (panel == null)
+        if (panel == null) {
             return null;
+        }
 
         ItemStack filter = panel.getFilter();
 
@@ -41,12 +42,13 @@ public class FactoryGaugeDisplaySource extends ValueListDisplaySource {
 
         if (demand != 0) {
             int promised = panel.getPromised();
-            if (panel.satisfied)
+            if (panel.satisfied) {
                 s = "✔";
-            else if (promised != 0)
+            } else if (promised != 0) {
                 s = "↑";
-            else
+            } else {
                 s = "▪";
+            }
         }
 
         return IntAttached.with(

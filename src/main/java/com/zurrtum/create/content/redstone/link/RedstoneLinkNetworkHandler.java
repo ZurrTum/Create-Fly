@@ -5,14 +5,13 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.levelWrappers.WorldHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RedstoneLinkNetworkHandler {
 
@@ -29,10 +28,12 @@ public class RedstoneLinkNetworkHandler {
         private int color;
 
         public static Frequency of(ItemStack stack) {
-            if (stack.isEmpty())
+            if (stack.isEmpty()) {
                 return EMPTY;
-            if (stack.getComponents().isEmpty())
+            }
+            if (stack.getComponents().isEmpty()) {
                 return simpleFrequencies.computeIfAbsent(stack.getItem(), $ -> new Frequency(stack));
+            }
             return new Frequency(stack);
         }
 
@@ -53,8 +54,9 @@ public class RedstoneLinkNetworkHandler {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
+            }
             return obj instanceof Frequency ? ((Frequency) obj).item == item && ((Frequency) obj).color == color : false;
         }
 
@@ -73,8 +75,9 @@ public class RedstoneLinkNetworkHandler {
     public Set<IRedstoneLinkable> getNetworkOf(LevelAccessor world, IRedstoneLinkable actor) {
         Map<Couple<Frequency>, Set<IRedstoneLinkable>> networksInWorld = networksIn(world);
         Couple<Frequency> key = actor.getNetworkKey();
-        if (!networksInWorld.containsKey(key))
+        if (!networksInWorld.containsKey(key)) {
             networksInWorld.put(key, new LinkedHashSet<>());
+        }
         return networksInWorld.get(key);
     }
 
@@ -105,11 +108,13 @@ public class RedstoneLinkNetworkHandler {
                 continue;
             }
 
-            if (!withinRange(actor, other))
+            if (!withinRange(actor, other)) {
                 continue;
+            }
 
-            if (power < 15)
+            if (power < 15) {
                 power = Math.max(other.getTransmittedStrength(), power);
+            }
         }
 
         if (actor instanceof ServerLinkBehaviour linkBehaviour) {
@@ -121,14 +126,16 @@ public class RedstoneLinkNetworkHandler {
         }
 
         for (IRedstoneLinkable other : network) {
-            if (other != actor && other.isListening() && withinRange(actor, other))
+            if (other != actor && other.isListening() && withinRange(actor, other)) {
                 other.setReceivedStrength(power);
+            }
         }
     }
 
     public static boolean withinRange(IRedstoneLinkable from, IRedstoneLinkable to) {
-        if (from == to)
+        if (from == to) {
             return true;
+        }
         return from.getLocation().closerThan(to.getLocation(), AllConfigs.server().logistics.linkRange.get());
     }
 
@@ -143,11 +150,14 @@ public class RedstoneLinkNetworkHandler {
     public boolean hasAnyLoadedPower(Couple<Frequency> frequency) {
         for (Map<Couple<Frequency>, Set<IRedstoneLinkable>> map : connections.values()) {
             Set<IRedstoneLinkable> set = map.get(frequency);
-            if (set == null || set.isEmpty())
+            if (set == null || set.isEmpty()) {
                 continue;
-            for (IRedstoneLinkable link : set)
-                if (link.getTransmittedStrength() > 0)
+            }
+            for (IRedstoneLinkable link : set) {
+                if (link.getTransmittedStrength() > 0) {
                     return true;
+                }
+            }
         }
         return false;
     }

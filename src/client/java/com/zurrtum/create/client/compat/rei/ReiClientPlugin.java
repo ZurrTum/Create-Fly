@@ -38,7 +38,9 @@ import java.util.function.Consumer;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class ReiClientPlugin implements REIClientPlugin {
-    public static final CategoryIdentifier<MysteriousItemConversionDisplay> MYSTERY_CONVERSION = CategoryIdentifier.of(MOD_ID, "mystery_conversion");
+    public static final CategoryIdentifier<MysteriousItemConversionDisplay> MYSTERY_CONVERSION = CategoryIdentifier.of(MOD_ID,
+        "mystery_conversion"
+    );
 
     private <T extends Display> Consumer<CategoryConfiguration<T>> workstations(ItemLike... item) {
         EntryIngredient[] workstations = new EntryIngredient[item.length];
@@ -85,7 +87,8 @@ public class ReiClientPlugin implements REIClientPlugin {
             entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.FLUID)),
             registry
         );
-        DrainingDisplay.register(entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)), registry);
+        DrainingDisplay.register(
+            entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)), registry);
     }
 
     private static void registerToolboxRecipes(DisplayRegistry registry) {

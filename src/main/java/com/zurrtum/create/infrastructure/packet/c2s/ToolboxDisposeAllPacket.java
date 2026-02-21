@@ -11,8 +11,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ToolboxDisposeAllPacket(BlockPos toolboxPos) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<ByteBuf, ToolboxDisposeAllPacket> CODEC = BlockPos.STREAM_CODEC.map(
-        ToolboxDisposeAllPacket::new,
+    public static final StreamCodec<ByteBuf, ToolboxDisposeAllPacket> CODEC = BlockPos.STREAM_CODEC.map(ToolboxDisposeAllPacket::new,
         ToolboxDisposeAllPacket::toolboxPos
     );
 

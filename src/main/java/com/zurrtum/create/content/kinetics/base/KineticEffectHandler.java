@@ -29,8 +29,8 @@ public class KineticEffectHandler {
         Level world = kte.getLevel();
 
         if (world.isClientSide()) {
-            if (overStressedTime > 0)
-                if (--overStressedTime == 0)
+            if (overStressedTime > 0) {
+                if (--overStressedTime == 0) {
                     if (kte.isOverStressed()) {
                         overStressedEffect = 1;
                         spawnEffect(ParticleTypes.SMOKE, 0.2f, 5);
@@ -38,16 +38,20 @@ public class KineticEffectHandler {
                         overStressedEffect = -1;
                         spawnEffect(ParticleTypes.CLOUD, .075f, 2);
                     }
+                }
+            }
 
             if (overStressedEffect != 0) {
                 overStressedEffect -= overStressedEffect * .1f;
-                if (Math.abs(overStressedEffect) < 1 / 128f)
+                if (Math.abs(overStressedEffect) < 1 / 128f) {
                     overStressedEffect = 0;
+                }
             }
 
         } else if (particleSpawnCountdown > 0) {
-            if (--particleSpawnCountdown == 0)
+            if (--particleSpawnCountdown == 0) {
                 spawnRotationIndicators();
+            }
         }
     }
 
@@ -57,10 +61,12 @@ public class KineticEffectHandler {
 
     public void spawnEffect(ParticleOptions particle, float maxMotion, int amount) {
         Level world = kte.getLevel();
-        if (world == null)
+        if (world == null) {
             return;
-        if (!world.isClientSide())
+        }
+        if (!world.isClientSide()) {
             return;
+        }
         RandomSource r = world.random;
         for (int i = 0; i < amount; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, r, maxMotion);
@@ -71,13 +77,15 @@ public class KineticEffectHandler {
 
     public void spawnRotationIndicators() {
         float speed = kte.getSpeed();
-        if (speed == 0)
+        if (speed == 0) {
             return;
+        }
 
         BlockState state = kte.getBlockState();
         Block block = state.getBlock();
-        if (!(block instanceof KineticBlock kb))
+        if (!(block instanceof KineticBlock kb)) {
             return;
+        }
 
         float radius1 = kb.getParticleInitialRadius();
         float radius2 = kb.getParticleTargetRadius();
@@ -85,10 +93,12 @@ public class KineticEffectHandler {
         Axis axis = kb.getRotationAxis(state);
         BlockPos pos = kte.getBlockPos();
         Level world = kte.getLevel();
-        if (axis == null)
+        if (axis == null) {
             return;
-        if (world == null)
+        }
+        if (world == null) {
             return;
+        }
 
         Vec3 vec = VecHelper.getCenterOf(pos);
         SpeedLevel speedLevel = SpeedLevel.of(speed);
@@ -97,7 +107,14 @@ public class KineticEffectHandler {
         particleSpeed *= Math.signum(speed);
 
         if (world instanceof ServerLevel serverWorld) {
-            RotationIndicatorParticleData particleData = new RotationIndicatorParticleData(color, particleSpeed, radius1, radius2, 10, axis);
+            RotationIndicatorParticleData particleData = new RotationIndicatorParticleData(
+                color,
+                particleSpeed,
+                radius1,
+                radius2,
+                10,
+                axis
+            );
             serverWorld.sendParticles(particleData, vec.x, vec.y, vec.z, 20, 0, 0, 0, 1);
         }
     }

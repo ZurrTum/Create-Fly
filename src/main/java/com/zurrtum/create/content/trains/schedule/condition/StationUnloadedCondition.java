@@ -5,8 +5,8 @@ import com.zurrtum.create.content.trains.station.GlobalStation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -19,12 +19,14 @@ public class StationUnloadedCondition extends ScheduleWaitCondition {
     @Override
     public boolean tickCompletion(Level level, Train train, CompoundTag context) {
         GlobalStation currentStation = train.getCurrentStation();
-        if (currentStation == null)
+        if (currentStation == null) {
             return false;
+        }
         ResourceKey<Level> stationDim = currentStation.getBlockEntityDimension();
         MinecraftServer server = level.getServer();
-        if (server == null)
+        if (server == null) {
             return false;
+        }
         ServerLevel stationLevel = server.getLevel(stationDim);
         if (stationLevel == null) {
             return false;

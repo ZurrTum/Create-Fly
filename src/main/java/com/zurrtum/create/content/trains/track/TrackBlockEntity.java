@@ -5,6 +5,7 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.contraptions.StructureTransform;
@@ -12,11 +13,7 @@ import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.protocol.Packet;
@@ -34,6 +31,8 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class TrackBlockEntity extends SmartBlockEntity implements TransformableBlockEntity, IMergeableBE {
 
@@ -63,8 +62,9 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     @Override
     public void initialize() {
         super.initialize();
-        if (level.isClientSide() && hasInteractableConnections())
+        if (level.isClientSide() && hasInteractableConnections()) {
             AllClientHandle.INSTANCE.registerToCurveInteraction(this);
+        }
     }
 
     @Override
@@ -75,9 +75,11 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
 
     @Override
     public void lazyTick() {
-        for (BezierConnection connection : connections.values())
-            if (connection.isPrimary())
+        for (BezierConnection connection : connections.values()) {
+            if (connection.isPrimary()) {
                 manageFakeTracksAlong(connection, false);
+            }
+        }
     }
 
     public void validateConnections() {
@@ -93,12 +95,14 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             }
 
             BlockState blockState = level.getBlockState(key);
-            if (blockState.getBlock() instanceof ITrackBlock trackBlock && !blockState.getValue(TrackBlock.HAS_BE))
+            if (blockState.getBlock() instanceof ITrackBlock trackBlock && !blockState.getValue(TrackBlock.HAS_BE)) {
                 for (Vec3 v : trackBlock.getTrackAxes(level, key, blockState)) {
                     Vec3 bcEndAxis = bc.axes.getSecond();
-                    if (v.distanceTo(bcEndAxis) < 1 / 1024f || v.distanceTo(bcEndAxis.scale(-1)) < 1 / 1024f)
+                    if (v.distanceTo(bcEndAxis) < 1 / 1024f || v.distanceTo(bcEndAxis.scale(-1)) < 1 / 1024f) {
                         level.setBlock(key, blockState.setValue(TrackBlock.HAS_BE, true), Block.UPDATE_ALL);
+                    }
                 }
+            }
 
             BlockEntity blockEntity = level.getBlockEntity(key);
             if (!(blockEntity instanceof TrackBlockEntity trackBE) || blockEntity.isRemoved()) {
@@ -112,41 +116,51 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             }
         }
 
-        for (BlockPos blockPos : invalid)
+        for (BlockPos blockPos : invalid) {
             removeConnection(blockPos);
+        }
     }
 
     public void addConnection(BezierConnection connection) {
         // don't replace existing connections with different materials
-        if (connections.containsKey(connection.getKey()) && connection.equalsSansMaterial(connections.get(connection.getKey())))
+        if (connections.containsKey(connection.getKey()) && connection.equalsSansMaterial(connections.get(connection.getKey()))) {
             return;
+        }
         connections.put(connection.getKey(), connection);
         level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
         notifyUpdate();
 
-        if (connection.isPrimary())
+        if (connection.isPrimary()) {
             manageFakeTracksAlong(connection, false);
+        }
     }
 
     public void removeConnection(BlockPos target) {
-        if (isTilted())
+        if (isTilted()) {
             tilt.captureSmoothingHandles();
+        }
 
         BezierConnection removed = connections.remove(target);
         notifyUpdate();
 
-        if (removed != null)
+        if (removed != null) {
             manageFakeTracksAlong(removed, true);
+        }
 
-        if (!connections.isEmpty() || getBlockState().getValueOrElse(TrackBlock.SHAPE, TrackShape.NONE).isPortal())
+        if (!connections.isEmpty() || getBlockState().getValueOrElse(TrackBlock.SHAPE, TrackShape.NONE).isPortal()) {
             return;
+        }
 
         BlockState blockState = level.getBlockState(worldPosition);
-        if (blockState.hasProperty(TrackBlock.HAS_BE))
+        if (blockState.hasProperty(TrackBlock.HAS_BE)) {
             level.setBlockAndUpdate(worldPosition, blockState.setValue(TrackBlock.HAS_BE, false));
+        }
         if (level instanceof ServerLevel serverLevel) {
             Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
-            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(
+                new ChunkPos(worldPosition),
+                false
+            )) {
                 player.connection.send(packet);
             }
         }
@@ -154,18 +168,24 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
 
     public void removeInboundConnections(boolean dropAndDiscard) {
         for (BezierConnection bezierConnection : connections.values()) {
-            if (!(level.getBlockEntity(bezierConnection.getKey()) instanceof TrackBlockEntity tbe))
+            if (!(level.getBlockEntity(bezierConnection.getKey()) instanceof TrackBlockEntity tbe)) {
                 return;
+            }
             tbe.removeConnection(bezierConnection.bePositions.getFirst());
-            if (!dropAndDiscard)
+            if (!dropAndDiscard) {
                 continue;
-            if (!cancelDrops)
+            }
+            if (!cancelDrops) {
                 bezierConnection.spawnItems(level);
+            }
             bezierConnection.spawnDestroyParticles(level);
         }
         if (dropAndDiscard && level instanceof ServerLevel serverLevel) {
             Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
-            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(
+                new ChunkPos(worldPosition),
+                false
+            )) {
                 player.connection.send(packet);
             }
         }
@@ -191,16 +211,21 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         super.write(view, clientPacket);
         writeTurns(view, false);
         tilt.smoothingAngle.ifPresent(angle -> view.store("Smoothing", Codec.DOUBLE, angle));
-        if (boundLocation == null)
+        if (boundLocation == null) {
             return;
+        }
         view.store("BoundLocation", BlockPos.CODEC, boundLocation.getSecond());
         view.store("BoundDimension", Level.RESOURCE_KEY_CODEC, boundLocation.getFirst());
     }
 
     private void writeTurns(ValueOutput view, boolean restored) {
         ValueOutput.ValueOutputList list = view.childrenList("Connections");
-        for (BezierConnection bezierConnection : connections.values())
-            (restored ? tilt.restoreToOriginalCurve(bezierConnection.clone()) : bezierConnection).write(list.addChild(), worldPosition);
+        for (BezierConnection bezierConnection : connections.values()) {
+            (restored ? tilt.restoreToOriginalCurve(bezierConnection.clone()) : bezierConnection).write(
+                list.addChild(),
+                worldPosition
+            );
+        }
     }
 
     @Override
@@ -221,14 +246,16 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         if (level != null && level.isClientSide()) {
             AllClientHandle.INSTANCE.queueUpdate(this);
 
-            if (hasInteractableConnections())
+            if (hasInteractableConnections()) {
                 AllClientHandle.INSTANCE.registerToCurveInteraction(this);
-            else
+            } else {
                 AllClientHandle.INSTANCE.removeFromCurveInteraction(this);
+            }
         }
 
         view.read("BoundLocation", BlockPos.CODEC)
-            .ifPresent(pos -> boundLocation = Pair.of(view.read("BoundDimension", Level.RESOURCE_KEY_CODEC).orElseThrow(), pos));
+            .ifPresent(pos -> boundLocation = Pair.of(
+                view.read("BoundDimension", Level.RESOURCE_KEY_CODEC).orElseThrow(), pos));
     }
 
     @Override
@@ -237,32 +264,37 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
 
     @Override
     public void accept(BlockEntity other) {
-        if (other instanceof TrackBlockEntity track)
+        if (other instanceof TrackBlockEntity track) {
             connections.putAll(track.connections);
+        }
         validateConnections();
         level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
     }
 
     public boolean hasInteractableConnections() {
-        for (BezierConnection connection : connections.values())
-            if (connection.isPrimary())
+        for (BezierConnection connection : connections.values()) {
+            if (connection.isPrimary()) {
                 return true;
+            }
+        }
         return false;
     }
 
     @Override
     public void transform(BlockEntity be, StructureTransform transform) {
         Map<BlockPos, BezierConnection> restoredConnections = new HashMap<>();
-        for (Map.Entry<BlockPos, BezierConnection> entry : connections.entrySet())
+        for (Map.Entry<BlockPos, BezierConnection> entry : connections.entrySet()) {
             restoredConnections.put(
                 entry.getKey(),
                 tilt.restoreToOriginalCurve(tilt.restoreToOriginalCurve(entry.getValue().secondary()).secondary())
             );
+        }
         connections = restoredConnections;
         tilt.smoothingAngle = Optional.empty();
 
-        if (transform.rotationAxis != Axis.Y)
+        if (transform.rotationAxis != Axis.Y) {
             return;
+        }
 
         Map<BlockPos, BezierConnection> transformedConnections = new HashMap<>();
         for (Map.Entry<BlockPos, BezierConnection> entry : connections.entrySet()) {
@@ -295,23 +327,27 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     @Override
     public void invalidate() {
         super.invalidate();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             AllClientHandle.INSTANCE.removeFromCurveInteraction(this);
+        }
     }
 
     @Override
     public void remove() {
         super.remove();
 
-        for (BezierConnection connection : connections.values())
+        for (BezierConnection connection : connections.values()) {
             manageFakeTracksAlong(connection, true);
+        }
 
         if (boundLocation != null && level instanceof ServerLevel) {
             ServerLevel otherLevel = level.getServer().getLevel(boundLocation.getFirst());
-            if (otherLevel == null)
+            if (otherLevel == null) {
                 return;
-            if (otherLevel.getBlockState(boundLocation.getSecond()).is(AllBlockTags.TRACKS))
+            }
+            if (otherLevel.getBlockState(boundLocation.getSecond()).is(AllBlockTags.TRACKS)) {
                 otherLevel.destroyBlock(boundLocation.getSecond(), false);
+            }
         }
     }
 
@@ -328,21 +364,24 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             boolean present = stateAtPos.is(AllBlocks.FAKE_TRACK);
 
             if (remove) {
-                if (present)
+                if (present) {
                     level.removeBlock(targetPos, false);
+                }
                 continue;
             }
 
             FluidState fluidState = stateAtPos.getFluidState();
-            if (!fluidState.isEmpty() && !fluidState.isSourceOfType(Fluids.WATER))
+            if (!fluidState.isEmpty() && !fluidState.isSourceOfType(Fluids.WATER)) {
                 continue;
+            }
 
-            if (!present && stateAtPos.canBeReplaced())
+            if (!present && stateAtPos.canBeReplaced()) {
                 level.setBlock(
                     targetPos,
                     ProperWaterloggedBlock.withWater(level, AllBlocks.FAKE_TRACK.defaultBlockState(), targetPos),
                     Block.UPDATE_ALL
                 );
+            }
             FakeTrackBlock.keepAlive(level, targetPos);
         }
     }

@@ -30,7 +30,8 @@ public class WaterWheelStructuralModel extends WrapperBlockStateModel {
 
     @Override
     public TextureAtlasSprite particleIcon() {
-        return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getModelManager().getMissingBlockStateModel().particleIcon();
+        return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getModelManager()
+            .getMissingBlockStateModel().particleIcon();
     }
 
     @Override

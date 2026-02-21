@@ -10,13 +10,12 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint.ITrackSelector;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.graph.TrackNode;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-
-import java.util.*;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+
+import java.util.*;
 
 public class CarriageSyncData {
 
@@ -54,10 +53,12 @@ public class CarriageSyncData {
 
     public CarriageSyncData copy() {
         CarriageSyncData data = new CarriageSyncData();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) {
             data.wheelLocations.set(i, wheelLocations.get(i));
-        if (fallbackLocations != null)
+        }
+        if (fallbackLocations != null) {
             data.fallbackLocations = fallbackLocations.copy();
+        }
         data.distanceToDestination = distanceToDestination;
         data.leadingCarriage = leadingCarriage;
         return data;
@@ -78,8 +79,9 @@ public class CarriageSyncData {
 
         for (Pair<Couple<Integer>, Float> pair : wheelLocations) {
             buffer.writeBoolean(pair == null);
-            if (pair == null)
+            if (pair == null) {
                 break;
+            }
             pair.getFirst().forEach(buffer::writeInt);
             buffer.writeFloat(pair.getSecond());
         }
@@ -92,14 +94,18 @@ public class CarriageSyncData {
         ticksSince = 0;
 
         if (fallback) {
-            fallbackLocations = Pair.of(VecHelper.read(buffer), Couple.create(VecHelper.read(buffer), VecHelper.read(buffer)));
+            fallbackLocations = Pair.of(
+                VecHelper.read(buffer),
+                Couple.create(VecHelper.read(buffer), VecHelper.read(buffer))
+            );
             return;
         }
 
         fallbackLocations = null;
         for (int i = 0; i < 4; i++) {
-            if (buffer.readBoolean())
+            if (buffer.readBoolean()) {
                 break;
+            }
             wheelLocations.set(i, Pair.of(Couple.create(buffer::readInt), buffer.readFloat()));
         }
         distanceToDestination = buffer.readFloat();
@@ -118,8 +124,9 @@ public class CarriageSyncData {
         leadingCarriage = entity.carriageIndex == (carriage.train.speed >= 0 ? 0 : carriage.train.carriages.size() - 1);
 
         for (boolean first : Iterate.trueAndFalse) {
-            if (!first && !carriage.isOnTwoBogeys())
+            if (!first && !carriage.isOnTwoBogeys()) {
                 break;
+            }
 
             CarriageBogey bogey = carriage.bogeys.get(first);
             for (boolean firstPoint : Iterate.trueAndFalse) {
@@ -157,24 +164,28 @@ public class CarriageSyncData {
         }
 
         TrackGraph graph = carriage.train.graph;
-        if (graph == null)
+        if (graph == null) {
             return;
+        }
 
         for (int i = 0; i < wheelLocations.size(); i++) {
             Pair<Couple<Integer>, Float> pair = wheelLocations.get(i);
-            if (pair == null)
+            if (pair == null) {
                 break;
+            }
 
             CarriageBogey bogey = carriage.bogeys.get(i / 2 == 0);
             TravellingPoint bogeyPoint = bogey.points.get(i % 2 == 0);
             TravellingPoint point = dce.pointsInitialised ? pointsToApproach[i] : bogeyPoint;
 
             Couple<TrackNode> nodes = pair.getFirst().map(graph::getNode);
-            if (nodes.either(Objects::isNull))
+            if (nodes.either(Objects::isNull)) {
                 continue;
+            }
             TrackEdge edge = graph.getConnectionsFrom(nodes.getFirst()).get(nodes.getSecond());
-            if (edge == null)
+            if (edge == null) {
                 continue;
+            }
 
             point.node1 = nodes.getFirst();
             point.node2 = nodes.getSecond();
@@ -211,8 +222,9 @@ public class CarriageSyncData {
             return;
         }
 
-        if (!leadingCarriage)
+        if (!leadingCarriage) {
             return;
+        }
 
         destinationDistanceSnapshot = (float) (distanceToDestination - carriage.train.navigation.distanceToDestination);
     }
@@ -221,15 +233,21 @@ public class CarriageSyncData {
         DimensionalCarriageEntity dce = carriage.getDimensional(entity.level());
 
         int updateInterval = entity.getType().updateInterval();
-        if (ticksSince >= updateInterval * 2)
+        if (ticksSince >= updateInterval * 2) {
             partialIn /= ticksSince - updateInterval * 2 + 1;
+        }
         partialIn *= AllClientHandle.INSTANCE.getServerSpeed();
         final float partial = partialIn;
 
         ticksSince++;
 
         if (fallbackLocations != null && fallbackPointSnapshot != null) {
-            dce.positionAnchor = approachVector(partial, dce.positionAnchor, fallbackLocations.getFirst(), fallbackPointSnapshot.getFirst());
+            dce.positionAnchor = approachVector(
+                partial,
+                dce.positionAnchor,
+                fallbackLocations.getFirst(),
+                fallbackPointSnapshot.getFirst()
+            );
             dce.rotationAnchors.replaceWithContext((current, first) -> approachVector(
                 partial,
                 current,
@@ -240,26 +258,32 @@ public class CarriageSyncData {
         }
 
         TrackGraph graph = carriage.train.graph;
-        if (graph == null)
+        if (graph == null) {
             return;
+        }
 
         carriage.train.navigation.distanceToDestination += partial * destinationDistanceSnapshot;
 
         for (boolean first : Iterate.trueAndFalse) {
-            if (!first && !carriage.isOnTwoBogeys())
+            if (!first && !carriage.isOnTwoBogeys()) {
                 break;
+            }
             CarriageBogey bogey = carriage.bogeys.get(first);
             for (boolean firstPoint : Iterate.trueAndFalse) {
                 int index = (first ? 0 : 2) + (firstPoint ? 0 : 1);
                 float f = pointDistanceSnapshot[index];
-                if (Mth.equal(f, 0))
+                if (Mth.equal(f, 0)) {
                     continue;
+                }
 
                 TravellingPoint point = bogey.points.get(firstPoint);
                 MutableBoolean success = new MutableBoolean(true);
                 TravellingPoint toApproach = pointsToApproach[index];
 
-                ITrackSelector trackSelector = point.follow(toApproach, b -> success.setValue(success.booleanValue() && b));
+                ITrackSelector trackSelector = point.follow(
+                    toApproach,
+                    b -> success.setValue(success.booleanValue() && b)
+                );
                 point.travel(graph, partial * f, trackSelector);
 
                 // could not pathfind to server location
@@ -275,19 +299,26 @@ public class CarriageSyncData {
     }
 
     private Vec3 approachVector(float partial, Vec3 current, Vec3 target, Vec3 snapshot) {
-        if (current == null || snapshot == null)
+        if (current == null || snapshot == null) {
             return target;
+        }
         return current.add(target.subtract(snapshot).scale(partial));
     }
 
-    public float getDistanceTo(TrackGraph graph, TravellingPoint current, TravellingPoint target, float maxDistance, boolean forward) {
-        if (maxDistance == -1)
+    public float getDistanceTo(
+        TrackGraph graph,
+        TravellingPoint current,
+        TravellingPoint target,
+        float maxDistance,
+        boolean forward
+    ) {
+        if (maxDistance == -1) {
             maxDistance = 32;
+        }
 
         Set<TrackEdge> visited = new HashSet<>();
         Map<TrackEdge, Pair<Boolean, TrackEdge>> reachedVia = new IdentityHashMap<>();
-        PriorityQueue<Pair<Double, Pair<Couple<TrackNode>, TrackEdge>>> frontier = new PriorityQueue<>((p1, p2) -> Double.compare(
-            p1.getFirst(),
+        PriorityQueue<Pair<Double, Pair<Couple<TrackNode>, TrackEdge>>> frontier = new PriorityQueue<>((p1, p2) -> Double.compare(p1.getFirst(),
             p2.getFirst()
         ));
 
@@ -295,12 +326,14 @@ public class CarriageSyncData {
         TrackNode initialNode2 = forward ? current.node2 : current.node1;
 
         Map<TrackNode, TrackEdge> connectionsFromInitial = graph.getConnectionsFrom(initialNode1);
-        if (connectionsFromInitial == null)
+        if (connectionsFromInitial == null) {
             return -1;
+        }
 
         TrackEdge initialEdge = connectionsFromInitial.get(initialNode2);
-        if (initialEdge == null)
+        if (initialEdge == null) {
             return -1; // graph changed
+        }
 
         TrackNode targetNode1 = forward ? target.node1 : target.node2;
         TrackNode targetNode2 = forward ? target.node2 : target.node1;
@@ -318,11 +351,13 @@ public class CarriageSyncData {
             TrackNode node2 = currentEntry.getFirst().getSecond();
             TrackEdge edge = currentEntry.getSecond();
 
-            if (edge == targetEdge)
+            if (edge == targetEdge) {
                 return (float) (distance - (forward ? edge.getLength() - target.position : target.position));
+            }
 
-            if (distance > maxDistance)
+            if (distance > maxDistance) {
                 continue;
+            }
 
             List<Map.Entry<TrackNode, TrackEdge>> validTargets = new ArrayList<>();
             Map<TrackNode, TrackEdge> connectionsFrom = graph.getConnectionsFrom(node2);
@@ -330,15 +365,18 @@ public class CarriageSyncData {
                 TrackEdge newEdge = entry.getValue();
                 Vec3 currentDirection = edge.getDirection(false);
                 Vec3 newDirection = newEdge.getDirection(true);
-                if (currentDirection.dot(newDirection) < 7 / 8f)
+                if (currentDirection.dot(newDirection) < 7 / 8f) {
                     continue;
-                if (!visited.add(entry.getValue()))
+                }
+                if (!visited.add(entry.getValue())) {
                     continue;
+                }
                 validTargets.add(entry);
             }
 
-            if (validTargets.isEmpty())
+            if (validTargets.isEmpty()) {
                 continue;
+            }
 
             for (Map.Entry<TrackNode, TrackEdge> entry : validTargets) {
                 TrackNode newNode = entry.getKey();

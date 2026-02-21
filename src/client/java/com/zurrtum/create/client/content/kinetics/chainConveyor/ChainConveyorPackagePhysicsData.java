@@ -3,11 +3,10 @@ package com.zurrtum.create.client.content.kinetics.chainConveyor;
 
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
-
-import java.lang.ref.WeakReference;
-
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
+
+import java.lang.ref.WeakReference;
 
 public class ChainConveyorPackagePhysicsData {
     public Vec3 targetPos;
@@ -35,14 +34,16 @@ public class ChainConveyorPackagePhysicsData {
     }
 
     public boolean shouldTick() {
-        if (lastTick == AnimationTickHolder.getTicks())
+        if (lastTick == AnimationTickHolder.getTicks()) {
             return false;
+        }
         lastTick = AnimationTickHolder.getTicks();
         return true;
     }
 
     public void setBE(ChainConveyorBlockEntity ccbe) {
-        if (beReference == null || beReference.get() != ccbe)
+        if (beReference == null || beReference.get() != ccbe) {
             beReference = new WeakReference<>(ccbe);
+        }
     }
 }

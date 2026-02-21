@@ -1,6 +1,12 @@
 package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.infrastructure.component.TerrainTools;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -8,19 +14,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.state.BlockState;
-
 public class FlattenTool {
 
     // gaussian with sig=1
     static float[][] kernel = {
 
-        {0.003765f, 0.015019f, 0.023792f, 0.015019f, 0.003765f}, {0.015019f, 0.059912f, 0.094907f, 0.059912f, 0.015019f}, {0.023792f, 0.094907f, 0.150342f, 0.094907f, 0.023792f}, {0.015019f, 0.059912f, 0.094907f, 0.059912f, 0.015019f}, {0.003765f, 0.015019f, 0.023792f, 0.015019f, 0.003765f},
+        {0.003765f, 0.015019f, 0.023792f, 0.015019f, 0.003765f},
+        {0.015019f, 0.059912f, 0.094907f, 0.059912f, 0.015019f},
+        {0.023792f, 0.094907f, 0.150342f, 0.094907f, 0.023792f},
+        {0.015019f, 0.059912f, 0.094907f, 0.059912f, 0.015019f},
+        {0.003765f, 0.015019f, 0.023792f, 0.015019f, 0.003765f},
 
     };
 
@@ -35,12 +38,14 @@ public class FlattenTool {
                         int iTarget = i + iOffset;
                         int jTarget = j + jOffset;
                         int ref = 0;
-                        if (iTarget < 0 || iTarget >= values.length || jTarget < 0 || jTarget >= values[0].length)
+                        if (iTarget < 0 || iTarget >= values.length || jTarget < 0 || jTarget >= values[0].length) {
                             ref = value;
-                        else
+                        } else {
                             ref = values[iTarget][jTarget];
-                        if (ref == Integer.MIN_VALUE)
+                        }
+                        if (ref == Integer.MIN_VALUE) {
                             ref = value;
+                        }
                         newValue += kernel[iOffset + 2][jOffset + 2] * ref;
                     }
                 }
@@ -72,8 +77,9 @@ public class FlattenTool {
             maxCoord2 = Math.max(maxCoord2, coords.getValue());
 
             if (TerrainTools.isReplaceable(belowSurface)) {
-                if (!heightMap.containsKey(coords))
+                if (!heightMap.containsKey(coords)) {
                     heightMap.put(coords, Integer.MIN_VALUE);
+                }
                 continue;
             }
 
@@ -81,23 +87,25 @@ public class FlattenTool {
             BlockState surface = world.getBlockState(p);
 
             if (!TerrainTools.isReplaceable(surface)) {
-                if (!heightMap.containsKey(coords) || heightMap.get(coords).equals(Integer.MIN_VALUE))
+                if (!heightMap.containsKey(coords) || heightMap.get(coords).equals(Integer.MIN_VALUE)) {
                     heightMap.put(coords, Integer.MAX_VALUE);
+                }
                 continue;
             }
 
             surfaces.add(p);
             int coordinate = facing.getAxis().choose(p.getX(), p.getY(), p.getZ());
-            if (!heightMap.containsKey(coords) || heightMap.get(coords).equals(Integer.MAX_VALUE) || heightMap.get(coords)
-                .equals(Integer.MIN_VALUE) || heightMap.get(coords) * offset < coordinate * offset) {
+            if (!heightMap.containsKey(coords) || heightMap.get(coords).equals(Integer.MAX_VALUE) || heightMap.get(
+                coords).equals(Integer.MIN_VALUE) || heightMap.get(coords) * offset < coordinate * offset) {
                 heightMap.put(coords, coordinate);
                 maxEntry = Math.max(maxEntry, coordinate);
                 minEntry = Math.min(minEntry, coordinate);
             }
         }
 
-        if (surfaces.isEmpty())
+        if (surfaces.isEmpty()) {
             return;
+        }
 
         // fill heightmap
         int[][] heightMapArray = new int[maxCoord1 - minCoord1 + 1][maxCoord2 - minCoord2 + 1];
@@ -130,8 +138,9 @@ public class FlattenTool {
             int targetCoord = heightMapArray[coords.getKey() - minCoord1][coords.getValue() - minCoord2] * offset;
 
             // Keep surface
-            if (surfaceCoord == targetCoord)
+            if (surfaceCoord == targetCoord) {
                 continue;
+            }
 
             // Lower surface
             BlockState blockState = world.getBlockState(p);
@@ -142,20 +151,23 @@ public class FlattenTool {
                 world.setBlockAndUpdate(p, blockState.getFluidState().createLegacyBlock());
                 p = p.relative(facing.getOpposite());
                 surfaceCoord--;
-                if (timeOut-- <= 0)
+                if (timeOut-- <= 0) {
                     break;
+                }
             }
 
             // Raise surface
             while (surfaceCoord < targetCoord) {
                 BlockPos above = p.relative(facing);
-                if (!(blockState.getBlock() instanceof LiquidBlock))
+                if (!(blockState.getBlock() instanceof LiquidBlock)) {
                     world.setBlockAndUpdate(above, blockState);
+                }
                 world.setBlockAndUpdate(p, world.getBlockState(p.relative(facing.getOpposite())));
                 p = p.relative(facing);
                 surfaceCoord++;
-                if (timeOut-- <= 0)
+                if (timeOut-- <= 0) {
                     break;
+                }
             }
 
         }

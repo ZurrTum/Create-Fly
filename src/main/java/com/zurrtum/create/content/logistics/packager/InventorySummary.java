@@ -4,15 +4,14 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.infrastructure.packet.s2c.LogisticalStockResponsePacket;
-import org.apache.commons.lang3.mutable.MutableInt;
-
-import java.util.*;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.apache.commons.lang3.mutable.MutableInt;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 public class InventorySummary {
     public static Codec<InventorySummary> CODEC = BigItemStack.CODEC.listOf().xmap(
@@ -53,13 +52,15 @@ public class InventorySummary {
     }
 
     public void addAllItemStacks(List<ItemStack> list) {
-        for (ItemStack stack : list)
+        for (ItemStack stack : list) {
             add(stack, stack.getCount());
+        }
     }
 
     public void addAllBigItemStacks(List<BigItemStack> list) {
-        for (BigItemStack entry : list)
+        for (BigItemStack entry : list) {
             add(entry.stack, entry.count);
+        }
     }
 
     public InventorySummary copy() {
@@ -69,24 +70,28 @@ public class InventorySummary {
     }
 
     public void add(ItemStack stack, int count) {
-        if (count == 0 || stack.isEmpty())
+        if (count == 0 || stack.isEmpty()) {
             return;
+        }
 
-        if (totalCount < BigItemStack.INF)
+        if (totalCount < BigItemStack.INF) {
             totalCount += count;
+        }
 
         List<BigItemStack> stacks = items.computeIfAbsent(stack.getItem(), $ -> Lists.newArrayList());
         for (BigItemStack existing : stacks) {
             ItemStack existingStack = existing.stack;
             if (ItemStack.isSameItemSameComponents(existingStack, stack)) {
-                if (existing.count < BigItemStack.INF)
+                if (existing.count < BigItemStack.INF) {
                     existing.count += count;
+                }
                 return;
             }
         }
 
-        if (stack.getCount() > stack.getMaxStackSize())
+        if (stack.getCount() > stack.getMaxStackSize()) {
             stack = stack.copyWithCount(1);
+        }
 
         BigItemStack newEntry = new BigItemStack(stack, count);
         stacks.add(newEntry);
@@ -94,13 +99,15 @@ public class InventorySummary {
 
     public boolean erase(ItemStack stack) {
         List<BigItemStack> stacks = items.get(stack.getItem());
-        if (stacks == null)
+        if (stacks == null) {
             return false;
+        }
         for (Iterator<BigItemStack> iterator = stacks.iterator(); iterator.hasNext(); ) {
             BigItemStack existing = iterator.next();
             ItemStack existingStack = existing.stack;
-            if (!ItemStack.isSameItemSameComponents(existingStack, stack))
+            if (!ItemStack.isSameItemSameComponents(existingStack, stack)) {
                 continue;
+            }
             totalCount -= existing.count;
             iterator.remove();
             return true;
@@ -110,20 +117,25 @@ public class InventorySummary {
 
     public int getCountOf(ItemStack stack) {
         List<BigItemStack> list = items.get(stack.getItem());
-        if (list == null)
+        if (list == null) {
             return 0;
-        for (BigItemStack entry : list)
-            if (ItemStack.isSameItemSameComponents(entry.stack, stack))
+        }
+        for (BigItemStack entry : list) {
+            if (ItemStack.isSameItemSameComponents(entry.stack, stack)) {
                 return entry.count;
+            }
+        }
         return 0;
     }
 
     public int getTotalOfMatching(Predicate<ItemStack> filter) {
         MutableInt sum = new MutableInt();
         items.forEach(($, list) -> {
-            for (BigItemStack entry : list)
-                if (filter.test(entry.stack))
+            for (BigItemStack entry : list) {
+                if (filter.test(entry.stack)) {
                     sum.add(entry.count);
+                }
+            }
         });
         return sum.getValue();
     }
@@ -156,27 +168,32 @@ public class InventorySummary {
 
         List<BigItemStack> currentList = null;
 
-        if (stacks.isEmpty())
+        if (stacks.isEmpty()) {
             player.connection.send(new LogisticalStockResponsePacket(true, pos, Collections.emptyList()));
+        }
 
         for (BigItemStack entry : stacks) {
-            if (currentList == null)
+            if (currentList == null) {
                 currentList = new ArrayList<>(Math.min(100, remaining));
+            }
 
             currentList.add(entry);
             remaining--;
 
-            if (remaining == 0)
+            if (remaining == 0) {
                 break;
-            if (currentList.size() < 100)
+            }
+            if (currentList.size() < 100) {
                 continue;
+            }
 
             player.connection.send(new LogisticalStockResponsePacket(false, pos, currentList));
             currentList = null;
         }
 
-        if (currentList != null)
+        if (currentList != null) {
             player.connection.send(new LogisticalStockResponsePacket(true, pos, currentList));
+        }
     }
 
     public boolean isEmpty() {

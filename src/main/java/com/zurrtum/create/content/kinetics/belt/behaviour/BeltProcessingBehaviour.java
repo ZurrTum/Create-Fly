@@ -1,10 +1,10 @@
 package com.zurrtum.create.content.kinetics.belt.behaviour;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.funnel.AbstractFunnelBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,9 +19,7 @@ public class BeltProcessingBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     public static final BehaviourType<BeltProcessingBehaviour> TYPE = new BehaviourType<>();
 
     public enum ProcessingResult {
-        PASS,
-        HOLD,
-        REMOVE;
+        PASS, HOLD, REMOVE;
     }
 
     private ProcessingCallback onItemEnter;
@@ -45,8 +43,9 @@ public class BeltProcessingBehaviour extends BlockEntityBehaviour<SmartBlockEnti
 
     public static boolean isBlocked(BlockGetter world, BlockPos processingSpace) {
         BlockState blockState = world.getBlockState(processingSpace.above());
-        if (AbstractFunnelBlock.isFunnel(blockState))
+        if (AbstractFunnelBlock.isFunnel(blockState)) {
             return false;
+        }
         return !blockState.getCollisionShape(world, processingSpace.above()).isEmpty();
     }
 
@@ -55,7 +54,10 @@ public class BeltProcessingBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         return TYPE;
     }
 
-    public ProcessingResult handleReceivedItem(TransportedItemStack stack, TransportedItemStackHandlerBehaviour inventory) {
+    public ProcessingResult handleReceivedItem(
+        TransportedItemStack stack,
+        TransportedItemStackHandlerBehaviour inventory
+    ) {
         return onItemEnter.apply(stack, inventory);
     }
 

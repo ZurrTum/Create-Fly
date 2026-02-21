@@ -28,16 +28,27 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
      * @param from  The source model orientation to rotate away from.
      * @param model The model to spin.
      */
-    public SingleAxisRotatingVisual(VisualizationContext context, T blockEntity, float partialTick, Direction from, Model model) {
+    public SingleAxisRotatingVisual(
+        VisualizationContext context,
+        T blockEntity,
+        float partialTick,
+        Direction from,
+        Model model
+    ) {
         super(context, blockEntity, partialTick);
-        rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, model).createInstance().rotateToFace(from, rotationAxis())
-            .setup(blockEntity).setPosition(getVisualPosition());
+        rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, model).createInstance()
+            .rotateToFace(from, rotationAxis()).setup(blockEntity).setPosition(getVisualPosition());
 
         rotatingModel.setChanged();
     }
 
     public static <T extends KineticBlockEntity> SimpleBlockEntityVisualizer.Factory<T> of(PartialModel partial) {
-        return (context, blockEntity, partialTick) -> new SingleAxisRotatingVisual<>(context, blockEntity, partialTick, Models.partial(partial));
+        return (context, blockEntity, partialTick) -> new SingleAxisRotatingVisual<>(
+            context,
+            blockEntity,
+            partialTick,
+            Models.partial(partial)
+        );
     }
 
     /**
@@ -53,8 +64,17 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
         );
     }
 
-    public static <T extends KineticBlockEntity> SingleAxisRotatingVisual<T> shaft(VisualizationContext context, T blockEntity, float partialTick) {
-        return new SingleAxisRotatingVisual<>(context, blockEntity, partialTick, Models.partial(AllPartialModels.SHAFT));
+    public static <T extends KineticBlockEntity> SingleAxisRotatingVisual<T> shaft(
+        VisualizationContext context,
+        T blockEntity,
+        float partialTick
+    ) {
+        return new SingleAxisRotatingVisual<>(
+            context,
+            blockEntity,
+            partialTick,
+            Models.partial(AllPartialModels.SHAFT)
+        );
     }
 
     public static <T extends KineticBlockEntity> SingleAxisRotatingVisual<T> backtank(

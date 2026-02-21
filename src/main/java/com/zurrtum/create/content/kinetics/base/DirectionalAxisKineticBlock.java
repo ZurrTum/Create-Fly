@@ -31,8 +31,9 @@ public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBloc
 
     protected Direction getFacingForPlacement(BlockPlaceContext context) {
         Direction facing = context.getNearestLookingDirection().getOpposite();
-        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())
+        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) {
             facing = facing.getOpposite();
+        }
         return facing;
     }
 
@@ -57,8 +58,9 @@ public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBloc
             boolean preferLeft = prefersConnectionTo(world, pos, positivePerpendicular, false);
             boolean preferRight = prefersConnectionTo(world, pos, positivePerpendicular.getOpposite(), false);
 
-            if (shaftAbove || shaftBelow || preferLeft || preferRight)
+            if (shaftAbove || shaftBelow || preferLeft || preferRight) {
                 alongFirst = faceAxis == Axis.X;
+            }
         }
 
         if (faceAxis.isVertical()) {
@@ -66,8 +68,14 @@ public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBloc
             Direction prefferedSide = null;
 
             for (Direction side : Iterate.horizontalDirections) {
-                if (!prefersConnectionTo(world, pos, side, true) && !prefersConnectionTo(world, pos, side.getClockWise(), false))
+                if (!prefersConnectionTo(world, pos, side, true) && !prefersConnectionTo(
+                    world,
+                    pos,
+                    side.getClockWise(),
+                    false
+                )) {
                     continue;
+                }
                 if (prefferedSide != null && prefferedSide.getAxis() != side.getAxis()) {
                     prefferedSide = null;
                     break;
@@ -75,20 +83,27 @@ public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBloc
                 prefferedSide = side;
             }
 
-            if (prefferedSide != null)
+            if (prefferedSide != null) {
                 alongFirst = prefferedSide.getAxis() == Axis.X;
+            }
         }
 
         return this.defaultBlockState().setValue(FACING, facing).setValue(AXIS_ALONG_FIRST_COORDINATE, alongFirst);
     }
 
     protected boolean prefersConnectionTo(LevelReader reader, BlockPos pos, Direction facing, boolean shaftAxis) {
-        if (!shaftAxis)
+        if (!shaftAxis) {
             return false;
+        }
         BlockPos neighbourPos = pos.relative(facing);
         BlockState blockState = reader.getBlockState(neighbourPos);
         Block block = blockState.getBlock();
-        return block instanceof IRotate && ((IRotate) block).hasShaftTowards(reader, neighbourPos, blockState, facing.getOpposite());
+        return block instanceof IRotate && ((IRotate) block).hasShaftTowards(
+            reader,
+            neighbourPos,
+            blockState,
+            facing.getOpposite()
+        );
     }
 
     @Override
@@ -96,20 +111,24 @@ public abstract class DirectionalAxisKineticBlock extends DirectionalKineticBloc
         Axis pistonAxis = state.getValue(FACING).getAxis();
         boolean alongFirst = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
 
-        if (pistonAxis == Axis.X)
+        if (pistonAxis == Axis.X) {
             return alongFirst ? Axis.Y : Axis.Z;
-        if (pistonAxis == Axis.Y)
+        }
+        if (pistonAxis == Axis.Y) {
             return alongFirst ? Axis.X : Axis.Z;
-        if (pistonAxis == Axis.Z)
+        }
+        if (pistonAxis == Axis.Z) {
             return alongFirst ? Axis.X : Axis.Y;
+        }
 
         throw new IllegalStateException("Unknown axis??");
     }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
-        if (rot.ordinal() % 2 == 1)
+        if (rot.ordinal() % 2 == 1) {
             state = state.cycle(AXIS_ALONG_FIRST_COORDINATE);
+        }
         return super.rotate(state, rot);
     }
 

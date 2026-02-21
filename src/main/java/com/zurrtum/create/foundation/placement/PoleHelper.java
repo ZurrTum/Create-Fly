@@ -24,15 +24,20 @@ public abstract class PoleHelper<T extends Comparable<T>> implements IPlacementH
     protected final Property<T> property;
     protected final Function<BlockState, Direction.Axis> axisFunction;
 
-    public PoleHelper(Predicate<BlockState> statePredicate, Function<BlockState, Direction.Axis> axisFunction, Property<T> property) {
+    public PoleHelper(
+        Predicate<BlockState> statePredicate,
+        Function<BlockState, Direction.Axis> axisFunction,
+        Property<T> property
+    ) {
         this.statePredicate = statePredicate;
         this.axisFunction = axisFunction;
         this.property = property;
     }
 
     public boolean matchesAxis(BlockState state, Direction.Axis axis) {
-        if (!statePredicate.test(state))
+        if (!statePredicate.test(state)) {
             return false;
+        }
 
         return axisFunction.apply(state) == axis;
     }
@@ -56,23 +61,30 @@ public abstract class PoleHelper<T extends Comparable<T>> implements IPlacementH
 
     @Override
     public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
-        List<Direction> directions = IPlacementHelper.orderedByDistance(pos, ray.getLocation(), dir -> dir.getAxis() == axisFunction.apply(state));
+        List<Direction> directions = IPlacementHelper.orderedByDistance(
+            pos,
+            ray.getLocation(),
+            dir -> dir.getAxis() == axisFunction.apply(state)
+        );
         for (Direction dir : directions) {
             int range = AllConfigs.server().equipment.placementAssistRange.get();
             if (player != null) {
                 AttributeInstance reach = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
-                if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier.id()))
+                if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier.id())) {
                     range += 4;
+                }
             }
             int poles = attachedPoles(world, pos, dir);
-            if (poles >= range)
+            if (poles >= range) {
                 continue;
+            }
 
             BlockPos newPos = pos.relative(dir, poles + 1);
             BlockState newState = world.getBlockState(newPos);
 
-            if (newState.canBeReplaced())
+            if (newState.canBeReplaced()) {
                 return PlacementOffset.success(newPos, bState -> bState.setValue(property, state.getValue(property)));
+            }
 
         }
 

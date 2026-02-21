@@ -25,16 +25,20 @@ public class RedstoneContactItem extends BlockItem {
         BlockPos pos = ctx.getClickedPos();
         BlockState state = super.getPlacementState(ctx);
 
-        if (state == null)
+        if (state == null) {
             return state;
-        if (!(state.getBlock() instanceof RedstoneContactBlock))
+        }
+        if (!(state.getBlock() instanceof RedstoneContactBlock)) {
             return state;
+        }
         Direction facing = state.getValue(RedstoneContactBlock.FACING);
-        if (facing.getAxis() == Axis.Y)
+        if (facing.getAxis() == Axis.Y) {
             return state;
+        }
 
-        if (ElevatorColumn.get(world, new ColumnCoords(pos.getX(), pos.getZ(), facing)) == null)
+        if (ElevatorColumn.get(world, new ColumnCoords(pos.getX(), pos.getZ(), facing)) == null) {
             return state;
+        }
 
         return BlockHelper.copyProperties(state, AllBlocks.ELEVATOR_CONTACT.defaultBlockState());
     }

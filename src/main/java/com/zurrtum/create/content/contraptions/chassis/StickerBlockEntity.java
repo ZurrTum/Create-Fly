@@ -33,8 +33,9 @@ public class StickerBlockEntity extends SmartBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
         piston.startWithValue(isBlockStateExtended() ? 1 : 0);
     }
 
@@ -46,21 +47,29 @@ public class StickerBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
         piston.tickChaser();
 
         if (isAttachedToBlock() && piston.getValue(0) != piston.getValue() && piston.getValue() == 1) {
-            AllClientHandle.INSTANCE.spawnSuperGlueParticles(level, worldPosition, getBlockState().getValue(StickerBlock.FACING), true);
+            AllClientHandle.INSTANCE.spawnSuperGlueParticles(
+                level,
+                worldPosition,
+                getBlockState().getValue(StickerBlock.FACING),
+                true
+            );
             playSound(true);
         }
 
-        if (!update)
+        if (!update) {
             return;
+        }
         update = false;
         int target = isBlockStateExtended() ? 1 : 0;
-        if (isAttachedToBlock() && target == 0 && piston.getChaseTarget() == 1)
+        if (isAttachedToBlock() && target == 0 && piston.getChaseTarget() == 1) {
             playSound(false);
+        }
         piston.chase(target, .4f, Chaser.LINEAR);
 
         AllClientHandle.INSTANCE.queueUpdate(this);
@@ -68,8 +77,9 @@ public class StickerBlockEntity extends SmartBlockEntity {
 
     public boolean isAttachedToBlock() {
         BlockState blockState = getBlockState();
-        if (!blockState.is(AllBlocks.STICKER))
+        if (!blockState.is(AllBlocks.STICKER)) {
             return false;
+        }
         Direction direction = blockState.getValue(StickerBlock.FACING);
         return SuperGlueEntity.isValidFace(level, worldPosition.relative(direction), direction.getOpposite());
     }
@@ -77,11 +87,18 @@ public class StickerBlockEntity extends SmartBlockEntity {
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             update = true;
+        }
     }
 
     public void playSound(boolean attach) {
-        AllSoundEvents.SLIME_ADDED.play(level, AllClientHandle.INSTANCE.getPlayer(), worldPosition, 0.35f, attach ? 0.75f : 0.2f);
+        AllSoundEvents.SLIME_ADDED.play(
+            level,
+            AllClientHandle.INSTANCE.getPlayer(),
+            worldPosition,
+            0.35f,
+            attach ? 0.75f : 0.2f
+        );
     }
 }

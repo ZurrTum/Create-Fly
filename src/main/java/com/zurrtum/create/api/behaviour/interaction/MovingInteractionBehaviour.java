@@ -19,7 +19,12 @@ import org.apache.commons.lang3.tuple.MutablePair;
 public abstract class MovingInteractionBehaviour {
     public static final SimpleRegistry<Block, MovingInteractionBehaviour> REGISTRY = SimpleRegistry.create();
 
-    protected void setContraptionActorData(AbstractContraptionEntity contraptionEntity, int index, StructureBlockInfo info, MovementContext ctx) {
+    protected void setContraptionActorData(
+        AbstractContraptionEntity contraptionEntity,
+        int index,
+        StructureBlockInfo info,
+        MovementContext ctx
+    ) {
         contraptionEntity.getContraption().getActors().remove(index);
         contraptionEntity.getContraption().getActors().add(index, MutablePair.of(info, ctx));
         if (contraptionEntity.level().isClientSide()) {
@@ -27,9 +32,14 @@ public abstract class MovingInteractionBehaviour {
         }
     }
 
-    protected void setContraptionBlockData(AbstractContraptionEntity contraptionEntity, BlockPos pos, StructureBlockInfo info) {
-        if (contraptionEntity.level().isClientSide())
+    protected void setContraptionBlockData(
+        AbstractContraptionEntity contraptionEntity,
+        BlockPos pos,
+        StructureBlockInfo info
+    ) {
+        if (contraptionEntity.level().isClientSide()) {
             return;
+        }
         contraptionEntity.setBlock(pos, info);
     }
 

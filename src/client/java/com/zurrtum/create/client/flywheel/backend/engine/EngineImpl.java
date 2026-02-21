@@ -35,7 +35,11 @@ public class EngineImpl implements Engine {
 
     private BlockPos renderOrigin = BlockPos.ZERO;
 
-    public EngineImpl(LevelAccessor level, DrawManager<? extends AbstractInstancer<?>> drawManager, int maxOriginDistance) {
+    public EngineImpl(
+        LevelAccessor level,
+        DrawManager<? extends AbstractInstancer<?>> drawManager,
+        int maxOriginDistance
+    ) {
         this.drawManager = drawManager;
         sqrMaxOriginDistance = maxOriginDistance * maxOriginDistance;
         environmentStorage = new EnvironmentStorage();
@@ -118,7 +122,12 @@ public class EngineImpl implements Engine {
         drawManager.triggerFallback();
     }
 
-    public <I extends Instance> Instancer<I> instancer(Environment environment, InstanceType<I> type, Model model, int bias) {
+    public <I extends Instance> Instancer<I> instancer(
+        Environment environment,
+        InstanceType<I> type,
+        Model model,
+        int bias
+    ) {
         return drawManager.getInstancer(environment, type, model, bias);
     }
 

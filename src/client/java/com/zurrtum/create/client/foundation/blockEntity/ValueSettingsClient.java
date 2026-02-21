@@ -1,16 +1,13 @@
 package com.zurrtum.create.client.foundation.blockEntity;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsBehaviour;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsInputHandler;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
-
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,6 +17,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+
+import java.util.List;
 
 public class ValueSettingsClient {
     public int interactHeldTicks = -1;
@@ -54,12 +53,15 @@ public class ValueSettingsClient {
     }
 
     public void tick(Minecraft mc) {
-        if (hoverWarmup > 0)
+        if (hoverWarmup > 0) {
             hoverWarmup--;
-        if (hoverTicks > 0)
+        }
+        if (hoverTicks > 0) {
             hoverTicks--;
-        if (interactHeldTicks == -1)
+        }
+        if (interactHeldTicks == -1) {
             return;
+        }
         LocalPlayer player = mc.player;
 
         if (!ValueSettingsInputHandler.canInteract(player) || player.getMainHandItem().is(AllItems.CLIPBOARD)) {
@@ -67,13 +69,14 @@ public class ValueSettingsClient {
             return;
         }
         HitResult hitResult = mc.hitResult;
-        if (!(hitResult instanceof BlockHitResult blockHitResult) || !blockHitResult.getBlockPos().equals(interactHeldPos)) {
+        if (!(hitResult instanceof BlockHitResult blockHitResult) || !blockHitResult.getBlockPos()
+            .equals(interactHeldPos)) {
             cancelInteraction();
             return;
         }
         BlockEntityBehaviour<?> behaviour = BlockEntityBehaviour.get(mc.level, interactHeldPos, interactHeldBehaviour);
-        if (!(behaviour instanceof ValueSettingsBehaviour valueSettingBehaviour) || valueSettingBehaviour.bypassesInput(player.getMainHandItem()) || !valueSettingBehaviour.testHit(
-            blockHitResult.getLocation())) {
+        if (!(behaviour instanceof ValueSettingsBehaviour valueSettingBehaviour) || valueSettingBehaviour.bypassesInput(
+            player.getMainHandItem()) || !valueSettingBehaviour.testHit(blockHitResult.getLocation())) {
             cancelInteraction();
             return;
         }
@@ -93,10 +96,12 @@ public class ValueSettingsClient {
             return;
         }
 
-        if (interactHeldTicks > 3)
+        if (interactHeldTicks > 3) {
             player.swinging = false;
-        if (interactHeldTicks++ < 5)
+        }
+        if (interactHeldTicks++ < 5) {
             return;
+        }
         ScreenOpener.open(new ValueSettingsScreen(
             interactHeldPos,
             valueSettingBehaviour.createBoard(player, blockHitResult),
@@ -108,22 +113,26 @@ public class ValueSettingsClient {
     }
 
     public void showHoverTip(Minecraft mc, List<MutableComponent> tip) {
-        if (mc.screen != null)
+        if (mc.screen != null) {
             return;
+        }
         if (hoverWarmup < 6) {
             hoverWarmup += 2;
             return;
-        } else
+        } else {
             hoverWarmup++;
+        }
         hoverTicks = hoverTicks == 0 ? 11 : Math.max(hoverTicks, 6);
         lastHoverTip = tip;
     }
 
     public void render(Minecraft mc, GuiGraphics guiGraphics) {
-        if (!ValueSettingsInputHandler.canInteract(mc.player))
+        if (!ValueSettingsInputHandler.canInteract(mc.player)) {
             return;
-        if (hoverTicks == 0 || lastHoverTip == null)
+        }
+        if (hoverTicks == 0 || lastHoverTip == null) {
             return;
+        }
 
         int x = guiGraphics.guiWidth() / 2;
         int y = guiGraphics.guiHeight() - 75 - lastHoverTip.size() * 12;

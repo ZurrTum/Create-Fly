@@ -44,10 +44,12 @@ public class TrackBlockOutline {
     public static BezierPointSelection result;
 
     public static void pickCurves(Minecraft mc) {
-        if (!(mc.getCameraEntity() instanceof LocalPlayer player))
+        if (!(mc.getCameraEntity() instanceof LocalPlayer player)) {
             return;
-        if (mc.level == null)
+        }
+        if (mc.level == null) {
             return;
+        }
 
         Vec3 origin = player.getEyePosition(AnimationTickHolder.getPartialTicks(mc.level));
 
@@ -61,12 +63,14 @@ public class TrackBlockOutline {
 
         for (TrackBlockEntity be : turns.values()) {
             for (BezierConnection bc : be.getConnections().values()) {
-                if (!bc.isPrimary())
+                if (!bc.isPrimary()) {
                     continue;
+                }
 
                 AABB bounds = bc.getBounds();
-                if (!bounds.contains(origin) && bounds.clip(origin, target).isEmpty())
+                if (!bounds.contains(origin) && bounds.clip(origin, target).isEmpty()) {
                     continue;
+                }
 
                 float[] stepLUT = bc.getStepLUT();
                 int segments = (int) (bc.getLength() * 2);
@@ -96,15 +100,18 @@ public class TrackBlockOutline {
                     localDirection = VecHelper.rotate(localDirection, AngleHelper.deg(-angles.y), Axis.Y);
 
                     Optional<Vec3> clip = segmentBounds.clip(localOrigin, localOrigin.add(localDirection));
-                    if (clip.isEmpty())
+                    if (clip.isEmpty()) {
                         continue;
+                    }
 
-                    if (bestSegment != -1 && bestDistance < clip.get().distanceToSqr(0, 0.25f, 0))
+                    if (bestSegment != -1 && bestDistance < clip.get().distanceToSqr(0, 0.25f, 0)) {
                         continue;
+                    }
 
                     double distanceToSqr = clip.get().distanceToSqr(localOrigin);
-                    if (distanceToSqr > maxRange)
+                    if (distanceToSqr > maxRange) {
                         continue;
+                    }
 
                     bestSegment = i;
                     newMaxRange = distanceToSqr;
@@ -114,13 +121,15 @@ public class TrackBlockOutline {
                     result = new BezierPointSelection(be, location, anchor, angles, diff.normalize());
                 }
 
-                if (bestSegment != -1)
+                if (bestSegment != -1) {
                     maxRange = newMaxRange;
+                }
             }
         }
 
-        if (result == null)
+        if (result == null) {
             return;
+        }
 
         if (mc.hitResult != null && mc.hitResult.getType() != Type.MISS) {
             Vec3 priorLoc = mc.hitResult.getLocation();
@@ -129,31 +138,41 @@ public class TrackBlockOutline {
     }
 
     public static void drawCurveSelection(Minecraft mc, PoseStack ms, MultiBufferSource buffer, Vec3 camera) {
-        if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
+        if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
             return;
+        }
 
         BezierPointSelection result = TrackBlockOutline.result;
-        if (result == null)
+        if (result == null) {
             return;
+        }
 
         VertexConsumer vb = buffer.getBuffer(RenderTypes.lines());
         Vec3 vec = result.vec().subtract(camera);
         Vec3 angles = result.angles();
-        TransformStack.of(ms).pushPose().translate(vec.x, vec.y + .125f, vec.z).rotateY((float) angles.y).rotateX((float) angles.x)
-            .translate(-.5, -.125f, -.5);
+        TransformStack.of(ms).pushPose().translate(vec.x, vec.y + .125f, vec.z).rotateY((float) angles.y)
+            .rotateX((float) angles.x).translate(-.5, -.125f, -.5);
 
         boolean holdingTrack = mc.player.getMainHandItem().is(AllItemTags.TRACKS);
         renderShape(AllShapes.TRACK_ORTHO.get(Direction.SOUTH), ms, vb, holdingTrack ? false : null);
         ms.popPose();
     }
 
-    public static boolean drawCustomBlockSelection(Minecraft mc, BlockPos pos, MultiBufferSource vertexConsumers, Vec3 camPos, PoseStack ms) {
+    public static boolean drawCustomBlockSelection(
+        Minecraft mc,
+        BlockPos pos,
+        MultiBufferSource vertexConsumers,
+        Vec3 camPos,
+        PoseStack ms
+    ) {
         BlockState blockstate = mc.level.getBlockState(pos);
 
-        if (!(blockstate.getBlock() instanceof TrackBlock))
+        if (!(blockstate.getBlock() instanceof TrackBlock)) {
             return false;
-        if (!mc.level.getWorldBorder().isWithinBounds(pos))
+        }
+        if (!mc.level.getWorldBorder().isWithinBounds(pos)) {
             return false;
+        }
 
         VertexConsumer vb = vertexConsumers.getBuffer(RenderTypes.lines());
 
@@ -204,30 +223,35 @@ public class TrackBlockOutline {
                 g = 0.25f;
             }
 
-            vb.addVertex(transform.pose(), (float) x1, (float) y1, (float) z1).setColor(r, g, b, .4f).setNormal(transform.copy(), xDiff, yDiff, zDiff)
-                .setLineWidth(1);
-            vb.addVertex(transform.pose(), (float) x2, (float) y2, (float) z2).setColor(r, g, b, .4f).setNormal(transform.copy(), xDiff, yDiff, zDiff)
-                .setLineWidth(1);
+            vb.addVertex(transform.pose(), (float) x1, (float) y1, (float) z1).setColor(r, g, b, .4f)
+                .setNormal(transform.copy(), xDiff, yDiff, zDiff).setLineWidth(1);
+            vb.addVertex(transform.pose(), (float) x2, (float) y2, (float) z2).setColor(r, g, b, .4f)
+                .setNormal(transform.copy(), xDiff, yDiff, zDiff).setLineWidth(1);
 
         });
     }
 
-    private static final VoxelShape LONG_CROSS = Shapes.or(TrackVoxelShapes.longOrthogonalZ(), TrackVoxelShapes.longOrthogonalX());
+    private static final VoxelShape LONG_CROSS = Shapes.or(
+        TrackVoxelShapes.longOrthogonalZ(),
+        TrackVoxelShapes.longOrthogonalX()
+    );
     private static final VoxelShape LONG_ORTHO = TrackVoxelShapes.longOrthogonalZ();
     private static final VoxelShape LONG_ORTHO_OFFSET = TrackVoxelShapes.longOrthogonalZOffset();
 
     private static void walkShapes(TrackShape shape, TransformStack<?> msr, Consumer<VoxelShape> renderer) {
         float angle45 = Mth.PI / 4;
 
-        if (shape == TrackShape.XO || shape == TrackShape.CR_NDX || shape == TrackShape.CR_PDX)
+        if (shape == TrackShape.XO || shape == TrackShape.CR_NDX || shape == TrackShape.CR_PDX) {
             renderer.accept(AllShapes.TRACK_ORTHO.get(Direction.EAST));
-        else if (shape == TrackShape.ZO || shape == TrackShape.CR_NDZ || shape == TrackShape.CR_PDZ)
+        } else if (shape == TrackShape.ZO || shape == TrackShape.CR_NDZ || shape == TrackShape.CR_PDZ) {
             renderer.accept(AllShapes.TRACK_ORTHO.get(Direction.SOUTH));
+        }
 
         if (shape.isPortal()) {
             for (Direction d : Iterate.horizontalDirections) {
-                if (TrackShape.asPortal(d) != shape)
+                if (TrackShape.asPortal(d) != shape) {
                     continue;
+                }
                 msr.rotateCentered(AngleHelper.rad(AngleHelper.horizontalAngle(d)), Direction.UP);
                 renderer.accept(LONG_ORTHO_OFFSET);
                 return;
@@ -242,15 +266,16 @@ public class TrackBlockOutline {
             renderer.accept(LONG_ORTHO);
         }
 
-        if (shape == TrackShape.CR_O)
+        if (shape == TrackShape.CR_O) {
             renderer.accept(AllShapes.TRACK_CROSS);
-        else if (shape == TrackShape.CR_D) {
+        } else if (shape == TrackShape.CR_D) {
             msr.rotateCentered(angle45, Direction.UP);
             renderer.accept(LONG_CROSS);
         }
 
-        if (!(shape == TrackShape.AE || shape == TrackShape.AN || shape == TrackShape.AW || shape == TrackShape.AS))
+        if (!(shape == TrackShape.AE || shape == TrackShape.AN || shape == TrackShape.AW || shape == TrackShape.AS)) {
             return;
+        }
 
         msr.translate(0, 1, 0);
         msr.rotateCentered(Mth.PI - AngleHelper.rad(shape.getModelRotation()), Direction.UP);
@@ -259,9 +284,8 @@ public class TrackBlockOutline {
         renderer.accept(LONG_ORTHO);
     }
 
-    public record BezierPointSelection(
-        TrackBlockEntity blockEntity, BezierTrackPointLocation loc, Vec3 vec, Vec3 angles, Vec3 direction
-    ) {
+    public record BezierPointSelection(TrackBlockEntity blockEntity, BezierTrackPointLocation loc, Vec3 vec,
+                                       Vec3 angles, Vec3 direction) {
     }
 
     public static void registerToCurveInteraction(TrackBlockEntity be) {

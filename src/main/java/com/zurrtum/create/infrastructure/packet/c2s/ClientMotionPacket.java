@@ -11,7 +11,8 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.phys.Vec3;
 
-public record ClientMotionPacket(Vec3 motion, boolean onGround, float limbSwing) implements Packet<ServerGamePacketListener> {
+public record ClientMotionPacket(Vec3 motion, boolean onGround,
+                                 float limbSwing) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMotionPacket> CODEC = StreamCodec.composite(
         Vec3.STREAM_CODEC,
         ClientMotionPacket::motion,

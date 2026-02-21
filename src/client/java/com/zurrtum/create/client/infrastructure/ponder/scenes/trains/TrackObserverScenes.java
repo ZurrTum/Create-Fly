@@ -49,7 +49,8 @@ public class TrackObserverScenes {
         Vec3 target = util.vector().topOf(5, 0, 7);
         AABB bb = new AABB(target, target).move(0, 2 / 16f, 0);
 
-        scene.overlay().showControls(target, Pointing.DOWN, 40).rightClick().withItem(AllItems.TRACK_OBSERVER.getDefaultInstance());
+        scene.overlay().showControls(target, Pointing.DOWN, 40).rightClick()
+            .withItem(AllItems.TRACK_OBSERVER.getDefaultInstance());
         scene.idle(6);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb, 1);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.inflate(.45f, 1 / 16f, .45f), 60);
@@ -64,8 +65,8 @@ public class TrackObserverScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, new AABB(util.grid().at(5, 1, 4)), 20);
         scene.idle(25);
 
-        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(5, 1, 4), Direction.WEST)).attachKeyFrame().placeNearTarget()
-            .text("The Observer will detect any Trains passing over the marker");
+        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(5, 1, 4), Direction.WEST))
+            .attachKeyFrame().placeNearTarget().text("The Observer will detect any Trains passing over the marker");
         scene.idle(20);
         scene.world().showSection(redstone, Direction.SOUTH);
         scene.idle(30);
@@ -74,7 +75,8 @@ public class TrackObserverScenes {
         scene.world().moveSection(trainInstance1, util.vector().of(6, 0, 0), 0);
         scene.world().moveSection(trainInstance1, util.vector().of(-16, 0, 0), 80);
         scene.world().animateBogey(util.grid().at(5, 2, 7), 16, 80);
-        ElementLink<ParrotElement> birb = scene.special().createBirb(util.vector().centerOf(12, 3, 7), ParrotPose.FacePointOfInterestPose::new);
+        ElementLink<ParrotElement> birb = scene.special()
+            .createBirb(util.vector().centerOf(12, 3, 7), ParrotPose.FacePointOfInterestPose::new);
         scene.special().moveParrot(birb, util.vector().of(-16, 0, 0), 80);
         scene.idle(10);
 

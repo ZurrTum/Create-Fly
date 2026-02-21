@@ -1,5 +1,7 @@
 package com.zurrtum.create.catnip.data;
 
+import net.minecraft.world.level.LevelAccessor;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +10,6 @@ import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import net.minecraft.world.level.LevelAccessor;
 
 public class WorldAttached<T> {
 
@@ -42,8 +42,9 @@ public class WorldAttached<T> {
 
     public T get(LevelAccessor world) {
         T t = attached.get(world);
-        if (t != null)
+        if (t != null) {
             return t;
+        }
         T entry = factory.apply(world);
         put(world, entry);
         return entry;
@@ -68,8 +69,9 @@ public class WorldAttached<T> {
     public T replace(LevelAccessor world, Consumer<T> finalizer) {
         T remove = attached.remove(world);
 
-        if (remove != null)
+        if (remove != null) {
             finalizer.accept(remove);
+        }
 
         return get(world);
     }

@@ -54,7 +54,11 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
             space = stack.getMaxStackSize() - count;
         }
         if (space != 0) {
-            ItemStack extract = contentHolder.inventory.takeFromCompartment(space, index + 1, index + STACKS_PER_COMPARTMENT - 1);
+            ItemStack extract = contentHolder.inventory.takeFromCompartment(
+                space,
+                index + 1,
+                index + STACKS_PER_COMPARTMENT - 1
+            );
             if (!extract.isEmpty()) {
                 if (count == 0) {
                     stack = extract;
@@ -87,7 +91,10 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
                 }
             }
 
-            if (type == ClickType.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.level().isClientSide()) {
+            if (type == ClickType.PICKUP && carried.isEmpty() && settle(
+                itemInClickedSlot,
+                index
+            ).isEmpty() && !player.level().isClientSide()) {
                 contentHolder.inventory.filters.set(index / STACKS_PER_COMPARTMENT, ItemStack.EMPTY);
                 contentHolder.sendData();
             }
@@ -108,8 +115,9 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
     public int totalCountInCompartment(int compartment) {
         int count = 0;
         int baseSlot = compartment * STACKS_PER_COMPARTMENT;
-        for (int i = 0; i < STACKS_PER_COMPARTMENT; i++)
+        for (int i = 0; i < STACKS_PER_COMPARTMENT; i++) {
             count += getSlot(baseSlot + i).getItem().getCount();
+        }
         return count;
     }
 
@@ -132,8 +140,9 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
             addSlot(new ToolboxSlot(this, inventory, baseIndex, xOffsets[compartment], yOffsets[compartment], true));
 
             // Hidden Slots
-            for (int i = 1; i < STACKS_PER_COMPARTMENT; i++)
+            for (int i = 1; i < STACKS_PER_COMPARTMENT; i++) {
                 addSlot(new ToolboxSlot(this, inventory, baseIndex + i, -10000, -10000, false));
+            }
         }
 
         addPlayerSlots(8, 165);
@@ -147,8 +156,9 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
     @Override
     public void removed(Player playerIn) {
         super.removed(playerIn);
-        if (!playerIn.level().isClientSide())
+        if (!playerIn.level().isClientSide()) {
             BlockEntityBehaviour.get(contentHolder, AnimatedContainerBehaviour.TYPE).stopOpen(playerIn);
+        }
     }
 
 }

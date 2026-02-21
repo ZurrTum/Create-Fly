@@ -52,7 +52,16 @@ public class BlockRenderDispatcherMixin {
             singleThreadPartList.clear();
             wrapper.addPartsWithInfo(world, pos, state, singleThreadRandom, singleThreadPartList);
             if (!singleThreadPartList.isEmpty()) {
-                modelRenderer.tesselateBlock(world, this.singleThreadPartList, state, pos, matrices, vertexConsumer, true, OverlayTexture.NO_OVERLAY);
+                modelRenderer.tesselateBlock(
+                    world,
+                    this.singleThreadPartList,
+                    state,
+                    pos,
+                    matrices,
+                    vertexConsumer,
+                    true,
+                    OverlayTexture.NO_OVERLAY
+                );
             }
             ci.cancel();
         }

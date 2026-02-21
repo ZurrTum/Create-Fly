@@ -11,7 +11,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBlock) implements Packet<ClientGamePacketListener> {
+public record GlueEffectPacket(BlockPos pos, Direction direction,
+                               boolean fullBlock) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, GlueEffectPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         GlueEffectPacket::pos,

@@ -32,10 +32,11 @@ public class SymmetryPlacementContext extends BlockPlaceContext {
     ) {
         super(
             world, player, hand, stack, new BlockHitResult(
-                new Vec3(position.getX() + 0.5 + direction.getStepX() * 0.5, y, position.getZ() + 0.5 + direction.getStepZ() * 0.5),
-                direction,
-                position,
-                false
+                new Vec3(
+                    position.getX() + 0.5 + direction.getStepX() * 0.5,
+                    y,
+                    position.getZ() + 0.5 + direction.getStepZ() * 0.5
+                ), direction, position, false
             )
         );
         if (!canReplaceExisting) {

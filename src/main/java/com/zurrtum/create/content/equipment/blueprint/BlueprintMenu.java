@@ -5,9 +5,6 @@ import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity.BlueprintSection;
 import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-
-import java.util.Optional;
-
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +18,8 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+
+import java.util.Optional;
 
 public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
     public BlueprintMenu(int id, Inventory inv, BlueprintSection section) {
@@ -39,9 +38,11 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
         int x = 29;
         int y = 21;
         int index = 0;
-        for (int row = 0; row < 3; ++row)
-            for (int col = 0; col < 3; ++col)
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 3; ++col) {
                 this.addSlot(new BlueprintCraftSlot(ghostInventory, index++, x + col * 18, y + row * 18));
+            }
+        }
 
         addSlot(new BlueprintCraftSlot(ghostInventory, index++, 123, 40));
         addSlot(new Slot(ghostInventory, index++, 135, 57));
@@ -49,21 +50,30 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
 
     public void onCraftMatrixChanged() {
         Level level = contentHolder.getBlueprintWorld();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         ServerPlayer serverplayerentity = (ServerPlayer) player;
         CraftingInput input = CraftingInput.of(3, 3, ghostInventory.getStacks().subList(0, 9));
-        Optional<RecipeHolder<CraftingRecipe>> optional = ((ServerLevel) level).recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, level);
+        Optional<RecipeHolder<CraftingRecipe>> optional = ((ServerLevel) level).recipeAccess()
+            .getRecipeFor(RecipeType.CRAFTING, input, level);
 
         if (optional.isEmpty()) {
-            if (ghostInventory.getItem(9).isEmpty())
+            if (ghostInventory.getItem(9).isEmpty()) {
                 return;
-            if (!contentHolder.inferredIcon)
+            }
+            if (!contentHolder.inferredIcon) {
                 return;
+            }
 
             ghostInventory.setItem(9, ItemStack.EMPTY);
-            serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(containerId, incrementStateId(), 45, ItemStack.EMPTY));
+            serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(
+                containerId,
+                incrementStateId(),
+                45,
+                ItemStack.EMPTY
+            ));
             contentHolder.inferredIcon = false;
             return;
         }
@@ -74,7 +84,12 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
         contentHolder.inferredIcon = true;
         ItemStack toSend = itemstack.copy();
         toSend.set(AllDataComponents.INFERRED_FROM_RECIPE, true);
-        serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(containerId, incrementStateId(), 45, toSend));
+        serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(
+            containerId,
+            incrementStateId(),
+            45,
+            toSend
+        ));
     }
 
     @Override
@@ -119,7 +134,12 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
                 if (hasItem() && !contentHolder.getBlueprintWorld().isClientSide()) {
                     contentHolder.inferredIcon = false;
                     ServerPlayer serverplayerentity = (ServerPlayer) player;
-                    serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(containerId, incrementStateId(), 45, getItem()));
+                    serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(
+                        containerId,
+                        incrementStateId(),
+                        45,
+                        getItem()
+                    ));
                 }
             } else if (index < 9) {
                 onCraftMatrixChanged();

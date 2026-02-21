@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.processing.burner;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
@@ -10,11 +11,6 @@ import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,6 +24,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
@@ -55,7 +54,10 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         goggles = false;
         stockKeeper = false;
 
-        headAngle.startWithValue((AngleHelper.horizontalAngle(state.getValueOrElse(BlazeBurnerBlock.FACING, Direction.SOUTH)) + 180) % 360);
+        headAngle.startWithValue((AngleHelper.horizontalAngle(state.getValueOrElse(
+            BlazeBurnerBlock.FACING,
+            Direction.SOUTH
+        )) + 180) % 360);
     }
 
     public FuelType getActiveFuel() {
@@ -76,27 +78,33 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
         if (level.isClientSide()) {
             AllClientHandle.INSTANCE.tickBlazeBurnerAnimation(this);
-            if (!isVirtual())
+            if (!isVirtual()) {
                 spawnParticles(getHeatLevelFromBlock(), 1);
+            }
             return;
         }
 
-        if (isCreative)
+        if (isCreative) {
             return;
+        }
 
-        if (remainingBurnTime > 0)
+        if (remainingBurnTime > 0) {
             remainingBurnTime--;
+        }
 
-        if (activeFuel == FuelType.NORMAL)
+        if (activeFuel == FuelType.NORMAL) {
             updateBlockState();
-        if (remainingBurnTime > 0)
+        }
+        if (remainingBurnTime > 0) {
             return;
+        }
 
         if (activeFuel == FuelType.SPECIAL) {
             activeFuel = FuelType.NORMAL;
             remainingBurnTime = MAX_HEAT_CAPACITY / 2;
-        } else
+        } else {
             activeFuel = FuelType.NONE;
+        }
 
         updateBlockState();
     }
@@ -110,13 +118,16 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
     @Nullable
     public static StockTickerBlockEntity getStockTicker(LevelAccessor level, BlockPos pos) {
         for (Direction direction : Iterate.horizontalDirections) {
-            if (level instanceof Level l && !l.isLoaded(pos))
+            if (level instanceof Level l && !l.isLoaded(pos)) {
                 return null;
+            }
             BlockState blockState = level.getBlockState(pos.relative(direction));
-            if (!blockState.is(AllBlocks.STOCK_TICKER))
+            if (!blockState.is(AllBlocks.STOCK_TICKER)) {
                 continue;
-            if (level.getBlockEntity(pos.relative(direction)) instanceof StockTickerBlockEntity stbe)
+            }
+            if (level.getBlockEntity(pos.relative(direction)) instanceof StockTickerBlockEntity stbe) {
                 return stbe;
+            }
         }
         return null;
     }
@@ -130,12 +141,15 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         if (!isCreative) {
             view.putInt("fuelLevel", activeFuel.ordinal());
             view.putInt("burnTimeRemaining", remainingBurnTime);
-        } else
+        } else {
             view.putBoolean("isCreative", true);
-        if (goggles)
+        }
+        if (goggles) {
             view.putBoolean("Goggles", true);
-        if (hat)
+        }
+        if (hat) {
             view.putBoolean("TrainHat", true);
+        }
         super.write(view, clientPacket);
     }
 
@@ -155,8 +169,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
     public BlazeBurnerBlock.HeatLevel getHeatLevelForRender() {
         HeatLevel heatLevel = getHeatLevelFromBlock();
-        if (!heatLevel.isAtLeast(HeatLevel.FADING) && stockKeeper)
+        if (!heatLevel.isAtLeast(HeatLevel.FADING) && stockKeeper) {
             return HeatLevel.FADING;
+        }
         return heatLevel;
     }
 
@@ -166,8 +181,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
     protected void setBlockHeat(HeatLevel heat) {
         HeatLevel inBlockState = getHeatLevelFromBlock();
-        if (inBlockState == heat)
+        if (inBlockState == heat) {
             return;
+        }
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(BlazeBurnerBlock.HEAT_LEVEL, heat));
         notifyUpdate();
     }
@@ -177,8 +193,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
      * consumed
      */
     protected boolean tryUpdateFuel(ItemStack itemStack, boolean forceOverflow, boolean simulate) {
-        if (isCreative)
+        if (isCreative) {
             return false;
+        }
 
         FuelType newFuel = FuelType.NONE;
         int newBurnTime;
@@ -196,10 +213,12 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
             }
         }
 
-        if (newFuel == FuelType.NONE)
+        if (newFuel == FuelType.NONE) {
             return false;
-        if (newFuel.ordinal() < activeFuel.ordinal())
+        }
+        if (newFuel.ordinal() < activeFuel.ordinal()) {
             return false;
+        }
 
         if (newFuel == activeFuel) {
             if (remainingBurnTime <= INSERTION_THRESHOLD) {
@@ -215,8 +234,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
             }
         }
 
-        if (simulate)
+        if (simulate) {
             return true;
+        }
 
         activeFuel = newFuel;
         remainingBurnTime = newBurnTime;
@@ -230,7 +250,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         playSound();
         updateBlockState();
 
-        if (prev != getHeatLevelFromBlock())
+        if (prev != getHeatLevelFromBlock()) {
             level.playSound(
                 null,
                 worldPosition,
@@ -239,6 +259,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
                 .125f + level.random.nextFloat() * .125f,
                 1.15f - level.random.nextFloat() * .25f
             );
+        }
 
         return true;
     }
@@ -256,8 +277,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         }
 
         playSound();
-        if (next == HeatLevel.FADING)
+        if (next == HeatLevel.FADING) {
             next = next.nextActiveLevel();
+        }
         setBlockHeat(next);
     }
 
@@ -266,8 +288,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
     }
 
     public boolean isValidBlockAbove() {
-        if (isVirtual())
+        if (isVirtual()) {
             return false;
+        }
         BlockState blockState = level.getBlockState(worldPosition.above());
         return BasinBlock.isBasin(level, worldPosition.above()) || blockState.getBlock() instanceof FluidTankBlock;
     }
@@ -296,23 +319,28 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
     }
 
     protected void spawnParticles(HeatLevel heatLevel, double burstMult) {
-        if (level == null)
+        if (level == null) {
             return;
-        if (heatLevel == BlazeBurnerBlock.HeatLevel.NONE)
+        }
+        if (heatLevel == BlazeBurnerBlock.HeatLevel.NONE) {
             return;
+        }
 
         RandomSource r = level.getRandom();
 
         Vec3 c = VecHelper.getCenterOf(worldPosition);
         Vec3 v = c.add(VecHelper.offsetRandomly(Vec3.ZERO, r, .125f).multiply(1, 0, 1));
 
-        if (r.nextInt(4) != 0)
+        if (r.nextInt(4) != 0) {
             return;
+        }
 
-        boolean empty = level.getBlockState(worldPosition.above()).getCollisionShape(level, worldPosition.above()).isEmpty();
+        boolean empty = level.getBlockState(worldPosition.above()).getCollisionShape(level, worldPosition.above())
+            .isEmpty();
 
-        if (empty || r.nextInt(8) == 0)
+        if (empty || r.nextInt(8) == 0) {
             level.addParticle(ParticleTypes.LARGE_SMOKE, v.x, v.y, v.z, 0, 0, 0);
+        }
 
         double yMotion = empty ? .0625f : r.nextDouble() * .0125f;
         Vec3 v2 = c.add(VecHelper.offsetRandomly(Vec3.ZERO, r, .5f).multiply(1, .25f, 1).normalize()
@@ -333,14 +361,20 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
             Vec3 v = c.add(offset.scale(.5 + r.nextDouble() * .125f)).add(0, .125, 0);
             Vec3 m = offset.scale(1 / 32f);
 
-            level.addParticle(soulFlame ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME, v.x, v.y, v.z, m.x, m.y, m.z);
+            level.addParticle(
+                soulFlame ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME,
+                v.x,
+                v.y,
+                v.z,
+                m.x,
+                m.y,
+                m.z
+            );
         }
     }
 
     public enum FuelType {
-        NONE,
-        NORMAL,
-        SPECIAL
+        NONE, NORMAL, SPECIAL
     }
 
 }

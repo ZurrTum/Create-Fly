@@ -35,7 +35,13 @@ public class CTModel extends WrapperBlockStateModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         int[] indices = createCTData(world, pos, state);
         for (BlockModelPart part : model.collectParts(random)) {
             QuadCollection.Builder builder = new QuadCollection.Builder();

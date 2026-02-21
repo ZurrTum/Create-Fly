@@ -22,7 +22,10 @@ public class AllPotatoProjectileTransforms {
         return (PotatoProjectileTransform<T>) ALL.get(renderMode.getClass());
     }
 
-    private static <T extends PotatoProjectileRenderMode> void register(Class<T> renderMode, PotatoProjectileTransform<T> transform) {
+    private static <T extends PotatoProjectileRenderMode> void register(
+        Class<T> renderMode,
+        PotatoProjectileTransform<T> transform
+    ) {
         ALL.put(renderMode, transform);
     }
 
@@ -33,20 +36,27 @@ public class AllPotatoProjectileTransforms {
                 Vec3 diff = state.box.getCenter().subtract(p1);
 
                 TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(Mth.atan2(diff.x, diff.z)) + 180)
-                    .rotateXDegrees(AngleHelper.deg(Mth.atan2(diff.y, Mth.sqrt((float) (diff.x * diff.x + diff.z * diff.z)))));
+                    .rotateXDegrees(AngleHelper.deg(Mth.atan2(
+                        diff.y,
+                        Mth.sqrt((float) (diff.x * diff.x + diff.z * diff.z))
+                    )));
             }
         );
         register(
             Tumble.class, (mode, ms, state) -> {
                 get(Billboard.INSTANCE).transform(Billboard.INSTANCE, ms, state);
-                TransformStack.of(ms).rotateZDegrees(state.ageInTicks * 2 * (state.hash % 16)).rotateXDegrees(state.ageInTicks * (state.hash % 32));
+                TransformStack.of(ms).rotateZDegrees(state.ageInTicks * 2 * (state.hash % 16))
+                    .rotateXDegrees(state.ageInTicks * (state.hash % 32));
             }
         );
         register(
             TowardMotion.class, (mode, ms, state) -> {
                 Vec3 diff = state.velocity;
                 TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(Mth.atan2(diff.x, diff.z)))
-                    .rotateXDegrees(270 + AngleHelper.deg(Mth.atan2(diff.y, -Mth.sqrt((float) (diff.x * diff.x + diff.z * diff.z)))));
+                    .rotateXDegrees(270 + AngleHelper.deg(Mth.atan2(
+                        diff.y,
+                        -Mth.sqrt((float) (diff.x * diff.x + diff.z * diff.z))
+                    )));
                 TransformStack.of(ms).rotateYDegrees(state.ageInTicks * 20 * mode.spin() + (state.hash % 360))
                     .rotateZDegrees(-mode.spriteAngleOffset());
             }

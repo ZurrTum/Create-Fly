@@ -12,20 +12,20 @@ import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.client.foundation.render.SpecialModels;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class StandardBogeyVisual implements BogeyVisual {
     private final TransformedInstance shaft1;
     private final TransformedInstance shaft2;
 
     public StandardBogeyVisual(VisualizationContext ctx, float partialTick, boolean inContraption) {
-        var shaftInstancer = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.SHAFT));
+        var shaftInstancer = ctx.instancerProvider()
+            .instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.SHAFT));
 
         shaft1 = shaftInstancer.createInstance();
         shaft2 = shaftInstancer.createInstance();
@@ -33,10 +33,10 @@ public class StandardBogeyVisual implements BogeyVisual {
 
     @Override
     public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {
-        shaft1.setTransform(poseStack).translate(-.5f, .25f, 0).center().rotateTo(Direction.UP, Direction.SOUTH).rotateYDegrees(wheelAngle).uncenter()
-            .setChanged();
-        shaft2.setTransform(poseStack).translate(-.5f, .25f, -1).center().rotateTo(Direction.UP, Direction.SOUTH).rotateYDegrees(wheelAngle)
-            .uncenter().setChanged();
+        shaft1.setTransform(poseStack).translate(-.5f, .25f, 0).center().rotateTo(Direction.UP, Direction.SOUTH)
+            .rotateYDegrees(wheelAngle).uncenter().setChanged();
+        shaft2.setTransform(poseStack).translate(-.5f, .25f, -1).center().rotateTo(Direction.UP, Direction.SOUTH)
+            .rotateYDegrees(wheelAngle).uncenter().setChanged();
     }
 
     @Override
@@ -72,7 +72,8 @@ public class StandardBogeyVisual implements BogeyVisual {
             super(ctx, partialTick, inContraption);
             var wheelInstancer = ctx.instancerProvider()
                 .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.SMALL_BOGEY_WHEELS));
-            frame = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_FRAME))
+            frame = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_FRAME))
                 .createInstance();
             wheel1 = wheelInstancer.createInstance();
             wheel2 = wheelInstancer.createInstance();
@@ -134,15 +135,22 @@ public class StandardBogeyVisual implements BogeyVisual {
                 .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.SHAFT));
             secondaryShaft1 = secondaryShaftInstancer.createInstance();
             secondaryShaft2 = secondaryShaftInstancer.createInstance();
-            drive = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_DRIVE))
+            drive = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_DRIVE))
                 .createInstance();
-            belt = ctx.instancerProvider()
-                .instancer(AllInstanceTypes.SCROLLING_TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_DRIVE_BELT)).createInstance();
-            piston = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_PISTON))
+            belt = ctx.instancerProvider().instancer(
+                AllInstanceTypes.SCROLLING_TRANSFORMED,
+                SpecialModels.smoothLit(AllPartialModels.BOGEY_DRIVE_BELT)
+            ).createInstance();
+            piston = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_PISTON))
                 .createInstance();
-            wheels = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.LARGE_BOGEY_WHEELS))
+            wheels = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.LARGE_BOGEY_WHEELS))
                 .createInstance();
-            pin = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_PIN)).createInstance();
+            pin = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_PIN))
+                .createInstance();
 
             belt.setSpriteShift(AllSpriteShifts.BOGEY_BELT);
         }
@@ -150,17 +158,17 @@ public class StandardBogeyVisual implements BogeyVisual {
         @Override
         public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {
             super.update(bogeyData, wheelAngle, poseStack);
-            secondaryShaft1.setTransform(poseStack).translate(-.5f, .25f, .5f).center().rotateTo(Direction.UP, Direction.EAST)
-                .rotateYDegrees(wheelAngle).uncenter().setChanged();
-            secondaryShaft2.setTransform(poseStack).translate(-.5f, .25f, -1.5f).center().rotateTo(Direction.UP, Direction.EAST)
-                .rotateYDegrees(wheelAngle).uncenter().setChanged();
+            secondaryShaft1.setTransform(poseStack).translate(-.5f, .25f, .5f).center()
+                .rotateTo(Direction.UP, Direction.EAST).rotateYDegrees(wheelAngle).uncenter().setChanged();
+            secondaryShaft2.setTransform(poseStack).translate(-.5f, .25f, -1.5f).center()
+                .rotateTo(Direction.UP, Direction.EAST).rotateYDegrees(wheelAngle).uncenter().setChanged();
             drive.setTransform(poseStack).scale(1 - 1 / 512f).setChanged();
-            belt.offset(0, StandardBogeyRenderer.Large.BELT_RADIUS_IN_UV_SPACE * Mth.DEG_TO_RAD * wheelAngle).setTransform(poseStack)
-                .scale(1 - 1 / 512f).setChanged();
+            belt.offset(0, StandardBogeyRenderer.Large.BELT_RADIUS_IN_UV_SPACE * Mth.DEG_TO_RAD * wheelAngle)
+                .setTransform(poseStack).scale(1 - 1 / 512f).setChanged();
             piston.setTransform(poseStack).translate(0, 0, 1 / 4f * Math.sin(AngleHelper.rad(wheelAngle))).setChanged();
             wheels.setTransform(poseStack).translate(0, 1, 0).rotateXDegrees(wheelAngle).setChanged();
-            pin.setTransform(poseStack).translate(0, 1, 0).rotateXDegrees(wheelAngle).translate(0, 1 / 4f, 0).rotateXDegrees(-wheelAngle)
-                .setChanged();
+            pin.setTransform(poseStack).translate(0, 1, 0).rotateXDegrees(wheelAngle).translate(0, 1 / 4f, 0)
+                .rotateXDegrees(-wheelAngle).setChanged();
         }
 
         @Override

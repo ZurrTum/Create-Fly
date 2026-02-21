@@ -52,8 +52,9 @@ public class ComputerScreen extends AbstractSimiScreen {
 
     @Override
     public void tick() {
-        if (!hasAttachedComputer.get())
+        if (!hasAttachedComputer.get()) {
             minecraft.setScreen(previousScreen);
+        }
 
         super.tick();
     }
@@ -67,12 +68,19 @@ public class ComputerScreen extends AbstractSimiScreen {
         int y = guiTop;
 
         if (Mods.COMPUTERCRAFT.isLoaded()) {
-            computerWidget = new ElementWidget(x + 33, y + 38).showingElement(GuiGameElement.of(Mods.COMPUTERCRAFT.getItem("computer_advanced")));
+            computerWidget = new ElementWidget(
+                x + 33,
+                y + 38
+            ).showingElement(GuiGameElement.of(Mods.COMPUTERCRAFT.getItem("computer_advanced")));
             computerWidget.getToolTip().add(CreateLang.translate("gui.attached_computer.hint").component());
             addRenderableWidget(computerWidget);
         }
 
-        confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            x + background.getWidth() - 33,
+            y + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(this::onClose);
         addRenderableWidget(confirmButton);
 
@@ -105,10 +113,19 @@ public class ComputerScreen extends AbstractSimiScreen {
             0xFF442000,
             false
         );
-        graphics.drawWordWrap(font, CreateLang.translate("gui.attached_computer.controlled").component(), x + 55, y + 32, 111, 0xFF7A7A7A, false);
+        graphics.drawWordWrap(
+            font,
+            CreateLang.translate("gui.attached_computer.controlled").component(),
+            x + 55,
+            y + 32,
+            111,
+            0xFF7A7A7A,
+            false
+        );
 
-        if (additionalRenderer != null)
+        if (additionalRenderer != null) {
             additionalRenderer.updateAdditional(partialTicks);
+        }
     }
 
     public interface AdditionalRenderer {

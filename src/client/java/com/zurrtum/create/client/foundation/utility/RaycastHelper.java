@@ -1,7 +1,5 @@
 package com.zurrtum.create.client.foundation.utility;
 
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -13,6 +11,8 @@ import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Predicate;
 
 public class RaycastHelper {
 
@@ -44,10 +44,12 @@ public class RaycastHelper {
     }
 
     public static PredicateTraceResult rayTraceUntil(Vec3 start, Vec3 end, Predicate<BlockPos> predicate) {
-        if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z))
+        if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z)) {
             return null;
-        if (Double.isNaN(end.x) || Double.isNaN(end.y) || Double.isNaN(end.z))
+        }
+        if (Double.isNaN(end.x) || Double.isNaN(end.y) || Double.isNaN(end.z)) {
             return null;
+        }
 
         int dx = Mth.floor(end.x);
         int dy = Mth.floor(end.y);
@@ -58,8 +60,12 @@ public class RaycastHelper {
 
         MutableBlockPos currentPos = new BlockPos(x, y, z).mutable();
 
-        if (predicate.test(currentPos))
-            return new PredicateTraceResult(currentPos.immutable(), Direction.getApproximateNearest(dx - x, dy - y, dz - z));
+        if (predicate.test(currentPos)) {
+            return new PredicateTraceResult(
+                currentPos.immutable(),
+                Direction.getApproximateNearest(dx - x, dy - y, dz - z)
+            );
+        }
 
         int remainingDistance = 200;
 
@@ -152,8 +158,9 @@ public class RaycastHelper {
             z = Mth.floor(start.z) - (enumfacing == Direction.SOUTH ? 1 : 0);
             currentPos.set(x, y, z);
 
-            if (predicate.test(currentPos))
+            if (predicate.test(currentPos)) {
                 return new PredicateTraceResult(currentPos.immutable(), enumfacing);
+            }
         }
 
         return new PredicateTraceResult();

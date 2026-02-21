@@ -1,9 +1,9 @@
 package com.zurrtum.create;
 
+import net.minecraft.world.level.ItemLike;
+
 import java.util.IdentityHashMap;
 import java.util.Map;
-
-import net.minecraft.world.level.ItemLike;
 
 public class AllFuelTimes {
     public static final Map<ItemLike, Integer> ALL = new IdentityHashMap<>();

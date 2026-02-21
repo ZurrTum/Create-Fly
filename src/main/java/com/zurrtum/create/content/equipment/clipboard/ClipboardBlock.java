@@ -59,11 +59,16 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
-        if (stateForPlacement == null)
+        if (stateForPlacement == null) {
             return null;
-        if (stateForPlacement.getValue(FACE) != AttachFace.WALL)
+        }
+        if (stateForPlacement.getValue(FACE) != AttachFace.WALL) {
             stateForPlacement = stateForPlacement.setValue(FACING, stateForPlacement.getValue(FACING).getOpposite());
-        return withWater(stateForPlacement, pContext).setValue(WRITTEN, !pContext.getItemInHand().getComponentsPatch().isEmpty());
+        }
+        return withWater(stateForPlacement, pContext).setValue(
+            WRITTEN,
+            !pContext.getItemInHand().getComponentsPatch().isEmpty()
+        );
     }
 
     @Override
@@ -81,7 +86,13 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
         if (player.isShiftKeyDown()) {
             breakAndCollect(state, level, pos, player);
             return InteractionResult.SUCCESS;
@@ -89,8 +100,9 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
 
         return onBlockEntityUse(
             level, pos, cbe -> {
-                if (level.isClientSide())
+                if (level.isClientSide()) {
                     AllClientHandle.INSTANCE.openClipboardScreen(player, cbe.components(), pos);
+                }
                 return InteractionResult.SUCCESS;
             }
         );
@@ -102,10 +114,12 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
     }
 
     private void breakAndCollect(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
-        if (FakePlayerHandler.has(pPlayer))
+        if (FakePlayerHandler.has(pPlayer)) {
             return;
-        if (pLevel.isClientSide())
+        }
+        if (pLevel.isClientSide()) {
             return;
+        }
         ItemStack cloneItemStack = getCloneItemStack(pLevel, pPos, pState, true);
         pLevel.destroyBlock(pPos, false);
         if (pLevel.getBlockState(pPos) != pState) {
@@ -126,10 +140,12 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!(level.getBlockEntity(pos) instanceof ClipboardBlockEntity cbe))
+        if (!(level.getBlockEntity(pos) instanceof ClipboardBlockEntity cbe)) {
             return state;
-        if (level.isClientSide() || player.isCreative())
+        }
+        if (level.isClientSide() || player.isCreative()) {
             return state;
+        }
         Block.popResource(level, pos, applyComponentsToDropStack(new ItemStack(this), cbe));
 
         return state;
@@ -137,8 +153,9 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
 
     @Override
     public List<ItemStack> getDrops(BlockState pState, LootParams.Builder pBuilder) {
-        if (!(pBuilder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof ClipboardBlockEntity cbe))
+        if (!(pBuilder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof ClipboardBlockEntity cbe)) {
             return super.getDrops(pState, pBuilder);
+        }
         ItemStack drop = applyComponentsToDropStack(new ItemStack(this), cbe);
         pBuilder.withDynamicDrop(ShulkerBoxBlock.CONTENTS, c -> c.accept(drop.copy()));
         return ImmutableList.of(drop);

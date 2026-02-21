@@ -40,8 +40,9 @@ public record SequencedAssemblyJunk(float chance, List<ProcessingOutput> junks) 
         float number = random.nextFloat() * totalWeight;
         for (ProcessingOutput junk : junks) {
             number -= junk.chance();
-            if (number < 0)
+            if (number < 0) {
                 return junk.create();
+            }
         }
         return ItemStack.EMPTY;
     }

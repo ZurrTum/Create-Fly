@@ -32,17 +32,21 @@ public class ScheduleMenu extends HeldItemGhostItemMenu {
     @Override
     protected void addSlots() {
         addPlayerSlots(46, 140);
-        for (int i = 0; i < slots; i++)
+        for (int i = 0; i < slots; i++) {
             addSlot(new InactiveItemHandlerSlot(ghostInventory, i, i, 54 + 20 * i, 88));
+        }
     }
 
     @Override
     protected void addPlayerSlots(int x, int y) {
-        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot)
+        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot) {
             this.addSlot(new InactiveSlot(playerInventory, hotbarSlot, x + hotbarSlot * 18, y + 58));
-        for (int row = 0; row < 3; ++row)
-            for (int col = 0; col < 9; ++col)
+        }
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
                 this.addSlot(new InactiveSlot(playerInventory, col + row * 9 + 9, x + col * 18, y + row * 18));
+            }
+        }
     }
 
     @Override
@@ -65,7 +69,13 @@ public class ScheduleMenu extends HeldItemGhostItemMenu {
     class InactiveItemHandlerSlot extends Slot {
         private final int targetIndex;
 
-        public InactiveItemHandlerSlot(Container itemHandler, int targetIndex, int index, int xPosition, int yPosition) {
+        public InactiveItemHandlerSlot(
+            Container itemHandler,
+            int targetIndex,
+            int index,
+            int xPosition,
+            int yPosition
+        ) {
             super(itemHandler, index, xPosition, yPosition);
             this.targetIndex = targetIndex;
         }

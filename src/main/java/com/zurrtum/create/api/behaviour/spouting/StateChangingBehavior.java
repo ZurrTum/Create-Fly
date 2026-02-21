@@ -20,17 +20,24 @@ import java.util.function.UnaryOperator;
  * @param canFill      a predicate that must match the target BlockState to fill it
  * @param fillFunction a function that converts the current state into the filled one
  */
-public record StateChangingBehavior(
-    int amount, Predicate<Fluid> fluidTest, Predicate<BlockState> canFill, UnaryOperator<BlockState> fillFunction
-) implements BlockSpoutingBehaviour {
+public record StateChangingBehavior(int amount, Predicate<Fluid> fluidTest, Predicate<BlockState> canFill,
+                                    UnaryOperator<BlockState> fillFunction) implements BlockSpoutingBehaviour {
     @Override
-    public int fillBlock(Level level, BlockPos pos, SpoutBlockEntity spout, FluidStack availableFluid, boolean simulate) {
-        if (availableFluid.getAmount() < this.amount || !this.fluidTest.test(availableFluid.getFluid()))
+    public int fillBlock(
+        Level level,
+        BlockPos pos,
+        SpoutBlockEntity spout,
+        FluidStack availableFluid,
+        boolean simulate
+    ) {
+        if (availableFluid.getAmount() < this.amount || !this.fluidTest.test(availableFluid.getFluid())) {
             return 0;
+        }
 
         BlockState state = level.getBlockState(pos);
-        if (!this.canFill.test(state))
+        if (!this.canFill.test(state)) {
             return 0;
+        }
 
         if (!simulate) {
             BlockState newState = this.fillFunction.apply(state);
@@ -62,7 +69,11 @@ public record StateChangingBehavior(
      *
      * @param property the property that will be incremented by one on each fill
      */
-    public static BlockSpoutingBehaviour incrementingState(int amount, Predicate<Fluid> fluidTest, IntegerProperty property) {
+    public static BlockSpoutingBehaviour incrementingState(
+        int amount,
+        Predicate<Fluid> fluidTest,
+        IntegerProperty property
+    ) {
         int max = property.getPossibleValues().stream().max(Integer::compareTo).orElseThrow();
 
         Predicate<BlockState> canFill = state -> state.hasProperty(property) && state.getValue(property) < max;

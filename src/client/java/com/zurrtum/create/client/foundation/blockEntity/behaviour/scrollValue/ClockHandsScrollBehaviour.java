@@ -18,9 +18,7 @@ public class ClockHandsScrollBehaviour extends ScrollOptionBehaviour<ClockHands>
     }
 
     private enum ClockHandsIcon implements INamedIconOptions {
-        HOUR_FIRST(AllIcons.I_HOUR_HAND_FIRST),
-        MINUTE_FIRST(AllIcons.I_MINUTE_HAND_FIRST),
-        HOUR_FIRST_24(AllIcons.I_HOUR_HAND_FIRST_24);
+        HOUR_FIRST(AllIcons.I_HOUR_HAND_FIRST), MINUTE_FIRST(AllIcons.I_MINUTE_HAND_FIRST), HOUR_FIRST_24(AllIcons.I_HOUR_HAND_FIRST_24);
 
         private final String translationKey;
         private final AllIcons icon;

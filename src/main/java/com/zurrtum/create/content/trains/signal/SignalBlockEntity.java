@@ -27,9 +27,7 @@ import java.util.Locale;
 public class SignalBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
     public enum OverlayState implements StringRepresentable {
-        RENDER,
-        SKIP,
-        DUAL;
+        RENDER, SKIP, DUAL;
         public static final Codec<OverlayState> CODEC = StringRepresentable.fromEnum(OverlayState::values);
 
         @Override
@@ -39,10 +37,7 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
     }
 
     public enum SignalState implements StringRepresentable {
-        RED,
-        YELLOW,
-        GREEN,
-        INVALID;
+        RED, YELLOW, GREEN, INVALID;
 
         public static final Codec<SignalState> CODEC = StringRepresentable.fromEnum(SignalState::values);
 
@@ -113,8 +108,9 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         SignalBoundary boundary = getSignal();
         if (boundary == null) {
@@ -126,8 +122,9 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
         BlockState blockState = getBlockState();
 
         blockState.getOptionalValue(SignalBlock.POWERED).ifPresent(powered -> {
-            if (lastReportedPower == powered)
+            if (lastReportedPower == powered) {
                 return;
+            }
             lastReportedPower = powered;
             boundary.updateBlockEntityPower(this);
             notifyUpdate();
@@ -158,19 +155,23 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
     }
 
     public void setOverlay(OverlayState state) {
-        if (this.overlay == state)
+        if (this.overlay == state) {
             return;
+        }
         this.overlay = state;
         notifyUpdate();
     }
 
     public void enterState(SignalState state) {
-        if (switchToRedAfterTrainEntered > 0)
+        if (switchToRedAfterTrainEntered > 0) {
             switchToRedAfterTrainEntered--;
-        if (this.state == state)
+        }
+        if (this.state == state) {
             return;
-        if (state == SignalState.RED && switchToRedAfterTrainEntered > 0)
+        }
+        if (state == SignalState.RED && switchToRedAfterTrainEntered > 0) {
             return;
+        }
         this.state = state;
         switchToRedAfterTrainEntered = state == SignalState.GREEN || state == SignalState.YELLOW ? 15 : 0;
         AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
@@ -182,7 +183,10 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
 
     @Override
     protected AABB createRenderBoundingBox() {
-        return new AABB(Vec3.atLowerCornerOf(worldPosition), Vec3.atLowerCornerOf(edgePoint.getGlobalPosition())).inflate(2);
+        return new AABB(
+            Vec3.atLowerCornerOf(worldPosition),
+            Vec3.atLowerCornerOf(edgePoint.getGlobalPosition())
+        ).inflate(2);
     }
 
     @Override

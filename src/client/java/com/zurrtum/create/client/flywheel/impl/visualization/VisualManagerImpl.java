@@ -67,11 +67,15 @@ public class VisualManagerImpl<T, S extends Storage<T>> implements VisualManager
     }
 
     public Plan<DynamicVisual.Context> framePlan(VisualizationContext visualizationContext) {
-        return SimplePlan.<DynamicVisual.Context>of(context -> processQueue(visualizationContext, context.partialTick())).then(storage.framePlan());
+        return SimplePlan.<DynamicVisual.Context>of(context -> processQueue(
+            visualizationContext,
+            context.partialTick()
+        )).then(storage.framePlan());
     }
 
     public Plan<TickableVisual.Context> tickPlan(VisualizationContext visualizationContext) {
-        return SimplePlan.<TickableVisual.Context>of(context -> processQueue(visualizationContext, 1)).then(storage.tickPlan());
+        return SimplePlan.<TickableVisual.Context>of(context -> processQueue(visualizationContext, 1))
+            .then(storage.tickPlan());
     }
 
     public void onLightUpdate(long section) {

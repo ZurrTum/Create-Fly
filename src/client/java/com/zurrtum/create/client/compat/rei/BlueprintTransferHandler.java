@@ -27,7 +27,8 @@ import java.util.List;
 public class BlueprintTransferHandler implements TransferHandler {
     @Override
     public ApplicabilityResult checkApplicable(Context context) {
-        if (context.getContainerScreen() instanceof BlueprintScreen && context.getDisplay().getCategoryIdentifier().equals(BuiltinPlugin.CRAFTING)) {
+        if (context.getContainerScreen() instanceof BlueprintScreen && context.getDisplay().getCategoryIdentifier()
+            .equals(BuiltinPlugin.CRAFTING)) {
             return ApplicabilityResult.createApplicable();
         }
         return ApplicabilityResult.createNotApplicable();
@@ -39,7 +40,10 @@ public class BlueprintTransferHandler implements TransferHandler {
             CraftingDisplay display = (CraftingDisplay) context.getDisplay();
             List<ItemStack> input = new ArrayList<>();
             List<TagKey<Item>> cache = new ArrayList<>();
-            List<InputIngredient<EntryStack<?>>> entries = display.getInputIngredients(context.getMenu(), context.getMinecraft().player);
+            List<InputIngredient<EntryStack<?>>> entries = display.getInputIngredients(
+                context.getMenu(),
+                context.getMinecraft().player
+            );
             for (InputIngredient<EntryStack<?>> inputIngredient : entries) {
                 List<EntryStack<?>> ingredient = inputIngredient.get();
                 int size = ingredient.size();
@@ -54,7 +58,10 @@ public class BlueprintTransferHandler implements TransferHandler {
                 TagKey<Item> tag = findTag(ingredient, cache);
                 if (tag != null) {
                     ItemStack filterItem = AllItems.ATTRIBUTE_FILTER.getDefaultInstance();
-                    filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, AttributeFilterWhitelistMode.WHITELIST_DISJ);
+                    filterItem.set(
+                        AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+                        AttributeFilterWhitelistMode.WHITELIST_DISJ
+                    );
                     filterItem.set(
                         AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES,
                         List.of(new ItemAttributeEntry(new InTagAttribute(tag), false))
@@ -86,8 +93,8 @@ public class BlueprintTransferHandler implements TransferHandler {
             }
         }
         int size = list.size();
-        return BuiltInRegistries.ITEM.getTags().filter(set -> set.size() == size).map(HolderSet.Named::key).filter(t -> matchTag(list, t)).findFirst()
-            .map(tag -> {
+        return BuiltInRegistries.ITEM.getTags().filter(set -> set.size() == size).map(HolderSet.Named::key)
+            .filter(t -> matchTag(list, t)).findFirst().map(tag -> {
                 cache.add(tag);
                 return tag;
             }).orElse(null);

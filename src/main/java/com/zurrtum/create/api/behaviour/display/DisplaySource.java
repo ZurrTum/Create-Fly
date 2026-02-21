@@ -9,12 +9,6 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayBoardTarget
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -25,6 +19,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class DisplaySource {
     public static final SimpleRegistry.Multi<Block, DisplaySource> BY_BLOCK = SimpleRegistry.Multi.create();
@@ -51,13 +50,17 @@ public abstract class DisplaySource {
         }
 
         List<MutableComponent> text = provideText(context, stats);
-        if (text.isEmpty())
+        if (text.isEmpty()) {
             text = EMPTY;
+        }
 
-        if (activeTarget.requiresComponentSanitization())
-            for (MutableComponent component : text)
-                if (NBTProcessors.textComponentHasClickEvent(component))
+        if (activeTarget.requiresComponentSanitization()) {
+            for (MutableComponent component : text) {
+                if (NBTProcessors.textComponentHasClickEvent(component)) {
                     return; // Naughty
+                }
+            }
+        }
 
         activeTarget.acceptText(line, text, context);
     }
@@ -88,13 +91,23 @@ public abstract class DisplaySource {
         return Component.translatable(this.getId().getNamespace() + ".display_source." + getTranslationKey());
     }
 
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout, int lineIndex) {
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout,
+        int lineIndex
+    ) {
         loadFlapDisplayLayout(context, flapDisplay, layout);
     }
 
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
-        if (!layout.isLayout("Default"))
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout
+    ) {
+        if (!layout.isLayout("Default")) {
             layout.loadDefault(flapDisplay.getMaxCharCount());
+        }
     }
 
     public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
@@ -106,8 +119,9 @@ public abstract class DisplaySource {
      */
     @Nullable
     public static DisplaySource get(@Nullable Identifier id) {
-        if (id == null)
+        if (id == null) {
             return null;
+        }
         return CreateRegistries.DISPLAY_SOURCE.getValue(id);
     }
 
@@ -120,8 +134,9 @@ public abstract class DisplaySource {
         List<DisplaySource> byBlock = BY_BLOCK.get(state);
 
         BlockEntity be = level.getBlockEntity(pos);
-        if (be == null)
+        if (be == null) {
             return byBlock;
+        }
 
         List<DisplaySource> byBe = BY_BLOCK_ENTITY.get(be.getType());
 

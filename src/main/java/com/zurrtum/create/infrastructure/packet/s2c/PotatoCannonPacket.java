@@ -13,9 +13,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
-public record PotatoCannonPacket(
-    Vec3 location, Vec3 motion, ItemStack item, InteractionHand hand, float pitch, boolean self
-) implements Packet<ClientGamePacketListener> {
+public record PotatoCannonPacket(Vec3 location, Vec3 motion, ItemStack item, InteractionHand hand, float pitch,
+                                 boolean self) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, PotatoCannonPacket> CODEC = StreamCodec.composite(
         Vec3.STREAM_CODEC,
         PotatoCannonPacket::location,

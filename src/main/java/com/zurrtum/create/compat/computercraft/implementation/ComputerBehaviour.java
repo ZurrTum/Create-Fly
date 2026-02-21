@@ -83,7 +83,10 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
             be.passingTrainUUID = observer.getCurrentTrain();
         }
         if (be.passingTrainUUID != null) {
-            peripheral.prepareComputerEvent(new TrainPassEvent(Create.RAILWAYS.trains.get(be.passingTrainUUID), shouldBePowered));
+            peripheral.prepareComputerEvent(new TrainPassEvent(
+                Create.RAILWAYS.trains.get(be.passingTrainUUID),
+                shouldBePowered
+            ));
             if (!shouldBePowered) {
                 be.passingTrainUUID = null;
             }
@@ -100,15 +103,24 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
         StationBlockEntity be = (StationBlockEntity) blockEntity;
         UUID trainId = be.imminentTrain;
         if (trainId == null && imminentTrain != null) {
-            peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.IMMINENT, imminentTrain));
+            peripheral.prepareComputerEvent(new StationTrainPresenceEvent(
+                StationTrainPresenceEvent.Type.IMMINENT,
+                imminentTrain
+            ));
         }
         if (newlyArrived) {
             if (trainPresent) {
-                peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
+                peripheral.prepareComputerEvent(new StationTrainPresenceEvent(
+                    StationTrainPresenceEvent.Type.ARRIVAL,
+                    imminentTrain
+                ));
             } else if (trainId != null) {
                 Train train = Create.RAILWAYS.trains.get(trainId);
                 if (train != null) {
-                    peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.DEPARTURE, train));
+                    peripheral.prepareComputerEvent(new StationTrainPresenceEvent(
+                        StationTrainPresenceEvent.Type.DEPARTURE,
+                        train
+                    ));
                 }
             }
         }

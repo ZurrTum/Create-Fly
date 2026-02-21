@@ -10,9 +10,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record FactoryPanelEffectPacket(
-    FactoryPanelPosition fromPos, FactoryPanelPosition toPos, boolean success
-) implements Packet<ClientGamePacketListener> {
+public record FactoryPanelEffectPacket(FactoryPanelPosition fromPos, FactoryPanelPosition toPos,
+                                       boolean success) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, FactoryPanelEffectPacket> CODEC = StreamCodec.composite(
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelEffectPacket::fromPos,

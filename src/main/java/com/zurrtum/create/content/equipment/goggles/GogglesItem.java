@@ -1,14 +1,13 @@
 package com.zurrtum.create.content.equipment.goggles;
 
 import com.zurrtum.create.AllItems;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 
 public class GogglesItem extends Item {
     private static final List<Predicate<Player>> IS_WEARING_PREDICATES = new ArrayList<>();

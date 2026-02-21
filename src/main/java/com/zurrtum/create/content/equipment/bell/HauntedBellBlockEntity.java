@@ -27,10 +27,12 @@ public class HauntedBellBlockEntity extends AbstractBellBlockEntity {
 
     @Override
     public boolean ring(Level world, BlockPos pos, Direction direction) {
-        if (isRinging && ringingTicks < RECHARGE_TICKS)
+        if (isRinging && ringingTicks < RECHARGE_TICKS) {
             return false;
-        if (world instanceof ServerLevel serverLevel)
+        }
+        if (world instanceof ServerLevel serverLevel) {
             HauntedBellPulser.sendPulse(serverLevel, pos, DISTANCE, false);
+        }
         effectTicks = EFFECT_TICKS;
         return super.ring(world, pos, direction);
     }
@@ -51,16 +53,19 @@ public class HauntedBellBlockEntity extends AbstractBellBlockEntity {
     public void tick() {
         super.tick();
 
-        if (effectTicks <= 0)
+        if (effectTicks <= 0) {
             return;
+        }
         effectTicks--;
 
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
 
         RandomSource rand = level.getRandom();
-        if (rand.nextFloat() > 0.25f)
+        if (rand.nextFloat() > 0.25f) {
             return;
+        }
 
         spawnParticle(rand);
         playSound(rand);

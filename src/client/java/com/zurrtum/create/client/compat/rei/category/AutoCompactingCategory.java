@@ -44,14 +44,21 @@ public class AutoCompactingCategory extends CreateCategory<CraftingDisplay> {
         List<EntryIngredient> ingredients = display.getInputEntries().stream().filter(e -> !e.isEmpty()).toList();
         List<Point> points = new ArrayList<>();
         for (int i = 0, size = ingredients.size(), rows = size == 4 ? 2 : 3; i < size; i++) {
-            points.add(new Point(bounds.x + 5 + (rows == 2 ? 27 : 18) + (i % rows) * 19, bounds.y + 56 - (i / rows) * 19));
+            points.add(new Point(
+                bounds.x + 5 + (rows == 2 ? 27 : 18) + (i % rows) * 19,
+                bounds.y + 56 - (i / rows) * 19
+            ));
         }
         Point output = new Point(bounds.x + 147, bounds.y + 56);
         widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, points, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + 37);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 86, bounds.y + 73);
-            graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 96, bounds.y));
+            graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(
+                new Matrix3x2f(graphics.pose()),
+                bounds.x + 96,
+                bounds.y
+            ));
         }));
         for (int i = 0, size = points.size(); i < size; i++) {
             widgets.add(createInputSlot(points.get(i)).entries(ingredients.get(i)));

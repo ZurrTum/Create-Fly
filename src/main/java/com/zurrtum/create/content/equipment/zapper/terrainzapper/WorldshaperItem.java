@@ -7,10 +7,6 @@ import com.zurrtum.create.infrastructure.component.PlacementOptions;
 import com.zurrtum.create.infrastructure.component.PlacementPatterns;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,6 +16,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorldshaperItem extends ZapperItem {
 
@@ -44,8 +43,9 @@ public class WorldshaperItem extends ZapperItem {
 
     @Override
     public Component validateUsage(ItemStack item) {
-        if (!item.has(AllDataComponents.SHAPER_BRUSH_PARAMS))
+        if (!item.has(AllDataComponents.SHAPER_BRUSH_PARAMS)) {
             return Component.translatable("create.terrainzapper.shiftRightClickToSet");
+        }
         return super.validateUsage(item);
     }
 
@@ -56,14 +56,24 @@ public class WorldshaperItem extends ZapperItem {
     }
 
     @Override
-    protected boolean activate(Level level, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data) {
+    protected boolean activate(
+        Level level,
+        Player player,
+        ItemStack stack,
+        BlockState stateToUse,
+        BlockHitResult raytrace,
+        CompoundTag data
+    ) {
 
         BlockPos targetPos = raytrace.getBlockPos();
         List<BlockPos> affectedPositions = new ArrayList<>();
 
         Brush brush = stack.getOrDefault(AllDataComponents.SHAPER_BRUSH, TerrainBrushes.Cuboid).get();
         BlockPos params = stack.get(AllDataComponents.SHAPER_BRUSH_PARAMS);
-        PlacementOptions option = stack.getOrDefault(AllDataComponents.SHAPER_PLACEMENT_OPTIONS, PlacementOptions.Merged);
+        PlacementOptions option = stack.getOrDefault(
+            AllDataComponents.SHAPER_PLACEMENT_OPTIONS,
+            PlacementOptions.Merged
+        );
         TerrainTools tool = stack.getOrDefault(AllDataComponents.SHAPER_TOOL, TerrainTools.Fill);
 
         brush.set(params.getX(), params.getY(), params.getZ());

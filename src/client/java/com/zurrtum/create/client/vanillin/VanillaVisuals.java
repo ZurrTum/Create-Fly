@@ -42,8 +42,8 @@ public class VanillaVisuals {
         builder(EntityType.BLOCK_DISPLAY).factory(BlockDisplayVisual::new).apply(STABLE);
 
         composable(EntityType.ITEM_DISPLAY).with(element(VisualElements.ITEM_DISPLAY).build())
-            .shouldVisualize((ctx, e) -> ItemDisplayVisual.shouldVisualize(e)).build().skipVanillaRender(ItemDisplayVisual::shouldVisualize)
-            .apply(EXPERIMENTAL);
+            .shouldVisualize((ctx, e) -> ItemDisplayVisual.shouldVisualize(e)).build()
+            .skipVanillaRender(ItemDisplayVisual::shouldVisualize).apply(EXPERIMENTAL);
 
         minecart(EntityType.CHEST_MINECART, ModelLayers.CHEST_MINECART).apply(STABLE);
         minecart(EntityType.COMMAND_BLOCK_MINECART, ModelLayers.COMMAND_BLOCK_MINECART).apply(STABLE);
@@ -53,16 +53,19 @@ public class VanillaVisuals {
         minecart(EntityType.SPAWNER_MINECART, ModelLayers.SPAWNER_MINECART).apply(STABLE);
 
         composable(EntityType.TNT_MINECART).apply(VanillaVisuals::commonElements)
-            .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(0.7f, ShadowElement.Config.DEFAULT_STRENGTH)).build())
-            .with(element(VisualElements.FIRE).build()).with(element(VisualElements.TNT_MINECART).build()).build()
-            .skipVanillaRender(MinecartVisual::shouldSkipRender).apply(STABLE);
+            .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(
+                0.7f,
+                ShadowElement.Config.DEFAULT_STRENGTH
+            )).build()).with(element(VisualElements.FIRE).build()).with(element(VisualElements.TNT_MINECART).build())
+            .build().skipVanillaRender(MinecartVisual::shouldSkipRender).apply(STABLE);
 
         itemFrame(EntityType.ITEM_FRAME).apply(EXPERIMENTAL);
         itemFrame(EntityType.GLOW_ITEM_FRAME).apply(EXPERIMENTAL);
 
         composable(EntityType.ITEM).apply(VanillaVisuals::commonElements).with(element(VisualElements.FIRE).build())
             .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(0.15f, 0.75f)).build())
-            .with(element(VisualElements.ITEM_ENTITY).build()).shouldVisualize(((ctx, entity) -> ItemVisual.isSupported(entity))).build()
+            .with(element(VisualElements.ITEM_ENTITY).build())
+            .shouldVisualize(((ctx, entity) -> ItemVisual.isSupported(entity))).build()
             .skipVanillaRender(ItemVisual::isSupported).apply(EXPERIMENTAL);
 
     }
@@ -73,13 +76,20 @@ public class VanillaVisuals {
 
     public static <T extends ItemFrame> EntityVisualizerBuilder<T> itemFrame(EntityType<T> type) {
         return composable(type).apply(VanillaVisuals::commonElements).with(element(VisualElements.ITEM_FRAME).build())
-            .shouldVisualize((ctx, entity) -> ItemFrameVisual.shouldVisualize(entity)).build().skipVanillaRender(ItemFrameVisual::shouldVisualize);
+            .shouldVisualize((ctx, entity) -> ItemFrameVisual.shouldVisualize(entity)).build()
+            .skipVanillaRender(ItemFrameVisual::shouldVisualize);
     }
 
-    public static <T extends AbstractMinecart> EntityVisualizerBuilder<T> minecart(EntityType<T> type, ModelLayerLocation variant) {
+    public static <T extends AbstractMinecart> EntityVisualizerBuilder<T> minecart(
+        EntityType<T> type,
+        ModelLayerLocation variant
+    ) {
         return composable(type).apply(VanillaVisuals::commonElements)
-            .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(0.7f, ShadowElement.Config.DEFAULT_STRENGTH)).build())
-            .with(element(VisualElements.FIRE).build()).with(element(VisualElements.MINECART).configure(variant).build()).build()
+            .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(
+                0.7f,
+                ShadowElement.Config.DEFAULT_STRENGTH
+            )).build()).with(element(VisualElements.FIRE).build())
+            .with(element(VisualElements.MINECART).configure(variant).build()).build()
             .skipVanillaRender(MinecartVisual::shouldSkipRender);
     }
 
@@ -162,7 +172,12 @@ public class VanillaVisuals {
 
             var controller = new ComposableEntityVisual.Controller<T>(elementsArray, predicate);
 
-            return builder(entityType).factory((ctx, entity, partialTick) -> new ComposableEntityVisual<T>(ctx, entity, partialTick, controller));
+            return builder(entityType).factory((ctx, entity, partialTick) -> new ComposableEntityVisual<T>(
+                ctx,
+                entity,
+                partialTick,
+                controller
+            ));
         }
     }
 

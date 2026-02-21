@@ -56,22 +56,24 @@ public class DebugInformation {
     }
 
     static {
-        DebugInfoSection.builder(Create.NAME).put("Mod Version", Create.VERSION).put("Ponder Version", getVersionOfMod("ponder"))
-            .put("NeoForge Version", getVersionOfMod("neoforge")).put("Minecraft Version", SharedConstants.getCurrentVersion().name())
+        DebugInfoSection.builder(Create.NAME).put("Mod Version", Create.VERSION)
+            .put("Ponder Version", getVersionOfMod("ponder")).put("NeoForge Version", getVersionOfMod("neoforge"))
+            .put("Minecraft Version", SharedConstants.getCurrentVersion().name())
             .buildTo(DebugInformation::registerBothInfo);
 
         AllClientHandle.INSTANCE.buildDebugInfo();
 
         DebugInfoSection.builder("System Information").put("Operating System", SystemReport.OPERATING_SYSTEM)
             .put("Java Version", SystemReport.JAVA_VERSION).put("JVM Flags", getMcSystemInfo("JVM Flags"))
-            .put("Memory", () -> getMcSystemInfo("Memory")).put("Total Memory", getTotalRam()).put("CPU", getCpuInfo()).putAll(listAllGraphicsCards())
-            .buildTo(DebugInformation::registerBothInfo);
+            .put("Memory", () -> getMcSystemInfo("Memory")).put("Total Memory", getTotalRam()).put("CPU", getCpuInfo())
+            .putAll(listAllGraphicsCards()).buildTo(DebugInformation::registerBothInfo);
 
         DebugInfoSection.builder("Other Mods").putAll(listAllOtherMods()).buildTo(DebugInformation::registerBothInfo);
     }
 
     public static String getVersionOfMod(String id) {
-        return FabricLoader.getInstance().getModContainer(id).map(mod -> mod.getMetadata().getVersion().toString()).orElse("None");
+        return FabricLoader.getInstance().getModContainer(id).map(mod -> mod.getMetadata().getVersion().toString())
+            .orElse("None");
     }
 
     public static Collection<InfoElement> listAllOtherMods() {
@@ -79,7 +81,8 @@ public class DebugInformation {
         FabricLoader.getInstance().getAllMods().forEach(mod -> {
             ModMetadata meta = mod.getMetadata();
             String id = meta.getId();
-            if (!id.equals(Create.MOD_ID) && !id.equals("fabric-api") && !id.equals("minecraft") && !id.equals("flywheel")) {
+            if (!id.equals(Create.MOD_ID) && !id.equals("fabric-api") && !id.equals("minecraft") && !id.equals(
+                "flywheel")) {
                 String name = meta.getName();
                 String version = meta.getVersion().toString();
                 mods.add(new InfoEntry(name, version));
@@ -94,8 +97,9 @@ public class DebugInformation {
             String name = getMcSystemInfo("Graphics card #" + i + " name");
             String vendor = getMcSystemInfo("Graphics card #" + i + " vendor");
             String vram = getMcSystemInfo("Graphics card #" + i + " VRAM (MB)");
-            if (name == null || vendor == null || vram == null)
+            if (name == null || vendor == null || vram == null) {
                 break;
+            }
             String key = "Graphics card #" + i;
             String value = String.format("%s (%s); %s MB of VRAM", name, vendor, vram);
             cards.add(new InfoEntry(key, value));
@@ -108,7 +112,13 @@ public class DebugInformation {
         long availableMemory = runtime.freeMemory();
         long totalMemory = runtime.totalMemory();
         long usedMemory = totalMemory - availableMemory;
-        return String.format("%s bytes (%s MiB) / %s bytes (%s MiB)", usedMemory, usedMemory / 1048576L, totalMemory, totalMemory / 1048576L);
+        return String.format(
+            "%s bytes (%s MiB) / %s bytes (%s MiB)",
+            usedMemory,
+            usedMemory / 1048576L,
+            totalMemory,
+            totalMemory / 1048576L
+        );
     }
 
     public static String getCpuInfo() {

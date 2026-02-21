@@ -21,25 +21,29 @@ import java.util.stream.Stream;
 
 public class BoilerDisplaySource extends DisplaySource {
 
-    public static final List<MutableComponent> notEnoughSpaceSingle = List.of(Component.translatable("create.display_source.boiler.not_enough_space")
+    public static final List<MutableComponent> notEnoughSpaceSingle = List.of(Component.translatable(
+            "create.display_source.boiler.not_enough_space")
         .append(Component.translatable("create.display_source.boiler.for_boiler_status")));
 
     public static final List<MutableComponent> notEnoughSpaceDouble = List.of(
-        Component.translatable("create.display_source.boiler.not_enough_space"),
+        Component.translatable(
+            "create.display_source.boiler.not_enough_space"),
         Component.translatable("create.display_source.boiler.for_boiler_status")
     );
 
     public static final List<List<MutableComponent>> notEnoughSpaceFlap = List.of(
-        List.of(Component.translatable("create.display_source.boiler.not_enough_space")),
+        List.of(Component.translatable(
+            "create.display_source.boiler.not_enough_space")),
         List.of(Component.translatable("create.display_source.boiler.for_boiler_status"))
     );
 
     @Override
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
-        if (stats.maxRows() < 2)
+        if (stats.maxRows() < 2) {
             return notEnoughSpaceSingle;
-        else if (stats.maxRows() < 4)
+        } else if (stats.maxRows() < 4) {
             return notEnoughSpaceDouble;
+        }
 
         boolean isBook = context.getTargetBlockEntity() instanceof LecternBlockEntity;
 
@@ -69,8 +73,8 @@ public class BoilerDisplaySource extends DisplaySource {
 
         List<List<MutableComponent>> components = getComponents(context, true).toList();
 
-        if (stats.maxColumns() * FlapDisplaySection.MONOSPACE < 6 * FlapDisplaySection.MONOSPACE + components.get(1).get(1).getString()
-            .length() * FlapDisplaySection.WIDE_MONOSPACE) {
+        if (stats.maxColumns() * FlapDisplaySection.MONOSPACE < 6 * FlapDisplaySection.MONOSPACE + components.get(1)
+            .get(1).getString().length() * FlapDisplaySection.WIDE_MONOSPACE) {
             context.flapDisplayContext = Boolean.FALSE;
             return notEnoughSpaceFlap;
         }
@@ -79,18 +83,25 @@ public class BoilerDisplaySource extends DisplaySource {
     }
 
     @Override
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout, int lineIndex) {
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout,
+        int lineIndex
+    ) {
         if (lineIndex == 0 || context.flapDisplayContext instanceof Boolean b && !b) {
-            if (layout.isLayout("Default"))
+            if (layout.isLayout("Default")) {
                 return;
+            }
 
             layout.loadDefault(flapDisplay.getMaxCharCount());
             return;
         }
 
         String layoutKey = "Boiler";
-        if (layout.isLayout(layoutKey))
+        if (layout.isLayout(layoutKey)) {
             return;
+        }
 
         int labelLength = (int) (labelWidth() * FlapDisplaySection.MONOSPACE);
         float maxSpace = flapDisplay.getMaxCharCount(1) * FlapDisplaySection.MONOSPACE;
@@ -102,12 +113,14 @@ public class BoilerDisplaySource extends DisplaySource {
 
     private Stream<List<MutableComponent>> getComponents(DisplayLinkContext context, boolean forFlapDisplay) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
-        if (!(sourceBE instanceof FluidTankBlockEntity tankBlockEntity))
+        if (!(sourceBE instanceof FluidTankBlockEntity tankBlockEntity)) {
             return Stream.of(EMPTY);
+        }
 
         tankBlockEntity = tankBlockEntity.getControllerBE();
-        if (tankBlockEntity == null)
+        if (tankBlockEntity == null) {
             return Stream.of(EMPTY);
+        }
 
         BoilerData boiler = tankBlockEntity.boiler;
 
@@ -144,8 +157,9 @@ public class BoilerDisplaySource extends DisplaySource {
     }
 
     private MutableComponent labelOf(String label) {
-        if (label.isBlank())
+        if (label.isBlank()) {
             return Component.empty();
+        }
         return Component.translatable("create.boiler." + label);
     }
 

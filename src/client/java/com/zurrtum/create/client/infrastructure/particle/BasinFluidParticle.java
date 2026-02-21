@@ -81,8 +81,9 @@ public class BasinFluidParticle extends FluidParticle {
             BlockEntity blockEntity = level.getBlockEntity(basinPos);
             if (blockEntity instanceof BasinBlockEntity) {
                 float totalUnits = ((BasinBlockEntity) blockEntity).getTotalFluidUnits(0);
-                if (totalUnits < 1)
+                if (totalUnits < 1) {
                     totalUnits = 0;
+                }
                 float fluidLevel = Mth.clamp(totalUnits / 162000, 0, 1);
                 y = 2 / 16f + basinPos.getY() + 12 / 16f * fluidLevel + yOffset;
             }

@@ -27,17 +27,18 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
         matrixStack.translate(-.5f, 0, -.5f);
 
         Entity ridingEntity = entity.getVehicle();
-        if (ridingEntity instanceof AbstractMinecart cart)
+        if (ridingEntity instanceof AbstractMinecart cart) {
             repositionOnCart(matrixStack, partialTicks, cart);
-        else if (ridingEntity instanceof AbstractContraptionEntity be) {
-            if (ridingEntity.getVehicle() instanceof AbstractMinecart cart)
+        } else if (ridingEntity instanceof AbstractContraptionEntity be) {
+            if (ridingEntity.getVehicle() instanceof AbstractMinecart cart) {
                 repositionOnCart(matrixStack, partialTicks, cart);
-            else
+            } else {
                 repositionOnContraption(entity, matrixStack, partialTicks, be);
+            }
         }
 
-        TransformStack.of(matrixStack).nudge(entity.getId()).center().rotateYDegrees(angleYaw).rotateZDegrees(anglePitch)
-            .rotateYDegrees(angleInitialYaw).uncenter();
+        TransformStack.of(matrixStack).nudge(entity.getId()).center().rotateYDegrees(angleYaw)
+            .rotateZDegrees(anglePitch).rotateYDegrees(angleInitialYaw).uncenter();
     }
 
     // Minecarts do not always render at their exact location, so the contraption
@@ -45,8 +46,9 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
     public static void repositionOnCart(PoseStack matrixStack, float partialTicks, AbstractMinecart ridingEntity) {
         Vec3 cartPos = getCartOffset(partialTicks, ridingEntity);
 
-        if (cartPos == Vec3.ZERO)
+        if (cartPos == Vec3.ZERO) {
             return;
+        }
 
         matrixStack.translate(cartPos.x, cartPos.y, cartPos.z);
     }
@@ -61,10 +63,12 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
             if (cartPos != null) {
                 Vec3 cartPosFront = controller.getPosOffs(cartX, cartY, cartZ, 0.3F);
                 Vec3 cartPosBack = controller.getPosOffs(cartX, cartY, cartZ, -0.3F);
-                if (cartPosFront == null)
+                if (cartPosFront == null) {
                     cartPosFront = cartPos;
-                if (cartPosBack == null)
+                }
+                if (cartPosBack == null) {
                     cartPosBack = cartPos;
+                }
 
                 cartX = cartPos.x - cartX;
                 cartY = (cartPosFront.y + cartPosBack.y) / 2.0D - cartY;
@@ -93,10 +97,15 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
         matrixStack.translate(pos.x, pos.y, pos.z);
     }
 
-    public static Vec3 getContraptionOffset(OrientedContraptionEntity entity, float partialTicks, AbstractContraptionEntity parent) {
+    public static Vec3 getContraptionOffset(
+        OrientedContraptionEntity entity,
+        float partialTicks,
+        AbstractContraptionEntity parent
+    ) {
         Vec3 passengerPosition = parent.getPassengerPosition(entity, partialTicks);
-        if (passengerPosition == null)
+        if (passengerPosition == null) {
             return Vec3.ZERO;
+        }
 
         double x = passengerPosition.x - Mth.lerp(partialTicks, entity.xOld, entity.getX());
         double y = passengerPosition.y - Mth.lerp(partialTicks, entity.yOld, entity.getY());

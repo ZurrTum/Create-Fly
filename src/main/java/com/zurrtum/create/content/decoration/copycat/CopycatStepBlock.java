@@ -8,11 +8,6 @@ import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementHelpers;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -37,6 +32,10 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 public class CopycatStepBlock extends WaterloggedCopycatBlock {
 
@@ -62,8 +61,10 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
     ) {
         if (!player.isShiftKeyDown() && player.mayBuild()) {
             IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
-            if (helper.matchesItem(stack))
-                return helper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+            if (helper.matchesItem(stack)) {
+                return helper.getOffset(player, level, state, pos, hitResult)
+                    .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+            }
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
@@ -77,42 +78,54 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
         @Nullable BlockPos fromPos,
         @Nullable BlockPos toPos
     ) {
-        if (fromPos == null || toPos == null)
+        if (fromPos == null || toPos == null) {
             return true;
+        }
 
         BlockState toState = reader.getBlockState(toPos);
 
-        if (!toState.is(this))
+        if (!toState.is(this)) {
             return true;
+        }
 
         Direction facing = state.getValue(FACING);
         BlockPos diff = fromPos.subtract(toPos);
         int coord = facing.getAxis().choose(diff.getX(), diff.getY(), diff.getZ());
 
         Half half = state.getValue(HALF);
-        if (half != toState.getValue(HALF))
+        if (half != toState.getValue(HALF)) {
             return diff.getY() == 0;
+        }
 
-        return facing == toState.getValue(FACING).getOpposite() && !(coord != 0 && coord != facing.getAxisDirection().getStep());
+        return facing == toState.getValue(FACING).getOpposite() && !(coord != 0 && coord != facing.getAxisDirection()
+            .getStep());
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
+    public boolean canConnectTexturesToward(
+        BlockAndTintGetter reader,
+        BlockPos fromPos,
+        BlockPos toPos,
+        BlockState state
+    ) {
         Direction facing = state.getValue(FACING);
         BlockState toState = reader.getBlockState(toPos);
         BlockPos diff = fromPos.subtract(toPos);
 
-        if (fromPos.equals(toPos.relative(facing)))
+        if (fromPos.equals(toPos.relative(facing))) {
             return false;
-        if (!toState.is(this))
+        }
+        if (!toState.is(this)) {
             return false;
+        }
 
         if (diff.getY() != 0) {
             return isOccluded(toState, state, diff.getY() > 0 ? Direction.UP : Direction.DOWN);
         }
 
-        if (isOccluded(state, toState, facing))
+        if (isOccluded(state, toState, facing)) {
             return true;
+        }
 
         int coord = facing.getAxis().choose(diff.getX(), diff.getY(), diff.getZ());
         return state.setValue(WATERLOGGED, false) == toState.setValue(WATERLOGGED, false) && coord == 0;
@@ -120,8 +133,9 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
 
     @Override
     public boolean canFaceBeOccluded(BlockState state, Direction face) {
-        if (face.getAxis() == Axis.Y)
+        if (face.getAxis() == Axis.Y) {
             return (state.getValue(HALF) == Half.TOP) == (face == Direction.UP);
+        }
         return state.getValue(FACING) == face;
     }
 
@@ -137,12 +151,15 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        BlockState stateForPlacement = super.getStateForPlacement(pContext).setValue(FACING, pContext.getHorizontalDirection());
+        BlockState stateForPlacement = super.getStateForPlacement(pContext)
+            .setValue(FACING, pContext.getHorizontalDirection());
         Direction direction = pContext.getClickedFace();
-        if (direction == Direction.UP)
+        if (direction == Direction.UP) {
             return stateForPlacement;
-        if (direction == Direction.DOWN || (pContext.getClickLocation().y - pContext.getClickedPos().getY() > 0.5D))
+        }
+        if (direction == Direction.DOWN || (pContext.getClickLocation().y - pContext.getClickedPos().getY() > 0.5D)) {
             return stateForPlacement.setValue(HALF, Half.TOP);
+        }
         return stateForPlacement;
     }
 
@@ -180,16 +197,20 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
 
         Half half = state.getValue(HALF);
         boolean vertical = pDirection.getAxis() == Axis.Y;
-        if (half != other.getValue(HALF))
+        if (half != other.getValue(HALF)) {
             return vertical && (pDirection == Direction.UP) == (half == Half.TOP);
-        if (vertical)
+        }
+        if (vertical) {
             return false;
+        }
 
         Direction facing = state.getValue(FACING);
-        if (facing.getOpposite() == other.getValue(FACING) && pDirection == facing)
+        if (facing.getOpposite() == other.getValue(FACING) && pDirection == facing) {
             return true;
-        if (other.getValue(FACING) != facing)
+        }
+        if (other.getValue(FACING) != facing) {
             return false;
+        }
         return pDirection.getAxis() != facing.getAxis();
     }
 
@@ -206,7 +227,11 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
     private static class PlacementHelper extends PoleHelper<Direction> {
 
         public PlacementHelper() {
-            super(state -> state.is(AllBlocks.COPYCAT_STEP), state -> state.getValue(FACING).getClockWise().getAxis(), FACING);
+            super(
+                state -> state.is(AllBlocks.COPYCAT_STEP),
+                state -> state.getValue(FACING).getClockWise().getAxis(),
+                FACING
+            );
         }
 
         @Override
@@ -215,11 +240,18 @@ public class CopycatStepBlock extends WaterloggedCopycatBlock {
         }
 
         @Override
-        public @NotNull PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public @NotNull PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             PlacementOffset offset = super.getOffset(player, world, state, pos, ray);
 
-            if (offset.isSuccessful())
+            if (offset.isSuccessful()) {
                 offset.withTransform(offset.getTransform().andThen(s -> s.setValue(HALF, state.getValue(HALF))));
+            }
 
             return offset;
         }

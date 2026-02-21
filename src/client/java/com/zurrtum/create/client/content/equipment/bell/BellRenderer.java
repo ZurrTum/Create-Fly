@@ -53,13 +53,19 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
         Direction facing = state.blockState.getValue(BellBlock.FACING);
         BellAttachType attachment = state.blockState.getValue(BellBlock.ATTACHMENT);
         float rY = AngleHelper.horizontalAngle(facing);
-        if (attachment == BellAttachType.SINGLE_WALL || attachment == BellAttachType.DOUBLE_WALL)
+        if (attachment == BellAttachType.SINGLE_WALL || attachment == BellAttachType.DOUBLE_WALL) {
             rY += 90;
+        }
         state.upAngle = AngleHelper.rad(rY);
     }
 
     @Override
-    public void submit(BellRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BellRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 

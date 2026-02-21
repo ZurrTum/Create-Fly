@@ -69,37 +69,45 @@ public class CogWheelBlock extends AbstractSimpleShaftBlock implements ICogWheel
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
-        if (placer instanceof Player player)
+        if (placer instanceof Player player) {
             triggerShiftingGearsAdvancement(worldIn, pos, state, player);
+        }
     }
 
     protected void triggerShiftingGearsAdvancement(Level world, BlockPos pos, BlockState state, Player player) {
-        if (world.isClientSide() || player == null)
+        if (world.isClientSide() || player == null) {
             return;
+        }
 
         Axis axis = state.getValue(CogWheelBlock.AXIS);
         for (Axis perpendicular1 : Iterate.axes) {
-            if (perpendicular1 == axis)
+            if (perpendicular1 == axis) {
                 continue;
+            }
 
             Direction d1 = Direction.get(AxisDirection.POSITIVE, perpendicular1);
             for (Axis perpendicular2 : Iterate.axes) {
-                if (perpendicular1 == perpendicular2)
+                if (perpendicular1 == perpendicular2) {
                     continue;
-                if (axis == perpendicular2)
+                }
+                if (axis == perpendicular2) {
                     continue;
+                }
 
                 Direction d2 = Direction.get(AxisDirection.POSITIVE, perpendicular2);
                 for (int offset1 : Iterate.positiveAndNegative) {
                     for (int offset2 : Iterate.positiveAndNegative) {
                         BlockPos connectedPos = pos.relative(d1, offset1).relative(d2, offset2);
                         BlockState blockState = world.getBlockState(connectedPos);
-                        if (!(blockState.getBlock() instanceof CogWheelBlock))
+                        if (!(blockState.getBlock() instanceof CogWheelBlock)) {
                             continue;
-                        if (blockState.getValue(CogWheelBlock.AXIS) != axis)
+                        }
+                        if (blockState.getValue(CogWheelBlock.AXIS) != axis) {
                             continue;
-                        if (ICogWheel.isLargeCog(blockState) == isLarge)
+                        }
+                        if (ICogWheel.isLargeCog(blockState) == isLarge) {
                             continue;
+                        }
 
                         AllAdvancements.COGS.trigger((ServerPlayer) player);
                     }
@@ -118,48 +126,56 @@ public class CogWheelBlock extends AbstractSimpleShaftBlock implements ICogWheel
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isShiftKeyDown() || !player.mayBuild())
+        if (player.isShiftKeyDown() || !player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         InteractionResult result = tryEncase(state, level, pos, stack, player, hand, hitResult);
-        if (result.consumesAction())
+        if (result.consumesAction()) {
             return result;
+        }
 
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     public static boolean isValidCogwheelPosition(boolean large, LevelReader worldIn, BlockPos pos, Axis cogAxis) {
         for (Direction facing : Iterate.directions) {
-            if (facing.getAxis() == cogAxis)
+            if (facing.getAxis() == cogAxis) {
                 continue;
+            }
 
             BlockPos offsetPos = pos.relative(facing);
             BlockState blockState = worldIn.getBlockState(offsetPos);
-            if (blockState.hasProperty(AXIS) && facing.getAxis() == blockState.getValue(AXIS))
+            if (blockState.hasProperty(AXIS) && facing.getAxis() == blockState.getValue(AXIS)) {
                 continue;
+            }
 
-            if (ICogWheel.isLargeCog(blockState) || large && ICogWheel.isSmallCog(blockState))
+            if (ICogWheel.isLargeCog(blockState) || large && ICogWheel.isSmallCog(blockState)) {
                 return false;
+            }
         }
         return true;
     }
 
     protected Axis getAxisForPlacement(BlockPlaceContext context) {
-        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())
+        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) {
             return context.getClickedFace().getAxis();
+        }
 
         Level world = context.getLevel();
         BlockState stateBelow = world.getBlockState(context.getClickedPos().below());
 
-        if (stateBelow.is(AllBlocks.ROTATION_SPEED_CONTROLLER) && isLargeCog())
+        if (stateBelow.is(AllBlocks.ROTATION_SPEED_CONTROLLER) && isLargeCog()) {
             return stateBelow.getValue(SpeedControllerBlock.HORIZONTAL_AXIS) == Axis.X ? Axis.Z : Axis.X;
+        }
 
         BlockPos placedOnPos = context.getClickedPos().relative(context.getClickedFace().getOpposite());
         BlockState placedAgainst = world.getBlockState(placedOnPos);
 
         Block block = placedAgainst.getBlock();
-        if (ICogWheel.isSmallCog(placedAgainst))
+        if (ICogWheel.isSmallCog(placedAgainst)) {
             return ((IRotate) block).getRotationAxis(placedAgainst);
+        }
 
         Axis preferredAxis = getPreferredAxis(context);
         return preferredAxis != null ? preferredAxis : context.getClickedFace().getAxis();
@@ -168,7 +184,8 @@ public class CogWheelBlock extends AbstractSimpleShaftBlock implements ICogWheel
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         boolean shouldWaterlog = context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER;
-        return this.defaultBlockState().setValue(AXIS, getAxisForPlacement(context)).setValue(BlockStateProperties.WATERLOGGED, shouldWaterlog);
+        return this.defaultBlockState().setValue(AXIS, getAxisForPlacement(context))
+            .setValue(BlockStateProperties.WATERLOGGED, shouldWaterlog);
     }
 
     @Override

@@ -47,15 +47,22 @@ public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
         WhistleSize size = blockEntity.getOctave();
         if (soundInstance == null || soundInstance.isStopped() || soundInstance.getOctave() != size) {
             mc.getSoundManager().play(soundInstance = new WhistleSoundInstance(size, pos));
-            AllSoundEvents.WHISTLE_CHIFF.playAt(world, pos, maxVolume * .175f, size == WhistleBlock.WhistleSize.SMALL ? f + .75f : f, false);
+            AllSoundEvents.WHISTLE_CHIFF.playAt(
+                world,
+                pos,
+                maxVolume * .175f,
+                size == WhistleBlock.WhistleSize.SMALL ? f + .75f : f,
+                false
+            );
             particle = true;
         }
 
         soundInstance.keepAlive();
         soundInstance.setPitch(f);
 
-        if (!particle)
+        if (!particle) {
             return;
+        }
 
         Direction facing = blockEntity.getBlockState().getOptionalValue(WhistleBlock.FACING).orElse(Direction.SOUTH);
         float angle = 180 + AngleHelper.horizontalAngle(facing);

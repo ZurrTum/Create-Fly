@@ -5,11 +5,10 @@ import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistration
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
 import com.zurrtum.create.client.ponder.foundation.PonderStoryBoardEntry;
+import net.minecraft.resources.Identifier;
 
 import java.util.Arrays;
 import java.util.function.Function;
-
-import net.minecraft.resources.Identifier;
 
 public class DefaultPonderSceneRegistrationHelper implements PonderSceneRegistrationHelper<Identifier> {
 
@@ -27,7 +26,12 @@ public class DefaultPonderSceneRegistrationHelper implements PonderSceneRegistra
     }
 
     @Override
-    public StoryBoardEntry addStoryBoard(Identifier component, Identifier schematicLocation, PonderStoryBoard storyBoard, Identifier... tags) {
+    public StoryBoardEntry addStoryBoard(
+        Identifier component,
+        Identifier schematicLocation,
+        PonderStoryBoard storyBoard,
+        Identifier... tags
+    ) {
         StoryBoardEntry entry = this.createStoryBoardEntry(storyBoard, schematicLocation, component);
         entry.highlightTags(tags);
         sceneRegistry.addStoryBoard(entry);
@@ -35,7 +39,12 @@ public class DefaultPonderSceneRegistrationHelper implements PonderSceneRegistra
     }
 
     @Override
-    public StoryBoardEntry addStoryBoard(Identifier component, String schematicPath, PonderStoryBoard storyBoard, Identifier... tags) {
+    public StoryBoardEntry addStoryBoard(
+        Identifier component,
+        String schematicPath,
+        PonderStoryBoard storyBoard,
+        Identifier... tags
+    ) {
         return addStoryBoard(component, asLocation(schematicPath), storyBoard, tags);
     }
 
@@ -54,7 +63,11 @@ public class DefaultPonderSceneRegistrationHelper implements PonderSceneRegistra
         return Identifier.fromNamespaceAndPath(namespace, path);
     }
 
-    private PonderStoryBoardEntry createStoryBoardEntry(PonderStoryBoard storyBoard, Identifier schematicLocation, Identifier component) {
+    private PonderStoryBoardEntry createStoryBoardEntry(
+        PonderStoryBoard storyBoard,
+        Identifier schematicLocation,
+        Identifier component
+    ) {
         return new PonderStoryBoardEntry(storyBoard, namespace, schematicLocation, component);
     }
 

@@ -4,18 +4,20 @@ import com.zurrtum.create.client.ponder.api.registration.MultiSceneBuilder;
 import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistrationHelper;
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
+import net.minecraft.resources.Identifier;
 
 import java.util.Arrays;
 import java.util.function.Function;
-
-import net.minecraft.resources.Identifier;
 
 public class GenericPonderSceneRegistrationHelper<T> implements PonderSceneRegistrationHelper<T> {
 
     private final PonderSceneRegistrationHelper<Identifier> helperDelegate;
     private final Function<T, Identifier> keyGen;
 
-    public GenericPonderSceneRegistrationHelper(PonderSceneRegistrationHelper<Identifier> helperDelegate, Function<T, Identifier> keyGen) {
+    public GenericPonderSceneRegistrationHelper(
+        PonderSceneRegistrationHelper<Identifier> helperDelegate,
+        Function<T, Identifier> keyGen
+    ) {
         this.helperDelegate = helperDelegate;
         this.keyGen = keyGen;
     }
@@ -25,11 +27,21 @@ public class GenericPonderSceneRegistrationHelper<T> implements PonderSceneRegis
         return new GenericPonderSceneRegistrationHelper<>(helperDelegate, keyGen.andThen(this.keyGen));
     }
 
-    public StoryBoardEntry addStoryBoard(T component, Identifier schematicLocation, PonderStoryBoard storyBoard, Identifier... tags) {
+    public StoryBoardEntry addStoryBoard(
+        T component,
+        Identifier schematicLocation,
+        PonderStoryBoard storyBoard,
+        Identifier... tags
+    ) {
         return helperDelegate.addStoryBoard(keyGen.apply(component), schematicLocation, storyBoard, tags);
     }
 
-    public StoryBoardEntry addStoryBoard(T component, String schematicPath, PonderStoryBoard storyBoard, Identifier... tags) {
+    public StoryBoardEntry addStoryBoard(
+        T component,
+        String schematicPath,
+        PonderStoryBoard storyBoard,
+        Identifier... tags
+    ) {
         return helperDelegate.addStoryBoard(keyGen.apply(component), schematicPath, storyBoard, tags);
     }
 

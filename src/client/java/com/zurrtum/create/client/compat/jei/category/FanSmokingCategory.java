@@ -61,7 +61,13 @@ public class FanSmokingCategory extends CreateCategory<RecipeHolder<SmokingRecip
     }
 
     @Override
-    public void draw(RecipeHolder<SmokingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<SmokingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 46, 27);
         AllGuiTextures.JEI_LIGHT.render(graphics, 65, 39);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 54, 51);

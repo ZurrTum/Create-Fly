@@ -78,19 +78,31 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         }
     }
 
-    private static float getAngle(float angle, float offset, Direction direction, BlockPos source, Direction sourceFacing) {
+    private static float getAngle(
+        float angle,
+        float offset,
+        Direction direction,
+        BlockPos source,
+        Direction sourceFacing
+    ) {
         if (source != null) {
-            if (sourceFacing.getAxis() == direction.getAxis())
+            if (sourceFacing.getAxis() == direction.getAxis()) {
                 angle *= sourceFacing == direction ? 1 : -1;
-            else if (sourceFacing.getAxisDirection() == direction.getAxisDirection())
+            } else if (sourceFacing.getAxisDirection() == direction.getAxisDirection()) {
                 angle *= -1;
+            }
         }
         angle += offset;
         return angle / 180f * (float) Math.PI;
     }
 
     @Override
-    public void submit(GearboxRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        GearboxRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -110,7 +122,13 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         public SuperByteBuffer east;
         public float eastAngle;
 
-        private void render(SuperByteBuffer model, float angle, Direction axis, PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
+        private void render(
+            SuperByteBuffer model,
+            float angle,
+            Direction axis,
+            PoseStack.Pose matricesEntry,
+            VertexConsumer vertexConsumer
+        ) {
             model.light(lightCoords);
             model.rotateCentered(angle, axis);
             model.color(color);

@@ -60,9 +60,20 @@ public class AutoMixingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 29);
         AllGuiTextures.JEI_SHADOW.render(context, 81, 65);
-        context.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(new Matrix3x2f(context.pose()), 91, -8));
+        context.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(
+            new Matrix3x2f(context.pose()),
+            91,
+            -8
+        ));
     }
 }

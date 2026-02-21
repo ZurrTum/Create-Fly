@@ -1,11 +1,11 @@
 package com.zurrtum.create;
 
-import static com.zurrtum.create.Create.MOD_ID;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+
+import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllEntityTags {
     public static final TagKey<EntityType<?>> BLAZE_BURNER_CAPTURABLE = register("blaze_burner_capturable");

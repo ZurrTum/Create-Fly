@@ -52,8 +52,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
     }
 
     public boolean pullNext(BlockPos root, boolean simulate) {
-        if (!frontier.isEmpty())
+        if (!frontier.isEmpty()) {
             return false;
+        }
         if (!Objects.equals(root, rootPos)) {
             rebuildContext(root);
             return false;
@@ -65,8 +66,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             return false;
         }
 
-        if (affectedArea == null)
+        if (affectedArea == null) {
             affectedArea = BoundingBox.fromCorners(root, root);
+        }
 
         Level world = getLevel();
         if (!queue.isEmpty() && !isValid) {
@@ -74,13 +76,15 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             return false;
         }
 
-        if (validationFrontier.isEmpty() && !queue.isEmpty() && !simulate && revalidateIn == 0)
+        if (validationFrontier.isEmpty() && !queue.isEmpty() && !simulate && revalidateIn == 0) {
             revalidate(root);
+        }
 
         if (!simulate && infinite) {
             blockEntity.award(AllAdvancements.HOSE_PULLEY);
-            if (FluidHelper.isLava(fluid))
+            if (FluidHelper.isLava(fluid)) {
                 blockEntity.award(AllAdvancements.HOSE_PULLEY_LAVA);
+            }
 
             playEffect(world, root, fluid, true);
             return true;
@@ -100,12 +104,13 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
                 fluid = Fluids.WATER;
             } else if (blockState.getBlock() instanceof LiquidBlock flowingFluid) {
                 emptied = Blocks.AIR.defaultBlockState();
-                if (blockState.getValue(LiquidBlock.LEVEL) == 0)
+                if (blockState.getValue(LiquidBlock.LEVEL) == 0) {
                     fluid = flowingFluid.fluid;
-                else {
+                } else {
                     affectedArea = BBHelper.encapsulate(affectedArea, BoundingBox.fromCorners(currentPos, currentPos));
-                    if (!blockEntity.isVirtual())
+                    if (!blockEntity.isVirtual()) {
                         world.setBlock(currentPos, emptied, 2 | 16);
+                    }
                     queue.dequeue();
                     if (queue.isEmpty()) {
                         isValid = checkValid(world, rootPos);
@@ -122,8 +127,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
                 emptied = Blocks.AIR.defaultBlockState();
             }
 
-            if (this.fluid == null)
+            if (this.fluid == null) {
                 this.fluid = fluid;
+            }
 
             if (!this.fluid.isSame(fluid)) {
                 queue.dequeue();
@@ -134,8 +140,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
                 continue;
             }
 
-            if (simulate)
+            if (simulate) {
                 return true;
+            }
 
             playEffect(world, currentPos, fluid, true);
             blockEntity.award(AllAdvancements.HOSE_PULLEY);
@@ -144,8 +151,12 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
                 world.setBlock(currentPos, emptied, 2 | 16);
 
                 BlockState stateAbove = world.getBlockState(currentPos.above());
-                if (stateAbove.getFluidState().getType() == Fluids.EMPTY && !stateAbove.canSurvive(world, currentPos.above()))
+                if (stateAbove.getFluidState().getType() == Fluids.EMPTY && !stateAbove.canSurvive(
+                    world,
+                    currentPos.above()
+                )) {
                     world.setBlock(currentPos.above(), Blocks.AIR.defaultBlockState(), 2 | 16);
+                }
             }
             affectedArea = BBHelper.encapsulate(affectedArea, currentPos);
 
@@ -159,11 +170,13 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             return true;
         }
 
-        if (rootPos == null)
+        if (rootPos == null) {
             return false;
+        }
 
-        if (isValid)
+        if (isValid) {
             rebuildContext(root);
+        }
 
         return false;
     }
@@ -188,47 +201,56 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             if (canPullFluidsFrom == FluidBlockType.FLOWING) {
                 for (Direction d : Iterate.directions) {
                     BlockPos side = currentPos.relative(d);
-                    if (canPullFluidsFrom(world.getBlockState(side), side) == FluidBlockType.SOURCE)
+                    if (canPullFluidsFrom(world.getBlockState(side), side) == FluidBlockType.SOURCE) {
                         return true;
+                    }
                 }
                 currentPos = currentPos.above();
                 continue;
             }
-            if (canPullFluidsFrom == FluidBlockType.SOURCE)
+            if (canPullFluidsFrom == FluidBlockType.SOURCE) {
                 return true;
+            }
             break;
         }
         return false;
     }
 
     protected enum FluidBlockType {
-        NONE,
-        SOURCE,
-        FLOWING;
+        NONE, SOURCE, FLOWING;
     }
 
     @Override
     public void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (!clientPacket && affectedArea != null)
+        if (!clientPacket && affectedArea != null) {
             frontier.add(new BlockPosEntry(rootPos, 0));
+        }
     }
 
     protected FluidBlockType canPullFluidsFrom(BlockState blockState, BlockPos pos) {
-        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED))
+        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED)) {
             return FluidBlockType.SOURCE;
-        if (blockState.getBlock() instanceof LiquidBlock)
+        }
+        if (blockState.getBlock() instanceof LiquidBlock) {
             return blockState.getValue(LiquidBlock.LEVEL) == 0 ? FluidBlockType.SOURCE : FluidBlockType.FLOWING;
-        if (blockState.getFluidState().getType() != Fluids.EMPTY && blockState.getCollisionShape(getLevel(), pos, CollisionContext.empty()).isEmpty())
+        }
+        if (blockState.getFluidState().getType() != Fluids.EMPTY && blockState.getCollisionShape(
+            getLevel(),
+            pos,
+            CollisionContext.empty()
+        ).isEmpty()) {
             return FluidBlockType.SOURCE;
+        }
         return FluidBlockType.NONE;
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (rootPos != null)
+        if (rootPos != null) {
             isValid = checkValid(getLevel(), rootPos);
+        }
         if (!frontier.isEmpty()) {
             continueSearch();
             return;
@@ -237,8 +259,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             continueValidation();
             return;
         }
-        if (revalidateIn > 0)
+        if (revalidateIn > 0) {
             revalidateIn--;
+        }
     }
 
     @Override
@@ -250,8 +273,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
         reset();
         rootPos = root;
         affectedArea = BoundingBox.fromCorners(rootPos, rootPos);
-        if (isValid)
+        if (isValid) {
             frontier.add(new BlockPosEntry(root, 0));
+        }
     }
 
     public void revalidate(BlockPos root) {
@@ -288,8 +312,9 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
             return;
         }
 
-        if (!frontier.isEmpty())
+        if (!frontier.isEmpty()) {
             return;
+        }
 
         blockEntity.sendData();
         visited.clear();
@@ -307,15 +332,17 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 
         int maxBlocks = maxBlocks();
         if (validationVisited.size() >= maxBlocks && canDrainInfinitely(fluid)) {
-            if (!infinite)
+            if (!infinite) {
                 reset();
+            }
             validationFrontier.clear();
             setLongValidationTimer();
             return;
         }
 
-        if (!validationFrontier.isEmpty())
+        if (!validationFrontier.isEmpty()) {
             return;
+        }
         if (infinite) {
             reset();
             return;
@@ -350,7 +377,10 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
     }
 
     public FluidStack getDrainableFluid(BlockPos rootPos) {
-        return fluid == null || isSearching() || !pullNext(rootPos, true) ? FluidStack.EMPTY : new FluidStack(fluid, BucketFluidInventory.CAPACITY);
+        return fluid == null || isSearching() || !pullNext(rootPos, true) ? FluidStack.EMPTY : new FluidStack(
+            fluid,
+            BucketFluidInventory.CAPACITY
+        );
     }
 
 }

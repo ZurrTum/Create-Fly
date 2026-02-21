@@ -19,9 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record ManualApplicationDisplay(
-    EntryIngredient input, EntryIngredient target, List<ProcessingOutput> outputs, boolean keepHeldItem, Optional<Identifier> location
-) implements Display {
+public record ManualApplicationDisplay(EntryIngredient input, EntryIngredient target, List<ProcessingOutput> outputs,
+                                       boolean keepHeldItem, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<ManualApplicationDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(ManualApplicationDisplay::input),

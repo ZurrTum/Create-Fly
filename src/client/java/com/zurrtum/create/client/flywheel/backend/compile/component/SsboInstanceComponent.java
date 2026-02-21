@@ -41,7 +41,9 @@ public class SsboInstanceComponent extends InstanceAssemblerComponent {
 
         builder._raw("layout(std430, binding = " + BufferBindings.INSTANCE + ") restrict readonly buffer InstanceBuffer {\n" + "    uint _flw_instances[];\n" + "};");
         builder.blankLine();
-        builder.function().signature(FnSignature.create().returnType(STRUCT_NAME).name(UNPACK_FN_NAME).arg("uint", UNPACK_ARG).build()).body(fnBody);
+        builder.function()
+            .signature(FnSignature.create().returnType(STRUCT_NAME).name(UNPACK_FN_NAME).arg("uint", UNPACK_ARG)
+                .build()).body(fnBody);
     }
 
     @Override

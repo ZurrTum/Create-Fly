@@ -10,16 +10,15 @@ import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.equipment.zapper.ConfigureZapperPacket;
 import com.zurrtum.create.infrastructure.component.PlacementPatterns;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ZapperScreen extends AbstractSimiScreen {
 
@@ -74,7 +73,11 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop;
 
-        confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            x + background.getWidth() - 33,
+            y + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(this::onClose);
         addRenderableWidget(confirmButton);
 
@@ -83,7 +86,11 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
             for (int col = 0; col <= 2; col++) {
                 int id = patternButtons.size();
                 PlacementPatterns pattern = PlacementPatterns.values()[id];
-                IconButton patternButton = new IconButton(x + background.getWidth() - 76 + col * 18, y + 21 + row * 18, getIcon(pattern));
+                IconButton patternButton = new IconButton(
+                    x + background.getWidth() - 76 + col * 18,
+                    y + 21 + row * 18,
+                    getIcon(pattern)
+                );
                 patternButton.withCallback(() -> {
                     patternButtons.forEach(b -> b.green = false);
                     patternButton.green = true;
@@ -98,11 +105,10 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
 
         addRenderableWidgets(patternButtons);
 
-        renderedItem = new ElementWidget(x + background.getWidth(), y + background.getHeight() - 48).showingElement(GuiGameElement.of(zapper)
-            .scale(4));
+        renderedItem = new ElementWidget(x + background.getWidth(), y + background.getHeight() - 48).showingElement(
+            GuiGameElement.of(zapper).scale(4));
         addRenderableWidget(renderedItem);
-        renderedBlock = new ElementWidget(x + 17, y + 24).showingElement(GuiGameElement.of(zapper.getOrDefault(
-            AllDataComponents.SHAPER_BLOCK_USED,
+        renderedBlock = new ElementWidget(x + 17, y + 24).showingElement(GuiGameElement.of(zapper.getOrDefault(AllDataComponents.SHAPER_BLOCK_USED,
             Blocks.AIR.defaultBlockState()
         )).scale(1.25f).rotate(-25f, -45f, 0).padding(10));
         addRenderableWidget(renderedBlock);

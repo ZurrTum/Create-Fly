@@ -28,8 +28,7 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
         RegistryAccess registryAccess = blockEntity.getLevel().registryAccess();
         for (BigItemStack entry : blockEntity.getAccurateSummary().getStacks()) {
             i++;
-            Map<String, Object> details = new HashMap<>(detailed.isPresent() && detailed.get() ? VanillaDetailRegistries.ITEM_STACK.getDetails(
-                registryAccess,
+            Map<String, Object> details = new HashMap<>(detailed.isPresent() && detailed.get() ? VanillaDetailRegistries.ITEM_STACK.getDetails(registryAccess,
                 entry.stack
             ) : VanillaDetailRegistries.ITEM_STACK.getBasicDetails(registryAccess, entry.stack));
             details.put("count", entry.count);
@@ -40,7 +39,11 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
 
     @LuaFunction(mainThread = true)
     public final Map<String, ?> getStockItemDetail(int slot) throws LuaException {
-        return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.getAccurateSummary(), slot);
+        return ComputerUtil.getItemDetail(
+            blockEntity.getLevel().registryAccess(),
+            blockEntity.getAccurateSummary(),
+            slot
+        );
     }
 
     @LuaFunction(mainThread = true)
@@ -52,12 +55,15 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
         List<BigItemStack> stock = blockEntity.getAccurateSummary().getStacks();
 
         for (int i = 1; i < filters.count(); i++) {
-            if (!(filters.get(i) instanceof Map<?, ?> filterTable))
+            if (!(filters.get(i) instanceof Map<?, ?> filterTable)) {
                 throw new LuaException("Filter must be a table");
+            }
 
-            for (Object key : filterTable.keySet())
-                if (!(key instanceof String))
+            for (Object key : filterTable.keySet()) {
+                if (!(key instanceof String)) {
                     throw new LuaException("Filter keys must be strings");
+                }
+            }
 
             @SuppressWarnings("unchecked") Map<String, Object> filter = (Map<String, Object>) filterTable;
 
@@ -67,10 +73,12 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
                 filterTable.remove("_requestCount");
                 if (requestCount instanceof Number) {
                     itemsRequested = ((Number) requestCount).intValue();
-                    if (itemsRequested < 1)
+                    if (itemsRequested < 1) {
                         throw new LuaException("_requestCount must be a positive number or nil for no limit");
-                } else
+                    }
+                } else {
                     throw new LuaException("_requestCount must be a positive number or nil for no limit");
+                }
             }
 
             RegistryAccess registryAccess = blockEntity.getLevel().registryAccess();
@@ -84,8 +92,9 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
                     entry.count -= toTake;
                     validItems.add(requestedItem);
                 }
-                if (itemsRequested <= 0)
+                if (itemsRequested <= 0) {
                     break;
+                }
             }
         }
 
@@ -103,7 +112,11 @@ public class StockTickerPeripheral extends SyncedPeripheral<StockTickerBlockEnti
 
     @LuaFunction(mainThread = true)
     public Map<String, ?> getItemDetail(int slot) throws LuaException {
-        return ComputerUtil.getItemDetail(blockEntity.getLevel().registryAccess(), blockEntity.getReceivedPaymentsHandler(), slot);
+        return ComputerUtil.getItemDetail(
+            blockEntity.getLevel().registryAccess(),
+            blockEntity.getReceivedPaymentsHandler(),
+            slot
+        );
     }
 
     @NotNull

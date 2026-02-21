@@ -2,9 +2,6 @@ package com.zurrtum.create.content.equipment.wrench;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.fluids.FluidPropagator;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -17,14 +14,17 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Optional;
+
 public interface IWrenchableWithBracket extends IWrenchable {
 
     public Optional<ItemStack> removeBracket(BlockGetter world, BlockPos pos, boolean inOnReplacedContext);
 
     @Override
     default InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        if (tryRemoveBracket(context))
+        if (tryRemoveBracket(context)) {
             return InteractionResult.SUCCESS;
+        }
         return IWrenchable.super.onWrenched(state, context);
     }
 
@@ -35,14 +35,25 @@ public interface IWrenchableWithBracket extends IWrenchable {
         BlockState blockState = world.getBlockState(pos);
         if (bracket.isPresent()) {
             Player player = context.getPlayer();
-            if (!world.isClientSide() && !player.isCreative())
+            if (!world.isClientSide() && !player.isCreative()) {
                 player.getInventory().placeItemBackInInventory(bracket.get());
+            }
             if (!world.isClientSide() && blockState.getBlock() == AllBlocks.FLUID_PIPE) {
                 Axis preferred = FluidPropagator.getStraightPipeAxis(blockState);
-                Direction preferredDirection = preferred == null ? Direction.UP : Direction.get(AxisDirection.POSITIVE, preferred);
-                BlockState updated = AllBlocks.FLUID_PIPE.updateBlockState(blockState, preferredDirection, null, world, pos);
-                if (updated != blockState)
+                Direction preferredDirection = preferred == null ? Direction.UP : Direction.get(
+                    AxisDirection.POSITIVE,
+                    preferred
+                );
+                BlockState updated = AllBlocks.FLUID_PIPE.updateBlockState(
+                    blockState,
+                    preferredDirection,
+                    null,
+                    world,
+                    pos
+                );
+                if (updated != blockState) {
                     world.setBlockAndUpdate(pos, updated);
+                }
             }
             return true;
         }

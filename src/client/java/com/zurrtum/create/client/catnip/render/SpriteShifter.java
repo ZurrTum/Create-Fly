@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.catnip.render;
 
+import net.minecraft.resources.Identifier;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import net.minecraft.resources.Identifier;
 
 public class SpriteShifter {
 
@@ -11,8 +11,9 @@ public class SpriteShifter {
 
     public static SpriteShiftEntry get(Identifier originalLocation, Identifier targetLocation) {
         String key = originalLocation + "->" + targetLocation;
-        if (ENTRY_CACHE.containsKey(key))
+        if (ENTRY_CACHE.containsKey(key)) {
             return ENTRY_CACHE.get(key);
+        }
 
         SpriteShiftEntry entry = new SpriteShiftEntry();
         entry.set(originalLocation, targetLocation);

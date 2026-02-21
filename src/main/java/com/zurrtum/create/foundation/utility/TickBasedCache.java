@@ -49,15 +49,17 @@ public class TickBasedCache<K, V> implements Cache<K, V> {
     @Override
     public V getIfPresent(Object key) {
         MutableInt timestamp = timestamps.get(key);
-        if (timestamp == null)
+        if (timestamp == null) {
             return null;
+        }
         if (timestamp.intValue() < ticks() - ticksUntilTimeout) {
             timestamps.remove(key);
             map.remove(key);
             return null;
         }
-        if (resetTimerOnAccess)
+        if (resetTimerOnAccess) {
             timestamp.setValue(ticks());
+        }
         return map.get(key);
     }
 
@@ -68,8 +70,9 @@ public class TickBasedCache<K, V> implements Cache<K, V> {
     @Override
     public V get(K key, Callable<? extends V> loader) throws ExecutionException {
         V ifPresent = getIfPresent(key);
-        if (ifPresent != null)
+        if (ifPresent != null) {
             return ifPresent;
+        }
         try {
             V entry = loader.call();
             map.put(key, entry);
@@ -139,10 +142,12 @@ public class TickBasedCache<K, V> implements Cache<K, V> {
     public void cleanUp() {
         Set<K> outdated = new HashSet<>();
         timestamps.forEach((k, v) -> {
-            if (v.intValue() < ticks() - ticksUntilTimeout)
+            if (v.intValue() < ticks() - ticksUntilTimeout) {
                 outdated.add(k);
-            if (resetTimerOnAccess)
+            }
+            if (resetTimerOnAccess) {
                 v.setValue(ticks());
+            }
         });
         outdated.forEach(map::remove);
         outdated.forEach(timestamps::remove);

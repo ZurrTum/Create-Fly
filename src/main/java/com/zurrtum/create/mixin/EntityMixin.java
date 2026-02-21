@@ -125,7 +125,11 @@ public abstract class EntityMixin implements SyncedDataHolder {
     }
 
     @WrapOperation(method = "playStepSound(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getSoundType()Lnet/minecraft/world/level/block/SoundType;"))
-    private SoundType getStepSound(BlockState state, Operation<SoundType> original, @Local(argsOnly = true) BlockPos pos) {
+    private SoundType getStepSound(
+        BlockState state,
+        Operation<SoundType> original,
+        @Local(argsOnly = true) BlockPos pos
+    ) {
         if (state.getBlock() instanceof SoundControlBlock block) {
             return block.getSoundGroup(level, pos);
         }

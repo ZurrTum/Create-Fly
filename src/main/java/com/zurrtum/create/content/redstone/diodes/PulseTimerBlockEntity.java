@@ -19,18 +19,21 @@ public class PulseTimerBlockEntity extends BrassDiodeBlockEntity {
 
     @Override
     protected void updateState(boolean powered, boolean powering, boolean atMax, boolean atMin) {
-        if (powered || state >= maxState.getValue() - 1)
+        if (powered || state >= maxState.getValue() - 1) {
             state = 0;
-        else
+        } else {
             state++;
+        }
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         boolean shouldPower = !powered && (maxState.getValue() == 2 ? state == 0 : state <= 1);
         BlockState blockState = getBlockState();
-        if (blockState.getValue(POWERING) != shouldPower)
+        if (blockState.getValue(POWERING) != shouldPower) {
             level.setBlockAndUpdate(worldPosition, blockState.setValue(POWERING, shouldPower));
+        }
     }
 
 }

@@ -7,14 +7,7 @@ import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.TranslatingContraption;
-import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.PistonState;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -30,6 +23,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 import static com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.*;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
@@ -58,11 +56,13 @@ public class PistonContraption extends TranslatingContraption {
 
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
-        if (!collectExtensions(world, pos, orientation))
+        if (!collectExtensions(world, pos, orientation)) {
             return false;
+        }
         int count = blocks.size();
-        if (!searchMovedStructure(world, anchor, retract ? orientation.getOpposite() : orientation))
+        if (!searchMovedStructure(world, anchor, retract ? orientation.getOpposite() : orientation)) {
             return false;
+        }
         if (blocks.size() == count) { // no new blocks added
             bounds = pistonExtensionCollisionBox;
         } else {
@@ -80,35 +80,45 @@ public class PistonContraption extends TranslatingContraption {
         BlockState blockState = world.getBlockState(pos);
         boolean sticky = isStickyPiston(blockState);
 
-        if (!isPiston(blockState))
+        if (!isPiston(blockState)) {
             return false;
+        }
 
         if (blockState.getValue(MechanicalPistonBlock.STATE) == PistonState.EXTENDED) {
-            while (PistonExtensionPoleBlock.PlacementHelper.get()
-                .matchesAxis(nextBlock, direction.getAxis()) || isPistonHead(nextBlock) && nextBlock.getValue(FACING) == direction) {
+            while (PistonExtensionPoleBlock.PlacementHelper.get().matchesAxis(
+                nextBlock,
+                direction.getAxis()
+            ) || isPistonHead(nextBlock) && nextBlock.getValue(FACING) == direction) {
 
                 actualStart = actualStart.relative(direction);
                 poles.add(new StructureBlockInfo(actualStart, nextBlock.setValue(FACING, direction), null));
                 extensionsInFront++;
 
-                if (isPistonHead(nextBlock))
+                if (isPistonHead(nextBlock)) {
                     break;
+                }
 
                 nextBlock = world.getBlockState(actualStart.relative(direction));
-                if (extensionsInFront > MechanicalPistonBlock.maxAllowedPistonPoles())
+                if (extensionsInFront > MechanicalPistonBlock.maxAllowedPistonPoles()) {
                     throw AssemblyException.tooManyPistonPoles();
+                }
             }
         }
 
-        if (extensionsInFront == 0)
+        if (extensionsInFront == 0) {
             poles.add(new StructureBlockInfo(
                 pos,
                 AllBlocks.MECHANICAL_PISTON_HEAD.defaultBlockState().setValue(FACING, direction)
                     .setValue(BlockStateProperties.PISTON_TYPE, sticky ? PistonType.STICKY : PistonType.DEFAULT),
                 null
             ));
-        else
-            poles.add(new StructureBlockInfo(pos, AllBlocks.PISTON_EXTENSION_POLE.defaultBlockState().setValue(FACING, direction), null));
+        } else {
+            poles.add(new StructureBlockInfo(
+                pos,
+                AllBlocks.PISTON_EXTENSION_POLE.defaultBlockState().setValue(FACING, direction),
+                null
+            ));
+        }
 
         BlockPos end = pos;
         nextBlock = world.getBlockState(end.relative(direction.getOpposite()));
@@ -120,8 +130,9 @@ public class PistonContraption extends TranslatingContraption {
             extensionsInBack++;
             nextBlock = world.getBlockState(end.relative(direction.getOpposite()));
 
-            if (extensionsInFront + extensionsInBack > MechanicalPistonBlock.maxAllowedPistonPoles())
+            if (extensionsInFront + extensionsInBack > MechanicalPistonBlock.maxAllowedPistonPoles()) {
                 throw AssemblyException.tooManyPistonPoles();
+            }
         }
 
         anchor = pos.relative(direction, initialExtensionProgress + 1);
@@ -132,8 +143,9 @@ public class PistonContraption extends TranslatingContraption {
             Vec3.atLowerCornerOf(BlockPos.ZERO.relative(direction, -extensionLength - 1))
         ).expandTowards(1, 1, 1);
 
-        if (extensionLength == 0)
+        if (extensionLength == 0) {
             throw AssemblyException.noPistonPoles();
+        }
 
         bounds = new AABB(0, 0, 0, 0, 0, 0);
 
@@ -153,37 +165,53 @@ public class PistonContraption extends TranslatingContraption {
     }
 
     @Override
-    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) throws AssemblyException {
+    protected boolean addToInitialFrontier(
+        Level world,
+        BlockPos pos,
+        Direction direction,
+        Queue<BlockPos> frontier
+    ) throws AssemblyException {
         frontier.clear();
         boolean sticky = isStickyPiston(world.getBlockState(pos.relative(orientation, -1)));
         boolean retracting = direction != orientation;
-        if (retracting && !sticky)
+        if (retracting && !sticky) {
             return true;
+        }
         for (int offset = 0; offset <= AllConfigs.server().kinetics.maxChassisRange.get(); offset++) {
-            if (offset == 1 && retracting)
+            if (offset == 1 && retracting) {
                 return true;
+            }
             BlockPos currentPos = pos.relative(orientation, offset + initialExtensionProgress);
-            if (retracting && world.isOutsideBuildHeight(currentPos))
+            if (retracting && world.isOutsideBuildHeight(currentPos)) {
                 return true;
-            if (!world.isLoaded(currentPos))
+            }
+            if (!world.isLoaded(currentPos)) {
                 throw AssemblyException.unloadedChunk(currentPos);
+            }
             BlockState state = world.getBlockState(currentPos);
-            if (!BlockMovementChecks.isMovementNecessary(state, world, currentPos))
+            if (!BlockMovementChecks.isMovementNecessary(state, world, currentPos)) {
                 return true;
-            if (BlockMovementChecks.isBrittle(state) && !(state.getBlock() instanceof WoolCarpetBlock))
+            }
+            if (BlockMovementChecks.isBrittle(state) && !(state.getBlock() instanceof WoolCarpetBlock)) {
                 return true;
-            if (isPistonHead(state) && state.getValue(FACING) == direction.getOpposite())
+            }
+            if (isPistonHead(state) && state.getValue(FACING) == direction.getOpposite()) {
                 return true;
-            if (!BlockMovementChecks.isMovementAllowed(state, world, currentPos))
-                if (retracting)
+            }
+            if (!BlockMovementChecks.isMovementAllowed(state, world, currentPos)) {
+                if (retracting) {
                     return true;
-                else
+                } else {
                     throw AssemblyException.unmovableBlock(currentPos, state);
-            if (retracting && state.getPistonPushReaction() == PushReaction.PUSH_ONLY)
+                }
+            }
+            if (retracting && state.getPistonPushReaction() == PushReaction.PUSH_ONLY) {
                 return true;
+            }
             frontier.add(currentPos);
-            if (BlockMovementChecks.isNotSupportive(state, orientation))
+            if (BlockMovementChecks.isNotSupportive(state, orientation)) {
                 return true;
+            }
         }
         return true;
     }
@@ -204,10 +232,16 @@ public class PistonContraption extends TranslatingContraption {
         BlockState pistonState = world.getBlockState(pistonPos);
         BlockEntity be = world.getBlockEntity(pistonPos);
         if (pos.equals(pistonPos)) {
-            if (be == null || be.isRemoved())
+            if (be == null || be.isRemoved()) {
                 return true;
-            if (!isExtensionPole(state) && isPiston(pistonState))
-                world.setBlock(pistonPos, pistonState.setValue(MechanicalPistonBlock.STATE, PistonState.RETRACTED), 3 | 16);
+            }
+            if (!isExtensionPole(state) && isPiston(pistonState)) {
+                world.setBlock(
+                    pistonPos,
+                    pistonState.setValue(MechanicalPistonBlock.STATE, PistonState.RETRACTED),
+                    3 | 16
+                );
+            }
             return true;
         }
         return false;

@@ -93,19 +93,22 @@ public class TransformedInstance extends ColoredLitOverlayInstance implements Af
 
     @Override
     public TransformedInstance rotateXCentered(float radians) {
-        pose.translate(Affine.CENTER, Affine.CENTER, Affine.CENTER).rotateX(radians).translate(-Affine.CENTER, -Affine.CENTER, -Affine.CENTER);
+        pose.translate(Affine.CENTER, Affine.CENTER, Affine.CENTER).rotateX(radians)
+            .translate(-Affine.CENTER, -Affine.CENTER, -Affine.CENTER);
         return this;
     }
 
     @Override
     public TransformedInstance rotateYCentered(float radians) {
-        pose.translate(Affine.CENTER, Affine.CENTER, Affine.CENTER).rotateY(radians).translate(-Affine.CENTER, -Affine.CENTER, -Affine.CENTER);
+        pose.translate(Affine.CENTER, Affine.CENTER, Affine.CENTER).rotateY(radians)
+            .translate(-Affine.CENTER, -Affine.CENTER, -Affine.CENTER);
         return this;
     }
 
     @Override
     public TransformedInstance rotateZCentered(float radians) {
-        pose.translate(Affine.CENTER, Affine.CENTER, Affine.CENTER).rotateZ(radians).translate(-Affine.CENTER, -Affine.CENTER, -Affine.CENTER);
+        pose.translate(Affine.CENTER, Affine.CENTER, Affine.CENTER).rotateZ(radians)
+            .translate(-Affine.CENTER, -Affine.CENTER, -Affine.CENTER);
         return this;
     }
 

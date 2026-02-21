@@ -6,15 +6,14 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-
-import java.util.Optional;
-import java.util.Random;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Optional;
+import java.util.Random;
 
 public class TransportedItemStack implements Comparable<TransportedItemStack> {
     public static final Codec<TransportedItemStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -26,7 +25,8 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         Codec.INT.fieldOf("InSegment").forGetter(i -> i.insertedAt),
         Codec.INT.fieldOf("Angle").forGetter(i -> i.angle),
         Direction.CODEC.fieldOf("InDirection").forGetter(i -> i.insertedFrom),
-        CreateRegistries.FAN_PROCESSING_TYPE.byNameCodec().optionalFieldOf("FanProcessingType").forGetter(i -> Optional.ofNullable(i.processedBy)),
+        CreateRegistries.FAN_PROCESSING_TYPE.byNameCodec().optionalFieldOf("FanProcessingType")
+            .forGetter(i -> Optional.ofNullable(i.processedBy)),
         Codec.INT.optionalFieldOf("FanProcessingTime", 0).forGetter(i -> i.processingTime),
         Codec.BOOL.fieldOf("Locked").forGetter(i -> i.locked),
         Codec.BOOL.fieldOf("LockedExternally").forGetter(i -> i.lockedExternally)
@@ -133,17 +133,20 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
 
         if (processedBy != null) {
             Identifier key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(processedBy);
-            if (key == null)
+            if (key == null) {
                 throw new IllegalArgumentException("Could not get id for FanProcessingType " + processedBy + "!");
+            }
 
             nbt.putString("FanProcessingType", key.toString());
             nbt.putInt("FanProcessingTime", processingTime);
         }
 
-        if (locked)
+        if (locked) {
             nbt.putBoolean("Locked", locked);
-        if (lockedExternally)
+        }
+        if (lockedExternally) {
             nbt.putBoolean("LockedExternally", lockedExternally);
+        }
         return nbt;
     }
 

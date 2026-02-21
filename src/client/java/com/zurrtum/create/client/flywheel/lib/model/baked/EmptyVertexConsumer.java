@@ -52,7 +52,19 @@ class EmptyVertexConsumer implements VertexConsumer {
     }
 
     @Override
-    public void addVertex(float x, float y, float z, int color, float u, float v, int overlayCoords, int lightCoords, float nx, float ny, float nz) {
+    public void addVertex(
+        float x,
+        float y,
+        float z,
+        int color,
+        float u,
+        float v,
+        int overlayCoords,
+        int lightCoords,
+        float nx,
+        float ny,
+        float nz
+    ) {
     }
 
     @Override
@@ -71,7 +83,16 @@ class EmptyVertexConsumer implements VertexConsumer {
     }
 
     @Override
-    public void putBulkData(PoseStack.Pose pose, BakedQuad quad, float r, float g, float b, float a, int lightCoords, int overlayCoords) {
+    public void putBulkData(
+        PoseStack.Pose pose,
+        BakedQuad quad,
+        float r,
+        float g,
+        float b,
+        float a,
+        int lightCoords,
+        int overlayCoords
+    ) {
     }
 
     @Override

@@ -53,7 +53,8 @@ public class CogwheelBlockItem extends BlockItem {
             IPlacementHelper helper = PlacementHelpers.get(item.placementHelperId);
             BlockState state = world.getBlockState(pos);
             if (helper.matchesState(state) && player != null && !player.isShiftKeyDown()) {
-                InteractionResult result = helper.getOffset(player, world, state, pos, ray).placeInWorld(world, item, player, hand);
+                InteractionResult result = helper.getOffset(player, world, state, pos, ray)
+                    .placeInWorld(world, item, player, hand);
                 if (result != InteractionResult.TRY_WITH_EMPTY_HAND) {
                     return result;
                 }
@@ -76,9 +77,16 @@ public class CogwheelBlockItem extends BlockItem {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
-            if (hitOnShaft(state, ray))
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
+            if (hitOnShaft(state, ray)) {
                 return PlacementOffset.fail();
+            }
 
             if (!ICogWheel.isLargeCog(state)) {
                 Axis axis = ((IRotate) state.getBlock()).getRotationAxis(state);
@@ -87,11 +95,13 @@ public class CogwheelBlockItem extends BlockItem {
                 for (Direction dir : directions) {
                     BlockPos newPos = pos.relative(dir);
 
-                    if (!CogWheelBlock.isValidCogwheelPosition(false, world, newPos, axis))
+                    if (!CogWheelBlock.isValidCogwheelPosition(false, world, newPos, axis)) {
                         continue;
+                    }
 
-                    if (!world.getBlockState(newPos).canBeReplaced())
+                    if (!world.getBlockState(newPos).canBeReplaced()) {
                         continue;
+                    }
 
                     return PlacementOffset.success(newPos, s -> s.setValue(AXIS, axis));
 
@@ -112,9 +122,16 @@ public class CogwheelBlockItem extends BlockItem {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
-            if (hitOnShaft(state, ray))
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
+            if (hitOnShaft(state, ray)) {
                 return PlacementOffset.fail();
+            }
 
             if (ICogWheel.isLargeCog(state)) {
                 Axis axis = ((IRotate) state.getBlock()).getRotationAxis(state);
@@ -123,11 +140,13 @@ public class CogwheelBlockItem extends BlockItem {
                 for (Direction dir : directions) {
                     BlockPos newPos = pos.relative(dir).relative(side);
 
-                    if (!CogWheelBlock.isValidCogwheelPosition(true, world, newPos, dir.getAxis()))
+                    if (!CogWheelBlock.isValidCogwheelPosition(true, world, newPos, dir.getAxis())) {
                         continue;
+                    }
 
-                    if (!world.getBlockState(newPos).canBeReplaced())
+                    if (!world.getBlockState(newPos).canBeReplaced()) {
                         continue;
+                    }
 
                     return PlacementOffset.success(newPos, s -> s.setValue(AXIS, dir.getAxis()));
                 }
@@ -147,7 +166,13 @@ public class CogwheelBlockItem extends BlockItem {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             // diagonal gears of different size
             Axis axis = ((IRotate) state.getBlock()).getRotationAxis(state);
             Direction closest = IPlacementHelper.orderedByDistanceExceptAxis(pos, ray.getLocation(), axis).getFirst();
@@ -160,11 +185,13 @@ public class CogwheelBlockItem extends BlockItem {
 
             for (Direction dir : directions) {
                 BlockPos newPos = pos.relative(dir).relative(closest);
-                if (!world.getBlockState(newPos).canBeReplaced())
+                if (!world.getBlockState(newPos).canBeReplaced()) {
                     continue;
+                }
 
-                if (!CogWheelBlock.isValidCogwheelPosition(ICogWheel.isLargeCog(state), world, newPos, axis))
+                if (!CogWheelBlock.isValidCogwheelPosition(ICogWheel.isLargeCog(state), world, newPos, axis)) {
                     continue;
+                }
 
                 return PlacementOffset.success(newPos, s -> s.setValue(AXIS, axis));
             }
@@ -173,8 +200,8 @@ public class CogwheelBlockItem extends BlockItem {
         }
 
         protected boolean hitOnShaft(BlockState state, BlockHitResult ray) {
-            return AllShapes.SIX_VOXEL_POLE.get(((IRotate) state.getBlock()).getRotationAxis(state)).bounds().inflate(0.001)
-                .contains(ray.getLocation().subtract(ray.getLocation().align(Iterate.axisSet)));
+            return AllShapes.SIX_VOXEL_POLE.get(((IRotate) state.getBlock()).getRotationAxis(state)).bounds()
+                .inflate(0.001).contains(ray.getLocation().subtract(ray.getLocation().align(Iterate.axisSet)));
         }
     }
 
@@ -191,32 +218,47 @@ public class CogwheelBlockItem extends BlockItem {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             Direction face = ray.getDirection();
             Axis newAxis;
 
-            if (state.hasProperty(HorizontalKineticBlock.HORIZONTAL_FACING))
+            if (state.hasProperty(HorizontalKineticBlock.HORIZONTAL_FACING)) {
                 newAxis = state.getValue(HorizontalKineticBlock.HORIZONTAL_FACING).getAxis();
-            else if (state.hasProperty(DirectionalKineticBlock.FACING))
+            } else if (state.hasProperty(DirectionalKineticBlock.FACING)) {
                 newAxis = state.getValue(DirectionalKineticBlock.FACING).getAxis();
-            else if (state.hasProperty(RotatedPillarKineticBlock.AXIS))
+            } else if (state.hasProperty(RotatedPillarKineticBlock.AXIS)) {
                 newAxis = state.getValue(RotatedPillarKineticBlock.AXIS);
-            else
+            } else {
                 newAxis = Axis.Y;
+            }
 
-            if (face.getAxis() == newAxis)
+            if (face.getAxis() == newAxis) {
                 return PlacementOffset.fail();
+            }
 
-            List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(pos, ray.getLocation(), face.getAxis(), newAxis);
+            List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(
+                pos,
+                ray.getLocation(),
+                face.getAxis(),
+                newAxis
+            );
 
             for (Direction d : directions) {
                 BlockPos newPos = pos.relative(face).relative(d);
 
-                if (!world.getBlockState(newPos).canBeReplaced())
+                if (!world.getBlockState(newPos).canBeReplaced()) {
                     continue;
+                }
 
-                if (!CogWheelBlock.isValidCogwheelPosition(false, world, newPos, newAxis))
+                if (!CogWheelBlock.isValidCogwheelPosition(false, world, newPos, newAxis)) {
                     return PlacementOffset.fail();
+                }
 
                 return PlacementOffset.success(newPos, s -> s.setValue(CogWheelBlock.AXIS, newAxis));
             }
@@ -239,32 +281,42 @@ public class CogwheelBlockItem extends BlockItem {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             Direction face = ray.getDirection();
             Axis newAxis;
 
-            if (state.hasProperty(HorizontalKineticBlock.HORIZONTAL_FACING))
+            if (state.hasProperty(HorizontalKineticBlock.HORIZONTAL_FACING)) {
                 newAxis = state.getValue(HorizontalKineticBlock.HORIZONTAL_FACING).getAxis();
-            else if (state.hasProperty(DirectionalKineticBlock.FACING))
+            } else if (state.hasProperty(DirectionalKineticBlock.FACING)) {
                 newAxis = state.getValue(DirectionalKineticBlock.FACING).getAxis();
-            else if (state.hasProperty(RotatedPillarKineticBlock.AXIS))
+            } else if (state.hasProperty(RotatedPillarKineticBlock.AXIS)) {
                 newAxis = state.getValue(RotatedPillarKineticBlock.AXIS);
-            else
+            } else {
                 newAxis = Axis.Y;
+            }
 
-            if (face.getAxis() == newAxis)
+            if (face.getAxis() == newAxis) {
                 return PlacementOffset.fail();
+            }
 
             List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(pos, ray.getLocation(), newAxis);
 
             for (Direction d : directions) {
                 BlockPos newPos = pos.relative(d);
 
-                if (!world.getBlockState(newPos).canBeReplaced())
+                if (!world.getBlockState(newPos).canBeReplaced()) {
                     continue;
+                }
 
-                if (!CogWheelBlock.isValidCogwheelPosition(false, world, newPos, newAxis))
+                if (!CogWheelBlock.isValidCogwheelPosition(false, world, newPos, newAxis)) {
                     return PlacementOffset.fail();
+                }
 
                 return PlacementOffset.success().at(newPos).withTransform(s -> s.setValue(CogWheelBlock.AXIS, newAxis));
             }

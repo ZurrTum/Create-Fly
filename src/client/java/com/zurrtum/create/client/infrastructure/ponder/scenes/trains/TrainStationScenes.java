@@ -57,7 +57,8 @@ public class TrainStationScenes {
 
         AABB bb = new AABB(util.vector().topOf(11, 0, 6), util.vector().topOf(11, 0, 6)).move(0, 2 / 16f, 0);
 
-        scene.overlay().showControls(marker, Pointing.DOWN, 40).rightClick().withItem(AllItems.TRACK_STATION.getDefaultInstance());
+        scene.overlay().showControls(marker, Pointing.DOWN, 40).rightClick()
+            .withItem(AllItems.TRACK_STATION.getDefaultInstance());
         scene.idle(6);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb, 1);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, bb.inflate(.45f, 1 / 16f, .45f), 100);
@@ -69,10 +70,16 @@ public class TrainStationScenes {
 
         scene.world().showSection(station, Direction.DOWN);
         scene.idle(15);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, bb, new AABB(stationPos).contract(1 / 16f, 2 / 16f, 1 / 16f), 20);
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.GREEN,
+            bb,
+            new AABB(stationPos).contract(1 / 16f, 2 / 16f, 1 / 16f),
+            20
+        );
         scene.idle(25);
 
-        scene.overlay().showText(80).pointAt(marker).attachKeyFrame().placeNearTarget().text("Stations are the Waypoints of your Track Network");
+        scene.overlay().showText(80).pointAt(marker).attachKeyFrame().placeNearTarget()
+            .text("Stations are the Waypoints of your Track Network");
         scene.idle(90);
 
         scene.overlay().showControls(stationTop, Pointing.DOWN, 50).rightClick();
@@ -98,16 +105,19 @@ public class TrainStationScenes {
         scene.overlay().showControls(util.vector().topOf(11, 0, 6), Pointing.RIGHT, 80).rightClick().withItem(casing);
         scene.idle(6);
         scene.world().restoreBlocks(util.select().position(10, 2, 6));
-        ElementLink<WorldSectionElement> trainElement1 = scene.world().showIndependentSection(util.select().position(10, 2, 6), Direction.DOWN);
+        ElementLink<WorldSectionElement> trainElement1 = scene.world()
+            .showIndependentSection(util.select().position(10, 2, 6), Direction.DOWN);
         scene.idle(20);
-        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(10, 2, 6), Direction.WEST)).placeNearTarget().attachKeyFrame()
-            .colored(PonderPalette.BLUE).text("Create new bogeys by using Train Casing on Tracks");
+        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(10, 2, 6), Direction.WEST))
+            .placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
+            .text("Create new bogeys by using Train Casing on Tracks");
         scene.idle(55);
 
         scene.overlay().showControls(util.vector().topOf(4, 0, 6), Pointing.RIGHT, 15).rightClick().withItem(casing);
         scene.idle(6);
         scene.world().setBlock(util.grid().at(3, 2, 6), AllBlocks.SMALL_BOGEY.defaultBlockState(), false);
-        ElementLink<WorldSectionElement> trainElement2 = scene.world().showIndependentSection(util.select().position(3, 2, 6), Direction.DOWN);
+        ElementLink<WorldSectionElement> trainElement2 = scene.world()
+            .showIndependentSection(util.select().position(3, 2, 6), Direction.DOWN);
         scene.idle(20);
         scene.overlay().showControls(util.vector().topOf(7, 0, 6), Pointing.RIGHT, 15).rightClick().withItem(casing);
         scene.idle(6);
@@ -115,8 +125,8 @@ public class TrainStationScenes {
         scene.world().showSectionAndMerge(util.select().position(6, 2, 6), Direction.DOWN, trainElement2);
         scene.idle(30);
 
-        scene.overlay().showText(50).pointAt(util.vector().topOf(3, 0, 6)).placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
-            .text("Click the track again to cycle between bogey designs");
+        scene.overlay().showText(50).pointAt(util.vector().topOf(3, 0, 6)).placeNearTarget().attachKeyFrame()
+            .colored(PonderPalette.BLUE).text("Click the track again to cycle between bogey designs");
         scene.idle(35);
 
         scene.overlay().showControls(util.vector().topOf(4, 0, 6), Pointing.RIGHT, 15).rightClick();
@@ -135,8 +145,8 @@ public class TrainStationScenes {
             40
         );
 
-        scene.overlay().showText(70).pointAt(util.vector().topOf(3, 2, 6)).placeNearTarget().attachKeyFrame().colored(PonderPalette.GREEN)
-            .text("Attach blocks with the help of Super Glue");
+        scene.overlay().showText(70).pointAt(util.vector().topOf(3, 2, 6)).placeNearTarget().attachKeyFrame()
+            .colored(PonderPalette.GREEN).text("Attach blocks with the help of Super Glue");
         scene.idle(35);
 
         scene.world().showSectionAndMerge(train1, Direction.DOWN, trainElement1);
@@ -159,10 +169,16 @@ public class TrainStationScenes {
         AABB glue1 = new AABB(util.grid().at(10, 2, 6));
         AABB glue2 = new AABB(util.grid().at(4, 2, 6));
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue2, glue2, 1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue2, glue2.inflate(2, 0, 1).expandTowards(1, 3, 0), 60);
+        scene.overlay()
+            .chaseBoundingBoxOutline(PonderPalette.GREEN, glue2, glue2.inflate(2, 0, 1).expandTowards(1, 3, 0), 60);
         scene.idle(5);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue1, glue1, 1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue1, glue1.inflate(1.25, 0, .25).expandTowards(0, 1, 0), 60);
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.GREEN,
+            glue1,
+            glue1.inflate(1.25, 0, .25).expandTowards(0, 1, 0),
+            60
+        );
         scene.idle(15);
         scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 2, 6)), Pointing.UP, 40)
             .withItem(AllItems.SUPER_GLUE.getDefaultInstance());
@@ -171,17 +187,20 @@ public class TrainStationScenes {
             .withItem(AllItems.SUPER_GLUE.getDefaultInstance());
         scene.idle(55);
 
-        scene.overlay().showControls(util.vector().topOf(util.grid().at(5, 3, 5)), Pointing.DOWN, 40).withItem(new ItemStack(Items.CHARCOAL));
+        scene.overlay().showControls(util.vector().topOf(util.grid().at(5, 3, 5)), Pointing.DOWN, 40)
+            .withItem(new ItemStack(Items.CHARCOAL));
         scene.idle(10);
-        scene.overlay().showText(90).pointAt(util.vector().blockSurface(util.grid().at(5, 3, 5), Direction.WEST)).placeNearTarget().attachKeyFrame()
-            .colored(PonderPalette.BLUE).text("Assembled Trains will move faster if they can find fuel in assembled chests or barrels");
+        scene.overlay().showText(90).pointAt(util.vector().blockSurface(util.grid().at(5, 3, 5), Direction.WEST))
+            .placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
+            .text("Assembled Trains will move faster if they can find fuel in assembled chests or barrels");
         scene.idle(100);
         scene.overlay().showOutlineWithText(util.select().fromTo(4, 3, 6, 5, 4, 7), 60)
-            .pointAt(util.vector().blockSurface(util.grid().at(5, 4, 6), Direction.UP)).colored(PonderPalette.RED).placeNearTarget()
-            .text("Fuel stored in Vaults will not be consumed by the train");
+            .pointAt(util.vector().blockSurface(util.grid().at(5, 4, 6), Direction.UP)).colored(PonderPalette.RED)
+            .placeNearTarget().text("Fuel stored in Vaults will not be consumed by the train");
         scene.idle(75);
 
-        ElementLink<WorldSectionElement> controlsElement = scene.world().showIndependentSection(controls, Direction.DOWN);
+        ElementLink<WorldSectionElement> controlsElement = scene.world()
+            .showIndependentSection(controls, Direction.DOWN);
         scene.idle(15);
         scene.overlay().showText(60).pointAt(util.vector().topOf(10, 3, 6)).placeNearTarget().attachKeyFrame()
             .text("Every Train requires Train Controls on board");
@@ -208,7 +227,8 @@ public class TrainStationScenes {
         scene.world().animateTrainStation(stationPos, true);
         scene.idle(20);
 
-        ElementLink<ParrotElement> birb = scene.special().createBirb(util.vector().centerOf(10, 3, 6), ParrotPose.FacePointOfInterestPose::new);
+        ElementLink<ParrotElement> birb = scene.special()
+            .createBirb(util.vector().centerOf(10, 3, 6), ParrotPose.FacePointOfInterestPose::new);
         scene.idle(15);
         scene.special().movePointOfInterest(util.grid().at(18, 3, 6));
         scene.idle(15);
@@ -233,7 +253,8 @@ public class TrainStationScenes {
             .text("Trains can be disassembled back into blocks at stations only");
         scene.idle(85);
 
-        scene.overlay().showControls(stationTop, Pointing.DOWN, 75).rightClick().withItem(new ItemStack(Items.FILLED_MAP));
+        scene.overlay().showControls(stationTop, Pointing.DOWN, 75).rightClick()
+            .withItem(new ItemStack(Items.FILLED_MAP));
         scene.idle(15);
         scene.overlay().showText(70).pointAt(stationTop).placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
             .text("When used on a station, maps will add a labeled marker at the location");
@@ -251,7 +272,8 @@ public class TrainStationScenes {
         scene.idle(15);
 
         Vec3 target = util.vector().topOf(util.grid().at(5, 3, 6));
-        scene.overlay().showControls(target, Pointing.DOWN, 75).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(target, Pointing.DOWN, 75).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(15);
 
         scene.overlay().showText(70).pointAt(target).placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
@@ -301,7 +323,8 @@ public class TrainStationScenes {
         scene.overlay().showText(90).pointAt(target).placeNearTarget().attachKeyFrame()
             .text("Schedules can be used to provide drivers with a destination");
         scene.idle(70);
-        scene.overlay().showControls(target.add(0, 0.5, 0), Pointing.DOWN, 40).withItem(AllItems.SCHEDULE.getDefaultInstance());
+        scene.overlay().showControls(target.add(0, 0.5, 0), Pointing.DOWN, 40)
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
         scene.special().movePointOfInterest(util.grid().at(9, 4, 6));
 
@@ -331,8 +354,8 @@ public class TrainStationScenes {
         scene.world().toggleRedstonePower(redstone);
         scene.effects().indicateRedstone(stationPos);
         scene.idle(25);
-        scene.overlay().showText(80).pointAt(util.vector().topOf(stationPos.north()).subtract(0, 14 / 16f, 0)).placeNearTarget().attachKeyFrame()
-            .text("Comparators will receive a signal whenever a Train is present");
+        scene.overlay().showText(80).pointAt(util.vector().topOf(stationPos.north()).subtract(0, 14 / 16f, 0))
+            .placeNearTarget().attachKeyFrame().text("Comparators will receive a signal whenever a Train is present");
         scene.idle(90);
 
         scene.world().hideSection(redstone, Direction.NORTH);
@@ -349,10 +372,11 @@ public class TrainStationScenes {
         scene.idle(25);
 
         target = target.add(10, 0, 0);
-        scene.overlay().showText(90).pointAt(marker.add(-.45, 0, 0)).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
-            .text("Mind that a Station can only be approached from the indicated direction");
+        scene.overlay().showText(90).pointAt(marker.add(-.45, 0, 0)).colored(PonderPalette.RED).placeNearTarget()
+            .attachKeyFrame().text("Mind that a Station can only be approached from the indicated direction");
         scene.idle(70);
-        scene.overlay().showControls(target.add(0, 0.5, 0), Pointing.DOWN, 40).withItem(AllItems.SCHEDULE.getDefaultInstance());
+        scene.overlay().showControls(target.add(0, 0.5, 0), Pointing.DOWN, 40)
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
 
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, bb, bb, 1);
@@ -383,8 +407,8 @@ public class TrainStationScenes {
         scene.world().showSection(belt, Direction.SOUTH);
         scene.idle(15);
 
-        scene.overlay().showText(70).pointAt(util.vector().topOf(stationPos).add(-.5, 0, 0)).placeNearTarget().attachKeyFrame()
-            .text("Stations can also be used to assign new Schedules automatically");
+        scene.overlay().showText(70).pointAt(util.vector().topOf(stationPos).add(-.5, 0, 0)).placeNearTarget()
+            .attachKeyFrame().text("Stations can also be used to assign new Schedules automatically");
         scene.idle(40);
 
         trainElement = scene.world().showIndependentSection(train, Direction.DOWN);
@@ -397,16 +421,23 @@ public class TrainStationScenes {
         scene.special().moveParrot(birb, util.vector().of(4, 0, 0), 20);
         scene.idle(10);
 
-        scene.world().createItemOnBelt(util.grid().at(11, 1, 3), Direction.DOWN, AllItems.SCHEDULE.getDefaultInstance());
+        scene.world()
+            .createItemOnBelt(util.grid().at(11, 1, 3), Direction.DOWN, AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(10);
         scene.world().animateTrainStation(stationPos, true);
         scene.idle(10);
-        scene.overlay().showControls(util.vector().topOf(stationPos), Pointing.DOWN, 20).withItem(AllItems.SCHEDULE.getDefaultInstance());
+        scene.overlay().showControls(util.vector().topOf(stationPos), Pointing.DOWN, 20)
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(30);
         scene.effects().indicateSuccess(stationPos);
         scene.idle(10);
         target = util.vector().centerOf(6, 3, 6);
-        scene.overlay().showLine(PonderPalette.GREEN, util.vector().topOf(stationPos).add(0, -.125, .45), target.add(0, 0, -.5), 40);
+        scene.overlay().showLine(
+            PonderPalette.GREEN,
+            util.vector().topOf(stationPos).add(0, -.125, .45),
+            target.add(0, 0, -.5),
+            40
+        );
         scene.idle(10);
         scene.effects().indicateSuccess(util.grid().at(6, 3, 6));
         scene.special().conductorBirb(birb, true);
@@ -426,7 +457,8 @@ public class TrainStationScenes {
         scene.special().hideElement(birb, null);
         scene.idle(25);
 
-        scene.overlay().showText(100).pointAt(util.vector().topOf(stationPos).add(-.5, 0, 0)).placeNearTarget().colored(PonderPalette.BLUE)
+        scene.overlay().showText(100).pointAt(util.vector().topOf(stationPos).add(-.5, 0, 0)).placeNearTarget()
+            .colored(PonderPalette.BLUE)
             .text("As opposed to manual scheduling, drivers will not take the item with them");
         scene.idle(60);
     }

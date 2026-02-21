@@ -10,8 +10,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record RemoveBlockEntityPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, RemoveBlockEntityPacket> CODEC = BlockPos.STREAM_CODEC.map(
-        RemoveBlockEntityPacket::new,
+    public static final StreamCodec<ByteBuf, RemoveBlockEntityPacket> CODEC = BlockPos.STREAM_CODEC.map(RemoveBlockEntityPacket::new,
         RemoveBlockEntityPacket::pos
     );
 

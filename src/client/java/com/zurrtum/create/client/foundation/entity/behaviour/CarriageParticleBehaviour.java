@@ -43,29 +43,36 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
 
     public void tick() {
         Contraption contraption = entity.getContraption();
-        if (contraption == null)
+        if (contraption == null) {
             return;
-        if (!(contraption instanceof CarriageContraption))
+        }
+        if (!(contraption instanceof CarriageContraption)) {
             return;
+        }
         Carriage carriage = entity.getCarriage();
-        if (carriage == null)
+        if (carriage == null) {
             return;
+        }
         Minecraft mc = Minecraft.getInstance();
         Entity camEntity = mc.getCameraEntity();
-        if (camEntity == null)
+        if (camEntity == null) {
             return;
+        }
         Carriage.DimensionalCarriageEntity dce = carriage.getDimensional(entity.level());
-        if (!dce.pointsInitialised)
+        if (!dce.pointsInitialised) {
             return;
+        }
         Vec3 leadingAnchor = dce.leadingAnchor();
-        if (leadingAnchor == null || !leadingAnchor.closerThan(camEntity.position(), 64))
+        if (leadingAnchor == null || !leadingAnchor.closerThan(camEntity.position(), 64)) {
             return;
+        }
 
         RandomSource r = entity.level().random;
         Vec3 contraptionMotion = entity.position().subtract(entity.getPrevPositionVec());
         double length = contraptionMotion.length();
-        if (arrived && length > 0.01f)
+        if (arrived && length > 0.01f) {
             arrived = false;
+        }
         arrived |= entity.isStalled();
 
         boolean stopped = length < .002f;
@@ -74,11 +81,13 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
                 arrived = true;
                 depressurise = (int) (20 * entity.getCarriage().train.accumulatedSteamRelease / 10f);
             }
-        } else
+        } else {
             depressurise = 0;
+        }
 
-        if (depressurise > 0)
+        if (depressurise > 0) {
             depressurise--;
+        }
 
         brakes.chase(prevMotion > length + length / 512f ? 1 : 0, .25f, Chaser.exp(.625f));
         brakes.tickChaser();
@@ -91,22 +100,26 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
         int bogeySpacing = entity.getCarriage().bogeySpacing;
 
         for (CarriageBogey bogey : entity.getCarriage().bogeys) {
-            if (bogey == null)
+            if (bogey == null) {
                 continue;
+            }
 
             boolean spark = depressurise == 0 || depressurise > 10;
 
             float cutoff = length < 1 / 8f ? 0 : 1 / 8f;
 
-            if (length > 1 / 6f)
+            if (length > 1 / 6f) {
                 cutoff = Math.max(cutoff, brakes.getValue() * 1.15f);
+            }
 
             for (int j : Iterate.positiveAndNegative) {
-                if (r.nextFloat() > cutoff && (spark || r.nextInt(4) == 0))
+                if (r.nextFloat() > cutoff && (spark || r.nextInt(4) == 0)) {
                     continue;
+                }
                 for (int i : Iterate.positiveAndNegative) {
-                    if (r.nextFloat() > cutoff && (spark || r.nextInt(4) == 0))
+                    if (r.nextFloat() > cutoff && (spark || r.nextInt(4) == 0)) {
                         continue;
+                    }
 
                     Vec3 v = Vec3.ZERO.add(j * 1.15, spark ? -.6f : .32, i);
                     Vec3 m = Vec3.ZERO.add(j * (spark ? .5 : .25), spark ? .49 : -.29, 0);
@@ -129,7 +142,15 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
 
                     m = m.add(contraptionMotion.scale(.75f));
 
-                    level.addParticle(spark ? bogey.getStyle().contactParticle : bogey.getStyle().smokeParticle, v.x, v.y, v.z, m.x, m.y, m.z);
+                    level.addParticle(
+                        spark ? bogey.getStyle().contactParticle : bogey.getStyle().smokeParticle,
+                        v.x,
+                        v.y,
+                        v.z,
+                        m.x,
+                        m.y,
+                        m.z
+                    );
                 }
             }
         }

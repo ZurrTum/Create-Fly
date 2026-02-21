@@ -3,11 +3,6 @@ package com.zurrtum.create.content.equipment.armor;
 import com.zurrtum.create.*;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
@@ -25,6 +20,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 public class BacktankUtil {
 
@@ -52,9 +51,11 @@ public class BacktankUtil {
         for (Function<LivingEntity, List<ItemStack>> supplier : BACKTANK_SUPPLIERS) {
             List<ItemStack> result = supplier.apply(entity);
 
-            for (ItemStack stack : result)
-                if (hasAirRemaining(stack))
+            for (ItemStack stack : result) {
+                if (hasAirRemaining(stack)) {
                     all.add(stack);
+                }
+            }
         }
 
         // Sort with ascending order (we want to prioritize the most empty so things actually run out)
@@ -77,18 +78,21 @@ public class BacktankUtil {
         int newAir = Math.max(air - i, 0);
         backtank.set(AllDataComponents.BACKTANK_AIR, Math.min(newAir, maxAir));
 
-        if (!(entity instanceof ServerPlayer player))
+        if (!(entity instanceof ServerPlayer player)) {
             return;
+        }
 
         sendWarning(player, air, newAir, maxAir / 10f);
         sendWarning(player, air, newAir, 1);
     }
 
     private static void sendWarning(ServerPlayer player, float air, float newAir, float threshold) {
-        if (newAir > threshold)
+        if (newAir > threshold) {
             return;
-        if (air <= threshold)
+        }
+        if (air <= threshold) {
             return;
+        }
 
         boolean depleted = threshold == 1;
         MutableComponent component = Component.translatable(depleted ? "create.backtank.depleted" : "create.backtank.low");
@@ -98,7 +102,8 @@ public class BacktankUtil {
 
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 40, 10));
         player.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal("\u26A0 ")
-            .withStyle(depleted ? ChatFormatting.RED : ChatFormatting.GOLD).append(component.withStyle(ChatFormatting.GRAY))));
+            .withStyle(depleted ? ChatFormatting.RED : ChatFormatting.GOLD)
+            .append(component.withStyle(ChatFormatting.GRAY))));
         player.connection.send(new ClientboundSetTitleTextPacket(CommonComponents.EMPTY));
     }
 
@@ -123,13 +128,16 @@ public class BacktankUtil {
     }
 
     public static boolean canAbsorbDamage(LivingEntity entity, int usesPerTank) {
-        if (usesPerTank == 0)
+        if (usesPerTank == 0) {
             return true;
-        if (entity instanceof Player playerEntity && playerEntity.isCreative())
+        }
+        if (entity instanceof Player playerEntity && playerEntity.isCreative()) {
             return true;
+        }
         List<ItemStack> backtanks = getAllWithAir(entity);
-        if (backtanks.isEmpty())
+        if (backtanks.isEmpty()) {
             return false;
+        }
         int cost = Math.max(maxAirWithoutEnchants() / usesPerTank, 1);
         consumeAir(entity, backtanks.getFirst(), cost);
         return true;
@@ -138,49 +146,64 @@ public class BacktankUtil {
     // For Air-using tools
 
     public static boolean isBarVisible(ItemStack stack, int usesPerTank) {
-        if (usesPerTank == 0)
+        if (usesPerTank == 0) {
             return false;
+        }
         Player player = AllClientHandle.INSTANCE.getPlayer();
-        if (player == null)
+        if (player == null) {
             return false;
+        }
         List<ItemStack> backtanks = getAllWithAir(player);
-        if (backtanks.isEmpty())
+        if (backtanks.isEmpty()) {
             return stack.isDamaged();
+        }
         return true;
     }
 
     public static int getBarWidth(ItemStack stack, int usesPerTank) {
-        if (usesPerTank == 0)
+        if (usesPerTank == 0) {
             return 13;
+        }
         Player player = AllClientHandle.INSTANCE.getPlayer();
-        if (player == null)
+        if (player == null) {
             return 13;
+        }
 
         List<ItemStack> backtanks = getAllWithAir(player);
 
-        if (backtanks.isEmpty())
+        if (backtanks.isEmpty()) {
             return Math.round(13.0F - (float) stack.getDamageValue() / stack.getMaxDamage() * 13.0F);
+        }
 
-        if (backtanks.size() == 1)
+        if (backtanks.size() == 1) {
             return backtanks.getFirst().getItem().getBarWidth(backtanks.getFirst());
+        }
 
         // If there is more than one backtank, average the bar widths.
-        int sumBarWidth = backtanks.stream().map(backtank -> backtank.getItem().getBarWidth(backtank)).reduce(0, Integer::sum);
+        int sumBarWidth = backtanks.stream().map(backtank -> backtank.getItem().getBarWidth(backtank))
+            .reduce(0, Integer::sum);
 
         return Math.round((float) sumBarWidth / backtanks.size());
     }
 
     public static int getBarColor(ItemStack stack, int usesPerTank) {
-        if (usesPerTank == 0)
+        if (usesPerTank == 0) {
             return 0;
+        }
         Player player = AllClientHandle.INSTANCE.getPlayer();
-        if (player == null)
+        if (player == null) {
             return 0;
+        }
         List<ItemStack> backtanks = getAllWithAir(player);
 
         // Fallback colour
-        if (backtanks.isEmpty())
-            return Mth.hsvToRgb(Math.max(0.0F, 1.0F - (float) stack.getDamageValue() / stack.getMaxDamage()) / 3.0F, 1.0F, 1.0F);
+        if (backtanks.isEmpty()) {
+            return Mth.hsvToRgb(
+                Math.max(0.0F, 1.0F - (float) stack.getDamageValue() / stack.getMaxDamage()) / 3.0F,
+                1.0F,
+                1.0F
+            );
+        }
 
         // Just return the "first" backtank for the bar color since that's the one we are consuming from
         return backtanks.getFirst().getItem().getBarColor(backtanks.getFirst());

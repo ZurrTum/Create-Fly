@@ -18,7 +18,8 @@ public abstract class MountedItemStorageType<T extends MountedItemStorage> {
     public static final SimpleRegistry<Block, MountedItemStorageType<?>> REGISTRY = SimpleRegistry.create();
 
     public final MapCodec<? extends T> codec;
-    public final Holder.Reference<MountedItemStorageType<?>> holder = CreateRegistries.MOUNTED_ITEM_STORAGE_TYPE.createIntrusiveHolder(this);
+    public final Holder.Reference<MountedItemStorageType<?>> holder = CreateRegistries.MOUNTED_ITEM_STORAGE_TYPE.createIntrusiveHolder(
+        this);
 
     protected MountedItemStorageType(MapCodec<? extends T> codec) {
         this.codec = codec;

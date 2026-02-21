@@ -4,11 +4,6 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.api.registry.CreateRegistryKeys;
 import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -18,9 +13,14 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public interface ItemAttribute {
-    Codec<ItemAttribute> CODEC = CreateRegistries.ITEM_ATTRIBUTE_TYPE.byNameCodec().dispatch(ItemAttribute::getType, ItemAttributeType::codec);
+    Codec<ItemAttribute> CODEC = CreateRegistries.ITEM_ATTRIBUTE_TYPE.byNameCodec()
+        .dispatch(ItemAttribute::getType, ItemAttributeType::codec);
     StreamCodec<RegistryFriendlyByteBuf, ItemAttribute> PACKET_CODEC = ByteBufCodecs.registry(CreateRegistryKeys.ITEM_ATTRIBUTE_TYPE)
         .dispatch(ItemAttribute::getType, ItemAttributeType::packetCodec);
 
@@ -48,7 +48,10 @@ public interface ItemAttribute {
     ItemAttributeType getType();
 
     default MutableComponent format(boolean inverted) {
-        return Component.translatable("create.item_attributes." + getTranslationKey() + (inverted ? ".inverted" : ""), getTranslationParameters());
+        return Component.translatable(
+            "create.item_attributes." + getTranslationKey() + (inverted ? ".inverted" : ""),
+            getTranslationParameters()
+        );
     }
 
     String getTranslationKey();

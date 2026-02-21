@@ -7,15 +7,14 @@ import com.zurrtum.create.client.flywheel.backend.engine.uniform.LevelUniforms;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
-import org.jetbrains.annotations.Nullable;
-import org.joml.*;
-
-import java.lang.Math;
-
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
+import org.jetbrains.annotations.Nullable;
+import org.joml.*;
+
+import java.lang.Math;
 
 public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
     private static final Long2IntMap WORLD_LIGHT_CACHE = new Long2IntOpenHashMap();
@@ -58,7 +57,11 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
     private final ShiftOutput shiftOutput = new ShiftOutput();
     private final Vector4f lightPos = new Vector4f();
 
-    public ShadeSeparatingSuperByteBuffer(TemplateMesh template, int[] shadeSwapVertices, boolean invertFakeDiffuseNormal) {
+    public ShadeSeparatingSuperByteBuffer(
+        TemplateMesh template,
+        int[] shadeSwapVertices,
+        boolean invertFakeDiffuseNormal
+    ) {
         this.template = template;
         this.shadeSwapVertices = shadeSwapVertices;
         this.invertFakeDiffuseNormal = invertFakeDiffuseNormal;
@@ -175,16 +178,17 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
                 light = SuperByteBuffer.maxLight(light, getLight(levelWithLight, lightPos));
             }
 
-            builder.addVertex(pos.x(), pos.y(), pos.z()).setColor(r, g, b, a).setUv(u, v).setOverlay(overlay).setLight(light)
-                .setNormal(normal.x(), normal.y(), normal.z());
+            builder.addVertex(pos.x(), pos.y(), pos.z()).setColor(r, g, b, a).setUv(u, v).setOverlay(overlay)
+                .setLight(light).setNormal(normal.x(), normal.y(), normal.z());
         }
 
         reset();
     }
 
     public SuperByteBuffer reset() {
-        while (!transforms.isEmpty())
+        while (!transforms.isEmpty()) {
             transforms.popPose();
+        }
         transforms.pushPose();
 
         r = 1;
@@ -304,8 +308,10 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
 
     public SuperByteBuffer shiftUVtoSheet(SpriteShiftEntry entry, float uTarget, float vTarget, int sheetSize) {
         spriteShiftFunc = (u, v, output) -> {
-            float targetU = entry.getTarget().getU((SpriteShiftEntry.getUnInterpolatedU(entry.getOriginal(), u) / sheetSize) + uTarget);
-            float targetV = entry.getTarget().getV((SpriteShiftEntry.getUnInterpolatedV(entry.getOriginal(), v) / sheetSize) + vTarget);
+            float targetU = entry.getTarget()
+                .getU((SpriteShiftEntry.getUnInterpolatedU(entry.getOriginal(), u) / sheetSize) + uTarget);
+            float targetV = entry.getTarget()
+                .getV((SpriteShiftEntry.getUnInterpolatedV(entry.getOriginal(), v) / sheetSize) + vTarget);
             output.accept(targetU, targetV);
         };
         return this;

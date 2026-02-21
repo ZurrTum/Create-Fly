@@ -17,7 +17,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public record TunnelFlapPacket(BlockPos pos, List<Pair<Direction, Boolean>> flaps) implements Packet<ClientGamePacketListener> {
+public record TunnelFlapPacket(BlockPos pos,
+                               List<Pair<Direction, Boolean>> flaps) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, TunnelFlapPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         TunnelFlapPacket::pos,

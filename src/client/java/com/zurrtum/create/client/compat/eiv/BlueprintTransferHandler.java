@@ -52,7 +52,10 @@ public class BlueprintTransferHandler implements RecipeTransferHandler {
                 Optional<TagKey<Item>> tag = ingredient.itemTag();
                 if (tag.isPresent()) {
                     ItemStack filterItem = AllItems.ATTRIBUTE_FILTER.getDefaultInstance();
-                    filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, AttributeFilterWhitelistMode.WHITELIST_DISJ);
+                    filterItem.set(
+                        AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+                        AttributeFilterWhitelistMode.WHITELIST_DISJ
+                    );
                     filterItem.set(
                         AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES,
                         List.of(new ItemAttributeEntry(new InTagAttribute(tag.get()), false))

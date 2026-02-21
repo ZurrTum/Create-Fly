@@ -32,16 +32,20 @@ public abstract class Storage<T> {
     }
 
     public Plan<DynamicVisual.Context> framePlan() {
-        var update = ConditionalPlan.<DynamicVisual.Context>on(() -> !ImplDebugFlags.PAUSE_UPDATES)
-            .then(NestedPlan.of(dynamicVisuals, ForEachPlan.of(() -> simpleDynamicVisuals, SimpleDynamicVisual::beginFrame)));
+        var update = ConditionalPlan.<DynamicVisual.Context>on(() -> !ImplDebugFlags.PAUSE_UPDATES).then(NestedPlan.of(
+            dynamicVisuals,
+            ForEachPlan.of(() -> simpleDynamicVisuals, SimpleDynamicVisual::beginFrame)
+        ));
 
         // Do light updates regardless.
         return NestedPlan.of(lightUpdatedVisuals.plan(), update);
     }
 
     public Plan<TickableVisual.Context> tickPlan() {
-        return ConditionalPlan.<TickableVisual.Context>on(() -> !ImplDebugFlags.PAUSE_UPDATES)
-            .then(NestedPlan.of(tickableVisuals, ForEachPlan.of(() -> simpleTickableVisuals, SimpleTickableVisual::tick)));
+        return ConditionalPlan.<TickableVisual.Context>on(() -> !ImplDebugFlags.PAUSE_UPDATES).then(NestedPlan.of(
+            tickableVisuals,
+            ForEachPlan.of(() -> simpleTickableVisuals, SimpleTickableVisual::tick)
+        ));
     }
 
     public LightUpdatedVisualStorage lightUpdatedVisuals() {

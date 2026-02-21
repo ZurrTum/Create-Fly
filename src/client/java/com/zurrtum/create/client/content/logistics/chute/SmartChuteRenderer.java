@@ -43,7 +43,12 @@ public class SmartChuteRenderer extends SmartBlockEntityRenderer<SmartChuteBlock
     }
 
     @Override
-    public void submit(SmartChuteRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SmartChuteRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.item != null) {
             state.item.render(matrices, queue, state.lightCoords);

@@ -72,8 +72,9 @@ public class AABBOutline extends Outline {
         renderBoxFaces(ms, buffer, cull, params.getHighlightedFace(), minPos, maxPos, color, lightmap);
 
         float lineWidth = params.getLineWidth();
-        if (lineWidth == 0)
+        if (lineWidth == 0) {
             return;
+        }
 
         VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
         renderBoxEdges(ms, consumer, minPos, maxPos, lineWidth, color, lightmap, disableLineNormals);
@@ -114,8 +115,9 @@ public class AABBOutline extends Outline {
         // TODO: Presumably, the other texture should be used, but this was not noticed before so fixing it may lead to suboptimal visuals.
         //BindableTexture faceTexture = highlighted ? params.hightlightedFaceTexture : params.faceTexture;
         BindableTexture faceTexture = params.faceTexture;
-        if (faceTexture == null)
+        if (faceTexture == null) {
             return;
+        }
 
         RenderType renderType = PonderRenderTypes.outlineTranslucent(faceTexture.getLocation(), cull);
         VertexConsumer consumer = buffer.getLateBuffer(renderType);
@@ -241,30 +243,110 @@ public class AABBOutline extends Outline {
         float lineLengthZ = maxPos.z() - minPos.z();
 
         origin.set(minPos);
-        bufferCuboidLine(pose, consumer, origin, Direction.EAST, lineLengthX, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.EAST,
+            lineLengthX,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
         bufferCuboidLine(pose, consumer, origin, Direction.UP, lineLengthY, lineWidth, color, lightmap, disableNormals);
-        bufferCuboidLine(pose, consumer, origin, Direction.SOUTH, lineLengthZ, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.SOUTH,
+            lineLengthZ,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
 
         origin.set(maxPos.x(), minPos.y(), minPos.z());
         bufferCuboidLine(pose, consumer, origin, Direction.UP, lineLengthY, lineWidth, color, lightmap, disableNormals);
-        bufferCuboidLine(pose, consumer, origin, Direction.SOUTH, lineLengthZ, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.SOUTH,
+            lineLengthZ,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
 
         origin.set(minPos.x(), maxPos.y(), minPos.z());
-        bufferCuboidLine(pose, consumer, origin, Direction.EAST, lineLengthX, lineWidth, color, lightmap, disableNormals);
-        bufferCuboidLine(pose, consumer, origin, Direction.SOUTH, lineLengthZ, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.EAST,
+            lineLengthX,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.SOUTH,
+            lineLengthZ,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
 
         origin.set(minPos.x(), minPos.y(), maxPos.z());
-        bufferCuboidLine(pose, consumer, origin, Direction.EAST, lineLengthX, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.EAST,
+            lineLengthX,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
         bufferCuboidLine(pose, consumer, origin, Direction.UP, lineLengthY, lineWidth, color, lightmap, disableNormals);
 
         origin.set(minPos.x(), maxPos.y(), maxPos.z());
-        bufferCuboidLine(pose, consumer, origin, Direction.EAST, lineLengthX, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.EAST,
+            lineLengthX,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
 
         origin.set(maxPos.x(), minPos.y(), maxPos.z());
         bufferCuboidLine(pose, consumer, origin, Direction.UP, lineLengthY, lineWidth, color, lightmap, disableNormals);
 
         origin.set(maxPos.x(), maxPos.y(), minPos.z());
-        bufferCuboidLine(pose, consumer, origin, Direction.SOUTH, lineLengthZ, lineWidth, color, lightmap, disableNormals);
+        bufferCuboidLine(
+            pose,
+            consumer,
+            origin,
+            Direction.SOUTH,
+            lineLengthZ,
+            lineWidth,
+            color,
+            lightmap,
+            disableNormals
+        );
     }
 
 }

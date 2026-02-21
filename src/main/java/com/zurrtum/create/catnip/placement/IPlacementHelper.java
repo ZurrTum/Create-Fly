@@ -3,14 +3,6 @@ package com.zurrtum.create.catnip.placement;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -22,6 +14,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public interface IPlacementHelper {
 
@@ -56,7 +55,14 @@ public interface IPlacementHelper {
     PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray);
 
     //sets the offset's ghost state with the default state of the held block item, this is used in PlacementHelpers and can be ignored in most cases
-    default PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray, ItemStack heldItem) {
+    default PlacementOffset getOffset(
+        Player player,
+        Level world,
+        BlockState state,
+        BlockPos pos,
+        BlockHitResult ray,
+        ItemStack heldItem
+    ) {
         PlacementOffset offset = getOffset(player, world, state, pos, ray);
         if (heldItem.getItem() instanceof BlockItem blockItem) {
             offset = offset.withGhostState(blockItem.getBlock().defaultBlockState());
@@ -68,7 +74,12 @@ public interface IPlacementHelper {
         return orderedByDistance(pos, hit, dir -> dir.getAxis() == axis);
     }
 
-    static List<Direction> orderedByDistanceOnlyAxis(BlockPos pos, Vec3 hit, Direction.Axis axis, Predicate<Direction> includeDirection) {
+    static List<Direction> orderedByDistanceOnlyAxis(
+        BlockPos pos,
+        Vec3 hit,
+        Direction.Axis axis,
+        Predicate<Direction> includeDirection
+    ) {
         return orderedByDistance(pos, hit, ((Predicate<Direction>) dir -> dir.getAxis() == axis).and(includeDirection));
     }
 
@@ -76,11 +87,21 @@ public interface IPlacementHelper {
         return orderedByDistance(pos, hit, dir -> dir.getAxis() != axis);
     }
 
-    static List<Direction> orderedByDistanceExceptAxis(BlockPos pos, Vec3 hit, Direction.Axis axis, Predicate<Direction> includeDirection) {
+    static List<Direction> orderedByDistanceExceptAxis(
+        BlockPos pos,
+        Vec3 hit,
+        Direction.Axis axis,
+        Predicate<Direction> includeDirection
+    ) {
         return orderedByDistance(pos, hit, ((Predicate<Direction>) dir -> dir.getAxis() != axis).and(includeDirection));
     }
 
-    static List<Direction> orderedByDistanceExceptAxis(BlockPos pos, Vec3 hit, Direction.Axis first, Direction.Axis second) {
+    static List<Direction> orderedByDistanceExceptAxis(
+        BlockPos pos,
+        Vec3 hit,
+        Direction.Axis first,
+        Direction.Axis second
+    ) {
         return orderedByDistanceExceptAxis(pos, hit, first, d -> d.getAxis() != second);
     }
 
@@ -91,7 +112,12 @@ public interface IPlacementHelper {
         Direction.Axis second,
         Predicate<Direction> includeDirection
     ) {
-        return orderedByDistanceExceptAxis(pos, hit, first, ((Predicate<Direction>) d -> d.getAxis() != second).and(includeDirection));
+        return orderedByDistanceExceptAxis(
+            pos,
+            hit,
+            first,
+            ((Predicate<Direction>) d -> d.getAxis() != second).and(includeDirection)
+        );
     }
 
     static List<Direction> orderedByDistance(BlockPos pos, Vec3 hit) {

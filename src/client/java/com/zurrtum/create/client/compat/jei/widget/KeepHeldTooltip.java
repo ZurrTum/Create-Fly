@@ -10,8 +10,8 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 public class KeepHeldTooltip implements IRecipeSlotRichTooltipCallback {
-    private static final Either<FormattedText, TooltipComponent> KEEP_HELD = Either.left(CreateLang.translateDirect("recipe.deploying.not_consumed")
-        .withStyle(ChatFormatting.GOLD));
+    private static final Either<FormattedText, TooltipComponent> KEEP_HELD = Either.left(CreateLang.translateDirect(
+        "recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD));
 
     @Override
     public void onRichTooltip(IRecipeSlotView iRecipeSlotView, ITooltipBuilder tooltip) {

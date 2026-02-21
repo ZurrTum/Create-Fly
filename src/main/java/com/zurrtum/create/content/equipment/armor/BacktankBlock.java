@@ -10,10 +10,6 @@ import com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
-
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -50,6 +46,9 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
+import java.util.Optional;
 
 public class BacktankBlock extends HorizontalKineticBlock implements IBE<BacktankBlockEntity>, SimpleWaterloggedBlock, SpecialBlockItemRequirement {
 
@@ -90,15 +89,17 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
         BlockState neighbourState,
         RandomSource random
     ) {
-        if (state.getValue(BlockStateProperties.WATERLOGGED))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+        }
         return state;
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
-        return super.getStateForPlacement(context).setValue(BlockStateProperties.WATERLOGGED, fluidState.getType() == Fluids.WATER);
+        return super.getStateForPlacement(context)
+            .setValue(BlockStateProperties.WATERLOGGED, fluidState.getType() == Fluids.WATER);
     }
 
     @Override
@@ -114,16 +115,20 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
-        if (stack == null)
+        }
+        if (stack == null) {
             return;
+        }
         withBlockEntityDo(
             worldIn, pos, be -> {
-                be.setCapacityEnchantLevel(stack.getEnchantments().getLevel(worldIn.registryAccess().getOrThrow(AllEnchantments.CAPACITY)));
+                be.setCapacityEnchantLevel(stack.getEnchantments()
+                    .getLevel(worldIn.registryAccess().getOrThrow(AllEnchantments.CAPACITY)));
                 be.setAirLevel(stack.getOrDefault(AllDataComponents.BACKTANK_AIR, 0));
-                if (stack.has(DataComponents.CUSTOM_NAME))
+                if (stack.has(DataComponents.CUSTOM_NAME)) {
                     be.setCustomName(stack.getCustomName());
+                }
 
                 be.setComponentPatch(stack.getComponentsPatch());
             }
@@ -135,16 +140,19 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
         List<ItemStack> lootDrops = super.getDrops(pState, pBuilder);
 
         BlockEntity blockEntity = pBuilder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (!(blockEntity instanceof BacktankBlockEntity bbe))
+        if (!(blockEntity instanceof BacktankBlockEntity bbe)) {
             return lootDrops;
+        }
 
         DataComponentPatch components = bbe.getComponentPatch().forget(c -> c.equals(AllDataComponents.BACKTANK_AIR));
-        if (components.isEmpty())
+        if (components.isEmpty()) {
             return lootDrops;
+        }
 
         return lootDrops.stream().peek(stack -> {
-            if (stack.getItem() instanceof BacktankItem)
+            if (stack.getItem() instanceof BacktankItem) {
                 stack.applyComponents(components);
+            }
         }).toList();
     }
 
@@ -158,16 +166,21 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null)
+        if (player == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (FakePlayerHandler.has(player))
+        }
+        if (FakePlayerHandler.has(player)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.getMainHandItem().getItem() instanceof BlockItem)
+        }
+        if (player.getMainHandItem().getItem() instanceof BlockItem) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (!player.getItemBySlot(EquipmentSlot.CHEST).isEmpty())
+        }
+        if (!player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (!level.isClientSide()) {
             level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .75f, 1);
             player.setItemSlot(EquipmentSlot.CHEST, getCloneItemStack(level, pos, state, true));
@@ -184,7 +197,8 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
 
         Optional<BacktankBlockEntity> blockEntityOptional = getBlockEntityOptional(pLevel, pos);
 
-        DataComponentPatch components = blockEntityOptional.map(BacktankBlockEntity::getComponentPatch).orElse(DataComponentPatch.EMPTY);
+        DataComponentPatch components = blockEntityOptional.map(BacktankBlockEntity::getComponentPatch)
+            .orElse(DataComponentPatch.EMPTY);
         int air = blockEntityOptional.map(BacktankBlockEntity::getAirLevel).orElse(0);
 
         ItemStack stack = new ItemStack(item.builtInRegistryHolder(), 1, components);
@@ -193,7 +207,12 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState p_220053_1_,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return AllShapes.BACKTANK;
     }
 

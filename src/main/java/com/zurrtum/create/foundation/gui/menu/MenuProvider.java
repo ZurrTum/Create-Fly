@@ -15,7 +15,12 @@ public interface MenuProvider {
         return Component.empty();
     }
 
-    @Nullable MenuBase<?> createMenu(int syncId, Inventory playerInventory, Player player, RegistryFriendlyByteBuf extraData);
+    @Nullable MenuBase<?> createMenu(
+        int syncId,
+        Inventory playerInventory,
+        Player player,
+        RegistryFriendlyByteBuf extraData
+    );
 
     default void openHandledScreen(ServerPlayer player) {
         openHandledScreen(player, this);
@@ -32,7 +37,8 @@ public interface MenuProvider {
         MenuBase<?> menu = provider.createMenu(player.containerCounter, player.getInventory(), player, buf);
         if (menu == null) {
             if (player.isSpectator()) {
-                player.displayClientMessage(Component.translatable("container.spectatorCantOpen").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                    Component.translatable("container.spectatorCantOpen").withStyle(ChatFormatting.RED), true);
             }
 
             buf.release();
@@ -41,7 +47,12 @@ public interface MenuProvider {
             byte[] data = new byte[buf.readableBytes()];
             buf.readBytes(data);
             buf.release();
-            player.connection.send(new OpenScreenPacket(menu.containerId, menu.getMenuType(), provider.getDisplayName(), data));
+            player.connection.send(new OpenScreenPacket(
+                menu.containerId,
+                menu.getMenuType(),
+                provider.getDisplayName(),
+                data
+            ));
             player.initMenu(menu);
             player.containerMenu = menu;
         }

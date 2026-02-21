@@ -92,7 +92,12 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
     }
 
     @Override
-    public void submit(ElevatorPulleyRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ElevatorPulleyRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -116,7 +121,11 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
 
     protected SuperByteBuffer getRotatedCoil(KineticBlockEntity be) {
         BlockState blockState = be.getBlockState();
-        return CachedBuffers.partialFacing(AllPartialModels.ELEVATOR_COIL, blockState, blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING));
+        return CachedBuffers.partialFacing(
+            AllPartialModels.ELEVATOR_COIL,
+            blockState,
+            blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING)
+        );
     }
 
     @Override
@@ -147,19 +156,22 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
                 super.render(matricesEntry, vertexConsumer);
             }
             if (magnet != null) {
-                magnet.center().rotateY(yRot).uncenter().translate(0, magnetOffset, 0).light(magnetLight).renderInto(matricesEntry, vertexConsumer);
+                magnet.center().rotateY(yRot).uncenter().translate(0, magnetOffset, 0).light(magnetLight)
+                    .renderInto(matricesEntry, vertexConsumer);
             }
             if (coilScroll != 0) {
                 rotatedCoil.shiftUVScrolling(coilShift, coilScroll);
             }
             rotatedCoil.light(lightCoords).renderInto(matricesEntry, vertexConsumer);
             if (halfRope != null) {
-                halfRope.center().rotateY(yRot).uncenter().translate(0, halfRopeOffset, 0).shiftUVScrolling(halfShift, halfScroll)
-                    .light(halfRopeLight).renderInto(matricesEntry, vertexConsumer);
+                halfRope.center().rotateY(yRot).uncenter().translate(0, halfRopeOffset, 0)
+                    .shiftUVScrolling(halfShift, halfScroll).light(halfRopeLight)
+                    .renderInto(matricesEntry, vertexConsumer);
             }
             if (rope != null) {
                 for (int i = 0, size = offsets.length; i < size; i++) {
-                    rope.center().rotateY(yRot).uncenter().translate(0, offsets[i], 0).shiftUVScrolling(halfShift, halfScroll).light(lights[i])
+                    rope.center().rotateY(yRot).uncenter().translate(0, offsets[i], 0)
+                        .shiftUVScrolling(halfShift, halfScroll).light(lights[i])
                         .renderInto(matricesEntry, vertexConsumer);
                 }
             }

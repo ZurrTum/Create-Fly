@@ -93,10 +93,12 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
                 BlockState blockState = scene.getLevel().getBlockState(pos);
                 BlockEntity blockEntity = scene.getLevel().getBlockEntity(pos);
 
-                if (!(blockState.getBlock() instanceof KineticBlock kb))
+                if (!(blockState.getBlock() instanceof KineticBlock kb)) {
                     return;
-                if (!(blockEntity instanceof KineticBlockEntity kbe))
+                }
+                if (!(blockEntity instanceof KineticBlockEntity kbe)) {
                     return;
+                }
 
                 Direction.Axis rotationAxis = kb.getRotationAxis(blockState);
 
@@ -116,8 +118,9 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
                     rotationAxis
                 );
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 20; i++) {
                     scene.getLevel().addParticle(particleData, location.x, location.y, location.z, 0, 0, 0);
+                }
             });
         }
 
@@ -154,32 +157,41 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
             addInstruction(scene -> {
                 PonderLevel world = scene.getLevel();
                 BlockEntity blockEntity = world.getBlockEntity(location);
-                if (!(blockEntity instanceof SmartBlockEntity beltBlockEntity))
+                if (!(blockEntity instanceof SmartBlockEntity beltBlockEntity)) {
                     return;
+                }
                 DirectBeltInputBehaviour behaviour = beltBlockEntity.getBehaviour(DirectBeltInputBehaviour.TYPE);
-                if (behaviour == null)
+                if (behaviour == null) {
                     return;
+                }
                 behaviour.handleInsertion(stack, insertionSide.getOpposite(), false);
             });
             flapFunnel(location.above(), true);
         }
 
-        public ElementLink<BeltItemElement> createItemOnBelt(BlockPos beltLocation, Direction insertionSide, ItemStack stack) {
+        public ElementLink<BeltItemElement> createItemOnBelt(
+            BlockPos beltLocation,
+            Direction insertionSide,
+            ItemStack stack
+        ) {
             ElementLink<BeltItemElement> link = new ElementLinkImpl<>(BeltItemElement.class);
             addInstruction(scene -> {
                 PonderLevel world = scene.getLevel();
                 BlockEntity blockEntity = world.getBlockEntity(beltLocation);
-                if (!(blockEntity instanceof BeltBlockEntity beltBlockEntity))
+                if (!(blockEntity instanceof BeltBlockEntity beltBlockEntity)) {
                     return;
+                }
 
                 DirectBeltInputBehaviour behaviour = beltBlockEntity.getBehaviour(DirectBeltInputBehaviour.TYPE);
                 behaviour.handleInsertion(stack, insertionSide.getOpposite(), false);
 
                 BeltBlockEntity controllerBE = beltBlockEntity.getControllerBE();
-                if (controllerBE != null)
+                if (controllerBE != null) {
                     controllerBE.tick();
+                }
 
-                TransportedItemStackHandlerBehaviour transporter = beltBlockEntity.getBehaviour(TransportedItemStackHandlerBehaviour.TYPE);
+                TransportedItemStackHandlerBehaviour transporter = beltBlockEntity.getBehaviour(
+                    TransportedItemStackHandlerBehaviour.TYPE);
                 transporter.handleProcessingOnAllItems(tis -> {
                     BeltItemElement tracker = new BeltItemElement(tis);
                     scene.addElement(tracker);
@@ -195,28 +207,36 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
             addInstruction(scene -> {
                 PonderLevel world = scene.getLevel();
                 BlockEntity blockEntity = world.getBlockEntity(beltLocation);
-                if (!(blockEntity instanceof SmartBlockEntity beltBlockEntity))
+                if (!(blockEntity instanceof SmartBlockEntity beltBlockEntity)) {
                     return;
-                TransportedItemStackHandlerBehaviour transporter = beltBlockEntity.getBehaviour(TransportedItemStackHandlerBehaviour.TYPE);
-                if (transporter == null)
+                }
+                TransportedItemStackHandlerBehaviour transporter = beltBlockEntity.getBehaviour(
+                    TransportedItemStackHandlerBehaviour.TYPE);
+                if (transporter == null) {
                     return;
-                transporter.handleCenteredProcessingOnAllItems(.52f, tis -> TransportedItemStackHandlerBehaviour.TransportedResult.removeItem());
+                }
+                transporter.handleCenteredProcessingOnAllItems(
+                    .52f,
+                    tis -> TransportedItemStackHandlerBehaviour.TransportedResult.removeItem()
+                );
             });
         }
 
         public void stallBeltItem(ElementLink<BeltItemElement> link, boolean stalled) {
             addInstruction(scene -> {
                 BeltItemElement resolve = scene.resolve(link);
-                if (resolve != null)
+                if (resolve != null) {
                     resolve.ifPresent(tis -> tis.locked = stalled);
+                }
             });
         }
 
         public void changeBeltItemTo(ElementLink<BeltItemElement> link, ItemStack newStack) {
             addInstruction(scene -> {
                 BeltItemElement resolve = scene.resolve(link);
-                if (resolve != null)
+                if (resolve != null) {
                     resolve.ifPresent(tis -> tis.stack = newStack);
+                }
             });
         }
 
@@ -250,19 +270,26 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
             modifyBlockEntityNBT(
                 selection, teType, nbt -> {
                     if (!filter.isEmpty()) {
-                        RegistryOps<Tag> ops = world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                        RegistryOps<Tag> ops = world().getHolderLookupProvider()
+                            .createSerializationContext(NbtOps.INSTANCE);
                         nbt.store("Filter", ItemStack.CODEC, ops, filter);
                     }
                 }
             );
         }
 
-        public void instructArm(BlockPos armLocation, ArmBlockEntity.Phase phase, ItemStack heldItem, int targetedPoint) {
+        public void instructArm(
+            BlockPos armLocation,
+            ArmBlockEntity.Phase phase,
+            ItemStack heldItem,
+            int targetedPoint
+        ) {
             modifyBlockEntityNBT(
                 scene.getSceneBuildingUtil().select().position(armLocation), ArmBlockEntity.class, compound -> {
                     compound.store("Phase", ArmBlockEntity.Phase.CODEC, phase);
                     if (!heldItem.isEmpty()) {
-                        RegistryOps<Tag> ops = world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                        RegistryOps<Tag> ops = world().getHolderLookupProvider()
+                            .createSerializationContext(NbtOps.INSTANCE);
                         compound.store("HeldItem", ItemStack.CODEC, ops, heldItem);
                     } else {
                         compound.remove("HeldItem");
@@ -348,8 +375,9 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
 
         private void markSmartBlockEntityVirtual(Selection selection) {
             addInstruction(scene -> selection.forEach(pos -> {
-                if (scene.getLevel().getBlockEntity(pos) instanceof SmartBlockEntity smartBlockEntity)
+                if (scene.getLevel().getBlockEntity(pos) instanceof SmartBlockEntity smartBlockEntity) {
                     smartBlockEntity.markVirtual();
+                }
             }));
         }
     }
@@ -374,7 +402,8 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
         }
 
         public void conductorBirb(ElementLink<ParrotElement> birb, boolean conductor) {
-            addInstruction(scene -> scene.resolveOptional(birb).map(FunctionalHelper.filterAndCast(ExpandedParrotElement.class))
+            addInstruction(scene -> scene.resolveOptional(birb)
+                .map(FunctionalHelper.filterAndCast(ExpandedParrotElement.class))
                 .ifPresent(expandedBirb -> expandedBirb.setConductor(conductor)));
         }
 
@@ -388,8 +417,9 @@ public class CreateSceneBuilder extends PonderSceneBuilder {
             @Override
             public void tick(PonderScene scene, Parrot entity, Vec3 location) {
                 BlockEntity blockEntity = scene.getLevel().getBlockEntity(componentPos);
-                if (!(blockEntity instanceof KineticBlockEntity))
+                if (!(blockEntity instanceof KineticBlockEntity)) {
                     return;
+                }
                 float rpm = ((KineticBlockEntity) blockEntity).getSpeed();
                 entity.yRotO = entity.getYRot();
                 entity.setYRot(entity.yRotO + (rpm * .3f));

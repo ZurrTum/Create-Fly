@@ -39,8 +39,9 @@ public class FunnelMovementBehaviour extends MovementBehaviour {
     public Vec3 getActiveAreaOffset(MovementContext context) {
         Direction facing = FunnelBlock.getFunnelFacing(context.state);
         Vec3 vec = Vec3.atLowerCornerOf(facing.getUnitVec3i());
-        if (facing != Direction.UP)
+        if (facing != Direction.UP) {
             return vec.scale(context.state.getValue(FunnelBlock.EXTRACTING) ? .15 : .65);
+        }
 
         return vec.scale(.65);
     }
@@ -49,10 +50,11 @@ public class FunnelMovementBehaviour extends MovementBehaviour {
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         super.visitNewPosition(context, pos);
 
-        if (context.state.getValue(FunnelBlock.EXTRACTING))
+        if (context.state.getValue(FunnelBlock.EXTRACTING)) {
             extract(context, pos);
-        else
+        } else {
             succ(context, pos);
+        }
 
     }
 
@@ -60,14 +62,17 @@ public class FunnelMovementBehaviour extends MovementBehaviour {
         Level world = context.world;
 
         Vec3 entityPos = context.position;
-        if (context.state.getValue(FunnelBlock.FACING) != Direction.DOWN)
+        if (context.state.getValue(FunnelBlock.FACING) != Direction.DOWN) {
             entityPos = entityPos.add(0, -.5f, 0);
+        }
 
-        if (!world.getBlockState(pos).getCollisionShape(world, pos).isEmpty())
+        if (!world.getBlockState(pos).getCollisionShape(world, pos).isEmpty()) {
             return;
+        }
 
-        if (!world.getEntitiesOfClass(ItemEntity.class, new AABB(BlockPos.containing(entityPos))).isEmpty())
+        if (!world.getEntitiesOfClass(ItemEntity.class, new AABB(BlockPos.containing(entityPos))).isEmpty()) {
             return;
+        }
 
         FilterItemStack filter = context.getFilterFromBE();
         int filterAmount = context.blockEntityData.getIntOr("FilterAmount", 0);
@@ -82,11 +87,13 @@ public class FunnelMovementBehaviour extends MovementBehaviour {
             extract = inventory.preciseExtract(s -> filter.test(world, s), filterAmount);
         }
 
-        if (extract.isEmpty())
+        if (extract.isEmpty()) {
             return;
+        }
 
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
 
         ItemEntity entity = new ItemEntity(world, entityPos.x, entityPos.y, entityPos.z, extract);
         entity.setDeltaMovement(Vec3.ZERO);
@@ -97,15 +104,21 @@ public class FunnelMovementBehaviour extends MovementBehaviour {
 
     private void succ(MovementContext context, BlockPos pos) {
         Level world = context.world;
-        List<Entity> items = world.getEntities((Entity) null, new AABB(pos), e -> e instanceof ItemEntity || e instanceof PackageEntity);
+        List<Entity> items = world.getEntities(
+            (Entity) null,
+            new AABB(pos),
+            e -> e instanceof ItemEntity || e instanceof PackageEntity
+        );
         FilterItemStack filter = context.getFilterFromBE();
 
         for (Entity entity : items) {
-            if (!entity.isAlive())
+            if (!entity.isAlive()) {
                 continue;
+            }
             ItemStack toInsert = ItemHelper.fromItemEntity(entity);
-            if (!filter.test(context.world, toInsert))
+            if (!filter.test(context.world, toInsert)) {
                 continue;
+            }
             Container inventory = context.contraption.getStorage().getAllItems();
             int count = toInsert.getCount();
             int insert = inventory.insertExist(toInsert);

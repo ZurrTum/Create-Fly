@@ -31,7 +31,9 @@ import java.util.Map;
 
 public class ChainConveyorInteractionHandler {
 
-    public static WorldAttached<Cache<BlockPos, List<ChainConveyorShape>>> loadedChains = new WorldAttached<>($ -> new TickBasedCache<>(60, true));
+    public static WorldAttached<Cache<BlockPos, List<ChainConveyorShape>>> loadedChains = new WorldAttached<>($ -> new TickBasedCache<>(60,
+        true
+    ));
 
     public static BlockPos selectedLift;
     public static float selectedChainPosition;
@@ -55,8 +57,9 @@ public class ChainConveyorInteractionHandler {
         HitResult hitResult = mc.hitResult;
 
         double bestDiff = Float.MAX_VALUE;
-        if (hitResult != null)
+        if (hitResult != null) {
             bestDiff = hitResult.getLocation().distanceToSqr(from);
+        }
 
         BlockPos bestLift = null;
         ChainConveyorShape bestShape = null;
@@ -65,35 +68,41 @@ public class ChainConveyorInteractionHandler {
         for (Map.Entry<BlockPos, List<ChainConveyorShape>> entry : loadedChains.get(mc.level).asMap().entrySet()) {
             BlockPos liftPos = entry.getKey();
             for (ChainConveyorShape chainConveyorShape : entry.getValue()) {
-                if (chainConveyorShape instanceof ChainConveyorShape.ChainConveyorBB && dismantling)
+                if (chainConveyorShape instanceof ChainConveyorShape.ChainConveyorBB && dismantling) {
                     continue;
+                }
                 Vec3 liftVec = Vec3.atLowerCornerOf(liftPos);
                 Vec3 intersect = chainConveyorShape.intersect(from.subtract(liftVec), to.subtract(liftVec));
-                if (intersect == null)
+                if (intersect == null) {
                     continue;
+                }
 
                 double distanceToSqr = intersect.add(liftVec).distanceToSqr(from);
-                if (distanceToSqr > bestDiff)
+                if (distanceToSqr > bestDiff) {
                     continue;
+                }
                 bestDiff = distanceToSqr;
                 bestLift = liftPos;
                 bestShape = chainConveyorShape;
                 selectedChainPosition = chainConveyorShape.getChainPosition(intersect);
-                if (chainConveyorShape instanceof ChainConveyorShape.ChainConveyorOBB obb)
+                if (chainConveyorShape instanceof ChainConveyorShape.ChainConveyorOBB obb) {
                     selectedConnection = obb.connection;
+                }
             }
         }
 
         selectedLift = bestLift;
-        if (bestLift == null)
+        if (bestLift == null) {
             return;
+        }
 
         selectedShape = bestShape;
         selectedBakedPosition = bestShape.getVec(bestLift, selectedChainPosition);
 
         if (!isWrench) {
-            Outliner.getInstance().chaseAABB("ChainPointSelection", new AABB(selectedBakedPosition, selectedBakedPosition)).colored(Color.WHITE)
-                .lineWidth(1 / 6f).disableLineNormals();
+            Outliner.getInstance()
+                .chaseAABB("ChainPointSelection", new AABB(selectedBakedPosition, selectedBakedPosition))
+                .colored(Color.WHITE).lineWidth(1 / 6f).disableLineNormals();
         }
     }
 
@@ -104,8 +113,9 @@ public class ChainConveyorInteractionHandler {
     }
 
     public static boolean onUse(Minecraft mc) {
-        if (selectedLift == null)
+        if (selectedLift == null) {
             return false;
+        }
 
         LocalPlayer player = mc.player;
         ItemStack mainHandItem = player.getMainHandItem();
@@ -117,14 +127,18 @@ public class ChainConveyorInteractionHandler {
                 return true;
             }
 
-            player.connection.send(new ChainConveyorConnectionPacket(selectedLift, selectedLift.offset(selectedConnection), usedItem, false));
+            player.connection.send(new ChainConveyorConnectionPacket(
+                selectedLift,
+                selectedLift.offset(selectedConnection),
+                usedItem,
+                false
+            ));
             return true;
         }
 
         if (mainHandItem.is(AllItems.PACKAGE_FROGPORT)) {
             PackagePortTargetSelectionHandler.exactPositionOfTarget = selectedBakedPosition;
-            PackagePortTargetSelectionHandler.activePackageTarget = new PackagePortTarget.ChainConveyorFrogportTarget(
-                selectedLift,
+            PackagePortTargetSelectionHandler.activePackageTarget = new PackagePortTarget.ChainConveyorFrogportTarget(selectedLift,
                 selectedChainPosition,
                 selectedConnection,
                 false
@@ -146,8 +160,9 @@ public class ChainConveyorInteractionHandler {
     }
 
     public static void drawCustomBlockSelection(PoseStack ms, MultiBufferSource buffer, Vec3 camera) {
-        if (selectedLift == null || selectedShape == null)
+        if (selectedLift == null || selectedShape == null) {
             return;
+        }
 
         VertexConsumer vb = buffer.getBuffer(RenderTypes.lines());
         ms.pushPose();

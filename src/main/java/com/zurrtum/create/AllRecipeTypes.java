@@ -56,12 +56,15 @@ public class AllRecipeTypes {
         Registries.RECIPE_SERIALIZER,
         Identifier.fromNamespaceAndPath(MOD_ID, "automation_ignore")
     );
-    public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id().identifier().getPath().endsWith("_manual_only");
+    public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id().identifier().getPath()
+        .endsWith("_manual_only");
 
     public static boolean shouldIgnoreInAutomation(RecipeHolder<?> recipe) {
         RecipeSerializer<?> serializer = recipe.value().getSerializer();
-        if (serializer != null && BuiltInRegistries.RECIPE_SERIALIZER.wrapAsHolder(serializer).is(AllRecipeTypes.AUTOMATION_IGNORE_TAG))
+        if (serializer != null && BuiltInRegistries.RECIPE_SERIALIZER.wrapAsHolder(serializer)
+            .is(AllRecipeTypes.AUTOMATION_IGNORE_TAG)) {
             return true;
+        }
         return !CAN_BE_AUTOMATED.test(recipe);
     }
 

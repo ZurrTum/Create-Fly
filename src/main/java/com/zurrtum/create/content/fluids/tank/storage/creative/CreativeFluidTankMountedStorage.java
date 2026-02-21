@@ -14,8 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class CreativeFluidTankMountedStorage extends WrapperMountedFluidStorage<CreativeFluidTankInventory> {
-    public static final MapCodec<CreativeFluidTankMountedStorage> CODEC = CreativeFluidTankInventory.CODEC.xmap(
-        CreativeFluidTankMountedStorage::new,
+    public static final MapCodec<CreativeFluidTankMountedStorage> CODEC = CreativeFluidTankInventory.CODEC.xmap(CreativeFluidTankMountedStorage::new,
         storage -> storage.wrapped
     ).fieldOf("value");
 

@@ -16,15 +16,24 @@ public class GirderCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     @Override
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
-        if (!state.hasProperty(GirderBlock.X))
+        if (!state.hasProperty(GirderBlock.X)) {
             return null;
+        }
         return !state.getValue(GirderBlock.X) && !state.getValue(GirderBlock.Z) && direction.getAxis() != Axis.Y ? AllSpriteShifts.GIRDER_POLE : null;
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
-        if (other.getBlock() != state.getBlock())
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
+        if (other.getBlock() != state.getBlock()) {
             return false;
+        }
         return !other.getValue(GirderBlock.X) && !other.getValue(GirderBlock.Z);
     }
 

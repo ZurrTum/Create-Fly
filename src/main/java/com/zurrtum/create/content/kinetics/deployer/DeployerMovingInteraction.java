@@ -38,9 +38,11 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
         BlockPos localPos,
         AbstractContraptionEntity contraptionEntity
     ) {
-        MutablePair<StructureBlockInfo, MovementContext> actor = contraptionEntity.getContraption().getActorAt(localPos);
-        if (actor == null || actor.right == null)
+        MutablePair<StructureBlockInfo, MovementContext> actor = contraptionEntity.getContraption()
+            .getActorAt(localPos);
+        if (actor == null || actor.right == null) {
             return false;
+        }
 
         MovementContext ctx = actor.right;
         ItemStack heldStack = player.getItemInHand(activeHand);
@@ -49,8 +51,9 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
             ctx.blockEntityData.store("Mode", Mode.CODEC, mode == Mode.PUNCH ? Mode.USE : Mode.PUNCH);
 
         } else {
-            if (ctx.world.isClientSide())
+            if (ctx.world.isClientSide()) {
                 return true; // we'll try again on the server side
+            }
             DeployerPlayer fake;
 
             if (!(ctx.temporaryData instanceof DeployerFakePlayer) && ctx.world instanceof ServerLevel) {
@@ -58,18 +61,25 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
                 String ownerName = ctx.blockEntityData.read("Owner", Codec.STRING).orElse(null);
                 DeployerPlayer deployerFakePlayer = DeployerPlayer.create((ServerLevel) ctx.world, owner, ownerName);
                 deployerFakePlayer.setOnMinecartContraption(ctx.contraption instanceof MountedContraption);
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(contraptionEntity.problemPath(), LOGGER)) {
-                    CompoundTag inventory = ctx.blockEntityData.read("Inventory", CompoundTag.CODEC).orElseGet(CompoundTag::new);
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    contraptionEntity.problemPath(),
+                    LOGGER
+                )) {
+                    CompoundTag inventory = ctx.blockEntityData.read("Inventory", CompoundTag.CODEC)
+                        .orElseGet(CompoundTag::new);
                     ValueInput view = TagValueInput.create(logging, ctx.world.registryAccess(), inventory);
-                    deployerFakePlayer.cast().getInventory().load(view.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
+                    deployerFakePlayer.cast().getInventory()
+                        .load(view.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
                 }
                 ctx.temporaryData = fake = deployerFakePlayer;
                 ctx.blockEntityData.remove("Inventory");
-            } else
+            } else {
                 fake = (DeployerPlayer) ctx.temporaryData;
+            }
 
-            if (fake == null)
+            if (fake == null) {
                 return false;
+            }
 
             ServerPlayer serverPlayer = fake.cast();
             ItemStack deployerItem = serverPlayer.getMainHandItem();

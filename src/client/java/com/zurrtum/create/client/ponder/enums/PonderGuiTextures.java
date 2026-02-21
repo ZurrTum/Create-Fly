@@ -17,33 +17,34 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
     LOGO("logo", 0, 0, 32, 32, 32, 32),
 
     //widgets
-    SPEECH_TOOLTIP_BACKGROUND("widgets", 0, 24, 8, 8),
-    SPEECH_TOOLTIP_COLOR("widgets", 8, 24, 8, 8),
+    SPEECH_TOOLTIP_BACKGROUND("widgets", 0, 24, 8, 8), SPEECH_TOOLTIP_COLOR("widgets", 8, 24, 8, 8),
 
     //icons
-    ICON_PONDER_LEFT("widgets", 0, 2),
-    ICON_PONDER_CLOSE("widgets", 1, 2),
-    ICON_PONDER_RIGHT("widgets", 2, 2),
-    ICON_PONDER_IDENTIFY("widgets", 3, 2),
-    ICON_PONDER_REPLAY("widgets", 4, 2),
-    ICON_PONDER_USER_MODE("widgets", 5, 2),
-    ICON_PONDER_SLOW_MODE("widgets", 6, 2),
+    ICON_PONDER_LEFT("widgets", 0, 2), ICON_PONDER_CLOSE("widgets", 1, 2), ICON_PONDER_RIGHT(
+        "widgets",
+        2,
+        2
+    ), ICON_PONDER_IDENTIFY("widgets", 3, 2), ICON_PONDER_REPLAY(
+        "widgets",
+        4,
+        2
+    ), ICON_PONDER_USER_MODE("widgets", 5, 2), ICON_PONDER_SLOW_MODE("widgets", 6, 2),
 
-    ICON_CONFIG_UNLOCKED("widgets", 0, 3),
-    ICON_CONFIG_LOCKED("widgets", 1, 3),
-    ICON_CONFIG_DISCARD("widgets", 2, 3),
-    ICON_CONFIG_SAVE("widgets", 3, 3),
-    ICON_CONFIG_RESET("widgets", 4, 3),
-    ICON_CONFIG_BACK("widgets", 5, 3),
-    ICON_CONFIG_PREV("widgets", 6, 3),
-    ICON_CONFIG_NEXT("widgets", 7, 3),
-    ICON_DISABLE("widgets", 8, 3),
-    ICON_CONFIG_OPEN("widgets", 9, 3),
-    ICON_CONFIRM("widgets", 10, 3),
+    ICON_CONFIG_UNLOCKED("widgets", 0, 3), ICON_CONFIG_LOCKED("widgets", 1, 3), ICON_CONFIG_DISCARD(
+        "widgets",
+        2,
+        3
+    ), ICON_CONFIG_SAVE("widgets", 3, 3), ICON_CONFIG_RESET("widgets", 4, 3), ICON_CONFIG_BACK(
+        "widgets",
+        5,
+        3
+    ), ICON_CONFIG_PREV("widgets", 6, 3), ICON_CONFIG_NEXT("widgets", 7, 3), ICON_DISABLE(
+        "widgets",
+        8,
+        3
+    ), ICON_CONFIG_OPEN("widgets", 9, 3), ICON_CONFIRM("widgets", 10, 3),
 
-    ICON_LMB("widgets", 0, 4),
-    ICON_SCROLL("widgets", 1, 4),
-    ICON_RMB("widgets", 2, 4),
+    ICON_LMB("widgets", 0, 4), ICON_SCROLL("widgets", 1, 4), ICON_RMB("widgets", 2, 4),
 
     // PlacementIndicator
     PLACEMENT_INDICATOR_SHEET("placement_indicator", 0, 0, 16, 256),
@@ -70,7 +71,16 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
         this(Ponder.MOD_ID, location, startX, startY, width, height, sheetWidth, sheetHeight);
     }
 
-    PonderGuiTextures(String namespace, String location, int startX, int startY, int width, int height, int sheetWidth, int sheetHeight) {
+    PonderGuiTextures(
+        String namespace,
+        String location,
+        int startX,
+        int startY,
+        int width,
+        int height,
+        int sheetWidth,
+        int sheetHeight
+    ) {
         this.location = Identifier.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
         this.width = width;
         this.height = height;
@@ -82,7 +92,18 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
 
     @Override
     public void render(GuiGraphics graphics, int x, int y) {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, getLocation(), x, y, startX, startY, width, height, sheetWidth, sheetHeight);
+        graphics.blit(
+            RenderPipelines.GUI_TEXTURED,
+            getLocation(),
+            x,
+            y,
+            startX,
+            startY,
+            width,
+            height,
+            sheetWidth,
+            sheetHeight
+        );
     }
 
     @Override
@@ -116,6 +137,7 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
     }
 
     public DelegatedStencilElement asStencil() {
-        return new DelegatedStencilElement().withStencilRenderer((ms, w, h, alpha) -> this.render(ms, 0, 0)).withBounds(16, 16);
+        return new DelegatedStencilElement().withStencilRenderer((ms, w, h, alpha) -> this.render(ms, 0, 0))
+            .withBounds(16, 16);
     }
 }

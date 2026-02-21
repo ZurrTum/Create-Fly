@@ -21,7 +21,11 @@ public interface MovementRenderBehaviour {
     }
 
     @Nullable
-    default ActorVisual createVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    default ActorVisual createVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         return null;
     }
 }

@@ -25,8 +25,9 @@ public class HauntedBellBlock extends AbstractBellBlock<HauntedBellBlockEntity> 
     @Override
     protected boolean ring(Level world, BlockPos pos, Direction direction, Player player) {
         boolean ring = super.ring(world, pos, direction, player);
-        if (ring && player instanceof ServerPlayer serverPlayer)
+        if (ring && player instanceof ServerPlayer serverPlayer) {
             AllAdvancements.HAUNTED_BELL.trigger(serverPlayer);
+        }
         return ring;
     }
 
@@ -42,13 +43,14 @@ public class HauntedBellBlock extends AbstractBellBlock<HauntedBellBlockEntity> 
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (oldState.getBlock() != this && !world.isClientSide())
+        if (oldState.getBlock() != this && !world.isClientSide()) {
             withBlockEntityDo(
                 world, pos, hbte -> {
                     hbte.effectTicks = HauntedBellBlockEntity.EFFECT_TICKS;
                     hbte.sendData();
                 }
             );
+        }
     }
 
 }

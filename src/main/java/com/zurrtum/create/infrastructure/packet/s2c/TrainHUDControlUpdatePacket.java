@@ -14,7 +14,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.UUID;
 
-public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double speed, int fuelTicks) implements Packet<ClientGamePacketListener> {
+public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double speed,
+                                          int fuelTicks) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, TrainHUDControlUpdatePacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainHUDControlUpdatePacket::trainId,

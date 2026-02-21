@@ -35,15 +35,17 @@ public class PackageLuaObject implements LuaComparable {
 
     @LuaFunction(mainThread = true)
     public final String getAddress() throws LuaException {
-        if (isEditable())
+        if (isEditable()) {
             this.address = PackageItem.getAddress(box);
+        }
         return this.address;
     }
 
     @LuaFunction(mainThread = true)
     public final void setAddress(String argument) throws LuaException {
-        if (!isEditable())
+        if (!isEditable()) {
             throw new LuaException("Package is not editable");
+        }
         PackageItem.addAddress(box, argument);
         this.address = argument;
     }
@@ -65,8 +67,9 @@ public class PackageLuaObject implements LuaComparable {
     @LuaFunction(mainThread = true)
     public final PackageOrderLuaObject getOrderData() throws LuaException {
 
-        if (!hasOrderData())
+        if (!hasOrderData()) {
             return null;
+        }
 
         return new PackageOrderLuaObject(this);
     }
@@ -94,8 +97,9 @@ public class PackageLuaObject implements LuaComparable {
             // Lazy getter so we don't need to get the contents if we don't need to
             map.put("contents", getLuaItemStacks());
 
-            if (hasOrderData())
+            if (hasOrderData()) {
                 map.put("orderData", getOrderData());
+            }
             return map;
 
         } catch (LuaException e) {

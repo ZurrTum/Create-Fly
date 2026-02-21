@@ -32,7 +32,8 @@ import java.util.*;
 
 public class SchematicRenderer {
 
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
 
     private final Map<ChunkSectionLayer, SuperByteBuffer> bufferCache = new LinkedHashMap<>(ChunkSectionLayer.values().length);
     private boolean changed;
@@ -57,11 +58,19 @@ public class SchematicRenderer {
         changed = true;
     }
 
-    public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffers, SchematicTransformation transformation, Vec3 camera) {
-        if (mc.level == null || mc.player == null)
+    public void render(
+        Minecraft mc,
+        PoseStack ms,
+        SuperRenderTypeBuffer buffers,
+        SchematicTransformation transformation,
+        Vec3 camera
+    ) {
+        if (mc.level == null || mc.player == null) {
             return;
-        if (changed)
+        }
+        if (changed) {
             redraw(mc);
+        }
         changed = false;
 
         bufferCache.forEach((layer, buffer) -> {
@@ -81,7 +90,11 @@ public class SchematicRenderer {
         );
         if (renderState != null) {
             FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
-            renderState.render(ms, renderDispatcher.getSubmitNodeStorage(), mc.gameRenderer.getLevelRenderState().cameraRenderState);
+            renderState.render(
+                ms,
+                renderDispatcher.getSubmitNodeStorage(),
+                mc.gameRenderer.getLevelRenderState().cameraRenderState
+            );
         }
 
         // Don't bother looping over errored BEs again.
@@ -93,8 +106,9 @@ public class SchematicRenderer {
 
         for (ChunkSectionLayer layer : ChunkSectionLayer.values()) {
             SuperByteBuffer buffer = drawLayer(mc, layer);
-            if (!buffer.isEmpty())
+            if (!buffer.isEmpty()) {
                 bufferCache.put(layer, buffer);
+            }
         }
     }
 
@@ -115,7 +129,14 @@ public class SchematicRenderer {
 
         renderWorld.renderMode = true;
         ModelBlockRenderer.enableCaching();
-        for (BlockPos localPos : BlockPos.betweenClosed(bounds.minX(), bounds.minY(), bounds.minZ(), bounds.maxX(), bounds.maxY(), bounds.maxZ())) {
+        for (BlockPos localPos : BlockPos.betweenClosed(
+            bounds.minX(),
+            bounds.minY(),
+            bounds.minZ(),
+            bounds.maxX(),
+            bounds.maxY(),
+            bounds.maxZ()
+        )) {
             BlockPos pos = mutableBlockPos.setWithOffset(localPos, anchor);
             BlockState state = renderWorld.getBlockState(pos);
 
@@ -131,7 +152,16 @@ public class SchematicRenderer {
                 } else {
                     model.collectParts(random, parts);
                 }
-                renderer.tesselateBlock(renderWorld, parts, state, pos, poseStack, sbbBuilder, true, OverlayTexture.NO_OVERLAY);
+                renderer.tesselateBlock(
+                    renderWorld,
+                    parts,
+                    state,
+                    pos,
+                    poseStack,
+                    sbbBuilder,
+                    true,
+                    OverlayTexture.NO_OVERLAY
+                );
                 poseStack.popPose();
             }
         }

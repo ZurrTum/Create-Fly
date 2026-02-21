@@ -71,7 +71,13 @@ public class FanHauntingCategory extends CreateCategory<RecipeHolder<HauntingRec
     }
 
     @Override
-    public void draw(RecipeHolder<HauntingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<HauntingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         int xOffsetAmount = 1 - Math.min(3, entry.value().results().size());
         AllGuiTextures.JEI_SHADOW.render(graphics, 46, 27);
         AllGuiTextures.JEI_LIGHT.render(graphics, 65, 39);

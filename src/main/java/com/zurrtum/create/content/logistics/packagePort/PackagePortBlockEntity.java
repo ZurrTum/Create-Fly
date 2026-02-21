@@ -2,10 +2,10 @@ package com.zurrtum.create.content.logistics.packagePort;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
@@ -55,9 +55,11 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     }
 
     public boolean isBackedUp() {
-        for (int i = 0, size = inventory.getContainerSize(); i < size; i++)
-            if (inventory.getItem(i).isEmpty())
+        for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
+            if (inventory.getItem(i).isEmpty()) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -71,8 +73,9 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (target != null)
+        if (target != null) {
             target.register(this, level, worldPosition);
+        }
     }
 
     public String getFilterString() {
@@ -82,8 +85,9 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        if (target != null)
+        if (target != null) {
             view.store("Target", PackagePortTarget.CODEC, target);
+        }
         view.putString("AddressFilter", addressFilter);
         view.putBoolean("AcceptsPackages", acceptsPackages);
         inventory.write(view);
@@ -97,8 +101,9 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         target = view.read("Target", PackagePortTarget.CODEC).orElse(null);
         addressFilter = view.getStringOr("AddressFilter", "");
         acceptsPackages = view.getBooleanOr("AcceptsPackages", false);
-        if (clientPacket && prevTarget != target)
+        if (clientPacket && prevTarget != target) {
             invalidateRenderBoundingBox();
+        }
     }
 
     @Override
@@ -113,15 +118,17 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
 
     @Override
     public void destroy() {
-        if (target != null)
+        if (target != null) {
             target.deregister(this, level, worldPosition);
+        }
         super.destroy();
         Containers.dropContents(level, worldPosition, inventory);
     }
 
     public void drop(ItemStack box) {
-        if (box.isEmpty())
+        if (box.isEmpty()) {
             return;
+        }
         Block.popResource(level, worldPosition, box);
     }
 
@@ -134,16 +141,19 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     protected abstract void onOpenChange(boolean open);
 
     public InteractionResult use(Player player) {
-        if (player == null || player.isCrouching())
+        if (player == null || player.isCrouching()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (FakePlayerHandler.has(player))
+        }
+        if (FakePlayerHandler.has(player)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         ItemStack mainHandItem = player.getMainHandItem();
         boolean clipboard = mainHandItem.is(AllItems.CLIPBOARD);
 
         if (level.isClientSide()) {
-            if (!clipboard)
+            if (!clipboard) {
                 onOpenedManually();
+            }
             return InteractionResult.SUCCESS;
         }
 
@@ -160,24 +170,30 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     }
 
     private void addAddressToClipboard(Player player, ItemStack mainHandItem) {
-        if (addressFilter == null || addressFilter.isBlank())
+        if (addressFilter == null || addressFilter.isBlank()) {
             return;
+        }
 
-        ClipboardContent clipboard = mainHandItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
+        ClipboardContent clipboard = mainHandItem.getOrDefault(
+            AllDataComponents.CLIPBOARD_CONTENT,
+            ClipboardContent.EMPTY
+        );
         List<List<ClipboardEntry>> list = ClipboardEntry.readAll(clipboard);
         for (List<ClipboardEntry> page : list) {
             for (ClipboardEntry entry : page) {
                 String existing = entry.text.getString();
-                if (existing.equals("#" + addressFilter) || existing.equals("# " + addressFilter))
+                if (existing.equals("#" + addressFilter) || existing.equals("# " + addressFilter)) {
                     return;
+                }
             }
         }
 
         List<ClipboardEntry> page = null;
 
         for (List<ClipboardEntry> freePage : list) {
-            if (freePage.size() > 11)
+            if (freePage.size() > 11) {
                 continue;
+            }
             page = freePage;
             break;
         }
@@ -195,7 +211,12 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     }
 
     @Override
-    public MenuBase<?> createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer, RegistryFriendlyByteBuf extraData) {
+    public MenuBase<?> createMenu(
+        int pContainerId,
+        Inventory pPlayerInventory,
+        Player pPlayer,
+        RegistryFriendlyByteBuf extraData
+    ) {
         extraData.writeBlockPos(worldPosition);
         return new PackagePortMenu(pContainerId, pPlayerInventory, this);
     }

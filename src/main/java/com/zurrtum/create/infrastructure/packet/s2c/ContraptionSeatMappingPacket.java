@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapping, int dismountedId) implements Packet<ClientGamePacketListener> {
+public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapping,
+                                           int dismountedId) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, ContraptionSeatMappingPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         ContraptionSeatMappingPacket::entityId,

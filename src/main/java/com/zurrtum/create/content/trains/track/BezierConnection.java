@@ -90,13 +90,22 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             hasGirder,
             trackMaterial
         );
-        if (smoothing != null)
+        if (smoothing != null) {
             bezierConnection.smoothing = smoothing.swap();
+        }
         return bezierConnection;
     }
 
     public BezierConnection clone() {
-        var out = new BezierConnection(bePositions.copy(), starts.copy(), axes.copy(), normals.copy(), primary, hasGirder, trackMaterial);
+        var out = new BezierConnection(
+            bePositions.copy(),
+            starts.copy(),
+            axes.copy(),
+            normals.copy(),
+            primary,
+            hasGirder,
+            trackMaterial
+        );
         if (smoothing != null) {
             out.smoothing = smoothing.copy();
         }
@@ -115,10 +124,13 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
     }
 
     private boolean equalsSansMaterialInner(BezierConnection other) {
-        return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
-            this.starts,
-            other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
+        return this == other || (other != null && coupleEquals(
+            this.bePositions,
+            other.bePositions
+        ) && coupleEquals(this.starts, other.starts) && coupleEquals(
+            this.axes,
+            other.axes
+        ) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -139,7 +151,8 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
     public BezierConnection(ValueInput view, BlockPos localTo) {
         this(
             view.read("Positions", CreateCodecs.COUPLE_BLOCK_POS_CODEC).orElseThrow().map(b -> b.offset(localTo)),
-            view.read("Starts", CreateCodecs.COUPLE_VEC3D_CODEC).orElseThrow().map(v -> v.add(Vec3.atLowerCornerOf(localTo))),
+            view.read("Starts", CreateCodecs.COUPLE_VEC3D_CODEC).orElseThrow()
+                .map(v -> v.add(Vec3.atLowerCornerOf(localTo))),
             view.read("Axes", CreateCodecs.COUPLE_VEC3D_CODEC).orElseThrow(),
             view.read("Normals", CreateCodecs.COUPLE_VEC3D_CODEC).orElseThrow(),
             view.getBooleanOr("Primary", false),
@@ -162,8 +175,9 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         view.store("Normals", CreateCodecs.COUPLE_VEC3D_CODEC, normals);
         view.store("Material", TrackMaterial.CODEC, getMaterial());
 
-        if (smoothing != null)
+        if (smoothing != null) {
             view.store("Smoothing", CreateCodecs.COUPLE_INT_CODEC, smoothing);
+        }
     }
 
     public BezierConnection(FriendlyByteBuf buffer) {
@@ -176,8 +190,9 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             buffer.readBoolean(),
             TrackMaterial.fromId(buffer.readIdentifier())
         );
-        if (buffer.readBoolean())
+        if (buffer.readBoolean()) {
             smoothing = Couple.create(buffer::readVarInt);
+        }
     }
 
     public void write(FriendlyByteBuf buffer) {
@@ -189,8 +204,9 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         buffer.writeBoolean(hasGirder);
         buffer.writeIdentifier(getMaterial().getId());
         buffer.writeBoolean(smoothing != null);
-        if (smoothing != null)
+        if (smoothing != null) {
             smoothing.forEach(buffer::writeVarInt);
+        }
     }
 
     public BlockPos getKey() {
@@ -202,12 +218,15 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
     }
 
     public int yOffsetAt(Vec3 end) {
-        if (smoothing == null)
+        if (smoothing == null) {
             return 0;
-        if (TrackBlockEntityTilt.compareHandles(starts.getFirst(), end))
+        }
+        if (TrackBlockEntityTilt.compareHandles(starts.getFirst(), end)) {
             return smoothing.getFirst();
-        if (TrackBlockEntityTilt.compareHandles(starts.getSecond(), end))
+        }
+        if (TrackBlockEntityTilt.compareHandles(starts.getSecond(), end)) {
             return smoothing.getSecond();
+        }
         return 0;
     }
 
@@ -244,8 +263,13 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
 
     public double incrementT(double currentT, double distance) {
         var runtime = resolve();
-        double dx = VecHelper.bezierDerivative(starts.getFirst(), starts.getSecond(), runtime.finish1, runtime.finish2, (float) currentT)
-            .length() / getLength();
+        double dx = VecHelper.bezierDerivative(
+            starts.getFirst(),
+            starts.getSecond(),
+            runtime.finish1,
+            runtime.finish2,
+            (float) currentT
+        ).length() / getLength();
         return currentT + distance / dx;
     }
 
@@ -260,7 +284,8 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         Vec3 fn1 = normals.getFirst();
         Vec3 fn2 = normals.getSecond();
 
-        Vec3 derivative = VecHelper.bezierDerivative(end1, end2, runtime.finish1, runtime.finish2, (float) t).normalize();
+        Vec3 derivative = VecHelper.bezierDerivative(end1, end2, runtime.finish1, runtime.finish2, (float) t)
+            .normalize();
         Vec3 faceNormal = fn1.equals(fn2) ? fn1 : VecHelper.slerp((float) t, fn1, fn2);
         Vec3 normal = faceNormal.cross(derivative).normalize();
         return derivative.cross(normal);
@@ -310,18 +335,21 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
     }
 
     public void spawnItems(Level level) {
-        if (!(level instanceof ServerLevel serverWorld) || !serverWorld.getGameRules().get(GameRules.BLOCK_DROPS))
+        if (!(level instanceof ServerLevel serverWorld) || !serverWorld.getGameRules().get(GameRules.BLOCK_DROPS)) {
             return;
+        }
         Vec3 origin = Vec3.atLowerCornerOf(bePositions.getFirst());
         for (Segment segment : this) {
-            if (segment.index % 2 != 0 || segment.index == getSegmentCount())
+            if (segment.index % 2 != 0 || segment.index == getSegmentCount()) {
                 continue;
+            }
             Vec3 v = VecHelper.offsetRandomly(segment.position, level.random, .125f).add(origin);
             ItemEntity entity = new ItemEntity(level, v.x, v.y, v.z, new ItemStack(getMaterial()));
             entity.setDefaultPickUpDelay();
             level.addFreshEntity(entity);
-            if (!hasGirder)
+            if (!hasGirder) {
                 continue;
+            }
             for (int i = 0; i < 2; i++) {
                 entity = new ItemEntity(level, v.x, v.y, v.z, AllItems.METAL_GIRDER.getDefaultInstance());
                 entity.setDefaultPickUpDelay();
@@ -331,17 +359,25 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
     }
 
     public void spawnDestroyParticles(Level level) {
-        if (!(level instanceof ServerLevel slevel))
+        if (!(level instanceof ServerLevel slevel)) {
             return;
-        BlockParticleOption data = new BlockParticleOption(ParticleTypes.BLOCK, getMaterial().getBlock().defaultBlockState());
-        BlockParticleOption girderData = new BlockParticleOption(ParticleTypes.BLOCK, AllBlocks.METAL_GIRDER.defaultBlockState());
+        }
+        BlockParticleOption data = new BlockParticleOption(
+            ParticleTypes.BLOCK,
+            getMaterial().getBlock().defaultBlockState()
+        );
+        BlockParticleOption girderData = new BlockParticleOption(
+            ParticleTypes.BLOCK,
+            AllBlocks.METAL_GIRDER.defaultBlockState()
+        );
         Vec3 origin = Vec3.atLowerCornerOf(bePositions.getFirst());
         for (Segment segment : this) {
             for (int offset : Iterate.positiveAndNegative) {
                 Vec3 v = segment.position.add(segment.normal.scale(14 / 16f * offset)).add(origin);
                 slevel.sendParticles(data, v.x, v.y, v.z, 1, 0, 0, 0, 0);
-                if (!hasGirder)
+                if (!hasGirder) {
                     continue;
+                }
                 slevel.sendParticles(girderData, v.x, v.y - .5f, v.z, 1, 0, 0, 0, 0);
             }
         }
@@ -414,8 +450,9 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             for (int i = 0; i <= scanCount; i++) {
                 float t = i / (float) scanCount;
                 Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
-                if (previous != null)
+                if (previous != null) {
                     length += result.distanceTo(previous);
+                }
                 previous = result;
             }
             return length;
@@ -436,8 +473,9 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
 
             float circle = 2 * Mth.PI;
             angle = (angle + circle) % circle;
-            if (Math.abs(circle - angle) < Math.abs(angle))
+            if (Math.abs(circle - angle) < Math.abs(angle)) {
                 angle = circle - angle;
+            }
 
             if (Mth.equal(angle, 0)) {
                 double[] intersect = VecHelper.intersect(end1, end2, axis1, cross2, Axis.Y);
@@ -468,8 +506,9 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
 
             radius = Math.abs(intersect[1]);
             handleLength = radius * factor;
-            if (Mth.equal(handleLength, 0))
+            if (Mth.equal(handleLength, 0)) {
                 handleLength = 1;
+            }
         }
     }
 
@@ -519,7 +558,11 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             float t = runtime.getSegmentT(segment.index);
             segment.position = VecHelper.bezier(end1, end2, finish1, finish2, t);
             segment.derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t).normalize();
-            segment.faceNormal = faceNormal1.equals(faceNormal2) ? faceNormal1 : VecHelper.slerp(t, faceNormal1, faceNormal2);
+            segment.faceNormal = faceNormal1.equals(faceNormal2) ? faceNormal1 : VecHelper.slerp(
+                t,
+                faceNormal1,
+                faceNormal2
+            );
             segment.normal = segment.faceNormal.cross(segment.derivative).normalize();
             return segment;
         }
@@ -571,7 +614,11 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             float t = Mth.clamp((i + 0.5f) * lut[i] / segCount, 0, 1);
             Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
             Vec3 derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t).normalize();
-            Vec3 faceNormal = faceNormal1.equals(faceNormal2) ? faceNormal1 : VecHelper.slerp(t, faceNormal1, faceNormal2);
+            Vec3 faceNormal = faceNormal1.equals(faceNormal2) ? faceNormal1 : VecHelper.slerp(
+                t,
+                faceNormal1,
+                faceNormal2
+            );
             Vec3 normal = faceNormal.cross(derivative).normalize();
             Vec3 below = result.add(faceNormal.scale(-.25f));
             Vec3 rail1 = below.add(normal.scale(.05f));
@@ -591,11 +638,13 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             BlockPos pos = BlockPos.containing(railMiddle);
             Pair<Integer, Integer> key = Pair.of(pos.getX(), pos.getZ());
             boolean alreadyPresent = yLevels.containsKey(key);
-            if (alreadyPresent && yLevels.get(key) <= railMiddle.y)
+            if (alreadyPresent && yLevels.get(key) <= railMiddle.y) {
                 continue;
+            }
             yLevels.put(key, railMiddle.y);
-            if (alreadyPresent)
+            if (alreadyPresent) {
                 continue;
+            }
 
             if (prev3 != null) { // Remove obsolete pixels
                 boolean doubledViaPrev = isLineDoubled(prev2, prev, key);
@@ -627,7 +676,11 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return to.distanceToSqr(pFrom.getFirst() + 0.5, to.y, pFrom.getSecond() + 0.5);
     }
 
-    private boolean isLineDoubled(Pair<Integer, Integer> pFrom, Pair<Integer, Integer> pVia, Pair<Integer, Integer> pTo) {
+    private boolean isLineDoubled(
+        Pair<Integer, Integer> pFrom,
+        Pair<Integer, Integer> pVia,
+        Pair<Integer, Integer> pTo
+    ) {
         int diff1x = pVia.getFirst() - pFrom.getFirst();
         int diff1z = pVia.getSecond() - pFrom.getSecond();
         int diff2x = pTo.getFirst() - pVia.getFirst();

@@ -21,9 +21,15 @@ import java.util.function.Function;
 public class AllBlockEntityBehaviours {
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T extends SmartBlockEntity> void add(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>>... factories) {
+    public static <T extends SmartBlockEntity> void add(
+        BlockEntityType<T> type,
+        Function<T, BlockEntityBehaviour<?>>... factories
+    ) {
         for (Function<T, BlockEntityBehaviour<?>> factory : factories) {
-            BlockEntityBehaviour.CLIENT_REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
+            BlockEntityBehaviour.CLIENT_REGISTRY.add(
+                type,
+                (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory
+            );
         }
     }
 
@@ -41,17 +47,37 @@ public class AllBlockEntityBehaviours {
             TunnelSelectionModeScrollBehaviour::new
         );
         add(AllBlockEntityTypes.CART_ASSEMBLER, CartAssemblerTooltipBehaviour::new, CartMovementScrollBehaviour::new);
-        add(AllBlockEntityTypes.CHAIN_CONVEYOR, ChainConveyorClientBehaviour::new, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
+        add(
+            AllBlockEntityTypes.CHAIN_CONVEYOR,
+            ChainConveyorClientBehaviour::new,
+            KineticAudioBehaviour::new,
+            KineticTooltipBehaviour::new
+        );
         add(AllBlockEntityTypes.CHASSIS, ChassisScrollValueBehaviour::new);
         add(AllBlockEntityTypes.CHUTE, ChuteTooltipBehaviour::new);
         add(AllBlockEntityTypes.CLUTCH, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
-        add(AllBlockEntityTypes.CLOCKWORK_BEARING, ClockHandsScrollBehaviour::new, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
+        add(
+            AllBlockEntityTypes.CLOCKWORK_BEARING,
+            ClockHandsScrollBehaviour::new,
+            KineticAudioBehaviour::new,
+            KineticTooltipBehaviour::new
+        );
         add(AllBlockEntityTypes.CONTRAPTION_CONTROLS, FilteringBehaviour::controls);
         add(AllBlockEntityTypes.CREATIVE_CRATE, FilteringBehaviour::crate);
         add(AllBlockEntityTypes.CRUSHING_WHEEL, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
         add(AllBlockEntityTypes.CRUSHING_WHEEL_CONTROLLER, CrushingWheelControllerAudioBehaviour::new);
-        add(AllBlockEntityTypes.CUCKOO_CLOCK, CuckooClockAnimationBehaviour::new, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
-        add(AllBlockEntityTypes.DEPLOYER, DeployerTooltipBehaviour::new, FilteringBehaviour::deployer, KineticAudioBehaviour::new);
+        add(
+            AllBlockEntityTypes.CUCKOO_CLOCK,
+            CuckooClockAnimationBehaviour::new,
+            KineticAudioBehaviour::new,
+            KineticTooltipBehaviour::new
+        );
+        add(
+            AllBlockEntityTypes.DEPLOYER,
+            DeployerTooltipBehaviour::new,
+            FilteringBehaviour::deployer,
+            KineticAudioBehaviour::new
+        );
         add(AllBlockEntityTypes.DRILL, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
         add(AllBlockEntityTypes.ELEVATOR_PULLEY, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
         add(AllBlockEntityTypes.ENCASED_COGWHEEL, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
@@ -71,7 +97,12 @@ public class AllBlockEntityBehaviours {
         add(AllBlockEntityTypes.ITEM_DRAIN, ItemDrainTooltipBehaviour::new);
         add(AllBlockEntityTypes.ITEM_HATCH, FilteringBehaviour::hatch);
         add(AllBlockEntityTypes.LARGE_WATER_WHEEL, GeneratingKineticTooltipBehaviour::new, KineticAudioBehaviour::new);
-        add(AllBlockEntityTypes.MECHANICAL_ARM, ArmSelectionModeScrollBehaviour::new, ArmTooltipBehaviour::new, KineticAudioBehaviour::new);
+        add(
+            AllBlockEntityTypes.MECHANICAL_ARM,
+            ArmSelectionModeScrollBehaviour::new,
+            ArmTooltipBehaviour::new,
+            KineticAudioBehaviour::new
+        );
         add(
             AllBlockEntityTypes.MECHANICAL_BEARING,
             KineticAudioBehaviour::new,
@@ -79,7 +110,12 @@ public class AllBlockEntityBehaviours {
             RotationModeScrollBehaviour::new
         );
         add(AllBlockEntityTypes.MECHANICAL_CRAFTER, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
-        add(AllBlockEntityTypes.MECHANICAL_MIXER, KineticAudioBehaviour::new, MechanicalMixerAudioBehaviour::new, KineticTooltipBehaviour::new);
+        add(
+            AllBlockEntityTypes.MECHANICAL_MIXER,
+            KineticAudioBehaviour::new,
+            MechanicalMixerAudioBehaviour::new,
+            KineticTooltipBehaviour::new
+        );
         add(
             AllBlockEntityTypes.MECHANICAL_PISTON,
             KineticAudioBehaviour::new,
@@ -89,30 +125,60 @@ public class AllBlockEntityBehaviours {
         add(AllBlockEntityTypes.MECHANICAL_PRESS, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
         add(AllBlockEntityTypes.MECHANICAL_PUMP, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
         add(AllBlockEntityTypes.MECHANICAL_ROLLER, FilteringBehaviour::roller, RollingModeScrollBehaviour::new);
-        add(AllBlockEntityTypes.MILLSTONE, KineticAudioBehaviour::new, KineticTooltipBehaviour::new, MillstoneAudioBehaviour::new);
-        add(AllBlockEntityTypes.MOTOR, GeneratingKineticTooltipBehaviour::new, KineticAudioBehaviour::new, KineticScrollValueBehaviour::motor);
+        add(
+            AllBlockEntityTypes.MILLSTONE,
+            KineticAudioBehaviour::new,
+            KineticTooltipBehaviour::new,
+            MillstoneAudioBehaviour::new
+        );
+        add(
+            AllBlockEntityTypes.MOTOR,
+            GeneratingKineticTooltipBehaviour::new,
+            KineticAudioBehaviour::new,
+            KineticScrollValueBehaviour::motor
+        );
         add(AllBlockEntityTypes.PACKAGE_FROGPORT, FrogportClientAudioBehaviour::new, FrogportTooltipBehaviour::new);
         add(AllBlockEntityTypes.POWERED_SHAFT, KineticAudioBehaviour::new, PoweredShaftTooltipBehaviour::new);
         add(AllBlockEntityTypes.PULSE_EXTENDER, BrassDiodeScrollValueBehaviour::new);
         add(AllBlockEntityTypes.PULSE_REPEATER, BrassDiodeScrollValueBehaviour::new);
         add(AllBlockEntityTypes.PULSE_TIMER, BrassDiodeScrollValueBehaviour::new);
         add(AllBlockEntityTypes.REDSTONE_LINK, LinkBehaviour::new);
-        add(AllBlockEntityTypes.ROPE_PULLEY, KineticAudioBehaviour::new, LinearActuatorTooltipBehaviour::new, MovementModeScrollBehaviour::pulley);
+        add(
+            AllBlockEntityTypes.ROPE_PULLEY,
+            KineticAudioBehaviour::new,
+            LinearActuatorTooltipBehaviour::new,
+            MovementModeScrollBehaviour::pulley
+        );
         add(
             AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER,
             KineticAudioBehaviour::new,
             KineticScrollValueBehaviour::controller,
             KineticTooltipBehaviour::new
         );
-        add(AllBlockEntityTypes.SAW, FilteringBehaviour::saw, KineticAudioBehaviour::new, KineticTooltipBehaviour::new, SawAudioBehaviour::new);
+        add(
+            AllBlockEntityTypes.SAW,
+            FilteringBehaviour::saw,
+            KineticAudioBehaviour::new,
+            KineticTooltipBehaviour::new,
+            SawAudioBehaviour::new
+        );
         add(AllBlockEntityTypes.SEQUENCED_GEARSHIFT, KineticAudioBehaviour::new, KineticTooltipBehaviour::new);
         add(AllBlockEntityTypes.SMART_CHUTE, ChuteTooltipBehaviour::new, FilteringBehaviour::chute);
         add(AllBlockEntityTypes.SMART_FLUID_PIPE, FilteringBehaviour::pipe);
         add(AllBlockEntityTypes.SMART_OBSERVER, FilteringBehaviour::observer);
         add(AllBlockEntityTypes.SPEEDOMETER, KineticAudioBehaviour::new, SpeedGaugeTooltipBehaviour::new);
         add(AllBlockEntityTypes.SPOUT, SpoutTooltipBehaviour::new);
-        add(AllBlockEntityTypes.STEAM_ENGINE, RotationDirectionScrollBehaviour::engine, SteamEngineTooltipBehaviour::new);
-        add(AllBlockEntityTypes.STEAM_WHISTLE, WhistleAnimationBehaviour::new, WhistleAudioBehaviour::new, WhistleTooltipBehaviour::new);
+        add(
+            AllBlockEntityTypes.STEAM_ENGINE,
+            RotationDirectionScrollBehaviour::engine,
+            SteamEngineTooltipBehaviour::new
+        );
+        add(
+            AllBlockEntityTypes.STEAM_WHISTLE,
+            WhistleAnimationBehaviour::new,
+            WhistleAudioBehaviour::new,
+            WhistleTooltipBehaviour::new
+        );
         add(AllBlockEntityTypes.STOCK_TICKER, StockTickerTooltipBehaviour::new);
         add(AllBlockEntityTypes.STRESSOMETER, KineticAudioBehaviour::new, StressGaugeTooltipBehaviour::new);
         add(AllBlockEntityTypes.TABLE_CLOTH, TableClothFilteringBehaviour::new);
@@ -126,7 +192,12 @@ public class AllBlockEntityBehaviours {
             ValveHandleScrollValueBehaviour::new
         );
         add(AllBlockEntityTypes.WATER_WHEEL, GeneratingKineticTooltipBehaviour::new, KineticAudioBehaviour::new);
-        add(AllBlockEntityTypes.WEIGHTED_EJECTOR, KineticAudioBehaviour::new, KineticScrollValueBehaviour::ejector, KineticTooltipBehaviour::new);
+        add(
+            AllBlockEntityTypes.WEIGHTED_EJECTOR,
+            KineticAudioBehaviour::new,
+            KineticScrollValueBehaviour::ejector,
+            KineticTooltipBehaviour::new
+        );
         add(
             AllBlockEntityTypes.WINDMILL_BEARING,
             KineticAudioBehaviour::new,

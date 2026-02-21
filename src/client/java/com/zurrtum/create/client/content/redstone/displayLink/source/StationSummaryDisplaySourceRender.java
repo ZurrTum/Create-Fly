@@ -10,14 +10,20 @@ import net.minecraft.ChatFormatting;
 
 public class StationSummaryDisplaySourceRender implements DisplaySourceRender {
     @Override
-    public void initConfigurationWidgets(DisplaySource source, DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
+    public void initConfigurationWidgets(
+        DisplaySource source,
+        DisplayLinkContext context,
+        ModularGuiLineBuilder builder,
+        boolean isFirstLine
+    ) {
         if (isFirstLine) {
             builder.addTextInput(
                 0, 137, (e, t) -> {
                     e.setValue("");
                     t.withTooltip(ImmutableList.of(
                         CreateLang.translateDirect("display_source.station_summary.filter").withColor(0x5391E1),
-                        CreateLang.translateDirect("gui.schedule.lmb_edit").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
+                        CreateLang.translateDirect("gui.schedule.lmb_edit")
+                            .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
                     ));
                 }, "Filter"
             );
@@ -26,7 +32,8 @@ public class StationSummaryDisplaySourceRender implements DisplaySourceRender {
 
         builder.addScrollInput(
             0, 32, (si, l) -> {
-                si.titled(CreateLang.translateDirect("display_source.station_summary.train_name_column")).withRange(0, 73).withShiftStep(12);
+                si.titled(CreateLang.translateDirect("display_source.station_summary.train_name_column"))
+                    .withRange(0, 73).withShiftStep(12);
                 si.setState(50);
                 l.withSuffix("%");
             }, "NameColumn"
@@ -34,7 +41,8 @@ public class StationSummaryDisplaySourceRender implements DisplaySourceRender {
 
         builder.addScrollInput(
             36, 22, (si, l) -> {
-                si.titled(CreateLang.translateDirect("display_source.station_summary.platform_column")).withRange(0, 16).withShiftStep(4);
+                si.titled(CreateLang.translateDirect("display_source.station_summary.platform_column")).withRange(0, 16)
+                    .withShiftStep(4);
                 si.setState(3);
             }, "PlatformColumn"
         );

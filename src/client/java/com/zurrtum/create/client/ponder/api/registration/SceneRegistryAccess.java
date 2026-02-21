@@ -1,12 +1,11 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.resources.Identifier;
 
 public interface SceneRegistryAccess {
 

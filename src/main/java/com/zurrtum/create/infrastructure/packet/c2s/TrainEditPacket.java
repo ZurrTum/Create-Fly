@@ -14,7 +14,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.UUID;
 
-public record TrainEditPacket(UUID id, String name, Identifier iconType, int mapColor) implements Packet<ServerGamePacketListener> {
+public record TrainEditPacket(UUID id, String name, Identifier iconType,
+                              int mapColor) implements Packet<ServerGamePacketListener> {
     public static StreamCodec<RegistryFriendlyByteBuf, TrainEditPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainEditPacket::id,

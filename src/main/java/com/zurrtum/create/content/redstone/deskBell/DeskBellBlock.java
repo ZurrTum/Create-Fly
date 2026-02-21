@@ -13,11 +13,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,7 +33,8 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
 
     public DeskBellBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(FACING, Direction.UP).setValue(POWERED, false).setValue(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.UP).setValue(POWERED, false)
+            .setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -76,10 +73,17 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
         playSound(player, level, pos);
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         level.setBlock(pos, state.setValue(POWERED, true), Block.UPDATE_ALL);
         updateNeighbours(state, level, pos);
         withBlockEntityDo(level, pos, DeskBellBlockEntity::ding);
@@ -87,15 +91,18 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
     }
 
     public void playSound(@Nullable Player pPlayer, LevelAccessor pLevel, BlockPos pPos) {
-        if (pLevel instanceof Level level)
+        if (pLevel instanceof Level level) {
             AllSoundEvents.DESK_BELL_USE.play(level, pPlayer, pPos);
+        }
     }
 
     @Override
     public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
-        if (!pIsMoving)
-            if (pState.getValue(POWERED))
+        if (!pIsMoving) {
+            if (pState.getValue(POWERED)) {
                 updateNeighbours(pState, pLevel, pPos);
+            }
+        }
     }
 
     @Override

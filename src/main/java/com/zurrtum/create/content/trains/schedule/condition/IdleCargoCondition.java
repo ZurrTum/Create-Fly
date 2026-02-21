@@ -14,8 +14,9 @@ public class IdleCargoCondition extends TimedWaitCondition {
     @Override
     public boolean tickCompletion(Level level, Train train, CompoundTag context) {
         int idleTime = Integer.MAX_VALUE;
-        for (Carriage carriage : train.carriages)
+        for (Carriage carriage : train.carriages) {
             idleTime = Math.min(idleTime, carriage.storage.getTicksSinceLastExchange());
+        }
         context.putInt("Time", idleTime);
         requestDisplayIfNecessary(context, idleTime);
         return idleTime > totalWaitTicks();

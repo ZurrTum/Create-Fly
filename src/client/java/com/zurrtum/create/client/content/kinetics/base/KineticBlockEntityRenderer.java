@@ -64,11 +64,19 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         state.angle = getAngleForBe(be, state.blockPos, state.axis);
     }
 
-    public void updateBaseRenderState(T be, S state, Level world, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void updateBaseRenderState(
+        T be,
+        S state,
+        Level world,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+    ) {
         state.blockPos = be.getBlockPos();
         state.blockState = getRenderedBlockState(be);
         state.blockEntityType = be.getType();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        state.lightCoords = world != null ? LevelRenderer.getLightColor(
+            world,
+            state.blockPos
+        ) : LightTexture.FULL_BRIGHT;
         state.breakProgress = crumblingOverlay;
         state.layer = getRenderType(be, state.blockState);
         state.axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);

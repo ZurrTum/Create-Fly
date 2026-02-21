@@ -57,16 +57,24 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
         super.tick();
         if (!infinityCheckFrontier.isEmpty() && rootPos != null) {
             Fluid fluid = getLevel().getFluidState(rootPos).getType();
-            if (fluid != Fluids.EMPTY)
+            if (fluid != Fluids.EMPTY) {
                 continueValidation(fluid);
+            }
         }
-        if (revalidateIn > 0)
+        if (revalidateIn > 0) {
             revalidateIn--;
+        }
     }
 
     protected void continueValidation(Fluid fluid) {
         try {
-            search(fluid, infinityCheckFrontier, infinityCheckVisited, (p, d) -> infinityCheckFrontier.add(new BlockPosEntry(p, d)), true);
+            search(
+                fluid,
+                infinityCheckFrontier,
+                infinityCheckVisited,
+                (p, d) -> infinityCheckFrontier.add(new BlockPosEntry(p, d)),
+                true
+            );
         } catch (ChunkNotLoadedException e) {
             infinityCheckFrontier.clear();
             infinityCheckVisited.clear();
@@ -87,8 +95,9 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
             return;
         }
 
-        if (!infinityCheckFrontier.isEmpty())
+        if (!infinityCheckFrontier.isEmpty()) {
             return;
+        }
         if (infinite) {
             reset();
             return;
@@ -112,8 +121,9 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
             return false;
         }
 
-        if (affectedArea == null)
+        if (affectedArea == null) {
             affectedArea = BoundingBox.fromCorners(root, root);
+        }
 
         if (revalidateIn == 0) {
             visited.clear();
@@ -128,19 +138,19 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
         int maxRange = maxRange();
         int maxRangeSq = maxRange * maxRange;
         int maxBlocks = maxBlocks();
-        boolean evaporate = world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, root) && FluidHelper.isTag(
-            fluid,
-            FluidTags.WATER
-        );
+        boolean evaporate = world.environmentAttributes()
+            .getValue(EnvironmentAttributes.WATER_EVAPORATES, root) && FluidHelper.isTag(fluid, FluidTags.WATER);
         boolean canPlaceSources = AllConfigs.server().fluids.fluidFillPlaceFluidSourceBlocks.get();
 
         if ((!fillInfinite() && infinite) || evaporate || !canPlaceSources) {
             FluidState fluidState = world.getFluidState(rootPos);
             boolean equivalentTo = fluidState.getType().isSame(fluid);
-            if (!equivalentTo && !evaporate && canPlaceSources)
+            if (!equivalentTo && !evaporate && canPlaceSources) {
                 return false;
-            if (simulate)
+            }
+            if (simulate) {
                 return true;
+            }
             playEffect(world, root, fluid, false);
             if (evaporate) {
                 int i = root.getX();
@@ -156,8 +166,9 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
                     0.5F,
                     2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F
                 );
-            } else if (!canPlaceSources)
+            } else if (!canPlaceSources) {
                 blockEntity.award(AllAdvancements.HOSE_PULLEY);
+            }
             return true;
         }
 
@@ -171,8 +182,9 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
                 continue;
             }
 
-            if (!simulate)
+            if (!simulate) {
                 visited.add(currentPos);
+            }
 
             if (visited.size() >= maxBlocks && maxBlocks != -1) {
                 infinite = true;
@@ -184,8 +196,9 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
             }
 
             SpaceType spaceType = getAtPos(world, currentPos, fluid);
-            if (spaceType == SpaceType.BLOCKING)
+            if (spaceType == SpaceType.BLOCKING) {
                 continue;
+            }
             if (spaceType == SpaceType.FILLABLE) {
                 success = true;
                 if (!simulate) {
@@ -193,12 +206,22 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
 
                     BlockState blockState = world.getBlockState(currentPos);
                     if (blockState.hasProperty(BlockStateProperties.WATERLOGGED) && fluid.isSame(Fluids.WATER)) {
-                        if (!blockEntity.isVirtual())
-                            world.setBlock(currentPos, updatePostWaterlogging(blockState.setValue(BlockStateProperties.WATERLOGGED, true)), 2 | 16);
+                        if (!blockEntity.isVirtual()) {
+                            world.setBlock(
+                                currentPos,
+                                updatePostWaterlogging(blockState.setValue(BlockStateProperties.WATERLOGGED, true)),
+                                2 | 16
+                            );
+                        }
                     } else {
                         replaceBlock(world, currentPos, blockState);
-                        if (!blockEntity.isVirtual())
-                            world.setBlock(currentPos, FluidHelper.convertToStill(fluid).defaultFluidState().createLegacyBlock(), 2 | 16);
+                        if (!blockEntity.isVirtual()) {
+                            world.setBlock(
+                                currentPos,
+                                FluidHelper.convertToStill(fluid).defaultFluidState().createLegacyBlock(),
+                                2 | 16
+                            );
+                        }
                     }
 
                     LevelTickAccess<Fluid> pendingFluidTicks = world.getFluidTicks();
@@ -210,30 +233,36 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
                 }
             }
 
-            if (simulate && success)
+            if (simulate && success) {
                 return true;
+            }
 
             visited.add(currentPos);
             queue.dequeue();
 
             for (Direction side : Iterate.directions) {
-                if (side == Direction.UP)
+                if (side == Direction.UP) {
                     continue;
+                }
 
                 BlockPos offsetPos = currentPos.relative(side);
-                if (visited.contains(offsetPos))
+                if (visited.contains(offsetPos)) {
                     continue;
-                if (offsetPos.distSqr(rootPos) > maxRangeSq)
+                }
+                if (offsetPos.distSqr(rootPos) > maxRangeSq) {
                     continue;
+                }
 
                 SpaceType nextSpaceType = getAtPos(world, offsetPos, fluid);
-                if (nextSpaceType != SpaceType.BLOCKING)
+                if (nextSpaceType != SpaceType.BLOCKING) {
                     queue.enqueue(new BlockPosEntry(offsetPos, entry.distance() + 1));
+                }
             }
         }
 
-        if (!simulate && success)
+        if (!simulate && success) {
             blockEntity.award(AllAdvancements.HOSE_PULLEY);
+        }
         return success;
     }
 
@@ -247,23 +276,28 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
     }
 
     enum SpaceType {
-        FILLABLE,
-        FILLED,
-        BLOCKING
+        FILLABLE, FILLED, BLOCKING
     }
 
     protected SpaceType getAtPos(Level world, BlockPos pos, Fluid toFill) {
         BlockState blockState = world.getBlockState(pos);
         FluidState fluidState = blockState.getFluidState();
 
-        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED))
+        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
             return toFill.isSame(Fluids.WATER) ? blockState.getValue(BlockStateProperties.WATERLOGGED) ? SpaceType.FILLED : SpaceType.FILLABLE : SpaceType.BLOCKING;
+        }
 
-        if (blockState.getBlock() instanceof LiquidBlock)
+        if (blockState.getBlock() instanceof LiquidBlock) {
             return blockState.getValue(LiquidBlock.LEVEL) == 0 ? toFill.isSame(fluidState.getType()) ? SpaceType.FILLED : SpaceType.BLOCKING : SpaceType.FILLABLE;
+        }
 
-        if (fluidState.getType() != Fluids.EMPTY && blockState.getCollisionShape(getLevel(), pos, CollisionContext.empty()).isEmpty())
+        if (fluidState.getType() != Fluids.EMPTY && blockState.getCollisionShape(
+            getLevel(),
+            pos,
+            CollisionContext.empty()
+        ).isEmpty()) {
             return toFill.isSame(fluidState.getType()) ? SpaceType.FILLED : SpaceType.BLOCKING;
+        }
 
         return canBeReplacedByFluid(world, pos, blockState) ? SpaceType.FILLABLE : SpaceType.BLOCKING;
     }
@@ -276,9 +310,10 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
     // From FlowingFluidBlock#isBlocked
     protected boolean canBeReplacedByFluid(BlockGetter world, BlockPos pos, BlockState pState) {
         Block block = pState.getBlock();
-        if (!(block instanceof DoorBlock) && !pState.is(BlockTags.ALL_SIGNS) && !pState.is(Blocks.LADDER) && !pState.is(Blocks.SUGAR_CANE) && !pState.is(
-            Blocks.BUBBLE_COLUMN)) {
-            if (!pState.is(Blocks.NETHER_PORTAL) && !pState.is(Blocks.END_PORTAL) && !pState.is(Blocks.END_GATEWAY) && !pState.is(Blocks.STRUCTURE_VOID)) {
+        if (!(block instanceof DoorBlock) && !pState.is(BlockTags.ALL_SIGNS) && !pState.is(Blocks.LADDER) && !pState.is(
+            Blocks.SUGAR_CANE) && !pState.is(Blocks.BUBBLE_COLUMN)) {
+            if (!pState.is(Blocks.NETHER_PORTAL) && !pState.is(Blocks.END_PORTAL) && !pState.is(Blocks.END_GATEWAY) && !pState.is(
+                Blocks.STRUCTURE_VOID)) {
                 return !pState.blocksMotion();
             } else {
                 return false;
@@ -289,8 +324,9 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
     }
 
     protected BlockState updatePostWaterlogging(BlockState state) {
-        if (state.hasProperty(BlockStateProperties.LIT))
+        if (state.hasProperty(BlockStateProperties.LIT)) {
             state = state.setValue(BlockStateProperties.LIT, false);
+        }
         return state;
     }
 

@@ -38,6 +38,10 @@ public class DeployingCategory extends CreateCategory {
 
     @Override
     public List<ItemStack> getCraftReferences() {
-        return List.of(AllItems.DEPLOYER.getDefaultInstance(), AllItems.DEPOT.getDefaultInstance(), AllItems.BELT_CONNECTOR.getDefaultInstance());
+        return List.of(
+            AllItems.DEPLOYER.getDefaultInstance(),
+            AllItems.DEPOT.getDefaultInstance(),
+            AllItems.BELT_CONNECTOR.getDefaultInstance()
+        );
     }
 }

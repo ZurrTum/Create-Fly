@@ -35,14 +35,15 @@ public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
         float fast = AllConfigs.server().kinetics.fastSpeed.get();
         float max = AllConfigs.server().kinetics.maxRotationSpeed.get().floatValue();
         float target;
-        if (speed == 0)
+        if (speed == 0) {
             target = 0;
-        else if (speed < medium)
+        } else if (speed < medium) {
             target = Mth.lerp(speed / medium, 0, .45f);
-        else if (speed < fast)
+        } else if (speed < fast) {
             target = Mth.lerp((speed - medium) / (fast - medium), .45f, .75f);
-        else
+        } else {
             target = Mth.lerp((speed - fast) / (max - fast), .75f, 1.125f);
+        }
         return target;
     }
 }

@@ -68,7 +68,12 @@ public class TableClothRenderer extends SmartBlockEntityRenderer<TableClothBlock
     }
 
     @Override
-    public void submit(TableClothRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        TableClothRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.shop != null) {
             queue.submitCustomGeometry(matrices, state.layer, state);

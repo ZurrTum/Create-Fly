@@ -1,12 +1,11 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.google.common.collect.MapMaker;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.concurrent.ConcurrentMap;
-
-import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
-import net.minecraft.resources.Identifier;
 
 /**
  * A helper class for loading and accessing JSON models not directly used by any blocks or items.

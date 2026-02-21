@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.content.kinetics.steamEngine.SteamEngineValueBox;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.contraptions.bearing.WindmillBearingBlockEntit
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.network.chat.Component;
 
 public class RotationDirectionScrollBehaviour extends ScrollOptionBehaviour<RotationDirection> {
@@ -39,8 +39,7 @@ public class RotationDirectionScrollBehaviour extends ScrollOptionBehaviour<Rota
 
     private enum RotationDirectionIcon implements INamedIconOptions {
 
-        CLOCKWISE(AllIcons.I_REFRESH),
-        COUNTER_CLOCKWISE(AllIcons.I_ROTATE_CCW);
+        CLOCKWISE(AllIcons.I_REFRESH), COUNTER_CLOCKWISE(AllIcons.I_ROTATE_CCW);
 
         private final String translationKey;
         private final AllIcons icon;

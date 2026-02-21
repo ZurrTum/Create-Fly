@@ -34,17 +34,23 @@ public enum DispenserBehaviorConverter implements SimpleRegistry.Provider<Item, 
     @Nullable
     @SuppressWarnings("deprecation")
     public MountedDispenseBehavior get(Item item, Level world) {
-        DispenseItemBehavior vanilla = ((DispenserBlock) Blocks.DISPENSER).getDispenseMethod(world, item.getDefaultInstance());
-        if (vanilla == null)
+        DispenseItemBehavior vanilla = ((DispenserBlock) Blocks.DISPENSER).getDispenseMethod(
+            world,
+            item.getDefaultInstance()
+        );
+        if (vanilla == null) {
             return null;
+        }
 
         // when the default, return null. The default will be used anyway, avoid caching it for no reason.
-        if (vanilla.getClass() == DefaultDispenseItemBehavior.class)
+        if (vanilla.getClass() == DefaultDispenseItemBehavior.class) {
             return null;
+        }
 
         // if the item is explicitly blocked from having its behavior wrapped, ignore it
-        if (item.builtInRegistryHolder().is(AllItemTags.DISPENSE_BEHAVIOR_WRAP_BLACKLIST))
+        if (item.builtInRegistryHolder().is(AllItemTags.DISPENSE_BEHAVIOR_WRAP_BLACKLIST)) {
             return null;
+        }
 
         if (vanilla instanceof ProjectileDispenseBehavior projectile) {
             return MountedProjectileDispenseBehavior.of(projectile);
@@ -85,16 +91,18 @@ public enum DispenserBehaviorConverter implements SimpleRegistry.Provider<Item, 
 
         @Override
         protected ItemStack execute(ItemStack stack, MovementContext context, BlockPos pos, Vec3 facing) {
-            if (this.hasErrored)
+            if (this.hasErrored) {
                 return stack;
+            }
 
             MinecraftServer server = context.world.getServer();
             ServerLevel serverLevel = server != null ? server.getLevel(context.world.dimension()) : null;
 
             Direction nearestFacing = MountedDispenseBehavior.getClosestFacingDirection(facing);
             BlockState state = context.state;
-            if (state.hasProperty(BlockStateProperties.FACING))
+            if (state.hasProperty(BlockStateProperties.FACING)) {
                 state = state.setValue(BlockStateProperties.FACING, nearestFacing);
+            }
 
             BlockSource source = new BlockSource(serverLevel, pos, state, null);
 

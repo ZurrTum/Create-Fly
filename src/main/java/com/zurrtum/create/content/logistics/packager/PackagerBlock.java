@@ -4,12 +4,12 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.*;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
@@ -49,13 +49,20 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     public PackagerBlock(Properties properties) {
         super(properties);
         BlockState defaultBlockState = defaultBlockState();
-        if (defaultBlockState.hasProperty(LINKED))
+        if (defaultBlockState.hasProperty(LINKED)) {
             defaultBlockState = defaultBlockState.setValue(LINKED, false);
+        }
         registerDefaultState(defaultBlockState.setValue(POWERED, false));
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, PackagerBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        PackagerBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.inventory;
     }
 
@@ -71,8 +78,9 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
         for (Direction face : context.getNearestLookingDirections()) {
             BlockPos pos = context.getClickedPos().relative(face);
             BlockEntity be = context.getLevel().getBlockEntity(pos);
-            if (be instanceof PackagerBlockEntity)
+            if (be instanceof PackagerBlockEntity) {
                 continue;
+            }
             if (be != null && be.hasLevel() && ItemHelper.getInventory(be.getLevel(), pos, null, be, null) != null) {
                 preferredFacing = face.getOpposite();
                 break;
@@ -93,7 +101,8 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
             }
         }
 
-        return super.getStateForPlacement(context).setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()))
+        return super.getStateForPlacement(context)
+            .setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()))
             .setValue(FACING, preferredFacing);
     }
 
@@ -107,37 +116,46 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (stack.is(AllItems.WRENCH))
+        if (stack.is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (stack.is(AllItems.FACTORY_GAUGE))
+        }
+        if (stack.is(AllItems.FACTORY_GAUGE)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (stack.is(AllItems.STOCK_LINK) && !(state.hasProperty(LINKED) && state.getValue(LINKED)))
+        }
+        if (stack.is(AllItems.STOCK_LINK) && !(state.hasProperty(LINKED) && state.getValue(LINKED))) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (stack.is(AllItems.PACKAGE_FROGPORT))
+        }
+        if (stack.is(AllItems.PACKAGE_FROGPORT)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         if (onBlockEntityUseItemOn(
             level, pos, be -> {
                 if (be.heldBox.isEmpty()) {
-                    if (be.animationTicks > 0)
+                    if (be.animationTicks > 0) {
                         return InteractionResult.SUCCESS;
+                    }
                     if (PackageItem.isPackage(stack)) {
-                        if (level.isClientSide())
+                        if (level.isClientSide()) {
                             return InteractionResult.SUCCESS;
-                        if (!be.unwrapBox(stack.copy(), true))
+                        }
+                        if (!be.unwrapBox(stack.copy(), true)) {
                             return InteractionResult.SUCCESS;
+                        }
                         be.unwrapBox(stack.copy(), false);
                         be.triggerStockCheck();
                         stack.shrink(1);
                         AllSoundEvents.DEPOT_PLOP.playOnServer(level, pos);
-                        if (stack.isEmpty())
+                        if (stack.isEmpty()) {
                             player.setItemInHand(hand, ItemStack.EMPTY);
+                        }
                         return InteractionResult.SUCCESS;
                     }
                     return InteractionResult.SUCCESS;
                 }
-                if (be.animationTicks > 0)
+                if (be.animationTicks > 0) {
                     return InteractionResult.SUCCESS;
+                }
                 if (!level.isClientSide()) {
                     player.getInventory().placeItemBackInInventory(be.heldBox.copy());
                     player.level().playSound(
@@ -153,8 +171,9 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
                 }
                 return InteractionResult.SUCCESS;
             }
-        ).consumesAction())
+        ).consumesAction()) {
             return InteractionResult.SUCCESS;
+        }
 
         return InteractionResult.SUCCESS;
     }
@@ -166,17 +185,27 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
 
     @Override
     public void onNeighborChange(BlockState state, LevelReader level, BlockPos pos, BlockPos neighbor) {
-        if (neighbor.relative(state.getValueOrElse(FACING, Direction.UP)).equals(pos))
+        if (neighbor.relative(state.getValueOrElse(FACING, Direction.UP)).equals(pos)) {
             withBlockEntityDo(level, pos, PackagerBlockEntity::triggerStockCheck);
+        }
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClientSide())
+    public void neighborUpdate(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos fromPos,
+        boolean isMoving
+    ) {
+        if (worldIn.isClientSide()) {
             return;
+        }
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.onNeighborChanged(fromPos);
+        }
     }
 
     @Override
@@ -188,14 +217,17 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
         @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered == worldIn.hasNeighborSignal(pos))
+        if (previouslyPowered == worldIn.hasNeighborSignal(pos)) {
             return;
+        }
         worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
-        if (!previouslyPowered)
+        if (!previouslyPowered) {
             withBlockEntityDo(worldIn, pos, PackagerBlockEntity::activate);
+        }
     }
 
     @Override
@@ -227,8 +259,9 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(pbe -> {
             boolean empty = pbe.inventory.getStack().isEmpty();
-            if (pbe.animationTicks != 0)
+            if (pbe.animationTicks != 0) {
                 empty = false;
+            }
             return empty ? 0 : 15;
         }).orElse(0);
     }

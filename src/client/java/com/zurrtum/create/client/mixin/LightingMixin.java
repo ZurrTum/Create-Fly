@@ -11,7 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Lighting.class)
 public class LightingMixin {
     @Inject(method = "updateBuffer(Lcom/mojang/blaze3d/platform/Lighting$Entry;Lorg/joml/Vector3f;Lorg/joml/Vector3f;)V", at = @At("TAIL"))
-    private void updateBuffer(Lighting.Entry type, Vector3f light0Diffusion, Vector3f light1Diffusion, CallbackInfo ci) {
+    private void updateBuffer(
+        Lighting.Entry type,
+        Vector3f light0Diffusion,
+        Vector3f light1Diffusion,
+        CallbackInfo ci
+    ) {
         LevelUniforms.update(type, light0Diffusion, light1Diffusion);
     }
 

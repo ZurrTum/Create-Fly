@@ -12,8 +12,9 @@ public class CardboardArmorStealthOverlay {
 
     public static void clientTick(Minecraft mc) {
         LocalPlayer player = mc.player;
-        if (player == null)
+        if (player == null) {
             return;
+        }
 
         opacity.tickChaser();
         opacity.updateChaseTarget(CardboardArmorHandler.testForStealth(player) ? 1 : 0);

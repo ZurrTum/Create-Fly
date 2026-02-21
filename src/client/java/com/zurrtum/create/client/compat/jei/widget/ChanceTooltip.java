@@ -11,7 +11,10 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 public record ChanceTooltip(Either<FormattedText, TooltipComponent> chance) implements IRecipeSlotRichTooltipCallback {
     public ChanceTooltip(float chance) {
-        this(Either.left(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100)).withStyle(ChatFormatting.GOLD)));
+        this(Either.left(CreateLang.translateDirect(
+            "recipe.processing.chance",
+            chance < 0.01 ? "<1" : (int) (chance * 100)
+        ).withStyle(ChatFormatting.GOLD)));
     }
 
     @Override

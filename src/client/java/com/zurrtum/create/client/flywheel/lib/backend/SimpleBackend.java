@@ -2,6 +2,8 @@ package com.zurrtum.create.client.flywheel.lib.backend;
 
 import com.zurrtum.create.client.flywheel.api.backend.Backend;
 import com.zurrtum.create.client.flywheel.api.backend.Engine;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -9,15 +11,16 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.LevelAccessor;
-
 public final class SimpleBackend implements Backend {
     private final Function<LevelAccessor, Engine> engineFactory;
     private final IntSupplier priority;
     private final BooleanSupplier isSupported;
 
-    public SimpleBackend(Function<LevelAccessor, Engine> engineFactory, IntSupplier priority, BooleanSupplier isSupported) {
+    public SimpleBackend(
+        Function<LevelAccessor, Engine> engineFactory,
+        IntSupplier priority,
+        BooleanSupplier isSupported
+    ) {
         this.engineFactory = engineFactory;
         this.priority = priority;
         this.isSupported = isSupported;
@@ -69,7 +72,10 @@ public final class SimpleBackend implements Backend {
         public Backend register(Identifier id) {
             Objects.requireNonNull(this.engineFactory);
             Objects.requireNonNull(this.isSupported);
-            return Backend.REGISTRY.registerAndGet(id, new SimpleBackend(this.engineFactory, this.priority, this.isSupported));
+            return Backend.REGISTRY.registerAndGet(
+                id,
+                new SimpleBackend(this.engineFactory, this.priority, this.isSupported)
+            );
         }
     }
 }

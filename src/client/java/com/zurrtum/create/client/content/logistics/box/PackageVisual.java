@@ -23,8 +23,9 @@ public class PackageVisual extends AbstractEntityVisual<PackageEntity> implement
         super(ctx, entity, partialTick);
 
         ItemStack box = entity.box;
-        if (box.isEmpty() || !PackageItem.isPackage(box))
+        if (box.isEmpty() || !PackageItem.isPackage(box)) {
             box = AllItems.CARDBOARD_BLOCK.getDefaultInstance();
+        }
         PartialModel model = AllPartialModels.PACKAGES.get(BuiltInRegistries.ITEM.getKey(box.getItem()));
 
         instance = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(model)).createInstance();
@@ -52,8 +53,8 @@ public class PackageVisual extends AbstractEntityVisual<PackageEntity> implement
         float yNudge = (((float) (randomBits >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
         float zNudge = (((float) (randomBits >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
 
-        instance.setIdentityTransform().translate(x - 0.5 + xNudge, y + yNudge, z - 0.5 + zNudge).rotateYCenteredDegrees(-yaw - 90)
-            .light(computePackedLight(partialTick)).setChanged();
+        instance.setIdentityTransform().translate(x - 0.5 + xNudge, y + yNudge, z - 0.5 + zNudge)
+            .rotateYCenteredDegrees(-yaw - 90).light(computePackedLight(partialTick)).setChanged();
     }
 
     @Override

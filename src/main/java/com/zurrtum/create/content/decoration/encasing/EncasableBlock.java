@@ -1,7 +1,5 @@
 package com.zurrtum.create.content.decoration.encasing;
 
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -13,6 +11,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.List;
 
 /**
  * Implement this interface to indicate that this block is encasable.
@@ -33,11 +33,13 @@ public interface EncasableBlock {
         List<Block> encasedVariants = EncasingRegistry.getVariants(state.getBlock());
         for (Block block : encasedVariants) {
             if (block instanceof EncasedBlock encased) {
-                if (encased.getCasing().asItem() != heldItem.getItem())
+                if (encased.getCasing().asItem() != heldItem.getItem()) {
                     continue;
+                }
 
-                if (level.isClientSide())
+                if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
+                }
 
                 encased.handleEncasing(state, level, pos, heldItem, player, hand, ray);
                 playEncaseSound(level, pos);
@@ -50,6 +52,13 @@ public interface EncasableBlock {
     default void playEncaseSound(Level level, BlockPos pos) {
         BlockState newState = level.getBlockState(pos);
         SoundType soundType = newState.getSoundType();
-        level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+        level.playSound(
+            null,
+            pos,
+            soundType.getPlaceSound(),
+            SoundSource.BLOCKS,
+            (soundType.getVolume() + 1.0F) / 2.0F,
+            soundType.getPitch() * 0.8F
+        );
     }
 }

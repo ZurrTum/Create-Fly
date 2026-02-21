@@ -8,7 +8,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import org.jspecify.annotations.Nullable;
 
 public class NetheriteBacktankFirstPersonRenderer {
-    private static final Identifier BACKTANK_ARMOR_LOCATION = Create.asResource("textures/models/armor/netherite_diving_arm.png");
+    private static final Identifier BACKTANK_ARMOR_LOCATION = Create.asResource(
+        "textures/models/armor/netherite_diving_arm.png");
 
     @Nullable
     public static Identifier getHandTexture(@Nullable LocalPlayer player) {

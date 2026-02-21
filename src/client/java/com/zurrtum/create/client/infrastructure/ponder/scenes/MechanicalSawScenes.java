@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.infrastructure.ponder.scenes;
 
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.client.foundation.ponder.CreateSceneBuilder;
 import com.zurrtum.create.client.ponder.api.PonderPalette;
@@ -14,7 +15,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -46,7 +46,8 @@ public class MechanicalSawScenes {
         scene.effects().rotationDirectionIndicator(shaftPos);
         scene.world().showSection(sawSelect, Direction.DOWN);
         scene.idle(10);
-        scene.overlay().showText(50).attachKeyFrame().text("Upward facing Mechanical Saws can process a variety of items")
+        scene.overlay().showText(50).attachKeyFrame()
+            .text("Upward facing Mechanical Saws can process a variety of items")
             .pointAt(util.vector().blockSurface(sawPos, Direction.WEST)).placeNearTarget();
         scene.idle(45);
 
@@ -92,12 +93,17 @@ public class MechanicalSawScenes {
                 inventory.remainingTime = -1;
             }
         );
-        logItem = scene.world().createItemEntity(util.vector().topOf(sawPos).add(0.5, -.1, 0), util.vector().of(0.05, 0.18, 0), strippedLog);
+        logItem = scene.world().createItemEntity(
+            util.vector().topOf(sawPos).add(0.5, -.1, 0),
+            util.vector().of(0.05, 0.18, 0),
+            strippedLog
+        );
         scene.idle(12);
         scene.overlay().showControls(itemSpawn.add(2, 0, 0), Pointing.DOWN, 20).withItem(strippedLog);
         scene.idle(30);
 
-        scene.overlay().showText(60).attachKeyFrame().text("The processed item always moves against the rotational input to the saw")
+        scene.overlay().showText(60).attachKeyFrame()
+            .text("The processed item always moves against the rotational input to the saw")
             .pointAt(util.vector().blockSurface(sawPos, Direction.UP)).placeNearTarget();
         scene.idle(70);
 
@@ -134,7 +140,8 @@ public class MechanicalSawScenes {
                 inventory.remainingTime = -1;
             }
         );
-        logItem = scene.world().createItemEntity(util.vector().topOf(sawPos).add(-0.5, -.1, 0), util.vector().of(-0.05, 0.18, 0), planks);
+        logItem = scene.world()
+            .createItemEntity(util.vector().topOf(sawPos).add(-0.5, -.1, 0), util.vector().of(-0.05, 0.18, 0), planks);
         scene.idle(22);
 
         Selection otherBelt = util.select().fromTo(3, 1, 3, 4, 1, 2);
@@ -144,7 +151,8 @@ public class MechanicalSawScenes {
         scene.world().setKineticSpeed(belt, 0);
         scene.world().modifyKineticSpeed(util.select().everywhere(), f -> -f);
         scene.world().modifyEntity(logItem, Entity::discard);
-        scene.world().setBlock(shaftPos, AllBlocks.COGWHEEL.defaultBlockState().setValue(ShaftBlock.AXIS, Axis.Z), true);
+        scene.world()
+            .setBlock(shaftPos, AllBlocks.COGWHEEL.defaultBlockState().setValue(ShaftBlock.AXIS, Axis.Z), true);
         scene.idle(3);
         scene.addKeyframe();
 
@@ -160,7 +168,8 @@ public class MechanicalSawScenes {
         scene.world().moveSection(beltSection, util.vector().of(0, -100, 0), 0);
         scene.idle(3);
 
-        ElementLink<WorldSectionElement> otherBeltSection = scene.world().showIndependentSection(otherBelt, Direction.WEST);
+        ElementLink<WorldSectionElement> otherBeltSection = scene.world()
+            .showIndependentSection(otherBelt, Direction.WEST);
         scene.world().moveSection(otherBeltSection, util.vector().of(0, 100, 0), 0);
         scene.idle(1);
         scene.world().removeItemsFromBelt(util.grid().at(3, 1, 2));
@@ -196,14 +205,19 @@ public class MechanicalSawScenes {
         );
         Vec3 filter = util.vector().of(2.5, 1 + 13 / 16f, 2 + 5 / 16f);
         scene.overlay().showFilterSlotInput(filter, Direction.UP, 80);
-        scene.overlay().showText(80).attachKeyFrame().text("When an ingredient has multiple possible outcomes, the filter slot can specify it")
-            .pointAt(filter).placeNearTarget();
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("When an ingredient has multiple possible outcomes, the filter slot can specify it").pointAt(filter)
+            .placeNearTarget();
         scene.idle(15);
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, saw -> {
                 ProcessingInventory inventory = saw.inventory;
                 inventory.setItem(1, ItemStack.EMPTY);
-                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(saw.getLevel(), util.grid().at(3, 1, 2), DirectBeltInputBehaviour.TYPE);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(
+                    saw.getLevel(),
+                    util.grid().at(3, 1, 2),
+                    DirectBeltInputBehaviour.TYPE
+                );
                 behaviour.handleInsertion(bricks, Direction.EAST, false);
             }
         );
@@ -237,14 +251,18 @@ public class MechanicalSawScenes {
             sawPos, SawBlockEntity.class, saw -> {
                 ProcessingInventory inventory = saw.inventory;
                 inventory.setItem(1, ItemStack.EMPTY);
-                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(saw.getLevel(), util.grid().at(3, 1, 2), DirectBeltInputBehaviour.TYPE);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(
+                    saw.getLevel(),
+                    util.grid().at(3, 1, 2),
+                    DirectBeltInputBehaviour.TYPE
+                );
                 behaviour.handleInsertion(bricks, Direction.EAST, false);
             }
         );
 
         scene.markAsFinished();
-        scene.overlay().showText(100).text("Without filter, the Saw would cycle through all outcomes instead").colored(PonderPalette.RED)
-            .pointAt(filter).placeNearTarget();
+        scene.overlay().showText(100).text("Without filter, the Saw would cycle through all outcomes instead")
+            .colored(PonderPalette.RED).pointAt(filter).placeNearTarget();
         scene.idle(65);
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
     }
@@ -255,7 +273,11 @@ public class MechanicalSawScenes {
         scene.configureBasePlate(0, 0, 5);
         scene.scaleSceneView(.9f);
         scene.world().setBlock(util.grid().at(2, 0, 2), Blocks.GRASS_BLOCK.defaultBlockState(), false);
-        scene.world().showSection(util.select().layer(0).add(util.select().position(3, 1, 1)).add(util.select().position(1, 1, 2)), Direction.UP);
+        scene.world()
+            .showSection(
+                util.select().layer(0).add(util.select().position(3, 1, 1)).add(util.select().position(1, 1, 2)),
+                Direction.UP
+            );
 
         scene.world().setKineticSpeed(util.select().position(5, 0, 1), -8);
         scene.world().setKineticSpeed(util.select().fromTo(3, 1, 2, 5, 1, 2), 16);
@@ -275,7 +297,8 @@ public class MechanicalSawScenes {
             scene.idle(10);
             scene.world().incrementBlockBreakingProgress(breakingPos);
             if (i == 1) {
-                scene.overlay().showText(80).attachKeyFrame().placeNearTarget().pointAt(util.vector().blockSurface(breakingPos, Direction.WEST))
+                scene.overlay().showText(80).attachKeyFrame().placeNearTarget()
+                    .pointAt(util.vector().blockSurface(breakingPos, Direction.WEST))
                     .text("When given Rotational Force, a Mechanical Saw will cut trees directly in front of it");
             }
         }
@@ -295,21 +318,28 @@ public class MechanicalSawScenes {
         for (int i = 0; i < 5; i++) {
             Vec3 dropPos = util.vector().centerOf(breakingPos.above(i));
             float distance = (float) dropPos.distanceTo(util.vector().centerOf(breakingPos));
-            scene.world().createItemEntity(dropPos, util.vector().of(-distance / 20, 0, 0), new ItemStack(Items.OAK_LOG));
+            scene.world()
+                .createItemEntity(dropPos, util.vector().of(-distance / 20, 0, 0), new ItemStack(Items.OAK_LOG));
         }
 
         scene.idle(35);
         scene.world().destroyBlock(util.grid().at(1, 1, 2));
-        scene.world().hideSection(util.select().layersFrom(2).add(util.select().fromTo(2, 1, 2, 1, 1, 3)), Direction.UP);
+        scene.world()
+            .hideSection(util.select().layersFrom(2).add(util.select().fromTo(2, 1, 2, 1, 1, 3)), Direction.UP);
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
         scene.idle(15);
         scene.world().setBlocks(util.select().fromTo(2, 1, 2, 1, 20, 3), Blocks.JUNGLE_LOG.defaultBlockState(), false);
-        scene.world().showSection(util.select().layersFrom(2).add(util.select().fromTo(2, 1, 2, 1, 1, 3)), Direction.UP);
+        scene.world()
+            .showSection(util.select().layersFrom(2).add(util.select().fromTo(2, 1, 2, 1, 1, 3)), Direction.UP);
         scene.idle(15);
 
-        scene.world().hideSection(util.select().fromTo(2, 1, 2, 1, 1, 3).substract(util.select().position(breakingPos)), Direction.WEST);
+        scene.world().hideSection(
+            util.select().fromTo(2, 1, 2, 1, 1, 3).substract(util.select().position(breakingPos)),
+            Direction.WEST
+        );
         scene.idle(10);
-        scene.overlay().showOutlineWithText(util.select().position(breakingPos), 90).attachKeyFrame().colored(PonderPalette.GREEN).placeNearTarget()
+        scene.overlay().showOutlineWithText(util.select().position(breakingPos), 90).attachKeyFrame()
+            .colored(PonderPalette.GREEN).placeNearTarget()
             .text("In order to cut the tree fully, the Saw has to break the last block connecting it to the ground");
 
         scene.idle(25);
@@ -319,12 +349,17 @@ public class MechanicalSawScenes {
         }
 
         for (int i = 0; i < 30; i++) {
-            scene.world().replaceBlocks(util.select().fromTo(2, i + 1, 2, 1, i + 1, 3), Blocks.AIR.defaultBlockState(), true);
+            scene.world()
+                .replaceBlocks(util.select().fromTo(2, i + 1, 2, 1, i + 1, 3), Blocks.AIR.defaultBlockState(), true);
             for (int x = 1; x <= 2; x++) {
                 for (int z = 2; z <= 3; z++) {
                     Vec3 dropPos = util.vector().centerOf(x, i + 1, z);
                     float distance = (float) dropPos.distanceTo(util.vector().centerOf(breakingPos));
-                    scene.world().createItemEntity(dropPos, util.vector().of(-distance / 20, 0, 0), new ItemStack(Items.JUNGLE_LOG));
+                    scene.world().createItemEntity(
+                        dropPos,
+                        util.vector().of(-distance / 20, 0, 0),
+                        new ItemStack(Items.JUNGLE_LOG)
+                    );
                 }
             }
             scene.idle(1);
@@ -337,26 +372,30 @@ public class MechanicalSawScenes {
         scene.configureBasePlate(1, 0, 6);
         scene.scaleSceneView(.9f);
         scene.world().setBlock(util.grid().at(2, 0, 3), Blocks.GRASS_BLOCK.defaultBlockState(), false);
-        scene.world().showSection(
-            util.select().layer(0).add(util.select().position(3, 1, 1)).add(util.select().position(1, 1, 2)).add(util.select().position(2, 1, 4)),
-            Direction.UP
-        );
+        scene.world()
+            .showSection(
+                util.select().layer(0).add(util.select().position(3, 1, 1)).add(util.select().position(1, 1, 2))
+                    .add(util.select().position(2, 1, 4)), Direction.UP
+            );
 
         Selection kinetics = util.select().fromTo(6, 1, 2, 6, 1, 6);
 
         scene.idle(5);
-        ElementLink<WorldSectionElement> pistonHead = scene.world().showIndependentSection(util.select().fromTo(6, 1, 1, 8, 1, 1), Direction.DOWN);
+        ElementLink<WorldSectionElement> pistonHead = scene.world()
+            .showIndependentSection(util.select().fromTo(6, 1, 1, 8, 1, 1), Direction.DOWN);
         scene.world().moveSection(pistonHead, util.vector().of(0, 0, 1), 0);
         scene.world().showSection(kinetics, Direction.DOWN);
         scene.idle(5);
-        ElementLink<WorldSectionElement> contraption = scene.world().showIndependentSection(util.select().fromTo(5, 1, 3, 5, 1, 2), Direction.DOWN);
+        ElementLink<WorldSectionElement> contraption = scene.world()
+            .showIndependentSection(util.select().fromTo(5, 1, 3, 5, 1, 2), Direction.DOWN);
         scene.idle(5);
         scene.world().showSectionAndMerge(util.select().position(4, 1, 3), Direction.EAST, contraption);
         scene.idle(5);
         scene.world().showSectionAndMerge(util.select().position(4, 1, 2), Direction.EAST, contraption);
         scene.idle(5);
 
-        scene.overlay().showText(60).attachKeyFrame().placeNearTarget().pointAt(util.vector().topOf(util.grid().at(4, 1, 3)))
+        scene.overlay().showText(60).attachKeyFrame().placeNearTarget()
+            .pointAt(util.vector().topOf(util.grid().at(4, 1, 3)))
             .text("Whenever Saws are moved as part of an animated Contraption...");
         scene.idle(70);
 
@@ -377,7 +416,8 @@ public class MechanicalSawScenes {
             scene.idle(3);
             scene.world().incrementBlockBreakingProgress(breakingPos);
             if (i == 2) {
-                scene.overlay().showText(80).placeNearTarget().pointAt(util.vector().blockSurface(breakingPos, Direction.WEST))
+                scene.overlay().showText(80).placeNearTarget()
+                    .pointAt(util.vector().blockSurface(breakingPos, Direction.WEST))
                     .text("...they will cut any trees the contraption runs them into");
             }
         }
@@ -395,7 +435,8 @@ public class MechanicalSawScenes {
         for (int i = 0; i < 5; i++) {
             Vec3 dropPos = util.vector().centerOf(breakingPos.above(i));
             float distance = (float) dropPos.distanceTo(util.vector().centerOf(breakingPos));
-            scene.world().createItemEntity(dropPos, util.vector().of(-distance / 20, 0, 0), new ItemStack(Items.OAK_LOG));
+            scene.world()
+                .createItemEntity(dropPos, util.vector().of(-distance / 20, 0, 0), new ItemStack(Items.OAK_LOG));
         }
 
         scene.world().moveSection(pistonHead, util.vector().of(-1, 0, 0), 20);
@@ -414,7 +455,8 @@ public class MechanicalSawScenes {
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
         scene.world().glueBlockOnto(util.grid().at(5, 2, 2), Direction.DOWN, contraption);
 
-        scene.overlay().showText(60).attachKeyFrame().placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(5, 2, 2), Direction.WEST))
+        scene.overlay().showText(60).attachKeyFrame().placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(5, 2, 2), Direction.WEST))
             .sharedText("storage_on_contraption");
         scene.idle(70);
 
@@ -445,7 +487,8 @@ public class MechanicalSawScenes {
         scene.idle(20);
         scene.world().setKineticSpeed(saws, 0);
         scene.idle(10);
-        scene.overlay().showControls(util.vector().topOf(3, 2, 2), Pointing.DOWN, 60).withItem(new ItemStack(Blocks.OAK_LOG));
+        scene.overlay().showControls(util.vector().topOf(3, 2, 2), Pointing.DOWN, 60)
+            .withItem(new ItemStack(Blocks.OAK_LOG));
         scene.idle(20);
     }
 

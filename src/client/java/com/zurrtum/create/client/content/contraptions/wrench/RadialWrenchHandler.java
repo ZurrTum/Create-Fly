@@ -18,36 +18,44 @@ public class RadialWrenchHandler {
     public static int COOLDOWN = 0;
 
     public static void clientTick() {
-        if (COOLDOWN > 0 && !AllKeys.ROTATE_MENU.isDown())
+        if (COOLDOWN > 0 && !AllKeys.ROTATE_MENU.isDown()) {
             COOLDOWN--;
+        }
     }
 
     public static void onKeyInput(Minecraft mc, KeyEvent input, boolean pressed) {
-        if (!pressed)
+        if (!pressed) {
             return;
+        }
 
-        if (!AllKeys.ROTATE_MENU.matches(input))
+        if (!AllKeys.ROTATE_MENU.matches(input)) {
             return;
+        }
 
-        if (COOLDOWN > 0)
+        if (COOLDOWN > 0) {
             return;
+        }
 
-        if (mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
+        if (mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
             return;
+        }
 
         LocalPlayer player = mc.player;
-        if (player == null)
+        if (player == null) {
             return;
+        }
 
         Level level = player.level();
 
         ItemStack heldItem = player.getMainHandItem();
-        if (!heldItem.is(AllItems.WRENCH))
+        if (!heldItem.is(AllItems.WRENCH)) {
             return;
+        }
 
         HitResult objectMouseOver = mc.hitResult;
-        if (!(objectMouseOver instanceof BlockHitResult blockHitResult))
+        if (!(objectMouseOver instanceof BlockHitResult blockHitResult)) {
             return;
+        }
 
         BlockState state = level.getBlockState(blockHitResult.getBlockPos());
 

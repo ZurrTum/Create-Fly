@@ -60,7 +60,8 @@ public class FluidThresholdConditionRender extends CargoThresholdConditionRender
         super.initConfigurationWidgets(input, builder);
         builder.addSelectionScrollInput(
             71, 50, (i, l) -> {
-                i.forOptions(ImmutableList.of(CreateLang.translateDirect("schedule.condition.threshold.buckets"))).titled(null);
+                i.forOptions(ImmutableList.of(CreateLang.translateDirect("schedule.condition.threshold.buckets")))
+                    .titled(null);
             }, "Measure"
         );
     }

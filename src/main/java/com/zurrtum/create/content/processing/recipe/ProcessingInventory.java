@@ -2,17 +2,16 @@ package com.zurrtum.create.content.processing.recipe;
 
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class ProcessingInventory implements SidedItemInventory {
     private static final int[] INPUT_SLOTS = {0};
@@ -150,7 +149,8 @@ public class ProcessingInventory implements SidedItemInventory {
         remainingTime = view.getFloatOr("ProcessingTime", 0);
         recipeDuration = view.getFloatOr("RecipeTime", 0);
         appliedRecipe = view.getBooleanOr("AppliedRecipe", false);
-        if (appliedRecipe && isEmpty())
+        if (appliedRecipe && isEmpty()) {
             appliedRecipe = false;
+        }
     }
 }

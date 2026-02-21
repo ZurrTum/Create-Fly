@@ -17,7 +17,11 @@ import java.io.Reader;
 @Mixin(ModelManager.class)
 public class LoadBlockModelMixin {
     @Inject(method = "method_65750", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockModel;fromStream(Ljava/io/Reader;)Lnet/minecraft/client/renderer/block/model/BlockModel;"), cancellable = true)
-    private static void deserialize(CallbackInfoReturnable<Pair<Identifier, UnbakedModel>> cir, @Local Identifier identifier, @Local Reader input) {
+    private static void deserialize(
+        CallbackInfoReturnable<Pair<Identifier, UnbakedModel>> cir,
+        @Local Identifier identifier,
+        @Local Reader input
+    ) {
         try {
             UnbakedModel model = GsonHelper.fromJson(BlockModel.GSON, input, UnbakedModel.class);
             cir.setReturnValue(Pair.of(identifier, model));

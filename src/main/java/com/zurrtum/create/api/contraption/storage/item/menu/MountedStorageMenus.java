@@ -30,15 +30,22 @@ public class MountedStorageMenus {
     );
 
     @Nullable
-    public static MenuProvider createGeneric(Component menuName, Container handler, Predicate<Player> stillValid, Consumer<ContainerUser> onClose) {
+    public static MenuProvider createGeneric(
+        Component menuName,
+        Container handler,
+        Predicate<Player> stillValid,
+        Consumer<ContainerUser> onClose
+    ) {
         int size = handler.getContainerSize();
         int rows = size / 9;
-        if (rows < 1 || rows > 6)
+        if (rows < 1 || rows > 6) {
             return null;
+        }
 
         // make sure rows are full
-        if (size % 9 != 0)
+        if (size % 9 != 0) {
             return null;
+        }
 
         MenuType<?> type = GENERIC_CHEST_MENUS.get(rows - 1);
         Container wrapper = new StorageInteractionWrapper(handler, stillValid, onClose);
@@ -47,9 +54,15 @@ public class MountedStorageMenus {
     }
 
     @Nullable
-    public static MenuProvider createGeneric9x9(Component name, Container handler, Predicate<Player> stillValid, Consumer<ContainerUser> onClose) {
-        if (handler.getContainerSize() != 9)
+    public static MenuProvider createGeneric9x9(
+        Component name,
+        Container handler,
+        Predicate<Player> stillValid,
+        Consumer<ContainerUser> onClose
+    ) {
+        if (handler.getContainerSize() != 9) {
             return null;
+        }
 
         Container wrapper = new StorageInteractionWrapper(handler, stillValid, onClose);
         MenuConstructor constructor = (id, inv, player) -> new DispenserMenu(id, inv, wrapper);

@@ -57,7 +57,13 @@ public class LightUpdatedVisualStorage {
             for (long section : sectionsUpdatedThisFrame) {
                 var updaters = section2Updaters.get(section);
                 if (updaters != null && !updaters.isEmpty()) {
-                    taskExecutor.execute(() -> Distribute.tasks(taskExecutor, updaterContext, sync, updaters, Updater::updateLight));
+                    taskExecutor.execute(() -> Distribute.tasks(
+                        taskExecutor,
+                        updaterContext,
+                        sync,
+                        updaters,
+                        Updater::updateLight
+                    ));
                 } else {
                     sync.decrementAndEventuallyRun();
                 }

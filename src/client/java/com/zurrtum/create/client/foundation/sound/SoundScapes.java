@@ -4,14 +4,13 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
-
-import java.util.*;
-import java.util.function.BiFunction;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
+
+import java.util.*;
+import java.util.function.BiFunction;
 
 public class SoundScapes {
 
@@ -31,7 +30,8 @@ public class SoundScapes {
 
     private static SoundScape crushing(float pitch, AmbienceGroup group) {
         return new SoundScape(pitch, group).repeating(AllSoundEvents.CRUSHING_1.getMainEvent(), 1.545f, .75f, 1)
-            .repeating(AllSoundEvents.CRUSHING_2.getMainEvent(), 0.425f, .75f, 2).repeating(AllSoundEvents.CRUSHING_3.getMainEvent(), 2f, 1.75f, 2);
+            .repeating(AllSoundEvents.CRUSHING_2.getMainEvent(), 0.425f, .75f, 2)
+            .repeating(AllSoundEvents.CRUSHING_3.getMainEvent(), 2f, 1.75f, 2);
     }
 
     private static SoundScape milling(float pitch, AmbienceGroup group) {
@@ -40,20 +40,24 @@ public class SoundScapes {
     }
 
     public static void play(AmbienceGroup group, BlockPos pos, float pitch) {
-        if (!AllConfigs.client().enableAmbientSounds.get())
+        if (!AllConfigs.client().enableAmbientSounds.get()) {
             return;
-        if (!outOfRange(pos))
+        }
+        if (!outOfRange(pos)) {
             addSound(group, pos, pitch);
+        }
     }
 
     public static void tick() {
         activeSounds.values().forEach(SoundScape::tick);
 
-        if (AnimationTickHolder.getTicks() % UPDATE_INTERVAL != 0)
+        if (AnimationTickHolder.getTicks() % UPDATE_INTERVAL != 0) {
             return;
+        }
 
         boolean disable = !AllConfigs.client().enableAmbientSounds.get();
-        for (Iterator<Map.Entry<Pair<AmbienceGroup, PitchGroup>, SoundScape>> iterator = activeSounds.entrySet().iterator(); iterator.hasNext(); ) {
+        for (Iterator<Map.Entry<Pair<AmbienceGroup, PitchGroup>, SoundScape>> iterator = activeSounds.entrySet()
+            .iterator(); iterator.hasNext(); ) {
 
             Map.Entry<Pair<AmbienceGroup, PitchGroup>, SoundScape> entry = iterator.next();
             Pair<AmbienceGroup, PitchGroup> key = entry.getKey();
@@ -70,7 +74,8 @@ public class SoundScapes {
 
     private static void addSound(AmbienceGroup group, BlockPos pos, float pitch) {
         PitchGroup groupFromPitch = getGroupFromPitch(pitch);
-        Set<BlockPos> set = counter.computeIfAbsent(group, ag -> new IdentityHashMap<>()).computeIfAbsent(groupFromPitch, pg -> new HashSet<>());
+        Set<BlockPos> set = counter.computeIfAbsent(group, ag -> new IdentityHashMap<>())
+            .computeIfAbsent(groupFromPitch, pg -> new HashSet<>());
         set.add(pos);
 
         Pair<AmbienceGroup, PitchGroup> pair = Pair.of(group, groupFromPitch);
@@ -95,8 +100,9 @@ public class SoundScapes {
 
     protected static BlockPos getCameraPos() {
         Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
-        if (renderViewEntity == null)
+        if (renderViewEntity == null) {
             return BlockPos.ZERO;
+        }
         return renderViewEntity.blockPosition();
     }
 
@@ -109,23 +115,24 @@ public class SoundScapes {
     }
 
     public static PitchGroup getGroupFromPitch(float pitch) {
-        if (pitch < .70)
+        if (pitch < .70) {
             return PitchGroup.VERY_LOW;
-        if (pitch < .90)
+        }
+        if (pitch < .90) {
             return PitchGroup.LOW;
-        if (pitch < 1.10)
+        }
+        if (pitch < 1.10) {
             return PitchGroup.NORMAL;
-        if (pitch < 1.30)
+        }
+        if (pitch < 1.30) {
             return PitchGroup.HIGH;
+        }
         return PitchGroup.VERY_HIGH;
     }
 
     public enum AmbienceGroup {
 
-        KINETIC(SoundScapes::kinetic),
-        COG(SoundScapes::cogwheel),
-        CRUSHING(SoundScapes::crushing),
-        MILLING(SoundScapes::milling),
+        KINETIC(SoundScapes::kinetic), COG(SoundScapes::cogwheel), CRUSHING(SoundScapes::crushing), MILLING(SoundScapes::milling),
 
         ;
 
@@ -142,11 +149,7 @@ public class SoundScapes {
     }
 
     public enum PitchGroup {
-        VERY_LOW,
-        LOW,
-        NORMAL,
-        HIGH,
-        VERY_HIGH
+        VERY_LOW, LOW, NORMAL, HIGH, VERY_HIGH
     }
 
 }

@@ -10,13 +10,23 @@ public interface LayoutBuilder {
 
     LayoutBuilder vector(String name, ValueRepr repr, @Range(from = 2L, to = 4L) int size);
 
-    LayoutBuilder matrix(String name, FloatRepr repr, @Range(from = 2L, to = 4L) int rows, @Range(from = 2L, to = 4L) int columns);
+    LayoutBuilder matrix(
+        String name,
+        FloatRepr repr,
+        @Range(from = 2L, to = 4L) int rows,
+        @Range(from = 2L, to = 4L) int columns
+    );
 
     LayoutBuilder matrix(String name, FloatRepr repr, @Range(from = 2L, to = 4L) int size);
 
     LayoutBuilder scalarArray(String name, ValueRepr repr, @Range(from = 1L, to = 256L) int length);
 
-    LayoutBuilder vectorArray(String name, ValueRepr repr, @Range(from = 2L, to = 4L) int size, @Range(from = 1L, to = 256L) int length);
+    LayoutBuilder vectorArray(
+        String name,
+        ValueRepr repr,
+        @Range(from = 2L, to = 4L) int size,
+        @Range(from = 1L, to = 256L) int length
+    );
 
     LayoutBuilder matrixArray(
         String name,
@@ -26,7 +36,12 @@ public interface LayoutBuilder {
         @Range(from = 1L, to = 256L) int length
     );
 
-    LayoutBuilder matrixArray(String name, FloatRepr repr, @Range(from = 2L, to = 4L) int size, @Range(from = 1L, to = 256L) int length);
+    LayoutBuilder matrixArray(
+        String name,
+        FloatRepr repr,
+        @Range(from = 2L, to = 4L) int size,
+        @Range(from = 1L, to = 256L) int length
+    );
 
     Layout build();
 

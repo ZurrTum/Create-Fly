@@ -12,10 +12,6 @@ import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.ConnectingFrom;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
@@ -33,6 +29,9 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class TrackPlacement {
     public static class PlacementInfo {
@@ -95,8 +94,9 @@ public class TrackPlacement {
         int lookAngle = (int) (22.5 + AngleHelper.deg(Mth.atan2(lookVec.z, lookVec.x)) % 360) / 8;
         int maxLength = AllConfigs.server().trains.maxTrackPlacementLength.get();
 
-        if (level.isClientSide() && cached != null && pos2.equals(hoveringPos) && stack.equals(lastItem) && hoveringMaxed == maximiseTurn && lookAngle == hoveringAngle)
+        if (level.isClientSide() && cached != null && pos2.equals(hoveringPos) && stack.equals(lastItem) && hoveringMaxed == maximiseTurn && lookAngle == hoveringAngle) {
             return cached;
+        }
 
         PlacementInfo info = new PlacementInfo(TrackMaterial.fromItem(stack.getItem()));
         hoveringMaxed = maximiseTurn;
@@ -130,14 +130,18 @@ public class TrackPlacement {
             info.axis2 = axis2;
         }
 
-        if (pos1.equals(pos2))
+        if (pos1.equals(pos2)) {
             return info.withMessage("second_point");
-        if (pos1.distSqr(pos2) > maxLength * maxLength)
+        }
+        if (pos1.distSqr(pos2) > maxLength * maxLength) {
             return info.withMessage("too_far").tooJumbly();
-        if (!state1.hasProperty(TrackBlock.HAS_BE))
+        }
+        if (!state1.hasProperty(TrackBlock.HAS_BE)) {
             return info.withMessage("original_missing");
-        if (level.getBlockEntity(pos2) instanceof TrackBlockEntity tbe && tbe.isTilted())
+        }
+        if (level.getBlockEntity(pos2) instanceof TrackBlockEntity tbe && tbe.isTilted()) {
             return info.withMessage("turn_start");
+        }
 
         if (axis1.dot(end2.subtract(end1)) < 0) {
             axis1 = axis1.scale(-1);
@@ -200,21 +204,24 @@ public class TrackPlacement {
 
                 skipCurve = Mth.equal(u, 0);
 
-                if (!skipCurve && sTest[0] < 0)
+                if (!skipCurve && sTest[0] < 0) {
                     return info.withMessage("perpendicular").tooJumbly();
+                }
 
                 if (skipCurve) {
                     dist = VecHelper.getCenterOf(pos1).distanceTo(VecHelper.getCenterOf(pos2));
                     info.end1Extent = (int) Math.round((dist + 1) / axis1.length());
 
                 } else {
-                    if (!Mth.equal(ascend, 0) || normedAxis1.y != 0)
+                    if (!Mth.equal(ascend, 0) || normedAxis1.y != 0) {
                         return info.withMessage("ascending_s_curve");
+                    }
 
                     double targetT = u <= 1 ? 3 : u * 2;
 
-                    if (t < targetT)
+                    if (t < targetT) {
                         return info.withMessage("too_sharp");
+                    }
 
                     // This is for standardising s curve sizes
                     if (t > targetT) {
@@ -229,14 +236,18 @@ public class TrackPlacement {
         // Slope
 
         if (slope) {
-            if (!skipCurve)
+            if (!skipCurve) {
                 return info.withMessage("slope_turn");
-            if (Mth.equal(normal1.dot(normal2), 0))
+            }
+            if (Mth.equal(normal1.dot(normal2), 0)) {
                 return info.withMessage("opposing_slopes");
-            if ((axis1.y < 0 || axis2.y > 0) && ascend > 0)
+            }
+            if ((axis1.y < 0 || axis2.y > 0) && ascend > 0) {
                 return info.withMessage("leave_slope_ascending");
-            if ((axis1.y > 0 || axis2.y < 0) && ascend < 0)
+            }
+            if ((axis1.y > 0 || axis2.y < 0) && ascend < 0) {
                 return info.withMessage("leave_slope_descending");
+            }
 
             skipCurve = false;
             info.end1Extent = 0;
@@ -247,16 +258,20 @@ public class TrackPlacement {
             double dist1 = Math.abs(intersect[0] / axis1.length());
             double dist2 = Math.abs(intersect[1] / axis2.length());
 
-            if (dist1 > dist2)
+            if (dist1 > dist2) {
                 info.end1Extent = (int) Math.round(dist1 - dist2);
-            if (dist2 > dist1)
+            }
+            if (dist2 > dist1) {
                 info.end2Extent = (int) Math.round(dist2 - dist1);
+            }
 
             double turnSize = Math.min(dist1, dist2);
-            if (intersect[0] < 0 || intersect[1] < 0)
+            if (intersect[0] < 0 || intersect[1] < 0) {
                 return info.withMessage("too_sharp").tooJumbly();
-            if (turnSize < 2)
+            }
+            if (turnSize < 2) {
                 return info.withMessage("too_sharp");
+            }
 
             // This is for standardising curve sizes
             if (turnSize > 2 && !maximiseTurn) {
@@ -272,13 +287,15 @@ public class TrackPlacement {
             int hDistance = info.end1Extent;
             if (axis1.y == 0 || !Mth.equal(absAscend + 1, dist / axis1.length())) {
 
-                if (axis1.y != 0 && axis1.y == -axis2.y)
+                if (axis1.y != 0 && axis1.y == -axis2.y) {
                     return info.withMessage("ascending_s_curve");
+                }
 
                 info.end1Extent = 0;
                 double minHDistance = Math.max(absAscend < 4 ? absAscend * 4 : absAscend * 3, 6) / axis1.length();
-                if (hDistance < minHDistance)
+                if (hDistance < minHDistance) {
                     return info.withMessage("too_steep");
+                }
                 if (hDistance > minHDistance) {
                     int correction = (int) (hDistance - minHDistance);
                     info.end1Extent = maximiseTurn ? 0 : correction / 2 + (correction % 2);
@@ -293,8 +310,9 @@ public class TrackPlacement {
 
         if (!parallel) {
             float absAngle = Math.abs(AngleHelper.deg(angle));
-            if (absAngle < 60 || absAngle > 300)
+            if (absAngle < 60 || absAngle > 300) {
                 return info.withMessage("turn_90").tooJumbly();
+            }
 
             intersect = VecHelper.intersect(end1, end2, normedAxis1, normedAxis2, Axis.Y);
             double dist1 = Math.abs(intersect[0]);
@@ -302,24 +320,32 @@ public class TrackPlacement {
             float ex1 = 0;
             float ex2 = 0;
 
-            if (dist1 > dist2)
+            if (dist1 > dist2) {
                 ex1 = (float) ((dist1 - dist2) / axis1.length());
-            if (dist2 > dist1)
+            }
+            if (dist2 > dist1) {
                 ex2 = (float) ((dist2 - dist1) / axis2.length());
+            }
 
             double turnSize = Math.min(dist1, dist2) - .1d;
             boolean ninety = (absAngle + .25f) % 90 < 1;
 
-            if (intersect[0] < 0 || intersect[1] < 0)
+            if (intersect[0] < 0 || intersect[1] < 0) {
                 return info.withMessage("too_sharp").tooJumbly();
+            }
 
             double minTurnSize = ninety ? 7 : 3.25;
-            double turnSizeToFitAscend = minTurnSize + (ninety ? Math.max(0, absAscend - 3) * 2f : Math.max(0, absAscend - 1.5f) * 1.5f);
+            double turnSizeToFitAscend = minTurnSize + (ninety ? Math.max(0, absAscend - 3) * 2f : Math.max(
+                0,
+                absAscend - 1.5f
+            ) * 1.5f);
 
-            if (turnSize < minTurnSize)
+            if (turnSize < minTurnSize) {
                 return info.withMessage("too_sharp");
-            if (turnSize < turnSizeToFitAscend)
+            }
+            if (turnSize < turnSizeToFitAscend) {
                 return info.withMessage("too_steep");
+            }
 
             // This is for standardising curve sizes
             if (!maximiseTurn) {
@@ -367,8 +393,9 @@ public class TrackPlacement {
 
         if (!player.isCreative()) {
             for (boolean simulate : Iterate.trueAndFalse) {
-                if (level.isClientSide() && !simulate)
+                if (level.isClientSide() && !simulate) {
                     break;
+                }
 
                 int tracks = info.requiredTracks;
                 int pavement = info.requiredPavement;
@@ -380,37 +407,46 @@ public class TrackPlacement {
                 for (int j = 0, end = Inventory.INVENTORY_SIZE + 1; j <= end; j++) {
                     int i = j;
                     boolean offhand = j == end;
-                    if (j == Inventory.INVENTORY_SIZE)
+                    if (j == Inventory.INVENTORY_SIZE) {
                         i = inv.getSelectedSlot();
-                    else if (offhand)
+                    } else if (offhand) {
                         i = 0;
-                    else if (j == inv.getSelectedSlot())
+                    } else if (j == inv.getSelectedSlot()) {
                         continue;
+                    }
 
                     ItemStack stackInSlot = offhand ? inv.getItem(Inventory.SLOT_OFFHAND) : main.get(i);
                     boolean isTrack = stackInSlot.is(AllItemTags.TRACKS) && stackInSlot.is(stack.getItem());
-                    if (!isTrack && (!shouldPave || offhandItem.getItem() != stackInSlot.getItem()))
+                    if (!isTrack && (!shouldPave || offhandItem.getItem() != stackInSlot.getItem())) {
                         continue;
-                    if (isTrack ? foundTracks >= tracks : foundPavement >= pavement)
+                    }
+                    if (isTrack ? foundTracks >= tracks : foundPavement >= pavement) {
                         continue;
+                    }
 
                     int count = stackInSlot.getCount();
 
                     if (!simulate) {
-                        int remainingItems = count - Math.min(isTrack ? tracks - foundTracks : pavement - foundPavement, count);
-                        if (i == inv.getSelectedSlot())
+                        int remainingItems = count - Math.min(
+                            isTrack ? tracks - foundTracks : pavement - foundPavement,
+                            count
+                        );
+                        if (i == inv.getSelectedSlot()) {
                             stackInSlot.remove(AllDataComponents.TRACK_CONNECTING_FROM);
+                        }
                         ItemStack newItem = stackInSlot.copyWithCount(remainingItems);
-                        if (offhand)
+                        if (offhand) {
                             player.setItemInHand(InteractionHand.OFF_HAND, newItem);
-                        else
+                        } else {
                             inv.setItem(i, newItem);
+                        }
                     }
 
-                    if (isTrack)
+                    if (isTrack) {
                         foundTracks += count;
-                    else
+                    } else {
                         foundPavement += count;
+                    }
                 }
 
                 if (simulate) {
@@ -431,8 +467,9 @@ public class TrackPlacement {
             }
         }
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return info;
+        }
         if (shouldPave) {
             BlockItem paveItem = (BlockItem) offhandItem.getItem();
             paveTracks(level, info, paveItem, false);
@@ -443,8 +480,10 @@ public class TrackPlacement {
     private static void paveTracks(Level level, PlacementInfo info, BlockItem blockItem, boolean simulate) {
         Block block = blockItem.getBlock();
         info.requiredPavement = 0;
-        if (block == null || block instanceof EntityBlock || block.defaultBlockState().getCollisionShape(level, info.pos1).isEmpty())
+        if (block == null || block instanceof EntityBlock || block.defaultBlockState()
+            .getCollisionShape(level, info.pos1).isEmpty()) {
             return;
+        }
 
         Set<BlockPos> visited = new HashSet<>();
 
@@ -452,11 +491,20 @@ public class TrackPlacement {
             int extent = (first ? info.end1Extent : info.end2Extent) + (info.curve != null ? 1 : 0);
             Vec3 axis = first ? info.axis1 : info.axis2;
             BlockPos pavePos = first ? info.pos1 : info.pos2;
-            info.requiredPavement += TrackPaver.paveStraight(level, pavePos.below(), axis, extent, block, simulate, visited);
+            info.requiredPavement += TrackPaver.paveStraight(
+                level,
+                pavePos.below(),
+                axis,
+                extent,
+                block,
+                simulate,
+                visited
+            );
         }
 
-        if (info.curve != null)
+        if (info.curve != null) {
             info.requiredPavement += TrackPaver.paveCurve(level, info.curve, block, simulate, visited);
+        }
     }
 
     private static PlacementInfo placeTracks(
@@ -475,8 +523,9 @@ public class TrackPlacement {
             Vec3 axis = first ? info.axis1 : info.axis2;
             BlockPos pos = first ? info.pos1 : info.pos2;
             BlockState state = first ? state1 : state2;
-            if (state.hasProperty(TrackBlock.HAS_BE) && !simulate)
+            if (state.hasProperty(TrackBlock.HAS_BE) && !simulate) {
                 state = state.setValue(TrackBlock.HAS_BE, false);
+            }
 
             switch (state.getValue(TrackBlock.SHAPE)) {
                 case TE, TW:
@@ -494,26 +543,37 @@ public class TrackPlacement {
                 BlockPos offsetPos = pos.offset(BlockPos.containing(offset));
                 BlockState stateAtPos = level.getBlockState(offsetPos);
                 // copy over all shared properties from the shaped state to the correct track material block
-                BlockState toPlace = BlockHelper.copyProperties(state, info.trackMaterial.getBlock().defaultBlockState());
+                BlockState toPlace = BlockHelper.copyProperties(
+                    state,
+                    info.trackMaterial.getBlock().defaultBlockState()
+                );
 
                 boolean canPlace = stateAtPos.canBeReplaced() || stateAtPos.is(BlockTags.FLOWERS);
-                if (canPlace)
+                if (canPlace) {
                     info.requiredTracks++;
-                if (simulate)
+                }
+                if (simulate) {
                     continue;
+                }
 
                 if (stateAtPos.getBlock() instanceof ITrackBlock trackAtPos) {
                     toPlace = trackAtPos.overlay(level, offsetPos, stateAtPos, toPlace);
                     canPlace = true;
                 }
 
-                if (canPlace)
-                    level.setBlock(offsetPos, ProperWaterloggedBlock.withWater(level, toPlace, offsetPos), Block.UPDATE_ALL);
+                if (canPlace) {
+                    level.setBlock(
+                        offsetPos,
+                        ProperWaterloggedBlock.withWater(level, toPlace, offsetPos),
+                        Block.UPDATE_ALL
+                    );
+                }
             }
         }
 
-        if (info.curve == null)
+        if (info.curve == null) {
             return info;
+        }
 
         if (!simulate) {
             BlockState onto = info.trackMaterial.getBlock().defaultBlockState();
@@ -521,7 +581,10 @@ public class TrackPlacement {
             level.setBlock(
                 targetPos1, ProperWaterloggedBlock.withWater(
                     level,
-                    (stateAtPos.is(AllBlockTags.TRACKS) ? stateAtPos : BlockHelper.copyProperties(state1, onto)).setValue(TrackBlock.HAS_BE, true),
+                    (stateAtPos.is(AllBlockTags.TRACKS) ? stateAtPos : BlockHelper.copyProperties(
+                        state1,
+                        onto
+                    )).setValue(TrackBlock.HAS_BE, true),
                     targetPos1
                 ), Block.UPDATE_ALL
             );
@@ -530,7 +593,10 @@ public class TrackPlacement {
             level.setBlock(
                 targetPos2, ProperWaterloggedBlock.withWater(
                     level,
-                    (stateAtPos.is(AllBlockTags.TRACKS) ? stateAtPos : BlockHelper.copyProperties(state2, onto)).setValue(TrackBlock.HAS_BE, true),
+                    (stateAtPos.is(AllBlockTags.TRACKS) ? stateAtPos : BlockHelper.copyProperties(
+                        state2,
+                        onto
+                    )).setValue(TrackBlock.HAS_BE, true),
                     targetPos2
                 ), Block.UPDATE_ALL
             );
@@ -545,11 +611,13 @@ public class TrackPlacement {
             return info;
         }
 
-        if (!tte1.getConnections().containsKey(tte2.getBlockPos()))
+        if (!tte1.getConnections().containsKey(tte2.getBlockPos())) {
             info.requiredTracks += requiredTracksForTurn;
+        }
 
-        if (simulate)
+        if (simulate) {
             return info;
+        }
 
         tte1.addConnection(info.curve);
         tte2.addConnection(info.curve.secondary());

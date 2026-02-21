@@ -4,14 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.data.Couple;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
@@ -20,9 +12,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class LayerPattern {
-    public static final Codec<LayerPattern> CODEC = Codec.list(Layer.CODEC).xmap(LayerPattern::new, pattern -> pattern.layers);
+    public static final Codec<LayerPattern> CODEC = Codec.list(Layer.CODEC)
+        .xmap(LayerPattern::new, pattern -> pattern.layers);
 
     public final List<Layer> layers;
 
@@ -32,17 +32,21 @@ public class LayerPattern {
 
     public Layer rollNext(@Nullable Layer previous, RandomSource random) {
         int totalWeight = 0;
-        for (Layer layer : layers)
-            if (layer != previous)
+        for (Layer layer : layers) {
+            if (layer != previous) {
                 totalWeight += layer.weight;
+            }
+        }
         int rolled = random.nextInt(totalWeight);
 
         for (Layer layer : layers) {
-            if (layer == previous)
+            if (layer == previous) {
                 continue;
+            }
             rolled -= layer.weight;
-            if (rolled < 0)
+            if (rolled < 0) {
                 return layer;
+            }
         }
         return null;
     }
@@ -75,7 +79,8 @@ public class LayerPattern {
 
     public static class Layer {
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.list(Codec.list(OreConfiguration.TargetBlockState.CODEC)).fieldOf("targets").forGetter(layer -> layer.targets),
+            Codec.list(Codec.list(OreConfiguration.TargetBlockState.CODEC)).fieldOf("targets")
+                .forGetter(layer -> layer.targets),
             Codec.intRange(0, Integer.MAX_VALUE).fieldOf("min_size").forGetter(layer -> layer.minSize),
             Codec.intRange(0, Integer.MAX_VALUE).fieldOf("max_size").forGetter(layer -> layer.maxSize),
             Codec.intRange(0, Integer.MAX_VALUE).fieldOf("weight").forGetter(layer -> layer.weight)
@@ -94,8 +99,9 @@ public class LayerPattern {
         }
 
         public List<OreConfiguration.TargetBlockState> rollBlock(RandomSource random) {
-            if (targets.size() == 1)
+            if (targets.size() == 1) {
                 return targets.getFirst();
+            }
             return targets.get(random.nextInt(targets.size()));
         }
 
@@ -120,21 +126,33 @@ public class LayerPattern {
 
             public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder block(Block block) {
                 if (netherMode) {
-                    this.targets.add(ImmutableList.of(OreConfiguration.target(NETHER_ORE_REPLACEABLES, block.defaultBlockState())));
+                    this.targets.add(ImmutableList.of(OreConfiguration.target(
+                        NETHER_ORE_REPLACEABLES,
+                        block.defaultBlockState()
+                    )));
                     return this;
                 }
                 return blocks(block.defaultBlockState(), block.defaultBlockState());
             }
 
-            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(Block block, Block deepblock) {
+            public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(
+                Block block,
+                Block deepblock
+            ) {
                 return blocks(block.defaultBlockState(), deepblock.defaultBlockState());
             }
 
             public com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(Couple<Supplier<? extends Block>> blocksByDepth) {
-                return blocks(blocksByDepth.getFirst().get().defaultBlockState(), blocksByDepth.getSecond().get().defaultBlockState());
+                return blocks(
+                    blocksByDepth.getFirst().get().defaultBlockState(),
+                    blocksByDepth.getSecond().get().defaultBlockState()
+                );
             }
 
-            private com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(BlockState stone, BlockState deepslate) {
+            private com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer.Builder blocks(
+                BlockState stone,
+                BlockState deepslate
+            ) {
                 this.targets.add(ImmutableList.of(
                     OreConfiguration.target(STONE_ORE_REPLACEABLES, stone),
                     OreConfiguration.target(DEEPSLATE_ORE_REPLACEABLES, deepslate)

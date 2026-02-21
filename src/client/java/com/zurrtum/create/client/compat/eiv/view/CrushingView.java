@@ -66,8 +66,19 @@ public class CrushingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(context, 72, 5);
-        context.guiRenderState.submitPicturesInPictureState(new CrushWheelRenderState(new Matrix3x2f(context.pose()), 42, 22));
+        context.guiRenderState.submitPicturesInPictureState(new CrushWheelRenderState(
+            new Matrix3x2f(context.pose()),
+            42,
+            22
+        ));
     }
 }

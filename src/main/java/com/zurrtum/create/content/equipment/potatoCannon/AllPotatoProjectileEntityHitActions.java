@@ -54,12 +54,16 @@ public class AllPotatoProjectileEntityHitActions {
     }
 
     private static void register(String name, MapCodec<? extends PotatoProjectileEntityHitAction> codec) {
-        Registry.register(CreateRegistries.POTATO_PROJECTILE_ENTITY_HIT_ACTION, Identifier.fromNamespaceAndPath(MOD_ID, name), codec);
+        Registry.register(
+            CreateRegistries.POTATO_PROJECTILE_ENTITY_HIT_ACTION,
+            Identifier.fromNamespaceAndPath(MOD_ID, name),
+            codec
+        );
     }
 
     public record SetOnFire(int ticks) implements PotatoProjectileEntityHitAction {
-        public static final MapCodec<SetOnFire> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(ExtraCodecs.POSITIVE_INT.fieldOf(
-            "ticks").forGetter(SetOnFire::ticks)).apply(instance, SetOnFire::new));
+        public static final MapCodec<SetOnFire> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ExtraCodecs.POSITIVE_INT.fieldOf("ticks").forGetter(SetOnFire::ticks)).apply(instance, SetOnFire::new));
 
         public static SetOnFire seconds(int seconds) {
             return new SetOnFire(seconds * 20);
@@ -77,9 +81,8 @@ public class AllPotatoProjectileEntityHitActions {
         }
     }
 
-    public record PotionEffect(
-        Holder<MobEffect> effect, int level, int ticks, boolean recoverable
-    ) implements PotatoProjectileEntityHitAction {
+    public record PotionEffect(Holder<MobEffect> effect, int level, int ticks,
+                               boolean recoverable) implements PotatoProjectileEntityHitAction {
         public static final MapCodec<PotionEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             BuiltInRegistries.MOB_EFFECT.holderByNameCodec().fieldOf("effect").forGetter(PotionEffect::effect),
             ExtraCodecs.POSITIVE_INT.fieldOf("level").forGetter(PotionEffect::level),
@@ -90,10 +93,12 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
-            if (entity.level().isClientSide())
+            if (entity.level().isClientSide()) {
                 return true;
-            if (entity instanceof LivingEntity livingEntity)
+            }
+            if (entity instanceof LivingEntity livingEntity) {
                 applyEffect(livingEntity, new MobEffectInstance(effect, ticks, level - 1));
+            }
             return !recoverable;
         }
 
@@ -103,12 +108,9 @@ public class AllPotatoProjectileEntityHitActions {
         }
     }
 
-    public record FoodEffects(
-        Consumable foodProperty, boolean recoverable
-    ) implements PotatoProjectileEntityHitAction {
+    public record FoodEffects(Consumable foodProperty, boolean recoverable) implements PotatoProjectileEntityHitAction {
         public static final MapCodec<FoodEffects> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Consumable.CODEC.fieldOf(
-                "food_property").forGetter(FoodEffects::foodProperty),
+            Consumable.CODEC.fieldOf("food_property").forGetter(FoodEffects::foodProperty),
             Codec.BOOL.fieldOf("recoverable").forGetter(FoodEffects::recoverable)
         ).apply(instance, FoodEffects::new));
 
@@ -116,8 +118,9 @@ public class AllPotatoProjectileEntityHitActions {
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
             Level world = entity.level();
-            if (world.isClientSide())
+            if (world.isClientSide()) {
                 return true;
+            }
 
             if (entity instanceof LivingEntity livingEntity) {
                 for (ConsumeEffect effect : foodProperty.onConsumeEffects()) {
@@ -134,17 +137,20 @@ public class AllPotatoProjectileEntityHitActions {
     }
 
     public record ChorusTeleport(double teleportDiameter) implements PotatoProjectileEntityHitAction {
-        public static final MapCodec<ChorusTeleport> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(CreateCodecs.POSITIVE_DOUBLE.fieldOf(
-            "teleport_diameter").forGetter(ChorusTeleport::teleportDiameter)).apply(instance, ChorusTeleport::new));
+        public static final MapCodec<ChorusTeleport> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                CreateCodecs.POSITIVE_DOUBLE.fieldOf("teleport_diameter").forGetter(ChorusTeleport::teleportDiameter))
+            .apply(instance, ChorusTeleport::new));
 
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
             Level level = entity.level();
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return true;
-            if (!(entity instanceof LivingEntity livingEntity))
+            }
+            if (!(entity instanceof LivingEntity livingEntity)) {
                 return false;
+            }
 
             double entityX = livingEntity.getX();
             double entityY = livingEntity.getY();
@@ -164,8 +170,9 @@ public class AllPotatoProjectileEntityHitActions {
                 //                if (event.isCanceled())
                 //                    return false;
                 if (livingEntity.randomTeleport(teleportX, teleportY, teleportZ, true)) {
-                    if (livingEntity.isPassenger())
+                    if (livingEntity.isPassenger()) {
                         livingEntity.stopRiding();
+                    }
 
                     SoundEvent soundevent = livingEntity instanceof Fox ? SoundEvents.FOX_TELEPORT : SoundEvents.CHORUS_FRUIT_TELEPORT;
                     level.playSound(null, entityX, entityY, entityZ, soundevent, SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -189,11 +196,10 @@ public class AllPotatoProjectileEntityHitActions {
 
         private static final FoodEffects EFFECT = new FoodEffects(Consumables.GOLDEN_APPLE, false);
         private static final GameProfile ZOMBIE_CONVERTER_NAME = new GameProfile(
-            UUID.fromString("be12d3dc-27d3-4992-8c97-66be53fd49c5"),
-            "Converter"
+            UUID.fromString(
+                "be12d3dc-27d3-4992-8c97-66be53fd49c5"), "Converter"
         );
-        private static final WorldAttached<FakePlayerEntity> ZOMBIE_CONVERTERS = new WorldAttached<>(w -> new FakePlayerEntity(
-            (ServerLevel) w,
+        private static final WorldAttached<FakePlayerEntity> ZOMBIE_CONVERTERS = new WorldAttached<>(w -> new FakePlayerEntity((ServerLevel) w,
             ZOMBIE_CONVERTER_NAME
         ));
 
@@ -204,10 +210,12 @@ public class AllPotatoProjectileEntityHitActions {
             Entity entity = ray.getEntity();
             Level world = entity.level();
 
-            if (!(entity instanceof ZombieVillager zombieVillager) || !zombieVillager.hasEffect(MobEffects.WEAKNESS))
+            if (!(entity instanceof ZombieVillager zombieVillager) || !zombieVillager.hasEffect(MobEffects.WEAKNESS)) {
                 return EFFECT.execute(projectile, ray, type);
-            if (world.isClientSide())
+            }
+            if (world.isClientSide()) {
                 return false;
+            }
 
             FakePlayerEntity dummy = ZOMBIE_CONVERTERS.get(world);
             dummy.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GOLDEN_APPLE, 1));
@@ -229,9 +237,13 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             if (ray.getEntity() instanceof LivingEntity livingEntity) {
-                SuspiciousStewEffects stew = projectile.getOrDefault(DataComponents.SUSPICIOUS_STEW_EFFECTS, SuspiciousStewEffects.EMPTY);
-                for (Entry effect : stew.effects())
+                SuspiciousStewEffects stew = projectile.getOrDefault(
+                    DataComponents.SUSPICIOUS_STEW_EFFECTS,
+                    SuspiciousStewEffects.EMPTY
+                );
+                for (Entry effect : stew.effects()) {
                     livingEntity.addEffect(effect.createEffectInstance());
+                }
             }
 
             return false;
@@ -246,7 +258,8 @@ public class AllPotatoProjectileEntityHitActions {
     private static void applyEffect(LivingEntity entity, MobEffectInstance effect) {
         if (effect.getEffect().value().isInstantenous()) {
             if (entity.level() instanceof ServerLevel serverWorld) {
-                effect.getEffect().value().applyInstantenousEffect(serverWorld, null, null, entity, effect.getDuration(), 1.0);
+                effect.getEffect().value()
+                    .applyInstantenousEffect(serverWorld, null, null, entity, effect.getDuration(), 1.0);
             }
         } else {
             entity.addEffect(effect);

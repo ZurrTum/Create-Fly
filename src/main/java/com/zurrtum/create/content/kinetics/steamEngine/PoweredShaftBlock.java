@@ -55,25 +55,29 @@ public class PoweredShaftBlock extends AbstractShaftBlock {
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isShiftKeyDown() || !player.mayBuild())
+        if (player.isShiftKeyDown() || !player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         IPlacementHelper helper = PlacementHelpers.get(ShaftBlock.placementHelperId);
-        if (helper.matchesItem(stack))
-            return helper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        if (helper.matchesItem(stack)) {
+            return helper.getOffset(player, level, state, pos, hitResult)
+                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        }
 
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        if (!stillValid(pState, pLevel, pPos))
+        if (!stillValid(pState, pLevel, pPos)) {
             pLevel.setBlock(
                 pPos,
                 AllBlocks.SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, pState.getValue(AXIS))
                     .setValue(WATERLOGGED, pState.getValue(WATERLOGGED)),
                 Block.UPDATE_ALL
             );
+        }
     }
 
     public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
@@ -87,22 +91,27 @@ public class PoweredShaftBlock extends AbstractShaftBlock {
 
     public static boolean stillValid(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         for (Direction d : Iterate.directions) {
-            if (d.getAxis() == pState.getValue(AXIS))
+            if (d.getAxis() == pState.getValue(AXIS)) {
                 continue;
+            }
             BlockPos enginePos = pPos.relative(d, 2);
             BlockState engineState = pLevel.getBlockState(enginePos);
-            if (!(engineState.getBlock() instanceof SteamEngineBlock engine))
+            if (!(engineState.getBlock() instanceof SteamEngineBlock engine)) {
                 continue;
-            if (!SteamEngineBlock.getShaftPos(engineState, enginePos).equals(pPos))
+            }
+            if (!SteamEngineBlock.getShaftPos(engineState, enginePos).equals(pPos)) {
                 continue;
-            if (SteamEngineBlock.isShaftValid(engineState, pState))
+            }
+            if (SteamEngineBlock.isShaftValid(engineState, pState)) {
                 return true;
+            }
         }
         return false;
     }
 
     public static BlockState getEquivalent(BlockState stateForPlacement) {
-        return AllBlocks.POWERED_SHAFT.defaultBlockState().setValue(PoweredShaftBlock.AXIS, stateForPlacement.getValue(ShaftBlock.AXIS))
+        return AllBlocks.POWERED_SHAFT.defaultBlockState()
+            .setValue(PoweredShaftBlock.AXIS, stateForPlacement.getValue(ShaftBlock.AXIS))
             .setValue(WATERLOGGED, stateForPlacement.getValue(WATERLOGGED));
     }
 

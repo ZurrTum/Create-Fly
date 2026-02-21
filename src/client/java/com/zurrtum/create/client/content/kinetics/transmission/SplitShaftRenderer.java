@@ -72,7 +72,12 @@ public class SplitShaftRenderer implements BlockEntityRenderer<SplitShaftBlockEn
     }
 
     @Override
-    public void submit(SplitShaftRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SplitShaftRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 

@@ -10,7 +10,8 @@ import net.minecraft.resources.Identifier;
 import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
 
 public final class ResourceUtil {
-    private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType(Component.translatable("argument.id.invalid"));
+    private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType(Component.translatable(
+        "argument.id.invalid"));
 
     private ResourceUtil() {
     }

@@ -45,7 +45,11 @@ public class BlockEntityStorage extends Storage<BlockEntity> {
 
     @Override
     @Nullable
-    protected BlockEntityVisual<?> createRaw(VisualizationContext visualizationContext, BlockEntity obj, float partialTick) {
+    protected BlockEntityVisual<?> createRaw(
+        VisualizationContext visualizationContext,
+        BlockEntity obj,
+        float partialTick
+    ) {
         var visualizer = VisualizationHelper.getVisualizer(obj);
         if (visualizer == null) {
             return null;

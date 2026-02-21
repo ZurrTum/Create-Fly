@@ -11,7 +11,10 @@ public class DepotMovementBehaviour extends MovementBehaviour {
         if (context.world.isClientSide()) {
             DepotBehaviour behaviour;
             if (context.temporaryData == null) {
-                if (AllClientHandle.INSTANCE.getBlockEntityClientSide(context.contraption, context.localPos) instanceof DepotBlockEntity be) {
+                if (AllClientHandle.INSTANCE.getBlockEntityClientSide(
+                    context.contraption,
+                    context.localPos
+                ) instanceof DepotBlockEntity be) {
                     behaviour = be.depotBehaviour;
                     context.temporaryData = behaviour;
                 } else {

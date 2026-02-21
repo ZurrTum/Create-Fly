@@ -10,7 +10,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.item.ItemStack;
 
-public record ContraptionDisableActorPacket(int entityId, ItemStack filter, boolean enable) implements Packet<ClientGamePacketListener> {
+public record ContraptionDisableActorPacket(int entityId, ItemStack filter,
+                                            boolean enable) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ContraptionDisableActorPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         ContraptionDisableActorPacket::entityId,

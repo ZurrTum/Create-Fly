@@ -30,8 +30,9 @@ public class LineOutline extends Outline {
     @Override
     public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         float width = params.getLineWidth();
-        if (width == 0)
+        if (width == 0) {
             return;
+        }
 
         VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
         params.loadColor(colorTemp);

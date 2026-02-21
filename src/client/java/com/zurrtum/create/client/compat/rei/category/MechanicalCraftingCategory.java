@@ -77,7 +77,14 @@ public class MechanicalCraftingCategory extends CreateCategory<MechanicalCraftin
                 bounds.x + 129,
                 bounds.y + 23
             ));
-            graphics.drawString(Minecraft.getInstance().font, String.valueOf(ingredients.size()), bounds.x + 147, bounds.y + 44, 0xFFFFFFFF, true);
+            graphics.drawString(
+                Minecraft.getInstance().font,
+                String.valueOf(ingredients.size()),
+                bounds.x + 147,
+                bounds.y + 44,
+                0xFFFFFFFF,
+                true
+            );
         }));
         for (int i = 0; i < inputs.size(); i++) {
             widgets.add(createInputSlot(inputs.get(i)).entries(ingredients.get(i)));

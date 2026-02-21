@@ -10,10 +10,6 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -22,11 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -39,6 +31,9 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<PostboxBlockEntity>, IWrenchable, ProperWaterloggedBlock, ItemInventoryProvider<PostboxBlockEntity> {
     public static MapCodec<PostboxBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -57,7 +52,13 @@ public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<Post
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, PostboxBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        PostboxBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.inventory;
     }
 
@@ -127,7 +128,13 @@ public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<Post
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
         return onBlockEntityUse(level, pos, be -> be.use(player));
     }
 

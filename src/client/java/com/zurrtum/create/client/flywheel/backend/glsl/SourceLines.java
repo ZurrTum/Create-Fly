@@ -5,11 +5,10 @@ import com.zurrtum.create.client.flywheel.backend.glsl.span.CharPos;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
+import net.minecraft.resources.Identifier;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.minecraft.resources.Identifier;
 
 public class SourceLines implements CharSequence {
     private static final Pattern NEW_LINE = Pattern.compile("(\\r\\n|\\r|\\n)");

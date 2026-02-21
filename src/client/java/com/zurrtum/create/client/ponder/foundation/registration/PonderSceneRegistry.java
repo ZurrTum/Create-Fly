@@ -51,8 +51,9 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
     //
 
     public void addStoryBoard(StoryBoardEntry entry) {
-        if (!allowRegistration)
+        if (!allowRegistration) {
             throw new IllegalStateException("Registration Phase has already ended!");
+        }
 
         scenes.put(entry.getComponent(), entry);
     }
@@ -73,13 +74,15 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
 
     @Override
     public List<PonderScene> compile(Identifier id) {
-        if (PonderIndex.editingModeActive())
+        if (PonderIndex.editingModeActive()) {
             PonderIndex.reload();
+        }
 
         Collection<StoryBoardEntry> entries = scenes.get(id);
 
-        if (entries.isEmpty())
+        if (entries.isEmpty()) {
             return Collections.emptyList();
+        }
 
         return compile(entries);
 
@@ -98,7 +101,14 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
         for (StoryBoardEntry storyBoard : entries) {
             StructureTemplate activeTemplate = loadSchematic(storyBoard.getSchematicLocation());
             PonderLevel level = new PonderLevel(BlockPos.ZERO, world);
-            activeTemplate.placeInWorld(level, BlockPos.ZERO, BlockPos.ZERO, new StructurePlaceSettings(), level.random, Block.UPDATE_CLIENTS);
+            activeTemplate.placeInWorld(
+                level,
+                BlockPos.ZERO,
+                BlockPos.ZERO,
+                new StructurePlaceSettings(),
+                level.random,
+                Block.UPDATE_CLIENTS
+            );
             level.createBackup();
             PonderScene scene = compileScene(localization, storyBoard, level);
             scene.begin();
@@ -108,8 +118,19 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
         return scenes;
     }
 
-    public static PonderScene compileScene(PonderLocalization localization, StoryBoardEntry sb, @Nullable PonderLevel level) {
-        PonderScene scene = new PonderScene(level, localization, sb.getNamespace(), sb.getComponent(), sb.getTags(), sb.getOrderingEntries());
+    public static PonderScene compileScene(
+        PonderLocalization localization,
+        StoryBoardEntry sb,
+        @Nullable PonderLevel level
+    ) {
+        PonderScene scene = new PonderScene(
+            level,
+            localization,
+            sb.getNamespace(),
+            sb.getComponent(),
+            sb.getTags(),
+            sb.getOrderingEntries()
+        );
         SceneBuilder builder = scene.builder();
         sb.getBoard().program(builder, scene.getSceneBuildingUtil());
         return scene;

@@ -4,9 +4,6 @@ import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
-
-import java.util.List;
-
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
@@ -16,6 +13,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public class FluidTankModel extends CTModel {
     public FluidTankModel(BlockState state, UnbakedRoot unbaked, ConnectedTextureBehaviour behaviour) {
@@ -31,7 +30,13 @@ public class FluidTankModel extends CTModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         int[] indices = createCTData(world, pos, state);
         boolean[] culls = createCullData(world, pos);
         for (BlockModelPart part : model.collectParts(random)) {

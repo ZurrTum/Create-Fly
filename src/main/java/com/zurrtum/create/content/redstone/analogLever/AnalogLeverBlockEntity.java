@@ -1,18 +1,17 @@
 package com.zurrtum.create.content.redstone.analogLever;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
 
 public class AnalogLeverBlockEntity extends SmartBlockEntity {
 
@@ -46,11 +45,13 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
         super.tick();
         if (lastChange > 0) {
             lastChange--;
-            if (lastChange == 0)
+            if (lastChange == 0) {
                 updateOutput();
+            }
         }
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             clientState.tickChaser();
+        }
     }
 
     @Override
@@ -71,8 +72,9 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
         int prevState = state;
         state += back ? -1 : 1;
         state = Mth.clamp(state, 0, 15);
-        if (prevState != state)
+        if (prevState != state) {
             lastChange = 15;
+        }
         sendData();
     }
 

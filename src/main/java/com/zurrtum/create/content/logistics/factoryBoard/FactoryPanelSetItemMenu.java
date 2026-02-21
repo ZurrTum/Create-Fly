@@ -44,7 +44,8 @@ public class FactoryPanelSetItemMenu extends GhostItemMenu<ServerFactoryPanelBeh
             AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1, 1);
             return;
         }
-        player.level().playSound(null, contentHolder.getPos(), SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, .25f, .1f);
+        player.level()
+            .playSound(null, contentHolder.getPos(), SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, .25f, .1f);
     }
 
 }

@@ -6,12 +6,11 @@ import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.LogicOp;
 import com.mojang.blaze3d.platform.PolygonMode;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.ShaderDefines;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.Optional;
-
-import net.minecraft.client.renderer.ShaderDefines;
-import net.minecraft.resources.Identifier;
 
 public class IndexRenderPipeline extends RenderPipeline {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

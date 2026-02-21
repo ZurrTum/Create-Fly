@@ -6,7 +6,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 
 public class CarriageSyncDataSerializer implements EntityDataSerializer<CarriageSyncData> {
-    private static final StreamCodec<FriendlyByteBuf, CarriageSyncData> CODEC = StreamCodec.ofMember(CarriageSyncData::write, CarriageSyncData::new);
+    private static final StreamCodec<FriendlyByteBuf, CarriageSyncData> CODEC = StreamCodec.ofMember(
+        CarriageSyncData::write,
+        CarriageSyncData::new
+    );
 
     @Override
     public StreamCodec<? super RegistryFriendlyByteBuf, CarriageSyncData> codec() {

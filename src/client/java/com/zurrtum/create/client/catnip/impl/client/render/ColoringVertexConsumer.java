@@ -3,7 +3,8 @@ package com.zurrtum.create.client.catnip.impl.client.render;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.util.ARGB;
 
-public record ColoringVertexConsumer(VertexConsumer delegate, float red, float green, float blue, float alpha) implements VertexConsumer {
+public record ColoringVertexConsumer(VertexConsumer delegate, float red, float green, float blue,
+                                     float alpha) implements VertexConsumer {
     @Override
     public VertexConsumer addVertex(float x, float y, float z) {
         delegate.addVertex(x, y, z);

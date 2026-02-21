@@ -9,8 +9,7 @@ import net.minecraft.resources.Identifier;
 
 public record ClickToLinkData(BlockPos selectedPos, Identifier selectedDim) {
     public static final Codec<ClickToLinkData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        BlockPos.CODEC.fieldOf("selected_pos")
-            .forGetter(ClickToLinkData::selectedPos),
+        BlockPos.CODEC.fieldOf("selected_pos").forGetter(ClickToLinkData::selectedPos),
         Identifier.CODEC.fieldOf("selected_dim").forGetter(ClickToLinkData::selectedDim)
     ).apply(instance, ClickToLinkData::new));
 

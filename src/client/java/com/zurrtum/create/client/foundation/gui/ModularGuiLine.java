@@ -5,11 +5,6 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
@@ -17,6 +12,10 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.nbt.CompoundTag;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ModularGuiLine {
 
@@ -44,8 +43,9 @@ public class ModularGuiLine {
         }
 
         for (Pair<AbstractWidget, String> pair : widgets) {
-            if (pair.getSecond().equals("Dummy"))
+            if (pair.getSecond().equals("Dummy")) {
                 continue;
+            }
 
             AbstractWidget aw = pair.getFirst();
             int x = aw.getX();
@@ -63,10 +63,11 @@ public class ModularGuiLine {
 
     private void box(GuiGraphics graphics, int x, int width, boolean b) {
         UIRenderHelper.drawStretched(graphics, x, 0, width, 18, AllGuiTextures.DATA_AREA);
-        if (b)
+        if (b) {
             AllGuiTextures.DATA_AREA_SPEECH.render(graphics, x - 3, 0);
-        else
+        } else {
             AllGuiTextures.DATA_AREA_START.render(graphics, x, 0);
+        }
         AllGuiTextures.DATA_AREA_END.render(graphics, x + width - 2, 0);
     }
 
@@ -74,10 +75,12 @@ public class ModularGuiLine {
         for (Pair<AbstractWidget, String> pair : widgets) {
             AbstractWidget w = pair.getFirst();
             String key = pair.getSecond();
-            if (w instanceof EditBox eb)
+            if (w instanceof EditBox eb) {
                 data.putString(key, eb.getValue());
-            if (w instanceof ScrollInput si)
+            }
+            if (w instanceof ScrollInput si) {
                 data.putInt(key, si.getState());
+            }
         }
     }
 
@@ -90,15 +93,18 @@ public class ModularGuiLine {
         for (Pair<AbstractWidget, String> pair : widgets) {
             AbstractWidget w = pair.getFirst();
             String key = pair.getSecond();
-            if (w instanceof EditBox eb)
+            if (w instanceof EditBox eb) {
                 eb.setValue(data.getStringOr(key, ""));
-            if (w instanceof ScrollInput si)
+            }
+            if (w instanceof ScrollInput si) {
                 si.setState(data.getIntOr(key, 0));
+            }
 
-            if (w instanceof TooltipArea)
+            if (w instanceof TooltipArea) {
                 addRenderableOnly.accept((T) w);
-            else
+            } else {
                 addRenderable.accept((T) w);
+            }
         }
     }
 

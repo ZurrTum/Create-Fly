@@ -12,7 +12,8 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 
-public record ConfigureSymmetryWandPacket(InteractionHand hand, SymmetryMirror mirror) implements Packet<ServerGamePacketListener> {
+public record ConfigureSymmetryWandPacket(InteractionHand hand,
+                                          SymmetryMirror mirror) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<FriendlyByteBuf, ConfigureSymmetryWandPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecs.HAND,
         ConfigureSymmetryWandPacket::hand,

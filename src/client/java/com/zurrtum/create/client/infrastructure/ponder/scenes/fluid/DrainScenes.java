@@ -37,12 +37,13 @@ public class DrainScenes {
         scene.world().moveSection(drainLink, util.vector().of(-1, 0, 0), 0);
         scene.idle(10);
 
-        scene.overlay().showText(40).text("Item Drains can extract fluids from items").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(drainPos.west(), Direction.UP));
+        scene.overlay().showText(40).text("Item Drains can extract fluids from items").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().blockSurface(drainPos.west(), Direction.UP));
         scene.idle(50);
 
         ItemStack lavaBucket = new ItemStack(Items.LAVA_BUCKET);
-        scene.overlay().showControls(util.vector().blockSurface(drainPos.west(), Direction.UP), Pointing.DOWN, 40).rightClick().withItem(lavaBucket);
+        scene.overlay().showControls(util.vector().blockSurface(drainPos.west(), Direction.UP), Pointing.DOWN, 40)
+            .rightClick().withItem(lavaBucket);
         scene.idle(7);
         scene.world().modifyBlockEntity(
             drainPos,
@@ -51,11 +52,15 @@ public class DrainScenes {
         );
         scene.idle(10);
 
-        scene.overlay().showText(50).text("Right-click it to pour fluids from your held item into it").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(drainPos.west(), Direction.WEST));
+        scene.overlay().showText(50).text("Right-click it to pour fluids from your held item into it").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().blockSurface(drainPos.west(), Direction.WEST));
         scene.idle(60);
 
-        scene.world().modifyBlockEntity(drainPos, ItemDrainBlockEntity.class, be -> be.internalTank.getCapability().extractAny(40500));
+        scene.world().modifyBlockEntity(
+            drainPos,
+            ItemDrainBlockEntity.class,
+            be -> be.internalTank.getCapability().extractAny(40500)
+        );
 
         scene.world().moveSection(drainLink, util.vector().of(1, 0, 0), 7);
         scene.world().showSection(largeCog, Direction.UP);
@@ -74,8 +79,8 @@ public class DrainScenes {
         scene.world().createItemOnBelt(beltPos, Direction.NORTH, lavaBucket);
         scene.idle(30);
 
-        scene.overlay().showText(60).text("...they roll across, emptying out their contained fluid").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(drainPos));
+        scene.overlay().showText(60).text("...they roll across, emptying out their contained fluid").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().topOf(drainPos));
         scene.idle(40);
 
         scene.world().showSection(tank, Direction.DOWN);
@@ -83,8 +88,8 @@ public class DrainScenes {
         scene.world().showSection(pipes, Direction.NORTH);
         scene.idle(20);
 
-        scene.overlay().showText(90).text("Pipe Networks can now pull the fluid from the drains' internal buffer").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(util.grid().at(3, 1, 3)));
+        scene.overlay().showText(90).text("Pipe Networks can now pull the fluid from the drains' internal buffer")
+            .attachKeyFrame().placeNearTarget().pointAt(util.vector().topOf(util.grid().at(3, 1, 3)));
         scene.idle(50);
         scene.markAsFinished();
         scene.idle(50);

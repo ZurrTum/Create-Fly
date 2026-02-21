@@ -54,10 +54,12 @@ public class PostboxScenes {
         scene.world().createItemOnBeltLike(util.grid().at(6, 2, 4), Direction.DOWN, boxItem2);
 
         scene.world().toggleControls(controls);
-        ElementLink<WorldSectionElement> base = scene.world().showIndependentSection(util.select().fromTo(0, 0, 1, 8, 0, 9), Direction.UP);
+        ElementLink<WorldSectionElement> base = scene.world()
+            .showIndependentSection(util.select().fromTo(0, 0, 1, 8, 0, 9), Direction.UP);
         scene.idle(10);
 
-        ElementLink<WorldSectionElement> tracksL = scene.world().showIndependentSection(util.select().position(8, 1, 5), Direction.DOWN);
+        ElementLink<WorldSectionElement> tracksL = scene.world()
+            .showIndependentSection(util.select().position(8, 1, 5), Direction.DOWN);
         scene.idle(1);
         for (int i = 7; i >= 0; i--) {
             scene.world().showSectionAndMerge(util.select().position(i, 1, 5), Direction.DOWN, tracksL);
@@ -80,8 +82,8 @@ public class PostboxScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, box, bb1.inflate(0.025, 0.025, 0.025), 50);
         scene.idle(26);
 
-        scene.overlay().showText(80).text("Right-click a Train Station and place the Postbox nearby").attachKeyFrame().placeNearTarget()
-            .pointAt(fromTarget);
+        scene.overlay().showText(80).text("Right-click a Train Station and place the Postbox nearby").attachKeyFrame()
+            .placeNearTarget().pointAt(fromTarget);
 
         scene.idle(40);
 
@@ -101,8 +103,9 @@ public class PostboxScenes {
         scene.overlay().showControls(util.vector().topOf(box.below()), Pointing.DOWN, 40).rightClick();
         scene.idle(7);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, funnel, bb2, 70);
-        scene.overlay().showText(70).attachKeyFrame().colored(PonderPalette.BLUE).text("Assign it an address in the inventory UI")
-            .pointAt(util.vector().topOf(box.below())).placeNearTarget();
+        scene.overlay().showText(70).attachKeyFrame().colored(PonderPalette.BLUE)
+            .text("Assign it an address in the inventory UI").pointAt(util.vector().topOf(box.below()))
+            .placeNearTarget();
         scene.idle(80);
 
         scene.world().moveSection(postboxE, util.vector().of(0, 1, 0), 10);
@@ -133,7 +136,8 @@ public class PostboxScenes {
         scene.overlay().showText(40).colored(PonderPalette.BLUE).text("Warehouse")
             .pointAt(util.vector().blockSurface(box, Direction.NORTH).add(-.5, 0, 0)).placeNearTarget();
         scene.idle(5);
-        scene.overlay().showText(40).colored(PonderPalette.OUTPUT).text("→ Outpost").pointAt(util.vector().centerOf(3, 2, 2)).placeNearTarget();
+        scene.overlay().showText(40).colored(PonderPalette.OUTPUT).text("→ Outpost")
+            .pointAt(util.vector().centerOf(3, 2, 2)).placeNearTarget();
 
         scene.idle(50);
 
@@ -145,7 +149,8 @@ public class PostboxScenes {
         scene.idle(15);
 
         ElementLink<WorldSectionElement> train1L = scene.world().showIndependentSection(train1, null);
-        ElementLink<ParrotElement> birbL = scene.special().createBirb(util.vector().of(9.5, 3.5, 5.5), FacePointOfInterestPose::new);
+        ElementLink<ParrotElement> birbL = scene.special()
+            .createBirb(util.vector().of(9.5, 3.5, 5.5), FacePointOfInterestPose::new);
         scene.special().movePointOfInterest(util.grid().at(-5, 4, 5));
         scene.world().moveSection(train1L, util.vector().of(6, 0, 0), 0);
         scene.idle(1);
@@ -178,8 +183,8 @@ public class PostboxScenes {
             .pointAt(util.vector().topOf(5, 2, 4)).placeNearTarget();
         scene.idle(95);
 
-        scene.overlay().showText(80).text("Conversely, packages matching the address will be dropped off").attachKeyFrame()
-            .pointAt(util.vector().topOf(6, 2, 4)).placeNearTarget();
+        scene.overlay().showText(80).text("Conversely, packages matching the address will be dropped off")
+            .attachKeyFrame().pointAt(util.vector().topOf(6, 2, 4)).placeNearTarget();
         scene.idle(50);
 
         scene.world().removeItemsFromBelt(util.grid().at(6, 2, 4));
@@ -188,8 +193,8 @@ public class PostboxScenes {
         animatePostbox(scene, box, true);
         scene.idle(60);
 
-        scene.overlay().showText(100).text("Packages that arrived by train can be extracted from the Postbox").attachKeyFrame()
-            .pointAt(util.vector().blockSurface(box, Direction.NORTH)).placeNearTarget();
+        scene.overlay().showText(100).text("Packages that arrived by train can be extracted from the Postbox")
+            .attachKeyFrame().pointAt(util.vector().blockSurface(box, Direction.NORTH)).placeNearTarget();
         scene.idle(60);
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), -1);
@@ -202,8 +207,8 @@ public class PostboxScenes {
         scene.overlay().showText(40).colored(PonderPalette.BLUE).text("Warehouse")
             .pointAt(util.vector().blockSurface(box, Direction.NORTH).add(-.5, 0, 0)).placeNearTarget();
         scene.idle(5);
-        scene.overlay().showText(40).colored(PonderPalette.OUTPUT).text("→ Warehouse").pointAt(util.vector().centerOf(3, 2, 2).add(0, -.25, 0))
-            .placeNearTarget();
+        scene.overlay().showText(40).colored(PonderPalette.OUTPUT).text("→ Warehouse")
+            .pointAt(util.vector().centerOf(3, 2, 2).add(0, -.25, 0)).placeNearTarget();
 
         scene.idle(50);
 
@@ -226,8 +231,18 @@ public class PostboxScenes {
         scene.world().hideIndependentSection(train1L, null);
         scene.world().hideIndependentSection(train2L, null);
         scene.idle(5);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, train1L, new AABB(util.grid().at(1, 3, 4)).inflate(1, .75f, .5f), 280);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, train2L, new AABB(util.grid().at(5, 3, 4)).inflate(1, .75f, .5f), 280);
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.BLUE,
+            train1L,
+            new AABB(util.grid().at(1, 3, 4)).inflate(1, .75f, .5f),
+            280
+        );
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.BLUE,
+            train2L,
+            new AABB(util.grid().at(5, 3, 4)).inflate(1, .75f, .5f),
+            280
+        );
         scene.idle(19);
 
         ElementLink<WorldSectionElement> outpostL = scene.world().showIndependentSection(glass, Direction.UP);
@@ -235,7 +250,8 @@ public class PostboxScenes {
         scene.idle(1);
         scene.world().moveSection(outpostL, util.vector().of(4, 0, 0), 40);
         scene.idle(9);
-        ElementLink<WorldSectionElement> stationL = scene.world().showIndependentSection(stationS.add(box2S), Direction.DOWN);
+        ElementLink<WorldSectionElement> stationL = scene.world()
+            .showIndependentSection(stationS.add(box2S), Direction.DOWN);
         scene.world().moveSection(stationL, util.vector().of(-3, 0, 0), 0);
         scene.idle(1);
         scene.world().moveSection(stationL, util.vector().of(3, 0, 0), 30);
@@ -243,13 +259,14 @@ public class PostboxScenes {
         scene.world().animateTrainStation(util.grid().at(1, 1, 8), true);
         scene.idle(10);
 
-        scene.overlay().showText(90).text("Just like trains, Postboxes maintain their behaviour in unloaded chunks").colored(PonderPalette.BLUE)
-            .attachKeyFrame().independent(30);
+        scene.overlay().showText(90).text("Just like trains, Postboxes maintain their behaviour in unloaded chunks")
+            .colored(PonderPalette.BLUE).attachKeyFrame().independent(30);
         scene.idle(100);
         scene.effects().indicateSuccess(util.grid().at(3, 1, 8));
         animatePostbox(scene, util.grid().at(3, 1, 8), true);
 
-        scene.overlay().showText(90).text("Packages can still be delivered from or to their inventory").colored(PonderPalette.BLUE).placeNearTarget()
+        scene.overlay().showText(90).text("Packages can still be delivered from or to their inventory")
+            .colored(PonderPalette.BLUE).placeNearTarget()
             .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 8), Direction.NORTH));
         scene.idle(80);
     }

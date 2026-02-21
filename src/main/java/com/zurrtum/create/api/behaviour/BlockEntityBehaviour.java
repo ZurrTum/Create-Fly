@@ -22,17 +22,26 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
     public static final SimpleRegistry.Multi<BlockEntityType<?>, Function<SmartBlockEntity, BlockEntityBehaviour<?>>> FIRST_READ_REGISTRY = SimpleRegistry.Multi.create();
 
     @SuppressWarnings("unchecked")
-    public static <T extends SmartBlockEntity> void add(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>> factory) {
+    public static <T extends SmartBlockEntity> void add(
+        BlockEntityType<T> type,
+        Function<T, BlockEntityBehaviour<?>> factory
+    ) {
         REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends SmartBlockEntity> void addFirstRead(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>> factory) {
+    public static <T extends SmartBlockEntity> void addFirstRead(
+        BlockEntityType<T> type,
+        Function<T, BlockEntityBehaviour<?>> factory
+    ) {
         FIRST_READ_REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends SmartBlockEntity> void addClient(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>> factory) {
+    public static <T extends SmartBlockEntity> void addClient(
+        BlockEntityType<T> type,
+        Function<T, BlockEntityBehaviour<?>> factory
+    ) {
         CLIENT_REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
     }
 
@@ -56,10 +65,12 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
     }
 
     public static <T extends BlockEntityBehaviour<?>> T get(BlockEntity be, BehaviourType<T> type) {
-        if (be == null)
+        if (be == null) {
             return null;
-        if (!(be instanceof SmartBlockEntity ste))
+        }
+        if (!(be instanceof SmartBlockEntity ste)) {
             return null;
+        }
         return ste.getBehaviour(type);
     }
 

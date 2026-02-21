@@ -16,8 +16,8 @@ import com.zurrtum.create.content.logistics.depot.storage.DepotMountedStorageTyp
 import com.zurrtum.create.content.logistics.vault.ItemVaultMountedStorageType;
 import com.zurrtum.create.impl.contraption.storage.FallbackMountedStorageType;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -26,14 +26,26 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllMountedStorageTypes {
     public static final DepotMountedStorageType DEPOT = register("depot", new DepotMountedStorageType());
-    public static final CreativeCrateMountedStorageType CREATIVE_CRATE = register("creative_crate", new CreativeCrateMountedStorageType());
+    public static final CreativeCrateMountedStorageType CREATIVE_CRATE = register(
+        "creative_crate",
+        new CreativeCrateMountedStorageType()
+    );
     public static final ItemVaultMountedStorageType VAULT = register("vault", new ItemVaultMountedStorageType());
     public static final ToolboxMountedStorageType TOOLBOX = register("toolbox", new ToolboxMountedStorageType());
     public static final ChestMountedStorageType CHEST = register("chest", new ChestMountedStorageType());
-    public static final DispenserMountedStorageType DISPENSER = register("dispenser", new DispenserMountedStorageType());
-    public static final SimpleMountedStorageType<SimpleMountedStorage> SIMPLE = register("simple", new SimpleMountedStorageType.Impl());
+    public static final DispenserMountedStorageType DISPENSER = register(
+        "dispenser",
+        new DispenserMountedStorageType()
+    );
+    public static final SimpleMountedStorageType<SimpleMountedStorage> SIMPLE = register(
+        "simple",
+        new SimpleMountedStorageType.Impl()
+    );
     public static final FallbackMountedStorageType FALLBACK = register("fallback", new FallbackMountedStorageType());
-    public static final FluidTankMountedStorageType FLUID_TANK = register("fluid_tank", new FluidTankMountedStorageType());
+    public static final FluidTankMountedStorageType FLUID_TANK = register(
+        "fluid_tank",
+        new FluidTankMountedStorageType()
+    );
     public static final CreativeFluidTankMountedStorageType CREATIVE_FLUID_TANK = register(
         "creative_fluid_tank",
         new CreativeFluidTankMountedStorageType()
@@ -42,7 +54,10 @@ public class AllMountedStorageTypes {
     private static <T extends MountedItemStorageType<?>> T register(String id, T type) {
         return Registry.register(
             CreateRegistries.MOUNTED_ITEM_STORAGE_TYPE,
-            ResourceKey.create(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, id)),
+            ResourceKey.create(
+                CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE,
+                Identifier.fromNamespaceAndPath(MOD_ID, id)
+            ),
             type
         );
     }
@@ -50,7 +65,10 @@ public class AllMountedStorageTypes {
     private static <T extends MountedFluidStorageType<?>> T register(String id, T type) {
         return Registry.register(
             CreateRegistries.MOUNTED_FLUID_STORAGE_TYPE,
-            ResourceKey.create(CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, id)),
+            ResourceKey.create(
+                CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE,
+                Identifier.fromNamespaceAndPath(MOD_ID, id)
+            ),
             type
         );
     }

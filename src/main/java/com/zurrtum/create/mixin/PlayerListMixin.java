@@ -20,7 +20,12 @@ public class PlayerListMixin {
     private MinecraftServer server;
 
     @Inject(method = "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/network/CommonListenerCookie;)V", at = @At("TAIL"))
-    private void onPlayerConnect(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo ci) {
+    private void onPlayerConnect(
+        Connection connection,
+        ServerPlayer player,
+        CommonListenerCookie clientData,
+        CallbackInfo ci
+    ) {
         Create.RAILWAYS.playerLogin(server, player);
     }
 }

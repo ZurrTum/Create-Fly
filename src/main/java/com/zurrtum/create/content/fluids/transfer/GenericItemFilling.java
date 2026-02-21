@@ -16,10 +16,12 @@ import net.minecraft.world.level.material.Fluids;
 
 public class GenericItemFilling {
     public static boolean canItemBeFilled(Level world, ItemStack stack) {
-        if (stack.getItem() == Items.GLASS_BOTTLE)
+        if (stack.getItem() == Items.GLASS_BOTTLE) {
             return true;
-        if (stack.getItem() == Items.MILK_BUCKET)
+        }
+        if (stack.getItem() == Items.MILK_BUCKET) {
             return false;
+        }
 
         try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack)) {
             if (capability == null) {
@@ -36,8 +38,9 @@ public class GenericItemFilling {
     }
 
     public static int getRequiredAmountForItem(Level world, ItemStack stack, FluidStack availableFluid) {
-        if (stack.getItem() == Items.GLASS_BOTTLE && canFillGlassBottleInternally(availableFluid))
+        if (stack.getItem() == Items.GLASS_BOTTLE && canFillGlassBottleInternally(availableFluid)) {
             return PotionFluidHandler.getRequiredAmountForFilledBottle(stack, availableFluid);
+        }
 
         try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack)) {
             if (capability == null) {
@@ -49,10 +52,12 @@ public class GenericItemFilling {
 
     private static boolean canFillGlassBottleInternally(FluidStack availableFluid) {
         Fluid fluid = availableFluid.getFluid();
-        if (fluid.isSame(Fluids.WATER))
+        if (fluid.isSame(Fluids.WATER)) {
             return true;
-        if (fluid.isSame(AllFluids.POTION))
+        }
+        if (fluid.isSame(AllFluids.POTION)) {
             return true;
+        }
         return fluid.isSame(AllFluids.TEA);
     }
 
@@ -63,12 +68,13 @@ public class GenericItemFilling {
         if (stack.getItem() == Items.GLASS_BOTTLE && canFillGlassBottleInternally(toFill)) {
             ItemStack fillBottle;
             Fluid fluid = toFill.getFluid();
-            if (FluidHelper.isWater(fluid))
+            if (FluidHelper.isWater(fluid)) {
                 fillBottle = PotionContents.createItemStack(Items.POTION, Potions.WATER);
-            else if (fluid.isSame(AllFluids.TEA))
+            } else if (fluid.isSame(AllFluids.TEA)) {
                 fillBottle = AllItems.BUILDERS_TEA.getDefaultInstance();
-            else
+            } else {
                 fillBottle = PotionFluidHandler.fillBottle(stack, toFill);
+            }
             availableFluid.decrement(requiredAmount);
             stack.shrink(1);
             return fillBottle;

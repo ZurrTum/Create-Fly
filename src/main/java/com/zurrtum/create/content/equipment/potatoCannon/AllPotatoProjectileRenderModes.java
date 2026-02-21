@@ -21,7 +21,11 @@ public class AllPotatoProjectileRenderModes {
     }
 
     private static void register(String name, MapCodec<? extends PotatoProjectileRenderMode> codec) {
-        Registry.register(CreateRegistries.POTATO_PROJECTILE_RENDER_MODE, Identifier.fromNamespaceAndPath(MOD_ID, name), codec);
+        Registry.register(
+            CreateRegistries.POTATO_PROJECTILE_RENDER_MODE,
+            Identifier.fromNamespaceAndPath(MOD_ID, name),
+            codec
+        );
     }
 
     public enum Billboard implements PotatoProjectileRenderMode {
@@ -49,7 +53,8 @@ public class AllPotatoProjectileRenderModes {
     public record TowardMotion(int spriteAngleOffset, float spin) implements PotatoProjectileRenderMode {
         public static final MapCodec<TowardMotion> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf(
-                "sprite_angle_offset").forGetter(i -> i.spriteAngleOffset), Codec.FLOAT.fieldOf("spin").forGetter(i -> i.spin)
+                "sprite_angle_offset").forGetter(i -> i.spriteAngleOffset),
+            Codec.FLOAT.fieldOf("spin").forGetter(i -> i.spin)
         ).apply(instance, TowardMotion::new));
 
         @Override
@@ -59,8 +64,8 @@ public class AllPotatoProjectileRenderModes {
     }
 
     public record StuckToEntity(Vec3 offset) implements PotatoProjectileRenderMode {
-        public static final MapCodec<StuckToEntity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(Vec3.CODEC.fieldOf("offset")
-            .forGetter(i -> i.offset)).apply(instance, StuckToEntity::new));
+        public static final MapCodec<StuckToEntity> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(Vec3.CODEC.fieldOf(
+            "offset").forGetter(i -> i.offset)).apply(instance, StuckToEntity::new));
 
         @Override
         public MapCodec<? extends PotatoProjectileRenderMode> codec() {

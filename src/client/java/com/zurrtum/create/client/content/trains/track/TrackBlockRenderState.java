@@ -2,8 +2,8 @@ package com.zurrtum.create.client.content.trains.track;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 public abstract class TrackBlockRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
     public RenderType layer;

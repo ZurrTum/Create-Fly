@@ -36,7 +36,10 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 public class StockTickerBlockEntity extends StockCheckingBlockEntity implements Clearable {
-    public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT.listOf());
+    public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(
+        UUIDUtil.STRING_CODEC,
+        Codec.INT.listOf()
+    );
 
     // Player-interface Feature
     public List<List<BigItemStack>> lastClientsideStockSnapshot;
@@ -80,7 +83,12 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
     }
 
     @Override
-    public boolean broadcastPackageRequest(RequestType type, PackageOrderWithCrafts order, IdentifiedInventory ignoredHandler, String address) {
+    public boolean broadcastPackageRequest(
+        RequestType type,
+        PackageOrderWithCrafts order,
+        IdentifiedInventory ignoredHandler,
+        String address
+    ) {
         boolean result = super.broadcastPackageRequest(type, order, ignoredHandler, address);
         previouslyUsedAddress = address;
         notifyUpdate();
@@ -102,8 +110,9 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
     public void tick() {
         super.tick();
         if (level.isClientSide()) {
-            if (ticksSinceLastUpdate < 100)
+            if (ticksSinceLastUpdate < 100) {
                 ticksSinceLastUpdate += 1;
+            }
         }
     }
 
@@ -115,8 +124,9 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
         view.store("Categories", CreateCodecs.ITEM_LIST_CODEC, categories);
         view.store("HiddenCategories", UUID_MAP_CODEC, hiddenCategoriesByPlayer);
 
-        if (clientPacket)
+        if (clientPacket) {
             view.putInt("ActiveLinks", activeLinks);
+        }
     }
 
     @Override
@@ -134,23 +144,27 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
         hiddenCategoriesByPlayer.clear();
         view.read("HiddenCategories", UUID_MAP_CODEC).ifPresent(map -> hiddenCategoriesByPlayer.putAll(map));
 
-        if (clientPacket)
+        if (clientPacket) {
             activeLinks = view.getIntOr("ActiveLinks", 0);
+        }
     }
 
     public void receiveStockPacket(List<BigItemStack> stacks, boolean endOfTransmission) {
-        if (newlyReceivedStockSnapshot == null)
+        if (newlyReceivedStockSnapshot == null) {
             newlyReceivedStockSnapshot = new ArrayList<>();
+        }
         newlyReceivedStockSnapshot.addAll(stacks);
 
-        if (!endOfTransmission)
+        if (!endOfTransmission) {
             return;
+        }
 
         lastClientsideStockSnapshotAsSummary = new InventorySummary();
         lastClientsideStockSnapshot = new ArrayList<>();
 
-        for (BigItemStack bigStack : newlyReceivedStockSnapshot)
+        for (BigItemStack bigStack : newlyReceivedStockSnapshot) {
             lastClientsideStockSnapshotAsSummary.add(bigStack);
+        }
 
         for (ItemStack filter : categories) {
             List<BigItemStack> inCategory = new ArrayList<>();
@@ -158,8 +172,9 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
                 FilterItemStack filterItemStack = FilterItemStack.of(filter);
                 for (Iterator<BigItemStack> iterator = newlyReceivedStockSnapshot.iterator(); iterator.hasNext(); ) {
                     BigItemStack bigStack = iterator.next();
-                    if (!filterItemStack.test(level, bigStack.stack))
+                    if (!filterItemStack.test(level, bigStack.stack)) {
                         continue;
+                    }
                     inCategory.add(bigStack);
                     iterator.remove();
                 }
@@ -176,9 +191,11 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
         for (int yOffset : Iterate.zeroAndOne) {
             for (Direction side : Iterate.horizontalDirections) {
                 BlockPos seatPos = worldPosition.below(yOffset).relative(side);
-                for (SeatEntity seatEntity : level.getEntitiesOfClass(SeatEntity.class, new AABB(seatPos)))
-                    if (seatEntity.isVehicle())
+                for (SeatEntity seatEntity : level.getEntitiesOfClass(SeatEntity.class, new AABB(seatPos))) {
+                    if (seatEntity.isVehicle()) {
                         return true;
+                    }
+                }
                 if (yOffset == 0) {
                     BlockEntity entity = level.getBlockEntity(seatPos);
                     if (entity != null && entity.getType() == AllBlockEntityTypes.HEATER) {
@@ -226,7 +243,12 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
         return new StockKeeperCategoryMenu(pContainerId, pPlayerInventory, StockTickerBlockEntity.this);
     }
 
-    public StockKeeperRequestMenu createRequestMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer, RegistryFriendlyByteBuf extraData) {
+    public StockKeeperRequestMenu createRequestMenu(
+        int pContainerId,
+        Inventory pPlayerInventory,
+        Player pPlayer,
+        RegistryFriendlyByteBuf extraData
+    ) {
         boolean showLockOption = behaviour.mayAdministrate(pPlayer) && Create.LOGISTICS.isLockable(behaviour.freqId);
         boolean isCurrentlyLocked = Create.LOGISTICS.isLocked(behaviour.freqId);
         extraData.writeBlockPos(worldPosition);

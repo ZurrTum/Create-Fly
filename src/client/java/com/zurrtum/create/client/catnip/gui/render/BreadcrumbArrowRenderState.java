@@ -11,10 +11,9 @@ import org.joml.Matrix3x2f;
 
 import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.POSITION_COLOR_TRIANGLES;
 
-public record BreadcrumbArrowRenderState(
-    Matrix3x2f pose, float x0, float x1, float x2, float x3, float y0, float y1, float y2, int fc1Color, int fc2Color, int fc3Color, int fc4Color,
-    ScreenRectangle bounds
-) implements GuiElementRenderState {
+public record BreadcrumbArrowRenderState(Matrix3x2f pose, float x0, float x1, float x2, float x3, float y0, float y1,
+                                         float y2, int fc1Color, int fc2Color, int fc3Color, int fc4Color,
+                                         ScreenRectangle bounds) implements GuiElementRenderState {
     public BreadcrumbArrowRenderState(
         Matrix3x2f pose,
         float x0,

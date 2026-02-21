@@ -12,12 +12,6 @@ import com.zurrtum.create.content.kinetics.waterwheel.LargeWaterWheelBlock;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelBlock;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelBlockEntity;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -30,12 +24,17 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends KineticBlockEntityRenderer<T, KineticRenderState> {
     public static final SuperByteBufferCache.Compartment<ModelKey> WATER_WHEEL = new SuperByteBufferCache.Compartment<>();
@@ -68,12 +67,16 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
                 BlockState state1 = key.state();
                 Direction dir;
                 if (key.large()) {
-                    dir = Direction.fromAxisAndDirection(state1.getValue(LargeWaterWheelBlock.AXIS), AxisDirection.POSITIVE);
+                    dir = Direction.fromAxisAndDirection(
+                        state1.getValue(LargeWaterWheelBlock.AXIS),
+                        AxisDirection.POSITIVE
+                    );
                 } else {
                     dir = state1.getValue(WaterWheelBlock.FACING);
                 }
                 PoseStack transform = CachedBuffers.rotateToFaceVertical(dir).get();
-                return SuperBufferFactory.getInstance().createForBlock(model, Blocks.AIR.defaultBlockState(), transform);
+                return SuperBufferFactory.getInstance()
+                    .createForBlock(model, Blocks.AIR.defaultBlockState(), transform);
             }
         );
     }
@@ -91,8 +94,9 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
         Identifier id = RegisteredObjectsHelper.getKeyOrThrow(planksBlock);
         String wood = plankStateToWoodName(planksBlockState);
 
-        if (wood == null)
+        if (wood == null) {
             return BakedModelHelper.generateModel(template, sprite -> null);
+        }
 
         String namespace = id.getNamespace();
         BlockState logBlockState = getLogBlockState(namespace, wood);
@@ -112,10 +116,14 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
         String path = id.getPath();
 
         if (path.endsWith("_planks")) // Covers most wood types
+        {
             return (path.startsWith("archwood") ? "blue_" : "") + path.substring(0, path.length() - 7);
+        }
 
         if (path.contains("wood/planks/")) // TerraFirmaCraft
+        {
             return path.substring(12);
+        }
 
         return null;
     }
@@ -133,16 +141,18 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
                 Registries.BLOCK,
                 Identifier.fromNamespaceAndPath(namespace, location.replace("x", wood))
             )).map(Holder::value).map(Block::defaultBlockState);
-            if (state.isPresent())
+            if (state.isPresent()) {
                 return state.get();
+            }
         }
         return Blocks.OAK_LOG.defaultBlockState();
     }
 
     private static TextureAtlasSprite getSpriteOnSide(BlockState state, Direction side) {
         BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        if (model == null)
+        if (model == null) {
             return null;
+        }
         RandomSource random = RandomSource.create();
         random.setSeed(42L);
         List<BlockModelPart> parts = model.collectParts(random);
@@ -167,9 +177,7 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
     }
 
     public enum Variant {
-        SMALL(AllPartialModels.WATER_WHEEL),
-        LARGE(AllPartialModels.LARGE_WATER_WHEEL),
-        LARGE_EXTENSION(AllPartialModels.LARGE_WATER_WHEEL_EXTENSION),
+        SMALL(AllPartialModels.WATER_WHEEL), LARGE(AllPartialModels.LARGE_WATER_WHEEL), LARGE_EXTENSION(AllPartialModels.LARGE_WATER_WHEEL_EXTENSION),
         ;
 
         private final PartialModel partial;

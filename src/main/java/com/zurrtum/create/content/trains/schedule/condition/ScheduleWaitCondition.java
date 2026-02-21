@@ -23,8 +23,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
-    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleWaitCondition> STREAM_CODEC = StreamCodec.of(
-        ScheduleWaitCondition::encode,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleWaitCondition> STREAM_CODEC = StreamCodec.of(ScheduleWaitCondition::encode,
         ScheduleWaitCondition::decode
     );
 
@@ -40,7 +39,10 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
 
     public final void write(ValueOutput view) {
         view.store("Id", Identifier.CODEC, id);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleWaitCondition",
+            Create.LOGGER
+        )) {
             TagValueOutput writeView = new TagValueOutput(logging, ((TagValueOutput) view).ops, data);
             writeAdditional(writeView);
             view.store("Data", CompoundTag.CODEC, writeView.buildResult());
@@ -51,7 +53,10 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     public static <T> DataResult<T> encode(final ScheduleWaitCondition input, final DynamicOps<T> ops, final T empty) {
         RecordBuilder<T> map = ops.mapBuilder();
         map.add("Id", input.id, Identifier.CODEC);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleWaitCondition",
+            Create.LOGGER
+        )) {
             TagValueOutput view = new TagValueOutput(logging, (DynamicOps<Tag>) ops, input.data);
             input.writeAdditional(view);
             map.add("Data", view.buildResult(), CompoundTag.CODEC);
@@ -79,7 +84,10 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
             return fallback(location);
         }
         condition.data = CompoundTag.CODEC.parse(ops, map.get("Data")).result().orElseGet(CompoundTag::new);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleWaitCondition",
+            Create.LOGGER
+        )) {
             TagValueInput view = new TagValueInput(logging, new NbtReadContext(ops), condition.data);
             condition.readAdditional(view);
         }
@@ -92,7 +100,10 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     }
 
     private static void encode(RegistryFriendlyByteBuf buf, ScheduleWaitCondition value) {
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleWaitCondition",
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, buf.registryAccess());
             value.write(view);
             buf.writeNbt(view.buildResult());
@@ -100,7 +111,10 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     }
 
     private static ScheduleWaitCondition decode(RegistryFriendlyByteBuf buf) {
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleWaitCondition",
+            Create.LOGGER
+        )) {
             ValueInput view = TagValueInput.create(logging, buf.registryAccess(), buf.readNbt());
             return ScheduleWaitCondition.read(view);
         }

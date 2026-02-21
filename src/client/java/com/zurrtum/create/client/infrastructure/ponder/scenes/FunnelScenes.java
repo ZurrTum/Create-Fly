@@ -57,10 +57,12 @@ public class FunnelScenes {
             scene.idle(8);
             scene.world().removeItemsFromBelt(exitBeltPos);
             scene.world().flapFunnel(exitBeltPos.above(), false);
-            if (i == 2)
+            if (i == 2) {
                 scene.rotateCameraY(70);
-            if (i < 6)
+            }
+            if (i < 6) {
                 scene.world().createItemOnBelt(entryBeltPos, Direction.EAST, itemStack);
+            }
         }
 
         scene.rotateCameraY(-70);
@@ -68,18 +70,22 @@ public class FunnelScenes {
 
         Selection outputFunnel = util.select().position(1, 2, 4);
         scene.world().setBlocks(outputFunnel, Blocks.AIR.defaultBlockState(), false);
-        scene.world().setBlocks(util.select().fromTo(2, -1, 4, 2, 0, 4), AllBlocks.ANDESITE_CASING.defaultBlockState(), true);
-        ElementLink<WorldSectionElement> independentSection = scene.world().showIndependentSection(verticalFunnel, Direction.UP);
+        scene.world()
+            .setBlocks(util.select().fromTo(2, -1, 4, 2, 0, 4), AllBlocks.ANDESITE_CASING.defaultBlockState(), true);
+        ElementLink<WorldSectionElement> independentSection = scene.world()
+            .showIndependentSection(verticalFunnel, Direction.UP);
 
         Vec3 topItemSpawn = util.vector().centerOf(2, 6, 4);
         Vec3 sideItemSpawn = util.vector().centerOf(1, 3, 4).add(0.15f, -0.45f, 0);
         ElementLink<EntityElement> lastItemEntity = null;
 
         for (int i = 0; i < 4; i++) {
-            if (lastItemEntity != null)
+            if (lastItemEntity != null) {
                 scene.world().modifyEntity(lastItemEntity, Entity::discard);
-            if (i < 3)
+            }
+            if (i < 3) {
                 lastItemEntity = scene.world().createItemEntity(topItemSpawn, util.vector().of(0, -0.4, 0), itemStack);
+            }
             scene.idle(8);
         }
 
@@ -87,7 +93,8 @@ public class FunnelScenes {
         scene.idle(10);
         scene.world().setBlocks(
             outputFunnel,
-            AllBlocks.ANDESITE_FUNNEL.defaultBlockState().setValue(FunnelBlock.FACING, Direction.WEST).setValue(FunnelBlock.EXTRACTING, true),
+            AllBlocks.ANDESITE_FUNNEL.defaultBlockState().setValue(FunnelBlock.FACING, Direction.WEST)
+                .setValue(FunnelBlock.EXTRACTING, true),
             false
         );
 
@@ -98,7 +105,8 @@ public class FunnelScenes {
         }
 
         scene.idle(8);
-        scene.overlay().showText(360).text("Funnels are ideal for transferring items from and to inventories.").independent();
+        scene.overlay().showText(360).text("Funnels are ideal for transferring items from and to inventories.")
+            .independent();
         scene.markAsFinished();
     }
 
@@ -124,11 +132,12 @@ public class FunnelScenes {
 
         // Placing funnels without sneak
         scene.world().showSection(topFunnelSelection, Direction.DOWN);
-        scene.overlay().showText(80).text("Placed normally, it pulls items from the inventory.").attachKeyFrame().pointAt(topCenter)
-            .placeNearTarget();
+        scene.overlay().showText(80).text("Placed normally, it pulls items from the inventory.").attachKeyFrame()
+            .pointAt(topCenter).placeNearTarget();
         scene.idle(45);
 
-        ElementLink<EntityElement> itemLink = scene.world().createItemEntity(topCenter, util.vector().of(0, 4 / 16f, 0), itemStack);
+        ElementLink<EntityElement> itemLink = scene.world()
+            .createItemEntity(topCenter, util.vector().of(0, 4 / 16f, 0), itemStack);
         scene.idle(40);
 
         scene.world().modifyEntity(itemLink, Entity::discard);
@@ -141,8 +150,8 @@ public class FunnelScenes {
 
         scene.world().showSection(topFunnelSelection, Direction.DOWN);
         scene.overlay().showControls(topCenter, Pointing.DOWN, 35).rightClick().whileSneaking();
-        scene.overlay().showText(80).text("Placed while sneaking, it puts items into the inventory.").attachKeyFrame().pointAt(topCenter)
-            .placeNearTarget();
+        scene.overlay().showText(80).text("Placed while sneaking, it puts items into the inventory.").attachKeyFrame()
+            .pointAt(topCenter).placeNearTarget();
         scene.idle(45);
 
         itemLink = scene.world().createItemEntity(topCenter.add(0, 3, 0), util.vector().of(0, -0.2, 0), itemStack);
@@ -152,17 +161,19 @@ public class FunnelScenes {
         scene.idle(45);
 
         // Wrench interaction
-        scene.overlay().showControls(topSide, Pointing.RIGHT, 40).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(topSide, Pointing.RIGHT, 40).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(10);
         scene.world().modifyBlock(topFunnel, s -> s.cycle(FunnelBlock.EXTRACTING), true);
         scene.idle(10);
-        scene.overlay().showText(80).text("Using a wrench, the funnel can be flipped after placement.").attachKeyFrame().pointAt(topCenter)
-            .placeNearTarget();
+        scene.overlay().showText(80).text("Using a wrench, the funnel can be flipped after placement.").attachKeyFrame()
+            .pointAt(topCenter).placeNearTarget();
 
         itemLink = scene.world().createItemEntity(topCenter, util.vector().of(0, 4 / 16f, 0), itemStack);
         scene.idle(30);
 
-        scene.overlay().showControls(topSide, Pointing.RIGHT, 40).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(topSide, Pointing.RIGHT, 40).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(10);
         scene.world().modifyBlock(topFunnel, s -> s.cycle(FunnelBlock.EXTRACTING), true);
         scene.idle(10);
@@ -177,12 +188,14 @@ public class FunnelScenes {
 
         scene.world().modifyBlock(sideFunnel, s -> s.cycle(FunnelBlock.EXTRACTING), false);
         scene.world().showSection(sideFunnelSelection, Direction.DOWN);
-        scene.overlay().showText(70).text("Same rules will apply for most orientations.").pointAt(sideCenter).placeNearTarget();
+        scene.overlay().showText(70).text("Same rules will apply for most orientations.").pointAt(sideCenter)
+            .placeNearTarget();
 
         scene.idle(20);
 
         scene.world().flapFunnel(sideFunnel, true);
-        itemLink = scene.world().createItemEntity(sideCenter.subtract(0, .45, 0), util.vector().of(0, 0, -0.1), itemStack);
+        itemLink = scene.world()
+            .createItemEntity(sideCenter.subtract(0, .45, 0), util.vector().of(0, 0, -0.1), itemStack);
         scene.idle(60);
         scene.world().hideSection(sideFunnelSelection, Direction.UP);
         scene.world().hideSection(topFunnelSelection, Direction.UP);
@@ -198,8 +211,8 @@ public class FunnelScenes {
         BlockPos cogPos = util.grid().at(1, 1, 3);
 
         scene.world().showSection(beltFunnelSetup, Direction.DOWN);
-        scene.overlay().showText(140).text("Funnels on belts will extract/insert depending on its movement direction.").attachKeyFrame()
-            .pointAt(topOfBeltFunnel);
+        scene.overlay().showText(140).text("Funnels on belts will extract/insert depending on its movement direction.")
+            .attachKeyFrame().pointAt(topOfBeltFunnel);
 
         scene.idle(15);
 
@@ -236,14 +249,15 @@ public class FunnelScenes {
         BlockPos drainFunnel = util.grid().at(0, 2, 3);
 
         scene.world().showSection(util.select().layer(0), Direction.UP);
-        Selection firstShow = util.select().layer(1).add(util.select().position(sawFunnel.south())).add(util.select().position(depotFunnel.south()))
-            .add(util.select().position(drainFunnel.south()));
+        Selection firstShow = util.select().layer(1).add(util.select().position(sawFunnel.south()))
+            .add(util.select().position(depotFunnel.south())).add(util.select().position(drainFunnel.south()));
         scene.idle(5);
 
         scene.world().showSection(firstShow, Direction.DOWN);
 
         scene.idle(8);
-        scene.overlay().showText(360).text("Funnels should also interact nicely with a handful of other components.").attachKeyFrame().independent(0);
+        scene.overlay().showText(360).text("Funnels should also interact nicely with a handful of other components.")
+            .attachKeyFrame().independent(0);
         scene.idle(40);
 
         scene.world().showSection(util.select().position(sawFunnel), Direction.DOWN);
@@ -306,8 +320,9 @@ public class FunnelScenes {
         AABB redstoneBB = new AABB(funnel).inflate(-1 / 16f, -6 / 16f, -1 / 16f).move(0, -5 / 16f, 0);
 
         for (int i = 0; i < 4; i++) {
-            if (lastItemEntity != null)
+            if (lastItemEntity != null) {
                 scene.world().modifyEntity(lastItemEntity, Entity::discard);
+            }
             lastItemEntity = scene.world().createItemEntity(topItemSpawn, util.vector().of(0, -0.2, 0), itemStack);
             scene.idle(8);
 
@@ -318,7 +333,8 @@ public class FunnelScenes {
                 scene.effects().indicateRedstone(lever);
                 scene.idle(4);
                 scene.overlay().chaseBoundingBoxOutline(PonderPalette.RED, funnel, redstoneBB, 80);
-                scene.overlay().showText(80).colored(PonderPalette.RED).text("Redstone power will prevent any funnel from acting")
+                scene.overlay().showText(80).colored(PonderPalette.RED)
+                    .text("Redstone power will prevent any funnel from acting")
                     .pointAt(util.vector().blockSurface(funnel, Direction.DOWN));
             } else {
                 scene.idle(4);
@@ -342,7 +358,8 @@ public class FunnelScenes {
         Selection withoutBelt = util.select().layersFrom(1).substract(beltAndStuff).substract(depots);
 
         scene.world().showSection(withoutBelt, Direction.DOWN);
-        ElementLink<WorldSectionElement> independentSection = scene.world().showIndependentSection(depots, Direction.DOWN);
+        ElementLink<WorldSectionElement> independentSection = scene.world()
+            .showIndependentSection(depots, Direction.DOWN);
         scene.world().moveSection(independentSection, util.vector().of(0, 0, 1), 0);
 
         BlockPos andesiteFunnel = util.grid().at(3, 2, 2);
@@ -358,7 +375,8 @@ public class FunnelScenes {
         scene.idle(60);
 
         Vec3 filter = util.vector().topOf(brassFunnel);
-        scene.overlay().showText(60).text("Brass Funnels can extract up to a full stack.").attachKeyFrame().pointAt(filter).placeNearTarget();
+        scene.overlay().showText(60).text("Brass Funnels can extract up to a full stack.").attachKeyFrame()
+            .pointAt(filter).placeNearTarget();
         scene.idle(10);
         scene.world().createItemOnBeltLike(brassFunnel.below().north(), Direction.SOUTH, itemStack.copyWithCount(64));
         scene.world().flapFunnel(brassFunnel, true);
@@ -368,8 +386,8 @@ public class FunnelScenes {
         scene.overlay().showFilterSlotInput(filter, Direction.NORTH, 80);
         scene.overlay().showControls(filter, Pointing.DOWN, 60).rightClick();
         scene.idle(10);
-        scene.overlay().showText(80).text("The value panel allows for precise control over the extracted stack size.").attachKeyFrame()
-            .pointAt(filter).placeNearTarget();
+        scene.overlay().showText(80).text("The value panel allows for precise control over the extracted stack size.")
+            .attachKeyFrame().pointAt(filter).placeNearTarget();
         scene.idle(90);
 
         // belt
@@ -388,8 +406,13 @@ public class FunnelScenes {
 
         for (int i = 0; i < 14; i++) {
 
-            if (i < 12)
-                scene.world().createItemOnBelt(andesiteFunnel.below(), Direction.SOUTH, i % 3 == 0 ? dirt : i % 3 == 1 ? gravel : emerald);
+            if (i < 12) {
+                scene.world().createItemOnBelt(
+                    andesiteFunnel.below(),
+                    Direction.SOUTH,
+                    i % 3 == 0 ? dirt : i % 3 == 1 ? gravel : emerald
+                );
+            }
             scene.idle(10);
 
             if (i > 0 && (i < 3 || i % 3 == 0)) {
@@ -399,8 +422,9 @@ public class FunnelScenes {
 
             scene.world().modifyEntities(
                 ItemEntity.class, e -> {
-                    if (e.getY() < 1)
+                    if (e.getY() < 1) {
                         e.discard();
+                    }
                 }
             );
 
@@ -408,14 +432,17 @@ public class FunnelScenes {
                 scene.overlay().showFilterSlotInput(filter, Direction.NORTH, 40);
                 scene.overlay().showControls(filter, Pointing.DOWN, 60).rightClick().withItem(emerald);
                 scene.idle(10);
-                scene.overlay().showText(80).text("Using items on the filter slot will restrict the funnel to only transfer matching stacks.")
+                scene.overlay().showText(80)
+                    .text("Using items on the filter slot will restrict the funnel to only transfer matching stacks.")
                     .attachKeyFrame().pointAt(filter).placeNearTarget();
                 scene.world().setFilterData(util.select().position(brassFunnel), FunnelBlockEntity.class, emerald);
-            } else
+            } else {
                 scene.idle(10);
+            }
 
-            if (i == 8)
+            if (i == 8) {
                 scene.markAsFinished();
+            }
         }
     }
 
@@ -429,8 +456,10 @@ public class FunnelScenes {
         BlockPos funnelPos = util.grid().at(2, 2, 2);
         Selection funnelSelect = util.select().position(funnelPos);
 
-        ElementLink<WorldSectionElement> rightChest = scene.world().showIndependentSection(util.select().position(0, 2, 2), Direction.DOWN);
-        ElementLink<WorldSectionElement> leftChest = scene.world().showIndependentSection(util.select().position(4, 2, 2), Direction.DOWN);
+        ElementLink<WorldSectionElement> rightChest = scene.world()
+            .showIndependentSection(util.select().position(0, 2, 2), Direction.DOWN);
+        ElementLink<WorldSectionElement> leftChest = scene.world()
+            .showIndependentSection(util.select().position(4, 2, 2), Direction.DOWN);
         scene.world().moveSection(rightChest, util.vector().of(2, 1, 0), 0);
         scene.world().moveSection(leftChest, util.vector().of(-2, -1, 0), 0);
         scene.idle(5);
@@ -439,7 +468,8 @@ public class FunnelScenes {
         scene.idle(20);
 
         scene.overlay().showOutlineWithText(funnelSelect, 40).colored(PonderPalette.RED)
-            .text("Funnels cannot ever transfer between closed inventories directly.").attachKeyFrame().placeNearTarget();
+            .text("Funnels cannot ever transfer between closed inventories directly.").attachKeyFrame()
+            .placeNearTarget();
         scene.idle(50);
 
         scene.world().hideSection(funnelSelect, Direction.SOUTH);
@@ -449,8 +479,9 @@ public class FunnelScenes {
         scene.world().showSection(funnelSelect, Direction.NORTH);
         scene.idle(10);
 
-        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("Chutes or Smart chutes might be more suitable for such purposes.")
-            .attachKeyFrame().pointAt(util.vector().centerOf(funnelPos)).placeNearTarget();
+        scene.overlay().showText(40).colored(PonderPalette.GREEN)
+            .text("Chutes or Smart chutes might be more suitable for such purposes.").attachKeyFrame()
+            .pointAt(util.vector().centerOf(funnelPos)).placeNearTarget();
         scene.idle(50);
 
         scene.world().hideSection(funnelSelect, Direction.UP);
@@ -462,7 +493,8 @@ public class FunnelScenes {
         scene.world().setBlocks(funnelSelect, Blocks.AIR.defaultBlockState(), false);
         scene.world().showSection(belt, Direction.DOWN);
         scene.world().showSection(util.select().fromTo(0, 2, 2, 4, 2, 2), Direction.DOWN);
-        scene.overlay().showText(120).colored(PonderPalette.GREEN).text("Same applies for horizontal movement. A mechanical belt should help here.")
+        scene.overlay().showText(120).colored(PonderPalette.GREEN)
+            .text("Same applies for horizontal movement. A mechanical belt should help here.")
             .pointAt(util.vector().topOf(1, 2, 2)).placeNearTarget();
 
         scene.markAsFinished();

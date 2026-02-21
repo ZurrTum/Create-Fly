@@ -6,12 +6,6 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.decoration.girder.GirderBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -24,23 +18,41 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class TrackPaver {
 
-    public static int paveStraight(Level level, BlockPos startPos, Vec3 direction, int extent, Block block, boolean simulate, Set<BlockPos> visited) {
+    public static int paveStraight(
+        Level level,
+        BlockPos startPos,
+        Vec3 direction,
+        int extent,
+        Block block,
+        boolean simulate,
+        Set<BlockPos> visited
+    ) {
         int itemsNeeded = 0;
 
         BlockState defaultBlockState = block.defaultBlockState();
         boolean slabLike = defaultBlockState.hasProperty(SlabBlock.TYPE);
         boolean wallLike = isWallLike(defaultBlockState);
 
-        if (slabLike)
+        if (slabLike) {
             defaultBlockState = defaultBlockState.setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+        }
 
-        if (defaultBlockState.getBlock() instanceof GirderBlock)
-            for (Direction d : Iterate.horizontalDirections)
-                if (Vec3.atLowerCornerOf(d.getUnitVec3i()).equals(direction))
-                    defaultBlockState = defaultBlockState.setValue(GirderBlock.TOP, false).setValue(GirderBlock.BOTTOM, false)
-                        .setValue(GirderBlock.AXIS, d.getAxis()).setValue(d.getAxis() == Axis.X ? GirderBlock.X : GirderBlock.Z, true);
+        if (defaultBlockState.getBlock() instanceof GirderBlock) {
+            for (Direction d : Iterate.horizontalDirections) {
+                if (Vec3.atLowerCornerOf(d.getUnitVec3i()).equals(direction)) {
+                    defaultBlockState = defaultBlockState.setValue(GirderBlock.TOP, false)
+                        .setValue(GirderBlock.BOTTOM, false).setValue(GirderBlock.AXIS, d.getAxis())
+                        .setValue(d.getAxis() == Axis.X ? GirderBlock.X : GirderBlock.Z, true);
+                }
+            }
+        }
 
         Set<BlockPos> toPlaceOn = new HashSet<>();
         Vec3 start = VecHelper.getCenterOf(startPos);
@@ -54,41 +66,56 @@ public class TrackPaver {
             Vec3 mainPos = start.add(offset.x, offset.y, offset.z);
             toPlaceOn.add(BlockPos.containing(mainPos.add(mainNormal)));
             toPlaceOn.add(BlockPos.containing(mainPos.subtract(mainNormal)));
-            if (wallLike)
+            if (wallLike) {
                 continue;
+            }
             toPlaceOn.add(BlockPos.containing(mainPos));
-            if (i < extent - 1)
-                for (int x : Iterate.positiveAndNegative)
+            if (i < extent - 1) {
+                for (int x : Iterate.positiveAndNegative) {
                     toPlaceOn.add(BlockPos.containing(mainPos.add(normalizedNormal.scale(x * diagFiller))
                         .add(normalizedDirection.scale(diagFiller))));
-            if (i > 0)
-                for (int x : Iterate.positiveAndNegative)
+                }
+            }
+            if (i > 0) {
+                for (int x : Iterate.positiveAndNegative) {
                     toPlaceOn.add(BlockPos.containing(mainPos.add(normalizedNormal.scale(x * diagFiller))
                         .add(normalizedDirection.scale(-diagFiller))));
+                }
+            }
         }
 
         final BlockState state = defaultBlockState;
         for (BlockPos p : toPlaceOn) {
-            if (!visited.add(p))
+            if (!visited.add(p)) {
                 continue;
-            if (placeBlockIfFree(level, p, state, simulate))
+            }
+            if (placeBlockIfFree(level, p, state, simulate)) {
                 itemsNeeded += slabLike ? 2 : 1;
+            }
         }
         visited.addAll(toPlaceOn);
 
         return itemsNeeded;
     }
 
-    public static int paveCurve(Level level, BezierConnection bc, Block block, boolean simulate, Set<BlockPos> visited) {
+    public static int paveCurve(
+        Level level,
+        BezierConnection bc,
+        Block block,
+        boolean simulate,
+        Set<BlockPos> visited
+    ) {
         int itemsNeeded = 0;
 
         BlockState defaultBlockState = block.defaultBlockState();
         boolean slabLike = defaultBlockState.hasProperty(SlabBlock.TYPE);
-        if (slabLike)
+        if (slabLike) {
             defaultBlockState = defaultBlockState.setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+        }
         if (isWallLike(defaultBlockState)) {
-            if (defaultBlockState.is(AllBlocks.METAL_GIRDER))
+            if (defaultBlockState.is(AllBlocks.METAL_GIRDER)) {
                 return ((bc.getSegmentCount() + 1) / 2) * 2;
+            }
             return 0;
         }
 
@@ -116,7 +143,11 @@ public class TrackPaver {
 
             Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
             Vec3 derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t).normalize();
-            Vec3 faceNormal = faceNormal1.equals(faceNormal2) ? faceNormal1 : VecHelper.slerp(t, faceNormal1, faceNormal2);
+            Vec3 faceNormal = faceNormal1.equals(faceNormal2) ? faceNormal1 : VecHelper.slerp(
+                t,
+                faceNormal1,
+                faceNormal2
+            );
             Vec3 normal = faceNormal.cross(derivative).normalize();
             Vec3 below = result.add(faceNormal.scale(-1.125f));
             Vec3 rail1 = below.add(normal.scale(.97f));
@@ -126,8 +157,9 @@ public class TrackPaver {
             for (Vec3 vec : new Vec3[]{rail1, rail2, railMiddle}) {
                 BlockPos pos = BlockPos.containing(vec);
                 Pair<Integer, Integer> key = Pair.of(pos.getX(), pos.getZ());
-                if (!yLevels.containsKey(key) || yLevels.get(key) > vec.y)
+                if (!yLevels.containsKey(key) || yLevels.get(key) > vec.y) {
                     yLevels.put(key, vec.y);
+                }
             }
         }
 
@@ -137,17 +169,24 @@ public class TrackPaver {
             boolean placeSlab = slabLike && yValue - floor >= .5;
             BlockPos targetPos = new BlockPos(entry.getKey().getFirst(), floor, entry.getKey().getSecond());
             targetPos = targetPos.offset(tePosition).above(placeSlab ? 1 : 0);
-            BlockState stateToPlace = placeSlab ? defaultBlockState.setValue(SlabBlock.TYPE, SlabType.BOTTOM) : defaultBlockState;
-            if (!visited.add(targetPos))
+            BlockState stateToPlace = placeSlab ? defaultBlockState.setValue(
+                SlabBlock.TYPE,
+                SlabType.BOTTOM
+            ) : defaultBlockState;
+            if (!visited.add(targetPos)) {
                 continue;
-            if (placeBlockIfFree(level, targetPos, stateToPlace, simulate))
+            }
+            if (placeBlockIfFree(level, targetPos, stateToPlace, simulate)) {
                 itemsNeeded += !placeSlab ? 2 : 1;
+            }
             if (placeSlab) {
-                if (!visited.add(targetPos.below()))
+                if (!visited.add(targetPos.below())) {
                     continue;
+                }
                 BlockState topSlab = stateToPlace.setValue(SlabBlock.TYPE, SlabType.TOP);
-                if (placeBlockIfFree(level, targetPos.below(), topSlab, simulate))
+                if (placeBlockIfFree(level, targetPos.below(), topSlab, simulate)) {
                     itemsNeeded++;
+                }
             }
         }
 
@@ -161,8 +200,9 @@ public class TrackPaver {
     private static boolean placeBlockIfFree(Level level, BlockPos pos, BlockState state, boolean simulate) {
         BlockState stateAtPos = level.getBlockState(pos);
         if (stateAtPos.getBlock() != state.getBlock() && stateAtPos.canBeReplaced()) {
-            if (!simulate)
+            if (!simulate) {
                 level.setBlock(pos, ProperWaterloggedBlock.withWater(level, state, pos), Block.UPDATE_ALL);
+            }
             return true;
         }
         return false;

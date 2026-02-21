@@ -11,8 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
 public class SuperGlueSpawnPacket extends ClientboundAddEntityPacket {
-    public static final StreamCodec<RegistryFriendlyByteBuf, SuperGlueSpawnPacket> CODEC = Packet.codec(
-        SuperGlueSpawnPacket::write,
+    public static final StreamCodec<RegistryFriendlyByteBuf, SuperGlueSpawnPacket> CODEC = Packet.codec(SuperGlueSpawnPacket::write,
         SuperGlueSpawnPacket::new
     );
     private final AABB box;
@@ -24,11 +23,14 @@ public class SuperGlueSpawnPacket extends ClientboundAddEntityPacket {
 
     private SuperGlueSpawnPacket(RegistryFriendlyByteBuf buf) {
         super(buf);
-        box = new AABB(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble()).move(
-            getX(),
-            getY(),
-            getZ()
-        );
+        box = new AABB(
+            buf.readDouble(),
+            buf.readDouble(),
+            buf.readDouble(),
+            buf.readDouble(),
+            buf.readDouble(),
+            buf.readDouble()
+        ).move(getX(), getY(), getZ());
     }
 
     @Override

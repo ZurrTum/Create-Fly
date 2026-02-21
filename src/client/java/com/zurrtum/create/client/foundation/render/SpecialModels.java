@@ -11,14 +11,15 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 
 public class SpecialModels {
-    private static final RendererReloadCache<Key, Model> FLAT = new RendererReloadCache<>(it -> new BakedModelBuilder(it.partial.get()).materialFunc((renderType, shaded, ao) -> {
-        var material = ModelUtil.getMaterial(renderType, shaded, ao);
-        if (material == null) {
-            return null;
-        }
-        return SimpleMaterial.builderOf(material).light(it.light).cardinalLightingMode(shaded ? it.cardinalLightingMode : CardinalLightingMode.OFF)
-            .build();
-    }).build());
+    private static final RendererReloadCache<Key, Model> FLAT = new RendererReloadCache<>(it -> new BakedModelBuilder(it.partial.get()).materialFunc(
+        (renderType, shaded, ao) -> {
+            var material = ModelUtil.getMaterial(renderType, shaded, ao);
+            if (material == null) {
+                return null;
+            }
+            return SimpleMaterial.builderOf(material).light(it.light)
+                .cardinalLightingMode(shaded ? it.cardinalLightingMode : CardinalLightingMode.OFF).build();
+        }).build());
 
     public static Model flatLit(PartialModel partial) {
         return FLAT.get(new Key(partial, LightShaders.FLAT, CardinalLightingMode.ENTITY));

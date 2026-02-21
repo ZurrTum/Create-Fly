@@ -12,9 +12,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record PackageOrderRequestPacket(
-    BlockPos pos, PackageOrderWithCrafts order, String address, boolean encodeRequester
-) implements Packet<ServerGamePacketListener> {
+public record PackageOrderRequestPacket(BlockPos pos, PackageOrderWithCrafts order, String address,
+                                        boolean encodeRequester) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderRequestPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         PackageOrderRequestPacket::pos,

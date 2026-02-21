@@ -8,14 +8,13 @@ import com.zurrtum.create.client.flywheel.backend.glsl.GlslVersion;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceFile;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL20;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.client.Minecraft;
 
 /**
  * Builder style class for compiling shaders.
@@ -48,7 +47,13 @@ public class Compilation {
         }
 
         GL20.glDeleteShader(handle);
-        return ShaderResult.failure(new FailedCompilation(shaderName, files, generatedSource.toString(), source, infoLog));
+        return ShaderResult.failure(new FailedCompilation(
+            shaderName,
+            files,
+            generatedSource.toString(),
+            source,
+            infoLog
+        ));
     }
 
     public void version(GlslVersion version) {
@@ -90,7 +95,8 @@ public class Compilation {
             // Add extra newline to keep line numbers consistent
             generatedSource.append(source).append('\n');
 
-            fullSource.append("\n#line ").append(generatedLines).append(" 0 // (generated) ") // all generated code is put in file 0
+            fullSource.append("\n#line ").append(generatedLines)
+                .append(" 0 // (generated) ") // all generated code is put in file 0
                 .append(component.name()).append('\n');
 
             generatedLines += StringUtil.countLines(source);

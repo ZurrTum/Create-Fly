@@ -10,7 +10,8 @@ import org.joml.Matrix3x2f;
 
 import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.TRIANGLE_FAN;
 
-public record DirectionIndicatorRenderState(Matrix3x2f pose, float r, float g, float b, ScreenRectangle bounds) implements GuiElementRenderState {
+public record DirectionIndicatorRenderState(Matrix3x2f pose, float r, float g, float b,
+                                            ScreenRectangle bounds) implements GuiElementRenderState {
     public DirectionIndicatorRenderState(Matrix3x2f pose, float r, float g, float b) {
         this(pose, r, g, b, new ScreenRectangle(-5, -5, 10, 5).transformMaxBounds(pose));
     }

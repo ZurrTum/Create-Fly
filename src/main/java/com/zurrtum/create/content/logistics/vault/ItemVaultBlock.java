@@ -41,7 +41,13 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
         registerDefaultState(defaultBlockState().setValue(LARGE, false));
     }
 
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ItemVaultBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        ItemVaultBlockEntity blockEntity,
+        Direction context
+    ) {
         if (blockEntity.itemCapability != null) {
             Container inventory = blockEntity.itemCapability.get();
             if (inventory != null) {
@@ -61,20 +67,24 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         if (pContext.getPlayer() == null || !pContext.getPlayer().isShiftKeyDown()) {
-            BlockState placedOn = pContext.getLevel().getBlockState(pContext.getClickedPos().relative(pContext.getClickedFace().getOpposite()));
+            BlockState placedOn = pContext.getLevel()
+                .getBlockState(pContext.getClickedPos().relative(pContext.getClickedFace().getOpposite()));
             Axis preferredAxis = getVaultBlockAxis(placedOn);
-            if (preferredAxis != null)
+            if (preferredAxis != null) {
                 return this.defaultBlockState().setValue(HORIZONTAL_AXIS, preferredAxis);
+            }
         }
         return this.defaultBlockState().setValue(HORIZONTAL_AXIS, pContext.getHorizontalDirection().getAxis());
     }
 
     @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
-        if (pOldState.getBlock() == pState.getBlock())
+        if (pOldState.getBlock() == pState.getBlock()) {
             return;
-        if (pIsMoving)
+        }
+        if (pIsMoving) {
             return;
+        }
         withBlockEntityDo(pLevel, pPos, ItemVaultBlockEntity::updateConnectivity);
     }
 
@@ -95,8 +105,9 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
     public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean pIsMoving) {
         if (state.hasBlockEntity()) {
             BlockEntity be = world.getBlockEntity(pos);
-            if (!(be instanceof ItemVaultBlockEntity vaultBE))
+            if (!(be instanceof ItemVaultBlockEntity vaultBE)) {
                 return;
+            }
             Containers.dropContents(world, pos, vaultBE.inventory);
             world.removeBlockEntity(pos);
             ConnectivityHandler.splitMulti(vaultBE);
@@ -109,21 +120,26 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
 
     @Nullable
     public static Axis getVaultBlockAxis(BlockState state) {
-        if (!isVault(state))
+        if (!isVault(state)) {
             return null;
+        }
         return state.getValue(HORIZONTAL_AXIS);
     }
 
     public static boolean isLarge(BlockState state) {
-        if (!isVault(state))
+        if (!isVault(state)) {
             return false;
+        }
         return state.getValue(LARGE);
     }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
         Axis axis = state.getValue(HORIZONTAL_AXIS);
-        return state.setValue(HORIZONTAL_AXIS, rot.rotate(Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE)).getAxis());
+        return state.setValue(
+            HORIZONTAL_AXIS,
+            rot.rotate(Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE)).getAxis()
+        );
     }
 
     @Override

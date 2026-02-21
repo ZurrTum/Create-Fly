@@ -108,7 +108,15 @@ public class ItemMeshEmitter implements VertexConsumer {
         stack.popPose();
     }
 
-    private Mesh compile(ModelPart part, PoseStack stack, TextureAtlasSprite meshSprite, int light, int overlay, int color, float alpha) {
+    private Mesh compile(
+        ModelPart part,
+        PoseStack stack,
+        TextureAtlasSprite meshSprite,
+        int light,
+        int overlay,
+        int color,
+        float alpha
+    ) {
         int vertexCount = 0;
         for (ModelPart.Cube cuboid : part.cubes) {
             vertexCount += cuboid.polygons.length * 4;
@@ -141,7 +149,12 @@ public class ItemMeshEmitter implements VertexConsumer {
                         u = meshSprite.getU(u);
                         v = meshSprite.getV(v);
                     }
-                    Vector3f position = matrix4f.transformPosition(vertex.x() / 16.0F, vertex.y() / 16.0F, vertex.z() / 16.0F, vector3f);
+                    Vector3f position = matrix4f.transformPosition(
+                        vertex.x() / 16.0F,
+                        vertex.y() / 16.0F,
+                        vertex.z() / 16.0F,
+                        vector3f
+                    );
                     meshVertices.x(index, position.x());
                     meshVertices.y(index, position.y());
                     meshVertices.z(index, position.z());

@@ -12,8 +12,9 @@ import net.minecraft.network.codec.StreamCodec;
 
 public class BlockFace extends Pair<BlockPos, Direction> {
     public static Codec<BlockFace> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        BlockPos.CODEC.fieldOf("pos")
-            .forGetter(BlockFace::getPos), Direction.CODEC.fieldOf("direction").forGetter(BlockFace::getFace)
+        BlockPos.CODEC.fieldOf(
+            "pos").forGetter(BlockFace::getPos),
+        Direction.CODEC.fieldOf("direction").forGetter(BlockFace::getFace)
     ).apply(instance, BlockFace::new));
 
     public static StreamCodec<FriendlyByteBuf, BlockFace> STREAM_CODEC = StreamCodec.composite(
@@ -29,8 +30,9 @@ public class BlockFace extends Pair<BlockPos, Direction> {
     }
 
     public boolean isEquivalent(BlockFace other) {
-        if (equals(other))
+        if (equals(other)) {
             return true;
+        }
         return getConnectedPos().equals(other.getPos()) && getPos().equals(other.getConnectedPos());
     }
 
@@ -62,7 +64,10 @@ public class BlockFace extends Pair<BlockPos, Direction> {
     }
 
     public static BlockFace fromNBT(CompoundTag compound) {
-        return new BlockFace(NBTHelper.readBlockPos(compound, "Pos"), NBTHelper.readEnum(compound, "Face", Direction.class));
+        return new BlockFace(
+            NBTHelper.readBlockPos(compound, "Pos"),
+            NBTHelper.readEnum(compound, "Face", Direction.class)
+        );
     }
 
 }

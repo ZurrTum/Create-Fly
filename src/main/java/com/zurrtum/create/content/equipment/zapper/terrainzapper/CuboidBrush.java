@@ -1,15 +1,14 @@
 package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CuboidBrush extends ShapedBrush {
 
@@ -46,15 +45,19 @@ public class CuboidBrush extends ShapedBrush {
 
     @Override
     public BlockPos getOffset(Vec3 ray, Direction face, PlacementOptions option) {
-        if (option == PlacementOptions.Merged)
+        if (option == PlacementOptions.Merged) {
             return BlockPos.ZERO;
+        }
 
         int offset = option == PlacementOptions.Attached ? face.getAxisDirection() == AxisDirection.NEGATIVE ? 2 : 1 : 0;
         int x = (param0 + (param0 == 0 ? 0 : offset)) / 2;
         int y = (param1 + (param1 == 0 ? 0 : offset)) / 2;
         int z = (param2 + (param2 == 0 ? 0 : offset)) / 2;
 
-        return BlockPos.ZERO.relative(face, face.getAxis().choose(x, y, z) * (option == PlacementOptions.Attached ? 1 : -1));
+        return BlockPos.ZERO.relative(
+            face,
+            face.getAxis().choose(x, y, z) * (option == PlacementOptions.Attached ? 1 : -1)
+        );
     }
 
     @Override

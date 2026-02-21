@@ -35,11 +35,13 @@ public class DivingBootsItem extends Item {
     }
 
     public static void accelerateDescentUnderwater(Entity entity) {
-        if (!(entity instanceof Player player))
+        if (!(entity instanceof Player player)) {
             return;
+        }
 
-        if (!affects(player))
+        if (!affects(player)) {
             return;
+        }
 
         Vec3 motion = player.getDeltaMovement();
         player.setOnGround(player.onGround() || player.verticalCollision);
@@ -52,8 +54,10 @@ public class DivingBootsItem extends Item {
         }
 
         float multiplier = 1.3f;
-        if (motion.multiply(1, 0, 1).length() < 0.145f && (player.zza > 0 || player.xxa != 0) && !player.isShiftKeyDown())
+        if (motion.multiply(1, 0, 1)
+            .length() < 0.145f && (player.zza > 0 || player.xxa != 0) && !player.isShiftKeyDown()) {
             motion = motion.multiply(multiplier, 1, multiplier);
+        }
         player.setDeltaMovement(motion);
     }
 
@@ -68,10 +72,12 @@ public class DivingBootsItem extends Item {
         if (!old) {
             AllSynchedDatas.HEAVY_BOOTS.set(player, true);
         }
-        if (!player.isInWater())
+        if (!player.isInWater()) {
             return false;
-        if (player.getPose() == Pose.SWIMMING)
+        }
+        if (player.getPose() == Pose.SWIMMING) {
             return false;
+        }
         return !player.getAbilities().flying;
     }
 

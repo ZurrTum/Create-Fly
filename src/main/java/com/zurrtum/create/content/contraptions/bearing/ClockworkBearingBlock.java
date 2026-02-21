@@ -29,10 +29,12 @@ public class ClockworkBearingBlock extends BearingBlock implements IBE<Clockwork
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.mayBuild())
+        if (!player.mayBuild()) {
             return InteractionResult.FAIL;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.FAIL;
+        }
         if (stack.isEmpty()) {
             if (!level.isClientSide()) {
                 withBlockEntityDo(
@@ -58,8 +60,9 @@ public class ClockworkBearingBlock extends BearingBlock implements IBE<Clockwork
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         InteractionResult resultType = super.onWrenched(state, context);
-        if (!context.getLevel().isClientSide() && resultType.consumesAction())
+        if (!context.getLevel().isClientSide() && resultType.consumesAction()) {
             withBlockEntityDo(context.getLevel(), context.getClickedPos(), ClockworkBearingBlockEntity::disassemble);
+        }
         return resultType;
     }
 

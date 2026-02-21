@@ -1,15 +1,14 @@
 package com.zurrtum.create.content.trains.schedule.destination;
 
 import com.mojang.serialization.DynamicOps;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.ValueInputContextHelper;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class NbtReadContext extends ValueInputContextHelper {
     public NbtReadContext(DynamicOps<?> ops) {

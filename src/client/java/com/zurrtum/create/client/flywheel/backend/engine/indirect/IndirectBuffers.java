@@ -88,7 +88,10 @@ public class IndirectBuffers {
         MemoryUtil.memPutInt(ptr + MODEL_HANDLE_OFFSET, model.handle());
         MemoryUtil.memPutInt(ptr + DRAW_HANDLE_OFFSET, draw.handle());
 
-        MemoryUtil.memPutAddress(ptr + PAGE_FRAME_DESCRIPTOR_SIZE_OFFSET, objectStorage.frameDescriptorBuffer.capacity());
+        MemoryUtil.memPutAddress(
+            ptr + PAGE_FRAME_DESCRIPTOR_SIZE_OFFSET,
+            objectStorage.frameDescriptorBuffer.capacity()
+        );
         MemoryUtil.memPutAddress(ptr + INSTANCE_SIZE_OFFSET, objectStorage.objectBuffer.capacity());
         MemoryUtil.memPutAddress(ptr + DRAW_INSTANCE_INDEX_SIZE_OFFSET, INT_SIZE * instanceCount);
         MemoryUtil.memPutAddress(ptr + MODEL_SIZE_OFFSET, MODEL_STRIDE * modelCount);

@@ -22,17 +22,22 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
     @Override
     protected boolean isSideActive(BlockState state, Direction direction) {
         Direction targetDirection = DirectedDirectionalBlock.getTargetDirection(state);
-        if (direction == targetDirection)
+        if (direction == targetDirection) {
             return false;
-        if (targetDirection.getOpposite() == direction)
+        }
+        if (targetDirection.getOpposite() == direction) {
             return true;
+        }
 
-        if (targetDirection.getAxis() != Axis.Y)
+        if (targetDirection.getAxis() != Axis.Y) {
             return direction == Direction.UP || direction == Direction.DOWN && hasSlotAtBottom;
-        if (targetDirection == Direction.UP)
+        }
+        if (targetDirection == Direction.UP) {
             direction = direction.getOpposite();
-        if (!hasSlotAtBottom)
+        }
+        if (!hasSlotAtBottom) {
             return direction == state.getValue(DirectedDirectionalBlock.FACING);
+        }
 
         return direction.getAxis() == state.getValue(DirectedDirectionalBlock.FACING).getClockWise().getAxis();
     }
@@ -41,10 +46,12 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
     public void rotate(BlockState state, PoseStack ms) {
         super.rotate(state, ms);
         Direction facing = state.getValue(DirectedDirectionalBlock.FACING);
-        if (facing.getAxis() == Axis.Y)
+        if (facing.getAxis() == Axis.Y) {
             return;
-        if (getSide() != Direction.UP)
+        }
+        if (getSide() != Direction.UP) {
             return;
+        }
         TransformStack.of(ms).rotateZDegrees(-AngleHelper.horizontalAngle(facing) + 180);
     }
 

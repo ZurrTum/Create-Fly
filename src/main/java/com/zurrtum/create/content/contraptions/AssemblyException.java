@@ -3,9 +3,6 @@ package com.zurrtum.create.content.contraptions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -13,6 +10,8 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.Optional;
 
 public class AssemblyException extends Exception {
     public static final Codec<AssemblyException> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -25,18 +24,21 @@ public class AssemblyException extends Exception {
     private BlockPos position = null;
 
     public static void write(ValueOutput view, AssemblyException exception) {
-        if (exception == null)
+        if (exception == null) {
             return;
+        }
 
         ValueOutput lastException = view.child("LastException");
         lastException.store("Component", ComponentSerialization.CODEC, exception.component);
-        if (exception.hasPosition())
+        if (exception.hasPosition()) {
             lastException.store("Position", BlockPos.CODEC, exception.getPosition());
+        }
     }
 
     public static AssemblyException read(ValueInput view) {
         return view.child("LastException").map(lastException -> {
-            Component component = lastException.read("Component", ComponentSerialization.CODEC).orElse(CommonComponents.EMPTY);
+            Component component = lastException.read("Component", ComponentSerialization.CODEC)
+                .orElse(CommonComponents.EMPTY);
             AssemblyException exception = new AssemblyException(component);
             lastException.read("Position", BlockPos.CODEC).ifPresent(position -> {
                 exception.position = position;
@@ -60,7 +62,13 @@ public class AssemblyException extends Exception {
     }
 
     public static AssemblyException unmovableBlock(BlockPos pos, BlockState state) {
-        AssemblyException e = new AssemblyException("unmovableBlock", pos.getX(), pos.getY(), pos.getZ(), state.getBlock().getName());
+        AssemblyException e = new AssemblyException(
+            "unmovableBlock",
+            pos.getX(),
+            pos.getY(),
+            pos.getZ(),
+            state.getBlock().getName()
+        );
         e.position = pos;
         return e;
     }
@@ -84,7 +92,11 @@ public class AssemblyException extends Exception {
     }
 
     public static AssemblyException notEnoughSails(int sails) {
-        return new AssemblyException("not_enough_sails", sails, AllConfigs.server().kinetics.minimumWindmillSails.get());
+        return new AssemblyException(
+            "not_enough_sails",
+            sails,
+            AllConfigs.server().kinetics.minimumWindmillSails.get()
+        );
     }
 
     public boolean hasPosition() {

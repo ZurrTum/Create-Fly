@@ -15,7 +15,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.*;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
@@ -77,7 +78,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<BlockState> SHAPER_BLOCK_USED = register(
         "shaper_block_used",
-        builder -> builder.persistent(BlockState.CODEC).networkSynchronized(ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY))
+        builder -> builder.persistent(BlockState.CODEC)
+            .networkSynchronized(ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY))
     );
 
     public static final DataComponentType<Boolean> SHAPER_SWAP = register(
@@ -92,7 +94,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<ItemContainerContents> FILTER_ITEMS = register(
         "filter_items",
-        builder -> builder.persistent(ItemContainerContents.CODEC).networkSynchronized(ItemContainerContents.STREAM_CODEC)
+        builder -> builder.persistent(ItemContainerContents.CODEC)
+            .networkSynchronized(ItemContainerContents.STREAM_CODEC)
     );
 
     // These 2 are placed on items inside filters and not the filter itself
@@ -108,7 +111,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<AttributeFilterWhitelistMode> ATTRIBUTE_FILTER_WHITELIST_MODE = register(
         "attribute_filter_whitelist_mode",
-        builder -> builder.persistent(AttributeFilterWhitelistMode.CODEC).networkSynchronized(AttributeFilterWhitelistMode.STREAM_CODEC)
+        builder -> builder.persistent(AttributeFilterWhitelistMode.CODEC)
+            .networkSynchronized(AttributeFilterWhitelistMode.STREAM_CODEC)
     );
 
     public static final DataComponentType<List<ItemAttributeEntry>> ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES = register(
@@ -144,7 +148,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<BezierTrackPointLocation> TRACK_TARGETING_ITEM_BEZIER = register(
         "track_targeting_item_bezier",
-        builder -> builder.persistent(BezierTrackPointLocation.CODEC).networkSynchronized(BezierTrackPointLocation.STREAM_CODEC)
+        builder -> builder.persistent(BezierTrackPointLocation.CODEC)
+            .networkSynchronized(BezierTrackPointLocation.STREAM_CODEC)
     );
 
     public static final DataComponentType<Boolean> SCHEMATIC_DEPLOYED = register(
@@ -194,7 +199,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<SandPaperItemComponent> SAND_PAPER_POLISHING = register(
         "sand_paper_polishing",
-        builder -> builder.persistent(SandPaperItemComponent.CODEC).networkSynchronized(SandPaperItemComponent.STREAM_CODEC)
+        builder -> builder.persistent(SandPaperItemComponent.CODEC)
+            .networkSynchronized(SandPaperItemComponent.STREAM_CODEC)
     );
 
     public static final DataComponentType<Unit> SAND_PAPER_JEI = register(
@@ -210,7 +216,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<ItemContainerContents> LINKED_CONTROLLER_ITEMS = register(
         "linked_controller_items",
-        builder -> builder.persistent(ItemContainerContents.CODEC).networkSynchronized(ItemContainerContents.STREAM_CODEC)
+        builder -> builder.persistent(ItemContainerContents.CODEC)
+            .networkSynchronized(ItemContainerContents.STREAM_CODEC)
     );
 
     public static final DataComponentType<ToolboxInventory> TOOLBOX_INVENTORY = register(
@@ -230,7 +237,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<SequencedAssemblyJunk> SEQUENCED_ASSEMBLY_JUNK = register(
         "sequenced_assembly_junk",
-        builder -> builder.persistent(SequencedAssemblyJunk.CODEC).networkSynchronized(SequencedAssemblyJunk.PACKET_CODEC)
+        builder -> builder.persistent(SequencedAssemblyJunk.CODEC)
+            .networkSynchronized(SequencedAssemblyJunk.PACKET_CODEC)
     );
 
     public static final DataComponentType<CompoundTag> TRAIN_SCHEDULE = register(
@@ -260,7 +268,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<SchematicannonOptions> SCHEMATICANNON_OPTIONS = register(
         "schematicannon_options",
-        builder -> builder.persistent(SchematicannonOptions.CODEC).networkSynchronized(SchematicannonOptions.STREAM_CODEC)
+        builder -> builder.persistent(SchematicannonOptions.CODEC)
+            .networkSynchronized(SchematicannonOptions.STREAM_CODEC)
     );
 
     public static final DataComponentType<AutoRequestData> AUTO_REQUEST_DATA = register(
@@ -285,7 +294,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<ItemContainerContents> PACKAGE_CONTENTS = register(
         "package_contents",
-        builder -> builder.persistent(ItemContainerContents.CODEC).networkSynchronized(ItemContainerContents.STREAM_CODEC)
+        builder -> builder.persistent(ItemContainerContents.CODEC)
+            .networkSynchronized(ItemContainerContents.STREAM_CODEC)
     );
 
     public static final DataComponentType<PackageOrderData> PACKAGE_ORDER_DATA = register(
@@ -295,7 +305,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<PackageOrderWithCrafts> PACKAGE_ORDER_CONTEXT = register(
         "package_order_context",
-        builder -> builder.persistent(PackageOrderWithCrafts.CODEC).networkSynchronized(PackageOrderWithCrafts.STREAM_CODEC)
+        builder -> builder.persistent(PackageOrderWithCrafts.CODEC)
+            .networkSynchronized(PackageOrderWithCrafts.STREAM_CODEC)
     );
 
     public static final DataComponentType<ClickToLinkData> CLICK_TO_LINK_DATA = register(
@@ -354,7 +365,10 @@ public class AllDataComponents {
         builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
     );
 
-    private static <T> DataComponentType<T> register(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
+    private static <T> DataComponentType<T> register(
+        String id,
+        UnaryOperator<DataComponentType.Builder<T>> builderOperator
+    ) {
         return Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
             Identifier.fromNamespaceAndPath(MOD_ID, id),

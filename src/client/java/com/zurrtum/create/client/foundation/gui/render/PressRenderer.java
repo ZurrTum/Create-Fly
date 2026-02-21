@@ -81,7 +81,8 @@ public class PressRenderer extends PictureInPictureRenderer<PressRenderState> {
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         matrices.pushPose();
-        blockState = AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.Z);
+        blockState = AllBlocks.SHAFT.defaultBlockState()
+            .setValue(BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.Z);
         world.blockState(blockState);
         parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
         matrices.translate(0.5f, 0.5f, 0.5f);
@@ -103,7 +104,9 @@ public class PressRenderer extends PictureInPictureRenderer<PressRenderState> {
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+            TextureSetup.singleTexture(texture.textureView(),
+                RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)
+            ),
             item.pose(),
             item.x0(),
             item.y0(),
@@ -129,10 +132,12 @@ public class PressRenderer extends PictureInPictureRenderer<PressRenderState> {
             float progress = cycle / 10;
             return -(progress * progress * progress);
         }
-        if (cycle < 15)
+        if (cycle < 15) {
             return -1;
-        if (cycle < 20)
+        }
+        if (cycle < 20) {
             return -1 + (1 - ((20 - cycle) / 5));
+        }
         return 0;
     }
 

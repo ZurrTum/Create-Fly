@@ -12,7 +12,10 @@ public class AllMountedItemStorageTypeTags {
     public static final TagKey<MountedItemStorageType<?>> FUEL_BLACKLIST = register("fuel_blacklist");
 
     private static TagKey<MountedItemStorageType<?>> register(String name) {
-        return TagKey.create(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name));
+        return TagKey.create(
+            CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE,
+            Identifier.fromNamespaceAndPath(MOD_ID, name)
+        );
     }
 
     public static void register() {

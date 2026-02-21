@@ -12,9 +12,6 @@ import com.zurrtum.create.content.decoration.girder.GirderEncasedShaftBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlock;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +26,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.function.Predicate;
 
 public class ShaftBlock extends AbstractSimpleShaftBlock implements EncasableBlock {
 
@@ -49,8 +48,9 @@ public class ShaftBlock extends AbstractSimpleShaftBlock implements EncasableBlo
     }
 
     public static BlockState pickCorrectShaftType(BlockState stateForPlacement, Level level, BlockPos pos) {
-        if (PoweredShaftBlock.stillValid(stateForPlacement, level, pos))
+        if (PoweredShaftBlock.stillValid(stateForPlacement, level, pos)) {
             return PoweredShaftBlock.getEquivalent(stateForPlacement);
+        }
         return stateForPlacement;
     }
 
@@ -79,31 +79,37 @@ public class ShaftBlock extends AbstractSimpleShaftBlock implements EncasableBlo
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isShiftKeyDown() || !player.mayBuild())
+        if (player.isShiftKeyDown() || !player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         InteractionResult result = tryEncase(state, level, pos, stack, player, hand, hitResult);
-        if (result.consumesAction())
+        if (result.consumesAction()) {
             return result;
+        }
 
         if (stack.is(AllItems.METAL_GIRDER) && state.getValue(AXIS) != Axis.Y) {
             KineticBlockEntity.switchToBlockState(
                 level,
                 pos,
-                AllBlocks.METAL_GIRDER_ENCASED_SHAFT.defaultBlockState().setValue(WATERLOGGED, state.getValue(WATERLOGGED))
+                AllBlocks.METAL_GIRDER_ENCASED_SHAFT.defaultBlockState()
+                    .setValue(WATERLOGGED, state.getValue(WATERLOGGED))
                     .setValue(GirderEncasedShaftBlock.HORIZONTAL_AXIS, state.getValue(AXIS) == Axis.Z ? Axis.Z : Axis.X)
             );
             if (!level.isClientSide() && !player.isCreative()) {
                 stack.shrink(1);
-                if (stack.isEmpty())
+                if (stack.isEmpty()) {
                     player.setItemInHand(hand, ItemStack.EMPTY);
+                }
             }
             return InteractionResult.SUCCESS;
         }
 
         IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
-        if (helper.matchesItem(stack))
-            return helper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        if (helper.matchesItem(stack)) {
+            return helper.getOffset(player, level, state, pos, hitResult)
+                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        }
 
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
@@ -131,11 +137,22 @@ public class ShaftBlock extends AbstractSimpleShaftBlock implements EncasableBlo
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             PlacementOffset offset = super.getOffset(player, world, state, pos, ray);
-            if (offset.isSuccessful())
+            if (offset.isSuccessful()) {
                 offset.withTransform(offset.getTransform()
-                    .andThen(s -> world.isClientSide() ? s : ShaftBlock.pickCorrectShaftType(s, world, offset.getBlockPos())));
+                    .andThen(s -> world.isClientSide() ? s : ShaftBlock.pickCorrectShaftType(
+                        s,
+                        world,
+                        offset.getBlockPos()
+                    )));
+            }
             return offset;
         }
 

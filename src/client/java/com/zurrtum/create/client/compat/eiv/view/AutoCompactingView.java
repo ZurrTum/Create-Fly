@@ -66,9 +66,20 @@ public class AutoCompactingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 30);
         AllGuiTextures.JEI_SHADOW.render(context, 81, 66);
-        context.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(new Matrix3x2f(context.pose()), 91, -7));
+        context.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(
+            new Matrix3x2f(context.pose()),
+            91,
+            -7
+        ));
     }
 }

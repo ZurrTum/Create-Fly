@@ -1,14 +1,11 @@
 package com.zurrtum.create.content.contraptions.actors.roller;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -18,6 +15,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
 
 public class RollerBlockEntity extends SmartBlockEntity {
 
@@ -53,18 +52,23 @@ public class RollerBlockEntity extends SmartBlockEntity {
     }
 
     protected boolean isValidMaterial(ItemStack newFilter) {
-        if (newFilter.isEmpty())
+        if (newFilter.isEmpty()) {
             return true;
+        }
         BlockState appliedState = RollerMovementBehaviour.getStateToPaveWith(newFilter);
-        if (appliedState.isAir())
+        if (appliedState.isAir()) {
             return false;
-        if (appliedState.getBlock() instanceof EntityBlock)
+        }
+        if (appliedState.getBlock() instanceof EntityBlock) {
             return false;
-        if (appliedState.getBlock() instanceof StairBlock)
+        }
+        if (appliedState.getBlock() instanceof StairBlock) {
             return false;
+        }
         VoxelShape shape = appliedState.getShape(level, worldPosition);
-        if (shape.isEmpty() || !shape.bounds().equals(Shapes.block().bounds()))
+        if (shape.isEmpty() || !shape.bounds().equals(Shapes.block().bounds())) {
             return false;
+        }
         VoxelShape collisionShape = appliedState.getCollisionShape(level, worldPosition);
         return !collisionShape.isEmpty();
     }
@@ -88,10 +92,12 @@ public class RollerBlockEntity extends SmartBlockEntity {
 
         for (int side : Iterate.positiveAndNegative) {
             BlockPos pos = this.worldPosition.relative(facing.getClockWise(), side);
-            if (level.getBlockState(pos) != blockState)
+            if (level.getBlockState(pos) != blockState) {
                 continue;
-            if (!(level.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller))
+            }
+            if (!(level.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller)) {
                 continue;
+            }
             acceptSharedValues(otherRoller.mode.getValue(), otherRoller.filtering.getFilter());
             shareValuesToAdjacent();
             break;
@@ -107,26 +113,27 @@ public class RollerBlockEntity extends SmartBlockEntity {
     }
 
     public void shareValuesToAdjacent() {
-        if (dontPropagate || level.isClientSide())
+        if (dontPropagate || level.isClientSide()) {
             return;
+        }
         BlockState blockState = getBlockState();
         Direction facing = blockState.getValueOrElse(RollerBlock.FACING, Direction.SOUTH);
 
         for (int side : Iterate.positiveAndNegative) {
             for (int i = 1; i < 100; i++) {
                 BlockPos pos = this.worldPosition.relative(facing.getClockWise(), side * i);
-                if (level.getBlockState(pos) != blockState)
+                if (level.getBlockState(pos) != blockState) {
                     break;
-                if (!(level.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller))
+                }
+                if (!(level.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller)) {
                     break;
+                }
                 otherRoller.acceptSharedValues(mode.getValue(), filtering.getFilter());
             }
         }
     }
 
     public enum RollingMode {
-        TUNNEL_PAVE,
-        STRAIGHT_FILL,
-        WIDE_FILL;
+        TUNNEL_PAVE, STRAIGHT_FILL, WIDE_FILL;
     }
 }

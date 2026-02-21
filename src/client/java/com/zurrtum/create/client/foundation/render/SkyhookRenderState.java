@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.foundation.render;
 
-import java.util.UUID;
-
 import net.minecraft.world.item.ItemStack;
+
+import java.util.UUID;
 
 public interface SkyhookRenderState {
     void create$setMainStack(ItemStack stack);

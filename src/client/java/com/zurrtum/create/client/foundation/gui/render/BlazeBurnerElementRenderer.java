@@ -37,8 +37,9 @@ public class BlazeBurnerElementRenderer extends PictureInPictureRenderer<BlazeBu
         PartialModel drawHat = AllPartialModels.LOGISTICS_HAT;
 
         VertexConsumer cutout = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
-        CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block()).rotateCentered(horizontalAngle + Mth.PI, Direction.UP)
-            .light(LightTexture.FULL_BRIGHT).renderInto(matrices.last(), cutout);
+        CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block())
+            .rotateCentered(horizontalAngle + Mth.PI, Direction.UP).light(LightTexture.FULL_BRIGHT)
+            .renderInto(matrices.last(), cutout);
 
         FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
         SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();

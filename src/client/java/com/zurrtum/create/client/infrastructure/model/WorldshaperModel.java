@@ -57,8 +57,14 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/handheld_worldshaper");
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/item");
     public static final Identifier CORE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core");
-    public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core_glow");
-    public static final Identifier ACCELERATOR_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/accelerator");
+    public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/handheld_worldshaper/core_glow"
+    );
+    public static final Identifier ACCELERATOR_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/handheld_worldshaper/accelerator"
+    );
     private static final int[] TINTS = new int[0];
     private static final RandomSource random = RandomSource.create();
     private static final PoseStack matrices = new PoseStack();
@@ -159,10 +165,11 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
 
         // Core glows
         float multiplier;
-        if (data.inHand)
+        if (data.inHand) {
             multiplier = animation;
-        else
+        } else {
             multiplier = Mth.sin(worldTime * 5);
+        }
         int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
         int glowLight = LightTexture.pack(lightItensity, Math.max(lightItensity, 4));
         renderItem(displayContext, matrices, queue, glowLight, overlay, core, itemLayer);
@@ -170,8 +177,9 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
 
         // Accelerator spins
         float angle = worldTime * -25;
-        if (data.inHand)
+        if (data.inHand) {
             angle += 360 * animation;
+        }
 
         angle %= 360;
         matrices.translate(0.5f, 0.345f, 0.5f);
@@ -195,7 +203,17 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         List<BakedQuad> item,
         RenderType layer
     ) {
-        queue.submitItem(matrices, displayContext, light, overlay, 0, TINTS, item, layer, ItemStackRenderState.FoilType.NONE);
+        queue.submitItem(
+            matrices,
+            displayContext,
+            light,
+            overlay,
+            0,
+            TINTS,
+            item,
+            layer,
+            ItemStackRenderState.FoilType.NONE
+        );
     }
 
     public static class RenderData {
@@ -207,8 +225,9 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof RenderData data))
+            if (!(o instanceof RenderData data)) {
                 return false;
+            }
             return transform == data.transform && state == data.state && rightHand == data.rightHand && inHand == data.inHand;
         }
 
@@ -229,7 +248,8 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.WorldshaperModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.WorldshaperModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.WorldshaperModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.WorldshaperModel.Unbaked::new);
 
         @Override
         public MapCodec<? extends ItemModel.Unbaked> type() {
@@ -251,7 +271,13 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
-            return new WorldshaperModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, ACCELERATOR_ID));
+            return new WorldshaperModel(
+                settings,
+                quads,
+                bake(baker, CORE_ID),
+                bake(baker, CORE_GLOW_ID),
+                bake(baker, ACCELERATOR_ID)
+            );
         }
 
         private static List<BakedQuad> bake(ModelBaker baker, Identifier id) {
@@ -281,10 +307,9 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         void render(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay);
     }
 
-    public record UsedItemRenderState(
-        Lighting diffuseLighting, MultiBufferSource.BufferSource entityVertexConsumers, FeatureRenderDispatcher entityRenderDispatcher,
-        ItemStackRenderState state
-    ) implements UsedRenderState {
+    public record UsedItemRenderState(Lighting diffuseLighting, MultiBufferSource.BufferSource entityVertexConsumers,
+                                      FeatureRenderDispatcher entityRenderDispatcher,
+                                      ItemStackRenderState state) implements UsedRenderState {
         public static UsedItemRenderState create(
             Minecraft mc,
             CrossCollisionBlock block,
@@ -295,7 +320,8 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         ) {
             ItemStackRenderState item = new ItemStackRenderState();
             item.displayContext = displayContext;
-            mc.getItemModelResolver().appendItemLayers(item, block.asItem().getDefaultInstance(), displayContext, world, user, seed);
+            mc.getItemModelResolver()
+                .appendItemLayers(item, block.asItem().getDefaultInstance(), displayContext, world, user, seed);
             if (item.usesBlockLight()) {
                 return new UsedItemRenderState(null, null, null, item);
             }
@@ -322,11 +348,15 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         }
     }
 
-    public record UsedBlockRenderState(
-        RenderType layer, BlockRenderDispatcher blockRenderManager, PoseStack matrices, SinglePosVirtualBlockGetter world, BlockState state,
-        List<BlockModelPart> parts
-    ) implements UsedRenderState, SubmitNodeCollector.CustomGeometryRenderer {
-        public static UsedBlockRenderState create(Minecraft mc, BlockState state, RandomSource random, PoseStack matrices) {
+    public record UsedBlockRenderState(RenderType layer, BlockRenderDispatcher blockRenderManager, PoseStack matrices,
+                                       SinglePosVirtualBlockGetter world, BlockState state,
+                                       List<BlockModelPart> parts) implements UsedRenderState, SubmitNodeCollector.CustomGeometryRenderer {
+        public static UsedBlockRenderState create(
+            Minecraft mc,
+            BlockState state,
+            RandomSource random,
+            PoseStack matrices
+        ) {
             RenderType layer = ItemBlockRenderTypes.getChunkRenderType(state) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
             SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();

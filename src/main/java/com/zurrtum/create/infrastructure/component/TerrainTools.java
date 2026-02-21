@@ -5,12 +5,6 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.equipment.zapper.ZapperItem;
 import com.zurrtum.create.content.equipment.zapper.terrainzapper.FlattenTool;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,14 +14,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Locale;
 
 public enum TerrainTools implements StringRepresentable {
-    Fill,
-    Place,
-    Replace,
-    Clear,
-    Overlay,
-    Flatten;
+    Fill, Place, Replace, Clear, Overlay, Flatten;
 
     public static final Codec<TerrainTools> CODEC = StringRepresentable.fromEnum(TerrainTools::values);
     public static final StreamCodec<ByteBuf, TerrainTools> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(TerrainTools.class);
@@ -61,8 +55,9 @@ public enum TerrainTools implements StringRepresentable {
             case Fill:
                 targetPositions.forEach(p -> {
                     BlockState toReplace = world.getBlockState(p);
-                    if (!isReplaceable(toReplace))
+                    if (!isReplaceable(toReplace)) {
                         return;
+                    }
                     world.setBlockAndUpdate(p, paintedState);
                     ZapperItem.setBlockEntityData(world, p, paintedState, data, player);
                 });
@@ -73,16 +68,19 @@ public enum TerrainTools implements StringRepresentable {
             case Overlay:
                 targetPositions.forEach(p -> {
                     BlockState toOverlay = world.getBlockState(p);
-                    if (isReplaceable(toOverlay))
+                    if (isReplaceable(toOverlay)) {
                         return;
-                    if (toOverlay == paintedState)
+                    }
+                    if (toOverlay == paintedState) {
                         return;
+                    }
 
                     p = p.above();
 
                     BlockState toReplace = world.getBlockState(p);
-                    if (!isReplaceable(toReplace))
+                    if (!isReplaceable(toReplace)) {
                         return;
+                    }
                     world.setBlockAndUpdate(p, paintedState);
                     ZapperItem.setBlockEntityData(world, p, paintedState, data, player);
                 });
@@ -96,8 +94,9 @@ public enum TerrainTools implements StringRepresentable {
             case Replace:
                 targetPositions.forEach(p -> {
                     BlockState toReplace = world.getBlockState(p);
-                    if (isReplaceable(toReplace))
+                    if (isReplaceable(toReplace)) {
                         return;
+                    }
                     world.setBlockAndUpdate(p, paintedState);
                     ZapperItem.setBlockEntityData(world, p, paintedState, data, player);
                 });

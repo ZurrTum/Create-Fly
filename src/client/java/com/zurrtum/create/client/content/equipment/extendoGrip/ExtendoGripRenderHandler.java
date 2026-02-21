@@ -34,16 +34,21 @@ public class ExtendoGripRenderHandler {
         mainHandAnimation *= Mth.clamp(mainHandAnimation, 0.8f, 0.99f);
 
         holding = false;
-        if (!getRenderedOffHandStack(mc).is(AllItems.EXTENDO_GRIP))
+        if (!getRenderedOffHandStack(mc).is(AllItems.EXTENDO_GRIP)) {
             return;
+        }
         ItemStack main = getRenderedMainHandStack(mc);
-        if (main.isEmpty())
+        if (main.isEmpty()) {
             return;
-        if (!(main.getItem() instanceof BlockItem))
+        }
+        if (!(main.getItem() instanceof BlockItem)) {
             return;
-        mc.getItemModelResolver().updateForTopItem(state, main, ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, null, null, 0);
-        if (!state.usesBlockLight())
+        }
+        mc.getItemModelResolver()
+            .updateForTopItem(state, main, ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, null, null, 0);
+        if (!state.usesBlockLight()) {
             return;
+        }
         holding = true;
     }
 
@@ -61,8 +66,9 @@ public class ExtendoGripRenderHandler {
         ItemStack offhandItem = getRenderedOffHandStack(mc);
         boolean inOffhand = offhandItem.is(AllItems.EXTENDO_GRIP);
         boolean inHeldItem = heldItem.is(AllItems.EXTENDO_GRIP);
-        if (!inOffhand && !inHeldItem)
+        if (!inOffhand && !inHeldItem) {
             return false;
+        }
         LocalPlayer player = mc.player;
         boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
 
@@ -73,8 +79,9 @@ public class ExtendoGripRenderHandler {
 
         ms.pushPose();
         if (hand == InteractionHand.MAIN_HAND) {
-            if (1 - swingProgress > mainHandAnimation && swingProgress > 0 && swingProgress < 0.1)
+            if (1 - swingProgress > mainHandAnimation && swingProgress > 0 && swingProgress < 0.1) {
                 mainHandAnimation = 0.95f;
+            }
 
             ms.translate(flip * (0.64000005F - .1f), -0.4F + equipProgress * -0.6F, -0.71999997F + .3f);
 
@@ -88,10 +95,23 @@ public class ExtendoGripRenderHandler {
 
             AvatarRenderer<AbstractClientPlayer> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
             Identifier texture = player.getSkin().body().texturePath();
-            if (rightHand)
-                playerrenderer.renderRightHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));
-            else
-                playerrenderer.renderLeftHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE));
+            if (rightHand) {
+                playerrenderer.renderRightHand(
+                    ms,
+                    queue,
+                    light,
+                    texture,
+                    player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE)
+                );
+            } else {
+                playerrenderer.renderLeftHand(
+                    ms,
+                    queue,
+                    light,
+                    texture,
+                    player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE)
+                );
+            }
             ms.popPose();
 
             // Render gun
@@ -99,8 +119,17 @@ public class ExtendoGripRenderHandler {
             ms.translate(flip * -0.1f, 0, -0.3f);
             state.clear();
             state.displayContext = rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
-            ItemModel model = mc.getModelManager().getItemModel((inOffhand ? offhandItem : heldItem).get(DataComponents.ITEM_MODEL));
-            model.update(state, inHeldItem && inOffhand ? null : heldItem, mc.getItemModelResolver(), state.displayContext, mc.level, player, 0);
+            ItemModel model = mc.getModelManager()
+                .getItemModel((inOffhand ? offhandItem : heldItem).get(DataComponents.ITEM_MODEL));
+            model.update(
+                state,
+                inHeldItem && inOffhand ? null : heldItem,
+                mc.getItemModelResolver(),
+                state.displayContext,
+                mc.level,
+                player,
+                0
+            );
             state.submit(ms, queue, light, OverlayTexture.NO_OVERLAY, 0);
             ms.popPose();
         }

@@ -60,24 +60,29 @@ public class KineticBlockEntity extends SmartBlockEntity {
     }
 
     public static void switchToBlockState(Level world, BlockPos pos, BlockState state) {
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
         BlockState currentState = world.getBlockState(pos);
         boolean isKinetic = blockEntity instanceof KineticBlockEntity;
 
-        if (currentState == state)
+        if (currentState == state) {
             return;
+        }
         if (blockEntity == null || !isKinetic) {
             world.setBlock(pos, state, Block.UPDATE_ALL);
             return;
         }
 
         KineticBlockEntity kineticBlockEntity = (KineticBlockEntity) blockEntity;
-        if (state.getBlock() instanceof KineticBlock && !((KineticBlock) state.getBlock()).areStatesKineticallyEquivalent(currentState, state)) {
-            if (kineticBlockEntity.hasNetwork())
+        if (state.getBlock() instanceof KineticBlock && !((KineticBlock) state.getBlock()).areStatesKineticallyEquivalent(currentState,
+            state
+        )) {
+            if (kineticBlockEntity.hasNetwork()) {
                 kineticBlockEntity.getOrCreateNetwork().remove(kineticBlockEntity);
+            }
             kineticBlockEntity.detachKinetics();
             kineticBlockEntity.removeSource();
         }
@@ -107,8 +112,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
     public void initialize() {
         if (hasNetwork() && !level.isClientSide()) {
             KineticNetwork network = getOrCreateNetwork();
-            if (!network.initialized)
+            if (!network.initialized) {
                 network.initFromTE(capacity, stress, networkSize);
+            }
             network.addSilently(this, lastCapacityProvided, lastStressApplied);
         }
 
@@ -117,8 +123,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     @Override
     public void tick() {
-        if (!level.isClientSide() && needsSpeedUpdate())
+        if (!level.isClientSide() && needsSpeedUpdate()) {
             attachKinetics();
+        }
 
         super.tick();
         effects.tick();
@@ -134,12 +141,14 @@ public class KineticBlockEntity extends SmartBlockEntity {
             validateKinetics();
         }
 
-        if (getFlickerScore() > 0)
+        if (getFlickerScore() > 0) {
             flickerTally = getFlickerScore() - 1;
+        }
 
         if (networkDirty) {
-            if (hasNetwork())
+            if (hasNetwork()) {
                 getOrCreateNetwork().updateNetwork();
+            }
             networkDirty = false;
         }
     }
@@ -151,8 +160,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
                 return;
             }
 
-            if (!level.hasChunkAt(source))
+            if (!level.hasChunkAt(source)) {
                 return;
+            }
 
             BlockEntity blockEntity = level.getBlockEntity(source);
             KineticBlockEntity sourceBE = blockEntity instanceof KineticBlockEntity ? (KineticBlockEntity) blockEntity : null;
@@ -166,8 +176,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
         }
 
         if (speed != 0) {
-            if (getGeneratedSpeed() == 0)
+            if (getGeneratedSpeed() == 0) {
                 speed = 0;
+            }
         }
     }
 
@@ -206,16 +217,18 @@ public class KineticBlockEntity extends SmartBlockEntity {
     public void onSpeedChanged(float previousSpeed) {
         boolean fromOrToZero = (previousSpeed == 0) != (getSpeed() == 0);
         boolean directionSwap = !fromOrToZero && Math.signum(previousSpeed) != Math.signum(getSpeed());
-        if (fromOrToZero || directionSwap)
+        if (fromOrToZero || directionSwap) {
             flickerTally = getFlickerScore() + 5;
+        }
         setChanged();
     }
 
     @Override
     public void remove() {
         if (!level.isClientSide()) {
-            if (hasNetwork())
+            if (hasNetwork()) {
                 getOrCreateNetwork().remove(this);
+            }
             detachKinetics();
         }
         super.remove();
@@ -224,14 +237,17 @@ public class KineticBlockEntity extends SmartBlockEntity {
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
         view.putFloat("Speed", speed);
-        if (sequenceContext != null && (!clientPacket || syncSequenceContext()))
+        if (sequenceContext != null && (!clientPacket || syncSequenceContext())) {
             view.store("Sequence", SequenceContext.CODEC, sequenceContext);
+        }
 
-        if (needsSpeedUpdate())
+        if (needsSpeedUpdate()) {
             view.putBoolean("NeedsSpeedUpdate", true);
+        }
 
-        if (hasSource())
+        if (hasSource()) {
             view.store("Source", BlockPos.CODEC, source);
+        }
 
         if (hasNetwork()) {
             ValueOutput networkTag = view.child("Network");
@@ -240,10 +256,12 @@ public class KineticBlockEntity extends SmartBlockEntity {
             networkTag.putFloat("Capacity", capacity);
             networkTag.putInt("Size", networkSize);
 
-            if (lastStressApplied != 0)
+            if (lastStressApplied != 0) {
                 networkTag.putFloat("AddedStress", lastStressApplied);
-            if (lastCapacityProvided != 0)
+            }
+            if (lastCapacityProvided != 0) {
                 networkTag.putFloat("AddedCapacity", lastCapacityProvided);
+            }
         }
 
         super.write(view, clientPacket);
@@ -281,11 +299,13 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
         super.read(view, clientPacket);
 
-        if (clientPacket && overStressedBefore != overStressed && speed != 0)
+        if (clientPacket && overStressedBefore != overStressed && speed != 0) {
             effects.triggerOverStressedEffect();
+        }
 
-        if (clientPacket)
+        if (clientPacket) {
             AllClientHandle.INSTANCE.queueUpdate(this);
+        }
     }
 
     public float getGeneratedSpeed() {
@@ -298,8 +318,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     public void setSource(BlockPos source) {
         this.source = source;
-        if (level == null || level.isClientSide())
+        if (level == null || level.isClientSide()) {
             return;
+        }
 
         BlockEntity blockEntity = level.getBlockEntity(source);
         if (!(blockEntity instanceof KineticBlockEntity sourceBE)) {
@@ -312,8 +333,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
     }
 
     public float getSpeed() {
-        if (overStressed || (level != null && level.tickRateManager().isFrozen()))
+        if (overStressed || (level != null && level.tickRateManager().isFrozen())) {
             return 0;
+        }
         return getTheoreticalSpeed();
     }
 
@@ -345,16 +367,19 @@ public class KineticBlockEntity extends SmartBlockEntity {
     }
 
     public void setNetwork(@Nullable Long networkIn) {
-        if (Objects.equals(network, networkIn))
+        if (Objects.equals(network, networkIn)) {
             return;
-        if (network != null)
+        }
+        if (network != null) {
             getOrCreateNetwork().remove(this);
+        }
 
         network = networkIn;
         setChanged();
 
-        if (networkIn == null)
+        if (networkIn == null) {
             return;
+        }
 
         network = networkIn;
         KineticNetwork network = getOrCreateNetwork();
@@ -381,8 +406,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     public boolean isSpeedRequirementFulfilled() {
         BlockState state = getBlockState();
-        if (!(state.getBlock() instanceof IRotate def))
+        if (!(state.getBlock() instanceof IRotate def)) {
             return true;
+        }
         SpeedLevel minimumRequiredSpeedLevel = def.getMinimumRequiredSpeedLevel();
         return Math.abs(getSpeed()) >= minimumRequiredSpeedLevel.getSpeedValue();
     }
@@ -453,15 +479,18 @@ public class KineticBlockEntity extends SmartBlockEntity {
      * @return
      */
     public List<BlockPos> addPropagationLocations(IRotate block, BlockState state, List<BlockPos> neighbours) {
-        if (!canPropagateDiagonally(block, state))
+        if (!canPropagateDiagonally(block, state)) {
             return neighbours;
+        }
 
         Axis axis = block.getRotationAxis(state);
         BlockPos.betweenClosedStream(new BlockPos(-1, -1, -1), new BlockPos(1, 1, 1)).forEach(offset -> {
-            if (axis.choose(offset.getX(), offset.getY(), offset.getZ()) != 0)
+            if (axis.choose(offset.getX(), offset.getY(), offset.getZ()) != 0) {
                 return;
-            if (offset.distSqr(BlockPos.ZERO) != 2)
+            }
+            if (offset.distSqr(BlockPos.ZERO) != 2) {
                 return;
+            }
             neighbours.add(worldPosition.offset(offset));
         });
         return neighbours;

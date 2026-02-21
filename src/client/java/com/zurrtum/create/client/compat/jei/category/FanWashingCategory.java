@@ -71,7 +71,13 @@ public class FanWashingCategory extends CreateCategory<RecipeHolder<SplashingRec
     }
 
     @Override
-    public void draw(RecipeHolder<SplashingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<SplashingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         int xOffsetAmount = 1 - Math.min(3, entry.value().results().size());
         AllGuiTextures.JEI_SHADOW.render(graphics, 46, 27);
         AllGuiTextures.JEI_SHADOW.render(graphics, 65, 39);

@@ -49,8 +49,9 @@ public class GlobalLogisticsManager {
     public void linkAdded(UUID networkId, GlobalPos pos, UUID ownedBy) {
         LogisticsNetwork network = logisticsNetworks.computeIfAbsent(networkId, $ -> new LogisticsNetwork(networkId));
         network.totalLinks.add(pos);
-        if (ownedBy != null && network.owner == null)
+        if (ownedBy != null && network.owner == null) {
             network.owner = ownedBy;
+        }
         markDirty();
     }
 
@@ -60,26 +61,30 @@ public class GlobalLogisticsManager {
 
     public void linkRemoved(UUID networkId, GlobalPos pos) {
         LogisticsNetwork logisticsNetwork = logisticsNetworks.get(networkId);
-        if (logisticsNetwork == null)
+        if (logisticsNetwork == null) {
             return;
+        }
         logisticsNetwork.totalLinks.remove(pos);
         logisticsNetwork.loadedLinks.remove(pos);
-        if (logisticsNetwork.totalLinks.size() <= 0)
+        if (logisticsNetwork.totalLinks.size() <= 0) {
             logisticsNetworks.remove(networkId);
+        }
         markDirty();
     }
 
     public void linkInvalidated(UUID networkId, GlobalPos pos) {
         LogisticsNetwork logisticsNetwork = logisticsNetworks.get(networkId);
-        if (logisticsNetwork == null)
+        if (logisticsNetwork == null) {
             return;
+        }
         logisticsNetwork.loadedLinks.remove(pos);
     }
 
     public int getUnloadedLinkCount(UUID networkId) {
         LogisticsNetwork logisticsNetwork = logisticsNetworks.get(networkId);
-        if (logisticsNetwork == null)
+        if (logisticsNetwork == null) {
             return 0;
+        }
         return logisticsNetwork.totalLinks.size() - logisticsNetwork.loadedLinks.size();
     }
 
@@ -93,23 +98,26 @@ public class GlobalLogisticsManager {
     }
 
     private void loadLogisticsData(MinecraftServer server) {
-        if (savedData != null)
+        if (savedData != null) {
             return;
+        }
         savedData = LogisticsNetworkSavedData.load(server);
         logisticsNetworks = savedData.getLogisticsNetworks();
     }
 
     public void tick(Level level) {
-        if (level.dimension() != Level.OVERWORLD)
+        if (level.dimension() != Level.OVERWORLD) {
             return;
+        }
         logisticsNetworks.forEach((id, network) -> {
             network.panelPromises.tick();
         });
     }
 
     public void markDirty() {
-        if (savedData != null)
+        if (savedData != null) {
             savedData.setDirty();
+        }
     }
 
 }

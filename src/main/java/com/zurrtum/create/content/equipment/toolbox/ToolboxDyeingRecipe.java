@@ -30,8 +30,9 @@ public class ToolboxDyeingRecipe extends CustomRecipe {
                 if (Block.byItem(stack.getItem()) instanceof ToolboxBlock) {
                     ++toolboxes;
                 } else {
-                    if (!stack.is(AllItemTags.DYES))
+                    if (!stack.is(AllItemTags.DYES)) {
                         return false;
+                    }
                     ++dyes;
                 }
 

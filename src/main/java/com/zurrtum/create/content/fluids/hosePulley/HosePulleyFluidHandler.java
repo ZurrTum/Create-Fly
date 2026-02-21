@@ -6,15 +6,14 @@ import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class HosePulleyFluidHandler implements SidedFluidInventory {
     private static final int HALF_BUCKET = BucketFluidInventory.CAPACITY / 2;
@@ -100,7 +99,10 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
         int amount = stack.getAmount();
         if (amount <= HALF_BUCKET && drainer.pullNext(rootPosGetter.get(), true)) {
             FluidStack stack = drainer.getDrainableFluid(rootPosGetter.get());
-            if (!stack.isEmpty() && (amount == 0 || matches(this.stack, stack)) && drainer.pullNext(rootPosGetter.get(), false)) {
+            if (!stack.isEmpty() && (amount == 0 || matches(this.stack, stack)) && drainer.pullNext(
+                rootPosGetter.get(),
+                false
+            )) {
                 filler.counterpartActed();
                 setMaxSize(stack, MAX);
                 if (amount > 0) {
@@ -127,7 +129,11 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
     public void markDirty() {
         int amount = stack.getAmount();
         if (amount > previousAmount) {
-            if (amount >= BucketFluidInventory.CAPACITY && predicate.get() && filler.tryDeposit(stack.getFluid(), rootPosGetter.get(), false)) {
+            if (amount >= BucketFluidInventory.CAPACITY && predicate.get() && filler.tryDeposit(
+                stack.getFluid(),
+                rootPosGetter.get(),
+                false
+            )) {
                 drainer.counterpartActed();
                 amount -= BucketFluidInventory.CAPACITY;
                 if (amount == 0) {

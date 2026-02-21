@@ -11,8 +11,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record LogisticalStockRequestPacket(BlockPos pos) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<ByteBuf, LogisticalStockRequestPacket> CODEC = BlockPos.STREAM_CODEC.map(
-        LogisticalStockRequestPacket::new,
+    public static final StreamCodec<ByteBuf, LogisticalStockRequestPacket> CODEC = BlockPos.STREAM_CODEC.map(LogisticalStockRequestPacket::new,
         LogisticalStockRequestPacket::pos
     );
 

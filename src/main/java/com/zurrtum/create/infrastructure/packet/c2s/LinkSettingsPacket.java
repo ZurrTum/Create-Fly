@@ -13,7 +13,8 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 
-public record LinkSettingsPacket(BlockPos pos, boolean first, InteractionHand hand) implements Packet<ServerGamePacketListener> {
+public record LinkSettingsPacket(BlockPos pos, boolean first,
+                                 InteractionHand hand) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, LinkSettingsPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         LinkSettingsPacket::pos,

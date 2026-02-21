@@ -60,14 +60,16 @@ public class StickerBlock extends WrenchableDirectionalBlock implements IBE<Stic
         @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         boolean previouslyPowered = state.getValue(POWERED);
         if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
             state = state.cycle(POWERED);
-            if (state.getValue(POWERED))
+            if (state.getValue(POWERED)) {
                 state = state.cycle(EXTENDED);
+            }
             worldIn.setBlock(pos, state, Block.UPDATE_CLIENTS);
         }
     }
@@ -96,8 +98,9 @@ public class StickerBlock extends WrenchableDirectionalBlock implements IBE<Stic
 
     @Override
     public void fallOn(Level p_152426_, BlockState p_152427_, BlockPos p_152428_, Entity p_152429_, double p_152430_) {
-        if (!isUprightSticker(p_152426_, p_152428_) || p_152429_.isSuppressingBounce())
+        if (!isUprightSticker(p_152426_, p_152428_) || p_152429_.isSuppressingBounce()) {
             super.fallOn(p_152426_, p_152427_, p_152428_, p_152429_, p_152430_);
+        }
         p_152429_.causeFallDamage(p_152430_, 1.0F, p_152426_.damageSources().fall());
     }
 
@@ -129,7 +132,13 @@ public class StickerBlock extends WrenchableDirectionalBlock implements IBE<Stic
     }
 
     @Override
-    public boolean addLandingEffects(BlockState state, ServerLevel world, BlockPos pos, LivingEntity entity, double distance) {
+    public boolean addLandingEffects(
+        BlockState state,
+        ServerLevel world,
+        BlockPos pos,
+        LivingEntity entity,
+        double distance
+    ) {
         if (state.getValue(FACING) == Direction.UP) {
             double e = entity.getX();
             double f = entity.getY();

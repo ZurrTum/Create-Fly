@@ -53,13 +53,29 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
         int xOffsetAmount = 1 - Math.min(3, outputSize);
         if (outputSize == 1) {
             input = new Point(bounds.x + 26, bounds.y + 53);
-            addOutputData(results.getFirst(), bounds.x + 146, bounds.y + 53, outputs, outputIngredients, chances, chanceIngredients);
+            addOutputData(
+                results.getFirst(),
+                bounds.x + 146,
+                bounds.y + 53,
+                outputs,
+                outputIngredients,
+                chances,
+                chanceIngredients
+            );
         } else {
             input = new Point(bounds.x + 26 + xOffsetAmount * 5, bounds.y + 53);
             for (int i = 0, left = bounds.x + 146 + xOffsetAmount * 9, top = bounds.y + (outputSize <= 9 ? 53 : 62); i < outputSize; i++) {
                 int xOffset = (i % 3) * 19;
                 int yOffset = (i / 3) * -19;
-                addOutputData(results.get(i), left + xOffset, top + yOffset, outputs, outputIngredients, chances, chanceIngredients);
+                addOutputData(
+                    results.get(i),
+                    left + xOffset,
+                    top + yOffset,
+                    outputs,
+                    outputIngredients,
+                    chances,
+                    chanceIngredients
+                );
             }
         }
         widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {

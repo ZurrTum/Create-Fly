@@ -2,13 +2,12 @@ package com.zurrtum.create.client.foundation.utility;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.client.AllKeys;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ControlsUtil {
 

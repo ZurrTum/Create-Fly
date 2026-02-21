@@ -34,13 +34,14 @@ public abstract class DirectionalKineticBlock extends KineticBlock {
                     context.getClickedPos().relative(side),
                     blockState,
                     side.getOpposite()
-                ))
+                )) {
                     if (prefferedSide != null && prefferedSide.getAxis() != side.getAxis()) {
                         prefferedSide = null;
                         break;
                     } else {
                         prefferedSide = side;
                     }
+                }
             }
         }
         return prefferedSide;
@@ -53,7 +54,8 @@ public abstract class DirectionalKineticBlock extends KineticBlock {
             Direction nearestLookingDirection = context.getNearestLookingDirection();
             return defaultBlockState().setValue(
                 FACING,
-                context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? nearestLookingDirection : nearestLookingDirection.getOpposite()
+                context.getPlayer() != null && context.getPlayer()
+                    .isShiftKeyDown() ? nearestLookingDirection : nearestLookingDirection.getOpposite()
             );
         }
         return defaultBlockState().setValue(FACING, preferred.getOpposite());

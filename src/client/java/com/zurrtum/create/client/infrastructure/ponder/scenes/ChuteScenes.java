@@ -31,41 +31,47 @@ public class ChuteScenes {
         scene.scaleSceneView(.9f);
         scene.world().showSection(util.select().layer(0), Direction.UP);
 
-        ElementLink<WorldSectionElement> top = scene.world().showIndependentSection(util.select().fromTo(3, 3, 3, 3, 4, 3), Direction.DOWN);
-        ElementLink<WorldSectionElement> bottom = scene.world().showIndependentSection(util.select().fromTo(3, 2, 3, 3, 1, 3), Direction.DOWN);
+        ElementLink<WorldSectionElement> top = scene.world()
+            .showIndependentSection(util.select().fromTo(3, 3, 3, 3, 4, 3), Direction.DOWN);
+        ElementLink<WorldSectionElement> bottom = scene.world()
+            .showIndependentSection(util.select().fromTo(3, 2, 3, 3, 1, 3), Direction.DOWN);
         scene.world().moveSection(bottom, util.vector().of(-2, 0, -1), 0);
         scene.world().moveSection(top, util.vector().of(0, 0, -1), 0);
         scene.idle(20);
 
         ItemStack stack = new ItemStack(Items.COPPER_BLOCK);
-        scene.world().createItemEntity(util.vector().centerOf(util.grid().at(3, 3, 2)), util.vector().of(0, -0.1, 0), stack);
+        scene.world()
+            .createItemEntity(util.vector().centerOf(util.grid().at(3, 3, 2)), util.vector().of(0, -0.1, 0), stack);
         scene.idle(20);
         ElementLink<EntityElement> remove = scene.world()
             .createItemEntity(util.vector().centerOf(util.grid().at(1, 5, 2)), util.vector().of(0, 0.1, 0), stack);
         scene.idle(15);
         scene.world().modifyEntity(remove, Entity::discard);
 
-        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().topOf(util.grid().at(1, 2, 2))).placeNearTarget()
-            .text("Chutes can transport items vertically from and to inventories");
+        scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().topOf(util.grid().at(1, 2, 2)))
+            .placeNearTarget().text("Chutes can transport items vertically from and to inventories");
         scene.idle(70);
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
         scene.world().moveSection(bottom, util.vector().of(1, 0, 0), 10);
         scene.world().moveSection(top, util.vector().of(-1, 0, 0), 10);
         scene.idle(20);
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.NORTH), Pointing.RIGHT, 40).rightClick()
-            .withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.NORTH), Pointing.RIGHT, 40)
+            .rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().modifyBlock(util.grid().at(3, 3, 3), s -> s.setValue(ChuteBlock.SHAPE, Shape.WINDOW), false);
-        scene.overlay().showText(50).attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.WEST)).placeNearTarget()
+        scene.overlay().showText(50).attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.WEST)).placeNearTarget()
             .text("Using the Wrench, a window can be created");
 
         scene.idle(60);
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH), Pointing.RIGHT, 40).rightClick()
-            .withItem(AllItems.INDUSTRIAL_IRON_BLOCK.getDefaultInstance());
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH), Pointing.RIGHT, 40)
+            .rightClick().withItem(AllItems.INDUSTRIAL_IRON_BLOCK.getDefaultInstance());
         scene.idle(7);
         scene.world().modifyBlock(util.grid().at(3, 2, 3), s -> s.setValue(ChuteBlock.SHAPE, Shape.ENCASED), false);
-        scene.overlay().showText(50).pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST)).placeNearTarget()
-            .text("Using Industrial Iron Blocks, chutes can be encased");
+        scene.overlay().showText(50).pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST))
+            .placeNearTarget().text("Using Industrial Iron Blocks, chutes can be encased");
 
         scene.idle(10);
 
@@ -81,26 +87,30 @@ public class ChuteScenes {
 
         scene.rotateCameraY(-90);
         scene.world().modifyBlock(util.grid().at(2, 2, 1), s -> s.setValue(ChuteBlock.SHAPE, Shape.NORMAL), false);
-        scene.world().modifyBlock(util.grid().at(2, 3, 2), s -> s.setValue(ChuteBlock.SHAPE, Shape.INTERSECTION), false);
+        scene.world()
+            .modifyBlock(util.grid().at(2, 3, 2), s -> s.setValue(ChuteBlock.SHAPE, Shape.INTERSECTION), false);
         scene.world().showSection(util.select().fromTo(2, 1, 1, 2, 2, 1), Direction.DOWN);
         scene.idle(30);
         ItemStack chuteItem = AllItems.CHUTE.getDefaultInstance();
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 2, 1), Direction.SOUTH), Pointing.LEFT, 30).rightClick()
-            .withItem(chuteItem);
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 2, 1), Direction.SOUTH), Pointing.LEFT, 30)
+            .rightClick().withItem(chuteItem);
         scene.idle(7);
         scene.world().showSection(util.select().position(2, 3, 2), Direction.NORTH);
         scene.world().restoreBlocks(util.select().position(2, 2, 1));
         scene.idle(15);
         scene.idle(20);
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.SOUTH), Pointing.LEFT, 30).rightClick()
-            .withItem(chuteItem);
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.SOUTH), Pointing.LEFT, 30)
+            .rightClick().withItem(chuteItem);
         scene.idle(7);
         scene.world().showSection(util.select().position(2, 4, 3), Direction.NORTH);
         scene.idle(10);
         scene.world().restoreBlocks(util.select().position(2, 3, 2));
         scene.idle(25);
 
-        scene.overlay().showText(70).attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(2, 4, 3), Direction.WEST)).placeNearTarget()
+        scene.overlay().showText(70).attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 4, 3), Direction.WEST)).placeNearTarget()
             .text("Placing chutes targeting the side faces of another will make it diagonal");
         scene.idle(15);
         scene.rotateCameraY(90);
@@ -122,7 +132,9 @@ public class ChuteScenes {
         }
 
         scene.idle(10);
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 1, 1), Direction.NORTH), Pointing.RIGHT, 50).withItem(stack);
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 1, 1), Direction.NORTH), Pointing.RIGHT, 50)
+            .withItem(stack);
         scene.markAsFinished();
     }
 
@@ -142,22 +154,26 @@ public class ChuteScenes {
         scene.idle(20);
         scene.world().setKineticSpeed(util.select().position(1, 1, 2), 0);
         Vec3 surface = util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.WEST);
-        scene.overlay().showText(70).text("Using Encased Fans at the top or bottom, a Chute can move items upward").attachKeyFrame().pointAt(surface)
-            .placeNearTarget();
+        scene.overlay().showText(70).text("Using Encased Fans at the top or bottom, a Chute can move items upward")
+            .attachKeyFrame().pointAt(surface).placeNearTarget();
         scene.idle(80);
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.NORTH), Pointing.RIGHT, 50)
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.NORTH), Pointing.RIGHT, 50)
             .withItem(AllItems.GOGGLES.getDefaultInstance());
-        scene.overlay().showText(70).text("Inspecting chutes with Engineers' Goggles reveals information about the movement direction")
+        scene.overlay().showText(70)
+            .text("Inspecting chutes with Engineers' Goggles reveals information about the movement direction")
             .attachKeyFrame().pointAt(surface).placeNearTarget();
         scene.idle(80);
 
-        scene.world().showSection(util.select().fromTo(2, 2, 2, 4, 1, 5).add(util.select().position(3, 0, 5)), Direction.DOWN);
+        scene.world()
+            .showSection(util.select().fromTo(2, 2, 2, 4, 1, 5).add(util.select().position(3, 0, 5)), Direction.DOWN);
         ItemStack stack = new ItemStack(Items.COPPER_BLOCK);
         scene.world().createItemOnBelt(util.grid().at(4, 1, 2), Direction.EAST, stack);
         scene.idle(10);
         scene.rotateCameraY(60);
-        scene.overlay().showText(70).text("On the 'blocked' end, items will have to be inserted/taken from the sides").attachKeyFrame()
-            .pointAt(util.vector().centerOf(util.grid().at(3, 1, 2)).add(0, 3 / 16f, 0)).placeNearTarget();
+        scene.overlay().showText(70).text("On the 'blocked' end, items will have to be inserted/taken from the sides")
+            .attachKeyFrame().pointAt(util.vector().centerOf(util.grid().at(3, 1, 2)).add(0, 3 / 16f, 0))
+            .placeNearTarget();
         scene.idle(32);
         scene.world().flapFunnel(util.grid().at(2, 2, 2), false);
         scene.world().removeItemsFromBelt(util.grid().at(2, 1, 2));
@@ -187,8 +203,8 @@ public class ChuteScenes {
         scene.overlay().showFilterSlotInput(filter, Direction.NORTH, 70);
         scene.idle(10);
         scene.rotateCameraY(20);
-        scene.overlay().showText(60).text("Items in the filter slot specify what to extract or transfer").attachKeyFrame()
-            .pointAt(filter.add(0, 0, 0.125)).placeNearTarget();
+        scene.overlay().showText(60).text("Items in the filter slot specify what to extract or transfer")
+            .attachKeyFrame().pointAt(filter.add(0, 0, 0.125)).placeNearTarget();
         scene.idle(60);
 
         scene.world().showSection(util.select().position(2, 4, 2), Direction.DOWN);
@@ -205,17 +221,19 @@ public class ChuteScenes {
             if (i == 8) {
                 scene.rotateCameraY(-20);
                 scene.overlay().showControls(filter.add(0, 0.125, 0), Pointing.DOWN, 40).rightClick();
-                scene.overlay().showText(50).text("Use the value panel to specify the extracted stack size").attachKeyFrame()
-                    .pointAt(filter.add(0, 0, 0.125)).placeNearTarget();
+                scene.overlay().showText(50).text("Use the value panel to specify the extracted stack size")
+                    .attachKeyFrame().pointAt(filter.add(0, 0, 0.125)).placeNearTarget();
             }
-            if (i == 13)
+            if (i == 13) {
                 scene.world().showSection(lever, Direction.NORTH);
+            }
         }
 
         scene.world().toggleRedstonePower(lever.add(util.select().position(smarty)));
         scene.effects().indicateRedstone(util.grid().at(0, 3, 2));
-        scene.overlay().showText(50).text("Redstone power will prevent Smart Chutes from acting.").attachKeyFrame().colored(PonderPalette.RED)
-            .pointAt(util.vector().blockSurface(util.grid().at(0, 2, 2), Direction.UP)).placeNearTarget();
+        scene.overlay().showText(50).text("Redstone power will prevent Smart Chutes from acting.").attachKeyFrame()
+            .colored(PonderPalette.RED).pointAt(util.vector().blockSurface(util.grid().at(0, 2, 2), Direction.UP))
+            .placeNearTarget();
         scene.idle(70);
 
         scene.world().toggleRedstonePower(lever.add(util.select().position(smarty)));

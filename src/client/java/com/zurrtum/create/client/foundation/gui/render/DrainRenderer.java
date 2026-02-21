@@ -104,7 +104,9 @@ public class DrainRenderer extends PictureInPictureRenderer<DrainRenderState> {
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+            TextureSetup.singleTexture(texture.textureView(),
+                RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)
+            ),
             element.pose(),
             element.x0(),
             element.y0(),

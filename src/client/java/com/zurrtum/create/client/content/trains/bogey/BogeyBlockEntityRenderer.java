@@ -44,7 +44,10 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
         Level world = be.getLevel();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        state.lightCoords = world != null ? LevelRenderer.getLightColor(
+            world,
+            state.blockPos
+        ) : LightTexture.FULL_BRIGHT;
         if (state.blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
             state.yRot = Mth.DEG_TO_RAD * 90;
         }
@@ -64,7 +67,12 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
     }
 
     @Override
-    public void submit(BogeyBlockEntityRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BogeyBlockEntityRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.data == null) {
             return;
         }

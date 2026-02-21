@@ -11,12 +11,11 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.packager.PackagerBlock;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
 
 public class PackagerVisual<T extends PackagerBlockEntity> extends AbstractBlockEntityVisual<T> implements SimpleDynamicVisual {
     public final TransformedInstance hatch;
@@ -30,15 +29,20 @@ public class PackagerVisual<T extends PackagerBlockEntity> extends AbstractBlock
         super(ctx, blockEntity, partialTick);
 
         lastHatchPartial = PackagerRenderer.getHatchModel(blockEntity);
-        hatch = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(lastHatchPartial)).createInstance();
+        hatch = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(lastHatchPartial))
+            .createInstance();
 
-        tray = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(PackagerRenderer.getTrayModel(blockState))).createInstance();
+        tray = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(PackagerRenderer.getTrayModel(blockState))
+        ).createInstance();
 
         Direction facing = blockState.getValue(PackagerBlock.FACING).getOpposite();
 
         var lowerCorner = Vec3.atLowerCornerOf(facing.getUnitVec3i());
         hatch.setIdentityTransform().translate(getVisualPosition()).translate(lowerCorner.scale(.49999f))
-            .rotateYCenteredDegrees(AngleHelper.horizontalAngle(facing)).rotateXCenteredDegrees(AngleHelper.verticalAngle(facing)).setChanged();
+            .rotateYCenteredDegrees(AngleHelper.horizontalAngle(facing))
+            .rotateXCenteredDegrees(AngleHelper.verticalAngle(facing)).setChanged();
 
         // TODO: I think we need proper ItemVisuals to handle rendering the boxes in here
 

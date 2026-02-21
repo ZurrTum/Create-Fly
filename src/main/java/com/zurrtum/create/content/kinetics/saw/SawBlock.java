@@ -8,10 +8,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.content.kinetics.drill.DrillBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -44,6 +40,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBlockEntity>, ItemInventoryProvider<SawBlockEntity> {
     public static final BooleanProperty FLIPPED = BooleanProperty.create("flipped");
 
@@ -54,7 +53,13 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, SawBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        SawBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.inventory;
     }
 
@@ -76,25 +81,31 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
         BlockState newState = super.getRotatedBlockState(originalState, targetedFace);
-        if (newState.getValue(FACING).getAxis() != Axis.Y)
+        if (newState.getValue(FACING).getAxis() != Axis.Y) {
             return newState;
-        if (targetedFace.getAxis() != Axis.Y)
+        }
+        if (targetedFace.getAxis() != Axis.Y) {
             return newState;
-        if (!originalState.getValue(AXIS_ALONG_FIRST_COORDINATE))
+        }
+        if (!originalState.getValue(AXIS_ALONG_FIRST_COORDINATE)) {
             newState = newState.cycle(FLIPPED);
+        }
         return newState;
     }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
         BlockState newState = super.rotate(state, rot);
-        if (state.getValue(FACING).getAxis() != Axis.Y)
+        if (state.getValue(FACING).getAxis() != Axis.Y) {
             return newState;
+        }
 
-        if (rot.ordinal() % 2 == 1 && (rot == Rotation.CLOCKWISE_90) != state.getValue(AXIS_ALONG_FIRST_COORDINATE))
+        if (rot.ordinal() % 2 == 1 && (rot == Rotation.CLOCKWISE_90) != state.getValue(AXIS_ALONG_FIRST_COORDINATE)) {
             newState = newState.cycle(FLIPPED);
-        if (rot == Rotation.CLOCKWISE_180)
+        }
+        if (rot == Rotation.CLOCKWISE_180) {
             newState = newState.cycle(FLIPPED);
+        }
 
         return newState;
     }
@@ -102,14 +113,17 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     @Override
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
         BlockState newState = super.mirror(state, mirrorIn);
-        if (state.getValue(FACING).getAxis() != Axis.Y)
+        if (state.getValue(FACING).getAxis() != Axis.Y) {
             return newState;
+        }
 
         boolean alongX = state.getValue(AXIS_ALONG_FIRST_COORDINATE);
-        if (alongX && mirrorIn == Mirror.FRONT_BACK)
+        if (alongX && mirrorIn == Mirror.FRONT_BACK) {
             newState = newState.cycle(FLIPPED);
-        if (!alongX && mirrorIn == Mirror.LEFT_RIGHT)
+        }
+        if (!alongX && mirrorIn == Mirror.LEFT_RIGHT) {
             newState = newState.cycle(FLIPPED);
+        }
 
         return newState;
     }
@@ -132,14 +146,17 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
         IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
         if (!player.isShiftKeyDown() && player.mayBuild()) {
             if (placementHelper.matchesItem(stack) && placementHelper.getOffset(player, level, state, pos, hitResult)
-                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand).consumesAction())
+                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand).consumesAction()) {
                 return InteractionResult.SUCCESS;
+            }
         }
 
-        if (player.isSpectator() || !stack.isEmpty())
+        if (player.isSpectator() || !stack.isEmpty()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (state.getValueOrElse(FACING, Direction.WEST) != Direction.UP)
+        }
+        if (state.getValueOrElse(FACING, Direction.WEST) != Direction.UP) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         return onBlockEntityUseItemOn(
             level, pos, be -> {
@@ -160,16 +177,30 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     }
 
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, InsideBlockEffectApplier handler, boolean bl) {
-        if (worldIn.isClientSide() || entityIn instanceof ItemEntity)
+    public void entityInside(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Entity entityIn,
+        InsideBlockEffectApplier handler,
+        boolean bl
+    ) {
+        if (worldIn.isClientSide() || entityIn instanceof ItemEntity) {
             return;
-        if (!new AABB(pos).deflate(.1f).intersects(entityIn.getBoundingBox()))
+        }
+        if (!new AABB(pos).deflate(.1f).intersects(entityIn.getBoundingBox())) {
             return;
+        }
         withBlockEntityDo(
             worldIn, pos, be -> {
-                if (be.getSpeed() == 0)
+                if (be.getSpeed() == 0) {
                     return;
-                entityIn.hurtServer((ServerLevel) worldIn, AllDamageSources.get(worldIn).saw, (float) DrillBlock.getDamage(be.getSpeed()));
+                }
+                entityIn.hurtServer(
+                    (ServerLevel) worldIn,
+                    AllDamageSources.get(worldIn).saw,
+                    (float) DrillBlock.getDamage(be.getSpeed())
+                );
             }
         );
     }
@@ -177,16 +208,19 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     @Override
     public void updateEntityMovementAfterFallOn(BlockGetter worldIn, Entity entityIn) {
         super.updateEntityMovementAfterFallOn(worldIn, entityIn);
-        if (!(entityIn instanceof ItemEntity))
+        if (!(entityIn instanceof ItemEntity)) {
             return;
-        if (entityIn.level().isClientSide())
+        }
+        if (entityIn.level().isClientSide()) {
             return;
+        }
 
         BlockPos pos = entityIn.blockPosition();
         withBlockEntityDo(
             entityIn.level(), pos, be -> {
-                if (be.getSpeed() == 0)
+                if (be.getSpeed() == 0) {
                     return;
+                }
                 be.insertItem((ItemEntity) entityIn);
             }
         );
@@ -203,7 +237,12 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        return isHorizontal(state) ? face == state.getValue(FACING).getOpposite() : super.hasShaftTowards(world, pos, state, face);
+        return isHorizontal(state) ? face == state.getValue(FACING).getOpposite() : super.hasShaftTowards(
+            world,
+            pos,
+            state,
+            face
+        );
     }
 
     @Override
@@ -234,7 +273,13 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(
                 pos,
                 ray.getLocation(),
@@ -242,12 +287,13 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
                 dir -> world.getBlockState(pos.relative(dir)).canBeReplaced()
             );
 
-            if (directions.isEmpty())
+            if (directions.isEmpty()) {
                 return PlacementOffset.fail();
-            else {
+            } else {
                 return PlacementOffset.success(
                     pos.relative(directions.getFirst()),
-                    s -> s.setValue(FACING, state.getValue(FACING)).setValue(AXIS_ALONG_FIRST_COORDINATE, state.getValue(AXIS_ALONG_FIRST_COORDINATE))
+                    s -> s.setValue(FACING, state.getValue(FACING))
+                        .setValue(AXIS_ALONG_FIRST_COORDINATE, state.getValue(AXIS_ALONG_FIRST_COORDINATE))
                         .setValue(FLIPPED, state.getValue(FLIPPED))
                 );
             }

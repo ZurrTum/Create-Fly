@@ -33,6 +33,7 @@ public class ValveHandleScrollValueBehaviour extends ScrollValueBehaviour<ValveH
     }
 
     public MutableComponent formatValue(ValueSettings settings) {
-        return CreateLang.number(Math.max(1, Math.abs(settings.value()))).add(CreateLang.translateDirect("generic.unit.degrees")).component();
+        return CreateLang.number(Math.max(1, Math.abs(settings.value())))
+            .add(CreateLang.translateDirect("generic.unit.degrees")).component();
     }
 }

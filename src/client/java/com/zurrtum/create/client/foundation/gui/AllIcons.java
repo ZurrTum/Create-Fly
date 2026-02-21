@@ -107,12 +107,13 @@ public class AllIcons implements ScreenElement {
     }
 
     private void vertex(VertexConsumer builder, Matrix4f matrix, Vec3 vec, Color rgb, float u, float v, int light) {
-        builder.addVertex(matrix, (float) vec.x, (float) vec.y, (float) vec.z).setColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), 255).setUv(u, v)
-            .setLight(light);
+        builder.addVertex(matrix, (float) vec.x, (float) vec.y, (float) vec.z)
+            .setColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), 255).setUv(u, v).setLight(light);
     }
 
     public DelegatedStencilElement asStencil() {
-        return new DelegatedStencilElement().withStencilRenderer((ms, w, h, alpha) -> this.render(ms, 0, 0)).withBounds(16, 16);
+        return new DelegatedStencilElement().withStencilRenderer((ms, w, h, alpha) -> this.render(ms, 0, 0))
+            .withBounds(16, 16);
     }
 
 }

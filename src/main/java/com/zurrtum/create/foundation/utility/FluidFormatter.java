@@ -19,6 +19,9 @@ public class FluidFormatter {
             );
         }
 
-        return Couple.create(Component.literal(String.valueOf(amount)), Component.translatable("create.generic.unit.millibuckets"));
+        return Couple.create(
+            Component.literal(String.valueOf(amount)),
+            Component.translatable("create.generic.unit.millibuckets")
+        );
     }
 }

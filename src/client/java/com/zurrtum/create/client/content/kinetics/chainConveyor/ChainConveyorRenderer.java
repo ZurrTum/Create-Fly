@@ -101,7 +101,12 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
     }
 
     @Override
-    public void submit(ChainConveyorRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ChainConveyorRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.chains != null) {
             for (ChainRenderState chain : state.chains) {
@@ -141,9 +146,16 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         Vec3 targetPosition = physicsData.prevTargetPos.lerp(physicsData.targetPos, partialTicks);
         float yaw = AngleHelper.angleLerp(partialTicks, physicsData.prevYaw, physicsData.yaw);
         state.yaw = Mth.DEG_TO_RAD * yaw;
-        state.offset = new Vec3(targetPosition.x - pos.getX(), targetPosition.y - pos.getY(), targetPosition.z - pos.getZ());
+        state.offset = new Vec3(
+            targetPosition.x - pos.getX(),
+            targetPosition.y - pos.getY(),
+            targetPosition.z - pos.getZ()
+        );
         BlockPos containingPos = BlockPos.containing(position);
-        state.light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, containingPos), world.getBrightness(LightLayer.SKY, containingPos));
+        state.light = LightTexture.pack(
+            world.getBrightness(LightLayer.BLOCK, containingPos),
+            world.getBrightness(LightLayer.SKY, containingPos)
+        );
         Vec3 dangleDiff = VecHelper.rotate(targetPosition.add(0, 0.5, 0).subtract(position), -yaw, Axis.Y);
         float zRot = Mth.wrapDegrees((float) Mth.atan2(-dangleDiff.x, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
         float xRot = Mth.wrapDegrees((float) Mth.atan2(dangleDiff.z, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
@@ -159,7 +171,12 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
     }
 
     @Nullable
-    public List<ChainRenderState> getChainsRenderState(ChainConveyorBlockEntity be, Level world, BlockPos tilePos, Vec3 cameraPos) {
+    public List<ChainRenderState> getChainsRenderState(
+        ChainConveyorBlockEntity be,
+        Level world,
+        BlockPos tilePos,
+        Vec3 cameraPos
+    ) {
         List<ChainRenderState> chains = new ArrayList<>();
         Vec3 position = Vec3.atCenterOf(tilePos);
         boolean renderWorld = Minecraft.getInstance().level == world;
@@ -169,7 +186,10 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
             time += 1;
         }
         float animation = time - 0.5f;
-        int light1 = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, tilePos), world.getBrightness(LightLayer.SKY, tilePos));
+        int light1 = LightTexture.pack(
+            world.getBrightness(LightLayer.BLOCK, tilePos),
+            world.getBrightness(LightLayer.SKY, tilePos)
+        );
         float yRot = Mth.DEG_TO_RAD * 45;
         for (BlockPos blockPos : be.connections) {
             ConnectionStats stats = be.connectionStats.get(blockPos);
@@ -177,18 +197,24 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
                 continue;
             }
             boolean far = renderWorld && !cameraPos.closerThan(
-                Vec3.atCenterOf(tilePos)
-                    .add(blockPos.getX() / 2f, blockPos.getY() / 2f, blockPos.getZ() / 2f), MIP_DISTANCE
+                Vec3.atCenterOf(tilePos).add(blockPos.getX() / 2f, blockPos.getY() / 2f, blockPos.getZ() / 2f),
+                MIP_DISTANCE
             );
             ChainRenderState state = far ? new FarChainRenderState() : new ChainRenderState();
             Vec3 diff = stats.end().subtract(stats.start());
             state.startOffset = stats.start().subtract(position);
             state.yaw = (float) Mth.atan2(diff.x, diff.z);
-            state.pitch = (float) (Mth.DEG_TO_RAD * (90 - Mth.RAD_TO_DEG * Mth.atan2(diff.y, diff.multiply(1, 0, 1).length())));
+            state.pitch = (float) (Mth.DEG_TO_RAD * (90 - Mth.RAD_TO_DEG * Mth.atan2(
+                diff.y,
+                diff.multiply(1, 0, 1).length()
+            )));
             state.yRot = yRot;
             BlockPos pos = tilePos.offset(blockPos);
             state.light1 = light1;
-            state.light2 = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, pos), world.getBrightness(LightLayer.SKY, pos));
+            state.light2 = LightTexture.pack(
+                world.getBrightness(LightLayer.BLOCK, pos),
+                world.getBrightness(LightLayer.SKY, pos)
+            );
             state.animation = animation;
             state.length = stats.chainLength();
             state.maxV = far ? 0.0625f : state.length + animation;
@@ -223,8 +249,40 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         Matrix4f matrix4f = pose.pose();
         renderQuad(matrix4f, pose, pConsumer, 0, pMaxY, pX0, pZ0, pX3, pZ3, pMinU, pMaxU, pMinV, pMaxV, light1, light2);
         renderQuad(matrix4f, pose, pConsumer, 0, pMaxY, pX3, pZ3, pX0, pZ0, pMinU, pMaxU, pMinV, pMaxV, light1, light2);
-        renderQuad(matrix4f, pose, pConsumer, 0, pMaxY, pX1, pZ1, pX2, pZ2, pMinU + uO, pMaxU + uO, pMinV, pMaxV, light1, light2);
-        renderQuad(matrix4f, pose, pConsumer, 0, pMaxY, pX2, pZ2, pX1, pZ1, pMinU + uO, pMaxU + uO, pMinV, pMaxV, light1, light2);
+        renderQuad(
+            matrix4f,
+            pose,
+            pConsumer,
+            0,
+            pMaxY,
+            pX1,
+            pZ1,
+            pX2,
+            pZ2,
+            pMinU + uO,
+            pMaxU + uO,
+            pMinV,
+            pMaxV,
+            light1,
+            light2
+        );
+        renderQuad(
+            matrix4f,
+            pose,
+            pConsumer,
+            0,
+            pMaxY,
+            pX2,
+            pZ2,
+            pX1,
+            pZ1,
+            pMinU + uO,
+            pMaxU + uO,
+            pMinV,
+            pMaxV,
+            light1,
+            light2
+        );
     }
 
     private static void renderQuad(
@@ -261,8 +319,8 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         float pV,
         int light
     ) {
-        pConsumer.addVertex(pPose, pX, pY, pZ).setColor(1.0f, 1.0f, 1.0f, 1.0f).setUv(pU, pV).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
-            .setNormal(pNormal, 0.0F, 1.0F, 0.0F);
+        pConsumer.addVertex(pPose, pX, pY, pZ).setColor(1.0f, 1.0f, 1.0f, 1.0f).setUv(pU, pV)
+            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pNormal, 0.0F, 1.0F, 0.0F);
     }
 
     @Override
@@ -395,10 +453,13 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         public int light;
 
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            rig.translate(offset).translate(0, 0.625f, 0).rotateY(yaw).rotateZ(zRot).rotateX(xRot).rotateY(yRot).uncenter();
-            rig.translate(0, offsetY, 0).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+            rig.translate(offset).translate(0, 0.625f, 0).rotateY(yaw).rotateZ(zRot).rotateX(xRot).rotateY(yRot)
+                .uncenter();
+            rig.translate(0, offsetY, 0).light(light).overlay(OverlayTexture.NO_OVERLAY)
+                .renderInto(matricesEntry, vertexConsumer);
             box.translate(offset).translate(0, 0.625f, 0).rotateY(yaw).rotateZ(zRot).rotateX(xRot).uncenter();
-            box.translate(0, offsetY, 0).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+            box.translate(0, offsetY, 0).light(light).overlay(OverlayTexture.NO_OVERLAY)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

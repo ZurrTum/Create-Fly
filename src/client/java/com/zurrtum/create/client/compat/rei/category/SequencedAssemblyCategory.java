@@ -54,7 +54,13 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 matrices.translate(point.x, point.y);
                 matrices.scale(scale, scale);
                 matrices.translate(-point.x, -point.y);
-                graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(i, new Matrix3x2f(matrices), point.x - 3, point.y + 18, i));
+                graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(
+                    i,
+                    new Matrix3x2f(matrices),
+                    point.x - 3,
+                    point.y + 18,
+                    i
+                ));
                 matrices.popMatrix();
             }
         );
@@ -192,7 +198,14 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
             for (int i = 0; i < size; i++) {
                 Point point = points.get(i);
                 String text = ROMANS[Math.min(i, ROMANS.length)];
-                graphics.drawString(textRenderer, text, point.x + 8 - textRenderer.width(text) / 2, point.y - 13, 0xff888888, false);
+                graphics.drawString(
+                    textRenderer,
+                    text,
+                    point.x + 8 - textRenderer.width(text) / 2,
+                    point.y - 13,
+                    0xff888888,
+                    false
+                );
                 SequencedRenderer draw = DRAW.get(types.get(i));
                 if (draw != null) {
                     Slot slot = slots.get(i);
@@ -222,7 +235,13 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
             widgets.add(new JunkWidget(xOffset + 156, bounds.y + 96, 1 - chanceOutput.chance()));
         }
         if (willRepeat) {
-            widgets.add(new TooltipWidget(xOffset + 57, bounds.y + 99, 71, 18, CreateLang.translateDirect("recipe.assembly.repeat", display.loop())));
+            widgets.add(new TooltipWidget(
+                xOffset + 57,
+                bounds.y + 99,
+                71,
+                18,
+                CreateLang.translateDirect("recipe.assembly.repeat", display.loop())
+            ));
         }
     }
 

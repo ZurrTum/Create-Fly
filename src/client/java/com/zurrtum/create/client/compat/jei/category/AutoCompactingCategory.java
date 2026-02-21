@@ -70,7 +70,8 @@ public class AutoCompactingCategory extends CreateCategory<RecipeHolder<Crafting
         List<Ingredient> ingredients;
         if (recipe instanceof ShapedRecipe shapedRecipe) {
             result = shapedRecipe.result;
-            ingredients = shapedRecipe.getIngredients().stream().filter(Optional::isPresent).map(Optional::get).toList();
+            ingredients = shapedRecipe.getIngredients().stream().filter(Optional::isPresent).map(Optional::get)
+                .toList();
         } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
             result = shapelessRecipe.result;
             ingredients = shapelessRecipe.ingredients;
@@ -78,15 +79,26 @@ public class AutoCompactingCategory extends CreateCategory<RecipeHolder<Crafting
             return;
         }
         for (int i = 0, size = ingredients.size(), rows = size == 4 ? 2 : 3; i < size; i++) {
-            builder.addInputSlot((rows == 2 ? 27 : 18) + (i % rows) * 19, 51 - (i / rows) * 19).setBackground(SLOT, -1, -1).add(ingredients.get(i));
+            builder.addInputSlot((rows == 2 ? 27 : 18) + (i % rows) * 19, 51 - (i / rows) * 19)
+                .setBackground(SLOT, -1, -1).add(ingredients.get(i));
         }
         builder.addOutputSlot(142, 51).setBackground(SLOT, -1, -1).add(result);
     }
 
     @Override
-    public void draw(RecipeHolder<CraftingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<CraftingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
         AllGuiTextures.JEI_SHADOW.render(graphics, 81, 68);
-        graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(new Matrix3x2f(graphics.pose()), 91, -5));
+        graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(
+            new Matrix3x2f(graphics.pose()),
+            91,
+            -5
+        ));
     }
 }

@@ -9,5 +9,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
 public interface ServerRightClickHandle {
-    InteractionResult onRightClickBlock(Level world, ServerPlayer player, ItemStack stack, InteractionHand hand, BlockHitResult hit, BlockPos pos);
+    InteractionResult onRightClickBlock(
+        Level world,
+        ServerPlayer player,
+        ItemStack stack,
+        InteractionHand hand,
+        BlockHitResult hit,
+        BlockPos pos
+    );
 }

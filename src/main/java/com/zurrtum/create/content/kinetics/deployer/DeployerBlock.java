@@ -49,9 +49,16 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, DeployerBlockEntity blockEntity, Direction context) {
-        if (blockEntity.invHandler == null)
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        DeployerBlockEntity blockEntity,
+        Direction context
+    ) {
+        if (blockEntity.invHandler == null) {
             blockEntity.initHandler();
+        }
         return blockEntity.invHandler;
     }
 
@@ -68,8 +75,9 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         if (isHand(state, context)) {
-            if (!context.getLevel().isClientSide())
+            if (!context.getLevel().isClientSide()) {
                 withBlockEntityDo(context.getLevel(), context.getClickedPos(), DeployerBlockEntity::changeMode);
+            }
             return InteractionResult.SUCCESS;
         }
         return super.onWrenched(state, context);
@@ -79,20 +87,22 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         Player player = context.getPlayer();
         if (player != null && isHand(state, context)) {
-            if (!context.getLevel().isClientSide())
+            if (!context.getLevel().isClientSide()) {
                 withBlockEntityDo(
                     context.getLevel(), context.getClickedPos(), be -> {
                         ServerPlayer serverPlayer = be.player.cast();
                         ItemStack heldByDeployer = serverPlayer.getMainHandItem();
                         ItemStack heldByPlayer = context.getItemInHand();
-                        if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty())
+                        if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty()) {
                             return;
+                        }
 
                         player.setItemInHand(context.getHand(), heldByDeployer.copy());
                         serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, heldByPlayer);
                         be.notifyUpdate();
                     }
                 );
+            }
             return InteractionResult.SUCCESS;
         }
         return super.onSneakWrenched(state, context);
@@ -100,7 +110,8 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
     private static boolean isHand(BlockState state, UseOnContext context) {
         Vec3 normal = Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i());
-        Vec3 location = context.getClickLocation().subtract(Vec3.atCenterOf(context.getClickedPos()).subtract(normal.scale(.5))).multiply(normal);
+        Vec3 location = context.getClickLocation()
+            .subtract(Vec3.atCenterOf(context.getClickedPos()).subtract(normal.scale(.5))).multiply(normal);
         return location.length() > .75f;
     }
 
@@ -131,27 +142,38 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
         IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
         if (!player.isShiftKeyDown() && player.mayBuild()) {
-            if (placementHelper.matchesItem(heldByPlayer) && placementHelper.getOffset(player, level, state, pos, hitResult)
-                .placeInWorld(level, (BlockItem) heldByPlayer.getItem(), player, hand).consumesAction())
+            if (placementHelper.matchesItem(heldByPlayer) && placementHelper.getOffset(
+                player,
+                level,
+                state,
+                pos,
+                hitResult
+            ).placeInWorld(level, (BlockItem) heldByPlayer.getItem(), player, hand).consumesAction()) {
                 return InteractionResult.SUCCESS;
+            }
         }
 
-        if (heldByPlayer.is(AllItems.WRENCH))
+        if (heldByPlayer.is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         Vec3 normal = Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i());
-        Vec3 location = hitResult.getLocation().subtract(Vec3.atCenterOf(pos).subtract(normal.scale(.5))).multiply(normal);
-        if (location.length() < .75f)
+        Vec3 location = hitResult.getLocation().subtract(Vec3.atCenterOf(pos).subtract(normal.scale(.5)))
+            .multiply(normal);
+        if (location.length() < .75f) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         withBlockEntityDo(
             level, pos, be -> {
                 ServerPlayer serverPlayer = be.player.cast();
                 ItemStack heldByDeployer = serverPlayer.getMainHandItem().copy();
-                if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty())
+                if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty()) {
                     return;
+                }
 
                 player.setItemInHand(hand, heldByDeployer);
                 serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, heldByPlayer);
@@ -197,10 +219,11 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
     @Override
     protected Direction getFacingForPlacement(BlockPlaceContext context) {
-        if (context instanceof AssemblyOperatorUseContext)
+        if (context instanceof AssemblyOperatorUseContext) {
             return Direction.DOWN;
-        else
+        } else {
             return super.getFacingForPlacement(context);
+        }
     }
 
     private static class PlacementHelper implements IPlacementHelper {
@@ -216,7 +239,13 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(
                 pos,
                 ray.getLocation(),
@@ -224,12 +253,13 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
                 dir -> world.getBlockState(pos.relative(dir)).canBeReplaced()
             );
 
-            if (directions.isEmpty())
+            if (directions.isEmpty()) {
                 return PlacementOffset.fail();
-            else {
+            } else {
                 return PlacementOffset.success(
                     pos.relative(directions.getFirst()),
-                    s -> s.setValue(FACING, state.getValue(FACING)).setValue(AXIS_ALONG_FIRST_COORDINATE, state.getValue(AXIS_ALONG_FIRST_COORDINATE))
+                    s -> s.setValue(FACING, state.getValue(FACING))
+                        .setValue(AXIS_ALONG_FIRST_COORDINATE, state.getValue(AXIS_ALONG_FIRST_COORDINATE))
                 );
             }
         }

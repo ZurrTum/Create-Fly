@@ -47,47 +47,62 @@ public abstract class AbstractBellBlock<BE extends AbstractBellBlockEntity> exte
         @Nullable Orientation wireOrientation,
         boolean pIsMoving
     ) {
-        if (pLevel.isClientSide())
+        if (pLevel.isClientSide()) {
             return;
+        }
         boolean shouldPower = pLevel.hasNeighborSignal(pPos);
-        if (shouldPower == pState.getValue(POWERED))
+        if (shouldPower == pState.getValue(POWERED)) {
             return;
+        }
         pLevel.setBlock(pPos, pState.setValue(POWERED, shouldPower), Block.UPDATE_ALL);
-        if (!shouldPower)
+        if (!shouldPower) {
             return;
+        }
         Direction facing = pState.getValue(FACING);
         BellAttachType type = pState.getValue(ATTACHMENT);
-        ring(pLevel, pPos, type == BellAttachType.CEILING || type == BellAttachType.FLOOR ? facing : facing.getClockWise(), null);
+        ring(
+            pLevel,
+            pPos,
+            type == BellAttachType.CEILING || type == BellAttachType.FLOOR ? facing : facing.getClockWise(),
+            null
+        );
     }
 
     @Override
     public boolean onHit(Level world, BlockState state, BlockHitResult hit, @Nullable Player player, boolean flag) {
         BlockPos pos = hit.getBlockPos();
         Direction direction = hit.getDirection();
-        if (direction == null)
+        if (direction == null) {
             direction = world.getBlockState(pos).getValue(FACING);
-        if (!this.canRingFrom(state, direction, hit.getLocation().y - pos.getY()))
+        }
+        if (!this.canRingFrom(state, direction, hit.getLocation().y - pos.getY())) {
             return false;
+        }
         return ring(world, pos, direction, player);
     }
 
     protected boolean ring(Level world, BlockPos pos, Direction direction, Player player) {
         BE be = getBlockEntity(world, pos);
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return true;
-        if (be == null || !be.ring(world, pos, direction))
+        }
+        if (be == null || !be.ring(world, pos, direction)) {
             return false;
+        }
         playSound(world, pos);
-        if (player != null)
+        if (player != null) {
             player.awardStat(Stats.BELL_RING);
+        }
         return true;
     }
 
     public boolean canRingFrom(BlockState state, Direction hitDir, double heightChange) {
-        if (hitDir.getAxis() == Direction.Axis.Y)
+        if (hitDir.getAxis() == Direction.Axis.Y) {
             return false;
-        if (heightChange > 0.8124)
+        }
+        if (heightChange > 0.8124) {
             return false;
+        }
 
         Direction direction = state.getValue(FACING);
         BellAttachType bellAttachment = state.getValue(ATTACHMENT);
@@ -105,7 +120,11 @@ public abstract class AbstractBellBlock<BE extends AbstractBellBlockEntity> exte
 
     @Override
     @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_152194_, BlockState p_152195_, BlockEntityType<T> p_152196_) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+        Level p_152194_,
+        BlockState p_152195_,
+        BlockEntityType<T> p_152196_
+    ) {
         return IBE.super.getTicker(p_152194_, p_152195_, p_152196_);
     }
 

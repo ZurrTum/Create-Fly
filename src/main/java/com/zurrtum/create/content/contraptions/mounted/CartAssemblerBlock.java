@@ -66,7 +66,10 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         RailShape.EAST_WEST,
         RailShape.NORTH_SOUTH
     );
-    public static final EnumProperty<CartAssembleRailType> RAIL_TYPE = EnumProperty.create("rail_type", CartAssembleRailType.class);
+    public static final EnumProperty<CartAssembleRailType> RAIL_TYPE = EnumProperty.create(
+        "rail_type",
+        CartAssembleRailType.class
+    );
 
     public static final MapCodec<CartAssemblerBlock> CODEC = simpleCodec(CartAssemblerBlock::new);
 
@@ -88,10 +91,12 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     public static BlockState getRailBlock(BlockState state) {
         BaseRailBlock railBlock = (BaseRailBlock) state.getValue(RAIL_TYPE).getBlock();
 
-        BlockState railState = railBlock.defaultBlockState().setValue(railBlock.getShapeProperty(), state.getValue(RAIL_SHAPE));
+        BlockState railState = railBlock.defaultBlockState()
+            .setValue(railBlock.getShapeProperty(), state.getValue(RAIL_SHAPE));
 
-        if (railState.hasProperty(ControllerRailBlock.BACKWARDS))
+        if (railState.hasProperty(ControllerRailBlock.BACKWARDS)) {
             railState = railState.setValue(ControllerRailBlock.BACKWARDS, state.getValue(BACKWARDS));
+        }
         return railState;
     }
 
@@ -108,21 +113,18 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
 
     @Override
     public void onMinecartPass(BlockState state, Level world, BlockPos pos, AbstractMinecart cart) {
-        if (!canAssembleTo(cart))
+        if (!canAssembleTo(cart)) {
             return;
-        if (world.isClientSide())
+        }
+        if (world.isClientSide()) {
             return;
+        }
 
         withBlockEntityDo(world, pos, be -> be.assembleNextTick(cart));
     }
 
     public enum CartAssemblerAction {
-        ASSEMBLE,
-        DISASSEMBLE,
-        ASSEMBLE_ACCELERATE,
-        DISASSEMBLE_BRAKE,
-        ASSEMBLE_ACCELERATE_DIRECTIONAL,
-        PASS;
+        ASSEMBLE, DISASSEMBLE, ASSEMBLE_ACCELERATE, DISASSEMBLE_BRAKE, ASSEMBLE_ACCELERATE_DIRECTIONAL, PASS;
 
         public boolean shouldAssemble() {
             return this == ASSEMBLE || this == ASSEMBLE_ACCELERATE || this == ASSEMBLE_ACCELERATE_DIRECTIONAL;
@@ -138,9 +140,12 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         boolean powered = state.getValue(POWERED);
         return switch (type) {
             case ACTIVATOR_RAIL -> powered ? CartAssemblerAction.DISASSEMBLE : CartAssemblerAction.PASS;
-            case CONTROLLER_RAIL -> powered ? CartAssemblerAction.ASSEMBLE_ACCELERATE_DIRECTIONAL : CartAssemblerAction.DISASSEMBLE_BRAKE;
-            case DETECTOR_RAIL -> cart.getPassengers().isEmpty() ? CartAssemblerAction.ASSEMBLE_ACCELERATE : CartAssemblerAction.DISASSEMBLE;
-            case POWERED_RAIL -> powered ? CartAssemblerAction.ASSEMBLE_ACCELERATE : CartAssemblerAction.DISASSEMBLE_BRAKE;
+            case CONTROLLER_RAIL ->
+                powered ? CartAssemblerAction.ASSEMBLE_ACCELERATE_DIRECTIONAL : CartAssemblerAction.DISASSEMBLE_BRAKE;
+            case DETECTOR_RAIL -> cart.getPassengers()
+                .isEmpty() ? CartAssemblerAction.ASSEMBLE_ACCELERATE : CartAssemblerAction.DISASSEMBLE;
+            case POWERED_RAIL ->
+                powered ? CartAssemblerAction.ASSEMBLE_ACCELERATE : CartAssemblerAction.DISASSEMBLE_BRAKE;
             case REGULAR -> powered ? CartAssemblerAction.ASSEMBLE : CartAssemblerAction.DISASSEMBLE;
             default -> CartAssemblerAction.PASS;
         };
@@ -165,11 +170,14 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         if (heldItem != previousItem) {
 
             CartAssembleRailType newType = null;
-            for (CartAssembleRailType type : CartAssembleRailType.values())
-                if (heldItem == type.getItem())
+            for (CartAssembleRailType type : CartAssembleRailType.values()) {
+                if (heldItem == type.getItem()) {
                     newType = type;
-            if (newType == null)
+                }
+            }
+            if (newType == null) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
+            }
             level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1, 1);
             level.setBlockAndUpdate(pos, state.setValue(RAIL_TYPE, newType));
 
@@ -192,11 +200,13 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         @Nullable Orientation WireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
             worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
+        }
         super.neighborChanged(state, worldIn, pos, blockIn, WireOrientation, isMoving);
     }
 
@@ -221,10 +231,12 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (context instanceof EntityCollisionContext entityShapeContext) {
             Entity entity = entityShapeContext.getEntity();
-            if (entity instanceof AbstractMinecart)
+            if (entity instanceof AbstractMinecart) {
                 return Shapes.empty();
-            if (entity instanceof Player)
+            }
+            if (entity instanceof Player) {
                 return AllShapes.CART_ASSEMBLER_PLAYER_COLLISION.get(getRailAxis(state));
+            }
         }
         return Shapes.block();
     }
@@ -271,7 +283,8 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         return super.getDrops(
             state,
             (new LootParams.Builder(world)).withParameter(LootContextParams.ORIGIN, Vec3.atLowerCornerOf(pos))
-                .withParameter(LootContextParams.TOOL, p_220077_5_).withOptionalParameter(LootContextParams.THIS_ENTITY, p_220077_4_)
+                .withParameter(LootContextParams.TOOL, p_220077_5_)
+                .withOptionalParameter(LootContextParams.THIS_ENTITY, p_220077_4_)
                 .withOptionalParameter(LootContextParams.BLOCK_ENTITY, p_220077_3_)
         );
     }
@@ -281,9 +294,10 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return InteractionResult.SUCCESS;
-        if (player != null && !player.isCreative())
+        }
+        if (player != null && !player.isCreative()) {
             getDropsNoRail(
                 state,
                 (ServerLevel) world,
@@ -292,8 +306,10 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
                 player,
                 context.getItemInHand()
             ).forEach(itemStack -> player.getInventory().placeItemBackInInventory(itemStack));
-        if (world instanceof ServerLevel)
+        }
+        if (world instanceof ServerLevel) {
             state.spawnAfterBreak((ServerLevel) world, pos, ItemStack.EMPTY, true);
+        }
         world.setBlockAndUpdate(pos, getRailBlock(state));
         return InteractionResult.SUCCESS;
     }
@@ -312,7 +328,12 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
 
         @Override
         @NotNull
-        public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+        public VoxelShape getShape(
+            BlockState p_220053_1_,
+            BlockGetter p_220053_2_,
+            BlockPos p_220053_3_,
+            CollisionContext p_220053_4_
+        ) {
             return Shapes.empty();
         }
     }
@@ -325,8 +346,9 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         BlockPos pos = context.getClickedPos();
         world.setBlock(pos, rotate(state, Rotation.CLOCKWISE_90), Block.UPDATE_ALL);
         world.updateNeighborsAt(pos.below(), this, null);
@@ -335,25 +357,31 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
-        if (rotation == Rotation.NONE)
+        if (rotation == Rotation.NONE) {
             return state;
-        BlockState base = AllBlocks.CONTROLLER_RAIL.defaultBlockState().setValue(ControllerRailBlock.SHAPE, state.getValue(RAIL_SHAPE))
+        }
+        BlockState base = AllBlocks.CONTROLLER_RAIL.defaultBlockState()
+            .setValue(ControllerRailBlock.SHAPE, state.getValue(RAIL_SHAPE))
             .setValue(ControllerRailBlock.BACKWARDS, state.getValue(BACKWARDS)).rotate(rotation);
-        return state.setValue(RAIL_SHAPE, base.getValue(ControllerRailBlock.SHAPE)).setValue(BACKWARDS, base.getValue(ControllerRailBlock.BACKWARDS));
+        return state.setValue(RAIL_SHAPE, base.getValue(ControllerRailBlock.SHAPE))
+            .setValue(BACKWARDS, base.getValue(ControllerRailBlock.BACKWARDS));
     }
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        if (mirror == Mirror.NONE)
+        if (mirror == Mirror.NONE) {
             return state;
-        BlockState base = AllBlocks.CONTROLLER_RAIL.defaultBlockState().setValue(ControllerRailBlock.SHAPE, state.getValue(RAIL_SHAPE))
+        }
+        BlockState base = AllBlocks.CONTROLLER_RAIL.defaultBlockState()
+            .setValue(ControllerRailBlock.SHAPE, state.getValue(RAIL_SHAPE))
             .setValue(ControllerRailBlock.BACKWARDS, state.getValue(BACKWARDS)).mirror(mirror);
         return state.setValue(BACKWARDS, base.getValue(ControllerRailBlock.BACKWARDS));
     }
 
     public static Direction getHorizontalDirection(BlockState blockState) {
-        if (!(blockState.getBlock() instanceof CartAssemblerBlock))
+        if (!(blockState.getBlock() instanceof CartAssemblerBlock)) {
             return Direction.SOUTH;
+        }
         Direction pointingTo = getPointingTowards(blockState);
         return blockState.getValue(BACKWARDS) ? pointingTo.getOpposite() : pointingTo;
     }

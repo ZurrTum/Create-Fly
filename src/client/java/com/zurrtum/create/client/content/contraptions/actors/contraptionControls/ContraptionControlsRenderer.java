@@ -45,13 +45,26 @@ public class ContraptionControlsRenderer extends SmartBlockEntityRenderer<Contra
         state.buttonMovement = buttonMovementAxis.scale(-0.07f + -1 / 24f * be.button.getValue(tickProgress));
         state.buttonOffset = buttonMovementAxis.scale(0.07f);
         state.layer = RenderTypes.solidMovingBlock();
-        state.button = CachedBuffers.partialFacing(AllPartialModels.CONTRAPTION_CONTROLS_BUTTON, state.blockState, facing);
+        state.button = CachedBuffers.partialFacing(
+            AllPartialModels.CONTRAPTION_CONTROLS_BUTTON,
+            state.blockState,
+            facing
+        );
         int i = (((int) be.indicator.getValue(tickProgress) / 45) % 8) + 8;
-        state.indicator = CachedBuffers.partialFacing(AllPartialModels.CONTRAPTION_CONTROLS_INDICATOR.get(i % 8), state.blockState, facing);
+        state.indicator = CachedBuffers.partialFacing(
+            AllPartialModels.CONTRAPTION_CONTROLS_INDICATOR.get(i % 8),
+            state.blockState,
+            facing
+        );
     }
 
     @Override
-    public void submit(ContraptionControlsRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ContraptionControlsRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         matrices.pushPose();
         matrices.translate(state.buttonMovement);
         super.submit(state, matrices, queue, cameraState);

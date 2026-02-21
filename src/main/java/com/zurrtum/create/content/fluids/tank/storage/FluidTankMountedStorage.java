@@ -71,8 +71,9 @@ public class FluidTankMountedStorage extends WrapperMountedFluidStorage<FluidTan
     @Override
     public void afterSync(Contraption contraption, BlockPos localPos) {
         BlockEntity be = AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, localPos);
-        if (!(be instanceof FluidTankBlockEntity tank))
+        if (!(be instanceof FluidTankBlockEntity tank)) {
             return;
+        }
 
         FluidTank inv = tank.getTankInventory();
         inv.setFluid(this.getFluid());

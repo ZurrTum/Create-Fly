@@ -8,7 +8,12 @@ public class CEquipment extends ConfigBase {
     public final ConfigInt placementAssistRange = i(12, 3, "placementAssistRange", Comments.placementRange);
     public final ConfigInt toolboxRange = i(10, 1, "toolboxRange", Comments.toolboxRange);
     public final ConfigInt airInBacktank = i(900, 1, "airInBacktank", Comments.maxAirInBacktank);
-    public final ConfigInt enchantedBacktankCapacity = i(300, 1, "enchantedBacktankCapacity", Comments.enchantedBacktankCapacity);
+    public final ConfigInt enchantedBacktankCapacity = i(
+        300,
+        1,
+        "enchantedBacktankCapacity",
+        Comments.enchantedBacktankCapacity
+    );
 
     public final ConfigInt maxExtendoGripActions = i(1000, 0, "maxExtendoGripActions", Comments.maxExtendoGripActions);
     public final ConfigInt maxPotatoCannonShots = i(200, 0, "maxPotatoCannonShots", Comments.maxPotatoCannonShots);

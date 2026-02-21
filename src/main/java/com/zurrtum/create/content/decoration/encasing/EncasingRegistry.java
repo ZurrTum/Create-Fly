@@ -1,10 +1,9 @@
 package com.zurrtum.create.content.decoration.encasing;
 
 import com.zurrtum.create.AllBlocks;
+import net.minecraft.world.level.block.Block;
 
 import java.util.*;
-
-import net.minecraft.world.level.block.Block;
 
 public class EncasingRegistry {
     private static final Map<Block, List<Block>> ENCASED_VARIANTS = new HashMap<>();
@@ -12,7 +11,10 @@ public class EncasingRegistry {
     /**
      * <strong>This method must not be called before block registration is finished.</strong>
      */
-    public static <B extends Block & EncasableBlock, E extends Block & EncasedBlock, P> void addVariant(B encasable, E encased) {
+    public static <B extends Block & EncasableBlock, E extends Block & EncasedBlock, P> void addVariant(
+        B encasable,
+        E encased
+    ) {
         ENCASED_VARIANTS.computeIfAbsent(encasable, b -> new ArrayList<>()).add(encased);
     }
 

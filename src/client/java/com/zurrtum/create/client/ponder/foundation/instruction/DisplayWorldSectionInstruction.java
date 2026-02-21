@@ -4,13 +4,12 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.WorldSectionElementImpl;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 
 public class DisplayWorldSectionInstruction extends FadeIntoSceneInstruction<WorldSectionElement> {
 
@@ -52,8 +51,9 @@ public class DisplayWorldSectionInstruction extends FadeIntoSceneInstruction<Wor
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
-        if (remainingTicks > 0)
+        if (remainingTicks > 0) {
             return;
+        }
         Optional.ofNullable(mergeOnto).ifPresent(c -> element.mergeOnto(c.get()));
         //TODO
         //if (glue != null)

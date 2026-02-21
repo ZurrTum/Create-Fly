@@ -23,13 +23,21 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class ShadowRenderHelper {
 
-    private static final RenderType SHADOW_LAYER = RenderTypes.entityShadow(Identifier.withDefaultNamespace("textures/misc/shadow.png"));
+    private static final RenderType SHADOW_LAYER = RenderTypes.entityShadow(Identifier.withDefaultNamespace(
+        "textures/misc/shadow.png"));
 
     public static void renderShadow(PoseStack matrixStack, SubmitNodeCollector queue, float opacity, float radius) {
         queue.submitCustomGeometry(matrixStack, SHADOW_LAYER, new ShadowRenderState(opacity / 2, radius, -1 * radius));
     }
 
-    public static void renderShadow(PoseStack matrixStack, MultiBufferSource buffer, LevelReader world, Vec3 pos, float opacity, float radius) {
+    public static void renderShadow(
+        PoseStack matrixStack,
+        MultiBufferSource buffer,
+        LevelReader world,
+        Vec3 pos,
+        float opacity,
+        float radius
+    ) {
         float f = radius;
 
         double d2 = pos.x();
@@ -66,7 +74,10 @@ public class ShadowRenderHelper {
             if (blockstate.isCollisionShapeFullBlock(world, blockpos)) {
                 VoxelShape voxelshape = blockstate.getShape(world, pos.below());
                 if (!voxelshape.isEmpty()) {
-                    float brightness = LightTexture.getBrightness(world.dimensionType(), world.getMaxLocalRawBrightness(pos));
+                    float brightness = LightTexture.getBrightness(
+                        world.dimensionType(),
+                        world.getMaxLocalRawBrightness(pos)
+                    );
                     float f = (float) ((opacity - (y - pos.getY()) / 2.0D) * 0.5D * brightness);
                     if (f >= 0.0F) {
                         if (f > 1.0F) {
@@ -98,12 +109,23 @@ public class ShadowRenderHelper {
         }
     }
 
-    private static void shadowVertex(PoseStack.Pose entry, VertexConsumer builder, float alpha, float x, float y, float z, float u, float v) {
-        builder.addVertex(entry.pose(), x, y, z).setColor(1.0F, 1.0F, 1.0F, alpha).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
-            .setLight(LightTexture.FULL_BRIGHT).setNormal(entry, 0.0F, 1.0F, 0.0F);
+    private static void shadowVertex(
+        PoseStack.Pose entry,
+        VertexConsumer builder,
+        float alpha,
+        float x,
+        float y,
+        float z,
+        float u,
+        float v
+    ) {
+        builder.addVertex(entry.pose(), x, y, z).setColor(1.0F, 1.0F, 1.0F, alpha).setUv(u, v)
+            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT)
+            .setNormal(entry, 0.0F, 1.0F, 0.0F);
     }
 
-    public record ShadowRenderState(float opacity, float radius, float negativeRadius) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record ShadowRenderState(float opacity, float radius,
+                                    float negativeRadius) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose entry, VertexConsumer builder) {
             shadowVertex(entry, builder, opacity, negativeRadius, 0, negativeRadius, 0, 0);

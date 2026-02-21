@@ -17,10 +17,6 @@ import com.zurrtum.create.foundation.recipe.TimedRecipe;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -39,6 +35,9 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Optional;
 
 public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
@@ -103,8 +102,9 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
         runningTicks = view.getIntOr("Ticks", 0);
         super.read(view, clientPacket);
 
-        if (clientPacket && hasLevel())
+        if (clientPacket && hasLevel()) {
             getBasin().ifPresent(bte -> bte.setAreFluidsMoving(running && runningTicks <= 20));
+        }
     }
 
     @Override
@@ -127,14 +127,16 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
         float speed = Math.abs(getSpeed());
         if (running && level != null) {
-            if (level.isClientSide() && runningTicks == 20)
+            if (level.isClientSide() && runningTicks == 20) {
                 renderParticles();
+            }
 
             if (getSpeed() == 0 || !isSpeedRequirementFulfilled()) {
-                if (runningTicks < 20)
+                if (runningTicks < 20) {
                     runningTicks = 40 - runningTicks;
-                else if (runningTicks == 20)
+                } else if (runningTicks == 20) {
                     runningTicks++;
+                }
             }
 
             if ((!level.isClientSide() || isVirtual()) && runningTicks == 20) {
@@ -165,33 +167,42 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
                 }
             }
 
-            if (runningTicks != 20)
+            if (runningTicks != 20) {
                 runningTicks++;
+            }
         }
     }
 
     public void renderParticles() {
         Optional<BasinBlockEntity> basin = getBasin();
-        if (basin.isEmpty() || level == null)
+        if (basin.isEmpty() || level == null) {
             return;
+        }
 
         BasinInventory inv = basin.get().itemCapability;
         for (int slot = 0, size = inv.getContainerSize(); slot < size; slot++) {
             ItemStack stackInSlot = inv.getItem(slot);
-            if (stackInSlot.isEmpty())
+            if (stackInSlot.isEmpty()) {
                 continue;
+            }
             ItemParticleOption data = new ItemParticleOption(ParticleTypes.ITEM, stackInSlot);
             spillParticle(data);
         }
 
         for (SmartFluidTankBehaviour behaviour : basin.get().getTanks()) {
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             for (TankSegment tankSegment : behaviour.getTanks()) {
-                if (tankSegment.isEmpty(0))
+                if (tankSegment.isEmpty(0)) {
                     continue;
+                }
                 FluidStack stack = tankSegment.getRenderedFluid();
-                spillParticle(new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, stack.getFluid(), stack.getComponentChanges()));
+                spillParticle(new FluidParticleData(
+                    AllParticleTypes.FLUID_PARTICLE,
+                    stack.getFluid(),
+                    stack.getComponentChanges()
+                ));
             }
         }
     }
@@ -222,8 +233,9 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
     @Override
     public void startProcessingBasin() {
-        if (running && runningTicks <= 20)
+        if (running && runningTicks <= 20) {
             return;
+        }
         super.startProcessingBasin();
         running = true;
         runningTicks = 0;
@@ -237,8 +249,9 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
     @Override
     protected void onBasinRemoved() {
-        if (!running)
+        if (!running) {
             return;
+        }
         runningTicks = 40;
         running = false;
     }

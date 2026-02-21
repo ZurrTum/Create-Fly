@@ -8,25 +8,25 @@ import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
 import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipePropertySet;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipePropertySet;
-
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllRecipeSets {
     public static final Map<ResourceKey<RecipePropertySet>, RecipeManager.IngredientExtractor> ALL = new IdentityHashMap<>();
     public static final ResourceKey<RecipePropertySet> ITEM_APPLICATION_TARGET = register("item_application_target");
-    public static final ResourceKey<RecipePropertySet> ITEM_APPLICATION_INGREDIENT = register("item_application_ingredient");
+    public static final ResourceKey<RecipePropertySet> ITEM_APPLICATION_INGREDIENT = register(
+        "item_application_ingredient");
     public static final ResourceKey<RecipePropertySet> EMPTYING = register("emptying");
     public static final ResourceKey<RecipePropertySet> FILLING = register("filling");
     public static final ResourceKey<RecipePropertySet> SAND_PAPER_POLISHING = register("sand_paper_polishing");
@@ -40,7 +40,11 @@ public class AllRecipeSets {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Recipe<?>> void register(ResourceKey<RecipePropertySet> key, Class<T> type, Function<T, Ingredient> getter) {
+    private static <T extends Recipe<?>> void register(
+        ResourceKey<RecipePropertySet> key,
+        Class<T> type,
+        Function<T, Ingredient> getter
+    ) {
         ALL.put(
             key, recipe -> {
                 if (type.isInstance(recipe)) {

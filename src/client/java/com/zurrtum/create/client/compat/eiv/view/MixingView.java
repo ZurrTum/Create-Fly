@@ -94,7 +94,14 @@ public class MixingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 32);
         Matrix3x2f pose = new Matrix3x2f(context.pose());
         if (heat == HeatCondition.NONE) {
@@ -103,9 +110,21 @@ public class MixingView extends CreateView {
         } else {
             AllGuiTextures.JEI_HEAT_BAR.render(context, 0, 80);
             AllGuiTextures.JEI_LIGHT.render(context, 77, 88);
-            context.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(pose, 87, 69, heat.visualizeAsBlazeBurner()));
+            context.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(
+                pose,
+                87,
+                69,
+                heat.visualizeAsBlazeBurner()
+            ));
         }
         context.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 87, -5));
-        context.drawString(Minecraft.getInstance().font, CreateLang.translateDirect(heat.getTranslationKey()), 5, 86, heat.getColor(), false);
+        context.drawString(
+            Minecraft.getInstance().font,
+            CreateLang.translateDirect(heat.getTranslationKey()),
+            5,
+            86,
+            heat.getColor(),
+            false
+        );
     }
 }

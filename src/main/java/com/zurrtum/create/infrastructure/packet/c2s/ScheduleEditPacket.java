@@ -11,8 +11,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ScheduleEditPacket(Schedule schedule) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleEditPacket> CODEC = Schedule.STREAM_CODEC.map(
-        ScheduleEditPacket::new,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleEditPacket> CODEC = Schedule.STREAM_CODEC.map(ScheduleEditPacket::new,
         ScheduleEditPacket::schedule
     );
 

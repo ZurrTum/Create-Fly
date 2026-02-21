@@ -46,9 +46,13 @@ public class ObjLoader extends CreateResourceReloader implements UnbakedModelLoa
     }
 
     @Override
-    public ObjModel read(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        if (!jsonObject.has("model"))
+    public ObjModel read(
+        JsonObject jsonObject,
+        JsonDeserializationContext jsonDeserializationContext
+    ) throws JsonParseException {
+        if (!jsonObject.has("model")) {
             throw new JsonParseException("OBJ Loader requires a 'model' key that points to a valid .OBJ model.");
+        }
 
         String modelLocation = jsonObject.get("model").getAsString();
 

@@ -17,9 +17,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
-public record TrainRelocationPacket(
-    UUID trainId, BlockPos pos, Vec3 lookAngle, int entityId, boolean direction, BezierTrackPointLocation hoveredBezier
-) implements Packet<ServerGamePacketListener> {
+public record TrainRelocationPacket(UUID trainId, BlockPos pos, Vec3 lookAngle, int entityId, boolean direction,
+                                    BezierTrackPointLocation hoveredBezier) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, TrainRelocationPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainRelocationPacket::trainId,

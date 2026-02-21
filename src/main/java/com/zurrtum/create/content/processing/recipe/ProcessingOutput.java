@@ -21,7 +21,8 @@ public record ProcessingOutput(Holder<Item> item, int count, DataComponentPatch 
     public static Codec<ProcessingOutput> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Item.CODEC.fieldOf("id").forGetter(ProcessingOutput::item),
         ExtraCodecs.intRange(1, 99).optionalFieldOf("count", 1).forGetter(ProcessingOutput::count),
-        DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(ProcessingOutput::components),
+        DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+            .forGetter(ProcessingOutput::components),
         Codec.FLOAT.optionalFieldOf("chance", 1F).forGetter(ProcessingOutput::chance)
     ).apply(instance, ProcessingOutput::new));
     public static StreamCodec<RegistryFriendlyByteBuf, ProcessingOutput> STREAM_CODEC = StreamCodec.composite(

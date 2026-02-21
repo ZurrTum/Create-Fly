@@ -34,17 +34,25 @@ public class FluidTankItem extends BlockItem {
     @Override
     public InteractionResult place(BlockPlaceContext ctx) {
         InteractionResult initialResult = super.place(ctx);
-        if (!initialResult.consumesAction())
+        if (!initialResult.consumesAction()) {
             return initialResult;
+        }
         tryMultiPlace(ctx);
         return initialResult;
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos blockPos, Level level, Player player, ItemStack itemStack, BlockState blockState) {
+    protected boolean updateCustomBlockEntityTag(
+        BlockPos blockPos,
+        Level level,
+        Player player,
+        ItemStack itemStack,
+        BlockState blockState
+    ) {
         MinecraftServer minecraftserver = level.getServer();
-        if (minecraftserver == null)
+        if (minecraftserver == null) {
             return false;
+        }
         TypedEntityData<BlockEntityType<?>> data = itemStack.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null) {
             CompoundTag nbt = data.copyTagWithoutId();
@@ -60,74 +68,96 @@ public class FluidTankItem extends BlockItem {
                     nbt.put("TankContent", fluid.toNbt(minecraftserver.registryAccess()));
                 }
             }
-            itemStack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(((IBE<?>) this.getBlock()).getBlockEntityType(), nbt));
+            itemStack.set(
+                DataComponents.BLOCK_ENTITY_DATA,
+                TypedEntityData.of(((IBE<?>) this.getBlock()).getBlockEntityType(), nbt)
+            );
         }
         return super.updateCustomBlockEntityTag(blockPos, level, player, itemStack, blockState);
     }
 
     private void tryMultiPlace(BlockPlaceContext ctx) {
         Player player = ctx.getPlayer();
-        if (player == null)
+        if (player == null) {
             return;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return;
+        }
         Direction face = ctx.getClickedFace();
-        if (!face.getAxis().isVertical())
+        if (!face.getAxis().isVertical()) {
             return;
+        }
         ItemStack stack = ctx.getItemInHand();
         Level world = ctx.getLevel();
         BlockPos pos = ctx.getClickedPos();
         BlockPos placedOnPos = pos.relative(face.getOpposite());
         BlockState placedOnState = world.getBlockState(placedOnPos);
 
-        if (!FluidTankBlock.isTank(placedOnState))
+        if (!FluidTankBlock.isTank(placedOnState)) {
             return;
-        if (SymmetryWandItem.presentInHotbar(player))
+        }
+        if (SymmetryWandItem.presentInHotbar(player)) {
             return;
+        }
         boolean creative = getBlock().equals(AllBlocks.CREATIVE_FLUID_TANK);
         FluidTankBlockEntity tankAt = ConnectivityHandler.partAt(
             creative ? AllBlockEntityTypes.CREATIVE_FLUID_TANK : AllBlockEntityTypes.FLUID_TANK,
             world,
             placedOnPos
         );
-        if (tankAt == null)
+        if (tankAt == null) {
             return;
+        }
         FluidTankBlockEntity controllerBE = tankAt.getControllerBE();
-        if (controllerBE == null)
+        if (controllerBE == null) {
             return;
+        }
 
         int width = controllerBE.width;
-        if (width == 1)
+        if (width == 1) {
             return;
+        }
 
         int tanksToPlace = 0;
-        BlockPos startPos = face == Direction.DOWN ? controllerBE.getBlockPos().below() : controllerBE.getBlockPos().above(controllerBE.height);
+        BlockPos startPos = face == Direction.DOWN ? controllerBE.getBlockPos().below() : controllerBE.getBlockPos()
+            .above(controllerBE.height);
 
-        if (startPos.getY() != pos.getY())
+        if (startPos.getY() != pos.getY()) {
             return;
+        }
 
         for (int xOffset = 0; xOffset < width; xOffset++) {
             for (int zOffset = 0; zOffset < width; zOffset++) {
                 BlockPos offsetPos = startPos.offset(xOffset, 0, zOffset);
                 BlockState blockState = world.getBlockState(offsetPos);
-                if (FluidTankBlock.isTank(blockState))
+                if (FluidTankBlock.isTank(blockState)) {
                     continue;
-                if (!blockState.canBeReplaced())
+                }
+                if (!blockState.canBeReplaced()) {
                     return;
+                }
                 tanksToPlace++;
             }
         }
 
-        if (!player.isCreative() && stack.getCount() < tanksToPlace)
+        if (!player.isCreative() && stack.getCount() < tanksToPlace) {
             return;
+        }
 
-        ItemPlacementSoundContext context = new ItemPlacementSoundContext(ctx, 0.1f, 1.5f, SILENCED_METAL.getPlaceSound());
+        ItemPlacementSoundContext context = new ItemPlacementSoundContext(
+            ctx,
+            0.1f,
+            1.5f,
+            SILENCED_METAL.getPlaceSound()
+        );
         for (int xOffset = 0; xOffset < width; xOffset++) {
             for (int zOffset = 0; zOffset < width; zOffset++) {
                 BlockPos offsetPos = startPos.offset(xOffset, 0, zOffset);
                 BlockState blockState = world.getBlockState(offsetPos);
-                if (FluidTankBlock.isTank(blockState))
+                if (FluidTankBlock.isTank(blockState)) {
                     continue;
+                }
                 super.place(context.offset(offsetPos, face));
             }
         }

@@ -27,8 +27,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 
 public class ItemFrameVisual extends AbstractVisual implements EntityVisual<ItemFrame>, SimpleDynamicVisual {
-    public static final RendererReloadCache<BlockStateModel, Model> MODEL_RESOURCE_LOCATION = new RendererReloadCache<>(model -> new BakedModelBuilder(
-        model).build());
+    public static final RendererReloadCache<BlockStateModel, Model> MODEL_RESOURCE_LOCATION = new RendererReloadCache<>(
+        model -> new BakedModelBuilder(model).build());
 
     private final Matrix4f baseTransform = new Matrix4f();
 
@@ -52,7 +52,8 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
 
         frame.setTransform(baseTransform);
 
-        item = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, lastItemStack, ItemDisplayContext.FIXED))
+        item = ctx.instancerProvider()
+            .instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, lastItemStack, ItemDisplayContext.FIXED))
             .createInstance();
 
         animate(partialTick);
@@ -60,7 +61,10 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
 
     public static boolean shouldVisualize(ItemFrame entity) {
         // We don't support map rendering, and we can't support exotic item models.
-        return !entity.getItem().is(Items.FILLED_MAP) && ItemModels.isSupported(entity.getItem(), ItemDisplayContext.FIXED);
+        return !entity.getItem().is(Items.FILLED_MAP) && ItemModels.isSupported(
+            entity.getItem(),
+            ItemDisplayContext.FIXED
+        );
     }
 
     @Override
@@ -69,7 +73,10 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
     }
 
     public void animate(float partialTick) {
-        var light = LightTexture.pack(getBlockLightLevel(entity.blockPosition()), getSkyLightLevel(entity.blockPosition()));
+        var light = LightTexture.pack(
+            getBlockLightLevel(entity.blockPosition()),
+            getSkyLightLevel(entity.blockPosition())
+        );
 
         boolean invisible = entity.isInvisible();
 
@@ -89,8 +96,8 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
         var frameLocation = getFrameModel();
 
         if (frameLocation != lastFrameModel) {
-            visualizationContext.instancerProvider().instancer(InstanceTypes.TRANSFORMED, MODEL_RESOURCE_LOCATION.get(frameLocation))
-                .stealInstance(frame);
+            visualizationContext.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, MODEL_RESOURCE_LOCATION.get(frameLocation)).stealInstance(frame);
             lastFrameModel = frameLocation;
         }
 
@@ -101,7 +108,8 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
         if (!ItemStack.matches(lastItemStack, stack)) {
             lastItemStack = stack.copy();
             visualizationContext.instancerProvider()
-                .instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, lastItemStack, ItemDisplayContext.FIXED)).stealInstance(item);
+                .instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, lastItemStack, ItemDisplayContext.FIXED))
+                .stealInstance(item);
         }
 
         item.setTransform(baseTransform);
@@ -145,7 +153,10 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
     }
 
     protected int getBlockLightLevel(BlockPos pos) {
-        return entity.getType() == EntityType.GLOW_ITEM_FRAME ? Math.max(5, getBlockLightLevelBase(pos)) : getBlockLightLevelBase(pos);
+        return entity.getType() == EntityType.GLOW_ITEM_FRAME ? Math.max(
+            5,
+            getBlockLightLevelBase(pos)
+        ) : getBlockLightLevelBase(pos);
     }
 
     public BlockStateModel getFrameModel() {

@@ -8,15 +8,14 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+
+import java.util.List;
 
 public class RepackagerScenes {
 
@@ -61,7 +60,8 @@ public class RepackagerScenes {
         scene.world().showSection(crafterCogs, Direction.EAST);
         scene.idle(5);
 
-        scene.overlay().showText(120).text("Sometimes, it is crucial for logistical requests to arrive as a single package").attachKeyFrame()
+        scene.overlay().showText(120)
+            .text("Sometimes, it is crucial for logistical requests to arrive as a single package").attachKeyFrame()
             .placeNearTarget().independent(130);
 
         scene.idle(90);
@@ -92,17 +92,19 @@ public class RepackagerScenes {
         AABB bb1 = new AABB(util.grid().at(2, 2, 1)).deflate(0.125, 0.5, 0.125).inflate(0.65, 0, 0).move(1.05, -.5, 0);
         AABB bb2 = new AABB(util.grid().at(7, 2, 1)).deflate(0.125, 0.5, 0.125).move(-.25, -.5, 0);
 
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, pack, new AABB(bb1.getCenter(), bb1.getCenter()), 1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, repack, new AABB(bb2.getCenter(), bb2.getCenter()), 1);
+        scene.overlay()
+            .chaseBoundingBoxOutline(PonderPalette.INPUT, pack, new AABB(bb1.getCenter(), bb1.getCenter()), 1);
+        scene.overlay()
+            .chaseBoundingBoxOutline(PonderPalette.OUTPUT, repack, new AABB(bb2.getCenter(), bb2.getCenter()), 1);
         scene.idle(1);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, pack, bb1, 60);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, repack, bb2, 60);
 
-        scene.overlay().showText(60).text("Order A").attachKeyFrame().colored(PonderPalette.INPUT).pointAt(util.vector().of(3, 2, 1.5))
-            .placeNearTarget();
+        scene.overlay().showText(60).text("Order A").attachKeyFrame().colored(PonderPalette.INPUT)
+            .pointAt(util.vector().of(3, 2, 1.5)).placeNearTarget();
 
-        scene.overlay().showText(60).text("Order B").attachKeyFrame().colored(PonderPalette.OUTPUT).pointAt(util.vector().of(7, 2, 1.5))
-            .placeNearTarget();
+        scene.overlay().showText(60).text("Order B").attachKeyFrame().colored(PonderPalette.OUTPUT)
+            .pointAt(util.vector().of(7, 2, 1.5)).placeNearTarget();
         scene.idle(60);
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 24f);
@@ -110,8 +112,8 @@ public class RepackagerScenes {
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 24f);
 
-        scene.overlay().showText(60).text("Otherwise, other packages could arrive inbetween").attachKeyFrame().colored(PonderPalette.RED)
-            .pointAt(util.vector().of(5.5, 2, 3)).placeNearTarget();
+        scene.overlay().showText(60).text("Otherwise, other packages could arrive inbetween").attachKeyFrame()
+            .colored(PonderPalette.RED).pointAt(util.vector().of(5.5, 2, 3)).placeNearTarget();
         scene.idle(60);
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 16f);
@@ -127,11 +129,16 @@ public class RepackagerScenes {
         insertItemsIntoCrafter(util, scene, new ItemStack(Items.OAK_PLANKS, 3));
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 5), Direction.NORTH), Pointing.DOWN, 40)
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 3, 5), Direction.NORTH), Pointing.DOWN, 40)
             .withItem(new ItemStack(Items.BARRIER));
 
         scene.idle(20);
-        scene.world().modifyBlockEntity(util.grid().at(2, 2, 5), MechanicalCrafterBlockEntity.class, MechanicalCrafterBlockEntity::ejectWholeGrid);
+        scene.world().modifyBlockEntity(
+            util.grid().at(2, 2, 5),
+            MechanicalCrafterBlockEntity.class,
+            MechanicalCrafterBlockEntity::ejectWholeGrid
+        );
         scene.world().removeItemsFromBelt(util.grid().at(5, 1, 5));
 
         scene.idle(40);
@@ -176,8 +183,8 @@ public class RepackagerScenes {
         scene.effects().indicateSuccess(repack);
         scene.idle(20);
 
-        scene.overlay().showText(60).text("Once all fragments arrived, they will be exported as a new package").attachKeyFrame()
-            .colored(PonderPalette.GREEN).pointAt(util.vector().of(5.5, 2, 3)).placeNearTarget();
+        scene.overlay().showText(60).text("Once all fragments arrived, they will be exported as a new package")
+            .attachKeyFrame().colored(PonderPalette.GREEN).pointAt(util.vector().of(5.5, 2, 3)).placeNearTarget();
         scene.idle(60);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 2f);
         scene.rotateCameraY(15);
@@ -195,8 +202,9 @@ public class RepackagerScenes {
         scene.world().setCraftingResult(util.grid().at(2, 2, 5), new ItemStack(Items.IRON_BLOCK));
         scene.idle(15);
 
-        scene.overlay().showText(120).text("Now, requested items arrive together and in a predictable order").attachKeyFrame()
-            .colored(PonderPalette.BLUE).pointAt(util.vector().blockSurface(util.grid().at(2, 3, 5), Direction.NORTH)).placeNearTarget();
+        scene.overlay().showText(120).text("Now, requested items arrive together and in a predictable order")
+            .attachKeyFrame().colored(PonderPalette.BLUE)
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 5), Direction.NORTH)).placeNearTarget();
 
         scene.idle(75);
         scene.world().removeItemsFromBelt(util.grid().at(5, 1, 5));
@@ -205,11 +213,19 @@ public class RepackagerScenes {
         insertItemsIntoCrafter(util, scene, new ItemStack(Items.OAK_PLANKS, 3));
         scene.world().setCraftingResult(util.grid().at(2, 2, 5), new ItemStack(Items.OAK_SLAB));
         scene.idle(20);
-        scene.world().modifyBlockEntity(util.grid().at(2, 2, 5), MechanicalCrafterBlockEntity.class, be -> be.checkCompletedRecipe(true));
+        scene.world().modifyBlockEntity(
+            util.grid().at(2, 2, 5),
+            MechanicalCrafterBlockEntity.class,
+            be -> be.checkCompletedRecipe(true)
+        );
     }
 
     private static void insertItemsIntoCrafter(SceneBuildingUtil util, CreateSceneBuilder scene, ItemStack stack) {
-        scene.world().modifyBlockEntity(util.grid().at(3, 2, 5), MechanicalCrafterBlockEntity.class, be -> be.getInvCapability().insert(stack));
+        scene.world().modifyBlockEntity(
+            util.grid().at(3, 2, 5),
+            MechanicalCrafterBlockEntity.class,
+            be -> be.getInvCapability().insert(stack)
+        );
     }
 
 }

@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.fluids.spout;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.behaviour.spouting.BlockSpoutingBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
@@ -64,7 +64,8 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         tank = SmartFluidTankBehaviour.single(this, BucketFluidInventory.CAPACITY, SpoutFluidHandler::new);
         behaviours.add(tank);
 
-        beltProcessing = new BeltProcessingBehaviour(this).whenItemEnters(this::onItemReceived).whileItemHeld(this::whenItemHeld);
+        beltProcessing = new BeltProcessingBehaviour(this).whenItemEnters(this::onItemReceived)
+            .whileItemHeld(this::whenItemHeld);
         behaviours.add(beltProcessing);
     }
 
@@ -73,31 +74,54 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         return List.of(AllAdvancements.SPOUT, AllAdvancements.FOODS);
     }
 
-    protected ProcessingResult onItemReceived(TransportedItemStack transported, TransportedItemStackHandlerBehaviour handler) {
-        if (handler.blockEntity.isVirtual())
+    protected ProcessingResult onItemReceived(
+        TransportedItemStack transported,
+        TransportedItemStackHandlerBehaviour handler
+    ) {
+        if (handler.blockEntity.isVirtual()) {
             return PASS;
-        if (!FillingBySpout.canItemBeFilled(level, transported.stack))
+        }
+        if (!FillingBySpout.canItemBeFilled(level, transported.stack)) {
             return PASS;
-        if (tank.isEmpty())
+        }
+        if (tank.isEmpty()) {
             return HOLD;
-        if (FillingBySpout.getRequiredAmountForItem((ServerLevel) level, transported.stack, getCurrentFluidInTank()) == -1)
+        }
+        if (FillingBySpout.getRequiredAmountForItem(
+            (ServerLevel) level,
+            transported.stack,
+            getCurrentFluidInTank()
+        ) == -1) {
             return PASS;
+        }
         return HOLD;
     }
 
-    protected ProcessingResult whenItemHeld(TransportedItemStack transported, TransportedItemStackHandlerBehaviour handler) {
-        if (processingTicks != -1 && processingTicks != 5)
+    protected ProcessingResult whenItemHeld(
+        TransportedItemStack transported,
+        TransportedItemStackHandlerBehaviour handler
+    ) {
+        if (processingTicks != -1 && processingTicks != 5) {
             return HOLD;
-        if (!FillingBySpout.canItemBeFilled(level, transported.stack))
+        }
+        if (!FillingBySpout.canItemBeFilled(level, transported.stack)) {
             return PASS;
-        if (tank.isEmpty())
+        }
+        if (tank.isEmpty()) {
             return HOLD;
+        }
         FluidStack fluid = getCurrentFluidInTank();
-        int requiredAmountForItem = FillingBySpout.getRequiredAmountForItem((ServerLevel) level, transported.stack, fluid.copy());
-        if (requiredAmountForItem <= 0)
+        int requiredAmountForItem = FillingBySpout.getRequiredAmountForItem(
+            (ServerLevel) level,
+            transported.stack,
+            fluid.copy()
+        );
+        if (requiredAmountForItem <= 0) {
             return PASS;
-        if (requiredAmountForItem > fluid.getAmount())
+        }
+        if (requiredAmountForItem > fluid.getAmount()) {
             return HOLD;
+        }
 
         if (processingTicks == -1) {
             processingTicks = FILLING_TIME;
@@ -114,10 +138,14 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             TransportedItemStack held = null;
             TransportedItemStack result = transported.copy();
             result.stack = out;
-            if (!transported.stack.isEmpty())
+            if (!transported.stack.isEmpty()) {
                 held = transported.copy();
+            }
             outList.add(result);
-            handler.handleProcessingOnItem(transported, TransportedItemStackHandlerBehaviour.TransportedResult.convertToAndLeaveHeld(outList, held));
+            handler.handleProcessingOnItem(
+                transported,
+                TransportedItemStackHandlerBehaviour.TransportedResult.convertToAndLeaveHeld(outList, held)
+            );
         }
 
         award(AllAdvancements.SPOUT);
@@ -125,8 +153,9 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             createdChocolateBerries |= out.is(AllItems.CHOCOLATE_BERRIES);
             createdHoneyApple |= out.is(AllItems.HONEYED_APPLE);
             createdSweetRoll |= out.is(AllItems.SWEET_ROLL);
-            if (createdChocolateBerries && createdHoneyApple && createdSweetRoll)
+            if (createdChocolateBerries && createdHoneyApple && createdSweetRoll) {
                 award(AllAdvancements.FOODS);
+            }
         }
 
         TankSegment primaryHandler = tank.getPrimaryHandler();
@@ -151,14 +180,18 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             sendSplash = false;
         }
 
-        if (!trackFoods())
+        if (!trackFoods()) {
             return;
-        if (createdChocolateBerries)
+        }
+        if (createdChocolateBerries) {
             view.putBoolean("ChocolateBerries", true);
-        if (createdHoneyApple)
+        }
+        if (createdHoneyApple) {
             view.putBoolean("HoneyApple", true);
-        if (createdSweetRoll)
+        }
+        if (createdSweetRoll) {
             view.putBoolean("SweetRoll", true);
+        }
     }
 
     private boolean trackFoods() {
@@ -175,10 +208,12 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         createdHoneyApple = view.getBooleanOr("HoneyApple", false);
         createdSweetRoll = view.getBooleanOr("SweetRoll", false);
 
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
-        if (view.getBooleanOr("Splash", false))
+        }
+        if (view.getBooleanOr("Splash", false)) {
             spawnSplash(tank.getPrimaryTank().getRenderedFluid());
+        }
     }
 
     public void tick() {
@@ -198,11 +233,20 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         if (processingTicks >= 0) {
             processingTicks--;
             if (processingTicks == 5 && customProcess != null) {
-                int fillBlock = customProcess.fillBlock(level, worldPosition.below(2), this, currentFluidInTank.copy(), false);
+                int fillBlock = customProcess.fillBlock(
+                    level,
+                    worldPosition.below(2),
+                    this,
+                    currentFluidInTank.copy(),
+                    false
+                );
                 customProcess = null;
                 if (fillBlock > 0) {
                     TankSegment handler = tank.getPrimaryHandler();
-                    handler.setFluid(FluidHelper.copyStackWithAmount(currentFluidInTank, currentFluidInTank.getAmount() - fillBlock));
+                    handler.setFluid(FluidHelper.copyStackWithAmount(
+                        currentFluidInTank,
+                        currentFluidInTank.getAmount() - fillBlock
+                    ));
                     handler.markDirty();
                     sendSplash = true;
                     notifyUpdate();
@@ -216,22 +260,32 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     }
 
     protected void spawnProcessingParticles(FluidStack fluid) {
-        if (isVirtual() || fluid.isEmpty())
+        if (isVirtual() || fluid.isEmpty()) {
             return;
+        }
         Vec3 vec = VecHelper.getCenterOf(worldPosition);
         vec = vec.subtract(0, 8 / 16f, 0);
-        ParticleOptions particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
+        ParticleOptions particle = new FluidParticleData(
+            AllParticleTypes.FLUID_PARTICLE,
+            fluid.getFluid(),
+            fluid.getComponentChanges()
+        );
         level.addAlwaysVisibleParticle(particle, vec.x, vec.y, vec.z, 0, -.1f, 0);
     }
 
     protected static int SPLASH_PARTICLE_COUNT = 20;
 
     protected void spawnSplash(FluidStack fluid) {
-        if (isVirtual() || fluid.isEmpty())
+        if (isVirtual() || fluid.isEmpty()) {
             return;
+        }
         Vec3 vec = VecHelper.getCenterOf(worldPosition);
         vec = vec.subtract(0, 2 - 5 / 16f, 0);
-        ParticleOptions particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
+        ParticleOptions particle = new FluidParticleData(
+            AllParticleTypes.FLUID_PARTICLE,
+            fluid.getFluid(),
+            fluid.getComponentChanges()
+        );
         for (int i = 0; i < SPLASH_PARTICLE_COUNT; i++) {
             Vec3 m = VecHelper.offsetRandomly(Vec3.ZERO, level.random, 0.125f);
             m = new Vec3(m.x, Math.abs(m.y), m.z);

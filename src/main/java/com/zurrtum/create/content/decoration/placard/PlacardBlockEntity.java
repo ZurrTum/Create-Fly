@@ -2,12 +2,9 @@ package com.zurrtum.create.content.decoration.placard;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +13,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class PlacardBlockEntity extends SmartBlockEntity {
 
@@ -38,14 +37,17 @@ public class PlacardBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (poweredTicks == 0)
+        }
+        if (poweredTicks == 0) {
             return;
+        }
 
         poweredTicks--;
-        if (poweredTicks > 0)
+        if (poweredTicks > 0) {
             return;
+        }
 
         BlockState blockState = getBlockState();
         level.setBlock(worldPosition, blockState.setValue(PlacardBlock.POWERED, false), Block.UPDATE_ALL);
@@ -77,14 +79,16 @@ public class PlacardBlockEntity extends SmartBlockEntity {
         heldItem = view.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         super.read(view, clientPacket);
 
-        if (clientPacket && prevTicks < poweredTicks)
+        if (clientPacket && prevTicks < poweredTicks) {
             spawnParticles();
+        }
     }
 
     private void spawnParticles() {
         BlockState blockState = getBlockState();
-        if (!blockState.is(AllBlocks.PLACARD))
+        if (!blockState.is(AllBlocks.PLACARD)) {
             return;
+        }
 
         DustParticleOptions pParticleData = new DustParticleOptions(0xff3300, 1);
         Vec3 centerOf = VecHelper.getCenterOf(worldPosition);
@@ -92,8 +96,8 @@ public class PlacardBlockEntity extends SmartBlockEntity {
         Vec3 offset = VecHelper.axisAlingedPlaneOf(normal);
 
         for (int i = 0; i < 10; i++) {
-            Vec3 v = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .5f).multiply(offset).normalize().scale(.45f).add(normal.scale(-.45f))
-                .add(centerOf);
+            Vec3 v = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .5f).multiply(offset).normalize().scale(.45f)
+                .add(normal.scale(-.45f)).add(centerOf);
             level.addParticle(pParticleData, v.x, v.y, v.z, 0, 0, 0);
         }
     }

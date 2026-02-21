@@ -42,13 +42,34 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/item");
     public static final Identifier POLE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/pole");
     public static final Identifier COG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/cog");
-    public static final Identifier THIN_SHORT_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_short");
-    public static final Identifier WIDE_SHORT_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_short");
-    public static final Identifier THIN_LONG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_long");
-    public static final Identifier WIDE_LONG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_long");
-    public static final Identifier DEPLOYER_HAND_POINTING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_pointing");
-    public static final Identifier DEPLOYER_HAND_PUNCHING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_punching");
-    public static final Identifier DEPLOYER_HAND_HOLDING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_holding");
+    public static final Identifier THIN_SHORT_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/extendo_grip/thin_short"
+    );
+    public static final Identifier WIDE_SHORT_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/extendo_grip/wide_short"
+    );
+    public static final Identifier THIN_LONG_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/extendo_grip/thin_long"
+    );
+    public static final Identifier WIDE_LONG_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/extendo_grip/wide_long"
+    );
+    public static final Identifier DEPLOYER_HAND_POINTING = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "block/deployer/hand_pointing"
+    );
+    public static final Identifier DEPLOYER_HAND_PUNCHING = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "block/deployer/hand_punching"
+    );
+    public static final Identifier DEPLOYER_HAND_HOLDING = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "block/deployer/hand_holding"
+    );
 
     private final RenderType itemLayer = Sheets.translucentItemSheet();
     private final RenderType blockLayer = Sheets.translucentBlockItemSheet();
@@ -110,12 +131,13 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         data.animation = 0.25f;
         boolean leftHand = displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         boolean rightHand = displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
-        if (leftHand || rightHand)
+        if (leftHand || rightHand) {
             data.animation = Mth.lerp(
                 AnimationTickHolder.getPartialTicks(),
                 ExtendoGripRenderHandler.lastMainHandAnimation,
                 ExtendoGripRenderHandler.mainHandAnimation
             );
+        }
         data.animation = data.animation * data.animation * data.animation;
         float extensionAngle = Mth.lerp(data.animation, 24f, 156f);
         data.state = state.newLayer();
@@ -127,8 +149,9 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         data.oppositeAngle = 180 - extensionAngle;
         data.hand = (leftHand || rightHand) ? ExtendoGripRenderHandler.holding ? holding : punching : pointing;
         data.angle = AnimationTickHolder.getRenderTime() * -2;
-        if (leftHand || rightHand)
+        if (leftHand || rightHand) {
             data.angle += 360 * data.animation;
+        }
         data.angle %= 360;
         if (stack == null) {
             data.self = true;
@@ -183,7 +206,17 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
 
         // grip
         LayerRenderState grip = data.state;
-        queue.submitItem(matrices, displayContext, light, overlay, 0, grip.tintLayers, grip.prepareQuadList(), grip.renderType, grip.foilType);
+        queue.submitItem(
+            matrices,
+            displayContext,
+            light,
+            overlay,
+            0,
+            grip.tintLayers,
+            grip.prepareQuadList(),
+            grip.renderType,
+            grip.foilType
+        );
         renderQuads(displayContext, matrices, queue, light, overlay, pole, blockLayer);
 
         // bits
@@ -244,7 +277,17 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         List<BakedQuad> quads,
         RenderType layer
     ) {
-        queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemStackRenderState.FoilType.NONE);
+        queue.submitItem(
+            matrices,
+            displayContext,
+            light,
+            overlay,
+            0,
+            tints,
+            quads,
+            layer,
+            ItemStackRenderState.FoilType.NONE
+        );
     }
 
     public static class RenderData {
@@ -270,7 +313,8 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.ExtendoGripModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.ExtendoGripModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.ExtendoGripModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.ExtendoGripModel.Unbaked::new);
 
         @Override
         public MapCodec<com.zurrtum.create.client.infrastructure.model.ExtendoGripModel.Unbaked> type() {

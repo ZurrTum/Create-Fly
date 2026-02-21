@@ -1,9 +1,9 @@
 package com.zurrtum.create.content.trains.station;
 
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
+
+import java.util.Map;
 
 public interface StationMapData {
 

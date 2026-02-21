@@ -5,9 +5,27 @@ import com.zurrtum.create.content.fluids.transfer.FluidManipulationBehaviour.Bot
 
 public class CFluids extends ConfigBase {
 
-    public final ConfigInt fluidTankCapacity = i(8, 1, "fluidTankCapacity", Comments.buckets, Comments.fluidTankCapacity);
-    public final ConfigInt fluidTankMaxHeight = i(32, 1, "fluidTankMaxHeight", Comments.blocks, Comments.fluidTankMaxHeight);
-    public final ConfigInt mechanicalPumpRange = i(16, 1, "mechanicalPumpRange", Comments.blocks, Comments.mechanicalPumpRange);
+    public final ConfigInt fluidTankCapacity = i(
+        8,
+        1,
+        "fluidTankCapacity",
+        Comments.buckets,
+        Comments.fluidTankCapacity
+    );
+    public final ConfigInt fluidTankMaxHeight = i(
+        32,
+        1,
+        "fluidTankMaxHeight",
+        Comments.blocks,
+        Comments.fluidTankMaxHeight
+    );
+    public final ConfigInt mechanicalPumpRange = i(
+        16,
+        1,
+        "mechanicalPumpRange",
+        Comments.blocks,
+        Comments.mechanicalPumpRange
+    );
 
     public final ConfigInt hosePulleyRange = i(128, 1, "hosePulleyRange", Comments.blocks, Comments.hosePulleyRange);
     public final ConfigInt hosePulleyBlockThreshold = i(
@@ -25,8 +43,16 @@ public class CFluids extends ConfigBase {
         Comments.bottomlessFluidMode
     );
 
-    public ConfigBool fluidFillPlaceFluidSourceBlocks = b(true, "fluidFillPlaceFluidSourceBlocks", Comments.fluidFillPlaceFluidSourceBlocks);
-    public ConfigBool pipesPlaceFluidSourceBlocks = b(true, "pipesPlaceFluidSourceBlocks", Comments.pipesPlaceFluidSourceBlocks);
+    public ConfigBool fluidFillPlaceFluidSourceBlocks = b(
+        true,
+        "fluidFillPlaceFluidSourceBlocks",
+        Comments.fluidFillPlaceFluidSourceBlocks
+    );
+    public ConfigBool pipesPlaceFluidSourceBlocks = b(
+        true,
+        "pipesPlaceFluidSourceBlocks",
+        Comments.pipesPlaceFluidSourceBlocks
+    );
 
     @Override
     public String getName() {

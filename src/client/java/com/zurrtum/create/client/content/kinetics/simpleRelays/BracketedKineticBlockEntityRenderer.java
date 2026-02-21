@@ -42,7 +42,11 @@ public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRende
         state.large = be.getBlockState().is(AllBlocks.LARGE_COGWHEEL);
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.large) {
-            state.shaft = CachedBuffers.partialFacingVertical(AllPartialModels.COGWHEEL_SHAFT, state.blockState, state.direction);
+            state.shaft = CachedBuffers.partialFacingVertical(
+                AllPartialModels.COGWHEEL_SHAFT,
+                state.blockState,
+                state.direction
+            );
             state.shaftAngle = getAngleForLargeCogShaft(be, state.axis);
         }
     }
@@ -55,7 +59,11 @@ public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRende
     @Override
     protected SuperByteBuffer getRotatedModel(BracketedKineticBlockEntity be, BracketedKineticRenderState state) {
         if (state.large) {
-            return CachedBuffers.partialFacingVertical(AllPartialModels.SHAFTLESS_LARGE_COGWHEEL, state.blockState, state.direction);
+            return CachedBuffers.partialFacingVertical(
+                AllPartialModels.SHAFTLESS_LARGE_COGWHEEL,
+                state.blockState,
+                state.direction
+            );
         }
         return super.getRotatedModel(be, state);
     }

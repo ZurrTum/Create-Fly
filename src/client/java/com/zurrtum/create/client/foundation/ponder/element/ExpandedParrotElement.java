@@ -5,10 +5,9 @@ import com.zurrtum.create.client.ponder.api.element.ParrotElement;
 import com.zurrtum.create.client.ponder.api.element.ParrotPose;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.ParrotElementImpl;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Supplier;
-
-import net.minecraft.world.phys.Vec3;
 
 public class ExpandedParrotElement extends ParrotElementImpl {
 
@@ -46,9 +45,10 @@ public class ExpandedParrotElement extends ParrotElementImpl {
             deferConductor = isConductor;
             return;
         }
-        if (isConductor)
+        if (isConductor) {
             AllSynchedDatas.PARROT_TRAIN_HAT.set(entity, true);
-        else
+        } else {
             AllSynchedDatas.PARROT_TRAIN_HAT.set(entity, false);
+        }
     }
 }

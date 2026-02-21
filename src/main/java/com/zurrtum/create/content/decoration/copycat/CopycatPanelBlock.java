@@ -6,11 +6,6 @@ import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementHelpers;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -36,6 +31,10 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class CopycatPanelBlock extends WaterloggedCopycatBlock {
 
@@ -63,17 +62,21 @@ public class CopycatPanelBlock extends WaterloggedCopycatBlock {
         BlockHitResult pHit,
         BlockState material
     ) {
-        if (!CopycatSpecialCases.isTrapdoorMaterial(material))
+        if (!CopycatSpecialCases.isTrapdoorMaterial(material)) {
             return super.prepareMaterial(pLevel, pPos, pState, pPlayer, pHand, pHit, material);
+        }
 
         Direction panelFacing = pState.getValue(FACING);
-        if (panelFacing == Direction.DOWN)
+        if (panelFacing == Direction.DOWN) {
             material = material.setValue(TrapDoorBlock.HALF, Half.TOP);
-        if (panelFacing.getAxis() == Axis.Y)
+        }
+        if (panelFacing.getAxis() == Axis.Y) {
             return material.setValue(TrapDoorBlock.FACING, pPlayer.getDirection()).setValue(TrapDoorBlock.OPEN, false);
+        }
 
         boolean clickedNearTop = pHit.getLocation().y - .5 > pPos.getY();
-        return material.setValue(TrapDoorBlock.OPEN, true).setValue(TrapDoorBlock.HALF, clickedNearTop ? Half.TOP : Half.BOTTOM)
+        return material.setValue(TrapDoorBlock.OPEN, true)
+            .setValue(TrapDoorBlock.HALF, clickedNearTop ? Half.TOP : Half.BOTTOM)
             .setValue(TrapDoorBlock.FACING, panelFacing);
     }
 
@@ -90,7 +93,8 @@ public class CopycatPanelBlock extends WaterloggedCopycatBlock {
         if (!player.isShiftKeyDown() && player.mayBuild()) {
             IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
             if (placementHelper.matchesItem(stack)) {
-                placementHelper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+                placementHelper.getOffset(player, level, state, pos, hitResult)
+                    .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -106,36 +110,47 @@ public class CopycatPanelBlock extends WaterloggedCopycatBlock {
         @Nullable BlockPos fromPos,
         @Nullable BlockPos toPos
     ) {
-        if (fromPos == null || toPos == null)
+        if (fromPos == null || toPos == null) {
             return true;
+        }
 
         Direction facing = state.getValue(FACING);
         BlockState toState = reader.getBlockState(toPos);
 
-        if (!toState.is(this))
+        if (!toState.is(this)) {
             return facing != face.getOpposite();
+        }
 
         BlockPos diff = fromPos.subtract(toPos);
         int coord = facing.getAxis().choose(diff.getX(), diff.getY(), diff.getZ());
-        return facing == toState.getValue(FACING).getOpposite() && !(coord != 0 && coord == facing.getAxisDirection().getStep());
+        return facing == toState.getValue(FACING).getOpposite() && !(coord != 0 && coord == facing.getAxisDirection()
+            .getStep());
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
+    public boolean canConnectTexturesToward(
+        BlockAndTintGetter reader,
+        BlockPos fromPos,
+        BlockPos toPos,
+        BlockState state
+    ) {
         Direction facing = state.getValue(FACING);
         BlockState toState = reader.getBlockState(toPos);
 
-        if (toPos.equals(fromPos.relative(facing)))
+        if (toPos.equals(fromPos.relative(facing))) {
             return false;
+        }
 
         BlockPos diff = fromPos.subtract(toPos);
         int coord = facing.getAxis().choose(diff.getX(), diff.getY(), diff.getZ());
 
-        if (!toState.is(this))
+        if (!toState.is(this)) {
             return coord != -facing.getAxisDirection().getStep();
+        }
 
-        if (isOccluded(state, toState, facing))
+        if (isOccluded(state, toState, facing)) {
             return true;
+        }
         return toState.setValue(WATERLOGGED, false) == state.setValue(WATERLOGGED, false) && coord == 0;
     }
 
@@ -196,10 +211,12 @@ public class CopycatPanelBlock extends WaterloggedCopycatBlock {
         state = state.setValue(WATERLOGGED, false);
         other = other.setValue(WATERLOGGED, false);
         Direction facing = state.getValue(FACING);
-        if (facing.getOpposite() == other.getValue(FACING) && pDirection == facing)
+        if (facing.getOpposite() == other.getValue(FACING) && pDirection == facing) {
             return true;
-        if (other.getValue(FACING) != facing)
+        }
+        if (other.getValue(FACING) != facing) {
             return false;
+        }
         return pDirection.getAxis() != facing.getAxis();
     }
 
@@ -225,7 +242,13 @@ public class CopycatPanelBlock extends WaterloggedCopycatBlock {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(
                 pos,
                 ray.getLocation(),
@@ -233,10 +256,13 @@ public class CopycatPanelBlock extends WaterloggedCopycatBlock {
                 dir -> world.getBlockState(pos.relative(dir)).canBeReplaced()
             );
 
-            if (directions.isEmpty())
+            if (directions.isEmpty()) {
                 return PlacementOffset.fail();
-            else {
-                return PlacementOffset.success(pos.relative(directions.getFirst()), s -> s.setValue(FACING, state.getValue(FACING)));
+            } else {
+                return PlacementOffset.success(
+                    pos.relative(directions.getFirst()),
+                    s -> s.setValue(FACING, state.getValue(FACING))
+                );
             }
         }
     }

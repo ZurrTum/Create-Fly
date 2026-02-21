@@ -15,8 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.List;
 
 public record ServerDebugInfoPacket(String serverInfo) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, ServerDebugInfoPacket> CODEC = ByteBufCodecs.STRING_UTF8.map(
-        ServerDebugInfoPacket::new,
+    public static final StreamCodec<ByteBuf, ServerDebugInfoPacket> CODEC = ByteBufCodecs.STRING_UTF8.map(ServerDebugInfoPacket::new,
         ServerDebugInfoPacket::serverInfo
     );
 

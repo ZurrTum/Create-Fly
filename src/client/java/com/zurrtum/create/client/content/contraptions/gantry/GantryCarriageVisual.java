@@ -32,10 +32,17 @@ public class GantryCarriageVisual extends ShaftVisual<GantryCarriageBlockEntity>
 
     private float lastAngle = Float.NaN;
 
-    public GantryCarriageVisual(VisualizationContext context, GantryCarriageBlockEntity blockEntity, float partialTick) {
+    public GantryCarriageVisual(
+        VisualizationContext context,
+        GantryCarriageBlockEntity blockEntity,
+        float partialTick
+    ) {
         super(context, blockEntity, partialTick);
 
-        gantryCogs = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.GANTRY_COGS)).createInstance();
+        gantryCogs = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.GANTRY_COGS)
+        ).createInstance();
 
         facing = blockState.getValue(GantryCarriageBlock.FACING);
         alongFirst = blockState.getValue(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
@@ -53,8 +60,9 @@ public class GantryCarriageVisual extends ShaftVisual<GantryCarriageBlockEntity>
     public void beginFrame(DynamicVisual.Context ctx) {
         float cogAngle = getCogAngle();
 
-        if (Mth.equal(cogAngle, lastAngle))
+        if (Mth.equal(cogAngle, lastAngle)) {
             return;
+        }
 
         animateCogs(cogAngle);
     }
@@ -64,29 +72,36 @@ public class GantryCarriageVisual extends ShaftVisual<GantryCarriageBlockEntity>
     }
 
     private void animateCogs(float cogAngle) {
-        gantryCogs.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(AngleHelper.horizontalAngle(facing))
+        gantryCogs.setIdentityTransform().translate(getVisualPosition()).center()
+            .rotateYDegrees(AngleHelper.horizontalAngle(facing))
             .rotateXDegrees(facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90)
-            .rotateYDegrees(alongFirst ^ facing.getAxis() == Direction.Axis.X ? 0 : 90).translate(0, -9 / 16f, 0).rotateXDegrees(-cogAngle)
-            .translate(0, 9 / 16f, 0).uncenter().setChanged();
+            .rotateYDegrees(alongFirst ^ facing.getAxis() == Direction.Axis.X ? 0 : 90).translate(0, -9 / 16f, 0)
+            .rotateXDegrees(-cogAngle).translate(0, 9 / 16f, 0).uncenter().setChanged();
     }
 
     static float getRotationMultiplier(Direction.Axis gantryAxis, Direction facing) {
         float multiplier = 1;
-        if (gantryAxis == Direction.Axis.X)
-            if (facing == Direction.UP)
+        if (gantryAxis == Direction.Axis.X) {
+            if (facing == Direction.UP) {
                 multiplier *= -1;
-        if (gantryAxis == Direction.Axis.Y)
-            if (facing == Direction.NORTH || facing == Direction.EAST)
+            }
+        }
+        if (gantryAxis == Direction.Axis.Y) {
+            if (facing == Direction.NORTH || facing == Direction.EAST) {
                 multiplier *= -1;
+            }
+        }
 
         return multiplier;
     }
 
     private Direction.Axis getGantryAxis() {
         Direction.Axis gantryAxis = Direction.Axis.X;
-        for (Direction.Axis axis : Iterate.axes)
-            if (axis != rotationAxis && axis != facing.getAxis())
+        for (Direction.Axis axis : Iterate.axes) {
+            if (axis != rotationAxis && axis != facing.getAxis()) {
                 gantryAxis = axis;
+            }
+        }
         return gantryAxis;
     }
 

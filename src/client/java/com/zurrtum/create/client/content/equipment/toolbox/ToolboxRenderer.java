@@ -50,7 +50,12 @@ public class ToolboxRenderer implements BlockEntityRenderer<ToolboxBlockEntity, 
     }
 
     @Override
-    public void submit(ToolboxRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ToolboxRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -65,10 +70,12 @@ public class ToolboxRenderer implements BlockEntityRenderer<ToolboxBlockEntity, 
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            lid.center().rotateY(yRot).uncenter().translate(0, 0.375f, 0.75f).rotateX(xRot).translate(0, -0.375f, -0.75f).light(lightCoords)
+            lid.center().rotateY(yRot).uncenter().translate(0, 0.375f, 0.75f).rotateX(xRot)
+                .translate(0, -0.375f, -0.75f).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            drawer.center().rotateY(yRot).uncenter().translate(0, 0.125f, offset1).light(lightCoords)
                 .renderInto(matricesEntry, vertexConsumer);
-            drawer.center().rotateY(yRot).uncenter().translate(0, 0.125f, offset1).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-            drawer.center().rotateY(yRot).uncenter().translate(0, 0, offset2).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            drawer.center().rotateY(yRot).uncenter().translate(0, 0, offset2).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

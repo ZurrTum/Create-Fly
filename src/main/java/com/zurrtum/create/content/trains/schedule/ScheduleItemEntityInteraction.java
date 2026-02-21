@@ -22,13 +22,16 @@ import net.minecraft.world.level.Level;
 public class ScheduleItemEntityInteraction {
     public static InteractionResult interactWithConductor(Entity entity, Player player, InteractionHand hand) {
         Entity rootVehicle = entity.getRootVehicle();
-        if (!(rootVehicle instanceof CarriageContraptionEntity cce))
+        if (!(rootVehicle instanceof CarriageContraptionEntity cce)) {
             return null;
-        if (!(entity instanceof LivingEntity living))
+        }
+        if (!(entity instanceof LivingEntity living)) {
             return null;
+        }
         ItemStack schedule = AllItems.SCHEDULE.getDefaultInstance();
-        if (player.getCooldowns().isOnCooldown(schedule))
+        if (player.getCooldowns().isOnCooldown(schedule)) {
             return null;
+        }
 
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof ScheduleItem si) {
@@ -39,26 +42,32 @@ public class ScheduleItemEntityInteraction {
             }
         }
 
-        if (hand == InteractionHand.OFF_HAND)
+        if (hand == InteractionHand.OFF_HAND) {
             return null;
+        }
 
         Contraption contraption = cce.getContraption();
-        if (!(contraption instanceof CarriageContraption cc))
+        if (!(contraption instanceof CarriageContraption cc)) {
             return null;
+        }
 
         Train train = cce.getCarriage().train;
-        if (train == null)
+        if (train == null) {
             return null;
-        if (train.runtime.getSchedule() == null)
+        }
+        if (train.runtime.getSchedule() == null) {
             return null;
+        }
 
         Integer seatIndex = contraption.getSeatMapping().get(entity.getUUID());
-        if (seatIndex == null)
+        if (seatIndex == null) {
             return null;
+        }
         BlockPos seatPos = contraption.getSeats().get(seatIndex);
         Couple<Boolean> directions = cc.conductorSeats.get(seatPos);
-        if (directions == null)
+        if (directions == null) {
             return null;
+        }
 
         Level world = player.level();
         boolean onServer = !world.isClientSide();
@@ -83,7 +92,14 @@ public class ScheduleItemEntityInteraction {
         }
 
         if (onServer) {
-            world.playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + world.random.nextFloat());
+            world.playSound(
+                null,
+                player.blockPosition(),
+                SoundEvents.ITEM_PICKUP,
+                SoundSource.PLAYERS,
+                .2f,
+                1f + world.random.nextFloat()
+            );
             player.displayClientMessage(
                 Component.translatable(train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" : "create.schedule.removed_from_train"),
                 true

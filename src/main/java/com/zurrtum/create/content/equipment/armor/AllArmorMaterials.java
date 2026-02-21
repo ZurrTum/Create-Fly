@@ -60,7 +60,16 @@ public class AllArmorMaterials {
         TagKey<Item> repairIngredient,
         ResourceKey<EquipmentAsset> assetId
     ) {
-        return new ArmorMaterial(durability, defense, enchantmentValue, equipSound, toughness, knockbackResistance, repairIngredient, assetId);
+        return new ArmorMaterial(
+            durability,
+            defense,
+            enchantmentValue,
+            equipSound,
+            toughness,
+            knockbackResistance,
+            repairIngredient,
+            assetId
+        );
     }
 
     private static Map<ArmorType, Integer> createDefenseMap(
@@ -85,10 +94,12 @@ public class AllArmorMaterials {
     }
 
     public static Item.Properties chest(ArmorMaterial material) {
-        return new Item.Properties().stacksTo(1).attributes(material.createAttributes(ArmorType.CHESTPLATE)).enchantable(material.enchantmentValue())
-            .repairable(material.repairIngredient()).component(
+        return new Item.Properties().stacksTo(1).attributes(material.createAttributes(ArmorType.CHESTPLATE))
+            .enchantable(material.enchantmentValue()).repairable(material.repairIngredient())
+            .component(
                 DataComponents.EQUIPPABLE,
-                Equippable.builder(EquipmentSlot.CHEST).setEquipSound(material.equipSound()).setAsset(material.assetId()).build()
+                Equippable.builder(EquipmentSlot.CHEST).setEquipSound(material.equipSound())
+                    .setAsset(material.assetId()).build()
             );
     }
 

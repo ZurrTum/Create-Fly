@@ -51,8 +51,9 @@ public abstract class SchematicToolBase implements ISchematicTool {
     public void updateSelection(Minecraft mc) {
         updateTargetPos();
 
-        if (selectedPos == null)
+        if (selectedPos == null) {
             return;
+        }
         lastChasingSelectedPos = chasingSelectedPos;
         Vec3 target = Vec3.atLowerCornerOf(selectedPos);
         if (target.distanceTo(chasingSelectedPos) < 1 / 512f) {
@@ -74,7 +75,11 @@ public abstract class SchematicToolBase implements ISchematicTool {
             Vec3 traceOrigin = player.getEyePosition();
             Vec3 start = transformation.toLocalSpace(traceOrigin);
             Vec3 end = transformation.toLocalSpace(RaycastHelper.getTraceTarget(player, 70, traceOrigin));
-            PredicateTraceResult result = RaycastHelper.rayTraceUntil(start, end, pos -> localBounds.contains(VecHelper.getCenterOf(pos)));
+            PredicateTraceResult result = RaycastHelper.rayTraceUntil(
+                start,
+                end,
+                pos -> localBounds.contains(VecHelper.getCenterOf(pos))
+            );
 
             schematicSelected = !result.missed();
             selectedFace = schematicSelected ? result.getFacing() : null;
@@ -85,25 +90,30 @@ public abstract class SchematicToolBase implements ISchematicTool {
         // Select location at distance
         if (selectIgnoreBlocks) {
             float pt = AnimationTickHolder.getPartialTicks();
-            selectedPos = BlockPos.containing(player.getEyePosition(pt).add(player.getLookAngle().scale(selectionRange)));
-            if (snap)
+            selectedPos = BlockPos.containing(player.getEyePosition(pt)
+                .add(player.getLookAngle().scale(selectionRange)));
+            if (snap) {
                 lastChasingSelectedPos = chasingSelectedPos = Vec3.atLowerCornerOf(selectedPos);
+            }
             return;
         }
 
         // Select targeted Block
         selectedPos = null;
         BlockHitResult trace = RaycastHelper.rayTraceRange(player.level(), player, 75);
-        if (trace == null || trace.getType() != Type.BLOCK)
+        if (trace == null || trace.getType() != Type.BLOCK) {
             return;
+        }
 
         BlockPos hit = BlockPos.containing(trace.getLocation());
         boolean replaceable = player.level().getBlockState(hit).canBeReplaced();
-        if (trace.getDirection().getAxis().isVertical() && !replaceable)
+        if (trace.getDirection().getAxis().isVertical() && !replaceable) {
             hit = hit.relative(trace.getDirection());
+        }
         selectedPos = hit;
-        if (snap)
+        if (snap) {
             lastChasingSelectedPos = chasingSelectedPos = Vec3.atLowerCornerOf(selectedPos);
+        }
     }
 
     @Override
@@ -116,8 +126,9 @@ public abstract class SchematicToolBase implements ISchematicTool {
 
     @Override
     public void renderOnSchematic(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer) {
-        if (!schematicHandler.isDeployed())
+        if (!schematicHandler.isDeployed()) {
             return;
+        }
 
         ms.pushPose();
         AABBOutline outline = schematicHandler.getOutline();

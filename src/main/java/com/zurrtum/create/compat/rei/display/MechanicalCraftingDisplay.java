@@ -19,14 +19,14 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
-public record MechanicalCraftingDisplay(
-    int width, int height, List<Optional<Ingredient>> inputs, EntryIngredient output, Optional<Identifier> location
-) implements Display {
+public record MechanicalCraftingDisplay(int width, int height, List<Optional<Ingredient>> inputs,
+                                        EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<MechanicalCraftingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("width").forGetter(MechanicalCraftingDisplay::width),
             Codec.INT.fieldOf("height").forGetter(MechanicalCraftingDisplay::height),
-            ExtraCodecs.optionalEmptyMap(Ingredient.CODEC).listOf().fieldOf("inputs").forGetter(MechanicalCraftingDisplay::inputs),
+            ExtraCodecs.optionalEmptyMap(Ingredient.CODEC).listOf().fieldOf("inputs")
+                .forGetter(MechanicalCraftingDisplay::inputs),
             EntryIngredient.codec().fieldOf("output").forGetter(MechanicalCraftingDisplay::output),
             Identifier.CODEC.optionalFieldOf("location").forGetter(MechanicalCraftingDisplay::location)
         ).apply(instance, MechanicalCraftingDisplay::new)), StreamCodec.composite(
@@ -49,12 +49,19 @@ public record MechanicalCraftingDisplay(
     }
 
     public MechanicalCraftingDisplay(Identifier id, MechanicalCraftingRecipe recipe) {
-        this(recipe.raw().width(), recipe.raw().height(), recipe.raw().ingredients(), EntryIngredients.of(recipe.result()), Optional.of(id));
+        this(
+            recipe.raw().width(),
+            recipe.raw().height(),
+            recipe.raw().ingredients(),
+            EntryIngredients.of(recipe.result()),
+            Optional.of(id)
+        );
     }
 
     @Override
     public List<EntryIngredient> getInputEntries() {
-        return inputs.stream().filter(Optional::isPresent).map(Optional::get).map(EntryIngredients::ofIngredient).toList();
+        return inputs.stream().filter(Optional::isPresent).map(Optional::get).map(EntryIngredients::ofIngredient)
+            .toList();
     }
 
     @Override

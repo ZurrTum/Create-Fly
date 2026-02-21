@@ -61,13 +61,19 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
         int y = guiTop;
 
         inputs = new Vector<>(5);
-        for (int row = 0; row < inputs.capacity(); row++)
+        for (int row = 0; row < inputs.capacity(); row++) {
             inputs.add(new Vector<>(3));
+        }
 
-        for (int row = 0; row < instructions.size(); row++)
+        for (int row = 0; row < instructions.size(); row++) {
             initInputsOfRow(row, x, y);
+        }
 
-        confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            x + background.getWidth() - 33,
+            y + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(this::onClose);
         addRenderableWidget(confirmButton);
         addAdditional(this, x, y, background);
@@ -75,7 +81,10 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
 
     @Override
     public void addAdditional(Screen screen, int x, int y, AllGuiTextures background) {
-        screen.addRenderableWidget(new ElementWidget(x + background.getWidth() + 6, y + background.getHeight() - 56).showingElement(renderedItem));
+        screen.addRenderableWidget(new ElementWidget(
+            x + background.getWidth() + 6,
+            y + background.getHeight() - 56
+        ).showingElement(renderedItem));
     }
 
     @Override
@@ -98,15 +107,17 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
 
     private static List<Component> getSpeedOptions() {
         List<Component> options = new ArrayList<>();
-        for (InstructionSpeedModifiers entry : InstructionSpeedModifiers.values())
+        for (InstructionSpeedModifiers entry : InstructionSpeedModifiers.values()) {
             options.add(CreateLang.translateDirect(translationKey(entry)));
+        }
         return options;
     }
 
     private static List<Component> getSequencerOptions() {
         List<Component> options = new ArrayList<>();
-        for (SequencerInstructions entry : SequencerInstructions.values())
+        for (SequencerInstructions entry : SequencerInstructions.values()) {
             options.add(CreateLang.translateDirect(descriptiveTranslationKey(entry)));
+        }
         return options;
     }
 
@@ -124,8 +135,18 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
         ScrollInput type = new SelectionScrollInput(x, y + rowHeight * row, 50, 18).forOptions(getSequencerOptions())
             .calling(state -> instructionUpdated(index, state)).setState(instruction.instruction.ordinal())
             .titled(CreateLang.translateDirect("gui.sequenced_gearshift.instruction"));
-        ScrollInput value = new ScrollInput(x + 58, y + rowHeight * row, 28, 18).calling(state -> instruction.value = state);
-        ScrollInput direction = new SelectionScrollInput(x + 88, y + rowHeight * row, 28, 18).forOptions(getSpeedOptions())
+        ScrollInput value = new ScrollInput(
+            x + 58,
+            y + rowHeight * row,
+            28,
+            18
+        ).calling(state -> instruction.value = state);
+        ScrollInput direction = new SelectionScrollInput(
+            x + 88,
+            y + rowHeight * row,
+            28,
+            18
+        ).forOptions(getSpeedOptions())
             .calling(state -> instruction.speedModifier = InstructionSpeedModifiers.values()[state])
             .titled(CreateLang.translateDirect("gui.sequenced_gearshift.speed"));
 
@@ -196,25 +217,30 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
 
         ScrollInput value = rowInputs.get(1);
         value.active = value.visible = hasValue;
-        if (hasValue)
-            value.withRange(1, maxValue(def) + 1).titled(CreateLang.translateDirect(parameterKey(def))).withShiftStep(shiftStep(def))
-                .setState(instruction.value).onChanged();
+        if (hasValue) {
+            value.withRange(1, maxValue(def) + 1).titled(CreateLang.translateDirect(parameterKey(def)))
+                .withShiftStep(shiftStep(def)).setState(instruction.value).onChanged();
+        }
         if (def == SequencerInstructions.DELAY) {
             value.withStepFunction(context -> {
                 int v = context.currentValue;
-                if (!context.forward)
+                if (!context.forward) {
                     v--;
-                if (v < 20)
+                }
+                if (v < 20) {
                     return context.shift ? 20 : 1;
+                }
                 return context.shift ? 100 : 20;
             });
-        } else
+        } else {
             value.withStepFunction(value.standardStep());
+        }
 
         ScrollInput modifier = rowInputs.get(2);
         modifier.active = modifier.visible = hasModifier;
-        if (hasModifier)
+        if (hasModifier) {
             modifier.setState(instruction.speedModifier.ordinal());
+        }
     }
 
     @Override
@@ -276,11 +302,19 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
                 int stringWidth = font.width(text);
                 label(graphics, 90 + (12 - stringWidth / 2), yOffset - 1, Component.literal(text));
             }
-            if (hasSpeedParameter(def))
+            if (hasSpeedParameter(def)) {
                 label(graphics, 127, yOffset - 1, label(instruction.speedModifier));
+            }
         }
 
-        graphics.drawString(font, title, x + (background.getWidth() - 8) / 2 - font.width(title) / 2, y + 4, 0xFF592424, false);
+        graphics.drawString(
+            font,
+            title,
+            x + (background.getWidth() - 8) / 2 - font.width(title) / 2,
+            y + 4,
+            0xFF592424,
+            false
+        );
     }
 
     private void label(GuiGraphics graphics, int x, int y, Component text) {
@@ -288,7 +322,8 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
     }
 
     public void sendPacket() {
-        Minecraft.getInstance().getConnection().send(new ConfigureSequencedGearshiftPacket(be.getBlockPos(), instructions));
+        Minecraft.getInstance().getConnection()
+            .send(new ConfigureSequencedGearshiftPacket(be.getBlockPos(), instructions));
     }
 
     @Override

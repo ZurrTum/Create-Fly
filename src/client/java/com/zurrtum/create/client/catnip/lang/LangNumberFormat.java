@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.catnip.lang;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class LangNumberFormat {
 
@@ -12,8 +12,9 @@ public class LangNumberFormat {
     private NumberFormat format = NumberFormat.getNumberInstance(Locale.ROOT);
 
     public static String format(double d) {
-        if (Mth.equal(d, 0))
+        if (Mth.equal(d, 0)) {
             d = 0;
+        }
         return numberFormat.get().format(d).replace("\u00A0", " ");
     }
 

@@ -5,9 +5,6 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
-
-import java.util.Iterator;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -21,6 +18,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Iterator;
 
 public class SchematicAndQuillItem extends Item {
 
@@ -46,8 +45,9 @@ public class SchematicAndQuillItem extends Item {
 
         for (Iterator<Tag> iterator = listtag.iterator(); iterator.hasNext(); ) {
             Tag tag = iterator.next();
-            if (!(tag instanceof CompoundTag compoundtag))
+            if (!(tag instanceof CompoundTag compoundtag)) {
                 continue;
+            }
             if (compoundtag.getCompound("nbt").flatMap(compound -> compound.read("id", Identifier.CODEC))
                 .map(id -> id.equals(EntityType.getKey(AllEntityTypes.SUPER_GLUE))).orElse(false)) {
                 iterator.remove();
@@ -56,7 +56,10 @@ public class SchematicAndQuillItem extends Item {
 
         for (SuperGlueEntity entity : SuperGlueEntity.collectCropped(level, aabb)) {
             Vec3 vec3 = new Vec3(entity.getX() - aabb.minX, entity.getY() - aabb.minY, entity.getZ() - aabb.minZ);
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(entity.problemPath(), Create.LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                entity.problemPath(),
+                Create.LOGGER
+            )) {
                 TagValueOutput view = TagValueOutput.createWithContext(logging, entity.level().registryAccess());
                 entity.save(view);
                 BlockPos blockpos = BlockPos.containing(vec3);

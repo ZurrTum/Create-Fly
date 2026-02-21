@@ -27,28 +27,37 @@ public class StickerPeripheral extends SyncedPeripheral<StickerBlockEntity> {
     @LuaFunction(mainThread = true)
     public boolean extend() {
         BlockState state = blockEntity.getBlockState();
-        if (!state.is(AllBlocks.STICKER) || state.getValue(StickerBlock.EXTENDED))
+        if (!state.is(AllBlocks.STICKER) || state.getValue(StickerBlock.EXTENDED)) {
             return false;
-        blockEntity.getLevel().setBlock(blockEntity.getBlockPos(), state.setValue(StickerBlock.EXTENDED, true), Block.UPDATE_CLIENTS);
+        }
+        blockEntity.getLevel()
+            .setBlock(blockEntity.getBlockPos(), state.setValue(StickerBlock.EXTENDED, true), Block.UPDATE_CLIENTS);
         return true;
     }
 
     @LuaFunction(mainThread = true)
     public boolean retract() {
         BlockState state = blockEntity.getBlockState();
-        if (!state.is(AllBlocks.STICKER) || !state.getValue(StickerBlock.EXTENDED))
+        if (!state.is(AllBlocks.STICKER) || !state.getValue(StickerBlock.EXTENDED)) {
             return false;
-        blockEntity.getLevel().setBlock(blockEntity.getBlockPos(), state.setValue(StickerBlock.EXTENDED, false), Block.UPDATE_CLIENTS);
+        }
+        blockEntity.getLevel()
+            .setBlock(blockEntity.getBlockPos(), state.setValue(StickerBlock.EXTENDED, false), Block.UPDATE_CLIENTS);
         return true;
     }
 
     @LuaFunction(mainThread = true)
     public boolean toggle() {
         BlockState state = blockEntity.getBlockState();
-        if (!state.is(AllBlocks.STICKER))
+        if (!state.is(AllBlocks.STICKER)) {
             return false;
+        }
         boolean extended = state.getValue(StickerBlock.EXTENDED);
-        blockEntity.getLevel().setBlock(blockEntity.getBlockPos(), state.setValue(StickerBlock.EXTENDED, !extended), Block.UPDATE_CLIENTS);
+        blockEntity.getLevel().setBlock(
+            blockEntity.getBlockPos(),
+            state.setValue(StickerBlock.EXTENDED, !extended),
+            Block.UPDATE_CLIENTS
+        );
         return true;
     }
 

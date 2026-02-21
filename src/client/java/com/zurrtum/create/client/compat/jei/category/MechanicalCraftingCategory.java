@@ -56,7 +56,11 @@ public class MechanicalCraftingCategory extends CreateCategory<RecipeHolder<Mech
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MechanicalCraftingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<MechanicalCraftingRecipe> entry,
+        IFocusGroup focuses
+    ) {
         MechanicalCraftingRecipe recipe = entry.value();
         ShapedRecipePattern raw = recipe.raw();
         int width = raw.width();
@@ -76,7 +80,8 @@ public class MechanicalCraftingCategory extends CreateCategory<RecipeHolder<Mech
                 if (ingredient.isEmpty()) {
                     continue;
                 }
-                builder.addInputSlot(left + 16 * w + (w * 3), top + 16 * h + (h * 3)).setBackground(SLOT, -1, -1).add(ingredient.get());
+                builder.addInputSlot(left + 16 * w + (w * 3), top + 16 * h + (h * 3)).setBackground(SLOT, -1, -1)
+                    .add(ingredient.get());
             }
         }
         builder.addOutputSlot(133, 80).setBackground(SLOT, -1, -1).add(recipe.result());
@@ -92,7 +97,11 @@ public class MechanicalCraftingCategory extends CreateCategory<RecipeHolder<Mech
     ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 128, 59);
         AllGuiTextures.JEI_SHADOW.render(graphics, 113, 38);
-        graphics.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(new Matrix3x2f(graphics.pose()), 124, 18));
+        graphics.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(
+            new Matrix3x2f(graphics.pose()),
+            124,
+            18
+        ));
         int size = recipeSlotsView.getSlotViews(RecipeIngredientRole.INPUT).size();
         graphics.drawString(Minecraft.getInstance().font, String.valueOf(size), 142, 39, 0xFFFFFFFF, true);
     }

@@ -15,7 +15,6 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -26,7 +25,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.*;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -55,8 +55,8 @@ import java.util.function.Function;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> extends Block implements IBE<T>, ProperWaterloggedBlock, SpecialBlockItemRequirement, IWrenchable {
-    public static final StreamCodec<RegistryFriendlyByteBuf, AbstractBogeyBlock<?>> STREAM_CODEC = ByteBufCodecs.registry(Registries.BLOCK)
-        .map(block -> (AbstractBogeyBlock<?>) block, Function.identity());
+    public static final StreamCodec<RegistryFriendlyByteBuf, AbstractBogeyBlock<?>> STREAM_CODEC = ByteBufCodecs.registry(
+        Registries.BLOCK).map(block -> (AbstractBogeyBlock<?>) block, Function.identity());
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
     static final List<Identifier> BOGEYS = Util.make(
         new ArrayList<>(), list -> {
@@ -76,8 +76,9 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
         TravellingPoint point = leading ? carriage.getLeadingPoint() : carriage.getTrailingPoint();
         CarriageBogey bogey = leading ? carriage.leadingBogey() : carriage.trailingBogey();
         TrackEdge currentEdge = point.edge;
-        if (currentEdge == null)
+        if (currentEdge == null) {
             return false;
+        }
         return currentEdge.getTrackMaterial().getId() != getTrackType(bogey.getStyle());
     }
 
@@ -160,8 +161,9 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
 
     @Nullable
     public BlockState getMatchingBogey(Direction upDirection, boolean axisAlongFirst) {
-        if (upDirection != Direction.UP)
+        if (upDirection != Direction.UP) {
             return null;
+        }
         return defaultBlockState().setValue(AXIS, axisAlongFirst ? Direction.Axis.X : Direction.Axis.Z);
     }
 
@@ -175,16 +177,18 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         if (!player.isShiftKeyDown() && stack.is(AllItems.WRENCH) && !player.getCooldowns()
             .isOnCooldown(stack) && AllBogeyStyles.BOGEY_STYLES.size() > 1) {
 
             BlockEntity be = level.getBlockEntity(pos);
 
-            if (!(be instanceof AbstractBogeyBlockEntity sbbe))
+            if (!(be instanceof AbstractBogeyBlockEntity sbbe)) {
                 return InteractionResult.FAIL;
+            }
 
             player.getCooldowns().addCooldown(stack, 20);
             BogeyStyle currentStyle = sbbe.getStyle();
@@ -192,14 +196,16 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
             BogeySize size = getSize();
 
             BogeyStyle style = this.getNextStyle(currentStyle);
-            if (style == currentStyle)
+            if (style == currentStyle) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
+            }
 
             Set<BogeySize> validSizes = style.validSizes();
 
             for (int i = 0; i < AllBogeySizes.all().size(); i++) {
-                if (validSizes.contains(size))
+                if (validSizes.contains(size)) {
                     break;
+                }
                 size = size.nextBySize();
             }
 
@@ -212,19 +218,26 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
                 if (state.getBlock() != style.getBlockForSize(size)) {
                     CompoundTag oldData = sbbe.getBogeyData();
                     level.setBlockAndUpdate(pos, copyProperties(state, getStateOfSize(sbbe, size)));
-                    if (!(level.getBlockEntity(pos) instanceof AbstractBogeyBlockEntity bogeyBlockEntity))
+                    if (!(level.getBlockEntity(pos) instanceof AbstractBogeyBlockEntity bogeyBlockEntity)) {
                         return InteractionResult.FAIL;
+                    }
                     bogeyBlockEntity.setBogeyData(oldData);
                 }
-                player.displayClientMessage(Component.translatable("create.bogey.style.updated_style").append(": ").append(style.displayName), true);
+                player.displayClientMessage(
+                    Component.translatable("create.bogey.style.updated_style").append(": ").append(style.displayName),
+                    true
+                );
             } else {
                 CompoundTag oldData = sbbe.getBogeyData();
                 level.setBlockAndUpdate(pos, getStateOfSize(sbbe, size));
-                if (!(level.getBlockEntity(pos) instanceof AbstractBogeyBlockEntity bogeyBlockEntity))
+                if (!(level.getBlockEntity(pos) instanceof AbstractBogeyBlockEntity bogeyBlockEntity)) {
                     return InteractionResult.FAIL;
+                }
                 bogeyBlockEntity.setBogeyData(oldData);
                 player.displayClientMessage(
-                    Component.translatable("create.bogey.style.updated_style_and_size").append(": ").append(style.displayName), true);
+                    Component.translatable("create.bogey.style.updated_style_and_size")
+                        .append(": ").append(style.displayName), true
+                );
             }
 
             return InteractionResult.CONSUME;
@@ -257,8 +270,9 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
         Block block = state.getBlock();
         List<Identifier> bogeyCycle = getBogeyBlockCycle();
         int indexOf = bogeyCycle.indexOf(RegisteredObjectsHelper.getKeyOrThrow(block));
-        if (indexOf == -1)
+        if (indexOf == -1) {
             return state;
+        }
         int index = (indexOf + 1) % bogeyCycle.size();
         Direction bogeyUpDirection = getBogeyUpDirection();
         boolean trackAxisAlongFirstCoordinate = isTrackAxisAlongFirstCoordinate(state);
@@ -268,8 +282,9 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
             Block newBlock = BuiltInRegistries.BLOCK.getValue(id);
             if (newBlock instanceof AbstractBogeyBlock<?> bogey) {
                 BlockState matchingBogey = bogey.getMatchingBogey(bogeyUpDirection, trackAxisAlongFirstCoordinate);
-                if (matchingBogey != null)
+                if (matchingBogey != null) {
                     return copyProperties(state, matchingBogey);
+                }
             }
             index = (index + 1) % bogeyCycle.size();
         }
@@ -279,8 +294,9 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
 
     public BlockState getNextSize(Level level, BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof AbstractBogeyBlockEntity sbbe)
+        if (be instanceof AbstractBogeyBlockEntity sbbe) {
             return this.getNextSize(sbbe);
+        }
         return level.getBlockState(pos);
     }
 
@@ -292,7 +308,11 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
     }
 
     // generic method needed to satisfy Property and BlockState's generic requirements
-    private <V extends Comparable<V>> BlockState copyProperty(BlockState source, BlockState target, Property<V> property) {
+    private <V extends Comparable<V>> BlockState copyProperty(
+        BlockState source,
+        BlockState target,
+        Property<V> property
+    ) {
         if (source.hasProperty(property) && target.hasProperty(property)) {
             return target.setValue(property, source.getValue(property));
         }
@@ -300,8 +320,9 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
     }
 
     private BlockState copyProperties(BlockState source, BlockState target) {
-        for (Property<?> property : propertiesToCopy())
+        for (Property<?> property : propertiesToCopy()) {
             target = copyProperty(source, target, property);
+        }
         return target;
     }
 
@@ -321,15 +342,17 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
 
     public BogeyStyle getNextStyle(Level level, BlockPos pos) {
         BlockEntity te = level.getBlockEntity(pos);
-        if (te instanceof AbstractBogeyBlockEntity sbbe)
+        if (te instanceof AbstractBogeyBlockEntity sbbe) {
             return this.getNextStyle(sbbe.getStyle());
+        }
         return getDefaultStyle();
     }
 
     public BogeyStyle getNextStyle(BogeyStyle style) {
         Collection<BogeyStyle> allStyles = style.getCycleGroup().values();
-        if (allStyles.size() <= 1)
+        if (allStyles.size() <= 1) {
             return style;
+        }
         List<BogeyStyle> list = new ArrayList<>(allStyles);
         return Iterate.cycleValue(list, style);
     }

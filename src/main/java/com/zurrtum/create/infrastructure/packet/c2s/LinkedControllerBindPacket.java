@@ -11,7 +11,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record LinkedControllerBindPacket(int button, BlockPos linkLocation) implements Packet<ServerGamePacketListener> {
+public record LinkedControllerBindPacket(int button,
+                                         BlockPos linkLocation) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, LinkedControllerBindPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT,
         LinkedControllerBindPacket::button,

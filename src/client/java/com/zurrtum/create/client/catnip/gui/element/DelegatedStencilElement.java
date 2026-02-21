@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.catnip.gui.element;
 
+import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import net.minecraft.client.gui.GuiGraphics;
-import com.zurrtum.create.catnip.theme.Color;
 
 public class DelegatedStencilElement extends AbstractRenderElement implements StencilElement {
 

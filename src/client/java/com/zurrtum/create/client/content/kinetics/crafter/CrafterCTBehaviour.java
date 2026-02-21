@@ -18,25 +18,37 @@ import static com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock.HO
 public class CrafterCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
-        if (state.getBlock() != other.getBlock())
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
+        if (state.getBlock() != other.getBlock()) {
             return false;
-        if (state.getValue(HORIZONTAL_FACING) != other.getValue(HORIZONTAL_FACING))
+        }
+        if (state.getValue(HORIZONTAL_FACING) != other.getValue(HORIZONTAL_FACING)) {
             return false;
+        }
         return CrafterHelper.areCraftersConnected(reader, pos, otherPos);
     }
 
     @Override
     protected boolean reverseUVs(BlockState state, Direction direction) {
-        if (!direction.getAxis().isVertical())
+        if (!direction.getAxis().isVertical()) {
             return false;
+        }
         Direction facing = state.getValue(HORIZONTAL_FACING);
-        if (facing.getAxis() == direction.getAxis())
+        if (facing.getAxis() == direction.getAxis()) {
             return false;
+        }
 
         boolean isNegative = facing.getAxisDirection() == AxisDirection.NEGATIVE;
-        if (direction == Direction.DOWN && facing.getAxis() == Axis.Z)
+        if (direction == Direction.DOWN && facing.getAxis() == Axis.Z) {
             return !isNegative;
+        }
         return isNegative;
     }
 

@@ -15,7 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public abstract class MountedFluidStorage implements FluidInventory {
-    public static final Codec<MountedFluidStorage> CODEC = MountedFluidStorageType.CODEC.dispatch(storage -> storage.type, type -> type.codec);
+    public static final Codec<MountedFluidStorage> CODEC = MountedFluidStorageType.CODEC.dispatch(
+        storage -> storage.type,
+        type -> type.codec
+    );
 
     @SuppressWarnings("deprecation")
     public static final StreamCodec<RegistryFriendlyByteBuf, MountedFluidStorage> STREAM_CODEC = StreamCodec.of(

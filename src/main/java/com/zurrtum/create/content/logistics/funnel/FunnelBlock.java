@@ -63,8 +63,9 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
 
         for (Direction direction : context.getNearestLookingDirections()) {
             BlockState blockstate = state.setValue(FACING, direction.getOpposite());
-            if (blockstate.canSurvive(context.getLevel(), context.getClickedPos()))
+            if (blockstate.canSurvive(context.getLevel(), context.getClickedPos())) {
                 return blockstate.setValue(POWERED, state.getValue(POWERED));
+            }
         }
 
         return state;
@@ -93,19 +94,22 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
     ) {
         boolean shouldntInsertItem = stack.is(AllItems.MECHANICAL_ARM) || !canInsertIntoFunnel(state);
 
-        if (stack.is(AllItems.WRENCH))
+        if (stack.is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         if (hitResult.getDirection() == getFunnelFacing(state) && !shouldntInsertItem) {
-            if (!level.isClientSide())
+            if (!level.isClientSide()) {
                 withBlockEntityDo(
                     level, pos, be -> {
                         ItemStack toInsert = stack.copy();
                         ItemStack remainder = tryInsert(level, pos, toInsert, false);
-                        if (!ItemStack.matches(remainder, toInsert) || remainder.getCount() != stack.getCount())
+                        if (!ItemStack.matches(remainder, toInsert) || remainder.getCount() != stack.getCount()) {
                             player.setItemInHand(hand, remainder);
+                        }
                     }
                 );
+            }
             return InteractionResult.SUCCESS;
         }
 
@@ -115,38 +119,53 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
-        if (!world.isClientSide())
+        if (!world.isClientSide()) {
             world.setBlockAndUpdate(context.getClickedPos(), state.cycle(EXTRACTING));
+        }
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, InsideBlockEffectApplier handler, boolean bl) {
-        if (worldIn.isClientSide())
+    public void entityInside(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Entity entityIn,
+        InsideBlockEffectApplier handler,
+        boolean bl
+    ) {
+        if (worldIn.isClientSide()) {
             return;
+        }
         ItemStack stack = ItemHelper.fromItemEntity(entityIn);
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
             return;
-        if (!canInsertIntoFunnel(state))
+        }
+        if (!canInsertIntoFunnel(state)) {
             return;
+        }
 
         Direction direction = getFunnelFacing(state);
         Vec3 openPos = VecHelper.getCenterOf(pos)
             .add(Vec3.atLowerCornerOf(direction.getUnitVec3i()).scale(entityIn instanceof ItemEntity ? -.25f : -.125f));
         Vec3 diff = entityIn.position().subtract(openPos);
         double projectedDiff = direction.getAxis().choose(diff.x, diff.y, diff.z);
-        if (projectedDiff < 0 == (direction.getAxisDirection() == AxisDirection.POSITIVE))
+        if (projectedDiff < 0 == (direction.getAxisDirection() == AxisDirection.POSITIVE)) {
             return;
+        }
         float yOffset = direction == Direction.UP ? 0.25f : -0.5f;
         ServerFilteringBehaviour filter = BlockEntityBehaviour.get(worldIn, pos, ServerFilteringBehaviour.TYPE);
-        if (filter.test(stack) && !PackageEntity.centerPackage(entityIn, openPos.add(0, yOffset, 0)))
+        if (filter.test(stack) && !PackageEntity.centerPackage(entityIn, openPos.add(0, yOffset, 0))) {
             return;
+        }
 
         ItemStack remainder = tryInsert(worldIn, pos, stack, false);
-        if (remainder.isEmpty())
+        if (remainder.isEmpty()) {
             entityIn.discard();
-        if (remainder.getCount() < stack.getCount() && entityIn instanceof ItemEntity)
+        }
+        if (remainder.getCount() < stack.getCount() && entityIn instanceof ItemEntity) {
             ((ItemEntity) entityIn).setItem(remainder);
+        }
     }
 
     protected boolean canInsertIntoFunnel(BlockState state) {
@@ -162,9 +181,10 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (context instanceof EntityCollisionContext && ((EntityCollisionContext) context).getEntity() instanceof ItemEntity && getFacing(state).getAxis()
-            .isHorizontal())
+        if (context instanceof EntityCollisionContext && ((EntityCollisionContext) context).getEntity() instanceof ItemEntity && getFacing(
+            state).getAxis().isHorizontal()) {
             return AllShapes.FUNNEL_COLLISION.get(getFacing(state));
+        }
         return getShape(state, world, pos, context);
     }
 
@@ -180,14 +200,20 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
         RandomSource random
     ) {
         updateWater(world, tickView, state, pos);
-        if (getFacing(state).getAxis().isVertical() || direction != Direction.DOWN)
+        if (getFacing(state).getAxis().isVertical() || direction != Direction.DOWN) {
             return state;
-        BlockState equivalentFunnel = ProperWaterloggedBlock.withWater(world, getEquivalentBeltFunnel(null, null, state), pos);
-        if (BeltFunnelBlock.isOnValidBelt(equivalentFunnel, world, pos))
+        }
+        BlockState equivalentFunnel = ProperWaterloggedBlock.withWater(
+            world,
+            getEquivalentBeltFunnel(null, null, state),
+            pos
+        );
+        if (BeltFunnelBlock.isOnValidBelt(equivalentFunnel, world, pos)) {
             return equivalentFunnel.setValue(
                 BeltFunnelBlock.SHAPE,
                 BeltFunnelBlock.getShapeForPosition(world, pos, getFacing(state), state.getValue(EXTRACTING))
             );
+        }
         return state;
     }
 

@@ -26,8 +26,9 @@ public abstract class GhostItemMenu<T> extends MenuBase<T> implements IClearable
 
     @Override
     public void clearContents() {
-        for (int i = 0, size = ghostInventory.getContainerSize(); i < size; i++)
+        for (int i = 0, size = ghostInventory.getContainerSize(); i < size; i++) {
             ghostInventory.setItem(i, ItemStack.EMPTY);
+        }
     }
 
     @Override
@@ -37,8 +38,9 @@ public abstract class GhostItemMenu<T> extends MenuBase<T> implements IClearable
 
     @Override
     public boolean canDragTo(Slot slotIn) {
-        if (allowRepeats())
+        if (allowRepeats()) {
             return true;
+        }
         return slotIn.container == playerInventory;
     }
 
@@ -48,8 +50,9 @@ public abstract class GhostItemMenu<T> extends MenuBase<T> implements IClearable
             super.clicked(slotId, dragType, clickTypeIn, player);
             return;
         }
-        if (clickTypeIn == ClickType.THROW)
+        if (clickTypeIn == ClickType.THROW) {
             return;
+        }
 
         ItemStack held = getCarried();
         int slot = slotId - 36;
@@ -86,8 +89,9 @@ public abstract class GhostItemMenu<T> extends MenuBase<T> implements IClearable
             ItemStack stackToInsert = slot.getItem();
             for (int i = 0, size = ghostInventory.getContainerSize(); i < size; i++) {
                 ItemStack stack = ghostInventory.getItem(i);
-                if (!allowRepeats() && ItemStack.isSameItemSameComponents(stack, stackToInsert))
+                if (!allowRepeats() && ItemStack.isSameItemSameComponents(stack, stackToInsert)) {
                     break;
+                }
                 if (stack.isEmpty()) {
                     ItemStack copy = stackToInsert.copy();
                     copy.setCount(1);

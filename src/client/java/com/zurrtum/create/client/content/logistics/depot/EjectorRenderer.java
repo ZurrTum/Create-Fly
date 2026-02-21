@@ -64,22 +64,31 @@ public class EjectorRenderer extends ShaftRenderer<EjectorBlockEntity, EjectorRe
             state.yRot = Mth.DEG_TO_RAD * (180 + AngleHelper.horizontalAngle(blockState.getValue(EjectorBlock.HORIZONTAL_FACING)));
         }
         DepotBehaviour behaviour = be.getBehaviour(DepotBehaviour.TYPE);
-        if (behaviour == null || behaviour.isEmpty())
+        if (behaviour == null || behaviour.isEmpty()) {
             return;
+        }
         Level world = be.getLevel();
         state.incoming = DepotRenderer.createIncomingStateList(behaviour, itemModelManager, tickProgress, world);
         state.outputs = DepotRenderer.createOutputStateList(behaviour, itemModelManager, world);
         if (state.support && (state.incoming != null || state.outputs != null)) {
             state.blockPos = be.getBlockPos();
             state.blockEntityType = be.getType();
-            state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+            state.lightCoords = world != null ? LevelRenderer.getLightColor(
+                world,
+                state.blockPos
+            ) : LightTexture.FULL_BRIGHT;
             state.lidAngle = Mth.DEG_TO_RAD * (be.getLidProgress(tickProgress) * -70);
             state.yRot = Mth.DEG_TO_RAD * (180 + AngleHelper.horizontalAngle(blockState.getValue(EjectorBlock.HORIZONTAL_FACING)));
         }
     }
 
     @Override
-    public void submit(EjectorRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        EjectorRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.incoming != null || state.outputs != null) {
             matrices.translate(0.5f, 0.5f, 0.5f);
@@ -91,7 +100,15 @@ public class EjectorRenderer extends ShaftRenderer<EjectorBlockEntity, EjectorRe
             matrices.translate(0.5f, 0.5f, 0.5f);
             matrices.mulPose(Axis.YP.rotation(-state.yRot));
             matrices.translate(-0.5f, -0.5f, -0.5f);
-            DepotRenderer.renderItemsOf(state.incoming, state.outputs, state.blockPos, cameraState.pos, queue, matrices, state.lightCoords);
+            DepotRenderer.renderItemsOf(
+                state.incoming,
+                state.outputs,
+                state.blockPos,
+                cameraState.pos,
+                queue,
+                matrices,
+                state.lightCoords
+            );
         }
     }
 
@@ -106,8 +123,9 @@ public class EjectorRenderer extends ShaftRenderer<EjectorBlockEntity, EjectorRe
     }
 
     static <T extends Translate<T> & Rotate<T>> void applyLidAngle(KineticBlockEntity be, float angle, T tr) {
-        tr.center().rotateYDegrees(180 + AngleHelper.horizontalAngle(be.getBlockState().getValue(EjectorBlock.HORIZONTAL_FACING))).uncenter()
-            .translate(pivot).rotateXDegrees(-angle).translateBack(pivot);
+        tr.center().rotateYDegrees(180 + AngleHelper.horizontalAngle(be.getBlockState()
+                .getValue(EjectorBlock.HORIZONTAL_FACING))).uncenter().translate(pivot).rotateXDegrees(-angle)
+            .translateBack(pivot);
     }
 
     public static class EjectorRenderState extends KineticRenderState {

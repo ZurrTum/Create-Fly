@@ -30,8 +30,9 @@ public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends Toolt
             CreateLang.translate("gui.stressometer.overstressed").style(GOLD).forGoggles(tooltip);
             Component hint = CreateLang.translateDirect("gui.contraptions.network_overstressed");
             List<Component> cutString = TooltipHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE);
-            for (Component component : cutString)
+            for (Component component : cutString) {
                 CreateLang.builder().add(component.copy()).forGoggles(tooltip);
+            }
             return true;
         }
 
@@ -42,8 +43,9 @@ public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends Toolt
                 I18n.get(blockEntity.getBlockState().getBlock().getDescriptionId())
             );
             List<Component> cutString = TooltipHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE);
-            for (Component component : cutString)
+            for (Component component : cutString) {
                 CreateLang.builder().add(component.copy()).forGoggles(tooltip);
+            }
             return true;
         }
 
@@ -52,11 +54,13 @@ public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends Toolt
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if (!StressImpact.isEnabled())
+        if (!StressImpact.isEnabled()) {
             return false;
+        }
         float stressAtBase = blockEntity.calculateStressApplied();
-        if (Mth.equal(stressAtBase, 0))
+        if (Mth.equal(stressAtBase, 0)) {
             return false;
+        }
 
         CreateLang.translate("gui.goggles.kinetic_stats").forGoggles(tooltip);
 

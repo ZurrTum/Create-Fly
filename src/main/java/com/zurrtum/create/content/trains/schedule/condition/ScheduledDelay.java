@@ -13,8 +13,9 @@ public class ScheduledDelay extends TimedWaitCondition {
     @Override
     public boolean tickCompletion(Level level, Train train, CompoundTag context) {
         int time = context.getIntOr("Time", 0);
-        if (time >= totalWaitTicks())
+        if (time >= totalWaitTicks()) {
             return true;
+        }
 
         context.putInt("Time", time + 1);
         requestDisplayIfNecessary(context, time);

@@ -51,23 +51,33 @@ public class TrackBlockItem extends BlockItem {
         BlockState state = level.getBlockState(pos);
         Player player = pContext.getPlayer();
 
-        if (player == null)
+        if (player == null) {
             return super.useOn(pContext);
-        if (pContext.getHand() == InteractionHand.OFF_HAND)
+        }
+        if (pContext.getHand() == InteractionHand.OFF_HAND) {
             return super.useOn(pContext);
+        }
 
         Vec3 lookAngle = player.getLookAngle();
 
         if (!isFoil(stack)) {
             if (state.getBlock() instanceof TrackBlock track && track.getTrackAxes(level, pos, state).size() > 1) {
-                if (!level.isClientSide())
-                    player.displayClientMessage(Component.translatable("create.track.junction_start").withStyle(ChatFormatting.RED), true);
+                if (!level.isClientSide()) {
+                    player.displayClientMessage(
+                        Component.translatable("create.track.junction_start")
+                            .withStyle(ChatFormatting.RED), true
+                    );
+                }
                 return InteractionResult.SUCCESS;
             }
 
             if (level.getBlockEntity(pos) instanceof TrackBlockEntity tbe && tbe.isTilted()) {
-                if (!level.isClientSide())
-                    player.displayClientMessage(Component.translatable("create.track.turn_start").withStyle(ChatFormatting.RED), true);
+                if (!level.isClientSide()) {
+                    player.displayClientMessage(
+                        Component.translatable("create.track.turn_start")
+                            .withStyle(ChatFormatting.RED), true
+                    );
+                }
                 return InteractionResult.SUCCESS;
             }
 
@@ -86,26 +96,30 @@ public class TrackBlockItem extends BlockItem {
         stack.remove(AllDataComponents.TRACK_EXTENDED_CURVE);
 
         if (placing) {
-            if (!state.canBeReplaced())
+            if (!state.canBeReplaced()) {
                 pos = pos.relative(pContext.getClickedFace());
+            }
             state = getPlacementState(pContext);
-            if (state == null)
+            if (state == null) {
                 return InteractionResult.FAIL;
+            }
         }
 
         ItemStack offhandItem = player.getOffhandItem();
         boolean hasGirder = offhandItem.is(AllItems.METAL_GIRDER);
         PlacementInfo info = TrackPlacement.tryConnect(level, player, pos, state, stack, hasGirder, extend);
 
-        if (info.message != null && !level.isClientSide())
+        if (info.message != null && !level.isClientSide()) {
             player.displayClientMessage(Component.translatable("create." + info.message), true);
+        }
         if (!info.valid) {
             AllSoundEvents.DENY.playFrom(player, 1, 1);
             return InteractionResult.FAIL;
         }
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         stack = player.getMainHandItem();
         if (stack.is(AllItemTags.TRACKS)) {
@@ -115,7 +129,7 @@ public class TrackBlockItem extends BlockItem {
         }
 
         SoundType soundtype = state.getSoundType();
-        if (soundtype != null)
+        if (soundtype != null) {
             level.playSound(
                 null,
                 pos,
@@ -124,13 +138,21 @@ public class TrackBlockItem extends BlockItem {
                 (soundtype.getVolume() + 1.0F) / 2.0F,
                 soundtype.getPitch() * 0.8F
             );
+        }
 
         return InteractionResult.SUCCESS;
     }
 
     public static InteractionResult clearSelection(ItemStack stack, Level level, Player player) {
         if (level.isClientSide()) {
-            level.playSound(player, player.blockPosition(), SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.75f, 1.0f);
+            level.playSound(
+                player,
+                player.blockPosition(),
+                SoundEvents.ITEM_FRAME_REMOVE_ITEM,
+                SoundSource.BLOCKS,
+                0.75f,
+                1.0f
+            );
         } else {
             player.displayClientMessage(Component.translatable("create.track.selection_cleared"), true);
             stack.remove(AllDataComponents.TRACK_CONNECTING_FROM);
@@ -145,8 +167,9 @@ public class TrackBlockItem extends BlockItem {
     public static boolean select(LevelAccessor world, BlockPos pos, Vec3 lookVec, ItemStack heldItem) {
         BlockState blockState = world.getBlockState(pos);
         Block block = blockState.getBlock();
-        if (!(block instanceof ITrackBlock track))
+        if (!(block instanceof ITrackBlock track)) {
             return false;
+        }
 
         Pair<Vec3, AxisDirection> nearestTrackAxis = track.getNearestTrackAxis(world, pos, blockState, lookVec);
         Vec3 axis = nearestTrackAxis.getFirst().scale(nearestTrackAxis.getSecond() == AxisDirection.POSITIVE ? -1 : 1);

@@ -14,7 +14,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record OpenScreenPacket(int id, MenuType<?> menu, Component name, byte[] data) implements Packet<ClientGamePacketListener> {
+public record OpenScreenPacket(int id, MenuType<?> menu, Component name,
+                               byte[] data) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreenPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.CONTAINER_ID,
         OpenScreenPacket::id,

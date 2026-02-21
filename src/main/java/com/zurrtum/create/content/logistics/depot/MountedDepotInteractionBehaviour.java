@@ -7,9 +7,6 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.MountedStorageManager;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.depot.storage.DepotMountedStorage;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Optional;
 
 public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour {
 
@@ -28,18 +27,21 @@ public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour
         BlockPos localPos,
         AbstractContraptionEntity contraptionEntity
     ) {
-        if (activeHand == InteractionHand.OFF_HAND)
+        if (activeHand == InteractionHand.OFF_HAND) {
             return false;
+        }
         Level world = player.level();
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return true;
+        }
 
         ItemStack itemInHand = player.getItemInHand(activeHand);
         MountedStorageManager manager = contraptionEntity.getContraption().getStorage();
 
         MountedItemStorage storage = manager.getAllItemStorages().get(localPos);
-        if (!(storage instanceof DepotMountedStorage depot))
+        if (!(storage instanceof DepotMountedStorage depot)) {
             return false;
+        }
 
         Optional<TransportedItemStack> itemOnDepot = depot.getHeld();
         if (itemOnDepot.isPresent()) {
@@ -85,7 +87,10 @@ public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour
         depot.setHeld(transported);
         depot.setChanged();
         player.setItemInHand(activeHand, ItemStack.EMPTY);
-        AllSoundEvents.DEPOT_SLIDE.playOnServer(world, BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(localPos), 0)));
+        AllSoundEvents.DEPOT_SLIDE.playOnServer(
+            world,
+            BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(localPos), 0))
+        );
 
         return true;
     }

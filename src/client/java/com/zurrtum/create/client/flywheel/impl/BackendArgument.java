@@ -9,16 +9,15 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.zurrtum.create.client.flywheel.api.backend.Backend;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.synchronization.SingletonArgumentInfo;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 
 public class BackendArgument implements ArgumentType<Backend> {
     private static final List<String> EXAMPLES = List.of("off", "flywheel:off", "instancing");
@@ -47,7 +46,10 @@ public class BackendArgument implements ArgumentType<Backend> {
         String input = builder.getRemaining().toLowerCase(Locale.ROOT);
         for (Identifier id : Backend.REGISTRY.getAllIds()) {
             String idStr = id.toString();
-            if (SharedSuggestionProvider.matchesSubStr(input, idStr) || SharedSuggestionProvider.matchesSubStr(input, id.getPath())) {
+            if (SharedSuggestionProvider.matchesSubStr(input, idStr) || SharedSuggestionProvider.matchesSubStr(
+                input,
+                id.getPath()
+            )) {
                 builder.suggest(idStr);
             }
         }

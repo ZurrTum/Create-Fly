@@ -15,10 +15,6 @@ import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -46,6 +42,9 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
 
 public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<BlazeBurnerBlockEntity>, IWrenchable, SpecialBlockItemRequirement {
     public static final MapCodec<BlazeBurnerBlock> CODEC = simpleCodec(BlazeBurnerBlock::new);
@@ -64,19 +63,22 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
         BlockEntity blockEntity = world.getBlockEntity(pos.above());
-        if (!(blockEntity instanceof BasinBlockEntity basin))
+        if (!(blockEntity instanceof BasinBlockEntity basin)) {
             return;
+        }
         basin.notifyChangeOfContents();
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        if (state.getValue(HEAT_LEVEL) == HeatLevel.NONE)
+        if (state.getValue(HEAT_LEVEL) == HeatLevel.NONE) {
             return null;
+        }
         return IBE.super.newBlockEntity(pos, state);
     }
 
@@ -92,41 +94,54 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
     ) {
         HeatLevel heat = state.getValue(HEAT_LEVEL);
 
-        if (stack.is(AllItems.GOGGLES) && heat != HeatLevel.NONE)
+        if (stack.is(AllItems.GOGGLES) && heat != HeatLevel.NONE) {
             return onBlockEntityUseItemOn(
                 level, pos, bbte -> {
-                    if (bbte.goggles)
+                    if (bbte.goggles) {
                         return InteractionResult.TRY_WITH_EMPTY_HAND;
+                    }
                     bbte.goggles = true;
                     bbte.notifyUpdate();
                     return InteractionResult.SUCCESS;
                 }
             );
+        }
 
         BlazeBurnerBlockEntity be = getBlockEntity(level, pos);
         if (be != null && be.stockKeeper) {
             StockTickerBlockEntity stockTicker = BlazeBurnerBlockEntity.getStockTicker(level, pos);
-            if (stockTicker != null)
+            if (stockTicker != null) {
                 StockTickerInteractionHandler.interactWithLogisticsManagerAt(player, level, stockTicker.getBlockPos());
+            }
             return InteractionResult.SUCCESS;
         }
 
-        if (stack.isEmpty() && heat != HeatLevel.NONE)
+        if (stack.isEmpty() && heat != HeatLevel.NONE) {
             return onBlockEntityUseItemOn(
                 level, pos, bbte -> {
-                    if (!bbte.goggles)
+                    if (!bbte.goggles) {
                         return InteractionResult.TRY_WITH_EMPTY_HAND;
+                    }
                     bbte.goggles = false;
                     bbte.notifyUpdate();
                     return InteractionResult.SUCCESS;
                 }
             );
+        }
 
         if (heat == HeatLevel.NONE) {
             if (stack.getItem() instanceof FlintAndSteelItem) {
-                level.playSound(player, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level.random.nextFloat() * 0.4F + 0.8F);
-                if (level.isClientSide())
+                level.playSound(
+                    player,
+                    pos,
+                    SoundEvents.FLINTANDSTEEL_USE,
+                    SoundSource.BLOCKS,
+                    1.0F,
+                    level.random.nextFloat() * 0.4F + 0.8F
+                );
+                if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
+                }
                 stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 level.setBlockAndUpdate(pos, AllBlocks.LIT_BLAZE_BURNER.defaultBlockState());
                 return InteractionResult.SUCCESS;
@@ -149,8 +164,9 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
             }
         }
 
-        if (res.consumesAction())
+        if (res.consumesAction()) {
             return res;
+        }
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
@@ -163,20 +179,24 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
         boolean forceOverflow,
         boolean simulate
     ) {
-        if (!state.hasBlockEntity())
+        if (!state.hasBlockEntity()) {
             return InteractionResult.FAIL;
+        }
 
         BlockEntity be = world.getBlockEntity(pos);
-        if (!(be instanceof BlazeBurnerBlockEntity burnerBE))
+        if (!(be instanceof BlazeBurnerBlockEntity burnerBE)) {
             return InteractionResult.FAIL;
+        }
 
         if (burnerBE.isCreativeFuel(stack)) {
-            if (!simulate)
+            if (!simulate) {
                 burnerBE.applyCreativeFuel();
+            }
             return InteractionResult.SUCCESS.heldItemTransformedTo(ItemStack.EMPTY);
         }
-        if (!burnerBE.tryUpdateFuel(stack, forceOverflow, simulate))
+        if (!burnerBE.tryUpdateFuel(stack, forceOverflow, simulate)) {
             return InteractionResult.FAIL;
+        }
 
         if (!doNotConsume) {
             ItemStack container = stack.getItem().getCraftingRemainder();
@@ -193,10 +213,12 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
         ItemStack stack = context.getItemInHand();
         Item item = stack.getItem();
         BlockState defaultState = defaultBlockState();
-        if (!(item instanceof BlazeBurnerBlockItem))
+        if (!(item instanceof BlazeBurnerBlockItem)) {
             return defaultState;
+        }
         HeatLevel initialHeat = ((BlazeBurnerBlockItem) item).hasCapturedBlaze() ? HeatLevel.SMOULDERING : HeatLevel.NONE;
-        return defaultState.setValue(HEAT_LEVEL, initialHeat).setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return defaultState.setValue(HEAT_LEVEL, initialHeat)
+            .setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
@@ -205,9 +227,15 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState p_220071_1_, BlockGetter p_220071_2_, BlockPos p_220071_3_, CollisionContext p_220071_4_) {
-        if (p_220071_4_ == CollisionContext.empty())
+    public VoxelShape getCollisionShape(
+        BlockState p_220071_1_,
+        BlockGetter p_220071_2_,
+        BlockPos p_220071_3_,
+        CollisionContext p_220071_4_
+    ) {
+        if (p_220071_4_ == CollisionContext.empty()) {
             return AllShapes.HEATER_BLOCK_SPECIAL_COLLISION_SHAPE;
+        }
         return getShape(p_220071_1_, p_220071_2_, p_220071_3_, p_220071_4_);
     }
 
@@ -228,10 +256,12 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
 
     @Override
     public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
-        if (random.nextInt(10) != 0)
+        if (random.nextInt(10) != 0) {
             return;
-        if (!state.getValue(HEAT_LEVEL).isAtLeast(HeatLevel.SMOULDERING))
+        }
+        if (!state.getValue(HEAT_LEVEL).isAtLeast(HeatLevel.SMOULDERING)) {
             return;
+        }
         world.playLocalSound(
             pos.getX() + 0.5F,
             pos.getY() + 0.5F,
@@ -288,11 +318,7 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
     }
 
     public enum HeatLevel implements StringRepresentable {
-        NONE,
-        SMOULDERING,
-        FADING,
-        KINDLED,
-        SEETHING;
+        NONE, SMOULDERING, FADING, KINDLED, SEETHING;
 
         public static final Codec<HeatLevel> CODEC = StringRepresentable.fromEnum(HeatLevel::values);
 

@@ -52,7 +52,10 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
             state.blockState = be.getBlockState();
             state.blockEntityType = be.getType();
             Level world = be.getLevel();
-            state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+            state.lightCoords = world != null ? LevelRenderer.getLightColor(
+                world,
+                state.blockPos
+            ) : LightTexture.FULL_BRIGHT;
             state.layer = RenderTypes.solidMovingBlock();
             state.facing = state.blockState.getValue(CuckooClockBlock.HORIZONTAL_FACING);
         }
@@ -75,14 +78,15 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
             int step = be.animationType == Animation.SURPRISE ? 3 : 15;
             for (int phase = 30; phase <= 60; phase += step) {
                 float local = value - phase;
-                if (local < -step / 3)
+                if (local < -step / 3) {
                     continue;
-                else if (local < 0)
+                } else if (local < 0) {
                     angle = Mth.lerpInt(((value - (phase - 5)) / 5), 0, 135);
-                else if (local < step / 3)
+                } else if (local < step / 3) {
                     angle = 135;
-                else if (local < 2 * step / 3)
+                } else if (local < 2 * step / 3) {
                     angle = Mth.lerpInt(((value - (phase + 5)) / 5), 135, 0);
+                }
             }
         }
         state.doorAngle = AngleHelper.rad(angle);
@@ -105,7 +109,12 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
     }
 
     @Override
-    public void submit(CuckooClockRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        CuckooClockRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -137,16 +146,19 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
             if (model != null) {
                 super.render(matricesEntry, vertexConsumer);
             }
-            hourHand.rotateCentered(angle, Direction.UP).translate(0.125f, 0.375f, 0.5f).rotate(hourAngle, Direction.EAST)
-                .translate(-0.125f, -0.375f, -0.5f).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-            minuteHand.rotateCentered(angle, Direction.UP).translate(0.125f, 0.375f, 0.5f).rotate(minuteAngle, Direction.EAST)
-                .translate(-0.125f, -0.375f, -0.5f).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-            leftDoor.rotateCentered(angle, Direction.UP).translate(0.125f, 0, 0.375f).rotate(-doorAngle, Direction.UP).translate(-0.125f, 0, -0.375f)
-                .light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-            rightDoor.rotateCentered(angle, Direction.UP).translate(0.125f, 0, 0.625f).rotate(doorAngle, Direction.UP).translate(-0.125f, 0, -0.625f)
-                .light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            hourHand.rotateCentered(angle, Direction.UP).translate(0.125f, 0.375f, 0.5f)
+                .rotate(hourAngle, Direction.EAST).translate(-0.125f, -0.375f, -0.5f).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
+            minuteHand.rotateCentered(angle, Direction.UP).translate(0.125f, 0.375f, 0.5f)
+                .rotate(minuteAngle, Direction.EAST).translate(-0.125f, -0.375f, -0.5f).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
+            leftDoor.rotateCentered(angle, Direction.UP).translate(0.125f, 0, 0.375f).rotate(-doorAngle, Direction.UP)
+                .translate(-0.125f, 0, -0.375f).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            rightDoor.rotateCentered(angle, Direction.UP).translate(0.125f, 0, 0.625f).rotate(doorAngle, Direction.UP)
+                .translate(-0.125f, 0, -0.625f).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
             if (figure != null) {
-                figure.rotateCentered(angle, Direction.UP).translate(offset, 0, 0).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+                figure.rotateCentered(angle, Direction.UP).translate(offset, 0, 0).light(lightCoords)
+                    .renderInto(matricesEntry, vertexConsumer);
             }
         }
     }

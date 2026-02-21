@@ -20,11 +20,11 @@ import net.minecraft.client.gui.GlyphSource;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -121,7 +121,12 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
     }
 
     @Override
-    public void submit(FlapDisplayRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        FlapDisplayRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.display != null) {
             state.display.render(matrices, queue);
@@ -280,7 +285,8 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         public float yRot;
 
         public void add(int light, boolean glowing, TextRenderable textDrawable) {
-            map.computeIfAbsent(textDrawable.renderType(DisplayMode.NORMAL), layer -> new TextRenderState(light)).add(glowing, textDrawable);
+            map.computeIfAbsent(textDrawable.renderType(DisplayMode.NORMAL), layer -> new TextRenderState(light))
+                .add(glowing, textDrawable);
         }
 
         public void render(PoseStack matrices, SubmitNodeCollector queue) {

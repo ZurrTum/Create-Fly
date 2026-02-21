@@ -8,14 +8,13 @@ import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.CargoThresholdCondition;
 import com.zurrtum.create.content.trains.schedule.condition.CargoThresholdCondition.Ops;
-
-import java.util.Arrays;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class CargoThresholdConditionRender<T extends CargoThresholdCondition> implements IScheduleInput<T> {
     protected abstract Component getUnit(T input);
@@ -24,7 +23,10 @@ public abstract class CargoThresholdConditionRender<T extends CargoThresholdCond
 
     @Override
     public Pair<ItemStack, Component> getSummary(T input) {
-        return Pair.of(getIcon(input), Component.literal(input.getOperator().formatted + " " + input.getThreshold()).append(getUnit(input)));
+        return Pair.of(
+            getIcon(input),
+            Component.literal(input.getOperator().formatted + " " + input.getThreshold()).append(getUnit(input))
+        );
     }
 
     @Override
@@ -42,14 +44,16 @@ public abstract class CargoThresholdConditionRender<T extends CargoThresholdCond
     }
 
     public List<MutableComponent> getOpsOptions() {
-        return Arrays.stream(Ops.values()).map(op -> CreateLang.translateDirect("schedule.condition.threshold." + Lang.asId(op.name()))).toList();
+        return Arrays.stream(Ops.values())
+            .map(op -> CreateLang.translateDirect("schedule.condition.threshold." + Lang.asId(op.name()))).toList();
     }
 
     @Override
     public void initConfigurationWidgets(T input, ModularGuiLineBuilder builder) {
         builder.addSelectionScrollInput(
             0, 24, (i, l) -> {
-                i.forOptions(getOpsOptions()).titled(CreateLang.translateDirect("schedule.condition.threshold.train_holds", ""))
+                i.forOptions(getOpsOptions())
+                    .titled(CreateLang.translateDirect("schedule.condition.threshold.train_holds", ""))
                     .format(state -> Component.literal(" " + Ops.values()[state].formatted));
             }, "Operator"
         );

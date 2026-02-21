@@ -87,8 +87,9 @@ public class ObjMaterialLibrary {
     }
 
     public Material getMaterial(String mat) {
-        if (!materials.containsKey(mat))
+        if (!materials.containsKey(mat)) {
             throw new NoSuchElementException("The material was not found in the library: " + mat);
+        }
         return materials.get(mat);
     }
 

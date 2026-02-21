@@ -2,6 +2,7 @@ package com.zurrtum.create.content.redstone.smartObserver;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
@@ -58,20 +58,21 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
             boolean canDetect = false;
             BlockEntity blockEntity = world.getBlockEntity(offsetPos);
 
-            if (BlockEntityBehaviour.get(blockEntity, TransportedItemStackHandlerBehaviour.TYPE) != null)
+            if (BlockEntityBehaviour.get(blockEntity, TransportedItemStackHandlerBehaviour.TYPE) != null) {
                 canDetect = true;
-            else if (BlockEntityBehaviour.get(blockEntity, FluidTransportBehaviour.TYPE) != null)
+            } else if (BlockEntityBehaviour.get(blockEntity, FluidTransportBehaviour.TYPE) != null) {
                 canDetect = true;
-            else if (blockEntity != null && (ItemHelper.getInventory(
+            } else if (blockEntity != null && (ItemHelper.getInventory(
                 context.getLevel(),
                 offsetPos,
                 null,
                 blockEntity,
                 null
-            ) != null || FluidHelper.hasFluidInventory(context.getLevel(), offsetPos, null, blockEntity, null)))
+            ) != null || FluidHelper.hasFluidInventory(context.getLevel(), offsetPos, null, blockEntity, null))) {
                 canDetect = true;
-            else if (blockEntity instanceof FunnelBlockEntity)
+            } else if (blockEntity instanceof FunnelBlockEntity) {
                 canDetect = true;
+            }
 
             if (canDetect) {
                 preferredFacing = face;
@@ -81,7 +82,8 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
 
         if (preferredFacing == null) {
             Direction facing = context.getNearestLookingDirection();
-            preferredFacing = context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? facing : facing.getOpposite();
+            preferredFacing = context.getPlayer() != null && context.getPlayer()
+                .isShiftKeyDown() ? facing : facing.getOpposite();
         }
 
         if (preferredFacing.getAxis() == Axis.Y) {
@@ -114,27 +116,42 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+    public void neighborUpdate(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos fromPos,
+        boolean isMoving
+    ) {
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.onNeighborChanged(fromPos);
+        }
     }
 
     public void onFunnelTransfer(Level world, BlockPos funnelPos, ItemStack transferred) {
         for (Direction direction : Iterate.directions) {
             BlockPos detectorPos = funnelPos.relative(direction);
             BlockState detectorState = world.getBlockState(detectorPos);
-            if (!detectorState.is(AllBlocks.SMART_OBSERVER))
+            if (!detectorState.is(AllBlocks.SMART_OBSERVER)) {
                 continue;
-            if (SmartObserverBlock.getTargetDirection(detectorState) != direction.getOpposite())
+            }
+            if (SmartObserverBlock.getTargetDirection(detectorState) != direction.getOpposite()) {
                 continue;
+            }
             withBlockEntityDo(
                 world, detectorPos, be -> {
-                    ServerFilteringBehaviour filteringBehaviour = BlockEntityBehaviour.get(be, ServerFilteringBehaviour.TYPE);
-                    if (filteringBehaviour == null)
+                    ServerFilteringBehaviour filteringBehaviour = BlockEntityBehaviour.get(
+                        be,
+                        ServerFilteringBehaviour.TYPE
+                    );
+                    if (filteringBehaviour == null) {
                         return;
-                    if (!filteringBehaviour.test(transferred))
+                    }
+                    if (!filteringBehaviour.test(transferred)) {
                         return;
+                    }
                     be.activate(4);
                 }
             );

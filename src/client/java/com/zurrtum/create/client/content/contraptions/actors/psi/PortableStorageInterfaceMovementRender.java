@@ -33,7 +33,11 @@ import org.joml.Matrix4f;
 public class PortableStorageInterfaceMovementRender implements MovementRenderBehaviour {
     @Nullable
     @Override
-    public ActorVisual createVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public ActorVisual createVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         return new PSIActorVisual(visualizationContext, simulationWorld, movementContext);
     }
 
@@ -53,7 +57,12 @@ public class PortableStorageInterfaceMovementRender implements MovementRenderBeh
         BlockState blockState = context.state;
         float renderPartialTicks = AnimationTickHolder.getPartialTicks();
         LerpedFloat animation = PortableStorageInterfaceMovement.getAnimation(context);
-        state.middle = CachedBuffers.partial(PortableStorageInterfaceRenderer.getMiddleForState(blockState, animation.settled()), blockState);
+        state.middle = CachedBuffers.partial(
+            PortableStorageInterfaceRenderer.getMiddleForState(
+                blockState,
+                animation.settled()
+            ), blockState
+        );
         state.top = CachedBuffers.partial(PortableStorageInterfaceRenderer.getTopForState(blockState), blockState);
         Direction facing = blockState.getValue(PortableStorageInterfaceBlock.FACING);
         state.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
@@ -89,10 +98,10 @@ public class PortableStorageInterfaceMovementRender implements MovementRenderBeh
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            middle.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, middleOffset, 0).light(light).useLevelLight(world, worldMatrix4f)
-                .renderInto(matricesEntry, vertexConsumer);
-            top.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, topOffset, 0).light(light).useLevelLight(world, worldMatrix4f)
-                .renderInto(matricesEntry, vertexConsumer);
+            middle.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, middleOffset, 0).light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
+            top.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, topOffset, 0).light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

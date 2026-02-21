@@ -136,7 +136,15 @@ public class WrappedClientLevel extends ClientLevel {
         double p_195589_10_,
         double p_195589_12_
     ) {
-        level.addAlwaysVisibleParticle(p_195589_1_, p_195589_2_, p_195589_4_, p_195589_6_, p_195589_8_, p_195589_10_, p_195589_12_);
+        level.addAlwaysVisibleParticle(
+            p_195589_1_,
+            p_195589_2_,
+            p_195589_4_,
+            p_195589_6_,
+            p_195589_8_,
+            p_195589_10_,
+            p_195589_12_
+        );
     }
 
     @Override
@@ -150,7 +158,16 @@ public class WrappedClientLevel extends ClientLevel {
         double p_217404_11_,
         double p_217404_13_
     ) {
-        level.addAlwaysVisibleParticle(p_217404_1_, p_217404_2_, p_217404_3_, p_217404_5_, p_217404_7_, p_217404_9_, p_217404_11_, p_217404_13_);
+        level.addAlwaysVisibleParticle(
+            p_217404_1_,
+            p_217404_2_,
+            p_217404_3_,
+            p_217404_5_,
+            p_217404_7_,
+            p_217404_9_,
+            p_217404_11_,
+            p_217404_13_
+        );
     }
 
     @Override
@@ -164,7 +181,16 @@ public class WrappedClientLevel extends ClientLevel {
         float p_184134_10_,
         boolean p_184134_11_
     ) {
-        level.playLocalSound(p_184134_1_, p_184134_3_, p_184134_5_, p_184134_7_, p_184134_8_, p_184134_9_, p_184134_10_, p_184134_11_);
+        level.playLocalSound(
+            p_184134_1_,
+            p_184134_3_,
+            p_184134_5_,
+            p_184134_7_,
+            p_184134_8_,
+            p_184134_9_,
+            p_184134_10_,
+            p_184134_11_
+        );
     }
 
     @Override
@@ -178,7 +204,16 @@ public class WrappedClientLevel extends ClientLevel {
         float p_184148_10_,
         float p_184148_11_
     ) {
-        level.playSound(p_184148_1_, p_184148_2_, p_184148_4_, p_184148_6_, p_184148_8_, p_184148_9_, p_184148_10_, p_184148_11_);
+        level.playSound(
+            p_184148_1_,
+            p_184148_2_,
+            p_184148_4_,
+            p_184148_6_,
+            p_184148_8_,
+            p_184148_9_,
+            p_184148_10_,
+            p_184148_11_
+        );
     }
 
     @Nullable

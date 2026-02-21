@@ -17,7 +17,10 @@ import org.joml.Matrix3x2fStack;
 
 public class PonderProgressBar extends AbstractSimiWidget {
 
-    public static final Couple<Color> BAR_COLORS = Couple.create(new Color(0x80_aaaadd, true), new Color(0x50_aaaadd, true)).map(Color::setImmutable);
+    public static final Couple<Color> BAR_COLORS = Couple.create(
+        new Color(0x80_aaaadd, true),
+        new Color(0x50_aaaadd, true)
+    ).map(Color::setImmutable);
 
     LerpedFloat progress;
 
@@ -52,12 +55,13 @@ public class PonderProgressBar extends AbstractSimiWidget {
 
         int keyframeIndex = getHoveredKeyframeIndex(activeScene, click.x());
 
-        if (keyframeIndex == -1)
+        if (keyframeIndex == -1) {
             ponder.seekToTime(0);
-        else if (keyframeIndex == activeScene.getKeyframeCount())
+        } else if (keyframeIndex == activeScene.getKeyframeCount()) {
             ponder.seekToTime(activeScene.getTotalTime());
-        else
+        } else {
             ponder.seekToTime(activeScene.getKeyframeTime(keyframeIndex));
+        }
     }
 
     public int getHoveredKeyframeIndex(PonderScene activeScene, double mouseX) {
@@ -80,8 +84,9 @@ public class PonderProgressBar extends AbstractSimiWidget {
         for (int i = 0; i < activeScene.getKeyframeCount(); i++) {
             int keyframeTime = activeScene.getKeyframeTime(i);
 
-            if (keyframeTime > clickedAtTime)
+            if (keyframeTime > clickedAtTime) {
                 break;
+            }
 
             index = i;
         }
@@ -95,8 +100,8 @@ public class PonderProgressBar extends AbstractSimiWidget {
 
         isHovered = isMouseOver(mouseX, mouseY);
 
-        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE).at(getX(), getY(), 400)
-            .withBounds(width, height).render(graphics);
+        new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE)
+            .at(getX(), getY(), 400).withBounds(width, height).render(graphics);
 
         poseStack.pushMatrix();
         poseStack.translate(getX() - 2, getY() - 2);
@@ -127,10 +132,20 @@ public class PonderProgressBar extends AbstractSimiWidget {
             hoverIndex = -2;
         }
 
-        if (hoverIndex == -1)
+        if (hoverIndex == -1) {
             drawKeyframe(graphics, activeScene, true, 0, 0, hover.getFirst(), hover.getSecond(), 8);
-        else if (hoverIndex == activeScene.getKeyframeCount())
-            drawKeyframe(graphics, activeScene, true, activeScene.getTotalTime(), width + 4, hover.getFirst(), hover.getSecond(), 8);
+        } else if (hoverIndex == activeScene.getKeyframeCount()) {
+            drawKeyframe(
+                graphics,
+                activeScene,
+                true,
+                activeScene.getTotalTime(),
+                width + 4,
+                hover.getFirst(),
+                hover.getSecond(),
+                8
+            );
+        }
 
         for (int i = 0; i < activeScene.getKeyframeCount(); i++) {
             int keyframeTime = activeScene.getKeyframeTime(i);
@@ -140,7 +155,16 @@ public class PonderProgressBar extends AbstractSimiWidget {
             Couple<Color> colors = selected ? hover : idle;
             int height = selected ? 8 : 4;
 
-            drawKeyframe(graphics, activeScene, selected, keyframeTime, keyframePos, colors.getFirst(), colors.getSecond(), height);
+            drawKeyframe(
+                graphics,
+                activeScene,
+                selected,
+                keyframeTime,
+                keyframePos,
+                colors.getFirst(),
+                colors.getSecond(),
+                height
+            );
 
         }
     }
@@ -157,7 +181,15 @@ public class PonderProgressBar extends AbstractSimiWidget {
     ) {
         if (selected) {
             Font font = graphics.minecraft.font;
-            UIRenderHelper.drawGradientRect(graphics, ((float) keyframePos), 9f, keyframePos + 2f, 9f + height, endColor, startColor);
+            UIRenderHelper.drawGradientRect(
+                graphics,
+                ((float) keyframePos),
+                9f,
+                keyframePos + 2f,
+                9f + height,
+                endColor,
+                startColor
+            );
             String text;
             int offset;
             if (activeScene.getCurrentTime() < keyframeTime) {
@@ -167,10 +199,25 @@ public class PonderProgressBar extends AbstractSimiWidget {
                 text = "<";
                 offset = 4;
             }
-            graphics.drawString(font, Component.literal(text).withStyle(ChatFormatting.BOLD), keyframePos + offset, 10, endColor.getRGB(), false);
+            graphics.drawString(
+                font,
+                Component.literal(text).withStyle(ChatFormatting.BOLD),
+                keyframePos + offset,
+                10,
+                endColor.getRGB(),
+                false
+            );
         }
 
-        UIRenderHelper.drawGradientRect(graphics, ((float) keyframePos), 0f, keyframePos + 2f, 1f + height, startColor, endColor);
+        UIRenderHelper.drawGradientRect(
+            graphics,
+            ((float) keyframePos),
+            0f,
+            keyframePos + 2f,
+            1f + height,
+            startColor,
+            endColor
+        );
     }
 
     @Override

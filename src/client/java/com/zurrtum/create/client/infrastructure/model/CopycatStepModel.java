@@ -52,10 +52,19 @@ public class CopycatStepModel extends CopycatModel {
         BlockStateModel model = getModelOf(material);
         for (BlockModelPart part : getMaterialParts(world, pos, material, random, model)) {
             QuadCollection.Builder builder = new QuadCollection.Builder();
-            addCroppedQuads(facing, upperHalf, normalScaled2, normalScaledN3, bb, part.getQuads(null), builder::addUnculledFace);
+            addCroppedQuads(
+                facing,
+                upperHalf,
+                normalScaled2,
+                normalScaledN3,
+                bb,
+                part.getQuads(null),
+                builder::addUnculledFace
+            );
             for (Direction direction : Iterate.directions) {
-                if (occlusionData.isOccluded(direction))
+                if (occlusionData.isOccluded(direction)) {
                     continue;
+                }
                 addCroppedQuads(
                     facing,
                     upperHalf,
@@ -63,7 +72,10 @@ public class CopycatStepModel extends CopycatModel {
                     normalScaledN3,
                     bb,
                     part.getQuads(direction),
-                    block.shouldFaceAlwaysRender(state, direction) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
+                    block.shouldFaceAlwaysRender(
+                        state,
+                        direction
+                    ) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
                         direction,
                         quad
                     )
@@ -89,29 +101,37 @@ public class CopycatStepModel extends CopycatModel {
         for (boolean top : Iterate.trueAndFalse) {
             for (boolean front : Iterate.trueAndFalse) {
                 AABB bb1 = bb;
-                if (front)
+                if (front) {
                     bb1 = bb1.move(normalScaledN3);
-                if (top)
+                }
+                if (top) {
                     bb1 = bb1.move(VEC_Y_3);
+                }
 
                 Vec3 offset = Vec3.ZERO;
-                if (front)
+                if (front) {
                     offset = offset.add(normalScaled2);
-                if (top != upperHalf)
+                }
+                if (top != upperHalf) {
                     offset = offset.add(upperHalf ? VEC_Y_2 : VEC_Y_N2);
+                }
 
                 for (int i = 0; i < size; i++) {
                     BakedQuad quad = quads.get(i);
                     Direction direction = quad.direction();
 
-                    if (front && direction == facing)
+                    if (front && direction == facing) {
                         continue;
-                    if (!front && direction == facing.getOpposite())
+                    }
+                    if (!front && direction == facing.getOpposite()) {
                         continue;
-                    if (!top && direction == Direction.UP)
+                    }
+                    if (!top && direction == Direction.UP) {
                         continue;
-                    if (top && direction == Direction.DOWN)
+                    }
+                    if (top && direction == Direction.DOWN) {
                         continue;
+                    }
 
                     consumer.accept(BakedModelHelper.cropAndMove(quad, bb1, offset));
                 }

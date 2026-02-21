@@ -53,8 +53,9 @@ public interface IMultiBlockEntityContainer {
             axis = state.getValue(BlockStateProperties.FACING).getAxis();
         } else if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
             axis = state.getValue(BlockStateProperties.HORIZONTAL_FACING).getAxis();
-        } else
+        } else {
             axis = Direction.Axis.Y;
+        }
 
         return axis;
     }

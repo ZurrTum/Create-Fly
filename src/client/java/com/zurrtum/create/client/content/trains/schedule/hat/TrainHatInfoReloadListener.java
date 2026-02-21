@@ -52,7 +52,10 @@ public class TrainHatInfoReloadListener {
                     splitPath[splitPath.length - 1].replace(".json", "")
                 );
                 if (!BuiltInRegistries.ENTITY_TYPE.containsKey(entityName)) {
-                    Create.LOGGER.error("Failed to load train hat info for entity {} as it does not exist.", entityName);
+                    Create.LOGGER.error(
+                        "Failed to load train hat info for entity {} as it does not exist.",
+                        entityName
+                    );
                     return;
                 }
 
@@ -60,7 +63,8 @@ public class TrainHatInfoReloadListener {
                     JsonObject json = GsonHelper.parse(reader);
                     ENTITY_INFO_MAP.put(
                         BuiltInRegistries.ENTITY_TYPE.getValue(entityName),
-                        TrainHatInfo.CODEC.parse(JsonOps.INSTANCE, json).resultOrPartial(Create.LOGGER::error).orElseThrow()
+                        TrainHatInfo.CODEC.parse(JsonOps.INSTANCE, json).resultOrPartial(Create.LOGGER::error)
+                            .orElseThrow()
                     );
                 } catch (Exception e) {
                     Create.LOGGER.error("Failed to read train hat info for entity {}!", entityName, e);

@@ -81,17 +81,20 @@ public class WaterWheelStructuralBlock extends DirectionalBlock implements IWren
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!stillValid(level, pos, state, false))
+        if (!stillValid(level, pos, state, false)) {
             return InteractionResult.FAIL;
-        if (!(level.getBlockEntity(getMaster(level, pos, state)) instanceof WaterWheelBlockEntity wwt))
+        }
+        if (!(level.getBlockEntity(getMaster(level, pos, state)) instanceof WaterWheelBlockEntity wwt)) {
             return InteractionResult.FAIL;
+        }
         return wwt.applyMaterialIfValid(stack);
     }
 
     @Override
     public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
-        if (stillValid(pLevel, pPos, pState, false))
+        if (stillValid(pLevel, pPos, pState, false)) {
             pLevel.destroyBlock(getMaster(pLevel, pPos, pState), true);
+        }
     }
 
     @Override
@@ -99,8 +102,9 @@ public class WaterWheelStructuralBlock extends DirectionalBlock implements IWren
         if (stillValid(pLevel, pPos, pState, false)) {
             BlockPos masterPos = getMaster(pLevel, pPos, pState);
             pLevel.destroyBlockProgress(masterPos.hashCode(), masterPos, -1);
-            if (!pLevel.isClientSide() && pPlayer.isCreative())
+            if (!pLevel.isClientSide() && pPlayer.isCreative()) {
                 pLevel.destroyBlock(masterPos, false);
+            }
         }
         return super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
     }
@@ -118,14 +122,17 @@ public class WaterWheelStructuralBlock extends DirectionalBlock implements IWren
     ) {
         if (stillValid(pLevel, pCurrentPos, pState, false)) {
             BlockPos masterPos = getMaster(pLevel, pCurrentPos, pState);
-            if (!tickView.getBlockTicks().hasScheduledTick(masterPos, AllBlocks.LARGE_WATER_WHEEL))
+            if (!tickView.getBlockTicks().hasScheduledTick(masterPos, AllBlocks.LARGE_WATER_WHEEL)) {
                 tickView.scheduleTick(masterPos, AllBlocks.LARGE_WATER_WHEEL, 1);
+            }
             return pState;
         }
-        if (!(pLevel instanceof Level level) || level.isClientSide())
+        if (!(pLevel instanceof Level level) || level.isClientSide()) {
             return pState;
-        if (!level.getBlockTicks().hasScheduledTick(pCurrentPos, this))
+        }
+        if (!level.getBlockTicks().hasScheduledTick(pCurrentPos, this)) {
             level.scheduleTick(pCurrentPos, this, 1);
+        }
         return pState;
     }
 
@@ -133,32 +140,42 @@ public class WaterWheelStructuralBlock extends DirectionalBlock implements IWren
         Direction direction = state.getValue(FACING);
         BlockPos targetedPos = pos.relative(direction);
         BlockState targetedState = level.getBlockState(targetedPos);
-        if (targetedState.is(AllBlocks.WATER_WHEEL_STRUCTURAL))
+        if (targetedState.is(AllBlocks.WATER_WHEEL_STRUCTURAL)) {
             return getMaster(level, targetedPos, targetedState);
+        }
         return targetedPos;
     }
 
     public boolean stillValid(BlockGetter level, BlockPos pos, BlockState state, boolean directlyAdjacent) {
-        if (!state.is(this))
+        if (!state.is(this)) {
             return false;
+        }
 
         Direction direction = state.getValue(FACING);
         BlockPos targetedPos = pos.relative(direction);
         BlockState targetedState = level.getBlockState(targetedPos);
 
-        if (!directlyAdjacent && stillValid(level, targetedPos, targetedState, true))
+        if (!directlyAdjacent && stillValid(level, targetedPos, targetedState, true)) {
             return true;
+        }
         return targetedState.getBlock() instanceof LargeWaterWheelBlock && targetedState.getValue(LargeWaterWheelBlock.AXIS) != direction.getAxis();
     }
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        if (!stillValid(pLevel, pPos, pState, false))
+        if (!stillValid(pLevel, pPos, pState, false)) {
             pLevel.setBlockAndUpdate(pPos, Blocks.AIR.defaultBlockState());
+        }
     }
 
     @Override
-    public boolean addLandingEffects(BlockState state, ServerLevel world, BlockPos pos, LivingEntity entity, double distance) {
+    public boolean addLandingEffects(
+        BlockState state,
+        ServerLevel world,
+        BlockPos pos,
+        LivingEntity entity,
+        double distance
+    ) {
         return true;
     }
 

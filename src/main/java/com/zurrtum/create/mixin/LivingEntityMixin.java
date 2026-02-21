@@ -72,7 +72,12 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @WrapOperation(method = "baseTick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isEyeInFluid(Lnet/minecraft/tags/TagKey;)Z"))
-    private boolean breatheInLava(LivingEntity entity, TagKey<Fluid> tagKey, Operation<Boolean> original, @Local ServerLevel serverWorld) {
+    private boolean breatheInLava(
+        LivingEntity entity,
+        TagKey<Fluid> tagKey,
+        Operation<Boolean> original,
+        @Local ServerLevel serverWorld
+    ) {
         if (original.call(entity, tagKey)) {
             return true;
         }
@@ -83,7 +88,11 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @WrapOperation(method = "baseTick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectUtil;hasWaterBreathing(Lnet/minecraft/world/entity/LivingEntity;)Z"))
-    private boolean canBreatheInWater(LivingEntity entity, Operation<Boolean> original, @Local ServerLevel serverWorld) {
+    private boolean canBreatheInWater(
+        LivingEntity entity,
+        Operation<Boolean> original,
+        @Local ServerLevel serverWorld
+    ) {
         if (original.call(entity)) {
             return true;
         }
@@ -151,7 +160,12 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @Inject(method = "dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V", at = @At(value = "HEAD"))
-    private void onDropPre(ServerLevel world, DamageSource damageSource, CallbackInfo ci, @Share("handler") LocalIntRef handler) {
+    private void onDropPre(
+        ServerLevel world,
+        DamageSource damageSource,
+        CallbackInfo ci,
+        @Share("handler") LocalIntRef handler
+    ) {
         if (damageSource.is(AllDamageTypes.CRUSH)) {
             AllSynchedDatas.CRUSH_DROP.set(this, true);
             handler.set(1);
@@ -162,7 +176,12 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @Inject(method = "dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V", at = @At(value = "TAIL"))
-    private void onDropPost(ServerLevel world, DamageSource damageSource, CallbackInfo ci, @Share("handler") LocalIntRef handler) {
+    private void onDropPost(
+        ServerLevel world,
+        DamageSource damageSource,
+        CallbackInfo ci,
+        @Share("handler") LocalIntRef handler
+    ) {
         switch (handler.get()) {
             case 1 -> AllSynchedDatas.CRUSH_DROP.set(this, false);
             case 2 -> AllSynchedDatas.CAPTURE_DROPS.get(this).ifPresent(drops -> {

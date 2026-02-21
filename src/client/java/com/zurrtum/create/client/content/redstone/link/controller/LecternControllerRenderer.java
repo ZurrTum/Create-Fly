@@ -51,7 +51,12 @@ public class LecternControllerRenderer implements BlockEntityRenderer<LecternCon
     }
 
     @Override
-    public void submit(LecternControllerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        LecternControllerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         matrices.translate(0.5f, 1.45f, 0.5f);
         matrices.mulPose(Axis.YP.rotation(state.yRot));
         matrices.translate(0.28f, 0, 0);

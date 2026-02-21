@@ -4,13 +4,10 @@ import com.zurrtum.create.client.ponder.api.registration.MultiTagBuilder;
 import com.zurrtum.create.client.ponder.api.registration.PonderTagRegistrationHelper;
 import com.zurrtum.create.client.ponder.api.registration.TagBuilder;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
-import com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Component;
-import com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Tag;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.function.Function;
-
-import net.minecraft.resources.Identifier;
 
 public class DefaultPonderTagRegistrationHelper implements PonderTagRegistrationHelper<Identifier> {
 
@@ -18,7 +15,11 @@ public class DefaultPonderTagRegistrationHelper implements PonderTagRegistration
     protected PonderTagRegistry tagRegistry;
     protected PonderLocalization localization;
 
-    public DefaultPonderTagRegistrationHelper(String namespace, PonderTagRegistry tagRegistry, PonderLocalization localization) {
+    public DefaultPonderTagRegistrationHelper(
+        String namespace,
+        PonderTagRegistry tagRegistry,
+        PonderLocalization localization
+    ) {
         this.namespace = namespace;
         this.tagRegistry = tagRegistry;
         this.localization = localization;
@@ -45,8 +46,9 @@ public class DefaultPonderTagRegistrationHelper implements PonderTagRegistration
         PonderTag tag = new PonderTag(builder.id, builder.textureIconLocation, builder.itemIcon, builder.mainItem);
         tagRegistry.registerTag(tag);
 
-        if (builder.addToIndex)
+        if (builder.addToIndex) {
             tagRegistry.listTag(tag);
+        }
     }
 
     @Override

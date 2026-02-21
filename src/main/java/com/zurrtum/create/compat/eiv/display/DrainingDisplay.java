@@ -85,7 +85,11 @@ public class DrainingDisplay extends CreateDisplay {
     }
 
     public static void registerPotionItem(List<IEivServerRecipe> recipes, ItemStack item) {
-        recipes.add(new DrainingDisplay(Items.GLASS_BOTTLE.getDefaultInstance(), PotionFluidHandler.getFluidFromPotionItem(item), List.of(item)));
+        recipes.add(new DrainingDisplay(
+            Items.GLASS_BOTTLE.getDefaultInstance(),
+            PotionFluidHandler.getFluidFromPotionItem(item),
+            List.of(item)
+        ));
     }
 
     @Override

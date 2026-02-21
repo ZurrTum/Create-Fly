@@ -29,19 +29,20 @@ public class MovementModeScrollBehaviour extends ScrollOptionBehaviour<MovementM
 
     public static MovementModeScrollBehaviour piston(SmartBlockEntity be) {
         return new MovementModeScrollBehaviour(
-            be, CreateLang.translateDirect("contraptions.movement_mode"), new DirectionalExtenderScrollOptionSlot((state, d) -> {
-            Axis axis = d.getAxis();
-            Axis extensionAxis = state.getValue(MechanicalPistonBlock.FACING).getAxis();
-            Axis shaftAxis = ((IRotate) state.getBlock()).getRotationAxis(state);
-            return extensionAxis != axis && shaftAxis != axis;
-        })
+            be,
+            CreateLang.translateDirect("contraptions.movement_mode"),
+            new DirectionalExtenderScrollOptionSlot((state, d) -> {
+                Axis axis = d.getAxis();
+                Axis extensionAxis = state.getValue(MechanicalPistonBlock.FACING).getAxis();
+                Axis shaftAxis = ((IRotate) state.getBlock()).getRotationAxis(state);
+                return extensionAxis != axis && shaftAxis != axis;
+            })
         );
     }
 
     private enum MovementModeIcon implements INamedIconOptions {
-        MOVE_PLACE(AllIcons.I_MOVE_PLACE),
-        MOVE_PLACE_RETURNED(AllIcons.I_MOVE_PLACE_RETURNED),
-        MOVE_NEVER_PLACE(AllIcons.I_MOVE_NEVER_PLACE);
+        MOVE_PLACE(AllIcons.I_MOVE_PLACE), MOVE_PLACE_RETURNED(AllIcons.I_MOVE_PLACE_RETURNED), MOVE_NEVER_PLACE(
+            AllIcons.I_MOVE_NEVER_PLACE);
 
         private final String translationKey;
         private final AllIcons icon;

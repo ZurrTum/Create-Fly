@@ -101,20 +101,32 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
             renderState.upper = CachedBuffers.block(blockState.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
             renderState.lower = CachedBuffers.block(blockState.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
             renderState.upperOffset = 1 - 1 / 512f;
-            renderState.offset = Vec3.atLowerCornerOf(movementDirection.getUnitVec3i()).scale(value * value * 13 / 16f).add(offset);
+            renderState.offset = Vec3.atLowerCornerOf(movementDirection.getUnitVec3i()).scale(value * value * 13 / 16f)
+                .add(offset);
             renderState.light = state.lightCoords;
             state.renderer = renderState;
         }
     }
 
     @Override
-    public void submit(DoorRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        DoorRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.renderer != null) {
             queue.submitCustomGeometry(matrices, state.layer, state.renderer);
         }
     }
 
-    public static Pair<ScrollInput, Label> createWidget(Minecraft mc, int x, int y, Consumer<DoorControl> callback, DoorControl initial) {
+    public static Pair<ScrollInput, Label> createWidget(
+        Minecraft mc,
+        int x,
+        int y,
+        Consumer<DoorControl> callback,
+        DoorControl initial
+    ) {
         Entity entity = mc.getCameraEntity();
         DoorControl playerFacing = entity != null ? switch (entity.getDirection()) {
             case EAST -> DoorControl.EAST;
@@ -125,8 +137,7 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
         } : DoorControl.NONE;
 
         Label label = new Label(x + 4, y + 6, Component.empty()).withShadow();
-        ScrollInput input = new SelectionScrollInput(x, y, 53, 16).forOptions(CreateLang.translatedOptions(
-            "contraption.door_control",
+        ScrollInput input = new SelectionScrollInput(x, y, 53, 16).forOptions(CreateLang.translatedOptions("contraption.door_control",
             valuesAsString()
         )).titled(CreateLang.translateDirect("contraption.door_control")).calling(s -> {
             DoorControl mode = DoorControl.values()[s];
@@ -142,7 +153,8 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
 
     public static String[] valuesAsString() {
         DoorControl[] values = DoorControl.values();
-        return Arrays.stream(values).map(dc -> dc.name().toLowerCase(Locale.ROOT)).toList().toArray(new String[values.length]);
+        return Arrays.stream(values).map(dc -> dc.name().toLowerCase(Locale.ROOT)).toList()
+            .toArray(new String[values.length]);
     }
 
     public static class DoorRenderState extends BlockEntityRenderState {

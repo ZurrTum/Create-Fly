@@ -24,7 +24,9 @@ import java.util.List;
 
 public class TableClothModel extends WrapperBlockStateModel {
     private static final List<WeakReference<TableClothModel>> MODELS = new ArrayList<>(19);
-    private static final Direction[] DIRECTIONS = new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
+    private static final Direction[] DIRECTIONS = new Direction[]{
+        Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST
+    };
     private static final int SOUTH_WEST = 0b0011;
     private static final int NORTH_WEST = 0b0110;
     private static final int NORTH_EAST = 0b1100;
@@ -58,7 +60,13 @@ public class TableClothModel extends WrapperBlockStateModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         model.collectParts(random, parts);
         int index = 0;
         MutableBlockPos mutable = new MutableBlockPos();
@@ -143,9 +151,8 @@ public class TableClothModel extends WrapperBlockStateModel {
         return newQuad;
     }
 
-    private record BakedCorner(
-        List<BakedQuad> south, List<BakedQuad> west, List<BakedQuad> north, List<BakedQuad> east, TextureAtlasSprite particleIcon
-    ) implements BlockModelPart {
+    private record BakedCorner(List<BakedQuad> south, List<BakedQuad> west, List<BakedQuad> north, List<BakedQuad> east,
+                               TextureAtlasSprite particleIcon) implements BlockModelPart {
         @Override
         public List<BakedQuad> getQuads(@Nullable Direction side) {
             return switch (side) {

@@ -26,7 +26,14 @@ import java.util.List;
 
 public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements EntryRenderer<FluidStack> {
     @Override
-    public void render(EntryStack<FluidStack> entry, GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
+    public void render(
+        EntryStack<FluidStack> entry,
+        GuiGraphics graphics,
+        Rectangle bounds,
+        int mouseX,
+        int mouseY,
+        float delta
+    ) {
         FluidStack stack = entry.getValue();
         Fluid fluid = stack.getFluid();
         FluidConfig config = AllFluidConfigs.get(fluid);
@@ -34,7 +41,15 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
             return;
         }
         int color = config.tint().apply(stack.getComponents().asPatch()) | 0xff000000;
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, config.still().get(), bounds.x, bounds.y, bounds.width, bounds.height, color);
+        graphics.blitSprite(
+            RenderPipelines.GUI_TEXTURED,
+            config.still().get(),
+            bounds.x,
+            bounds.y,
+            bounds.width,
+            bounds.height,
+            color
+        );
     }
 
     @Override
@@ -50,14 +65,19 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
             if (stack.getFluid() == AllFluids.POTION) {
                 PatchedDataComponentMap components = stack.getComponents();
                 PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-                BottleType bottleType = components.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
-                Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getDescriptionId() + ".effect.");
+                BottleType bottleType = components.getOrDefault(
+                    AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
+                    BottleType.REGULAR
+                );
+                Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType)
+                    .getDescriptionId() + ".effect.");
                 List<Tooltip.Entry> list = new ArrayList<>();
                 list.add(Tooltip.entry(name));
                 Float scale = components.get(DataComponents.POTION_DURATION_SCALE);
                 if (scale == null) {
                     if (bottleType == BottleType.LINGERING) {
-                        scale = Items.LINGERING_POTION.components().getOrDefault(DataComponents.POTION_DURATION_SCALE, 1f);
+                        scale = Items.LINGERING_POTION.components()
+                            .getOrDefault(DataComponents.POTION_DURATION_SCALE, 1f);
                     } else {
                         scale = 1f;
                     }

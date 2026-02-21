@@ -10,7 +10,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record CubeParticleData(float red, float green, float blue, float scale, int avgAge, boolean hot) implements ParticleOptions {
+public record CubeParticleData(float red, float green, float blue, float scale, int avgAge,
+                               boolean hot) implements ParticleOptions {
 
     public static final MapCodec<CubeParticleData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
         Codec.FLOAT.fieldOf("r").forGetter(CubeParticleData::red),

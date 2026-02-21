@@ -24,13 +24,16 @@ public class CrafterHelper {
         ConnectedInput input1 = getInput(reader, pos);
         ConnectedInput input2 = getInput(reader, otherPos);
 
-        if (input1 == null || input2 == null)
+        if (input1 == null || input2 == null) {
             return false;
-        if (input1.data.isEmpty() || input2.data.isEmpty())
+        }
+        if (input1.data.isEmpty() || input2.data.isEmpty()) {
             return false;
+        }
         try {
-            if (pos.offset(input1.data.getFirst()).equals(otherPos.offset(input2.data.getFirst())))
+            if (pos.offset(input1.data.getFirst()).equals(otherPos.offset(input2.data.getFirst()))) {
                 return true;
+            }
         } catch (IndexOutOfBoundsException e) {
             // race condition. data somehow becomes empty between the last 2 if statements
         }

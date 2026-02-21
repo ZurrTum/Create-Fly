@@ -19,10 +19,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
-public record ConfigureWorldshaperPacket(
-    InteractionHand hand, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool,
-    PlacementOptions placement
-) implements ConfigureZapperPacket {
+public record ConfigureWorldshaperPacket(InteractionHand hand, PlacementPatterns pattern, TerrainBrushes brush,
+                                         int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool,
+                                         PlacementOptions placement) implements ConfigureZapperPacket {
     public static final StreamCodec<ByteBuf, ConfigureWorldshaperPacket> CODEC = CatnipLargerStreamCodecs.composite(
         CatnipStreamCodecs.HAND,
         packet -> packet.hand,
@@ -45,7 +44,16 @@ public record ConfigureWorldshaperPacket(
 
     @Override
     public void configureZapper(ItemStack stack) {
-        WorldshaperItem.configureSettings(stack, pattern, brush, brushParamX, brushParamY, brushParamZ, tool, placement);
+        WorldshaperItem.configureSettings(
+            stack,
+            pattern,
+            brush,
+            brushParamX,
+            brushParamY,
+            brushParamZ,
+            tool,
+            placement
+        );
     }
 
     @Override

@@ -39,7 +39,11 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
         this(TYPE, be, target);
     }
 
-    private InvManipulationBehaviour(BehaviourType<InvManipulationBehaviour> type, SmartBlockEntity be, InterfaceProvider target) {
+    private InvManipulationBehaviour(
+        BehaviourType<InvManipulationBehaviour> type,
+        SmartBlockEntity be,
+        InterfaceProvider target
+    ) {
         super(be, target);
         behaviourType = type;
     }
@@ -47,8 +51,9 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
     @Nullable
     public IdentifiedInventory getIdentifiedInventory() {
         Container inventory = this.getInventory();
-        if (inventory == null)
+        if (inventory == null) {
             return null;
+        }
 
         InventoryIdentifier identifier = InventoryIdentifier.get(this.getLevel(), this.getTarget().getOpposite());
         return new IdentifiedInventory(identifier, inventory);
@@ -71,11 +76,13 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
         boolean shouldSimulate = simulateNext;
         simulateNext = false;
 
-        if (getLevel().isClientSide())
+        if (getLevel().isClientSide()) {
             return ItemStack.EMPTY;
+        }
         Container inventory = targetCapability;
-        if (inventory == null)
+        if (inventory == null) {
             return ItemStack.EMPTY;
+        }
 
         Predicate<ItemStack> test = getFilterTest(filter);
         ItemStack extract;
@@ -110,8 +117,9 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
         boolean shouldSimulate = simulateNext;
         simulateNext = false;
         Container inventory = targetCapability;
-        if (inventory == null)
+        if (inventory == null) {
             return stack;
+        }
         int insert;
         if (shouldSimulate) {
             insert = inventory.countSpace(stack);
@@ -131,8 +139,9 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
     protected Predicate<ItemStack> getFilterTest(Predicate<ItemStack> customFilter) {
         Predicate<ItemStack> test = customFilter;
         ServerFilteringBehaviour filter = blockEntity.getBehaviour(ServerFilteringBehaviour.TYPE);
-        if (filter != null)
+        if (filter != null) {
             test = customFilter.and(filter::test);
+        }
         return test;
     }
 

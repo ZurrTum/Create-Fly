@@ -59,14 +59,21 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
+        }
 
         tryGrabbingItem(context);
         DeployerPlayer player = getPlayer(context);
         Mode mode = getMode(context);
-        if (mode == Mode.USE && !DeployerHandler.shouldActivate(player.cast().getMainHandItem(), context.world, pos, null))
+        if (mode == Mode.USE && !DeployerHandler.shouldActivate(
+            player.cast().getMainHandItem(),
+            context.world,
+            pos,
+            null
+        )) {
             return;
+        }
 
         activate(context, pos, player, mode);
         checkForTrackPlacementAdvancement(context, player);
@@ -92,10 +99,12 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         float xRot = AbstractContraptionEntity.pitchFromVector(facingVec) - 90;
         if (Math.abs(xRot) > 89) {
             Vec3 initial = new Vec3(0, 0, 1);
-            if (context.contraption.entity instanceof OrientedContraptionEntity oce)
+            if (context.contraption.entity instanceof OrientedContraptionEntity oce) {
                 initial = VecHelper.rotate(initial, oce.getInitialYaw(), Axis.Y);
-            if (context.contraption.entity instanceof CarriageContraptionEntity cce)
+            }
+            if (context.contraption.entity instanceof CarriageContraptionEntity cce) {
                 initial = VecHelper.rotate(initial, 90, Axis.Y);
+            }
             facingVec = context.rotation.apply(initial);
         }
 
@@ -116,25 +125,38 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         }
     }
 
-    protected void activateAsSchematicPrinter(MovementContext context, BlockPos pos, DeployerPlayer player, Level world, ItemStack filter) {
-        if (!filter.has(AllDataComponents.SCHEMATIC_ANCHOR))
+    protected void activateAsSchematicPrinter(
+        MovementContext context,
+        BlockPos pos,
+        DeployerPlayer player,
+        Level world,
+        ItemStack filter
+    ) {
+        if (!filter.has(AllDataComponents.SCHEMATIC_ANCHOR)) {
             return;
-        if (!world.getBlockState(pos).canBeReplaced())
+        }
+        if (!world.getBlockState(pos).canBeReplaced()) {
             return;
+        }
 
-        if (!filter.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false))
+        if (!filter.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false)) {
             return;
+        }
         SchematicLevel schematicWorld = SchematicInstances.get(world, filter);
-        if (schematicWorld == null)
+        if (schematicWorld == null) {
             return;
-        if (!schematicWorld.getBounds().isInside(pos.subtract(schematicWorld.anchor)))
+        }
+        if (!schematicWorld.getBounds().isInside(pos.subtract(schematicWorld.anchor))) {
             return;
+        }
         BlockState blockState = schematicWorld.getBlockState(pos);
         ItemRequirement requirement = ItemRequirement.of(blockState, schematicWorld.getBlockEntity(pos));
-        if (requirement.isInvalid() || requirement.isEmpty())
+        if (requirement.isInvalid() || requirement.isEmpty()) {
             return;
-        if (blockState.is(AllBlocks.BELT))
+        }
+        if (blockState.is(AllBlocks.BELT)) {
             return;
+        }
 
         List<ItemRequirement.StackRequirement> requiredItems = requirement.getRequiredItems();
         ItemStack contextStack = requiredItems.isEmpty() ? ItemStack.EMPTY : requiredItems.getFirst().stack;
@@ -157,16 +179,19 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         CompoundTag data = BlockHelper.prepareBlockEntityData(world, blockState, schematicWorld.getBlockEntity(pos));
         BlockHelper.placeSchematicBlock(world, blockState, pos, contextStack, data);
 
-        if (blockState.getBlock() instanceof BaseRailBlock || blockState.getBlock() instanceof ITrackBlock)
+        if (blockState.getBlock() instanceof BaseRailBlock || blockState.getBlock() instanceof ITrackBlock) {
             player.setPlacedTracks(true);
+        }
     }
 
     @Override
     public void tick(MovementContext context) {
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
-        if (!context.stall)
+        }
+        if (!context.stall) {
             return;
+        }
 
         DeployerPlayer player = getPlayer(context);
         Mode mode = getMode(context);
@@ -190,31 +215,39 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void cancelStall(MovementContext context) {
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
+        }
 
         super.cancelStall(context);
         DeployerPlayer player = getPlayer(context);
-        if (player == null)
+        if (player == null) {
             return;
-        if (player.getBlockBreakingProgress() == null)
+        }
+        if (player.getBlockBreakingProgress() == null) {
             return;
+        }
         context.world.destroyBlockProgress(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
         player.setBlockBreakingProgress(null);
     }
 
     @Override
     public void stopMoving(MovementContext context) {
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
+        }
 
         DeployerPlayer player = getPlayer(context);
-        if (player == null)
+        if (player == null) {
             return;
+        }
 
         ServerPlayer serverPlayer = player.cast();
         cancelStall(context);
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(context.contraption.entity.problemPath(), LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            context.contraption.entity.problemPath(),
+            LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, context.world.registryAccess());
             serverPlayer.getInventory().save(view.list("Inventory", ItemStackWithSlot.CODEC));
             context.blockEntityData.store("Inventory", CompoundTag.CODEC, view.buildResult());
@@ -224,22 +257,26 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     private void tryGrabbingItem(MovementContext context) {
         DeployerPlayer player = getPlayer(context);
-        if (player == null)
+        if (player == null) {
             return;
+        }
         ServerPlayer serverPlayer = player.cast();
         if (serverPlayer.getMainHandItem().isEmpty()) {
             FilterItemStack filter = context.getFilterFromBE();
-            if (filter.item().is(AllItems.SCHEMATIC))
+            if (filter.item().is(AllItems.SCHEMATIC)) {
                 return;
-            ItemStack held = context.contraption.getStorage().getAllItems().extract(stack -> filter.test(context.world, stack), 1);
+            }
+            ItemStack held = context.contraption.getStorage().getAllItems()
+                .extract(stack -> filter.test(context.world, stack), 1);
             serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, held);
         }
     }
 
     private void tryDisposeOfExcess(MovementContext context) {
         DeployerPlayer player = getPlayer(context);
-        if (player == null)
+        if (player == null) {
             return;
+        }
         Inventory inv = player.cast().getInventory();
         FilterItemStack filter = context.getFilterFromBE();
 
@@ -247,8 +284,9 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         int selected = inv.getSelectedSlot();
         for (int i = 0; i < main.size(); i++) {
             ItemStack stack = main.get(i);
-            if (stack.isEmpty() || i == selected && filter.test(context.world, stack))
+            if (stack.isEmpty() || i == selected && filter.test(context.world, stack)) {
                 continue;
+            }
             collectOrDropItem(context, stack);
             main.set(i, ItemStack.EMPTY);
         }
@@ -265,8 +303,9 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
     @Override
     public void writeExtraData(MovementContext context) {
         DeployerPlayer player = getPlayer(context);
-        if (player == null)
+        if (player == null) {
             return;
+        }
         ItemStack stack = player.cast().getMainHandItem();
         if (stack.isEmpty()) {
             return;
@@ -283,18 +322,26 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             DeployerPlayer player = DeployerPlayer.create((ServerLevel) context.world, owner, ownerName);
             player.setOnMinecartContraption(context.contraption instanceof MountedContraption);
 
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "DeployerMovementBehaviour", LOGGER)) {
-                CompoundTag inventory = context.blockEntityData.read("Inventory", CompoundTag.CODEC).orElseGet(CompoundTag::new);
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                () -> "DeployerMovementBehaviour",
+                LOGGER
+            )) {
+                CompoundTag inventory = context.blockEntityData.read("Inventory", CompoundTag.CODEC)
+                    .orElseGet(CompoundTag::new);
                 ValueInput view = TagValueInput.create(logging, registryManager, inventory);
                 player.cast().getInventory().load(view.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
             }
 
-            if (context.data.contains("HeldItem"))
+            if (context.data.contains("HeldItem")) {
                 player.cast().setItemInHand(
                     InteractionHand.MAIN_HAND,
-                    context.data.read("HeldItem", ItemStack.CODEC, registryManager.createSerializationContext(NbtOps.INSTANCE))
-                        .orElse(ItemStack.EMPTY)
+                    context.data.read(
+                        "HeldItem",
+                        ItemStack.CODEC,
+                        registryManager.createSerializationContext(NbtOps.INSTANCE)
+                    ).orElse(ItemStack.EMPTY)
                 );
+            }
             context.blockEntityData.remove("Inventory");
             context.temporaryData = player;
         }

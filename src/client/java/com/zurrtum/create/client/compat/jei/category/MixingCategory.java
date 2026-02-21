@@ -67,9 +67,19 @@ public class MixingCategory extends BasinCategory<MixingRecipe> {
     }
 
     @Override
-    public void draw(RecipeHolder<MixingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<MixingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         MixingRecipe recipe = entry.value();
         drawBackground(recipe, graphics, recipe.results().size() + recipe.fluidResults().size());
-        graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(new Matrix3x2f(graphics.pose()), 91, -5));
+        graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(
+            new Matrix3x2f(graphics.pose()),
+            91,
+            -5
+        ));
     }
 }

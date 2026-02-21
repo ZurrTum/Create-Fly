@@ -46,7 +46,11 @@ public class BlockItemMixin {
     }
 
     @Inject(method = "useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", at = @At("RETURN"))
-    private void useOn(UseOnContext useOnContext, CallbackInfoReturnable<InteractionResult> cir, @Share("place") LocalRef<BlockPlaceContext> place) {
+    private void useOn(
+        UseOnContext useOnContext,
+        CallbackInfoReturnable<InteractionResult> cir,
+        @Share("place") LocalRef<BlockPlaceContext> place
+    ) {
         if (cir.getReturnValue().consumesAction()) {
             BlockPlaceContext context = place.get();
             if (context != null) {
@@ -95,7 +99,11 @@ public class BlockItemMixin {
     }
 
     @WrapOperation(method = "place(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/SoundType;getVolume()F"))
-    private float getVolume(SoundType instance, Operation<Float> original, @Share("group") LocalRef<ItemPlacementSoundContext> group) {
+    private float getVolume(
+        SoundType instance,
+        Operation<Float> original,
+        @Share("group") LocalRef<ItemPlacementSoundContext> group
+    ) {
         if (instance == null) {
             return group.get().getVolume();
         }
@@ -103,7 +111,11 @@ public class BlockItemMixin {
     }
 
     @WrapOperation(method = "place(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/SoundType;getPitch()F"))
-    private float getPitch(SoundType instance, Operation<Float> original, @Share("group") LocalRef<ItemPlacementSoundContext> group) {
+    private float getPitch(
+        SoundType instance,
+        Operation<Float> original,
+        @Share("group") LocalRef<ItemPlacementSoundContext> group
+    ) {
         if (instance == null) {
             return group.get().getPitch();
         }

@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.trains.track;
 
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.trains.graph.*;
@@ -8,7 +9,6 @@ import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
@@ -67,12 +67,15 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         view.store("TargetTrack", BlockPos.CODEC, targetTrack);
         view.putBoolean("Ortho", orthogonal);
         view.putBoolean("TargetDirection", targetDirection == AxisDirection.POSITIVE);
-        if (rotatedDirection != null)
+        if (rotatedDirection != null) {
             view.store("RotatedAxis", Vec3.CODEC, rotatedDirection);
-        if (prevDirection != null)
+        }
+        if (prevDirection != null) {
             view.store("PrevAxis", Vec3.CODEC, prevDirection);
-        if (migrationData != null && !clientPacket)
+        }
+        if (migrationData != null && !clientPacket) {
             view.store("Migrate", CompoundTag.CODEC, migrationData);
+        }
         if (targetBezier != null) {
             ValueOutput bezier = view.child("Bezier");
             bezier.putInt("Segment", targetBezier.segment());
@@ -90,8 +93,9 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         view.read("RotatedAxis", Vec3.CODEC).ifPresent(rotated -> rotatedDirection = rotated);
         view.read("PrevAxis", Vec3.CODEC).ifPresent(prev -> prevDirection = prev);
         view.read("Migrate", CompoundTag.CODEC).ifPresent(migration -> migrationData = migration);
-        if (clientPacket)
+        if (clientPacket) {
             edgePoint = null;
+        }
         view.child("Bezier").ifPresent(bezier -> {
             BlockPos key = bezier.read("Key", BlockPos.CODEC).orElse(BlockPos.ZERO);
             targetBezier = new BezierTrackPointLocation(key.offset(getPos()), bezier.getIntOr("Segment", 0));
@@ -113,36 +117,43 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
     @Override
     public void tick() {
         super.tick();
-        if (edgePoint == null)
+        if (edgePoint == null) {
             edgePoint = createEdgePoint();
+        }
     }
 
     @SuppressWarnings("unchecked")
     public T createEdgePoint() {
         Level level = getLevel();
         boolean isClientSide = level.isClientSide();
-        if (migrationData == null || isClientSide)
+        if (migrationData == null || isClientSide) {
             for (TrackGraph trackGraph : Create.RAILWAYS.sided(level).trackNetworks.values()) {
                 T point = trackGraph.getPoint(edgePointType, id);
-                if (point == null)
+                if (point == null) {
                     continue;
+                }
                 return point;
             }
+        }
 
-        if (isClientSide)
+        if (isClientSide) {
             return null;
-        if (!hasValidTrack())
+        }
+        if (!hasValidTrack()) {
             return null;
+        }
         TrackGraphLocation loc = determineGraphLocation();
-        if (loc == null)
+        if (loc == null) {
             return null;
+        }
 
         TrackGraph graph = loc.graph;
         TrackNode node1 = graph.locateNode(loc.edge.getFirst());
         TrackNode node2 = graph.locateNode(loc.edge.getSecond());
         TrackEdge edge = graph.getConnectionsFrom(node1).get(node2);
-        if (edge == null)
+        if (edge == null) {
             return null;
+        }
 
         T point = edgePointType.create();
         boolean front = getTargetDirection() == AxisDirection.POSITIVE;
@@ -168,8 +179,9 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
             orthogonal = targetBezier == null;
             Vec3 direction = edge.getDirection(true);
             int nonZeroComponents = 0;
-            for (Axis axis : Iterate.axes)
+            for (Axis axis : Iterate.axes) {
                 nonZeroComponents += direction.get(axis) != 0 ? 1 : 0;
+            }
             orthogonal &= nonZeroComponents <= 1;
         }
 
@@ -177,15 +189,18 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         if (signalData.hasPoints()) {
             for (EdgePointType<?> otherType : EdgePointType.TYPES.values()) {
                 TrackEdgePoint otherPoint = signalData.get(otherType, loc.position);
-                if (otherPoint == null)
-                    continue;
-                if (otherType != edgePointType) {
-                    if (!otherPoint.canCoexistWith(edgePointType, front))
-                        return null;
+                if (otherPoint == null) {
                     continue;
                 }
-                if (!otherPoint.canMerge())
+                if (otherType != edgePointType) {
+                    if (!otherPoint.canCoexistWith(edgePointType, front)) {
+                        return null;
+                    }
+                    continue;
+                }
+                if (!otherPoint.canMerge()) {
                     return null;
+                }
                 otherPoint.blockEntityAdded(blockEntity, front);
                 id = otherPoint.getId();
                 blockEntity.notifyUpdate();
@@ -194,7 +209,10 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         }
 
         if (data != null) {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), Create.LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                blockEntity.problemPath(),
+                Create.LOGGER
+            )) {
                 ValueInput view = TagValueInput.create(logging, level.registryAccess(), data);
                 DimensionPalette dimensions = view.read("DimensionPalette", DimensionPalette.CODEC).orElseThrow();
                 point.read(view, true, dimensions);
@@ -216,7 +234,11 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         if (edgePoint != null) {
             Level world = getLevel();
             if (!world.isClientSide()) {
-                edgePoint.blockEntityRemoved(world.getServer(), getPos(), getTargetDirection() == AxisDirection.POSITIVE);
+                edgePoint.blockEntityRemoved(
+                    world.getServer(),
+                    getPos(),
+                    getTargetDirection() == AxisDirection.POSITIVE
+                );
             }
         }
     }
@@ -254,8 +276,9 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         BlockPos target = targetTrack.offset(blockEntity.getBlockPos());
         if (targetBezier != null && getLevel().getBlockEntity(target) instanceof TrackBlockEntity tbe) {
             BezierConnection bc = tbe.getConnections().get(targetBezier.curveTarget());
-            if (bc == null)
+            if (bc == null) {
                 return target;
+            }
             double length = Mth.floor(bc.getLength() * 2);
             int seg = targetBezier.segment() + 1;
             double t = seg / length;
@@ -289,22 +312,21 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
     }
 
     public enum RenderedTrackOverlayType {
-        STATION,
-        SIGNAL,
-        DUAL_SIGNAL,
-        OBSERVER;
+        STATION, SIGNAL, DUAL_SIGNAL, OBSERVER;
     }
 
     public void transform(BlockEntity be, StructureTransform transform) {
         id = UUID.randomUUID();
         targetTrack = transform.applyWithoutOffset(targetTrack);
-        if (prevDirection != null)
+        if (prevDirection != null) {
             rotatedDirection = transform.applyWithoutOffsetUncentered(prevDirection);
-        if (targetBezier != null)
+        }
+        if (targetBezier != null) {
             targetBezier = new BezierTrackPointLocation(
                 transform.applyWithoutOffset(targetBezier.curveTarget().subtract(getPos())).offset(getPos()),
                 targetBezier.segment()
             );
+        }
         blockEntity.notifyUpdate();
     }
 

@@ -32,14 +32,16 @@ import org.joml.Matrix4f;
 
 public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehaviour {
     public void tick(MovementContext context) {
-        if (!shouldRender(context))
+        if (!shouldRender(context)) {
             return;
+        }
 
         RandomSource r = context.world.getRandom();
         Vec3 c = context.position;
         Vec3 v = c.add(VecHelper.offsetRandomly(Vec3.ZERO, r, .125f).multiply(1, 0, 1));
-        if (r.nextInt(3) == 0 && context.motion.length() < 1 / 64f)
+        if (r.nextInt(3) == 0 && context.motion.length() < 1 / 64f) {
             context.world.addParticle(ParticleTypes.LARGE_SMOKE, v.x, v.y, v.z, 0, 0, 0);
+        }
 
         LerpedFloat headAngle = getHeadAngle(context);
         boolean quickTurn = shouldRenderHat(context) && !Mth.equal(context.relativeMotion.length(), 0);
@@ -52,12 +54,16 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
     }
 
     private boolean shouldRender(MovementContext context) {
-        return context.state.getValueOrElse(BlazeBurnerBlock.HEAT_LEVEL, BlazeBurnerBlock.HeatLevel.NONE) != BlazeBurnerBlock.HeatLevel.NONE;
+        return context.state.getValueOrElse(
+            BlazeBurnerBlock.HEAT_LEVEL,
+            BlazeBurnerBlock.HeatLevel.NONE
+        ) != BlazeBurnerBlock.HeatLevel.NONE;
     }
 
     private LerpedFloat getHeadAngle(MovementContext context) {
-        if (!(context.temporaryData instanceof LerpedFloat))
+        if (!(context.temporaryData instanceof LerpedFloat)) {
             context.temporaryData = LerpedFloat.angular().startWithValue(getTargetAngle(context));
+        }
         return (LerpedFloat) context.temporaryData;
     }
 
@@ -73,7 +79,8 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
 
         Entity player = Minecraft.getInstance().getCameraEntity();
         if (player != null && !player.isInvisible() && context.position != null) {
-            Vec3 applyRotation = context.contraption.entity.reverseRotation(player.position().subtract(context.position), 1);
+            Vec3 applyRotation = context.contraption.entity.reverseRotation(
+                player.position().subtract(context.position), 1);
             double dx = applyRotation.x;
             double dz = applyRotation.z;
             return AngleHelper.deg(-Mth.atan2(dz, dx)) - 90;
@@ -83,19 +90,26 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
 
     private boolean shouldRenderHat(MovementContext context) {
         CompoundTag data = context.data;
-        if (!data.contains("Conductor"))
+        if (!data.contains("Conductor")) {
             data.putBoolean("Conductor", determineIfConducting(context));
-        return data.getBooleanOr("Conductor", false) && (context.contraption.entity instanceof CarriageContraptionEntity cce) && cce.hasSchedule();
+        }
+        return data.getBooleanOr(
+            "Conductor",
+            false
+        ) && (context.contraption.entity instanceof CarriageContraptionEntity cce) && cce.hasSchedule();
     }
 
     private boolean determineIfConducting(MovementContext context) {
         Contraption contraption = context.contraption;
-        if (!(contraption instanceof CarriageContraption carriageContraption))
+        if (!(contraption instanceof CarriageContraption carriageContraption)) {
             return false;
+        }
         Direction assemblyDirection = carriageContraption.getAssemblyDirection();
-        for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis()))
-            if (carriageContraption.inControl(context.localPos, direction))
+        for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis())) {
+            if (carriageContraption.inControl(context.localPos, direction)) {
                 return true;
+            }
+        }
         return false;
     }
 

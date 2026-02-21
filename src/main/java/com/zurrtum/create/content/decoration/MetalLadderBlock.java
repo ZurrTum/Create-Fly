@@ -7,9 +7,6 @@ import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -30,6 +27,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.function.Predicate;
+
 public class MetalLadderBlock extends LadderBlock implements IWrenchable {
 
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
@@ -45,8 +44,9 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
 
     @Override
     public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pDirection) {
-        if (pDirection != null && pDirection.getAxis().isHorizontal())
+        if (pDirection != null && pDirection.getAxis().isHorizontal()) {
             return pAdjacentBlockState.isAir() || !pAdjacentBlockState.blocksMotion();
+        }
         return pDirection == Direction.UP && pAdjacentBlockState.getBlock() instanceof LadderBlock;
     }
 
@@ -66,15 +66,17 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
         BlockState pFacingState,
         RandomSource random
     ) {
-        if (!pState.canSurvive(pLevel, pCurrentPos))
+        if (!pState.canSurvive(pLevel, pCurrentPos)) {
             return Blocks.AIR.defaultBlockState();
+        }
         return super.updateShape(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
     }
 
     @Override
     public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         BlockState otherState = pLevel.getBlockState(pPos.relative(Direction.UP));
-        return super.canSurvive(pState, pLevel, pPos) || (otherState.is(this) && pState.getValue(FACING).equals(otherState.getValue(FACING)));
+        return super.canSurvive(pState, pLevel, pPos) || (otherState.is(this) && pState.getValue(FACING)
+            .equals(otherState.getValue(FACING)));
     }
 
     @Override
@@ -87,11 +89,14 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isShiftKeyDown() || !player.mayBuild())
+        if (player.isShiftKeyDown() || !player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
-        if (helper.matchesItem(stack))
-            return helper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        if (helper.matchesItem(stack)) {
+            return helper.getOffset(player, level, state, pos, hitResult)
+                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        }
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
@@ -120,28 +125,38 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             Direction dir = player.getXRot() < 0 ? Direction.UP : Direction.DOWN;
 
             int range = AllConfigs.server().equipment.placementAssistRange.get();
             if (player != null) {
                 AttributeInstance reach = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
-                if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier.id()))
+                if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier.id())) {
                     range += 4;
+                }
             }
 
             int ladders = attachedLadders(world, pos, dir);
-            if (ladders >= range)
+            if (ladders >= range) {
                 return PlacementOffset.fail();
+            }
 
             BlockPos newPos = pos.relative(dir, ladders + 1);
             BlockState newState = world.getBlockState(newPos);
 
-            if (!state.canSurvive(world, newPos))
+            if (!state.canSurvive(world, newPos)) {
                 return PlacementOffset.fail();
+            }
 
-            if (newState.canBeReplaced())
+            if (newState.canBeReplaced()) {
                 return PlacementOffset.success(newPos, bState -> bState.setValue(FACING, state.getValue(FACING)));
+            }
             return PlacementOffset.fail();
         }
 

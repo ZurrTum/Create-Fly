@@ -16,7 +16,11 @@ import net.minecraft.client.renderer.state.ParticleGroupRenderState;
 
 public class CubeParticleRenderer extends ParticleGroup<CubeParticle> {
     public static final ParticleRenderType SHEET = new ParticleRenderType("create:cube");
-    public static final Layer RENDER_TYPE = new Layer(false, PonderSpecialTextures.BLANK.getLocation(), AllRenderPipelines.CUBE);
+    public static final Layer RENDER_TYPE = new Layer(
+        false,
+        PonderSpecialTextures.BLANK.getLocation(),
+        AllRenderPipelines.CUBE
+    );
     public CubeParticleSubmittable submittable = new CubeParticleSubmittable();
 
     public CubeParticleRenderer(ParticleEngine particleManager) {

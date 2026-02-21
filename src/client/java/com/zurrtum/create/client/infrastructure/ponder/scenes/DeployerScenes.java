@@ -60,8 +60,8 @@ public class DeployerScenes {
         scene.idle(44);
 
         scene.overlay().showOutlineWithText(util.select().position(deployerPos.west(2)), 60)
-            .text("It will always interact with the position 2 blocks in front of itself").attachKeyFrame().placeNearTarget()
-            .colored(PonderPalette.GREEN).attachKeyFrame();
+            .text("It will always interact with the position 2 blocks in front of itself").attachKeyFrame()
+            .placeNearTarget().colored(PonderPalette.GREEN).attachKeyFrame();
         scene.world().moveDeployer(deployerPos, 1, 25);
         scene.idle(26);
         scene.world().moveDeployer(deployerPos, -1, 25);
@@ -69,8 +69,8 @@ public class DeployerScenes {
         scene.world().showSection(util.select().fromTo(2, 1, 3, 2, 1, 1), Direction.DOWN);
         scene.idle(24);
 
-        scene.overlay().showText(50).pointAt(util.vector().topOf(deployerPos.west())).text("Blocks directly in front will not obstruct it")
-            .placeNearTarget();
+        scene.overlay().showText(50).pointAt(util.vector().topOf(deployerPos.west()))
+            .text("Blocks directly in front will not obstruct it").placeNearTarget();
         scene.world().moveDeployer(deployerPos, 1, 25);
         scene.idle(26);
         scene.world().moveDeployer(deployerPos, -1, 25);
@@ -78,7 +78,9 @@ public class DeployerScenes {
         scene.world().hideSection(util.select().fromTo(2, 1, 3, 2, 1, 1), Direction.UP);
         scene.idle(20);
 
-        String[] actions = new String[]{"Place Blocks,", "Use Items,", "Activate Blocks,", "Harvest blocks", "and Attack Mobs"};
+        String[] actions = new String[]{
+            "Place Blocks,", "Use Items,", "Activate Blocks,", "Harvest blocks", "and Attack Mobs"
+        };
 
         scene.overlay().showText(80).attachKeyFrame().independent(40).placeNearTarget().text("Deployers can:");
 
@@ -98,18 +100,24 @@ public class DeployerScenes {
         Class<DeployerBlockEntity> teType = DeployerBlockEntity.class;
         scene.world().modifyBlockEntityNBT(
             deployerSelection, teType, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("HeldItem", ItemStack.CODEC, ops, pot);
             }
         );
         scene.idle(10);
 
-        scene.overlay().showText(40).attachKeyFrame().placeNearTarget().pointAt(frontVec).text("Right-click the front to give it an Item to use");
+        scene.overlay().showText(40).attachKeyFrame().placeNearTarget().pointAt(frontVec)
+            .text("Right-click the front to give it an Item to use");
         scene.idle(40);
         scene.world().moveDeployer(deployerPos, 1, 25);
         scene.idle(26);
         scene.world().restoreBlocks(util.select().position(potPosition));
-        scene.world().modifyBlockEntityNBT(deployerSelection, teType, nbt -> nbt.store("HeldItem", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY));
+        scene.world().modifyBlockEntityNBT(
+            deployerSelection,
+            teType,
+            nbt -> nbt.store("HeldItem", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY)
+        );
         scene.world().moveDeployer(deployerPos, -1, 25);
         scene.idle(20);
 
@@ -118,22 +126,29 @@ public class DeployerScenes {
         ItemStack tulip = new ItemStack(Items.RED_TULIP);
         Vec3 entitySpawn = util.vector().topOf(deployerPos.above(3));
 
-        ElementLink<EntityElement> entity1 = scene.world().createItemEntity(entitySpawn, util.vector().of(0, 0.2, 0), tulip);
+        ElementLink<EntityElement> entity1 = scene.world()
+            .createItemEntity(entitySpawn, util.vector().of(0, 0.2, 0), tulip);
         scene.idle(17);
         scene.world().modifyEntity(entity1, Entity::discard);
         scene.world().modifyBlockEntityNBT(
             deployerSelection, teType, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("HeldItem", ItemStack.CODEC, ops, tulip);
             }
         );
         scene.idle(10);
-        scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().of(3, 2.5, 3)).text("Items can also be inserted automatically");
+        scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().of(3, 2.5, 3))
+            .text("Items can also be inserted automatically");
         scene.idle(30);
         scene.world().moveDeployer(deployerPos, 1, 25);
         scene.idle(26);
         scene.world().setBlock(potPosition, Blocks.POTTED_RED_TULIP.defaultBlockState(), false);
-        scene.world().modifyBlockEntityNBT(deployerSelection, teType, nbt -> nbt.store("HeldItem", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY));
+        scene.world().modifyBlockEntityNBT(
+            deployerSelection,
+            teType,
+            nbt -> nbt.store("HeldItem", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY)
+        );
         scene.world().moveDeployer(deployerPos, -1, 25);
         scene.idle(25);
         scene.world().hideSection(util.select().position(potPosition), Direction.UP);
@@ -142,7 +157,8 @@ public class DeployerScenes {
 
         Vec3 filterSlot = util.vector().topOf(deployerPos).add(2 / 16f, 0, 0);
         scene.overlay().showFilterSlotInput(filterSlot, Direction.UP, 80);
-        scene.overlay().showText(40).attachKeyFrame().placeNearTarget().pointAt(filterSlot).text("Deployers carry a filter slot");
+        scene.overlay().showText(40).attachKeyFrame().placeNearTarget().pointAt(filterSlot)
+            .text("Deployers carry a filter slot");
         scene.idle(50);
 
         ItemStack shears = new ItemStack(Items.SHEARS);
@@ -178,7 +194,8 @@ public class DeployerScenes {
         scene.world().modifyEntity(entity1, Entity::discard);
         scene.world().modifyBlockEntityNBT(
             deployerSelection, teType, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("HeldItem", ItemStack.CODEC, ops, shears);
             }
         );
@@ -192,13 +209,10 @@ public class DeployerScenes {
         scene.idle(26);
         scene.world().modifyEntity(sheep, e -> ((Sheep) e).setSheared(true));
         scene.effects().emitParticles(
-            util.vector().topOf(deployerPos.west(2)).add(0, -.25, 0),
-            scene.effects().particleEmitterWithinBlockSpace(
+            util.vector().topOf(deployerPos.west(2)).add(0, -.25, 0), scene.effects().particleEmitterWithinBlockSpace(
                 new BlockParticleOption(ParticleTypes.BLOCK, Blocks.PINK_WOOL.defaultBlockState()),
                 util.vector().of(0, 0, 0)
-            ),
-            25,
-            1
+            ), 25, 1
         );
         scene.world().moveDeployer(deployerPos, -1, 25);
         scene.world().showSection(util.select().position(deployerPos.north()), Direction.SOUTH);
@@ -247,7 +261,8 @@ public class DeployerScenes {
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(
             deployerSelection, DeployerBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("HeldItem", ItemStack.CODEC, ops, tool);
             }
         );
@@ -265,7 +280,8 @@ public class DeployerScenes {
         scene.world().moveDeployer(deployerPos, -1, 25);
         scene.idle(46);
 
-        scene.overlay().showControls(frontVec, Pointing.LEFT, 40).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(frontVec, Pointing.LEFT, 40).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(
             deployerSelection,
@@ -286,12 +302,18 @@ public class DeployerScenes {
             scene.world().incrementBlockBreakingProgress(breakingPos);
             scene.world().incrementBlockBreakingProgress(breakingPos);
             scene.world().moveDeployer(deployerPos, -1, 25);
-            if (i == 3)
-                scene.world().createItemEntity(util.vector().centerOf(breakingPos), util.vector().of(0, 0, 0), new ItemStack(Blocks.DIRT));
+            if (i == 3) {
+                scene.world().createItemEntity(
+                    util.vector().centerOf(breakingPos),
+                    util.vector().of(0, 0, 0),
+                    new ItemStack(Blocks.DIRT)
+                );
+            }
             scene.idle(26);
 
-            if (i == 0)
+            if (i == 0) {
                 scene.markAsFinished();
+            }
         }
     }
 
@@ -302,7 +324,8 @@ public class DeployerScenes {
         scene.world().showSection(util.select().layer(0), Direction.UP);
         scene.idle(5);
 
-        ElementLink<WorldSectionElement> depot = scene.world().showIndependentSection(util.select().position(2, 1, 1), Direction.DOWN);
+        ElementLink<WorldSectionElement> depot = scene.world()
+            .showIndependentSection(util.select().position(2, 1, 1), Direction.DOWN);
         scene.world().moveSection(depot, util.vector().of(0, 0, 1), 0);
         scene.idle(10);
 
@@ -323,11 +346,16 @@ public class DeployerScenes {
         scene.idle(10);
 
         ItemStack tool = AllItems.SAND_PAPER.getDefaultInstance();
-        scene.overlay().showControls(util.vector().blockSurface(pressPos.below(), Direction.EAST).add(0, 0.15, 0), Pointing.RIGHT, 30).withItem(tool);
+        scene.overlay().showControls(
+            util.vector().blockSurface(pressPos.below(), Direction.EAST).add(0, 0.15, 0),
+            Pointing.RIGHT,
+            30
+        ).withItem(tool);
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(
             pressS, DeployerBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 nbt.store("HeldItem", ItemStack.CODEC, ops, tool);
             }
         );
@@ -368,8 +396,8 @@ public class DeployerScenes {
         scene.world().showSection(util.select().fromTo(4, 1, 2, 0, 2, 2), Direction.SOUTH);
         scene.idle(20);
         BlockPos beltPos = util.grid().at(0, 1, 2);
-        scene.overlay().showText(40).pointAt(util.vector().blockSurface(beltPos, Direction.WEST)).placeNearTarget().attachKeyFrame()
-            .text("When items are provided on a belt...");
+        scene.overlay().showText(40).pointAt(util.vector().blockSurface(beltPos, Direction.WEST)).placeNearTarget()
+            .attachKeyFrame().text("When items are provided on a belt...");
         scene.idle(30);
 
         ElementLink<BeltItemElement> ingot = scene.world().createItemOnBelt(beltPos, Direction.SOUTH, quartz);
@@ -428,7 +456,8 @@ public class DeployerScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.idle(10);
 
-        scene.overlay().showText(60).colored(PonderPalette.RED).attachKeyFrame().pointAt(util.vector().topOf(deployerPos)).placeNearTarget()
+        scene.overlay().showText(60).colored(PonderPalette.RED).attachKeyFrame()
+            .pointAt(util.vector().topOf(deployerPos)).placeNearTarget()
             .text("When powered by Redstone, Deployers will not activate");
         scene.idle(70);
 
@@ -452,7 +481,8 @@ public class DeployerScenes {
         scene.world().toggleRedstonePower(redstone);
         scene.effects().indicateRedstone(leverPos);
         scene.world().moveDeployer(deployerPos, 1, 30);
-        scene.overlay().showText(100).colored(PonderPalette.GREEN).attachKeyFrame().pointAt(util.vector().topOf(deployerPos)).placeNearTarget()
+        scene.overlay().showText(100).colored(PonderPalette.GREEN).attachKeyFrame()
+            .pointAt(util.vector().topOf(deployerPos)).placeNearTarget()
             .text("Thus, a negative pulse can be used to trigger exactly one activation cycle");
         scene.idle(31);
         scene.world().moveDeployer(deployerPos, -1, 30);
@@ -477,16 +507,19 @@ public class DeployerScenes {
         scene.world().showSection(util.select().layer(0).add(flowers), Direction.UP);
         scene.idle(5);
 
-        ElementLink<WorldSectionElement> pistonHead = scene.world().showIndependentSection(util.select().fromTo(5, 1, 2, 8, 1, 2), Direction.DOWN);
+        ElementLink<WorldSectionElement> pistonHead = scene.world()
+            .showIndependentSection(util.select().fromTo(5, 1, 2, 8, 1, 2), Direction.DOWN);
         scene.world().moveSection(pistonHead, util.vector().of(0, 0, 1), 0);
         scene.world().showSection(kinetics, Direction.DOWN);
         scene.idle(5);
 
-        ElementLink<WorldSectionElement> contraption = scene.world().showIndependentSection(deployerSelection, Direction.DOWN);
+        ElementLink<WorldSectionElement> contraption = scene.world()
+            .showIndependentSection(deployerSelection, Direction.DOWN);
         scene.idle(5);
         scene.world().glueBlockOnto(util.grid().at(4, 2, 3), Direction.DOWN, contraption);
 
-        scene.overlay().showText(60).attachKeyFrame().placeNearTarget().pointAt(util.vector().blockSurface(deployerPos, Direction.WEST))
+        scene.overlay().showText(60).attachKeyFrame().placeNearTarget()
+            .pointAt(util.vector().blockSurface(deployerPos, Direction.WEST))
             .text("Whenever Deployers are moved as part of an animated Contraption...");
         scene.idle(70);
 

@@ -28,10 +28,11 @@ public class AssemblyOperatorBlockItem extends BlockItem {
         Level level = context.getLevel();
         BlockState placedOnState = level.getBlockState(placedOnPos);
         if (operatesOn(level, placedOnPos, placedOnState) && context.getClickedFace() == Direction.UP) {
-            if (level.getBlockState(placedOnPos.above(2)).canBeReplaced())
+            if (level.getBlockState(placedOnPos.above(2)).canBeReplaced()) {
                 context = adjustContext(context, placedOnPos);
-            else
+            } else {
                 return InteractionResult.FAIL;
+            }
         }
 
         return super.place(context);
@@ -51,9 +52,13 @@ public class AssemblyOperatorBlockItem extends BlockItem {
     }
 
     protected boolean operatesOn(LevelReader world, BlockPos pos, BlockState placedOnState) {
-        if (placedOnState.is(AllBlocks.BELT))
+        if (placedOnState.is(AllBlocks.BELT)) {
             return placedOnState.getValue(BeltBlock.SLOPE) == BeltSlope.HORIZONTAL;
-        return BasinBlock.isBasin(world, pos) || placedOnState.is(AllBlocks.DEPOT) || placedOnState.is(AllBlocks.WEIGHTED_EJECTOR);
+        }
+        return BasinBlock.isBasin(
+            world,
+            pos
+        ) || placedOnState.is(AllBlocks.DEPOT) || placedOnState.is(AllBlocks.WEIGHTED_EJECTOR);
     }
 
 }

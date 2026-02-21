@@ -1,10 +1,10 @@
 package com.zurrtum.create.foundation.advancement;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.foundation.advancement.CreateTrigger.Conditions;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.CriterionTrigger.Listener;
 import net.minecraft.core.BlockPos;
@@ -51,14 +51,16 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
     }
 
     private void removeAwarded(ServerPlayer player) {
-        if (advancements.isEmpty())
+        if (advancements.isEmpty()) {
             return;
+        }
         ServerAdvancementManager loader = player.level().getServer().getAdvancements();
         PlayerAdvancements advancementTracker = player.getAdvancements();
         advancements.removeIf(trigger -> {
             Set<Listener<Conditions>> containers = trigger.listeners.get(advancementTracker);
             if (containers != null) {
-                return containers.stream().allMatch(container -> advancementTracker.getOrStartProgress(container.advancement()).isDone());
+                return containers.stream()
+                    .allMatch(container -> advancementTracker.getOrStartProgress(container.advancement()).isDone());
             }
             AdvancementHolder advancement = loader.get(trigger.id);
             if (advancement == null) {
@@ -74,17 +76,20 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
 
     public void awardPlayerIfNear(CreateTrigger advancement, int maxDistance) {
         ServerPlayer player = getPlayer();
-        if (player == null)
+        if (player == null) {
             return;
-        if (player.distanceToSqr(Vec3.atCenterOf(getPos())) > maxDistance * maxDistance)
+        }
+        if (player.distanceToSqr(Vec3.atCenterOf(getPos())) > maxDistance * maxDistance) {
             return;
+        }
         award(advancement, player);
     }
 
     public void awardPlayer(CreateTrigger advancement) {
         ServerPlayer player = getPlayer();
-        if (player == null)
+        if (player == null) {
             return;
+        }
         award(advancement, player);
     }
 
@@ -96,16 +101,18 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
     }
 
     private ServerPlayer getPlayer() {
-        if (playerId == null)
+        if (playerId == null) {
             return null;
+        }
         return (ServerPlayer) getLevel().getPlayerByUUID(playerId);
     }
 
     @Override
     public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        if (playerId != null)
+        if (playerId != null) {
             view.store("Owner", UUIDUtil.CODEC, playerId);
+        }
     }
 
     @Override
@@ -121,19 +128,22 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
 
     public static void tryAward(BlockGetter reader, BlockPos pos, CreateTrigger advancement) {
         AdvancementBehaviour behaviour = BlockEntityBehaviour.get(reader, pos, AdvancementBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.awardPlayer(advancement);
+        }
     }
 
     public static void setPlacedBy(Level worldIn, BlockPos pos, LivingEntity placer) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
         if (!(worldIn.getBlockEntity(pos) instanceof SmartBlockEntity blockEntity)) {
             return;
         }
         if (placer instanceof ServerPlayer player) {
-            if (FakePlayerHandler.has(player))
+            if (FakePlayerHandler.has(player)) {
                 return;
+            }
             blockEntity.addAdvancementBehaviour(player);
         }
     }

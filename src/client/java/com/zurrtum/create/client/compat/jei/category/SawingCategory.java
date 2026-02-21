@@ -68,9 +68,19 @@ public class SawingCategory extends CreateCategory<RecipeHolder<CuttingRecipe>> 
     }
 
     @Override
-    public void draw(RecipeHolder<CuttingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<CuttingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 70, 6);
         AllGuiTextures.JEI_SHADOW.render(graphics, 55, 55);
-        graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), 64, 31));
+        graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(
+            new Matrix3x2f(graphics.pose()),
+            64,
+            31
+        ));
     }
 }

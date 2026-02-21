@@ -101,23 +101,31 @@ public class ItemHelper {
 
     public static void addToList(ItemStack stack, List<ItemStack> stacks) {
         for (ItemStack s : stacks) {
-            if (!ItemStack.isSameItemSameComponents(stack, s))
+            if (!ItemStack.isSameItemSameComponents(stack, s)) {
                 continue;
+            }
             int transferred = Math.min(s.getMaxStackSize() - s.getCount(), stack.getCount());
             s.grow(transferred);
             stack.shrink(transferred);
         }
-        if (stack.getCount() > 0)
+        if (stack.getCount() > 0) {
             stacks.add(stack);
+        }
     }
 
-    public static <T extends IBE<? extends BlockEntity>> int calcRedstoneFromBlockEntity(T ibe, Level level, BlockPos pos) {
-        return ibe.getBlockEntityOptional(level, pos).map(be -> getInventory(level, pos, null)).map(ItemHelper::calcRedstoneFromInventory).orElse(0);
+    public static <T extends IBE<? extends BlockEntity>> int calcRedstoneFromBlockEntity(
+        T ibe,
+        Level level,
+        BlockPos pos
+    ) {
+        return ibe.getBlockEntityOptional(level, pos).map(be -> getInventory(level, pos, null))
+            .map(ItemHelper::calcRedstoneFromInventory).orElse(0);
     }
 
     public static int calcRedstoneFromInventory(@Nullable Container inv) {
-        if (inv == null)
+        if (inv == null) {
             return 0;
+        }
         int i = 0;
         float f = 0.0F;
         int totalSlots = inv.getContainerSize();
@@ -135,16 +143,18 @@ public class ItemHelper {
             }
         }
 
-        if (totalSlots == 0)
+        if (totalSlots == 0) {
             return 0;
+        }
 
         f = f / totalSlots;
         return Mth.floor(f * 14.0F) + (i > 0 ? 1 : 0);
     }
 
     public static boolean matchIngredients(Ingredient i1, Ingredient i2) {
-        if (i1 == i2)
+        if (i1 == i2) {
             return true;
+        }
         HolderSet<Item> entries1 = i1.values;
         HolderSet<Item> entries2 = i2.values;
         Optional<TagKey<Item>> tag1 = entries1.unwrapKey();
@@ -157,32 +167,39 @@ public class ItemHelper {
         }
         int size = entries1.size();
         if (size == entries2.size()) {
-            for (int i = 0; i < size; i++)
-                if (!entries1.contains(entries2.get(i)))
+            for (int i = 0; i < size; i++) {
+                if (!entries1.contains(entries2.get(i))) {
                     return false;
+                }
+            }
             return true;
         }
         return false;
     }
 
     public static boolean matchAllIngredients(List<Ingredient> ingredients) {
-        if (ingredients.size() <= 1)
+        if (ingredients.size() <= 1) {
             return true;
+        }
         Ingredient firstIngredient = ingredients.getFirst();
-        for (int i = 1; i < ingredients.size(); i++)
-            if (!matchIngredients(firstIngredient, ingredients.get(i)))
+        for (int i = 1; i < ingredients.size(); i++) {
+            if (!matchIngredients(firstIngredient, ingredients.get(i))) {
                 return false;
+            }
+        }
         return true;
     }
 
     public static enum ExtractionCountMode {
-        EXACTLY,
-        UPTO
+        EXACTLY, UPTO
     }
 
     public static ItemStack extractItem(Container inventory, int slot, int amount, boolean simulate) {
         ItemStack stack = inventory.getItem(slot);
-        if (stack.isEmpty() || (inventory instanceof WorldlyContainer sidedInventory && !sidedInventory.canTakeItemThroughFace(slot, stack, null))) {
+        if (stack.isEmpty() || (inventory instanceof WorldlyContainer sidedInventory && !sidedInventory.canTakeItemThroughFace(slot,
+            stack,
+            null
+        ))) {
             return ItemStack.EMPTY;
         }
         int extract = Math.min(amount, stack.getCount());
@@ -206,8 +223,9 @@ public class ItemHelper {
     }
 
     public static ItemStack fromItemEntity(Entity entityIn) {
-        if (!entityIn.isAlive())
+        if (!entityIn.isAlive()) {
             return ItemStack.EMPTY;
+        }
         if (entityIn instanceof PackageEntity packageEntity) {
             return packageEntity.getBox();
         }
@@ -229,11 +247,13 @@ public class ItemHelper {
     public static ItemStack limitCountToMaxStackSize(ItemStack stack, boolean simulate) {
         int count = stack.getCount();
         int max = stack.getMaxStackSize();
-        if (count <= max)
+        if (count <= max) {
             return ItemStack.EMPTY;
+        }
         ItemStack remainder = stack.copyWithCount(count - max);
-        if (!simulate)
+        if (!simulate) {
             stack.setCount(max);
+        }
         return remainder;
     }
 
@@ -266,7 +286,13 @@ public class ItemHelper {
         return getInventory(world, pos, null, null, direction);
     }
 
-    public static Container getInventory(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    public static Container getInventory(
+        Level world,
+        BlockPos pos,
+        BlockState state,
+        BlockEntity blockEntity,
+        Direction direction
+    ) {
         if (state == null) {
             state = blockEntity != null ? blockEntity.getBlockState() : world.getBlockState(pos);
         }

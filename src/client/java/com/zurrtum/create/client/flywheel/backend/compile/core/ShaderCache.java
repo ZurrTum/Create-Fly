@@ -41,7 +41,8 @@ public class ShaderCache {
     }
 
     public void delete() {
-        inner.values().stream().filter(r -> r instanceof ShaderResult.Success).map(ShaderResult::unwrap).forEach(GlShader::delete);
+        inner.values().stream().filter(r -> r instanceof ShaderResult.Success).map(ShaderResult::unwrap)
+            .forEach(GlShader::delete);
         inner.clear();
     }
 

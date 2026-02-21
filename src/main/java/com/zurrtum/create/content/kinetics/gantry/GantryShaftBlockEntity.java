@@ -24,20 +24,25 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
     }
 
     public void checkAttachedCarriageBlocks() {
-        if (!canAssembleOn())
+        if (!canAssembleOn()) {
             return;
+        }
         for (Direction d : Iterate.directions) {
-            if (d.getAxis() == getBlockState().getValue(GantryShaftBlock.FACING).getAxis())
+            if (d.getAxis() == getBlockState().getValue(GantryShaftBlock.FACING).getAxis()) {
                 continue;
+            }
             BlockPos offset = worldPosition.relative(d);
             BlockState pinionState = level.getBlockState(offset);
-            if (!pinionState.is(AllBlocks.GANTRY_CARRIAGE))
+            if (!pinionState.is(AllBlocks.GANTRY_CARRIAGE)) {
                 continue;
-            if (pinionState.getValue(GantryCarriageBlock.FACING) != d)
+            }
+            if (pinionState.getValue(GantryCarriageBlock.FACING) != d) {
                 continue;
+            }
             BlockEntity blockEntity = level.getBlockEntity(offset);
-            if (blockEntity instanceof GantryCarriageBlockEntity)
+            if (blockEntity instanceof GantryCarriageBlockEntity) {
                 ((GantryCarriageBlockEntity) blockEntity).queueAssembly();
+            }
         }
     }
 
@@ -56,18 +61,29 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
         boolean connectedViaAxes,
         boolean connectedViaCogs
     ) {
-        float defaultModifier = super.propagateRotationTo(target, stateFrom, stateTo, diff, connectedViaAxes, connectedViaCogs);
+        float defaultModifier = super.propagateRotationTo(
+            target,
+            stateFrom,
+            stateTo,
+            diff,
+            connectedViaAxes,
+            connectedViaCogs
+        );
 
-        if (connectedViaAxes)
+        if (connectedViaAxes) {
             return defaultModifier;
-        if (!stateFrom.getValue(GantryShaftBlock.POWERED))
+        }
+        if (!stateFrom.getValue(GantryShaftBlock.POWERED)) {
             return defaultModifier;
-        if (!stateTo.is(AllBlocks.GANTRY_CARRIAGE))
+        }
+        if (!stateTo.is(AllBlocks.GANTRY_CARRIAGE)) {
             return defaultModifier;
+        }
 
         Direction direction = Direction.getApproximateNearest(diff.getX(), diff.getY(), diff.getZ());
-        if (stateTo.getValue(GantryCarriageBlock.FACING) != direction)
+        if (stateTo.getValue(GantryCarriageBlock.FACING) != direction) {
             return defaultModifier;
+        }
         return GantryCarriageBlockEntity.getGantryPinionModifier(
             stateFrom.getValue(GantryShaftBlock.FACING),
             stateTo.getValue(GantryCarriageBlock.FACING)
@@ -76,8 +92,9 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
 
     @Override
     public boolean isCustomConnection(KineticBlockEntity other, BlockState state, BlockState otherState) {
-        if (!otherState.is(AllBlocks.GANTRY_CARRIAGE))
+        if (!otherState.is(AllBlocks.GANTRY_CARRIAGE)) {
             return false;
+        }
         final BlockPos diff = other.getBlockPos().subtract(worldPosition);
         Direction direction = Direction.getApproximateNearest(diff.getX(), diff.getY(), diff.getZ());
         return otherState.getValue(GantryCarriageBlock.FACING) == direction;
@@ -85,10 +102,12 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
 
     public boolean canAssembleOn() {
         BlockState blockState = getBlockState();
-        if (blockState.getBlock() != AllBlocks.GANTRY_SHAFT)
+        if (blockState.getBlock() != AllBlocks.GANTRY_SHAFT) {
             return false;
-        if (blockState.getValue(GantryShaftBlock.POWERED))
+        }
+        if (blockState.getValue(GantryShaftBlock.POWERED)) {
             return false;
+        }
         float speed = getPinionMovementSpeed();
 
         switch (blockState.getValue(GantryShaftBlock.PART)) {
@@ -106,8 +125,9 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
 
     public float getPinionMovementSpeed() {
         BlockState blockState = getBlockState();
-        if (blockState.getBlock() != AllBlocks.GANTRY_SHAFT)
+        if (blockState.getBlock() != AllBlocks.GANTRY_SHAFT) {
             return 0;
+        }
         return Mth.clamp(convertToLinear(-getSpeed()), -.49f, .49f);
     }
 

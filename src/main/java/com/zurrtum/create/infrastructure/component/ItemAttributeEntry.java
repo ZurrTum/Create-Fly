@@ -9,8 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 public record ItemAttributeEntry(ItemAttribute attribute, boolean inverted) {
     public static final Codec<ItemAttributeEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
-        ItemAttribute.CODEC.fieldOf("attribute")
-            .forGetter(ItemAttributeEntry::attribute),
+        ItemAttribute.CODEC.fieldOf("attribute").forGetter(ItemAttributeEntry::attribute),
         Codec.BOOL.fieldOf("inverted").forGetter(ItemAttributeEntry::inverted)
     ).apply(i, ItemAttributeEntry::new));
 

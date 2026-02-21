@@ -36,14 +36,16 @@ public class CreativeMotorBlockEntity extends GeneratingKineticBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
+        if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed()) {
             updateGeneratedRotation();
+        }
     }
 
     @Override
     public float getGeneratedSpeed() {
-        if (!getBlockState().is(AllBlocks.CREATIVE_MOTOR))
+        if (!getBlockState().is(AllBlocks.CREATIVE_MOTOR)) {
             return 0;
+        }
         return convertToDirection(generatedSpeed.getValue(), getBlockState().getValue(CreativeMotorBlock.FACING));
     }
 

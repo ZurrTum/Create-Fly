@@ -35,8 +35,9 @@ public class ContraptionWorld extends WrappedLevel {
     public BlockState getBlockState(BlockPos pos) {
         StructureTemplate.StructureBlockInfo blockInfo = contraption.getBlocks().get(pos);
 
-        if (blockInfo != null)
+        if (blockInfo != null) {
             return blockInfo.state();
+        }
 
         return Blocks.AIR.defaultBlockState();
     }

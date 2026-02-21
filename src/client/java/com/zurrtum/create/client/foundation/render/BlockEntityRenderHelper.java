@@ -68,7 +68,10 @@ public class BlockEntityRenderHelper {
 
             try {
                 BlockEntityRenderState renderState = renderer.createRenderState();
-                int realLevelLight = LevelRenderer.getLightColor(realLevel, getLightPos(lightTransform, blockEntity.getBlockPos()));
+                int realLevelLight = LevelRenderer.getLightColor(
+                    realLevel,
+                    getLightPos(lightTransform, blockEntity.getBlockPos())
+                );
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
                 }
@@ -82,10 +85,11 @@ public class BlockEntityRenderHelper {
                 erroredBEsOut.set(i);
 
                 String message = "BlockEntity " + RegisteredObjectsHelper.getKeyOrThrow(blockEntity.getType()) + " could not be rendered virtually.";
-                if (AllConfigs.client().explainRenderErrors.get())
+                if (AllConfigs.client().explainRenderErrors.get()) {
                     Create.LOGGER.error(message, e);
-                else
+                } else {
                     Create.LOGGER.error(message);
+                }
             }
         }
 
@@ -100,7 +104,12 @@ public class BlockEntityRenderHelper {
 
     private static BlockPos getLightPos(@Nullable Matrix4f lightTransform, BlockPos contraptionPos) {
         if (lightTransform != null) {
-            Vector4f lightVec = new Vector4f(contraptionPos.getX() + .5f, contraptionPos.getY() + .5f, contraptionPos.getZ() + .5f, 1);
+            Vector4f lightVec = new Vector4f(
+                contraptionPos.getX() + .5f,
+                contraptionPos.getY() + .5f,
+                contraptionPos.getZ() + .5f,
+                1
+            );
             lightVec.mul(lightTransform);
             return BlockPos.containing(lightVec.x(), lightVec.y(), lightVec.z());
         } else {
@@ -108,9 +117,8 @@ public class BlockEntityRenderHelper {
         }
     }
 
-    public record BlockEntityListRenderState(
-        BlockEntityRenderDispatcher dispatcher, Vec3 camera, BlockPos cameraPos, List<BlockEntityRenderState> states
-    ) {
+    public record BlockEntityListRenderState(BlockEntityRenderDispatcher dispatcher, Vec3 camera, BlockPos cameraPos,
+                                             List<BlockEntityRenderState> states) {
         public void render(PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
             Vec3 prevPos = cameraRenderState.pos;
             BlockPos prevBlockPos = cameraRenderState.blockPos;

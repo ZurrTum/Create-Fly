@@ -8,11 +8,7 @@ import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.crafting.*;
 
 public record SandPaperPolishingRecipe(ItemStack result, Ingredient ingredient) implements CreateSingleStackRecipe {
     @Override

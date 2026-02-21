@@ -22,10 +22,14 @@ public abstract class AbstractEncasedShaftBlock extends RotatedPillarKineticBloc
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())
+        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) {
             return super.getStateForPlacement(context);
+        }
         Direction.Axis preferredAxis = getPreferredAxis(context);
-        return defaultBlockState().setValue(AXIS, preferredAxis == null ? context.getNearestLookingDirection().getAxis() : preferredAxis);
+        return defaultBlockState().setValue(
+            AXIS,
+            preferredAxis == null ? context.getNearestLookingDirection().getAxis() : preferredAxis
+        );
     }
 
     @Override

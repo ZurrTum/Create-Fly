@@ -5,9 +5,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,6 +31,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Locale;
+
 public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implements IBE<MechanicalPistonBlockEntity>, NeighborUpdateListeningBlock {
 
     public static final EnumProperty<PistonState> STATE = EnumProperty.create("state", PistonState.class);
@@ -49,7 +48,8 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
 
     protected MechanicalPistonBlock(Properties properties, boolean sticky) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(STATE, PistonState.RETRACTED));
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH)
+            .setValue(STATE, PistonState.RETRACTED));
         isSticky = sticky;
     }
 
@@ -69,10 +69,12 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.mayBuild())
+        if (!player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (!stack.is(AllItemTags.SLIME_BALLS)) {
             if (stack.isEmpty()) {
                 withBlockEntityDo(level, pos, be -> be.assembleNextTick = true);
@@ -80,21 +82,25 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
             }
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
-        if (state.getValue(STATE) != PistonState.RETRACTED)
+        if (state.getValue(STATE) != PistonState.RETRACTED) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         Direction direction = state.getValue(FACING);
-        if (hitResult.getDirection() != direction)
+        if (hitResult.getDirection() != direction) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (((MechanicalPistonBlock) state.getBlock()).isSticky)
+        }
+        if (((MechanicalPistonBlock) state.getBlock()).isSticky) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (level.isClientSide()) {
             Vec3 vec = hitResult.getLocation();
             level.addParticle(ParticleTypes.ITEM_SLIME, vec.x, vec.y, vec.z, 0, 0, 0);
             return InteractionResult.SUCCESS;
         }
         AllSoundEvents.SLIME_ADDED.playOnServer(level, pos, .5f, 1);
-        if (!player.isCreative())
+        if (!player.isCreative()) {
             stack.shrink(1);
+        }
         level.setBlockAndUpdate(
             pos,
             AllBlocks.STICKY_MECHANICAL_PISTON.defaultBlockState().setValue(FACING, direction)
@@ -104,12 +110,21 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+    public void neighborUpdate(
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos fromPos,
+        boolean isMoving
+    ) {
         Direction direction = state.getValue(FACING);
-        if (!fromPos.equals(pos.relative(direction.getOpposite())))
+        if (!fromPos.equals(pos.relative(direction.getOpposite()))) {
             return;
-        if (!world.isClientSide() && !world.getBlockTicks().willTickThisTick(pos, this))
+        }
+        if (!world.isClientSide() && !world.getBlockTicks().willTickThisTick(pos, this)) {
             world.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override
@@ -137,8 +152,9 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
             }
             return;
         }
-        if (pole.getValue(PistonExtensionPoleBlock.FACING).getAxis() != direction.getAxis())
+        if (pole.getValue(PistonExtensionPoleBlock.FACING).getAxis() != direction.getAxis()) {
             return;
+        }
         withBlockEntityDo(
             worldIn, pos, be -> {
                 if (!be.running) {
@@ -151,8 +167,9 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
                         }
                     }
                 }
-                if (be.lastException == null)
+                if (be.lastException == null) {
                     return;
+                }
                 be.lastException = null;
                 be.sendData();
             }
@@ -161,15 +178,14 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        if (state.getValue(STATE) != PistonState.RETRACTED)
+        if (state.getValue(STATE) != PistonState.RETRACTED) {
             return InteractionResult.PASS;
+        }
         return super.onWrenched(state, context);
     }
 
     public enum PistonState implements StringRepresentable {
-        RETRACTED,
-        MOVING,
-        EXTENDED;
+        RETRACTED, MOVING, EXTENDED;
 
         @Override
         public String getSerializedName() {
@@ -189,8 +205,10 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
             BlockPos currentPos = pos.relative(direction, offset);
             BlockState block = worldIn.getBlockState(currentPos);
 
-            if (isExtensionPole(block) && direction.getAxis() == block.getValue(BlockStateProperties.FACING).getAxis())
+            if (isExtensionPole(block) && direction.getAxis() == block.getValue(BlockStateProperties.FACING)
+                .getAxis()) {
                 continue;
+            }
 
             if (isPistonHead(block) && block.getValue(BlockStateProperties.FACING) == direction) {
                 pistonHead = currentPos;
@@ -200,14 +218,16 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
         }
 
         if (pistonHead != null && pistonBase != null) {
-            BlockPos.betweenClosedStream(pistonBase, pistonHead).filter(p -> !p.equals(pos)).forEach(p -> worldIn.destroyBlock(p, dropBlocks));
+            BlockPos.betweenClosedStream(pistonBase, pistonHead).filter(p -> !p.equals(pos))
+                .forEach(p -> worldIn.destroyBlock(p, dropBlocks));
         }
 
         for (int offset = 1; offset < maxPoles; offset++) {
             BlockPos currentPos = pos.relative(direction.getOpposite(), offset);
             BlockState block = worldIn.getBlockState(currentPos);
 
-            if (isExtensionPole(block) && direction.getAxis() == block.getValue(BlockStateProperties.FACING).getAxis()) {
+            if (isExtensionPole(block) && direction.getAxis() == block.getValue(BlockStateProperties.FACING)
+                .getAxis()) {
                 worldIn.destroyBlock(currentPos, dropBlocks);
                 continue;
             }
@@ -225,11 +245,13 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 
-        if (state.getValue(STATE) == PistonState.EXTENDED)
+        if (state.getValue(STATE) == PistonState.EXTENDED) {
             return AllShapes.MECHANICAL_PISTON_EXTENDED.get(state.getValue(FACING));
+        }
 
-        if (state.getValue(STATE) == PistonState.MOVING)
+        if (state.getValue(STATE) == PistonState.MOVING) {
             return AllShapes.MECHANICAL_PISTON.get(state.getValue(FACING));
+        }
 
         return Shapes.block();
     }

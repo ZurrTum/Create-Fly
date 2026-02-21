@@ -44,7 +44,10 @@ public class RuntimeDataGenerator {
     private static final Multimap<Identifier, TagEntry> TAGS = HashMultimap.create();
     private static final Object2ObjectOpenHashMap<Identifier, JsonElement> JSON_FILES = new Object2ObjectOpenHashMap<>();
     private static final Map<Identifier, Identifier> MISMATCHED_WOOD_NAMES = ImmutableMap.<Identifier, Identifier>builder()
-        .put(Mods.ARS_N.asResource("blue_archwood"), Mods.ARS_N.asResource("archwood")) // Generate recipes for planks -> everything else
+        .put(
+            Mods.ARS_N.asResource("blue_archwood"),
+            Mods.ARS_N.asResource("archwood")
+        ) // Generate recipes for planks -> everything else
         //.put(Mods.UUE.asResource("chorus_cane"), Mods.UUE.asResource("chorus_nest")) // Has a weird setup with both normal and stripped planks, that it already provides cutting recipes for
         .put(Mods.DD.asResource("blooming"), Mods.DD.asResource("bloom")).build();
 
@@ -70,7 +73,10 @@ public class RuntimeDataGenerator {
             Create.LOGGER.info("Created {} tags which will be injected into the game", TAGS.size());
             for (Map.Entry<Identifier, Collection<TagEntry>> tags : TAGS.asMap().entrySet()) {
                 TagFile tagFile = new TagFile(new ArrayList<>(tags.getValue()), false);
-                dynamicPack.put(tags.getKey().withPrefix("tags/item/"), TagFile.CODEC.encodeStart(JsonOps.INSTANCE, tagFile).result().orElseThrow());
+                dynamicPack.put(
+                    tags.getKey().withPrefix("tags/item/"),
+                    TagFile.CODEC.encodeStart(JsonOps.INSTANCE, tagFile).result().orElseThrow()
+                );
             }
             TAGS.clear();
         }
@@ -93,8 +99,8 @@ public class RuntimeDataGenerator {
 
         // Last ditch attempt. Try to find logs without stripped variants
         boolean noStrippedVariant = false;
-        if (!hasFoundMatch && !BuiltInRegistries.ITEM.containsKey(itemId.withPrefix("stripped_")) && !BuiltInRegistries.ITEM.containsKey(itemId.withSuffix(
-            "_stripped"))) {
+        if (!hasFoundMatch && !BuiltInRegistries.ITEM.containsKey(itemId.withPrefix("stripped_")) && !BuiltInRegistries.ITEM.containsKey(
+            itemId.withSuffix("_stripped"))) {
             match = NON_STRIPPED_WOODS_REGEX.matcher(path);
             hasFoundMatch = match.find();
             noStrippedVariant = true;
@@ -110,8 +116,10 @@ public class RuntimeDataGenerator {
             base = MISMATCHED_WOOD_NAMES.getOrDefault(base, base);
             Identifier nonStrippedId = matched_name.withSuffix(type).withPrefix(prefix).withSuffix(suffix);
             Identifier planksId = base.withSuffix("_planks");
-            Identifier stairsId = base.withSuffix(base.getNamespace().equals(Mods.BTN.getId()) ? "_planks_stairs" : "_stairs");
-            Identifier slabId = base.withSuffix(base.getNamespace().equals(Mods.BTN.getId()) ? "_planks_slab" : "_slab");
+            Identifier stairsId = base.withSuffix(base.getNamespace()
+                .equals(Mods.BTN.getId()) ? "_planks_stairs" : "_stairs");
+            Identifier slabId = base.withSuffix(base.getNamespace()
+                .equals(Mods.BTN.getId()) ? "_planks_slab" : "_slab");
             Identifier fenceId = base.withSuffix("_fence");
             Identifier fenceGateId = base.withSuffix("_fence_gate");
             Identifier doorId = base.withSuffix("_door");
@@ -129,7 +137,10 @@ public class RuntimeDataGenerator {
                 }
                 simpleWoodRecipe(typeId, itemId, planksId, planksCount);
             } else if (BuiltInRegistries.ITEM.containsKey(planksId)) {
-                Identifier tag = Identifier.fromNamespaceAndPath(MOD_ID, "runtime_generated/compat/" + itemId.getNamespace() + "/" + base.getPath());
+                Identifier tag = Identifier.fromNamespaceAndPath(
+                    MOD_ID,
+                    "runtime_generated/compat/" + itemId.getNamespace() + "/" + base.getPath()
+                );
                 insertIntoTag(tag, itemId);
 
                 simpleWoodRecipe(typeId, TagKey.create(Registries.ITEM, tag), planksId, planksCount);
@@ -157,8 +168,9 @@ public class RuntimeDataGenerator {
     }
 
     private static void insertIntoTag(Identifier tag, Identifier itemId) {
-        if (BuiltInRegistries.ITEM.containsKey(itemId))
+        if (BuiltInRegistries.ITEM.containsKey(itemId)) {
             TAGS.put(tag, TagEntry.optionalElement(itemId));
+        }
     }
 
     private static void simpleWoodRecipe(Identifier typeId, Identifier inputId, Identifier outputId) {
@@ -180,8 +192,7 @@ public class RuntimeDataGenerator {
     private static void simpleWoodRecipe(Identifier typeId, TagKey<Item> inputTag, Identifier outputId, int amount) {
         if (BuiltInRegistries.ITEM.containsKey(outputId)) {
             Recipe.CODEC.encodeStart(
-                EmptyJsonOps.INSTANCE,
-                new CuttingRecipe(
+                EmptyJsonOps.INSTANCE, new CuttingRecipe(
                     50,
                     List.of(new ProcessingOutput(BuiltInRegistries.ITEM.get(outputId).orElseThrow(), amount)),
                     EmptyJsonOps.ofTag(inputTag)

@@ -13,12 +13,11 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlockEntity;
+import net.minecraft.core.Direction;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
-
-import net.minecraft.core.Direction;
 
 public class FlywheelVisual extends KineticBlockEntityVisual<FlywheelBlockEntity> implements SimpleDynamicVisual {
 
@@ -32,11 +31,13 @@ public class FlywheelVisual extends KineticBlockEntityVisual<FlywheelBlockEntity
         super(context, blockEntity, partialTick);
 
         var axis = rotationAxis();
-        shaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT)).createInstance();
+        shaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT))
+            .createInstance();
 
         shaft.setup(FlywheelVisual.this.blockEntity).setPosition(getVisualPosition()).rotateToFace(axis).setChanged();
 
-        wheel = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.FLYWHEEL)).createInstance();
+        wheel = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.FLYWHEEL))
+            .createInstance();
 
 
         Direction align = Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
@@ -57,8 +58,9 @@ public class FlywheelVisual extends KineticBlockEntityVisual<FlywheelBlockEntity
         float speed = blockEntity.visualSpeed.getValue(partialTicks) * 3 / 10f;
         float angle = blockEntity.angle + speed * partialTicks;
 
-        if (Math.abs(angle - lastAngle) < 0.001)
+        if (Math.abs(angle - lastAngle) < 0.001) {
             return;
+        }
 
         animate(angle);
 

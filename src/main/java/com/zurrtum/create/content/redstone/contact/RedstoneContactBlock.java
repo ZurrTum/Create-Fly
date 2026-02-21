@@ -15,11 +15,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.SignalGetter;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -51,10 +47,12 @@ public class RedstoneContactBlock extends WrenchableDirectionalBlock implements 
             context.getLevel(),
             context.getClickedPos(),
             placeDirection
-        ))
+        )) {
             state = state.setValue(FACING, placeDirection);
-        if (hasValidContact(context.getLevel(), context.getClickedPos(), state.getValue(FACING)))
+        }
+        if (hasValidContact(context.getLevel(), context.getClickedPos(), state.getValue(FACING))) {
             state = state.setValue(POWERED, true);
+        }
 
         return state;
     }
@@ -62,20 +60,24 @@ public class RedstoneContactBlock extends WrenchableDirectionalBlock implements 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         InteractionResult onWrenched = super.onWrenched(state, context);
-        if (onWrenched != InteractionResult.SUCCESS)
+        if (onWrenched != InteractionResult.SUCCESS) {
             return onWrenched;
+        }
 
         Level level = context.getLevel();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return onWrenched;
+        }
 
         BlockPos pos = context.getClickedPos();
         state = level.getBlockState(pos);
         Direction facing = state.getValue(RedstoneContactBlock.FACING);
-        if (facing.getAxis() == Axis.Y)
+        if (facing.getAxis() == Axis.Y) {
             return onWrenched;
-        if (ElevatorColumn.get(level, new ColumnCoords(pos.getX(), pos.getZ(), facing)) == null)
+        }
+        if (ElevatorColumn.get(level, new ColumnCoords(pos.getX(), pos.getZ(), facing)) == null) {
             return onWrenched;
+        }
 
         level.setBlockAndUpdate(pos, BlockHelper.copyProperties(state, AllBlocks.ELEVATOR_CONTACT.defaultBlockState()));
 
@@ -100,24 +102,28 @@ public class RedstoneContactBlock extends WrenchableDirectionalBlock implements 
         BlockState facingState,
         RandomSource random
     ) {
-        if (facing != stateIn.getValue(FACING))
+        if (facing != stateIn.getValue(FACING)) {
             return stateIn;
+        }
         boolean hasValidContact = hasValidContact(world, currentPos, facing);
-        if (stateIn.getValue(POWERED) != hasValidContact)
+        if (stateIn.getValue(POWERED) != hasValidContact) {
             return stateIn.setValue(POWERED, hasValidContact);
+        }
         return stateIn;
     }
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
         boolean hasValidContact = hasValidContact(worldIn, pos, state.getValue(FACING));
-        if (state.getValue(POWERED) != hasValidContact)
+        if (state.getValue(POWERED) != hasValidContact) {
             worldIn.setBlockAndUpdate(pos, state.setValue(POWERED, hasValidContact));
+        }
     }
 
     public static boolean hasValidContact(LevelReader world, BlockPos pos, Direction direction) {
         BlockState blockState = world.getBlockState(pos.relative(direction));
-        return (blockState.is(AllBlocks.REDSTONE_CONTACT) || blockState.is(AllBlocks.ELEVATOR_CONTACT)) && blockState.getValue(FACING) == direction.getOpposite();
+        return (blockState.is(AllBlocks.REDSTONE_CONTACT) || blockState.is(AllBlocks.ELEVATOR_CONTACT)) && blockState.getValue(
+            FACING) == direction.getOpposite();
     }
 
     @Override

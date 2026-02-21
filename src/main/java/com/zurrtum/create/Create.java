@@ -41,8 +41,8 @@ public class Create implements ModInitializer {
     public static final String MOD_ID = "create";
     public static final String NAME = "Create";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final String VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion()
-        .getFriendlyString().split("\\+")[0];
+    public static final String VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata()
+        .getVersion().getFriendlyString().split("\\+")[0];
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static boolean Lazy = false;
 

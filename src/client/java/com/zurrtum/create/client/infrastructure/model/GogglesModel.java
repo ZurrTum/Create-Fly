@@ -38,7 +38,10 @@ public class GogglesModel implements ItemModel {
     private final ModelRenderProperties blockSettings;
     private final Supplier<Vector3fc[]> blockVector;
 
-    public GogglesModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> block) {
+    public GogglesModel(
+        Tuple<List<BakedQuad>, ModelRenderProperties> item,
+        Tuple<List<BakedQuad>, ModelRenderProperties> block
+    ) {
         itemQuads = item.getA();
         itemSettings = item.getB();
         itemVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(itemQuads));
@@ -81,7 +84,8 @@ public class GogglesModel implements ItemModel {
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked::new);
 
         @Override
         public MapCodec<com.zurrtum.create.client.infrastructure.model.GogglesModel.Unbaked> type() {

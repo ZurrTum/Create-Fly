@@ -11,11 +11,17 @@ import net.minecraft.world.item.crafting.RecipeInput;
 
 import java.util.List;
 
-public record BasinInput(
-    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items, RandomSource random, BasinBlockEntity blockEntity
-) implements RecipeInput {
+public record BasinInput(ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items,
+                         RandomSource random, BasinBlockEntity blockEntity) implements RecipeInput {
     public BasinInput(BasinBlockEntity basin) {
-        this(basin.getFilter(), basin.getHeatLevel(), basin.fluidCapability, basin.itemCapability, basin.getLevel().getRandom(), basin);
+        this(
+            basin.getFilter(),
+            basin.getHeatLevel(),
+            basin.fluidCapability,
+            basin.itemCapability,
+            basin.getLevel().getRandom(),
+            basin
+        );
     }
 
     public boolean acceptOutputs(List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {

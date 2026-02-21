@@ -4,11 +4,6 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllTrackMaterials;
 import com.zurrtum.create.Create;
 import io.netty.buffer.ByteBuf;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
@@ -16,10 +11,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 public class TrackMaterial implements ItemLike {
     public static final Map<Identifier, TrackMaterial> ALL = new HashMap<>();
     public static final Codec<TrackMaterial> CODEC = Identifier.CODEC.xmap(TrackMaterial::fromId, TrackMaterial::getId);
-    public static final StreamCodec<ByteBuf, TrackMaterial> PACKET_CODEC = Identifier.STREAM_CODEC.map(TrackMaterial::fromId, TrackMaterial::getId);
+    public static final StreamCodec<ByteBuf, TrackMaterial> PACKET_CODEC = Identifier.STREAM_CODEC.map(
+        TrackMaterial::fromId,
+        TrackMaterial::getId
+    );
 
     private final Identifier id;
     private final Supplier<TrackBlock> trackBlock;
@@ -54,16 +56,18 @@ public class TrackMaterial implements ItemLike {
     }
 
     public static TrackMaterial fromId(Identifier id) {
-        if (ALL.containsKey(id))
+        if (ALL.containsKey(id)) {
             return ALL.get(id);
+        }
 
         Create.LOGGER.error("Failed to locate serialized track material: {}", id);
         return AllTrackMaterials.ANDESITE;
     }
 
     public static TrackMaterial fromItem(Item item) {
-        if (item instanceof BlockItem blockItem && blockItem.getBlock() instanceof ITrackBlock trackBlock)
+        if (item instanceof BlockItem blockItem && blockItem.getBlock() instanceof ITrackBlock trackBlock) {
             return trackBlock.getMaterial();
+        }
         return AllTrackMaterials.ANDESITE;
     }
 }

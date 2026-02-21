@@ -11,8 +11,9 @@ public class AirCurrentClient {
     private static AirCurrentSound flyingSound;
 
     public static void enableClientPlayerSound(Entity e, float maxVolume) {
-        if (e != Minecraft.getInstance().getCameraEntity())
+        if (e != Minecraft.getInstance().getCameraEntity()) {
             return;
+        }
 
         isClientPlayerInAirCurrent = true;
 
@@ -27,11 +28,13 @@ public class AirCurrentClient {
     }
 
     public static void tickClientPlayerSounds() {
-        if (!isClientPlayerInAirCurrent && flyingSound != null)
-            if (flyingSound.isFaded())
+        if (!isClientPlayerInAirCurrent && flyingSound != null) {
+            if (flyingSound.isFaded()) {
                 flyingSound.stopSound();
-            else
+            } else {
                 flyingSound.fadeOut();
+            }
+        }
         isClientPlayerInAirCurrent = false;
     }
 }

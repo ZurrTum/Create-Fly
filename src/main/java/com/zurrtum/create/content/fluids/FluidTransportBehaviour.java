@@ -1,13 +1,13 @@
 package com.zurrtum.create.content.fluids;
 
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.content.fluids.pipes.EncasedPipeBlock;
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -62,8 +62,9 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
         BlockPos pos = getPos();
         boolean onServer = !world.isClientSide() || blockEntity.isVirtual();
 
-        if (interfaces == null)
+        if (interfaces == null) {
             return;
+        }
         Collection<PipeConnection> connections = interfaces.values();
 
         // Do not provide a lone pipe connection with its own flow input
@@ -87,8 +88,9 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
                 sendUpdate |= connection.flipFlowsIfPressureReversed();
                 connection.manageSource(world, pos, blockEntity);
             }
-            if (sendUpdate)
+            if (sendUpdate) {
                 blockEntity.notifyUpdate();
+            }
         }
 
         if (phase == UpdatePhase.FLIP_FLOWS) {
@@ -102,8 +104,9 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
 
             for (PipeConnection connection : connections) {
                 FluidStack fluidInFlow = connection.getProvidedFluid();
-                if (fluidInFlow.isEmpty())
+                if (fluidInFlow.isEmpty()) {
                     continue;
+                }
                 if (availableFlow.isEmpty()) {
                     singleSource = connection;
                     availableFlow = fluidInFlow;
@@ -126,16 +129,22 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
             boolean sendUpdate = false;
             for (PipeConnection connection : connections) {
                 FluidStack internalFluid = singleSource != connection ? availableFlow : FluidStack.EMPTY;
-                Predicate<FluidStack> extractionPredicate = extracted -> canPullFluidFrom(extracted, blockEntity.getBlockState(), connection.side);
+                Predicate<FluidStack> extractionPredicate = extracted -> canPullFluidFrom(
+                    extracted,
+                    blockEntity.getBlockState(),
+                    connection.side
+                );
                 sendUpdate |= connection.manageFlows(world, pos, internalFluid, extractionPredicate);
             }
 
-            if (sendUpdate)
+            if (sendUpdate) {
                 blockEntity.notifyUpdate();
+            }
         }
 
-        for (PipeConnection connection : connections)
+        for (PipeConnection connection : connections) {
             connection.tickFlowProgress(world, pos);
+        }
     }
 
     @Override
@@ -144,8 +153,9 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
         BlockPos pos = blockEntity.getBlockPos();
         for (Direction face : Iterate.directions) {
             view.child(face.getName()).ifPresent(data -> {
-                if (interfaces == null)
+                if (interfaces == null) {
                     interfaces = new IdentityHashMap<>();
+                }
                 interfaces.computeIfAbsent(face, PipeConnection::new).read(data, pos, clientPacket);
             });
         }
@@ -154,19 +164,23 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
     @Override
     public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             createConnectionData();
-        if (interfaces == null)
+        }
+        if (interfaces == null) {
             return;
+        }
 
         BlockPos pos = blockEntity.getBlockPos();
-        interfaces.values().forEach(connection -> connection.write(view.child(connection.side.getName()), pos, clientPacket));
+        interfaces.values()
+            .forEach(connection -> connection.write(view.child(connection.side.getName()), pos, clientPacket));
     }
 
     public FluidStack getProvidedOutwardFluid(Direction side) {
         createConnectionData();
-        if (!interfaces.containsKey(side))
+        if (!interfaces.containsKey(side)) {
             return FluidStack.EMPTY;
+        }
         return interfaces.get(side).provideOutboundFlow();
     }
 
@@ -178,36 +192,42 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
 
     public boolean hasAnyPressure() {
         createConnectionData();
-        for (PipeConnection pipeConnection : interfaces.values())
-            if (pipeConnection.hasPressure())
+        for (PipeConnection pipeConnection : interfaces.values()) {
+            if (pipeConnection.hasPressure()) {
                 return true;
+            }
+        }
         return false;
     }
 
     @Nullable
     public PipeConnection.Flow getFlow(Direction side) {
         createConnectionData();
-        if (!interfaces.containsKey(side))
+        if (!interfaces.containsKey(side)) {
             return null;
+        }
         return interfaces.get(side).flow.orElse(null);
     }
 
     public void addPressure(Direction side, boolean inbound, float pressure) {
         createConnectionData();
-        if (!interfaces.containsKey(side))
+        if (!interfaces.containsKey(side)) {
             return;
+        }
         interfaces.get(side).addPressure(inbound, pressure);
         blockEntity.sendData();
     }
 
     public void wipePressure() {
-        if (interfaces != null)
+        if (interfaces != null) {
             for (Direction d : Iterate.directions) {
-                if (!canHaveFlowToward(blockEntity.getBlockState(), d))
+                if (!canHaveFlowToward(blockEntity.getBlockState(), d)) {
                     interfaces.remove(d);
-                else
+                } else {
                     interfaces.computeIfAbsent(d, PipeConnection::new);
+                }
             }
+        }
         phase = UpdatePhase.WAIT_FOR_PUMPS;
         createConnectionData();
         interfaces.values().forEach(PipeConnection::wipePressure);
@@ -215,41 +235,57 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
     }
 
     private void createConnectionData() {
-        if (interfaces != null)
+        if (interfaces != null) {
             return;
+        }
         interfaces = new IdentityHashMap<>();
-        for (Direction d : Iterate.directions)
-            if (canHaveFlowToward(blockEntity.getBlockState(), d))
+        for (Direction d : Iterate.directions) {
+            if (canHaveFlowToward(blockEntity.getBlockState(), d)) {
                 interfaces.put(d, new PipeConnection(d));
+            }
+        }
     }
 
-    public AttachmentTypes getRenderedRimAttachment(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction direction) {
-        if (!canHaveFlowToward(state, direction))
+    public AttachmentTypes getRenderedRimAttachment(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        Direction direction
+    ) {
+        if (!canHaveFlowToward(state, direction)) {
             return AttachmentTypes.NONE;
+        }
 
         BlockPos offsetPos = pos.relative(direction);
         BlockState facingState = world.getBlockState(offsetPos);
 
-        if (facingState.getBlock() instanceof PumpBlock && facingState.getValue(PumpBlock.FACING) == direction.getOpposite())
+        if (facingState.getBlock() instanceof PumpBlock && facingState.getValue(PumpBlock.FACING) == direction.getOpposite()) {
             return AttachmentTypes.NONE;
+        }
 
-        if (facingState.is(AllBlocks.ENCASED_FLUID_PIPE) && facingState.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(direction.getOpposite())))
+        if (facingState.is(AllBlocks.ENCASED_FLUID_PIPE) && facingState.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(
+            direction.getOpposite()))) {
             return AttachmentTypes.RIM;
+        }
 
-        if (FluidPropagator.hasFluidCapability(world, offsetPos, direction.getOpposite()) && !facingState.is(AllBlocks.HOSE_PULLEY))
+        if (FluidPropagator.hasFluidCapability(
+            world,
+            offsetPos,
+            direction.getOpposite()
+        ) && !facingState.is(AllBlocks.HOSE_PULLEY)) {
             return AttachmentTypes.DRAIN;
+        }
 
         return AttachmentTypes.RIM;
     }
 
     public enum AttachmentTypes {
-        NONE,
-        CONNECTION(ComponentPartials.CONNECTION),
-        DETAILED_CONNECTION(ComponentPartials.RIM_CONNECTOR),
-        RIM(ComponentPartials.RIM_CONNECTOR, ComponentPartials.RIM),
-        PARTIAL_RIM(ComponentPartials.RIM),
-        DRAIN(ComponentPartials.RIM_CONNECTOR, ComponentPartials.DRAIN),
-        PARTIAL_DRAIN(ComponentPartials.DRAIN);
+        NONE, CONNECTION(ComponentPartials.CONNECTION), DETAILED_CONNECTION(ComponentPartials.RIM_CONNECTOR), RIM(ComponentPartials.RIM_CONNECTOR,
+            ComponentPartials.RIM
+        ), PARTIAL_RIM(ComponentPartials.RIM), DRAIN(
+            ComponentPartials.RIM_CONNECTOR,
+            ComponentPartials.DRAIN
+        ), PARTIAL_DRAIN(ComponentPartials.DRAIN);
 
         public final ComponentPartials[] partials;
 
@@ -258,18 +294,17 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
         }
 
         public AttachmentTypes withoutConnector() {
-            if (this == AttachmentTypes.RIM)
+            if (this == AttachmentTypes.RIM) {
                 return AttachmentTypes.PARTIAL_RIM;
-            if (this == AttachmentTypes.DRAIN)
+            }
+            if (this == AttachmentTypes.DRAIN) {
                 return AttachmentTypes.PARTIAL_DRAIN;
+            }
             return this;
         }
 
         public enum ComponentPartials {
-            CONNECTION,
-            RIM_CONNECTOR,
-            RIM,
-            DRAIN;
+            CONNECTION, RIM_CONNECTOR, RIM, DRAIN;
         }
     }
 
@@ -280,18 +315,21 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
 
     // for switching TEs, but retaining flows
 
-    public static final WorldAttached<Map<BlockPos, Map<Direction, PipeConnection>>> interfaceTransfer = new WorldAttached<>($ -> new HashMap<>());
+    public static final WorldAttached<Map<BlockPos, Map<Direction, PipeConnection>>> interfaceTransfer = new WorldAttached<>(
+        $ -> new HashMap<>());
 
     public static void cacheFlows(LevelAccessor world, BlockPos pos) {
         FluidTransportBehaviour pipe = BlockEntityBehaviour.get(world, pos, FluidTransportBehaviour.TYPE);
-        if (pipe != null)
+        if (pipe != null) {
             interfaceTransfer.get(world).put(pos, pipe.interfaces);
+        }
     }
 
     public static void loadFlows(LevelAccessor world, BlockPos pos) {
         FluidTransportBehaviour newPipe = BlockEntityBehaviour.get(world, pos, FluidTransportBehaviour.TYPE);
-        if (newPipe != null)
+        if (newPipe != null) {
             newPipe.interfaces = interfaceTransfer.get(world).remove(pos);
+        }
     }
 
 }

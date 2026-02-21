@@ -1,12 +1,6 @@
 package com.zurrtum.create.infrastructure.worldgen;
 
 import com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -20,6 +14,11 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
 
 public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
     public LayeredOreFeature() {
@@ -40,8 +39,9 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
         LayeredOreConfiguration config = pContext.config();
         List<LayerPattern> patternPool = config.layerPatterns;
 
-        if (patternPool.isEmpty())
+        if (patternPool.isEmpty()) {
             return false;
+        }
 
         LayerPattern layerPattern = patternPool.get(random.nextInt(patternPool.size()));
 
@@ -53,8 +53,9 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
         int y0 = origin.getY();
         int z0 = origin.getZ();
 
-        if (origin.getY() >= worldGenLevel.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, origin.getX(), origin.getZ()))
+        if (origin.getY() >= worldGenLevel.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, origin.getX(), origin.getZ())) {
             return false;
+        }
 
         List<TemporaryLayerEntry> tempLayers = new ArrayList<>();
         float layerSizeTotal = 0.0f;
@@ -72,8 +73,9 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
         for (TemporaryLayerEntry tempLayerEntry : tempLayers) {
             float rampStartValue = resolvedLayers.size() == 0 ? Float.NEGATIVE_INFINITY : cumulativeLayerSize * (2.0f / size) - 1.0f;
             cumulativeLayerSize += tempLayerEntry.size();
-            if (cumulativeLayerSize < 0)
+            if (cumulativeLayerSize < 0) {
                 continue;
+            }
             float radialThresholdMultiplier = Mth.randomBetween(random, 0.5f, 1.0f);
             resolvedLayers.add(new ResolvedLayerEntry(tempLayerEntry.layer, radialThresholdMultiplier, rampStartValue));
         }
@@ -96,21 +98,25 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
 
             for (int dzBlock = -radiusBound; dzBlock <= radiusBound; dzBlock++) {
                 float dz = dzBlock * (1.0f / radius);
-                if (dz * dz > 1)
+                if (dz * dz > 1) {
                     continue;
+                }
 
                 for (int dxBlock = -radiusBound; dxBlock <= radiusBound; dxBlock++) {
                     float dx = dxBlock * (1.0f / radius);
-                    if (dz * dz + dx * dx > 1)
+                    if (dz * dz + dx * dx > 1) {
                         continue;
+                    }
 
                     for (int dyBlock = -radiusBound; dyBlock <= radiusBound; dyBlock++) {
                         float dy = dyBlock * (1.0f / radius);
                         float distanceSquared = dz * dz + dx * dx + dy * dy;
-                        if (distanceSquared > 1)
+                        if (distanceSquared > 1) {
                             continue;
-                        if (worldGenLevel.isOutsideBuildHeight(y0 + dyBlock))
+                        }
+                        if (worldGenLevel.isOutsideBuildHeight(y0 + dyBlock)) {
                             continue;
+                        }
 
                         int currentX = x0 + dxBlock;
                         int currentY = y0 + dyBlock;
@@ -123,38 +129,42 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
                             currentZ * LAYER_NOISE_FREQUENCY
                         ) * (MAX_LAYER_DISPLACEMENT / size);
 
-                        int layerIndex = Collections.binarySearch(resolvedLayers, new ResolvedLayerEntry(null, 0, rampValue));
-                        if (layerIndex < 0)
+                        int layerIndex = Collections.binarySearch(
+                            resolvedLayers,
+                            new ResolvedLayerEntry(null, 0, rampValue)
+                        );
+                        if (layerIndex < 0) {
                             layerIndex = -2 - layerIndex; // Counter (-insertionIndex - 1) return result, where insertionIndex = layerIndex + 1
+                        }
                         ResolvedLayerEntry layerEntry = resolvedLayers.get(layerIndex);
 
-                        if (distanceSquared > layerEntry.radialThresholdMultiplier)
+                        if (distanceSquared > layerEntry.radialThresholdMultiplier) {
                             continue;
+                        }
 
                         float thresholdNoiseValue = Mth.map(
                             (float) radiusNoise.getValue(
                                 currentX * RADIAL_NOISE_FREQUENCY,
                                 currentY * RADIAL_NOISE_FREQUENCY,
                                 currentZ * RADIAL_NOISE_FREQUENCY
-                            ),
-                            -1.0f,
-                            1.0f,
-                            1.0f - MAX_RADIAL_THRESHOLD_REDUCTION,
-                            1.0f
+                            ), -1.0f, 1.0f, 1.0f - MAX_RADIAL_THRESHOLD_REDUCTION, 1.0f
                         );
 
-                        if (distanceSquared > layerEntry.radialThresholdMultiplier * thresholdNoiseValue)
+                        if (distanceSquared > layerEntry.radialThresholdMultiplier * thresholdNoiseValue) {
                             continue;
+                        }
 
                         Layer layer = layerEntry.layer;
                         List<OreConfiguration.TargetBlockState> targetBlockStates = layer.rollBlock(random);
 
                         mutablePos.set(currentX, currentY, currentZ);
-                        if (!worldGenLevel.ensureCanWrite(mutablePos))
+                        if (!worldGenLevel.ensureCanWrite(mutablePos)) {
                             continue;
+                        }
                         LevelChunkSection levelChunkSection = bulkSectionAccess.getSection(mutablePos);
-                        if (levelChunkSection == null)
+                        if (levelChunkSection == null) {
                             continue;
+                        }
 
                         int localX = SectionPos.sectionRelative(currentX);
                         int localY = SectionPos.sectionRelative(currentY);
@@ -162,10 +172,19 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
                         BlockState blockState = levelChunkSection.getBlockState(localX, localY, localZ);
 
                         for (OreConfiguration.TargetBlockState targetBlockState : targetBlockStates) {
-                            if (!canPlaceOre(blockState, bulkSectionAccess::getBlockState, random, config, targetBlockState, mutablePos))
+                            if (!canPlaceOre(
+                                blockState,
+                                bulkSectionAccess::getBlockState,
+                                random,
+                                config,
+                                targetBlockState,
+                                mutablePos
+                            )) {
                                 continue;
-                            if (targetBlockState.state.isAir())
+                            }
+                            if (targetBlockState.state.isAir()) {
                                 continue;
+                            }
                             levelChunkSection.setBlockState(localX, localY, localZ, targetBlockState.state, false);
                             ++placedAmount;
                             break;
@@ -197,10 +216,12 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
         OreConfiguration.TargetBlockState pTargetState,
         BlockPos.MutableBlockPos pMatablePos
     ) {
-        if (!pTargetState.target.test(pState, pRandom))
+        if (!pTargetState.target.test(pState, pRandom)) {
             return false;
-        if (shouldSkipAirCheck(pRandom, pConfig.discardChanceOnAirExposure))
+        }
+        if (shouldSkipAirCheck(pRandom, pConfig.discardChanceOnAirExposure)) {
             return true;
+        }
 
         return !isAdjacentToAir(pAdjacentStateAccessor, pMatablePos);
     }
@@ -212,7 +233,8 @@ public class LayeredOreFeature extends Feature<LayeredOreConfiguration> {
     private record TemporaryLayerEntry(Layer layer, float size) {
     }
 
-    private record ResolvedLayerEntry(Layer layer, float radialThresholdMultiplier, float rampStartValue) implements Comparable<ResolvedLayerEntry> {
+    private record ResolvedLayerEntry(Layer layer, float radialThresholdMultiplier,
+                                      float rampStartValue) implements Comparable<ResolvedLayerEntry> {
         @Override
         public int compareTo(LayeredOreFeature.ResolvedLayerEntry b) {
             return Float.compare(rampStartValue, b.rampStartValue);

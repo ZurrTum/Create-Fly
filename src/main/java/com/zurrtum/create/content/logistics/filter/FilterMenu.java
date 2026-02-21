@@ -31,9 +31,11 @@ public class FilterMenu extends AbstractFilterMenu {
     protected void addFilterSlots() {
         int x = 23;
         int y = 25;
-        for (int row = 0; row < 2; ++row)
-            for (int col = 0; col < 9; ++col)
+        for (int row = 0; row < 2; ++row) {
+            for (int col = 0; col < 9; ++col) {
                 this.addSlot(new Slot(ghostInventory, col + row * 9, x + col * 18, y + row * 18));
+            }
+        }
     }
 
     @Override
@@ -54,10 +56,12 @@ public class FilterMenu extends AbstractFilterMenu {
         filterItem.set(AllDataComponents.FILTER_ITEMS_RESPECT_NBT, respectNBT);
         filterItem.set(AllDataComponents.FILTER_ITEMS_BLACKLIST, blacklist);
 
-        if (respectNBT || blacklist)
+        if (respectNBT || blacklist) {
             return;
-        if (!ghostInventory.isEmpty())
+        }
+        if (!ghostInventory.isEmpty()) {
             return;
+        }
         filterItem.remove(AllDataComponents.FILTER_ITEMS_RESPECT_NBT);
         filterItem.remove(AllDataComponents.FILTER_ITEMS_BLACKLIST);
     }

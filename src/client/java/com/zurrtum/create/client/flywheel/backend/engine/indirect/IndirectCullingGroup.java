@@ -234,7 +234,12 @@ public class IndirectCullingGroup<I extends Instance> {
     }
 
     public void bindForCrumbling(Material material) {
-        var program = programs.getIndirectProgram(instanceType, ContextShader.CRUMBLING, material, PipelineCompiler.OitMode.OFF);
+        var program = programs.getIndirectProgram(
+            instanceType,
+            ContextShader.CRUMBLING,
+            material,
+            PipelineCompiler.OitMode.OFF
+        );
 
         program.bind();
 

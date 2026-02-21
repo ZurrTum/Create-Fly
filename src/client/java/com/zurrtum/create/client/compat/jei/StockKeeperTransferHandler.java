@@ -58,7 +58,8 @@ public class StockKeeperTransferHandler implements IUniversalRecipeTransferHandl
         Identifier id = entry.id().identifier();
         for (CraftableBigItemStack cbis : screen.recipesToOrder) {
             if (cbis.id.equals(id)) {
-                return new RecipeTransferErrorTooltip(CreateLang.translateDirect("gui.stock_keeper.already_ordering_recipe"));
+                return new RecipeTransferErrorTooltip(CreateLang.translateDirect(
+                    "gui.stock_keeper.already_ordering_recipe"));
             }
         }
         if (screen.itemsToOrder.size() >= 9) {
@@ -105,7 +106,10 @@ public class StockKeeperTransferHandler implements IUniversalRecipeTransferHandl
             }
         }
         if (output == null) {
-            return new RecipeTransferErrorMissingSlots(CreateLang.translateDirect("gui.stock_keeper.recipe_result_empty"), outputViews);
+            return new RecipeTransferErrorMissingSlots(
+                CreateLang.translateDirect("gui.stock_keeper.recipe_result_empty"),
+                outputViews
+            );
         }
         InventorySummary summary = screen.getMenu().contentHolder.getLastClientsideStockSnapshotAsSummary();
         if (summary == null) {
@@ -115,7 +119,10 @@ public class StockKeeperTransferHandler implements IUniversalRecipeTransferHandl
         if (!missingIndices.isEmpty()) {
             List<IRecipeSlotView> missingViews = new ArrayList<>();
             missingIndices.forEach(index -> missingViews.add(inputViews.get(index)));
-            return new RecipeTransferErrorMissingSlots(CreateLang.translateDirect("gui.stock_keeper.not_in_stock"), missingViews);
+            return new RecipeTransferErrorMissingSlots(
+                CreateLang.translateDirect("gui.stock_keeper.not_in_stock"),
+                missingViews
+            );
         }
         if (doTransfer) {
             CraftableBigItemStack cbis = new CraftableBigItemStack(id, inputs, output);

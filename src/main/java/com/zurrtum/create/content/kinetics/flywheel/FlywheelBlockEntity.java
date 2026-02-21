@@ -26,16 +26,18 @@ public class FlywheelBlockEntity extends KineticBlockEntity {
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             visualSpeed.chase(getGeneratedSpeed(), 1 / 64f, Chaser.EXP);
+        }
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
 
         float targetSpeed = getSpeed();
         visualSpeed.updateChaseTarget(targetSpeed);

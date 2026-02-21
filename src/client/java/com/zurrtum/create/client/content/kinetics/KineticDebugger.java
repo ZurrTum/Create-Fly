@@ -34,17 +34,19 @@ public class KineticDebugger {
         }
 
         KineticBlockEntity be = getSelectedBE(mc);
-        if (be == null)
+        if (be == null) {
             return;
+        }
 
         Level world = mc.level;
         BlockPos toOutline = be.hasSource() ? be.source : be.getBlockPos();
         BlockState state = be.getBlockState();
         VoxelShape shape = world.getBlockState(toOutline).getBlockSupportShape(world, toOutline);
 
-        if (be.getTheoreticalSpeed() != 0 && !shape.isEmpty())
+        if (be.getTheoreticalSpeed() != 0 && !shape.isEmpty()) {
             Outliner.getInstance().chaseAABB("kineticSource", shape.bounds().move(toOutline)).lineWidth(1 / 16f)
                 .colored(be.hasSource() ? Color.generateFromLong(be.network).getRGB() : 0xffcc00);
+        }
 
         if (state.getBlock() instanceof IRotate rotate) {
             Axis axis = rotate.getRotationAxis(state);
@@ -65,17 +67,21 @@ public class KineticDebugger {
 
     public static KineticBlockEntity getSelectedBE(Minecraft mc) {
         HitResult obj = mc.hitResult;
-        if (obj == null)
+        if (obj == null) {
             return null;
+        }
         ClientLevel world = mc.level;
-        if (world == null)
+        if (world == null) {
             return null;
-        if (!(obj instanceof BlockHitResult ray))
+        }
+        if (!(obj instanceof BlockHitResult ray)) {
             return null;
+        }
 
         BlockEntity be = world.getBlockEntity(ray.getBlockPos());
-        if (!(be instanceof KineticBlockEntity))
+        if (!(be instanceof KineticBlockEntity)) {
             return null;
+        }
 
         return (KineticBlockEntity) be;
     }

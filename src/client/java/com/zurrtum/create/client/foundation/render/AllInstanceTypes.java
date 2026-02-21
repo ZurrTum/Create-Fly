@@ -17,9 +17,10 @@ import static com.zurrtum.create.client.Create.asResource;
 public class AllInstanceTypes {
     public static final InstanceType<RotatingInstance> ROTATING = SimpleInstanceType.builder(RotatingInstance::new)
         .cullShader(asResource("instance/cull/rotating.glsl")).vertexShader(asResource("instance/rotating.vert"))
-        .layout(LayoutBuilder.create().vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4).vector("light", IntegerRepr.SHORT, 2)
-            .vector("overlay", IntegerRepr.SHORT, 2).vector("rotation", FloatRepr.FLOAT, 4).vector("pos", FloatRepr.FLOAT, 3)
-            .scalar("speed", FloatRepr.FLOAT).scalar("offset", FloatRepr.FLOAT).vector("axis", FloatRepr.NORMALIZED_BYTE, 3).build())
+        .layout(LayoutBuilder.create().vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
+            .vector("light", IntegerRepr.SHORT, 2).vector("overlay", IntegerRepr.SHORT, 2)
+            .vector("rotation", FloatRepr.FLOAT, 4).vector("pos", FloatRepr.FLOAT, 3).scalar("speed", FloatRepr.FLOAT)
+            .scalar("offset", FloatRepr.FLOAT).vector("axis", FloatRepr.NORMALIZED_BYTE, 3).build())
         .writer((ptr, instance) -> {
             MemoryUtil.memPutByte(ptr, instance.red);
             MemoryUtil.memPutByte(ptr + 1, instance.green);
@@ -40,8 +41,9 @@ public class AllInstanceTypes {
 
     public static final InstanceType<ScrollInstance> SCROLLING = SimpleInstanceType.builder(ScrollInstance::new)
         .cullShader(asResource("instance/cull/scrolling.glsl")).vertexShader(asResource("instance/scrolling.vert"))
-        .layout(LayoutBuilder.create().vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4).vector("light", IntegerRepr.SHORT, 2)
-            .vector("overlay", IntegerRepr.SHORT, 2).vector("pos", FloatRepr.FLOAT, 3).vector("rotation", FloatRepr.FLOAT, 4)
+        .layout(LayoutBuilder.create().vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
+            .vector("light", IntegerRepr.SHORT, 2).vector("overlay", IntegerRepr.SHORT, 2)
+            .vector("pos", FloatRepr.FLOAT, 3).vector("rotation", FloatRepr.FLOAT, 4)
             .vector("speed", FloatRepr.FLOAT, 2).vector("diff", FloatRepr.FLOAT, 2).vector("scale", FloatRepr.FLOAT, 2)
             .vector("offset", FloatRepr.FLOAT, 2).build()).writer((ptr, instance) -> {
             MemoryUtil.memPutByte(ptr, instance.red);
@@ -67,12 +69,14 @@ public class AllInstanceTypes {
     // TODO: Switch everything using SCROLLING to this? Right now this is only used for bogey belts.
     //  This takes a decent few more bytes to represent but perhaps it can be packed
     //  down into 96 by sacrificing precision
-    public static final InstanceType<ScrollTransformedInstance> SCROLLING_TRANSFORMED = SimpleInstanceType.builder(ScrollTransformedInstance::new)
-        .cullShader(asResource("instance/cull/scrolling_transformed.glsl")).vertexShader(asResource("instance/scrolling_transformed.vert"))
-        .layout(LayoutBuilder.create().matrix("pose", FloatRepr.FLOAT, 4).vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
-            .vector("light", IntegerRepr.SHORT, 2).vector("overlay", IntegerRepr.SHORT, 2).vector("speed", FloatRepr.FLOAT, 2)
-            .vector("diff", FloatRepr.FLOAT, 2).vector("scale", FloatRepr.FLOAT, 2).vector("offset", FloatRepr.FLOAT, 2).build())
-        .writer((ptr, instance) -> {
+    public static final InstanceType<ScrollTransformedInstance> SCROLLING_TRANSFORMED = SimpleInstanceType.builder(
+            ScrollTransformedInstance::new).cullShader(asResource("instance/cull/scrolling_transformed.glsl"))
+        .vertexShader(asResource("instance/scrolling_transformed.vert"))
+        .layout(LayoutBuilder.create().matrix("pose", FloatRepr.FLOAT, 4)
+            .vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4).vector("light", IntegerRepr.SHORT, 2)
+            .vector("overlay", IntegerRepr.SHORT, 2).vector("speed", FloatRepr.FLOAT, 2)
+            .vector("diff", FloatRepr.FLOAT, 2).vector("scale", FloatRepr.FLOAT, 2).vector("offset", FloatRepr.FLOAT, 2)
+            .build()).writer((ptr, instance) -> {
             ExtraMemoryOps.putMatrix4f(ptr, instance.pose);
             MemoryUtil.memPutByte(ptr + 64, instance.red);
             MemoryUtil.memPutByte(ptr + 65, instance.green);
@@ -92,8 +96,9 @@ public class AllInstanceTypes {
 
     public static final InstanceType<FluidInstance> FLUID = SimpleInstanceType.builder(FluidInstance::new)
         .cullShader(asResource("instance/cull/fluid.glsl")).vertexShader(asResource("instance/fluid.vert"))
-        .layout(LayoutBuilder.create().matrix("pose", FloatRepr.FLOAT, 4).vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
-            .vector("light", IntegerRepr.SHORT, 2).vector("overlay", IntegerRepr.SHORT, 2).scalar("progress", FloatRepr.FLOAT)
+        .layout(LayoutBuilder.create().matrix("pose", FloatRepr.FLOAT, 4)
+            .vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4).vector("light", IntegerRepr.SHORT, 2)
+            .vector("overlay", IntegerRepr.SHORT, 2).scalar("progress", FloatRepr.FLOAT)
             .scalar("vScale", FloatRepr.FLOAT).scalar("v0", FloatRepr.FLOAT).build()).writer((ptr, instance) -> {
             ExtraMemoryOps.putMatrix4f(ptr, instance.pose);
             MemoryUtil.memPutByte(ptr + 64, instance.red);

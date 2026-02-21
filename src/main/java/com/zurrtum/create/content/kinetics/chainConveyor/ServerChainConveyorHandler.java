@@ -21,13 +21,15 @@ public class ServerChainConveyorHandler {
         int count = hangingPlayers.size();
         hangingPlayers.put(player.getUUID(), 20);
 
-        if (hangingPlayers.size() != count)
+        if (hangingPlayers.size() != count) {
             sync(server);
+        }
     }
 
     public static void handleStopRidingPacket(MinecraftServer server, Player player) {
-        if (hangingPlayers.removeInt(player.getUUID()) != 0)
+        if (hangingPlayers.removeInt(player.getUUID()) != 0) {
             sync(server);
+        }
     }
 
     public static void tick(MinecraftServer server) {
@@ -48,8 +50,9 @@ public class ServerChainConveyorHandler {
 
         int after = hangingPlayers.size();
 
-        if (ticks % 10 != 0 && before == after)
+        if (ticks % 10 != 0 && before == after) {
             return;
+        }
 
         sync(server);
 

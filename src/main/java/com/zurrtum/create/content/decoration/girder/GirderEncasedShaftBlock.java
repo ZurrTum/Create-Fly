@@ -45,7 +45,8 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
 
     public GirderEncasedShaftBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(TOP, false).setValue(BOTTOM, false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(TOP, false)
+            .setValue(BOTTOM, false));
     }
 
     @Override
@@ -69,15 +70,17 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
             .setValue(GirderBlock.X, originalState.getValue(HORIZONTAL_AXIS) == Axis.Z)
             .setValue(GirderBlock.Z, originalState.getValue(HORIZONTAL_AXIS) == Axis.X)
             .setValue(GirderBlock.AXIS, originalState.getValue(HORIZONTAL_AXIS) == Axis.X ? Axis.Z : Axis.X)
-            .setValue(GirderBlock.BOTTOM, originalState.getValue(BOTTOM)).setValue(GirderBlock.TOP, originalState.getValue(TOP));
+            .setValue(GirderBlock.BOTTOM, originalState.getValue(BOTTOM))
+            .setValue(GirderBlock.TOP, originalState.getValue(TOP));
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         InteractionResult onWrenched = super.onWrenched(state, context);
         Player player = context.getPlayer();
-        if (onWrenched == InteractionResult.SUCCESS && player != null && !player.isCreative())
+        if (onWrenched == InteractionResult.SUCCESS && player != null && !player.isCreative()) {
             player.getInventory().placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance());
+        }
         return onWrenched;
     }
 
@@ -107,13 +110,16 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
         BlockState neighbourState,
         RandomSource random
     ) {
-        if (state.getValue(WATERLOGGED))
+        if (state.getValue(WATERLOGGED)) {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+        }
 
         Property<Boolean> updateProperty = direction == Direction.UP ? TOP : BOTTOM;
         if (direction.getAxis().isVertical()) {
-            if (world.getBlockState(pos.relative(direction)).getBlockSupportShape(world, pos.relative(direction)).isEmpty())
+            if (world.getBlockState(pos.relative(direction)).getBlockSupportShape(world, pos.relative(direction))
+                .isEmpty()) {
                 state = state.setValue(updateProperty, false);
+            }
             return GirderBlock.updateVerticalProperty(world, pos, state, updateProperty, neighbourState, direction);
         }
 
@@ -131,7 +137,8 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
 
     @Override
     public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
-        return ItemRequirement.of(AllBlocks.SHAFT.defaultBlockState(), be).union(ItemRequirement.of(AllBlocks.METAL_GIRDER.defaultBlockState(), be));
+        return ItemRequirement.of(AllBlocks.SHAFT.defaultBlockState(), be)
+            .union(ItemRequirement.of(AllBlocks.METAL_GIRDER.defaultBlockState(), be));
     }
 
 }

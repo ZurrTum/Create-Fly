@@ -40,7 +40,13 @@ public class BeltModel extends WrapperBlockStateModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         BeltBlockEntity blockentity = (BeltBlockEntity) world.getBlockEntity(pos);
         if (blockentity == null || blockentity.casing == CasingType.NONE) {
             model.collectParts(random, parts);
@@ -57,7 +63,10 @@ public class BeltModel extends WrapperBlockStateModel {
         TextureAtlasSprite original = SPRITE_SHIFT.getOriginal();
         if (blockentity.covered) {
             boolean alongX = state.getValue(BeltBlock.HORIZONTAL_FACING).getAxis() == Axis.X;
-            parts.add(replaceQuads(original, alongX ? AllPartialModels.ANDESITE_BELT_COVER_X.get() : AllPartialModels.ANDESITE_BELT_COVER_Z.get()));
+            parts.add(replaceQuads(
+                original,
+                alongX ? AllPartialModels.ANDESITE_BELT_COVER_X.get() : AllPartialModels.ANDESITE_BELT_COVER_Z.get()
+            ));
         }
         for (BlockModelPart part : model.collectParts(random)) {
             parts.add(replaceQuads(original, part));

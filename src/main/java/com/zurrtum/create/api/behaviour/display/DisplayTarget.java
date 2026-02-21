@@ -6,10 +6,6 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -22,6 +18,9 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class DisplayTarget {
     public static final SimpleRegistry<Block, DisplayTarget> BY_BLOCK = SimpleRegistry.create();
@@ -36,8 +35,9 @@ public abstract class DisplayTarget {
     }
 
     public static void reserve(int line, DisplayHolder target, DisplayLinkContext context) {
-        if (line == 0)
+        if (line == 0) {
             return;
+        }
 
         target.updateLine(line, context.blockEntity().getBlockPos());
     }
@@ -48,8 +48,10 @@ public abstract class DisplayTarget {
             return false;
         }
 
-        if (!reserved.equals(context.blockEntity().getBlockPos()) && context.level().getBlockState(reserved).is(AllBlocks.DISPLAY_LINK))
+        if (!reserved.equals(context.blockEntity().getBlockPos()) && context.level().getBlockState(reserved)
+            .is(AllBlocks.DISPLAY_LINK)) {
             return true;
+        }
 
         target.removeLine(line);
         return false;
@@ -64,8 +66,9 @@ public abstract class DisplayTarget {
      */
     @Nullable
     public static DisplayTarget get(@Nullable Identifier id) {
-        if (id == null)
+        if (id == null) {
             return null;
+        }
         return CreateRegistries.DISPLAY_TARGET.getValue(id);
     }
 
@@ -77,16 +80,19 @@ public abstract class DisplayTarget {
         BlockState state = level.getBlockState(pos);
         DisplayTarget byBlock = BY_BLOCK.get(state);
         // block takes priority if present, it's more granular
-        if (byBlock != null)
+        if (byBlock != null) {
             return byBlock;
+        }
 
         BlockEntity be = level.getBlockEntity(pos);
-        if (be == null)
+        if (be == null) {
             return null;
+        }
 
         DisplayTarget byBe = BY_BLOCK_ENTITY.get(be.getType());
-        if (byBe != null)
+        if (byBe != null) {
             return byBe;
+        }
 
         // special case: modded signs are common
         return be instanceof SignBlockEntity ? AllDisplayTargets.SIGN : null;
@@ -94,8 +100,9 @@ public abstract class DisplayTarget {
 
     public AABB getMultiblockBounds(LevelAccessor level, BlockPos pos) {
         VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
-        if (shape.isEmpty())
+        if (shape.isEmpty()) {
             return new AABB(pos);
+        }
         return shape.bounds().move(pos);
     }
 }

@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.flywheel.backend.glsl.error;
 
 public enum ErrorLevel {
-    WARN(ConsoleColors.YELLOW, "warn"),
-    ERROR(ConsoleColors.RED, "error"),
-    HINT(ConsoleColors.WHITE_BRIGHT, "hint"),
-    NOTE(ConsoleColors.WHITE_BRIGHT, "note");
+    WARN(ConsoleColors.YELLOW, "warn"), ERROR(ConsoleColors.RED, "error"), HINT(
+        ConsoleColors.WHITE_BRIGHT,
+        "hint"
+    ), NOTE(ConsoleColors.WHITE_BRIGHT, "note");
 
     private final String color;
     private final String error;

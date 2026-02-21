@@ -17,9 +17,7 @@ public class CClient extends ConfigBase {
     public final ConfigFloat indicatorScale = f(1.0f, 0f, "indicatorScale", Comments.indicatorScale);
 
     public enum PlacementIndicatorSetting {
-        TEXTURE,
-        TRIANGLE,
-        NONE
+        TEXTURE, TRIANGLE, NONE
     }
 
     @Override
@@ -32,7 +30,10 @@ public class CClient extends ConfigBase {
         static String editingMode = "Show additional info in the ponder view and reload scene scripts more frequently.";
 
         static String placementAssist = "Settings for the Placement Assist";
-        static String[] placementIndicator = new String[]{"What indicator should be used when showing where the assisted placement ends up relative to your crosshair", "Choose 'NONE' to disable the Indicator altogether"};
+        static String[] placementIndicator = new String[]{
+            "What indicator should be used when showing where the assisted placement ends up relative to your crosshair",
+            "Choose 'NONE' to disable the Indicator altogether"
+        };
         static String indicatorScale = "Change the size of the Indicator by this multiplier";
     }
 }

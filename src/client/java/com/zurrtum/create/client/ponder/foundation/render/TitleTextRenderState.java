@@ -5,9 +5,8 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record TitleTextRenderState(
-    Matrix3x2f pose, int x0, int y0, float diff, String title, String otherTitle, ScreenRectangle bounds
-) implements PictureInPictureRenderState {
+public record TitleTextRenderState(Matrix3x2f pose, int x0, int y0, float diff, String title, String otherTitle,
+                                   ScreenRectangle bounds) implements PictureInPictureRenderState {
     public TitleTextRenderState(Matrix3x2f pose, int x, int y, float diff, String title, String otherTitle) {
         this(pose, x, y, diff, title, otherTitle, new ScreenRectangle(x, y, 180, 20).transformMaxBounds(pose));
     }

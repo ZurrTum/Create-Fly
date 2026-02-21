@@ -10,7 +10,10 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record WiFiEffectPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, WiFiEffectPacket> CODEC = BlockPos.STREAM_CODEC.map(WiFiEffectPacket::new, WiFiEffectPacket::pos);
+    public static final StreamCodec<ByteBuf, WiFiEffectPacket> CODEC = BlockPos.STREAM_CODEC.map(
+        WiFiEffectPacket::new,
+        WiFiEffectPacket::pos
+    );
 
     @Override
     public void handle(ClientGamePacketListener listener) {

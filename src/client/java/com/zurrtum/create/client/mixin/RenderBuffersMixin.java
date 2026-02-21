@@ -14,7 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderBuffers.class)
 public abstract class RenderBuffersMixin {
     @Shadow
-    private static void put(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> builderStorage, RenderType layer) {
+    private static void put(
+        Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> builderStorage,
+        RenderType layer
+    ) {
     }
 
     @Inject(method = "method_54639(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))

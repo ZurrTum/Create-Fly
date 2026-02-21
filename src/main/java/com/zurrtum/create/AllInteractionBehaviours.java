@@ -34,7 +34,8 @@ public class AllInteractionBehaviours {
 
     @SuppressWarnings("deprecation")
     public static void register(MovingInteractionBehaviour behaviour, TagKey<Block> tag) {
-        MovingInteractionBehaviour.REGISTRY.registerProvider(block -> block.builtInRegistryHolder().is(tag) ? behaviour : null);
+        MovingInteractionBehaviour.REGISTRY.registerProvider(block -> block.builtInRegistryHolder()
+            .is(tag) ? behaviour : null);
     }
 
     public static void register() {
@@ -43,7 +44,14 @@ public class AllInteractionBehaviours {
         register(CONTRAPTION_CONTROLS, AllBlocks.CONTRAPTION_CONTROLS);
         register(DEPLOYER, AllBlocks.DEPLOYER);
         register(CONTROLS, AllBlocks.TRAIN_CONTROLS);
-        register(DOOR, AllBlocks.ANDESITE_DOOR, AllBlocks.BRASS_DOOR, AllBlocks.COPPER_DOOR, AllBlocks.TRAIN_DOOR, AllBlocks.FRAMED_GLASS_DOOR);
+        register(
+            DOOR,
+            AllBlocks.ANDESITE_DOOR,
+            AllBlocks.BRASS_DOOR,
+            AllBlocks.COPPER_DOOR,
+            AllBlocks.TRAIN_DOOR,
+            AllBlocks.FRAMED_GLASS_DOOR
+        );
         register(DOOR, BlockTags.WOODEN_DOORS);
         register(
             SEAT,

@@ -84,7 +84,12 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     }
 
     @Override
-    public void submit(SchematicannonRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SchematicannonRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.blocks != null) {
             for (LaunchedRenderState block : state.blocks) {
                 block.render(matrices, queue, state.lightCoords);
@@ -96,7 +101,12 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     }
 
     @Nullable
-    public List<LaunchedRenderState> getFlyBlocksRenderState(SchematicannonBlockEntity be, Level world, BlockPos pos, float partialTicks) {
+    public List<LaunchedRenderState> getFlyBlocksRenderState(
+        SchematicannonBlockEntity be,
+        Level world,
+        BlockPos pos,
+        float partialTicks
+    ) {
         List<LaunchedRenderState> blocks = new ArrayList<>();
         Vec3 position = Vec3.atCenterOf(pos.above());
         for (LaunchedItem launched : be.flyingBlocks) {
@@ -166,7 +176,8 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
             Vec3 diff = Vec3.atLowerCornerOf(target.subtract(pos));
             if (blockEntity.previousTarget != null) {
                 diff = (Vec3.atLowerCornerOf(blockEntity.previousTarget)
-                    .add(Vec3.atLowerCornerOf(target.subtract(blockEntity.previousTarget)).scale(partialTicks))).subtract(Vec3.atLowerCornerOf(pos));
+                    .add(Vec3.atLowerCornerOf(target.subtract(blockEntity.previousTarget))
+                        .scale(partialTicks))).subtract(Vec3.atLowerCornerOf(pos));
             }
 
             double diffX = diff.x();
@@ -192,12 +203,14 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
 
         for (LaunchedItem launched : blockEntity.flyingBlocks) {
 
-            if (launched.ticksRemaining == 0)
+            if (launched.ticksRemaining == 0) {
                 continue;
+            }
 
             // Apply Recoil if block was just launched
-            if ((launched.ticksRemaining + 1 - partialTicks) > launched.totalTicks - 10)
+            if ((launched.ticksRemaining + 1 - partialTicks) > launched.totalTicks - 10) {
                 recoil = Math.max(recoil, (launched.ticksRemaining + 1 - partialTicks) - launched.totalTicks + 10);
+            }
         }
 
         return recoil;
@@ -231,8 +244,9 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             connector.translate(0.5f, 0, 0.5f).rotate(yaw, Direction.UP).translate(-0.5f, 0, -0.5f).light(light)
                 .renderInto(matricesEntry, vertexConsumer);
-            pipe.translate(0.5f, 0.9375f, 0.5f).rotate(yaw, Direction.UP).rotate(pitch, Direction.SOUTH).translate(-0.5f, -0.9375f, -0.5f)
-                .translate(0, offset, 0).light(light).renderInto(matricesEntry, vertexConsumer);
+            pipe.translate(0.5f, 0.9375f, 0.5f).rotate(yaw, Direction.UP).rotate(pitch, Direction.SOUTH)
+                .translate(-0.5f, -0.9375f, -0.5f).translate(0, offset, 0).light(light)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 

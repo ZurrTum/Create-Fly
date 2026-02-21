@@ -17,7 +17,13 @@ public class CreativeCrateBlock extends CrateBlock implements IBE<CreativeCrateB
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, CreativeCrateBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        CreativeCrateBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.inv;
     }
 

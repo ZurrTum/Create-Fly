@@ -26,19 +26,29 @@ public class SmartChuteBlock extends AbstractChuteBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation wireOrientation, boolean isMoving) {
+    public void neighborChanged(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Block block,
+        @Nullable Orientation wireOrientation,
+        boolean isMoving
+    ) {
         super.neighborChanged(state, level, pos, block, wireOrientation, isMoving);
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (!level.getBlockTicks().willTickThisTick(pos, this))
+        }
+        if (!level.getBlockTicks().willTickThisTick(pos, this)) {
             level.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource r) {
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
             worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
+        }
     }
 
     @Override

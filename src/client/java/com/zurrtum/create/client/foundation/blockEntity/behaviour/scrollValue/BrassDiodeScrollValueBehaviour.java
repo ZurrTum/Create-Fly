@@ -39,10 +39,12 @@ public class BrassDiodeScrollValueBehaviour extends ScrollValueBehaviour<SmartBl
     }
 
     private static String format(int value) {
-        if (value < 60)
+        if (value < 60) {
             return value + "t";
-        if (value < 20 * 60)
+        }
+        if (value < 20 * 60) {
             return (value / 20) + "s";
+        }
         return (value / 20 / 60) + "m";
     }
 }

@@ -2,6 +2,7 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.AllSpecialTextures;
@@ -16,7 +17,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -43,17 +43,20 @@ import java.util.List;
 public class FilteringRenderer {
     public static void tick(Minecraft mc) {
         HitResult target = mc.hitResult;
-        if (!(target instanceof BlockHitResult result))
+        if (!(target instanceof BlockHitResult result)) {
             return;
+        }
 
         ClientLevel world = mc.level;
         BlockPos pos = result.getBlockPos();
         BlockState state = world.getBlockState(pos);
 
-        if (mc.player.isShiftKeyDown())
+        if (mc.player.isShiftKeyDown()) {
             return;
-        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity sbe))
+        }
+        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity sbe)) {
             return;
+        }
 
         ItemStack mainhandItem = mc.player.getItemInHand(InteractionHand.MAIN_HAND);
 
@@ -72,20 +75,29 @@ public class FilteringRenderer {
         }
 
         for (FilteringBehaviour<?> behaviour : behaviours) {
-            if (!behaviour.isActive())
+            if (!behaviour.isActive()) {
                 continue;
-            if (behaviour.slotPositioning instanceof ValueBoxTransform.Sided)
+            }
+            if (behaviour.slotPositioning instanceof ValueBoxTransform.Sided) {
                 ((Sided) behaviour.slotPositioning).fromSide(result.getDirection());
-            if (!behaviour.slotPositioning.shouldRender(state))
+            }
+            if (!behaviour.slotPositioning.shouldRender(state)) {
                 continue;
-            if (!behaviour.mayInteract(mc.player))
+            }
+            if (!behaviour.mayInteract(mc.player)) {
                 continue;
+            }
 
             ItemStack filter = behaviour.getFilter();
             boolean isFilterSlotted = filter.getItem() instanceof FilterItem;
             boolean showCount = behaviour.isCountVisible();
             Component label = behaviour.getLabel();
-            boolean hit = behaviour.slotPositioning.testHit(world, pos, state, target.getLocation().subtract(Vec3.atLowerCornerOf(pos)));
+            boolean hit = behaviour.slotPositioning.testHit(
+                world,
+                pos,
+                state,
+                target.getLocation().subtract(Vec3.atLowerCornerOf(pos))
+            );
 
             AABB emptyBB = new AABB(Vec3.ZERO, Vec3.ZERO);
             AABB bb = isFilterSlotted ? emptyBB.inflate(.45f, .31f, .2f) : emptyBB.inflate(.25f);
@@ -93,17 +105,21 @@ public class FilteringRenderer {
             ValueBox box = new ItemValueBox(label, bb, pos, filter, behaviour.getCountLabelForValueBox());
             box.passive(!hit || behaviour.bypassesInput(mainhandItem));
 
-            Outliner.getInstance().showOutline(Pair.of("filter" + behaviour.netId(), pos), box.transform(behaviour.slotPositioning))
-                .lineWidth(1 / 64f).withFaceTexture(hit ? AllSpecialTextures.THIN_CHECKERED : null).highlightFace(result.getDirection());
+            Outliner.getInstance()
+                .showOutline(Pair.of("filter" + behaviour.netId(), pos), box.transform(behaviour.slotPositioning))
+                .lineWidth(1 / 64f).withFaceTexture(hit ? AllSpecialTextures.THIN_CHECKERED : null)
+                .highlightFace(result.getDirection());
 
-            if (!hit)
+            if (!hit) {
                 continue;
+            }
 
             List<MutableComponent> tip = new ArrayList<>();
             tip.add(label.copy());
             tip.add(behaviour.getTip());
-            if (showCount)
+            if (showCount) {
                 tip.add(behaviour.getAmountTip());
+            }
 
             Create.VALUE_SETTINGS_HANDLER.showHoverTip(mc, tip);
         }
@@ -135,7 +151,12 @@ public class FilteringRenderer {
                             if (list == null) {
                                 list = new ArrayList<>(4);
                             }
-                            list.add(SingleFilterRenderState.create(slotPositioning, itemModelManager, filter, be.getLevel()));
+                            list.add(SingleFilterRenderState.create(
+                                slotPositioning,
+                                itemModelManager,
+                                filter,
+                                be.getLevel()
+                            ));
                         }
                     }
                     if (++count == 4) {
@@ -149,7 +170,10 @@ public class FilteringRenderer {
         if (behaviour == null) {
             return null;
         }
-        if (!be.isVirtual() && (behaviour.behaviour == null || !behaviour.isActive() || isOutOfRange(behaviour, distance))) {
+        if (!be.isVirtual() && (behaviour.behaviour == null || !behaviour.isActive() || isOutOfRange(
+            behaviour,
+            distance
+        ))) {
             return null;
         }
         if (behaviour instanceof SidedFilteringBehaviour sidedFilteringBehaviour) {
@@ -187,7 +211,8 @@ public class FilteringRenderer {
         }
     }
 
-    public record SingleFilterRenderState(ValueBoxTransform slotPositioning, ItemStackRenderState state, float offset) implements FilterRenderState {
+    public record SingleFilterRenderState(ValueBoxTransform slotPositioning, ItemStackRenderState state,
+                                          float offset) implements FilterRenderState {
         public static SingleFilterRenderState create(
             ValueBoxTransform slotPositioning,
             ItemModelResolver itemModelManager,
@@ -197,7 +222,11 @@ public class FilteringRenderer {
             ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.FIXED;
             itemModelManager.appendItemLayers(renderState, stack, ItemDisplayContext.FIXED, world, null, 0);
-            return new SingleFilterRenderState(slotPositioning, renderState, ValueBoxRenderer.customZOffset(stack.getItem()));
+            return new SingleFilterRenderState(
+                slotPositioning,
+                renderState,
+                ValueBoxRenderer.customZOffset(stack.getItem())
+            );
         }
 
         @Override
@@ -209,9 +238,8 @@ public class FilteringRenderer {
         }
     }
 
-    public record SidedSingleFilterRenderState(
-        Sided sided, Direction side, ItemStackRenderState state, Float offset, List<Direction> sides
-    ) implements FilterRenderState {
+    public record SidedSingleFilterRenderState(Sided sided, Direction side, ItemStackRenderState state, Float offset,
+                                               List<Direction> sides) implements FilterRenderState {
         public static SidedSingleFilterRenderState create(
             Sided sided,
             BlockState blockState,
@@ -259,9 +287,8 @@ public class FilteringRenderer {
         }
     }
 
-    public record SidedFilterRenderState(
-        Sided slotPositioning, Direction side, List<BoxRenderState> boxes
-    ) implements FilterRenderState {
+    public record SidedFilterRenderState(Sided slotPositioning, Direction side,
+                                         List<BoxRenderState> boxes) implements FilterRenderState {
         @Nullable
         public static FilterRenderState create(
             SidedFilteringBehaviour behaviour,
@@ -275,11 +302,13 @@ public class FilteringRenderer {
             Direction side = sided.getSide();
             for (Direction direction : Iterate.directions) {
                 ItemStack filter = behaviour.getFilter(direction);
-                if (filter.isEmpty())
+                if (filter.isEmpty()) {
                     continue;
+                }
                 sided.fromSide(direction);
-                if (!sided.shouldRender(blockState))
+                if (!sided.shouldRender(blockState)) {
                     continue;
+                }
                 ItemStackRenderState renderState = new ItemStackRenderState();
                 if (flat) {
                     renderState.displayContext = ItemDisplayContext.GUI;

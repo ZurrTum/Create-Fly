@@ -10,8 +10,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record ContraptionRelocationPacket(int entityId) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, ContraptionRelocationPacket> CODEC = ByteBufCodecs.INT.map(
-        ContraptionRelocationPacket::new,
+    public static final StreamCodec<ByteBuf, ContraptionRelocationPacket> CODEC = ByteBufCodecs.INT.map(ContraptionRelocationPacket::new,
         ContraptionRelocationPacket::entityId
     );
 

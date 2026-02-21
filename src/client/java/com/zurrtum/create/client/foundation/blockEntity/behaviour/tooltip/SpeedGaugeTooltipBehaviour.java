@@ -6,11 +6,10 @@ import com.zurrtum.create.client.foundation.item.TooltipHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.content.kinetics.gauge.SpeedGaugeBlockEntity;
-
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+
+import java.util.List;
 
 public class SpeedGaugeTooltipBehaviour extends GaugeTooltipBehaviour<SpeedGaugeBlockEntity> {
     public SpeedGaugeTooltipBehaviour(SpeedGaugeBlockEntity be) {
@@ -29,13 +28,14 @@ public class SpeedGaugeTooltipBehaviour extends GaugeTooltipBehaviour<SpeedGauge
         SpeedLevel speedLevel = SpeedLevel.of(speed);
         LangBuilder builder = CreateLang.text(TooltipHelper.makeProgressBar(3, speedLevel.ordinal()));
 
-        builder.translate("tooltip.speedRequirement." + Lang.asId(speedLevel.name())).space().text("(").add(CreateLang.number(Math.abs(speed)))
-            .space().translate("generic.unit.rpm").text(")").space();
+        builder.translate("tooltip.speedRequirement." + Lang.asId(speedLevel.name())).space().text("(")
+            .add(CreateLang.number(Math.abs(speed))).space().translate("generic.unit.rpm").text(")").space();
 
-        if (overstressed)
+        if (overstressed) {
             builder.style(ChatFormatting.DARK_GRAY).style(ChatFormatting.STRIKETHROUGH);
-        else
+        } else {
             builder.style(speedLevel.getTextColor());
+        }
 
         return builder;
     }

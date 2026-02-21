@@ -28,8 +28,9 @@ public class TreeFertilizerItem extends Item {
         Block block = state.getBlock();
         if (block instanceof BonemealableBlock bonemealableBlock && state.is(BlockTags.SAPLINGS)) {
 
-            if (state.getValueOrElse(BlockStateProperties.HANGING, false))
+            if (state.getValueOrElse(BlockStateProperties.HANGING, false)) {
                 return InteractionResult.PASS;
+            }
 
             if (world.isClientSide()) {
                 BoneMealItem.addGrowthParticles(world, context.getClickedPos(), 100);
@@ -40,30 +41,39 @@ public class TreeFertilizerItem extends Item {
             TreesDreamWorld treesDreamWorld = new TreesDreamWorld((ServerLevel) world, saplingPos);
 
             for (BlockPos pos : BlockPos.betweenClosed(-1, 0, -1, 1, 0, 1)) {
-                if (world.getBlockState(saplingPos.offset(pos)).getBlock() == block)
+                if (world.getBlockState(saplingPos.offset(pos)).getBlock() == block) {
                     treesDreamWorld.setBlockAndUpdate(pos.above(10), withStage(state, 1));
+                }
             }
 
-            bonemealableBlock.performBonemeal(treesDreamWorld, treesDreamWorld.getRandom(), BlockPos.ZERO.above(10), withStage(state, 1));
+            bonemealableBlock.performBonemeal(
+                treesDreamWorld,
+                treesDreamWorld.getRandom(),
+                BlockPos.ZERO.above(10),
+                withStage(state, 1)
+            );
 
             for (BlockPos pos : treesDreamWorld.blocksAdded.keySet()) {
                 BlockPos actualPos = pos.offset(saplingPos).below(10);
                 BlockState newState = treesDreamWorld.blocksAdded.get(pos);
 
                 // Don't replace Bedrock
-                if (world.getBlockState(actualPos).getDestroySpeed(world, actualPos) == -1)
+                if (world.getBlockState(actualPos).getDestroySpeed(world, actualPos) == -1) {
                     continue;
+                }
                 // Don't replace solid blocks with leaves
-                if (!newState.isRedstoneConductor(treesDreamWorld, pos) && !world.getBlockState(actualPos).getCollisionShape(world, actualPos)
-                    .isEmpty())
+                if (!newState.isRedstoneConductor(treesDreamWorld, pos) && !world.getBlockState(actualPos)
+                    .getCollisionShape(world, actualPos).isEmpty()) {
                     continue;
+                }
 
                 world.destroyBlock(actualPos, true);
                 world.setBlockAndUpdate(actualPos, newState);
             }
 
-            if (context.getPlayer() != null && !context.getPlayer().isCreative())
+            if (context.getPlayer() != null && !context.getPlayer().isCreative()) {
                 context.getItemInHand().shrink(1);
+            }
             return InteractionResult.SUCCESS;
 
         }
@@ -72,8 +82,9 @@ public class TreeFertilizerItem extends Item {
     }
 
     private BlockState withStage(BlockState original, int stage) {
-        if (!original.hasProperty(BlockStateProperties.STAGE))
+        if (!original.hasProperty(BlockStateProperties.STAGE)) {
             return original;
+        }
         return original.setValue(BlockStateProperties.STAGE, stage);
     }
 
@@ -85,23 +96,26 @@ public class TreeFertilizerItem extends Item {
             BlockState stateUnderSapling = wrapped.getBlockState(saplingPos.below());
 
             // Tree features don't seem to succeed with mud as soil
-            if (stateUnderSapling.is(BlockTags.DIRT))
+            if (stateUnderSapling.is(BlockTags.DIRT)) {
                 stateUnderSapling = Blocks.DIRT.defaultBlockState();
+            }
 
             soil = stateUnderSapling;
         }
 
         @Override
         public BlockState getBlockState(BlockPos pos) {
-            if (pos.getY() <= 9)
+            if (pos.getY() <= 9) {
                 return soil;
+            }
             return super.getBlockState(pos);
         }
 
         @Override
         public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
-            if (newState.getBlock() == Blocks.PODZOL)
+            if (newState.getBlock() == Blocks.PODZOL) {
                 return true;
+            }
             return super.setBlock(pos, newState, flags);
         }
     }

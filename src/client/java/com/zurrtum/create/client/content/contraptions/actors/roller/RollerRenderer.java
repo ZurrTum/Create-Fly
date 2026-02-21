@@ -56,7 +56,12 @@ public class RollerRenderer extends SmartBlockEntityRenderer<RollerBlockEntity, 
     }
 
     @Override
-    public void submit(RollerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        RollerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
@@ -73,8 +78,8 @@ public class RollerRenderer extends SmartBlockEntityRenderer<RollerBlockEntity, 
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            wheel.translate(offset).rotateCentered(wheelAngle, Direction.UP).rotate(rotate, Direction.WEST).translate(0, -.5, .5).rotateY(yRot)
-                .light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            wheel.translate(offset).rotateCentered(wheelAngle, Direction.UP).rotate(rotate, Direction.WEST)
+                .translate(0, -.5, .5).rotateY(yRot).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
             frame.rotateCentered(frameAngle, Direction.UP).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
         }
     }

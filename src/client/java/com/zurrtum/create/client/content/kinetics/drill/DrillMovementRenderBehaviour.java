@@ -33,7 +33,11 @@ import org.joml.Matrix4f;
 public class DrillMovementRenderBehaviour implements MovementRenderBehaviour {
     @Nullable
     @Override
-    public ActorVisual createVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public ActorVisual createVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         return new DrillActorVisual(visualizationContext, simulationWorld, movementContext);
     }
 
@@ -89,8 +93,8 @@ public class DrillMovementRenderBehaviour implements MovementRenderBehaviour {
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            head.center().rotateY(yRot).rotateX(xRot).rotateZ(zRot).uncenter().light(light).useLevelLight(world, worldMatrix4f)
-                .renderInto(matricesEntry, vertexConsumer);
+            head.center().rotateY(yRot).rotateX(xRot).rotateZ(zRot).uncenter().light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

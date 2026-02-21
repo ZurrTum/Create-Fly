@@ -4,15 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.outliner.LineOutline.EndChasingLineOutline;
 import com.zurrtum.create.client.catnip.outliner.Outline.OutlineParams;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
-
-import java.util.*;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class Outliner {
 
@@ -98,8 +97,9 @@ public class Outliner {
     }
 
     public void keep(Object slot) {
-        if (outlines.containsKey(slot))
+        if (outlines.containsKey(slot)) {
             outlines.get(slot).ticksTillRemoval = 1;
+        }
     }
 
     public void remove(Object slot) {
@@ -108,8 +108,9 @@ public class Outliner {
 
     public Optional<OutlineParams> edit(Object slot) {
         keep(slot);
-        if (outlines.containsKey(slot))
+        if (outlines.containsKey(slot)) {
             return Optional.of(outlines.get(slot).getOutline().getParams());
+        }
         return Optional.empty();
     }
 
@@ -147,8 +148,9 @@ public class Outliner {
         while (iterator.hasNext()) {
             OutlineEntry entry = iterator.next();
             entry.tick();
-            if (!entry.isAlive())
+            if (!entry.isAlive()) {
                 iterator.remove();
+            }
         }
     }
 
@@ -165,8 +167,9 @@ public class Outliner {
                 float alpha = Mth.lerp(pt, lastAlpha, currentAlpha);
 
                 params.alpha = alpha * alpha * alpha;
-                if (params.alpha < 1 / 8f)
+                if (params.alpha < 1 / 8f) {
                     return;
+                }
             }
             outline.render(mc, ms, buffer, camera, pt);
         });

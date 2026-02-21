@@ -1,10 +1,7 @@
 package com.zurrtum.create.client.infrastructure.model;
 
-import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
+import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -13,14 +10,26 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
+
 public class BracketedKineticBlockModel extends WrapperBlockStateModel {
     public BracketedKineticBlockModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked);
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
-        BracketedBlockEntityBehaviour attachmentBehaviour = BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE);
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
+        BracketedBlockEntityBehaviour attachmentBehaviour = BlockEntityBehaviour.get(
+            world,
+            pos,
+            BracketedBlockEntityBehaviour.TYPE
+        );
         if (attachmentBehaviour == null) {
             return;
         }

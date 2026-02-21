@@ -13,7 +13,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BlockEntityRenderDispatcher.class)
 public class BlockEntityRenderDispatcherMixin {
     @Inject(method = "onResourceManagerReload(Lnet/minecraft/server/packs/resources/ResourceManager;)V", at = @At("TAIL"))
-    private void onReload(ResourceManager resourceManager, CallbackInfo ci, @Local BlockEntityRendererProvider.Context context) {
+    private void onReload(
+        ResourceManager resourceManager,
+        CallbackInfo ci,
+        @Local BlockEntityRendererProvider.Context context
+    ) {
         VanillaVisuals.onReloadModel(context.entityModelSet());
     }
 }

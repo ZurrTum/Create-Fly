@@ -5,6 +5,7 @@ import com.zurrtum.create.client.flywheel.backend.glsl.SourceLines;
 import com.zurrtum.create.client.flywheel.backend.glsl.error.lines.*;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.Span;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
@@ -12,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import net.minecraft.resources.Identifier;
 
 public class ErrorBuilder {
     // set to false for testing
@@ -100,7 +99,13 @@ public class ErrorBuilder {
     }
 
     public ErrorBuilder pointAtLine(SourceLines lines, int spanLine, int ctxLines) {
-        return this.pointAtLine(lines, spanLine, ctxLines, lines.lineStartColTrimmed(spanLine), lines.lineWidth(spanLine));
+        return this.pointAtLine(
+            lines,
+            spanLine,
+            ctxLines,
+            lines.lineStartColTrimmed(spanLine),
+            lines.lineWidth(spanLine)
+        );
     }
 
     public ErrorBuilder pointAtLine(SourceLines lines, int spanLine, int ctxLines, int firstCol, int lastCol) {

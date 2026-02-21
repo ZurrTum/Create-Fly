@@ -16,7 +16,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl$WaterRenderHandler")
 public class WaterRenderHandlerMixin {
     @Inject(method = "getFluidSprites(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/material/FluidState;)[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", at = @At("HEAD"), cancellable = true)
-    private void getSprites(BlockAndTintGetter view, BlockPos pos, FluidState state, CallbackInfoReturnable<TextureAtlasSprite[]> cir) {
+    private void getSprites(
+        BlockAndTintGetter view,
+        BlockPos pos,
+        FluidState state,
+        CallbackInfoReturnable<TextureAtlasSprite[]> cir
+    ) {
         if (state.getType() instanceof FlowableFluid fluid) {
             FluidConfig config = AllFluidConfigs.get(fluid);
             if (config != null) {

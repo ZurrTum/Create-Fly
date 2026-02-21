@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -91,8 +90,9 @@ public class SchematicItem extends Item {
         StructurePlaceSettings settings = new StructurePlaceSettings();
         settings.setRotation(blueprint.getOrDefault(AllDataComponents.SCHEMATIC_ROTATION, Rotation.NONE));
         settings.setMirror(blueprint.getOrDefault(AllDataComponents.SCHEMATIC_MIRROR, Mirror.NONE));
-        if (processNBT)
+        if (processNBT) {
             settings.addProcessor(SchematicProcessor.INSTANCE);
+        }
         return settings;
     }
 
@@ -101,8 +101,9 @@ public class SchematicItem extends Item {
         String owner = blueprint.get(AllDataComponents.SCHEMATIC_OWNER);
         String schematic = blueprint.get(AllDataComponents.SCHEMATIC_FILE);
 
-        if (owner == null || schematic == null || !schematic.endsWith(".nbt"))
+        if (owner == null || schematic == null || !schematic.endsWith(".nbt")) {
             return t;
+        }
 
         Path dir;
         Path file;
@@ -116,11 +117,11 @@ public class SchematicItem extends Item {
         }
 
         Path path = dir.resolve(file).normalize();
-        if (!path.startsWith(dir))
+        if (!path.startsWith(dir)) {
             return t;
+        }
 
-        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(new GZIPInputStream(Files.newInputStream(
-            path,
+        try (DataInputStream stream = new DataInputStream(new BufferedInputStream(new GZIPInputStream(Files.newInputStream(path,
             StandardOpenOption.READ
         ))))) {
             CompoundTag nbt = NbtIo.read(stream, NbtAccounter.create(0x20000000L));
@@ -134,25 +135,30 @@ public class SchematicItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getPlayer() != null && !onItemUse(context.getPlayer(), context.getHand()))
+        if (context.getPlayer() != null && !onItemUse(context.getPlayer(), context.getHand())) {
             return super.useOn(context);
+        }
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
-        if (!onItemUse(playerIn, handIn))
+        if (!onItemUse(playerIn, handIn)) {
             return super.use(worldIn, playerIn, handIn);
+        }
         return InteractionResult.SUCCESS;
     }
 
     private boolean onItemUse(Player player, InteractionHand hand) {
-        if (!player.isShiftKeyDown() || hand != InteractionHand.MAIN_HAND)
+        if (!player.isShiftKeyDown() || hand != InteractionHand.MAIN_HAND) {
             return false;
-        if (!player.getItemInHand(hand).has(AllDataComponents.SCHEMATIC_FILE))
+        }
+        if (!player.getItemInHand(hand).has(AllDataComponents.SCHEMATIC_FILE)) {
             return false;
-        if (!player.level().isClientSide())
+        }
+        if (!player.level().isClientSide()) {
             return true;
+        }
         AllClientHandle.INSTANCE.openSchematicEditScreen();
         return true;
     }

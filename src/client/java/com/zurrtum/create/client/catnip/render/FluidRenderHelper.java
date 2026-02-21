@@ -86,18 +86,55 @@ public class FluidRenderHelper {
 
         PoseStack.Pose entry = ms.last();
         for (Direction side : Iterate.directions) {
-            if (side == Direction.DOWN && !renderBottom)
+            if (side == Direction.DOWN && !renderBottom) {
                 continue;
+            }
 
             boolean positive = side.getAxisDirection() == Direction.AxisDirection.POSITIVE;
             if (side.getAxis().isHorizontal()) {
                 if (side.getAxis() == Direction.Axis.X) {
-                    renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, entry, light, color, fluidTexture);
+                    renderStillTiledFace(
+                        side,
+                        zMin,
+                        yMin,
+                        zMax,
+                        yMax,
+                        positive ? xMax : xMin,
+                        builder,
+                        entry,
+                        light,
+                        color,
+                        fluidTexture
+                    );
                 } else {
-                    renderStillTiledFace(side, xMin, yMin, xMax, yMax, positive ? zMax : zMin, builder, entry, light, color, fluidTexture);
+                    renderStillTiledFace(
+                        side,
+                        xMin,
+                        yMin,
+                        xMax,
+                        yMax,
+                        positive ? zMax : zMin,
+                        builder,
+                        entry,
+                        light,
+                        color,
+                        fluidTexture
+                    );
                 }
             } else {
-                renderStillTiledFace(side, xMin, zMin, xMax, zMax, positive ? yMax : yMin, builder, entry, light, color, fluidTexture);
+                renderStillTiledFace(
+                    side,
+                    xMin,
+                    zMin,
+                    xMax,
+                    zMax,
+                    positive ? yMax : yMin,
+                    builder,
+                    entry,
+                    light,
+                    color,
+                    fluidTexture
+                );
             }
         }
 
@@ -139,18 +176,55 @@ public class FluidRenderHelper {
         }
 
         for (Direction side : Iterate.directions) {
-            if (side == Direction.DOWN && !renderBottom)
+            if (side == Direction.DOWN && !renderBottom) {
                 continue;
+            }
 
             boolean positive = side.getAxisDirection() == Direction.AxisDirection.POSITIVE;
             if (side.getAxis().isHorizontal()) {
                 if (side.getAxis() == Direction.Axis.X) {
-                    renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, entry, light, color, fluidTexture);
+                    renderStillTiledFace(
+                        side,
+                        zMin,
+                        yMin,
+                        zMax,
+                        yMax,
+                        positive ? xMax : xMin,
+                        builder,
+                        entry,
+                        light,
+                        color,
+                        fluidTexture
+                    );
                 } else {
-                    renderStillTiledFace(side, xMin, yMin, xMax, yMax, positive ? zMax : zMin, builder, entry, light, color, fluidTexture);
+                    renderStillTiledFace(
+                        side,
+                        xMin,
+                        yMin,
+                        xMax,
+                        yMax,
+                        positive ? zMax : zMin,
+                        builder,
+                        entry,
+                        light,
+                        color,
+                        fluidTexture
+                    );
                 }
             } else {
-                renderStillTiledFace(side, xMin, zMin, xMax, zMax, positive ? yMax : yMin, builder, entry, light, color, fluidTexture);
+                renderStillTiledFace(
+                    side,
+                    xMin,
+                    zMin,
+                    xMax,
+                    zMax,
+                    positive ? yMax : yMin,
+                    builder,
+                    entry,
+                    light,
+                    color,
+                    fluidTexture
+                );
             }
         }
     }

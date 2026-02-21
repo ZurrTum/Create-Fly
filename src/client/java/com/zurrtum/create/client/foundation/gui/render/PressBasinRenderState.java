@@ -5,7 +5,8 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record PressBasinRenderState(Matrix3x2f pose, int x0, int y0, ScreenRectangle bounds) implements PictureInPictureRenderState {
+public record PressBasinRenderState(Matrix3x2f pose, int x0, int y0,
+                                    ScreenRectangle bounds) implements PictureInPictureRenderState {
     public PressBasinRenderState(Matrix3x2f pose, int x, int y) {
         this(pose, x, y, new ScreenRectangle(x, y, 30, 80).transformMaxBounds(pose));
     }

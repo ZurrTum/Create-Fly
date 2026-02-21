@@ -22,22 +22,28 @@ public class DrillActorVisual extends ActorVisual {
     private double rotation;
     private double previousRotation;
 
-    public DrillActorVisual(VisualizationContext visualizationContext, VirtualRenderWorld contraption, MovementContext context) {
+    public DrillActorVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld contraption,
+        MovementContext context
+    ) {
         super(visualizationContext, contraption, context);
 
         BlockState state = context.state;
 
         facing = state.getValue(DrillBlock.FACING);
 
-        drillHead = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.DRILL_HEAD)).createInstance();
+        drillHead = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.DRILL_HEAD))
+            .createInstance();
     }
 
     @Override
     public void tick() {
         previousRotation = rotation;
 
-        if (context.disabled || VecHelper.isVecPointingTowards(context.relativeMotion, facing.getOpposite()))
+        if (context.disabled || VecHelper.isVecPointingTowards(context.relativeMotion, facing.getOpposite())) {
             return;
+        }
 
         float deg = context.getAnimationSpeed();
 
@@ -48,8 +54,8 @@ public class DrillActorVisual extends ActorVisual {
 
     @Override
     public void beginFrame() {
-        drillHead.setIdentityTransform().translate(context.localPos).center().rotateToFace(facing.getOpposite()).rotateZDegrees((float) getRotation())
-            .uncenter().setChanged();
+        drillHead.setIdentityTransform().translate(context.localPos).center().rotateToFace(facing.getOpposite())
+            .rotateZDegrees((float) getRotation()).uncenter().setChanged();
     }
 
     protected double getRotation() {

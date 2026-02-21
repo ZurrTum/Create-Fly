@@ -1,10 +1,6 @@
 package com.zurrtum.create.catnip.codecs.stream;
 
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -24,6 +20,9 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 public interface CatnipStreamCodecs {
     StreamCodec<FriendlyByteBuf, Character> CHAR = new StreamCodec<>() {
@@ -37,7 +36,10 @@ public interface CatnipStreamCodecs {
     };
     StreamCodec<RegistryFriendlyByteBuf, Holder<Fluid>> HOLDER_FLUID = ByteBufCodecs.holderRegistry(Registries.FLUID);
     StreamCodec<RegistryFriendlyByteBuf, Fluid> FLUID = ByteBufCodecs.registry(Registries.FLUID);
-    StreamCodec<ByteBuf, Tag> COMPOUND_AS_TAG = ByteBufCodecs.COMPOUND_TAG.map(Function.identity(), tag -> (CompoundTag) tag);
+    StreamCodec<ByteBuf, Tag> COMPOUND_AS_TAG = ByteBufCodecs.COMPOUND_TAG.map(
+        Function.identity(),
+        tag -> (CompoundTag) tag
+    );
     StreamCodec<FriendlyByteBuf, ListTag> COMPOUND_LIST_TAG = new StreamCodec<>() {
         @Override
         public @NotNull ListTag decode(FriendlyByteBuf buffer) {
@@ -71,11 +73,10 @@ public interface CatnipStreamCodecs {
         BlockHitResult::getBlockPos,
         ByteBufCodecs.BOOL,
         BlockHitResult::isInside,
-        (miss, location, direction, blockPos, isInside) -> miss ? BlockHitResult.miss(location, direction, blockPos) : new BlockHitResult(
+        (miss, location, direction, blockPos, isInside) -> miss ? BlockHitResult.miss(
             location,
             direction,
-            blockPos,
-            isInside
-        )
+            blockPos
+        ) : new BlockHitResult(location, direction, blockPos, isInside)
     );
 }

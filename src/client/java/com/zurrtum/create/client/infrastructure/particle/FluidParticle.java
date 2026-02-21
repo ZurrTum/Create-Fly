@@ -98,14 +98,18 @@ public class FluidParticle extends SingleQuadParticle {
     @Override
     public void tick() {
         super.tick();
-        if (!canEvaporate())
+        if (!canEvaporate()) {
             return;
-        if (onGround)
+        }
+        if (onGround) {
             remove();
-        if (!removed)
+        }
+        if (!removed) {
             return;
-        if (!onGround && random.nextFloat() < 1 / 8f)
+        }
+        if (!onGround && random.nextFloat() < 1 / 8f) {
             return;
+        }
 
         Color color = new Color(config.tint().apply(components));
         level.addParticle(

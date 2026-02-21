@@ -13,8 +13,9 @@ public class DepotItemHandler implements ItemInventory {
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (slot != 0)
+        if (slot != 0) {
             return false;
+        }
         if (!behaviour.isItemValid(stack) || !behaviour.canAcceptItems.get()) {
             return false;
         }

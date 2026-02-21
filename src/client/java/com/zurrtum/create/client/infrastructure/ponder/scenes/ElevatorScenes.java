@@ -59,11 +59,13 @@ public class ElevatorScenes {
         scene.world().moveSection(camLink, util.vector().of(0, -12, 0), 0);
         scene.world().setKineticSpeed(util.select().position(pulleyPos), 0);
         scene.idle(5);
-        ElementLink<WorldSectionElement> pulleyLink = scene.world().showIndependentSection(util.select().position(pulleyPos), Direction.DOWN);
+        ElementLink<WorldSectionElement> pulleyLink = scene.world()
+            .showIndependentSection(util.select().position(pulleyPos), Direction.DOWN);
         scene.world().moveSection(pulleyLink, util.vector().of(0, -16, 0), 0);
         scene.idle(15);
 
-        scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 2, 2), Direction.WEST))
+        scene.overlay().showText(60).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 2, 2), Direction.WEST))
             .text("Elevator Pulleys can move structures vertically between marked locations");
         scene.idle(60);
         scene.world().moveSection(pulleyLink, util.vector().of(0, 4, 0), 20);
@@ -84,7 +86,8 @@ public class ElevatorScenes {
         scene.idle(10);
         scene.world().showSectionAndMerge(util.select().fromTo(4, 17, 1, 2, 17, 3), Direction.DOWN, elevatorLink);
 
-        scene.overlay().showText(40).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(2, 2, 1), Direction.UP))
+        scene.overlay().showText(40).placeNearTarget().attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 1), Direction.UP))
             .text("Start by constructing a cabin");
         scene.idle(30);
 
@@ -95,29 +98,33 @@ public class ElevatorScenes {
         scene.world().toggleRedstonePower(util.select().fromTo(2, 14, 2, 1, 13, 2));
         scene.idle(15);
 
-        scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(1, 2, 1), Direction.UP))
+        scene.overlay().showText(60).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 1), Direction.UP))
             .text("Place a pair of Redstone Contacts facing each other...");
         scene.idle(55);
 
         AABB glue1 = new AABB(util.grid().at(3, 4, 2));
         AABB glue2 = glue1.inflate(1, 0, 1).expandTowards(0, -4, 0);
 
-        scene.overlay().showControls(util.vector().centerOf(4, 3, 1), Pointing.RIGHT, 60).withItem(AllItems.SUPER_GLUE.getDefaultInstance());
+        scene.overlay().showControls(util.vector().centerOf(4, 3, 1), Pointing.RIGHT, 60)
+            .withItem(AllItems.SUPER_GLUE.getDefaultInstance());
         scene.idle(7);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue1, glue1, 5);
         scene.idle(1);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue1, glue2, 90);
         scene.idle(10);
 
-        scene.overlay().showOutlineWithText(util.select().position(2, 1, 2), 80).placeNearTarget().colored(PonderPalette.GREEN)
-            .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 1), Direction.UP)).text("...and glue one of them to your moving structure");
+        scene.overlay().showOutlineWithText(util.select().position(2, 1, 2), 80).placeNearTarget()
+            .colored(PonderPalette.GREEN).pointAt(util.vector().blockSurface(util.grid().at(1, 2, 1), Direction.UP))
+            .text("...and glue one of them to your moving structure");
         scene.idle(70);
 
         scene.world().showSectionAndMerge(controls, Direction.DOWN, elevatorLink);
         scene.idle(15);
         scene.effects().superGlue(util.grid().at(4, 1, 2), Direction.DOWN, true);
 
-        scene.overlay().showText(80).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(4, 1, 2), Direction.UP))
+        scene.overlay().showText(80).placeNearTarget().attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(4, 1, 2), Direction.UP))
             .text("Contraption Controls can be attached to make floor selection easier");
         scene.idle(70);
 
@@ -127,11 +134,14 @@ public class ElevatorScenes {
         scene.world().setKineticSpeed(util.select().position(pulleyPos), 64);
         scene.idle(5);
 
-        scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.WEST))
+        scene.overlay().showText(60).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.WEST))
             .text("Ensure that the pulley is supplied with Rotational Power");
         scene.idle(75);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60).rightClick();
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60)
+            .rightClick();
         scene.idle(7);
         scene.effects().indicateSuccess(util.grid().at(3, 6, 2));
         scene.world().toggleRedstonePower(util.select().position(1, 13, 2));
@@ -143,18 +153,22 @@ public class ElevatorScenes {
         );
         scene.world().movePulley(pulleyPos, 1, 0);
 
-        scene.overlay().showText(50).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.WEST))
+        scene.overlay().showText(50).placeNearTarget().attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.WEST))
             .text("Right-Clicking the pulley assembles the elevator");
         scene.idle(60);
 
-        scene.overlay().showText(70).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP))
+        scene.overlay().showText(70).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP))
             .text("The stationary contact now turns into an Elevator Contact");
         scene.idle(80);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP), Pointing.DOWN, 60).rightClick();
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP), Pointing.DOWN, 60)
+            .rightClick();
         scene.idle(7);
-        scene.overlay().showOutlineWithText(util.select().position(1, 1, 2), 60).placeNearTarget().colored(PonderPalette.BLUE)
-            .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP))
+        scene.overlay().showOutlineWithText(util.select().position(1, 1, 2), 60).placeNearTarget()
+            .colored(PonderPalette.BLUE).pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP))
             .text("Elevator Contacts represent a 'floor' and can be configured");
         scene.idle(75);
 
@@ -169,8 +183,11 @@ public class ElevatorScenes {
         scene.world().showSectionAndMerge(util.select().position(midContact), Direction.DOWN, camLink);
         scene.idle(10);
         scene.effects().indicateSuccess(util.grid().at(1, 2, 2));
-        scene.world()
-            .setBlock(midContact, AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST), false);
+        scene.world().setBlock(
+            midContact,
+            AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST),
+            false
+        );
         scene.idle(15);
 
         AABB bb = new AABB(util.grid().at(1, 8, 2));
@@ -179,7 +196,8 @@ public class ElevatorScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, bb, bb.expandTowards(0, -6, 0), 90);
         scene.idle(10);
 
-        scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.UP))
+        scene.overlay().showText(60).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.UP))
             .text("Any redstone contact sharing this column will be converted");
         scene.idle(50);
         scene.world().showSectionAndMerge(midInput, Direction.SOUTH, camLink);
@@ -195,7 +213,8 @@ public class ElevatorScenes {
         scene.world().toggleRedstonePower(midInput);
         scene.idle(10);
 
-        scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(1, 1, 0), Direction.UP))
+        scene.overlay().showText(60).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 0), Direction.UP))
             .text("Supply a redstone pulse to call the elevator to the contact");
 
         scene.idle(30);
@@ -210,13 +229,18 @@ public class ElevatorScenes {
         scene.addLazyKeyframe();
         scene.idle(10);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(4, 2, 2), Direction.UP), Pointing.DOWN, 60).scroll();
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(4, 2, 2), Direction.UP), Pointing.DOWN, 60)
+            .scroll();
         scene.idle(15);
-        scene.overlay().showText(90).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(4, 2, 2), Direction.UP))
+        scene.overlay().showText(90).placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(4, 2, 2), Direction.UP))
             .text("Scroll and click on the controls block to choose a floor while on-board");
         scene.idle(85);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(4, 2, 2), Direction.UP), Pointing.DOWN, 10).rightClick();
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(4, 2, 2), Direction.UP), Pointing.DOWN, 10)
+            .rightClick();
         scene.idle(7);
         scene.world().cycleBlockProperty(midContact, ElevatorContactBlock.POWERING);
         scene.world().cycleBlockProperty(topContact, ElevatorContactBlock.CALLING);
@@ -231,19 +255,24 @@ public class ElevatorScenes {
         scene.world().cycleBlockProperty(topContact, ElevatorContactBlock.CALLING);
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60).rightClick();
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60)
+            .rightClick();
         scene.idle(7);
         scene.effects().indicateSuccess(util.grid().at(3, 6, 2));
         scene.world().movePulley(pulleyPos, -1, 0);
 
-        scene.overlay().showText(80).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.WEST))
+        scene.overlay().showText(80).placeNearTarget().attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.WEST))
             .text("Right-Clicking the assembled pulley will turn the cabin back into blocks");
         scene.idle(90);
 
         scene.world().showSectionAndMerge(util.select().fromTo(doorPos, doorPos.above()), Direction.DOWN, elevatorLink);
         scene.idle(20);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60).rightClick();
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60)
+            .rightClick();
         scene.idle(7);
         scene.effects().indicateSuccess(util.grid().at(3, 6, 2));
         scene.world().movePulley(pulleyPos, 1, 0);
@@ -251,7 +280,8 @@ public class ElevatorScenes {
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.VISIBLE);
         scene.world().cycleBlockProperty(doorPos.above(), SlidingDoorBlock.VISIBLE);
 
-        scene.overlay().showText(80).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(3, 1, 1), Direction.NORTH))
+        scene.overlay().showText(80).placeNearTarget().attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 1), Direction.NORTH))
             .text("Sliding doors attached to the cabin will open and close automatically");
         scene.idle(90);
 
@@ -265,8 +295,11 @@ public class ElevatorScenes {
         scene.world().showSectionAndMerge(util.select().position(botContact), Direction.DOWN, camLink);
         scene.idle(10);
         scene.effects().indicateSuccess(util.grid().at(1, 2, 2));
-        scene.world()
-            .setBlock(botContact, AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST), false);
+        scene.world().setBlock(
+            botContact,
+            AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST),
+            false
+        );
         scene.idle(5);
         scene.world().showSectionAndMerge(botInput, Direction.SOUTH, camLink);
         scene.idle(15);
@@ -303,7 +336,11 @@ public class ElevatorScenes {
             .text("This can be useful to trigger doors or special effects upon arrival");
         scene.idle(90);
 
-        scene.world().setBlock(nixiePos, AllBlocks.GREEN_NIXIE_TUBE.defaultBlockState().setValue(NixieTubeBlock.FACING, Direction.WEST), false);
+        scene.world().setBlock(
+            nixiePos,
+            AllBlocks.GREEN_NIXIE_TUBE.defaultBlockState().setValue(NixieTubeBlock.FACING, Direction.WEST),
+            false
+        );
 
         scene.world().moveSection(camLink, util.vector().of(0, -13, 0), 20);
         scene.world().moveSection(pulleyLink, util.vector().of(0, -13, 0), 20);
@@ -311,15 +348,17 @@ public class ElevatorScenes {
         scene.idle(30);
         scene.world().showSectionAndMerge(util.select().position(nixiePos), Direction.DOWN, camLink);
         scene.idle(15);
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(4, 1, 0), Direction.UP), Pointing.DOWN, 15).rightClick()
-            .withItem(AllItems.DISPLAY_LINK.getDefaultInstance());
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(4, 1, 0), Direction.UP), Pointing.DOWN, 15)
+            .rightClick().withItem(AllItems.DISPLAY_LINK.getDefaultInstance());
         scene.world().toggleRedstonePower(util.select().position(1, 14, 2));
         scene.idle(15);
         scene.world().showSectionAndMerge(util.select().position(linkPos), Direction.DOWN, camLink);
         scene.world().flashDisplayLink(linkPos);
         scene.world().modifyBlockEntityNBT(
             util.select().position(nixiePos), NixieTubeBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 Component component = Component.literal("0F");
                 nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
             }
@@ -349,7 +388,8 @@ public class ElevatorScenes {
         scene.world().flashDisplayLink(linkPos);
         scene.world().modifyBlockEntityNBT(
             util.select().position(nixiePos), NixieTubeBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 Component component = Component.literal("1F");
                 nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
             }
@@ -367,7 +407,8 @@ public class ElevatorScenes {
         scene.world().flashDisplayLink(linkPos);
         scene.world().modifyBlockEntityNBT(
             util.select().position(nixiePos), NixieTubeBlockEntity.class, nbt -> {
-                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider()
+                    .createSerializationContext(NbtOps.INSTANCE);
                 Component component = Component.literal("2F");
                 nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
             }
@@ -414,8 +455,8 @@ public class ElevatorScenes {
         scene.world().moveSection(planksLink, util.vector().of(0, 2, 0), 20);
         scene.idle(20);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(1, 4, 3), Direction.WEST)).placeNearTarget()
-            .text("...other pulleys on the same layer will connect to the structure");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(1, 4, 3), Direction.WEST))
+            .placeNearTarget().text("...other pulleys on the same layer will connect to the structure");
         scene.idle(60);
 
         scene.world().movePulley(pulley1, 2, 20);
@@ -431,8 +472,8 @@ public class ElevatorScenes {
         scene.world().moveSection(planksLink, util.vector().of(0, 2, 0), 20);
         scene.idle(20);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(1, 4, 3), Direction.WEST)).placeNearTarget()
-            .text("They do not require to be powered, the effect is purely cosmetic");
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(1, 4, 3), Direction.WEST))
+            .placeNearTarget().text("They do not require to be powered, the effect is purely cosmetic");
         scene.idle(60);
 
         scene.world().movePulley(pulley1, 2, 20);

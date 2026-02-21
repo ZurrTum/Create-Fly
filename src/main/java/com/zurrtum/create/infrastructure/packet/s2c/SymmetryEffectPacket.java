@@ -12,7 +12,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.List;
 
-public record SymmetryEffectPacket(BlockPos mirror, List<BlockPos> positions) implements Packet<ClientGamePacketListener> {
+public record SymmetryEffectPacket(BlockPos mirror,
+                                   List<BlockPos> positions) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, SymmetryEffectPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         SymmetryEffectPacket::mirror,

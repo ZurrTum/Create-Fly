@@ -2,13 +2,6 @@ package com.zurrtum.create.api.registry;
 
 import com.zurrtum.create.impl.registry.SimpleRegistryImpl;
 import com.zurrtum.create.impl.registry.TagProviderImpl;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Function;
-
 import net.minecraft.core.Holder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -18,6 +11,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * A simple registry mapping between objects with identity semantics.

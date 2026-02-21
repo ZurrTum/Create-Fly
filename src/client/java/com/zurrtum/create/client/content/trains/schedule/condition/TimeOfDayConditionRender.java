@@ -24,15 +24,20 @@ import java.util.List;
 public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayCondition> {
     @Override
     public Pair<ItemStack, Component> getSummary(TimeOfDayCondition input) {
-        return Pair.of(new ItemStack(Items.STRUCTURE_VOID), input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false));
+        return Pair.of(
+            new ItemStack(Items.STRUCTURE_VOID),
+            input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false)
+        );
     }
 
     @Override
     public List<Component> getTitleAs(TimeOfDayCondition input, String type) {
         return ImmutableList.of(
             CreateLang.translateDirect("schedule.condition.time_of_day.scheduled"),
-            input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false).withStyle(ChatFormatting.DARK_AQUA)
-                .append(Component.literal(" -> ").withStyle(ChatFormatting.DARK_GRAY)).append(CreateLang.translatedOptions(
+            input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false)
+                .withStyle(ChatFormatting.DARK_AQUA)
+                .append(Component.literal(" -> ").withStyle(ChatFormatting.DARK_GRAY))
+                .append(CreateLang.translatedOptions(
                     "schedule.condition.time_of_day.rotation",
                     "every_24",
                     "every_12",
@@ -55,7 +60,11 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
     private Identifier getClockTextureId(TimeOfDayCondition input) {
         int displayHr = (input.intData("Hour") + 12) % 24;
         float progress = (displayHr * 60f + input.intData("Minute")) / (24 * 60);
-        return Identifier.withDefaultNamespace("textures/item/clock_" + twoDigits(Mth.clamp((int) (progress * 64), 0, 63)) + ".png");
+        return Identifier.withDefaultNamespace("textures/item/clock_" + twoDigits(Mth.clamp(
+            (int) (progress * 64),
+            0,
+            63
+        )) + ".png");
     }
 
     @Override

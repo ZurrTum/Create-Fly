@@ -36,8 +36,9 @@ public abstract class FadeInOutInstruction extends TickingInstruction {
             float fade = (remainingTicks / (float) fadeTime);
             applyFade(scene, fade * fade);
 
-        } else
+        } else {
             applyFade(scene, 1);
+        }
 
         if (remainingTicks == 0) {
             applyFade(scene, 0);

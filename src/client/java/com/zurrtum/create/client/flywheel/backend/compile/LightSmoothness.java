@@ -2,16 +2,12 @@ package com.zurrtum.create.client.flywheel.backend.compile;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.client.flywheel.backend.compile.core.Compilation;
+import net.minecraft.util.StringRepresentable;
 
 import java.util.Locale;
 
-import net.minecraft.util.StringRepresentable;
-
 public enum LightSmoothness implements StringRepresentable {
-    FLAT(0, false),
-    TRI_LINEAR(1, false),
-    SMOOTH(2, false),
-    SMOOTH_INNER_FACE_CORRECTED(2, true);
+    FLAT(0, false), TRI_LINEAR(1, false), SMOOTH(2, false), SMOOTH_INNER_FACE_CORRECTED(2, true);
 
     public static final Codec<LightSmoothness> CODEC = StringRepresentable.fromEnum(LightSmoothness::values);
 

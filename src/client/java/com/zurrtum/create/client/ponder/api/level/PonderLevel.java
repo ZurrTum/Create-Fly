@@ -86,7 +86,10 @@ public class PonderLevel extends SchematicLevel {
         RegistryAccess registryManager = registryAccess();
         blockEntities.forEach((k, v) -> originalBlockEntities.put(k, v.saveWithFullMetadata(registryManager)));
         entities.forEach(e -> {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(e.problemPath(), Ponder.LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                e.problemPath(),
+                Ponder.LOGGER
+            )) {
                 TagValueOutput writeView = TagValueOutput.createWithContext(logging, registryManager);
                 e.save(writeView);
                 ValueInput readView = TagValueInput.create(logging, registryManager, writeView.buildResult());
@@ -110,7 +113,10 @@ public class PonderLevel extends SchematicLevel {
             renderedBlockEntities.add(blockEntity);
         });
         originalEntities.forEach(e -> {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(e.problemPath(), Ponder.LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                e.problemPath(),
+                Ponder.LOGGER
+            )) {
                 TagValueOutput writeView = TagValueOutput.createWithContext(logging, registryManager);
                 e.save(writeView);
                 ValueInput readView = TagValueInput.create(logging, registryManager, writeView.buildResult());
@@ -124,10 +130,16 @@ public class PonderLevel extends SchematicLevel {
 
     public void restoreBlocks(Selection selection) {
         selection.forEach(p -> {
-            if (originalBlocks.containsKey(p))
+            if (originalBlocks.containsKey(p)) {
                 blocks.put(p, originalBlocks.get(p));
+            }
             if (originalBlockEntities.containsKey(p)) {
-                BlockEntity blockEntity = BlockEntity.loadStatic(p, originalBlocks.get(p), originalBlockEntities.get(p), registryAccess());
+                BlockEntity blockEntity = BlockEntity.loadStatic(
+                    p,
+                    originalBlocks.get(p),
+                    originalBlockEntities.get(p),
+                    registryAccess()
+                );
                 if (blockEntity != null) {
                     onBEAdded(blockEntity, blockEntity.getBlockPos());
                     blockEntities.put(p, blockEntity);
@@ -138,8 +150,9 @@ public class PonderLevel extends SchematicLevel {
     }
 
     private void redraw() {
-        if (scene != null)
+        if (scene != null) {
             scene.forEach(WorldSectionElement.class, WorldSectionElement::queueRedraw);
+        }
     }
 
     public void pushFakeLight(int light) {
@@ -165,10 +178,12 @@ public class PonderLevel extends SchematicLevel {
 
     @Override
     public BlockState getBlockState(BlockPos globalPos) {
-        if (mask != null && !mask.test(globalPos.subtract(anchor)))
+        if (mask != null && !mask.test(globalPos.subtract(anchor))) {
             return Blocks.AIR.defaultBlockState();
-        if (currentlyTickingEntities && globalPos.getY() < 0)
+        }
+        if (currentlyTickingEntities && globalPos.getY() < 0) {
             return Blocks.AIR.defaultBlockState();
+        }
         return super.getBlockState(globalPos);
     }
 
@@ -177,7 +192,13 @@ public class PonderLevel extends SchematicLevel {
         return this;
     }
 
-    public void renderEntities(PoseStack ms, SubmitNodeCollector queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
+    public void renderEntities(
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        Camera ari,
+        CameraRenderState cameraRenderState,
+        float pt
+    ) {
         Vec3 Vector3d = ari.position();
         double d0 = Vector3d.x();
         double d1 = Vector3d.y();
@@ -210,7 +231,13 @@ public class PonderLevel extends SchematicLevel {
         renderManager.submit(state, cameraRenderState, state.x - x, state.y - y, state.z - z, ms, queue);
     }
 
-    public void renderParticles(PoseStack ms, SubmitNodeStorage queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
+    public void renderParticles(
+        PoseStack ms,
+        SubmitNodeStorage queue,
+        Camera ari,
+        CameraRenderState cameraRenderState,
+        float pt
+    ) {
         particles.renderParticles(ms, queue, ari, cameraRenderState, pt);
     }
 
@@ -228,11 +255,13 @@ public class PonderLevel extends SchematicLevel {
             entity.zOld = entity.getZ();
             entity.tick();
 
-            if (entity.getY() <= -.5f)
+            if (entity.getY() <= -.5f) {
                 entity.discard();
+            }
 
-            if (!entity.isAlive())
+            if (!entity.isAlive()) {
                 iterator.remove();
+            }
         }
 
         currentlyTickingEntities = false;
@@ -244,27 +273,38 @@ public class PonderLevel extends SchematicLevel {
     }
 
     @Override
-    public void addAlwaysVisibleParticle(ParticleOptions data, double x, double y, double z, double mx, double my, double mz) {
+    public void addAlwaysVisibleParticle(
+        ParticleOptions data,
+        double x,
+        double y,
+        double z,
+        double mx,
+        double my,
+        double mz
+    ) {
         addParticle(data, x, y, z, mx, my, mz);
     }
 
     public void addParticle(@Nullable Particle p) {
-        if (p != null)
+        if (p != null) {
             particles.addParticle(p);
+        }
     }
 
     protected void onBEAdded(BlockEntity blockEntity, BlockPos pos) {
         super.onBEadded(blockEntity, pos);
-        if (!(blockEntity instanceof VirtualBlockEntity virtualBlockEntity))
+        if (!(blockEntity instanceof VirtualBlockEntity virtualBlockEntity)) {
             return;
+        }
         virtualBlockEntity.markVirtual();
     }
 
     public void setBlockBreakingProgress(BlockPos pos, int damage) {
-        if (damage == 0)
+        if (damage == 0) {
             blockBreakingProgressions.remove(pos);
-        else
+        } else {
             blockBreakingProgressions.put(pos, damage - 1);
+        }
     }
 
     public Map<BlockPos, Integer> getBlockBreakingProgressions() {
@@ -273,8 +313,9 @@ public class PonderLevel extends SchematicLevel {
 
     public void addBlockDestroyEffects(BlockPos pos, BlockState state) {
         VoxelShape voxelshape = state.getShape(this, pos);
-        if (voxelshape.isEmpty())
+        if (voxelshape.isEmpty()) {
             return;
+        }
 
         AABB bb = voxelshape.bounds();
         double d1 = Math.min(1.0D, bb.maxX - bb.minX);
@@ -330,7 +371,12 @@ public class PonderLevel extends SchematicLevel {
     }
 
     @Override
-    public boolean hasNearbyAlivePlayer(double p_217358_1_, double p_217358_3_, double p_217358_5_, double p_217358_7_) {
+    public boolean hasNearbyAlivePlayer(
+        double p_217358_1_,
+        double p_217358_3_,
+        double p_217358_5_,
+        double p_217358_7_
+    ) {
         return true; // always enable spawner animations
     }
 
@@ -346,8 +392,10 @@ public class PonderLevel extends SchematicLevel {
                 BlockHitResult blockHitResult = clipWithInteractionOverride(vec3d, vec3d2, pos, voxelShape, blockState);
                 VoxelShape voxelShape2 = innerContext.getFluidShape(fluidState, this, pos);
                 BlockHitResult blockHitResult2 = voxelShape2.clip(vec3d, vec3d2, pos);
-                double d = blockHitResult == null ? Double.MAX_VALUE : innerContext.getFrom().distanceToSqr(blockHitResult.getLocation());
-                double e = blockHitResult2 == null ? Double.MAX_VALUE : innerContext.getFrom().distanceToSqr(blockHitResult2.getLocation());
+                double d = blockHitResult == null ? Double.MAX_VALUE : innerContext.getFrom()
+                    .distanceToSqr(blockHitResult.getLocation());
+                double e = blockHitResult2 == null ? Double.MAX_VALUE : innerContext.getFrom()
+                    .distanceToSqr(blockHitResult2.getLocation());
                 return d <= e ? blockHitResult : blockHitResult2;
             }, (innerContext) -> {
                 Vec3 vec3d = innerContext.getFrom().subtract(innerContext.getTo());
@@ -365,7 +413,10 @@ public class PonderLevel extends SchematicLevel {
         if (chunks == null) {
             chunks = new Long2ObjectOpenHashMap<>();
         }
-        return chunks.computeIfAbsent(ChunkPos.asLong(x, z), packedPos -> new PonderChunk(this, ChunkPos.getX(packedPos), ChunkPos.getZ(packedPos)));
+        return chunks.computeIfAbsent(
+            ChunkPos.asLong(x, z),
+            packedPos -> new PonderChunk(this, ChunkPos.getX(packedPos), ChunkPos.getZ(packedPos))
+        );
     }
 
     @Override

@@ -19,13 +19,16 @@ public class ClickToLinkHandler {
 
     public static void clientTick(Minecraft mc) {
         Player player = mc.player;
-        if (player == null)
+        if (player == null) {
             return;
+        }
         ItemStack heldItemMainhand = player.getMainHandItem();
-        if (!(heldItemMainhand.getItem() instanceof ClickToLinkBlockItem blockItem))
+        if (!(heldItemMainhand.getItem() instanceof ClickToLinkBlockItem blockItem)) {
             return;
-        if (!heldItemMainhand.has(AllDataComponents.CLICK_TO_LINK_DATA))
+        }
+        if (!heldItemMainhand.has(AllDataComponents.CLICK_TO_LINK_DATA)) {
             return;
+        }
 
         //noinspection DataFlowIssue
         BlockPos selectedPos = heldItemMainhand.get(AllDataComponents.CLICK_TO_LINK_DATA).selectedPos();

@@ -30,12 +30,17 @@ public class CobbleGenOptimisation {
     }
 
     @Nullable
-    public static CobbleGenBlockConfiguration getConfig(LevelAccessor level, BlockPos drillPos, Direction drillDirection) {
+    public static CobbleGenBlockConfiguration getConfig(
+        LevelAccessor level,
+        BlockPos drillPos,
+        Direction drillDirection
+    ) {
         List<BlockState> list = new ArrayList<>();
         for (Direction side : Iterate.directions) {
             BlockPos relative = drillPos.relative(drillDirection).relative(side);
-            if (level instanceof Level l && !l.isLoaded(relative))
+            if (level instanceof Level l && !l.isLoaded(relative)) {
                 return null;
+            }
             list.add(level.getBlockState(relative));
         }
         return new CobbleGenBlockConfiguration(list);
@@ -46,13 +51,15 @@ public class CobbleGenOptimisation {
         Map<Fluid, Pair<Direction, FluidState>> presentFluidTypes = new HashMap<>();
 
         for (int i = 0; i < Iterate.directions.length; i++) {
-            if (config.statesAroundDrill.size() <= i)
+            if (config.statesAroundDrill.size() <= i) {
                 break;
+            }
             FluidState fluidState = config.statesAroundDrill.get(i).getFluidState();
             if (!fluidState.isEmpty()) {
                 Fluid fluid = fluidState.getType();
-                if (interactions.get(fluid) != null)
+                if (interactions.get(fluid) != null) {
                     presentFluidTypes.put(fluid, Pair.of(Iterate.directions[i], fluidState));
+                }
             }
         }
 
@@ -64,16 +71,19 @@ public class CobbleGenOptimisation {
             List<InteractionInformation> list = interactions.get(type.getKey());
             FluidState state = FluidHelper.convertToFlowing(type.getValue().getSecond().getType()).defaultFluidState();
 
-            if (list == null)
+            if (list == null) {
                 continue;
+            }
             for (Direction d : Iterate.horizontalDirections) {
                 for (InteractionInformation information : list) {
-                    if (d == type.getValue().getFirst())
+                    if (d == type.getValue().getFirst()) {
                         continue;
+                    }
                     BlockPos relative = pos.relative(d);
                     HasFluidInteraction predicate = information.predicate();
-                    if (!predicate.test(level, pos, relative, state))
+                    if (!predicate.test(level, pos, relative, state)) {
                         continue;
+                    }
                     interaction = information.interaction();
                     affected = Pair.of(d, state);
                     break Search;
@@ -82,15 +92,18 @@ public class CobbleGenOptimisation {
         }
 
         ServerLevel owLevel = level.getServer().getLevel(Level.OVERWORLD);
-        if (owLevel == null)
+        if (owLevel == null) {
             owLevel = level;
+        }
 
-        if (cachedLevel == null || cachedLevel.getLevel() != owLevel)
+        if (cachedLevel == null || cachedLevel.getLevel() != owLevel) {
             cachedLevel = new CobbleGenLevel(level);
+        }
 
         BlockState result = Blocks.AIR.defaultBlockState();
-        if (interaction == null)
+        if (interaction == null) {
             return result;
+        }
 
         interaction.interact(cachedLevel, pos, pos.relative(affected.getFirst()), affected.getSecond());
         BlockState output = cachedLevel.blocksAdded.getOrDefault(pos, result);
@@ -100,7 +113,8 @@ public class CobbleGenOptimisation {
     }
 
     public static void invalidateWorld(LevelAccessor world) {
-        if (cachedLevel != null && cachedLevel.getLevel() == world)
+        if (cachedLevel != null && cachedLevel.getLevel() == world) {
             cachedLevel = null;
+        }
     }
 }

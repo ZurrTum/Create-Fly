@@ -59,7 +59,10 @@ public class SpeedControllerRenderer implements BlockEntityRenderer<SpeedControl
             state.bracket = CachedBuffers.partial(AllPartialModels.SPEED_CONTROLLER_BRACKET, state.blockState);
             boolean alongX = state.blockState.getValue(SpeedControllerBlock.HORIZONTAL_AXIS) == Axis.X;
             state.bracketAngle = (float) (alongX ? Math.PI : Math.PI / 2);
-            state.bracketLight = world != null ? LevelRenderer.getLightColor(world, state.blockPos.above()) : LightTexture.FULL_BRIGHT;
+            state.bracketLight = world != null ? LevelRenderer.getLightColor(
+                world,
+                state.blockPos.above()
+            ) : LightTexture.FULL_BRIGHT;
         }
         if (state.render || state.hasBracket) {
             state.layer = RenderTypes.solidMovingBlock();
@@ -67,7 +70,12 @@ public class SpeedControllerRenderer implements BlockEntityRenderer<SpeedControl
     }
 
     @Override
-    public void submit(SpeedControllerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SpeedControllerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.render || state.hasBracket) {
             queue.submitCustomGeometry(matrices, state.layer, state);
         }

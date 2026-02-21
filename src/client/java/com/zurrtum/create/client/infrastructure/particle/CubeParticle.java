@@ -21,7 +21,16 @@ public class CubeParticle extends Particle {
     protected float blue = 1.0F;
     protected float alpha = 1.0F;
 
-    public CubeParticle(ClientLevel world, CubeParticleData data, double x, double y, double z, double motionX, double motionY, double motionZ) {
+    public CubeParticle(
+        ClientLevel world,
+        CubeParticleData data,
+        double x,
+        double y,
+        double z,
+        double motionX,
+        double motionY,
+        double motionZ
+    ) {
         super(world, x, y, z);
         this.xd = motionX;
         this.yd = motionY;

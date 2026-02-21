@@ -55,10 +55,22 @@ public class DepthPyramid {
             downsampleSecondProgram.setUInt("base_mip_level", baseMipLevel);
 
             for (int i = 0; i < Math.min(7, mipLevels - baseMipLevel); i++) {
-                GL46.glBindImageTexture(i, pyramidTextureId, baseMipLevel + i, false, 0, GL32.GL_WRITE_ONLY, GL32.GL_R32F);
+                GL46.glBindImageTexture(
+                    i,
+                    pyramidTextureId,
+                    baseMipLevel + i,
+                    false,
+                    0,
+                    GL32.GL_WRITE_ONLY,
+                    GL32.GL_R32F
+                );
             }
 
-            GL46.glDispatchCompute(MoreMath.ceilingDiv(width >> baseMipLevel, 64), MoreMath.ceilingDiv(height >> baseMipLevel, 64), 1);
+            GL46.glDispatchCompute(
+                MoreMath.ceilingDiv(width >> baseMipLevel, 64),
+                MoreMath.ceilingDiv(height >> baseMipLevel, 64),
+                1
+            );
         }
 
         GL46.glMemoryBarrier(GL46.GL_TEXTURE_FETCH_BARRIER_BIT);

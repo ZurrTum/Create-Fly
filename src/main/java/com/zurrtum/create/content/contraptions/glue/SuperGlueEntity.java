@@ -55,17 +55,30 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
         return new AABB(Vec3.atLowerCornerOf(startPos), Vec3.atLowerCornerOf(endPos)).expandTowards(1, 1, 1);
     }
 
-    public static boolean isGlued(LevelAccessor level, BlockPos blockPos, Direction direction, Set<SuperGlueEntity> cached) {
+    public static boolean isGlued(
+        LevelAccessor level,
+        BlockPos blockPos,
+        Direction direction,
+        Set<SuperGlueEntity> cached
+    ) {
         BlockPos targetPos = blockPos.relative(direction);
-        if (cached != null)
-            for (SuperGlueEntity glueEntity : cached)
-                if (glueEntity.contains(blockPos) && glueEntity.contains(targetPos))
+        if (cached != null) {
+            for (SuperGlueEntity glueEntity : cached) {
+                if (glueEntity.contains(blockPos) && glueEntity.contains(targetPos)) {
                     return true;
-        for (SuperGlueEntity glueEntity : level.getEntitiesOfClass(SuperGlueEntity.class, span(blockPos, targetPos).inflate(16))) {
-            if (!glueEntity.contains(blockPos) || !glueEntity.contains(targetPos))
+                }
+            }
+        }
+        for (SuperGlueEntity glueEntity : level.getEntitiesOfClass(
+            SuperGlueEntity.class,
+            span(blockPos, targetPos).inflate(16)
+        )) {
+            if (!glueEntity.contains(blockPos) || !glueEntity.contains(targetPos)) {
                 continue;
-            if (cached != null)
+            }
+            if (cached != null) {
                 cached.add(glueEntity);
+            }
             return true;
         }
         return false;
@@ -76,10 +89,12 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
         for (SuperGlueEntity glueEntity : level.getEntitiesOfClass(SuperGlueEntity.class, bb)) {
             AABB glueBox = glueEntity.getBoundingBox();
             AABB intersect = bb.intersect(glueBox);
-            if (intersect.getXsize() * intersect.getYsize() * intersect.getZsize() == 0)
+            if (intersect.getXsize() * intersect.getYsize() * intersect.getZsize() == 0) {
                 continue;
-            if (Mth.equal(intersect.getSize(), 1))
+            }
+            if (Mth.equal(intersect.getSize(), 1)) {
                 continue;
+            }
             glue.add(new SuperGlueEntity(level, intersect));
         }
         return glue;
@@ -106,31 +121,39 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
     public static boolean isValidFace(Level world, BlockPos pos, Direction direction) {
         BlockState state = world.getBlockState(pos);
-        if (BlockMovementChecks.isBlockAttachedTowards(state, world, pos, direction))
+        if (BlockMovementChecks.isBlockAttachedTowards(state, world, pos, direction)) {
             return true;
-        if (!BlockMovementChecks.isMovementNecessary(state, world, pos))
+        }
+        if (!BlockMovementChecks.isMovementNecessary(state, world, pos)) {
             return false;
+        }
         return !BlockMovementChecks.isNotSupportive(state, direction);
     }
 
     public static boolean isSideSticky(Level world, BlockPos pos, Direction direction) {
         BlockState state = world.getBlockState(pos);
-        if (state.is(AllBlocks.STICKY_MECHANICAL_PISTON))
+        if (state.is(AllBlocks.STICKY_MECHANICAL_PISTON)) {
             return state.getValue(DirectionalKineticBlock.FACING) == direction;
+        }
 
-        if (state.is(AllBlocks.STICKER))
+        if (state.is(AllBlocks.STICKER)) {
             return state.getValue(DirectionalBlock.FACING) == direction;
+        }
 
-        if (state.getBlock() == Blocks.SLIME_BLOCK)
+        if (state.getBlock() == Blocks.SLIME_BLOCK) {
             return true;
-        if (state.getBlock() == Blocks.HONEY_BLOCK)
+        }
+        if (state.getBlock() == Blocks.HONEY_BLOCK) {
             return true;
+        }
 
-        if (state.is(AllBlocks.CART_ASSEMBLER))
+        if (state.is(AllBlocks.CART_ASSEMBLER)) {
             return Direction.UP == direction;
+        }
 
-        if (state.is(AllBlocks.GANTRY_CARRIAGE))
+        if (state.is(AllBlocks.GANTRY_CARRIAGE)) {
             return state.getValue(DirectionalKineticBlock.FACING) == direction;
+        }
 
         if (state.getBlock() instanceof BearingBlock) {
             return state.getValue(DirectionalKineticBlock.FACING) == direction;
@@ -138,8 +161,9 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
         if (state.getBlock() instanceof AbstractChassisBlock) {
             BooleanProperty glueableSide = ((AbstractChassisBlock) state.getBlock()).getGlueableSide(state, direction);
-            if (glueableSide == null)
+            if (glueableSide == null) {
                 return false;
+            }
             return state.getValue(glueableSide);
         }
 
@@ -160,8 +184,9 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
         yo = getY();
         zo = getZ();
 
-        if (getBoundingBox().getXsize() == 0)
+        if (getBoundingBox().getXsize() == 0) {
             discard();
+        }
     }
 
     @Override
@@ -174,14 +199,16 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
     @Override
     public void move(MoverType typeIn, Vec3 pos) {
-        if (!level().isClientSide() && isAlive() && pos.lengthSqr() > 0.0D)
+        if (!level().isClientSide() && isAlive() && pos.lengthSqr() > 0.0D) {
             discard();
+        }
     }
 
     @Override
     public void push(double x, double y, double z) {
-        if (!level().isClientSide() && isAlive() && x * x + y * y + z * z > 0.0D)
+        if (!level().isClientSide() && isAlive() && x * x + y * y + z * z > 0.0D) {
             discard();
+        }
     }
 
     @Override
@@ -240,8 +267,9 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
     @Override
     public float rotate(Rotation transformRotation) {
         AABB bb = getBoundingBox().move(position().scale(-1));
-        if (transformRotation == Rotation.CLOCKWISE_90 || transformRotation == Rotation.COUNTERCLOCKWISE_90)
+        if (transformRotation == Rotation.CLOCKWISE_90 || transformRotation == Rotation.COUNTERCLOCKWISE_90) {
             setBoundingBox(new AABB(bb.minZ, bb.minY, bb.minX, bb.maxZ, bb.maxY, bb.maxX).move(position()));
+        }
         return super.rotate(transformRotation);
     }
 
@@ -277,28 +305,32 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
         Vec3 origin = new Vec3(bb.minX, bb.minY, bb.minZ);
         Vec3 extents = new Vec3(bb.getXsize(), bb.getYsize(), bb.getZsize());
 
-        if (!(level() instanceof ServerLevel slevel))
+        if (!(level() instanceof ServerLevel slevel)) {
             return;
+        }
 
         for (Axis axis : Iterate.axes) {
             AxisDirection positive = AxisDirection.POSITIVE;
             double max = axis.choose(extents.x, extents.y, extents.z);
             Vec3 normal = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis, positive).getUnitVec3i());
             for (Axis axis2 : Iterate.axes) {
-                if (axis2 == axis)
+                if (axis2 == axis) {
                     continue;
+                }
                 double max2 = axis2.choose(extents.x, extents.y, extents.z);
                 Vec3 normal2 = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis2, positive).getUnitVec3i());
                 for (Axis axis3 : Iterate.axes) {
-                    if (axis3 == axis2 || axis3 == axis)
+                    if (axis3 == axis2 || axis3 == axis) {
                         continue;
+                    }
                     double max3 = axis3.choose(extents.x, extents.y, extents.z);
                     Vec3 normal3 = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis3, positive).getUnitVec3i());
 
                     for (int i = 0; i <= max * 2; i++) {
                         for (int o1 : Iterate.zeroAndOne) {
                             for (int o2 : Iterate.zeroAndOne) {
-                                Vec3 v = origin.add(normal.scale(i / 2f)).add(normal2.scale(max2 * o1)).add(normal3.scale(max3 * o2));
+                                Vec3 v = origin.add(normal.scale(i / 2f)).add(normal2.scale(max2 * o1))
+                                    .add(normal3.scale(max3 * o2));
 
                                 slevel.sendParticles(ParticleTypes.ITEM_SLIME, v.x, v.y, v.z, 1, 0, 0, 0, 0);
 

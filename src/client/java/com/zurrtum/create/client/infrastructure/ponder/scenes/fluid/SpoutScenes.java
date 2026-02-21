@@ -36,7 +36,8 @@ public class SpoutScenes {
         scene.showBasePlate();
         scene.idle(5);
 
-        ElementLink<WorldSectionElement> depot = scene.world().showIndependentSection(util.select().position(2, 1, 1), Direction.DOWN);
+        ElementLink<WorldSectionElement> depot = scene.world()
+            .showIndependentSection(util.select().position(2, 1, 1), Direction.DOWN);
         scene.world().moveSection(depot, util.vector().of(0, 0, 1), 0);
         scene.idle(10);
 
@@ -68,16 +69,17 @@ public class SpoutScenes {
 
         scene.idle(20);
         ItemStack bucket = AllItems.HONEY_BUCKET.getDefaultInstance();
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.NORTH), Pointing.RIGHT, 40)
+        scene.overlay()
+            .showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.NORTH), Pointing.RIGHT, 40)
             .showing(AllIcons.I_MTD_CLOSE).withItem(bucket);
         scene.idle(7);
         scene.overlay().showOutlineWithText(util.select().position(2, 3, 2), 50)
-            .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.WEST)).attachKeyFrame().colored(PonderPalette.RED)
-            .placeNearTarget().text("The content of a Spout cannot be accessed manually");
+            .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.WEST)).attachKeyFrame()
+            .colored(PonderPalette.RED).placeNearTarget().text("The content of a Spout cannot be accessed manually");
         scene.idle(60);
         scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.allowInsertion());
-        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(2, 3, 3), Direction.WEST)).colored(PonderPalette.GREEN)
-            .placeNearTarget().text("Instead, Pipes can be used to supply it with fluids");
+        scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(2, 3, 3), Direction.WEST))
+            .colored(PonderPalette.GREEN).placeNearTarget().text("Instead, Pipes can be used to supply it with fluids");
 
         scene.idle(90);
         scene.overlay().showText(60).pointAt(spoutSide.subtract(0, 2, 0)).attachKeyFrame().placeNearTarget()
@@ -90,7 +92,8 @@ public class SpoutScenes {
         scene.idle(10);
 
         scene.idle(20);
-        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
+        scene.world()
+            .modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
         scene.world().modifyBlockEntityNBT(spoutS, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
         scene.idle(20);
         scene.world().removeItemsFromBelt(depotPos);
@@ -116,8 +119,8 @@ public class SpoutScenes {
         scene.world().showSection(util.select().fromTo(4, 1, 2, 0, 2, 2), Direction.SOUTH);
         scene.idle(20);
         BlockPos beltPos = util.grid().at(0, 1, 2);
-        scene.overlay().showText(40).pointAt(util.vector().blockSurface(beltPos, Direction.WEST)).placeNearTarget().attachKeyFrame()
-            .text("When items are provided on a belt...");
+        scene.overlay().showText(40).pointAt(util.vector().blockSurface(beltPos, Direction.WEST)).placeNearTarget()
+            .attachKeyFrame().text("When items are provided on a belt...");
         scene.idle(30);
 
         ElementLink<BeltItemElement> ingot = scene.world().createItemOnBelt(beltPos, Direction.SOUTH, bottle);
@@ -125,10 +128,12 @@ public class SpoutScenes {
         ElementLink<BeltItemElement> ingot2 = scene.world().createItemOnBelt(beltPos, Direction.SOUTH, bottle);
         scene.idle(15);
         scene.world().stallBeltItem(ingot, true);
-        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
+        scene.world()
+            .modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
         scene.world().modifyBlockEntityNBT(spoutS, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
 
-        scene.overlay().showText(50).pointAt(spoutSide).placeNearTarget().attachKeyFrame().text("The Spout will hold and process them automatically");
+        scene.overlay().showText(50).pointAt(spoutSide).placeNearTarget().attachKeyFrame()
+            .text("The Spout will hold and process them automatically");
 
         scene.idle(20);
         for (int i = 0; i < 10; i++) {
@@ -146,7 +151,8 @@ public class SpoutScenes {
         scene.world().stallBeltItem(ingot, false);
         scene.idle(15);
         scene.world().stallBeltItem(ingot2, true);
-        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
+        scene.world()
+            .modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
         scene.world().modifyBlockEntityNBT(spoutS, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
         scene.idle(20);
         for (int i = 0; i < 10; i++) {

@@ -1,13 +1,12 @@
 package com.zurrtum.create.client.foundation.gui.widget;
 
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SelectionScrollInput extends ScrollInput {
 
@@ -31,32 +30,37 @@ public class SelectionScrollInput extends ScrollInput {
     @Override
     protected void updateTooltip() {
         toolTip.clear();
-        if (title == null)
+        if (title == null) {
             return;
+        }
         toolTip.add(title.plainCopy().withStyle(s -> s.withColor(HEADER_RGB.getRGB())));
         int min = Math.min(this.max - 16, state - 7);
         int max = Math.max(this.min + 16, state + 8);
         min = Math.max(min, this.min);
         max = Math.min(max, this.max);
-        if (this.min + 1 == min)
+        if (this.min + 1 == min) {
             min--;
+        }
         if (min > this.min) {
             toolTip.add(Component.literal("> ...").withStyle(ChatFormatting.GRAY));
         }
-        if (this.max - 1 == max)
+        if (this.max - 1 == max) {
             max++;
+        }
         for (int i = min; i < max; i++) {
-            if (i == state)
+            if (i == state) {
                 toolTip.add(Component.empty().append("-> ").append(options.get(i)).withStyle(ChatFormatting.WHITE));
-            else
+            } else {
                 toolTip.add(Component.empty().append("> ").append(options.get(i)).withStyle(ChatFormatting.GRAY));
+            }
         }
         if (max < this.max) {
             toolTip.add(Component.literal("> ...").withStyle(ChatFormatting.GRAY));
         }
 
-        if (hint != null)
+        if (hint != null) {
             toolTip.add(hint.plainCopy().withStyle(s -> s.withColor(HINT_RGB.getRGB())));
+        }
         toolTip.add(scrollToSelect.plainCopy().withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
     }
 

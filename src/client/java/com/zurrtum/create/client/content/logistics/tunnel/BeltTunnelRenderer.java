@@ -52,13 +52,25 @@ public class BeltTunnelRenderer extends SmartBlockEntityRenderer<BeltTunnelBlock
                 continue;
             }
             float f = be.flaps.get(direction).getValue(tickProgress);
-            flaps.add(FlapStuffs.getFlapsRenderState(flapBuffer, FlapStuffs.TUNNEL_PIVOT, direction, f, 0, state.lightCoords));
+            flaps.add(FlapStuffs.getFlapsRenderState(
+                flapBuffer,
+                FlapStuffs.TUNNEL_PIVOT,
+                direction,
+                f,
+                0,
+                state.lightCoords
+            ));
         }
         state.flaps = flaps;
     }
 
     @Override
-    public void submit(BeltTunnelRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BeltTunnelRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.flaps != null) {
             RenderType layer = RenderTypes.solidMovingBlock();

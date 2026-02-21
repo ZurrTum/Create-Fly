@@ -51,8 +51,9 @@ public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
     @Override
     public void read(ValueInput view, boolean migration, DimensionPalette dimensions) {
         super.read(view, migration, dimensions);
-        if (migration)
+        if (migration) {
             return;
+        }
         blockEntityPos = view.read("BlockEntityPos", BlockPos.CODEC).orElse(BlockPos.ZERO);
         blockEntityDimension = view.read("BlockEntityDimension", dimensions).orElseThrow();
     }
@@ -60,8 +61,9 @@ public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
     @Override
     public <T> void decode(DynamicOps<T> ops, T input, boolean migration, DimensionPalette dimensions) {
         super.decode(ops, input, migration, dimensions);
-        if (migration)
+        if (migration) {
             return;
+        }
         MapLike<T> map = ops.getMap(input).getOrThrow();
         blockEntityPos = BlockPos.CODEC.parse(ops, map.get("BlockEntityPos")).result().orElse(BlockPos.ZERO);
         blockEntityDimension = dimensions.parse(ops, map.get("BlockEntityDimension")).getOrThrow();

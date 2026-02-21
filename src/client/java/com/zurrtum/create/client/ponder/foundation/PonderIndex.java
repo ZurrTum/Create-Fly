@@ -63,17 +63,27 @@ public class PonderIndex {
 
     public static void registerAll() {
         Stopwatch stopwatch = Stopwatch.createStarted();
-        forEachPlugin(plugin -> plugin.registerScenes(new DefaultPonderSceneRegistrationHelper(plugin.getModId(), SCENES)));
+        forEachPlugin(plugin -> plugin.registerScenes(new DefaultPonderSceneRegistrationHelper(
+            plugin.getModId(),
+            SCENES
+        )));
         LOGGER.info("Registering Ponder Scenes took {}", stopwatch.stop());
 
         stopwatch.reset().start();
-        forEachPlugin(plugin -> plugin.registerTags(new DefaultPonderTagRegistrationHelper(plugin.getModId(), TAGS, LOCALIZATION)));
+        forEachPlugin(plugin -> plugin.registerTags(new DefaultPonderTagRegistrationHelper(
+            plugin.getModId(),
+            TAGS,
+            LOCALIZATION
+        )));
         LOGGER.info("Registering Ponder Tags took {}", stopwatch.stop());
     }
 
     public static void gatherSharedText() {
         Stopwatch stopwatch = Stopwatch.createStarted();
-        forEachPlugin(plugin -> plugin.registerSharedText(new DefaultSharedTextRegistrationHelper(plugin.getModId(), LOCALIZATION)));
+        forEachPlugin(plugin -> plugin.registerSharedText(new DefaultSharedTextRegistrationHelper(
+            plugin.getModId(),
+            LOCALIZATION
+        )));
         LOGGER.info("Collecting Shared Ponder Text took {}", stopwatch.stop());
     }
 

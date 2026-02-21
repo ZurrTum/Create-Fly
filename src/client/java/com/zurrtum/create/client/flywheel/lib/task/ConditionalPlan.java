@@ -11,9 +11,8 @@ import com.zurrtum.create.client.flywheel.lib.task.functional.BooleanSupplierWit
  * @param onTrue    The plan to execute if the condition is true.
  * @param <C>       The type of the context object.
  */
-public record ConditionalPlan<C>(
-    BooleanSupplierWithContext<C> condition, Plan<C> onTrue
-) implements SimplyComposedPlan<C> {
+public record ConditionalPlan<C>(BooleanSupplierWithContext<C> condition,
+                                 Plan<C> onTrue) implements SimplyComposedPlan<C> {
     public static <C> Builder<C> on(BooleanSupplierWithContext<C> condition) {
         return new Builder<>(condition);
     }

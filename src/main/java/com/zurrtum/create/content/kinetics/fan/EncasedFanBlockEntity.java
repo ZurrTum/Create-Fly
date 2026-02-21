@@ -6,10 +6,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -17,6 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCurrentSource {
 
@@ -39,8 +38,9 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             airCurrent.rebuild();
+        }
     }
 
     @Override
@@ -67,8 +67,9 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     @Override
     public Direction getAirFlowDirection() {
         float speed = getSpeed();
-        if (speed == 0)
+        if (speed == 0) {
             return null;
+        }
         Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
         speed = convertToDirection(speed, facing);
         return speed > 0 ? facing : facing.getOpposite();
@@ -94,15 +95,18 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
 
     public void updateChute() {
         Direction direction = getBlockState().getValue(EncasedFanBlock.FACING);
-        if (!direction.getAxis().isVertical())
+        if (!direction.getAxis().isVertical()) {
             return;
+        }
         BlockEntity poweredChute = level.getBlockEntity(worldPosition.relative(direction));
-        if (!(poweredChute instanceof ChuteBlockEntity chuteBE))
+        if (!(poweredChute instanceof ChuteBlockEntity chuteBE)) {
             return;
-        if (direction == Direction.DOWN)
+        }
+        if (direction == Direction.DOWN) {
             chuteBE.updatePull();
-        else
+        } else {
             chuteBE.updatePush(1);
+        }
     }
 
     public void blockInFrontChanged() {
@@ -123,13 +127,15 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
         if (updateAirFlow) {
             updateAirFlow = false;
             airCurrent.rebuild();
-            if (airCurrent.maxDistance > 0)
+            if (airCurrent.maxDistance > 0) {
                 award(AllAdvancements.ENCASED_FAN);
+            }
             sendData();
         }
 
-        if (getSpeed() == 0)
+        if (getSpeed() == 0) {
             return;
+        }
 
         if (entitySearchCooldown-- <= 0) {
             entitySearchCooldown = 5;

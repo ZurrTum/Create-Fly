@@ -26,8 +26,9 @@ public class MetalScaffoldingBlockItem extends ScaffoldingBlockItem {
         Level level = pContext.getLevel();
         BlockState blockstate = level.getBlockState(blockpos);
         Block block = this.getBlock();
-        if (!blockstate.is(block))
+        if (!blockstate.is(block)) {
             return pContext;
+        }
 
         Direction direction;
         if (pContext.isSecondaryUseActive()) {
@@ -43,8 +44,12 @@ public class MetalScaffoldingBlockItem extends ScaffoldingBlockItem {
             if (!level.isClientSide() && !level.isInWorldBounds(blockpos$mutableblockpos)) {
                 Player player = pContext.getPlayer();
                 int j = level.getMaxY();
-                if (player instanceof ServerPlayer sp && blockpos$mutableblockpos.getY() > j)
-                    sp.sendSystemMessage(Component.translatable("build.tooHigh", j).withStyle(ChatFormatting.RED), true);
+                if (player instanceof ServerPlayer sp && blockpos$mutableblockpos.getY() > j) {
+                    sp.sendSystemMessage(
+                        Component.translatable("build.tooHigh", j).withStyle(ChatFormatting.RED),
+                        true
+                    );
+                }
                 break;
             }
 

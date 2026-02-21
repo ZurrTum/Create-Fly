@@ -99,8 +99,9 @@ public class InputWindowElement extends AnimatedOverlayElementBase {
         int keyWidth = 0;
         String text = hasText ? PonderIndex.getLangAccess().getShared(key) : "";
 
-        if (fade < 1 / 16f)
+        if (fade < 1 / 16f) {
             return;
+        }
         Vec2 sceneToScreen = scene.getTransform().sceneToScreen(sceneSpace, partialTicks);
 
         if (hasIcon) {
@@ -124,7 +125,7 @@ public class InputWindowElement extends AnimatedOverlayElementBase {
 
         PonderUI.renderSpeechBox(graphics, 0, 0, width, height, false, direction, true);
 
-        if (hasText)
+        if (hasText) {
             graphics.drawString(
                 font,
                 text,
@@ -133,6 +134,7 @@ public class InputWindowElement extends AnimatedOverlayElementBase {
                 PonderPalette.WHITE.getColorObject().scaleAlpha(fade).getRGB(),
                 false
             );
+        }
 
         if (hasIcon) {
             poseStack.pushMatrix();

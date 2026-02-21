@@ -52,9 +52,16 @@ public class SchematicTableBlock extends HorizontalDirectionalBlock implements I
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.isClientSide())
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         withBlockEntityDo(level, pos, be -> be.openHandledScreen((ServerPlayer) player));
         return InteractionResult.SUCCESS;
     }

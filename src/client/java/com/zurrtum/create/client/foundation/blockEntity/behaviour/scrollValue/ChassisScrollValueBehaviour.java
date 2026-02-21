@@ -32,8 +32,7 @@ public class ChassisScrollValueBehaviour extends ScrollValueBehaviour<ChassisBlo
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
         ImmutableList<Component> rows = ImmutableList.of(CreateLang.translateDirect("contraptions.chassis.distance"));
-        ValueSettingsFormatter formatter = new ValueSettingsFormatter(vs -> ValueSettingsFormatter.toLocaleNumber(new ValueSettings(
-            vs.row(),
+        ValueSettingsFormatter formatter = new ValueSettingsFormatter(vs -> ValueSettingsFormatter.toLocaleNumber(new ValueSettings(vs.row(),
             vs.value() + 1
         )));
         return new ValueSettingsBoard(label, behaviour.getMax() - 1, 1, rows, formatter);
@@ -43,10 +42,13 @@ public class ChassisScrollValueBehaviour extends ScrollValueBehaviour<ChassisBlo
     public void newSettingHovered(ValueSettings valueSetting) {
         if (!AllKeys.hasControlDown()) {
             blockEntity.currentlySelectedRange = valueSetting.value() + 1;
-        } else
-            for (SmartBlockEntity be : behaviour.getBulk())
-                if (be instanceof ChassisBlockEntity cbe)
+        } else {
+            for (SmartBlockEntity be : behaviour.getBulk()) {
+                if (be instanceof ChassisBlockEntity cbe) {
                     cbe.currentlySelectedRange = valueSetting.value() + 1;
+                }
+            }
+        }
         ChassisRangeDisplay.display(blockEntity);
     }
 }

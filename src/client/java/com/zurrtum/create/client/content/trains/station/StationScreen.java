@@ -76,7 +76,14 @@ public class StationScreen extends AbstractStationScreen {
         Consumer<String> onTextChanged;
 
         onTextChanged = s -> nameBox.setX(nameBoxX(s, nameBox));
-        nameBox = new EditBox(new NoShadowFontWrapper(font), x + 23, y + 4, background.getWidth() - 20, 10, Component.literal(station.name));
+        nameBox = new EditBox(
+            new NoShadowFontWrapper(font),
+            x + 23,
+            y + 4,
+            background.getWidth() - 20,
+            10,
+            Component.literal(station.name)
+        );
         nameBox.setBordered(false);
         nameBox.setMaxLength(25);
         nameBox.setTextColor(0xFF592424);
@@ -105,10 +112,12 @@ public class StationScreen extends AbstractStationScreen {
         dropScheduleButton = new IconButton(x + 73, y + 65, AllIcons.I_VIEW_SCHEDULE);
         dropScheduleButton.active = false;
         dropScheduleButton.visible = false;
-        dropScheduleButton.withCallback(() -> minecraft.player.connection.send(StationEditPacket.dropSchedule(blockEntity.getBlockPos())));
+        dropScheduleButton.withCallback(() -> minecraft.player.connection.send(StationEditPacket.dropSchedule(
+            blockEntity.getBlockPos())));
         addRenderableWidget(dropScheduleButton);
 
-        colorTypeScroll = new ScrollInput(x + 166, y + 17, 22, 14).titled(CreateLang.translateDirect("station.train_map_color"));
+        colorTypeScroll = new ScrollInput(x + 166, y + 17, 22, 14).titled(CreateLang.translateDirect(
+            "station.train_map_color"));
         colorTypeScroll.withRange(0, 16);
         colorTypeScroll.withStepFunction(ctx -> colorTypeScroll.standardStep().apply(ctx));
         colorTypeScroll.calling(s -> {
@@ -158,8 +167,9 @@ public class StationScreen extends AbstractStationScreen {
 
         if (messedWithColors > 0) {
             messedWithColors--;
-            if (messedWithColors == 0)
+            if (messedWithColors == 0) {
                 syncTrainNameAndColor();
+            }
         }
 
         super.tick();
@@ -203,11 +213,13 @@ public class StationScreen extends AbstractStationScreen {
 
                 int trainIconWidth = getTrainIconWidth(imminentTrain);
                 int targetPos = background.getWidth() / 2 - trainIconWidth / 2;
-                if (trainIconWidth > 130)
+                if (trainIconWidth > 130) {
                     targetPos -= trainIconWidth - 130;
+                }
                 float f = (float) (imminentTrain.navigation.distanceToDestination / 15f);
-                if (trainPresent())
+                if (trainPresent()) {
                     f = 0;
+                }
                 trainPosition.startWithValue(targetPos - (targetPos + 5) * f);
             }
             return;
@@ -215,8 +227,9 @@ public class StationScreen extends AbstractStationScreen {
 
         int trainIconWidth = getTrainIconWidth(train);
         int targetPos = background.getWidth() / 2 - trainIconWidth / 2;
-        if (trainIconWidth > 130)
+        if (trainIconWidth > 130) {
             targetPos -= trainIconWidth - 130;
+        }
 
         if (leavingAnimation > 0) {
             colorTypeScroll.visible = false;
@@ -225,8 +238,9 @@ public class StationScreen extends AbstractStationScreen {
             float f = 1 - (leavingAnimation / 80f);
             trainPosition.setValue(targetPos + f * f * f * (background.getWidth() - targetPos + 5));
             leavingAnimation--;
-            if (leavingAnimation > 0)
+            if (leavingAnimation > 0) {
                 return;
+            }
 
             displayedTrain = new WeakReference<>(null);
             disassembleTrainButton.visible = false;
@@ -244,10 +258,11 @@ public class StationScreen extends AbstractStationScreen {
         disassembleTrainButton.active = trainAtStation && blockEntity.trainCanDisassemble && blockEntity.edgePoint.isOrthogonal();
         dropScheduleButton.active = blockEntity.trainHasSchedule;
 
-        if (blockEntity.trainHasSchedule)
+        if (blockEntity.trainHasSchedule) {
             dropScheduleButton.setToolTip(CreateLang.translateDirect(blockEntity.trainHasAutoSchedule ? "station.remove_auto_schedule" : "station.remove_schedule"));
-        else
+        } else {
             dropScheduleButton.getToolTip().clear();
+        }
 
         float f = trainAtStation ? 0 : (float) (train.navigation.distanceToDestination / 30f);
         trainPosition.setValue(targetPos - (targetPos + trainIconWidth) * f);
@@ -279,8 +294,9 @@ public class StationScreen extends AbstractStationScreen {
 
         String text = nameBox.getValue();
 
-        if (!nameBox.isFocused())
+        if (!nameBox.isFocused()) {
             AllGuiTextures.STATION_EDIT_NAME.render(graphics, nameBoxX(text, nameBox) + font.width(text) + 5, y + 1);
+        }
 
         graphics.renderItem(AllItems.TRAIN_DOOR.getDefaultInstance(), x + 14, y + 103);
 
@@ -337,12 +353,14 @@ public class StationScreen extends AbstractStationScreen {
         if (!trainNameBox.isFocused()) {
             int buttonX = nameBoxX(text, trainNameBox) + font.width(text) + 5;
             AllGuiTextures.STATION_EDIT_TRAIN_NAME.render(graphics, Math.min(buttonX, guiLeft + 156), y + 44);
-            if (font.width(text) > trainNameBox.getWidth())
+            if (font.width(text) > trainNameBox.getWidth()) {
                 graphics.drawString(font, "...", guiLeft + 26, guiTop + 47, 0xffa6a6a6, true);
+            }
         }
 
-        if (!mapModsPresent())
+        if (!mapModsPresent()) {
             return;
+        }
 
         AllGuiTextures sprite = AllGuiTextures.TRAINMAP_SPRITES;
         sprite.bind();
@@ -421,20 +439,33 @@ public class StationScreen extends AbstractStationScreen {
 
     private void syncTrainNameAndColor() {
         Train train = displayedTrain.get();
-        if (train != null && !trainNameBox.getValue().equals(train.name.getString()))
-            minecraft.player.connection.send(new TrainEditPacket(train.id, trainNameBox.getValue(), train.icon.id(), train.mapColorIndex));
+        if (train != null && !trainNameBox.getValue().equals(train.name.getString())) {
+            minecraft.player.connection.send(new TrainEditPacket(
+                train.id,
+                trainNameBox.getValue(),
+                train.icon.id(),
+                train.mapColorIndex
+            ));
+        }
     }
 
     private void syncStationName() {
-        if (!nameBox.getValue().equals(station.name))
-            minecraft.player.connection.send(StationEditPacket.configure(blockEntity.getBlockPos(), false, nameBox.getValue(), doorControl));
+        if (!nameBox.getValue().equals(station.name)) {
+            minecraft.player.connection.send(StationEditPacket.configure(
+                blockEntity.getBlockPos(),
+                false,
+                nameBox.getValue(),
+                doorControl
+            ));
+        }
     }
 
     @Override
     public void removed() {
         super.removed();
-        if (nameBox == null || trainNameBox == null)
+        if (nameBox == null || trainNameBox == null) {
             return;
+        }
         minecraft.player.connection.send(StationEditPacket.configure(
             blockEntity.getBlockPos(),
             switchingToAssemblyMode,
@@ -442,12 +473,19 @@ public class StationScreen extends AbstractStationScreen {
             doorControl
         ));
         Train train = displayedTrain.get();
-        if (train == null)
+        if (train == null) {
             return;
-        if (!switchingToAssemblyMode)
-            minecraft.player.connection.send(new TrainEditPacket(train.id, trainNameBox.getValue(), train.icon.id(), train.mapColorIndex));
-        else
+        }
+        if (!switchingToAssemblyMode) {
+            minecraft.player.connection.send(new TrainEditPacket(
+                train.id,
+                trainNameBox.getValue(),
+                train.icon.id(),
+                train.mapColorIndex
+            ));
+        } else {
             blockEntity.imminentTrain = null;
+        }
     }
 
     @Override

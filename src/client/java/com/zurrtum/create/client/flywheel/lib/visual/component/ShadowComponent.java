@@ -141,7 +141,13 @@ public final class ShadowComponent implements EntityComponent {
         }
     }
 
-    private void setupInstance(ChunkAccess chunk, BlockPos.MutableBlockPos pos, float entityX, float entityZ, float strength) {
+    private void setupInstance(
+        ChunkAccess chunk,
+        BlockPos.MutableBlockPos pos,
+        float entityX,
+        float entityZ,
+        float strength
+    ) {
         // TODO: cache this?
         var maxLocalRawBrightness = level.getMaxLocalRawBrightness(pos);
         if (maxLocalRawBrightness <= 3) {

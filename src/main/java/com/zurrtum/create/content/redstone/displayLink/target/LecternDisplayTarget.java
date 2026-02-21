@@ -3,10 +3,6 @@ package com.zurrtum.create.content.redstone.displayLink.target;
 import com.zurrtum.create.api.behaviour.display.DisplayHolder;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -18,36 +14,47 @@ import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LecternDisplayTarget extends DisplayTarget {
 
     @Override
     public void acceptText(int line, List<MutableComponent> text, DisplayLinkContext context) {
         BlockEntity be = context.getTargetBlockEntity();
-        if (!(be instanceof LecternBlockEntity lectern))
+        if (!(be instanceof LecternBlockEntity lectern)) {
             return;
+        }
         ItemStack book = lectern.getBook();
-        if (book.isEmpty())
+        if (book.isEmpty()) {
             return;
+        }
 
-        if (book.is(Items.WRITABLE_BOOK))
+        if (book.is(Items.WRITABLE_BOOK)) {
             lectern.setBook(book = signBook(book));
-        if (!book.is(Items.WRITTEN_BOOK))
+        }
+        if (!book.is(Items.WRITTEN_BOOK)) {
             return;
+        }
 
-        WrittenBookContent writtenBookContent = book.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY);
+        WrittenBookContent writtenBookContent = book.getOrDefault(
+            DataComponents.WRITTEN_BOOK_CONTENT,
+            WrittenBookContent.EMPTY
+        );
         List<Filterable<Component>> pages = new ArrayList<>(writtenBookContent.pages());
 
         boolean changed = false;
         DisplayHolder holder = (DisplayHolder) lectern;
         for (int i = 0; i - line < text.size() && i < 50; i++) {
-            if (pages.size() <= i)
+            if (pages.size() <= i) {
                 pages.add(Filterable.passThrough(i < line ? Component.empty() : text.get(i - line)));
-
-            else if (i >= line) {
-                if (i - line == 0)
+            } else if (i >= line) {
+                if (i - line == 0) {
                     reserve(i, holder, context);
-                if (i - line > 0 && isReserved(i - line, holder, context))
+                }
+                if (i - line > 0 && isReserved(i - line, holder, context)) {
                     break;
+                }
 
                 pages.set(i, Filterable.passThrough(text.get(i - line)));
             }
@@ -57,8 +64,10 @@ public class LecternDisplayTarget extends DisplayTarget {
         book.set(DataComponents.WRITTEN_BOOK_CONTENT, writtenBookContent.withReplacedPages(pages));
         lectern.setBook(book);
 
-        if (changed)
-            context.level().sendBlockUpdated(context.getTargetPos(), lectern.getBlockState(), lectern.getBlockState(), 2);
+        if (changed) {
+            context.level()
+                .sendBlockUpdated(context.getTargetPos(), lectern.getBlockState(), lectern.getBlockState(), 2);
+        }
     }
 
     @Override
@@ -74,8 +83,15 @@ public class LecternDisplayTarget extends DisplayTarget {
         ItemStack written = new ItemStack(Items.WRITTEN_BOOK);
         WritableBookContent bookContents = book.get(DataComponents.WRITABLE_BOOK_CONTENT);
 
-        List<Filterable<Component>> list = bookContents.pages().stream().map(filterable -> filterable.<Component>map(Component::literal)).toList();
-        WrittenBookContent writtenContent = new WrittenBookContent(Filterable.passThrough("Printed Book"), "Data Gatherer", 0, list, true);
+        List<Filterable<Component>> list = bookContents.pages().stream()
+            .map(filterable -> filterable.<Component>map(Component::literal)).toList();
+        WrittenBookContent writtenContent = new WrittenBookContent(
+            Filterable.passThrough("Printed Book"),
+            "Data Gatherer",
+            0,
+            list,
+            true
+        );
         written.set(DataComponents.WRITTEN_BOOK_CONTENT, writtenContent);
 
         return written;

@@ -63,7 +63,12 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
     }
 
     @Override
-    public void submit(ChuteRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ChuteRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.item != null) {
             state.item.render(matrices, queue, state.lightCoords);
         }
@@ -74,7 +79,12 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
     }
 
     public record ChuteItemRenderState(ItemStackRenderState item, float offset, float rotate) {
-        public static ChuteItemRenderState create(ItemModelResolver itemModelManager, ItemStack stack, float itemPosition, Level world) {
+        public static ChuteItemRenderState create(
+            ItemModelResolver itemModelManager,
+            ItemStack stack,
+            float itemPosition,
+            Level world
+        ) {
             float offset = itemPosition - .5f;
             float rotate;
             if (PackageItem.isPackage(stack)) {

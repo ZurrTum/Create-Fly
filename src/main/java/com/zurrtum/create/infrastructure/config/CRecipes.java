@@ -8,14 +8,40 @@ public class CRecipes extends ConfigBase {
     public final ConfigBool bulkCutting = b(false, "bulkCutting", Comments.bulkCutting);
     public final ConfigBool allowBrewingInMixer = b(true, "allowBrewingInMixer", Comments.allowBrewingInMixer);
     public final ConfigBool allowShapelessInMixer = b(true, "allowShapelessInMixer", Comments.allowShapelessInMixer);
-    public final ConfigBool allowShapedSquareInPress = b(true, "allowShapedSquareInPress", Comments.allowShapedSquareInPress);
-    public final ConfigBool allowRegularCraftingInCrafter = b(true, "allowRegularCraftingInCrafter", Comments.allowRegularCraftingInCrafter);
-    public final ConfigInt maxFireworkIngredientsInCrafter = i(9, 1, "maxFireworkIngredientsInCrafter", Comments.maxFireworkIngredientsInCrafter);
+    public final ConfigBool allowShapedSquareInPress = b(
+        true,
+        "allowShapedSquareInPress",
+        Comments.allowShapedSquareInPress
+    );
+    public final ConfigBool allowRegularCraftingInCrafter = b(
+        true,
+        "allowRegularCraftingInCrafter",
+        Comments.allowRegularCraftingInCrafter
+    );
+    public final ConfigInt maxFireworkIngredientsInCrafter = i(
+        9,
+        1,
+        "maxFireworkIngredientsInCrafter",
+        Comments.maxFireworkIngredientsInCrafter
+    );
     public final ConfigBool allowStonecuttingOnSaw = b(true, "allowStonecuttingOnSaw", Comments.allowStonecuttingOnSaw);
     public final ConfigBool allowCastingBySpout = b(true, "allowCastingBySpout", Comments.allowCastingBySpout);
-    public final ConfigBool displayLogStrippingRecipes = b(true, "displayLogStrippingRecipes", Comments.displayLogStrippingRecipes);
-    public final ConfigInt lightSourceCountForRefinedRadiance = i(10, 1, "lightSourceCountForRefinedRadiance", Comments.refinedRadiance);
-    public final ConfigBool enableRefinedRadianceRecipe = b(true, "enableRefinedRadianceRecipe", Comments.refinedRadianceRecipe);
+    public final ConfigBool displayLogStrippingRecipes = b(
+        true,
+        "displayLogStrippingRecipes",
+        Comments.displayLogStrippingRecipes
+    );
+    public final ConfigInt lightSourceCountForRefinedRadiance = i(
+        10,
+        1,
+        "lightSourceCountForRefinedRadiance",
+        Comments.refinedRadiance
+    );
+    public final ConfigBool enableRefinedRadianceRecipe = b(
+        true,
+        "enableRefinedRadianceRecipe",
+        Comments.refinedRadianceRecipe
+    );
     public final ConfigBool enableShadowSteelRecipe = b(true, "enableShadowSteelRecipe", Comments.shadowSteelRecipe);
 
     @Override

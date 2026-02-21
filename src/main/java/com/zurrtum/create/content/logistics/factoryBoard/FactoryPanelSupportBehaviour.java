@@ -1,9 +1,9 @@
 package com.zurrtum.create.content.logistics.factoryBoard;
 
 import com.mojang.serialization.Codec;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,12 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     private Supplier<Boolean> isOutput;
     private Runnable onNotify;
 
-    public FactoryPanelSupportBehaviour(SmartBlockEntity be, Supplier<Boolean> isOutput, Supplier<Boolean> outputPower, Runnable onNotify) {
+    public FactoryPanelSupportBehaviour(
+        SmartBlockEntity be,
+        Supplier<Boolean> isOutput,
+        Supplier<Boolean> outputPower,
+        Runnable onNotify
+    ) {
         super(be);
         this.isOutput = isOutput;
         this.outputPower = outputPower;
@@ -48,8 +53,9 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     @Override
     public void destroy() {
         for (FactoryPanelPosition panelPos : linkedPanels) {
-            if (!getLevel().isLoaded(panelPos.pos()))
+            if (!getLevel().isLoaded(panelPos.pos())) {
                 continue;
+            }
             ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getLevel(), panelPos);
             behaviour.targetedByLinks.remove(getPos());
             behaviour.blockEntity.notifyUpdate();
@@ -58,12 +64,14 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     }
 
     public void notifyPanels() {
-        if (getLevel().isClientSide())
+        if (getLevel().isClientSide()) {
             return;
+        }
         for (Iterator<FactoryPanelPosition> iterator = linkedPanels.iterator(); iterator.hasNext(); ) {
             FactoryPanelPosition panelPos = iterator.next();
-            if (!getLevel().isLoaded(panelPos.pos()))
+            if (!getLevel().isLoaded(panelPos.pos())) {
                 continue;
+            }
             ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getLevel(), panelPos);
             if (behaviour == null) {
                 iterator.remove();
@@ -78,16 +86,18 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     public Boolean shouldBePoweredTristate() {
         for (Iterator<FactoryPanelPosition> iterator = linkedPanels.iterator(); iterator.hasNext(); ) {
             FactoryPanelPosition panelPos = iterator.next();
-            if (!getLevel().isLoaded(panelPos.pos()))
+            if (!getLevel().isLoaded(panelPos.pos())) {
                 return null;
+            }
             ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getLevel(), panelPos);
             if (behaviour == null) {
                 iterator.remove();
                 changed = true;
                 continue;
             }
-            if (behaviour.isActive() && behaviour.satisfied && behaviour.count != 0)
+            if (behaviour.isActive() && behaviour.satisfied && behaviour.count != 0) {
                 return true;
+            }
         }
         return false;
     }
@@ -98,8 +108,9 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
 
     public void connect(ServerFactoryPanelBehaviour panel) {
         FactoryPanelPosition panelPosition = panel.getPanelPosition();
-        if (linkedPanels.contains(panelPosition))
+        if (linkedPanels.contains(panelPosition)) {
             return;
+        }
         linkedPanels.add(panelPosition);
         changed = true;
     }
@@ -114,8 +125,9 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
         super.tick();
         if (changed) {
             changed = false;
-            if (!isOutput())
+            if (!isOutput()) {
                 notifyLink();
+            }
             blockEntity.setChanged();
         }
     }

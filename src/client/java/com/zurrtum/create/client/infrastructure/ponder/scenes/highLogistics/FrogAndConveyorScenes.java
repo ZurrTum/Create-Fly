@@ -115,8 +115,8 @@ public class FrogAndConveyorScenes {
         connection(builder, conv1, conv2, true);
         scene.world().setKineticSpeed(conv2S, -32);
 
-        scene.overlay().showText(80).text("Right-click two conveyors with chains to connect them").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(conv1.offset(-1, 0, -1)));
+        scene.overlay().showText(80).text("Right-click two conveyors with chains to connect them").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().topOf(conv1.offset(-1, 0, -1)));
         scene.idle(90);
 
         scene.world().showSection(pole3, Direction.DOWN);
@@ -132,8 +132,8 @@ public class FrogAndConveyorScenes {
         connection(builder, conv1, conv4, true);
         scene.idle(20);
 
-        scene.overlay().showText(70).text("Chain conveyors relay rotational power between each other..").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(conv3.offset(-1, 0, -1)));
+        scene.overlay().showText(70).text("Chain conveyors relay rotational power between each other..")
+            .attachKeyFrame().placeNearTarget().pointAt(util.vector().topOf(conv3.offset(-1, 0, -1)));
         scene.idle(60);
 
         scene.world().hideIndependentSection(poleE, Direction.SOUTH);
@@ -148,8 +148,8 @@ public class FrogAndConveyorScenes {
         scene.effects().rotationDirectionIndicator(conv2.below(2));
         scene.idle(10);
 
-        scene.overlay().showText(60).text("..and connect to shafts above or below them").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().centerOf(util.grid().at(1, 2, 7)));
+        scene.overlay().showText(60).text("..and connect to shafts above or below them").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().centerOf(util.grid().at(1, 2, 7)));
         scene.idle(60);
         scene.world().hideSection(cogsBelow, Direction.SOUTH);
         scene.idle(15);
@@ -157,12 +157,16 @@ public class FrogAndConveyorScenes {
         scene.world().moveSection(poleE2, util.vector().of(0, 0, 1), 0);
         scene.idle(10);
 
-        scene.overlay().showText(80).text("Right-click holding a wrench to start travelling on the chain").attachKeyFrame().independent(30);
+        scene.overlay().showText(80).text("Right-click holding a wrench to start travelling on the chain")
+            .attachKeyFrame().independent(30);
 
         scene.idle(40);
         ElementLink<ParrotElement> parrot = new ElementLinkImpl<>(ParrotElement.class);
         Vec3 parrotStart = util.vector().centerOf(conv2).add(0, -1.45, 1);
-        ChainConveyorParrotElement element = new ChainConveyorParrotElement(parrotStart, ParrotPose.FacePointOfInterestPose::new);
+        ChainConveyorParrotElement element = new ChainConveyorParrotElement(
+            parrotStart,
+            ParrotPose.FacePointOfInterestPose::new
+        );
         scene.addInstruction(new CreateParrotInstruction(0, Direction.DOWN, element));
         scene.addInstruction(s -> s.linkElement(element, parrot));
         scene.special().movePointOfInterest(util.grid().at(0, 3, 2));
@@ -174,8 +178,8 @@ public class FrogAndConveyorScenes {
         scene.special().moveParrot(parrot, util.vector().of(5.75, 0, -5.75), 90);
         scene.idle(65);
 
-        scene.overlay().showText(60).text("At a junction, face towards a chain to follow it").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(conv1));
+        scene.overlay().showText(60).text("At a junction, face towards a chain to follow it").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().topOf(conv1));
 
         scene.idle(25);
         scene.special().movePointOfInterest(util.grid().at(9, 3, 1));
@@ -195,18 +199,20 @@ public class FrogAndConveyorScenes {
     private static void connection(SceneBuilder builder, BlockPos p1, BlockPos p2, boolean connect) {
         builder.world().modifyBlockEntity(
             p1, ChainConveyorBlockEntity.class, be -> {
-                if (connect)
+                if (connect) {
                     be.connections.add(p2.subtract(p1));
-                else
+                } else {
                     be.connections.remove(p2.subtract(p1));
+                }
             }
         );
         builder.world().modifyBlockEntity(
             p2, ChainConveyorBlockEntity.class, be -> {
-                if (connect)
+                if (connect) {
                     be.connections.add(p1.subtract(p2));
-                else
+                } else {
                     be.connections.remove(p1.subtract(p2));
+                }
             }
         );
     }
@@ -264,7 +270,14 @@ public class FrogAndConveyorScenes {
             poseStack.translate(-0.1, 0.2, -0.6);
             ItemStackRenderState itemRenderState = new ItemStackRenderState();
             itemRenderState.displayContext = ItemDisplayContext.GROUND;
-            itemModelManager.appendItemLayers(itemRenderState, wrench.getItem(), itemRenderState.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(
+                itemRenderState,
+                wrench.getItem(),
+                itemRenderState.displayContext,
+                world,
+                null,
+                0
+            );
             int light = lightCoordsFromFade(fade);
             itemRenderState.submit(poseStack, queue, light, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
@@ -342,8 +355,8 @@ public class FrogAndConveyorScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, conv1, bb1.inflate(0.025, 0.025, 0.025), 50);
         scene.idle(26);
 
-        scene.overlay().showText(80).text("Right-click a Chain Conveyor and place the Frogport nearby").attachKeyFrame().placeNearTarget()
-            .pointAt(fromTarget);
+        scene.overlay().showText(80).text("Right-click a Chain Conveyor and place the Frogport nearby").attachKeyFrame()
+            .placeNearTarget().pointAt(fromTarget);
 
         scene.idle(40);
 
@@ -362,8 +375,9 @@ public class FrogAndConveyorScenes {
 
         scene.overlay().showControls(util.vector().topOf(fromFrog.below()), Pointing.DOWN, 40).rightClick();
         scene.idle(7);
-        scene.overlay().showOutlineWithText(util.select().position(fromFrog.below()), 70).attachKeyFrame().colored(PonderPalette.BLUE)
-            .text("Assign it an address in the inventory UI").pointAt(util.vector().topOf(fromFrog.below())).placeNearTarget();
+        scene.overlay().showOutlineWithText(util.select().position(fromFrog.below()), 70).attachKeyFrame()
+            .colored(PonderPalette.BLUE).text("Assign it an address in the inventory UI")
+            .pointAt(util.vector().topOf(fromFrog.below())).placeNearTarget();
         scene.idle(80);
 
         scene.world().moveSection(fromFrogE, util.vector().of(0, 1, 0), 10);
@@ -390,10 +404,11 @@ public class FrogAndConveyorScenes {
 
         scene.idle(70);
 
-        scene.overlay().showText(40).colored(PonderPalette.BLUE).text("Albert").pointAt(util.vector().topOf(fromFrog)).placeNearTarget();
-        scene.idle(5);
-        scene.overlay().showText(40).colored(PonderPalette.OUTPUT).text("→ Peter").pointAt(util.vector().centerOf(util.grid().at(5, 2, 0)))
+        scene.overlay().showText(40).colored(PonderPalette.BLUE).text("Albert").pointAt(util.vector().topOf(fromFrog))
             .placeNearTarget();
+        scene.idle(5);
+        scene.overlay().showText(40).colored(PonderPalette.OUTPUT).text("→ Peter")
+            .pointAt(util.vector().centerOf(util.grid().at(5, 2, 0))).placeNearTarget();
 
         scene.idle(50);
 
@@ -405,12 +420,13 @@ public class FrogAndConveyorScenes {
         scene.world().modifyBlockEntity(fromFrog, FrogportBlockEntity.class, be -> be.startAnimation(box, true));
         scene.idle(15);
 
-        scene.overlay().showText(60).text("..the Frogport will place the package on the conveyor").pointAt(fromTarget.add(0, 0, 1.5))
-            .placeNearTarget();
+        scene.overlay().showText(60).text("..the Frogport will place the package on the conveyor")
+            .pointAt(fromTarget.add(0, 0, 1.5)).placeNearTarget();
         scene.idle(95);
 
-        scene.overlay().showText(60).attachKeyFrame().colored(PonderPalette.RED).text("Packages spin in place if they have no valid destination")
-            .pointAt(util.vector().of(6.5, 4.25, 7.5)).placeNearTarget();
+        scene.overlay().showText(60).attachKeyFrame().colored(PonderPalette.RED)
+            .text("Packages spin in place if they have no valid destination").pointAt(util.vector().of(6.5, 4.25, 7.5))
+            .placeNearTarget();
         scene.idle(60);
 
         scene.world().showSection(util.select().position(toFrog.below()), Direction.SOUTH);
@@ -428,18 +444,20 @@ public class FrogAndConveyorScenes {
 
         scene.idle(10);
 
-        scene.overlay().showText(70).text("More Frogports can be added anywhere on the chain network").attachKeyFrame().placeNearTarget()
-            .pointAt(toTarget);
+        scene.overlay().showText(70).text("More Frogports can be added anywhere on the chain network").attachKeyFrame()
+            .placeNearTarget().pointAt(toTarget);
 
         scene.idle(75);
 
-        scene.overlay().showText(70).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog)).placeNearTarget();
+        scene.overlay().showText(70).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog))
+            .placeNearTarget();
         scene.idle(30);
 
         scene.world().modifyBlockEntity(conv2, ChainConveyorBlockEntity.class, be -> boxTransfer(conv1, conv2, be));
 
         scene.idle(50);
-        scene.overlay().showText(70).attachKeyFrame().text("Packages find their path to a matching frog on the chain network")
+        scene.overlay().showText(70).attachKeyFrame()
+            .text("Packages find their path to a matching frog on the chain network")
             .pointAt(util.vector().topOf(toFrog)).placeNearTarget();
         scene.idle(40);
 
@@ -450,18 +468,23 @@ public class FrogAndConveyorScenes {
 
         scene.world().createItemOnBelt(util.grid().at(1, 1, 5), Direction.EAST, box);
         scene.idle(20);
-        scene.world().hideSection(util.select().fromTo(0, 1, 6, 0, 1, 9).add(util.select().position(1, 1, 9)), Direction.SOUTH);
+        scene.world()
+            .hideSection(util.select().fromTo(0, 1, 6, 0, 1, 9).add(util.select().position(1, 1, 9)), Direction.SOUTH);
         scene.world().setKineticSpeed(util.select().fromTo(1, 1, 5, 0, 1, 5), 0);
 
-        scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog)).placeNearTarget();
-        scene.idle(5);
-        scene.overlay().showText(55).colored(PonderPalette.OUTPUT).text("\u2192 Peter").pointAt(util.vector().centerOf(util.grid().at(0, 2, 5)))
+        scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog))
             .placeNearTarget();
+        scene.idle(5);
+        scene.overlay().showText(55).colored(PonderPalette.OUTPUT).text("\u2192 Peter")
+            .pointAt(util.vector().centerOf(util.grid().at(0, 2, 5))).placeNearTarget();
 
         scene.idle(60);
 
         scene.world().hideSection(util.select().fromTo(1, 2, 5, 0, 1, 5), Direction.WEST);
-        scene.world().hideSection(util.select().fromTo(5, 2, 1, 5, 1, 0).add(util.select().fromTo(6, 1, 0, 9, 1, 0)), Direction.NORTH);
+        scene.world().hideSection(
+            util.select().fromTo(5, 2, 1, 5, 1, 0).add(util.select().fromTo(6, 1, 0, 9, 1, 0)),
+            Direction.NORTH
+        );
         scene.world().hideSection(util.select().position(9, 0, 1), Direction.DOWN);
 
         scene.idle(15);
@@ -475,8 +498,10 @@ public class FrogAndConveyorScenes {
         scene.world().moveSection(toBarrelE, util.vector().of(-1, 0, 0), 0);
         scene.idle(20);
 
-        scene.overlay().showOutlineWithText(util.select().position(fromFrog.below()).add(fromFrogS), 70).attachKeyFrame().colored(PonderPalette.BLUE)
-            .text("Frogports can directly interface with inventories below them").pointAt(util.vector().topOf(fromFrog.below())).placeNearTarget();
+        scene.overlay().showOutlineWithText(util.select().position(fromFrog.below()).add(fromFrogS), 70)
+            .attachKeyFrame().colored(PonderPalette.BLUE)
+            .text("Frogports can directly interface with inventories below them")
+            .pointAt(util.vector().topOf(fromFrog.below())).placeNearTarget();
 
         scene.idle(70);
 
@@ -487,28 +512,37 @@ public class FrogAndConveyorScenes {
         scene.world().showIndependentSection(fromPackager, Direction.WEST);
         ElementLink<WorldSectionElement> toPackagerE = scene.world().showIndependentSection(toPackager, Direction.EAST);
         scene.world().moveSection(toPackagerE, util.vector().of(0, 0, 1), 0);
-        ElementLink<WorldSectionElement> leverE = scene.world().showIndependentSection(util.select().position(lever), Direction.DOWN);
+        ElementLink<WorldSectionElement> leverE = scene.world()
+            .showIndependentSection(util.select().position(lever), Direction.DOWN);
         scene.world().moveSection(leverE, util.vector().of(-1, 0, 0), 0);
         scene.idle(15);
 
-        scene.overlay().showText(90).attachKeyFrame().text("This also works with packagers. Items can be packed and shipped directly")
+        scene.overlay().showText(90).attachKeyFrame()
+            .text("This also works with packagers. Items can be packed and shipped directly")
             .pointAt(util.vector().blockSurface(fromFrog.below(), Direction.WEST)).placeNearTarget();
         scene.idle(100);
 
         scene.world().showSection(sign, Direction.EAST);
         scene.idle(10);
 
-        scene.overlay().showText(80).colored(PonderPalette.BLUE).text("Albert").pointAt(util.vector().topOf(fromFrog)).placeNearTarget();
-        scene.overlay().showText(80).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog)).placeNearTarget();
+        scene.overlay().showText(80).colored(PonderPalette.BLUE).text("Albert").pointAt(util.vector().topOf(fromFrog))
+            .placeNearTarget();
+        scene.overlay().showText(80).colored(PonderPalette.BLUE).text("Peter").pointAt(util.vector().topOf(toFrog))
+            .placeNearTarget();
         scene.idle(20);
 
-        scene.overlay().showOutlineWithText(util.select().position(fromFrog.below()).add(util.select().position(fromFrog.below().west())), 70)
-            .colored(PonderPalette.OUTPUT).text("Addresses packages to 'Peter'")
+        scene.overlay().showOutlineWithText(
+                util.select().position(fromFrog.below())
+                    .add(util.select().position(fromFrog.below().west())), 70
+            ).colored(PonderPalette.OUTPUT).text("Addresses packages to 'Peter'")
             .pointAt(util.vector().blockSurface(fromFrog.below().west(), Direction.NORTH)).placeNearTarget();
         scene.idle(80);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(6, 1, 2), Direction.UP).add(0.5, 0, 0), Pointing.DOWN, 40)
-            .withItem(new ItemStack(Items.DIAMOND));
+        scene.overlay().showControls(
+            util.vector().blockSurface(util.grid().at(6, 1, 2), Direction.UP).add(0.5, 0, 0),
+            Pointing.DOWN,
+            40
+        ).withItem(new ItemStack(Items.DIAMOND));
         scene.idle(25);
 
         scene.addKeyframe();
@@ -535,22 +569,27 @@ public class FrogAndConveyorScenes {
         PonderHilo.packagerUnpack(scene, util.grid().at(2, 1, 4), box);
         scene.idle(20);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(0, 1, 5), Direction.UP).add(0.5, 0, 0), Pointing.DOWN, 40)
-            .withItem(new ItemStack(Items.DIAMOND));
+        scene.overlay().showControls(
+            util.vector().blockSurface(util.grid().at(0, 1, 5), Direction.UP).add(0.5, 0, 0),
+            Pointing.DOWN,
+            40
+        ).withItem(new ItemStack(Items.DIAMOND));
         scene.idle(60);
 
         scene.overlay().showControls(util.vector().centerOf(util.grid().at(2, 2, 5)), Pointing.RIGHT, 40).rightClick()
             .withItem(AllItems.CLIPBOARD.getDefaultInstance());
         scene.idle(10);
 
-        scene.overlay().showText(90).attachKeyFrame().text("Right-click Frogports with a clipboard to collect their address")
+        scene.overlay().showText(90).attachKeyFrame()
+            .text("Right-click Frogports with a clipboard to collect their address")
             .pointAt(util.vector().blockSurface(toFrog, Direction.WEST)).placeNearTarget();
         scene.idle(70);
 
         scene.world().showSection(logistics, Direction.DOWN);
         scene.idle(30);
 
-        scene.overlay().showText(120).text("Clipboards with collected names can help auto-complete address inputs in other UIs")
+        scene.overlay().showText(120)
+            .text("Clipboards with collected names can help auto-complete address inputs in other UIs")
             .pointAt(util.vector().topOf(util.grid().at(2, 1, 2))).placeNearTarget();
         scene.idle(70);
     }

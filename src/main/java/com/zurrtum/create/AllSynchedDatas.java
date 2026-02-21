@@ -32,13 +32,16 @@ public class AllSynchedDatas {
     private static final Map<Class<?>, SynchedData> ALL = new IdentityHashMap<>();
     private static final Map<Class<?>, Optional<SynchedData>> ON_DATA = new IdentityHashMap<>();
     public static final List<EntityDataSerializer<?>> HANDLERS = new ArrayList<>();
-    public static final EntityDataSerializer<Optional<MinecartController>> MINECART_CONTROLLER_HANDLER = register(MinecartController.PACKET_CODEC.apply(
+    public static final EntityDataSerializer<Optional<MinecartController>> MINECART_CONTROLLER_HANDLER = register(
+        MinecartController.PACKET_CODEC.apply(ByteBufCodecs::optional));
+    public static final EntityDataSerializer<Optional<UUID>> OPTIONAL_UUID_HANDLER = register(UUIDUtil.STREAM_CODEC.apply(
         ByteBufCodecs::optional));
-    public static final EntityDataSerializer<Optional<UUID>> OPTIONAL_UUID_HANDLER = register(UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs::optional));
-    public static final EntityDataSerializer<Optional<List<ItemStack>>> CAPTURE_DROPS_HANDLER = register(ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list())
-        .apply(ByteBufCodecs::optional));
-    public static final EntityDataSerializer<CarriageSyncData> CARRIAGE_DATA_HANDLER = register(CarriageSyncDataSerializer::new);
-    public static final EntityDataSerializer<Optional<Vec3>> OPTIONAL_VEC3D_HANDLER = register(Vec3.STREAM_CODEC.apply(ByteBufCodecs::optional));
+    public static final EntityDataSerializer<Optional<List<ItemStack>>> CAPTURE_DROPS_HANDLER = register(ItemStack.STREAM_CODEC.apply(
+        ByteBufCodecs.list()).apply(ByteBufCodecs::optional));
+    public static final EntityDataSerializer<CarriageSyncData> CARRIAGE_DATA_HANDLER = register(
+        CarriageSyncDataSerializer::new);
+    public static final EntityDataSerializer<Optional<Vec3>> OPTIONAL_VEC3D_HANDLER = register(Vec3.STREAM_CODEC.apply(
+        ByteBufCodecs::optional));
     public static final EntityDataSerializer<CompoundTag> NBT_COMPOUND_HANDLER = register(ByteBufCodecs.TRUSTED_COMPOUND_TAG);
     public static final Entry<Integer> HAUNTING = register(Horse.class, EntityDataSerializers.INT, 0);
     public static final Entry<String> ITEM_TYPE = register(ItemEntity.class, EntityDataSerializers.STRING, "");
@@ -58,21 +61,54 @@ public class AllSynchedDatas {
     public static final Entry<Boolean> FIRE_IMMUNE = register(Player.class, EntityDataSerializers.BOOLEAN, false);
     public static final Entry<Boolean> HEAVY_BOOTS = register(Player.class, EntityDataSerializers.BOOLEAN, false);
     public static final Entry<Boolean> CRUSH_DROP = register(Entity.class, EntityDataSerializers.BOOLEAN, false);
-    public static final Entry<Optional<List<ItemStack>>> CAPTURE_DROPS = register(Entity.class, CAPTURE_DROPS_HANDLER, Optional.empty());
-    public static final Entry<Boolean> CONTRAPTION_GROUNDED = register(Entity.class, EntityDataSerializers.BOOLEAN, false);
-    public static final Entry<Optional<Vec3>> CONTRAPTION_DISMOUNT_LOCATION = register(LivingEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
-    public static final Entry<Optional<Vec3>> CONTRAPTION_MOUNT_LOCATION = register(Player.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
-    public static final Entry<Boolean> IS_USING_LECTERN_CONTROLLER = register(Player.class, EntityDataSerializers.BOOLEAN, false);
+    public static final Entry<Optional<List<ItemStack>>> CAPTURE_DROPS = register(
+        Entity.class,
+        CAPTURE_DROPS_HANDLER,
+        Optional.empty()
+    );
+    public static final Entry<Boolean> CONTRAPTION_GROUNDED = register(
+        Entity.class,
+        EntityDataSerializers.BOOLEAN,
+        false
+    );
+    public static final Entry<Optional<Vec3>> CONTRAPTION_DISMOUNT_LOCATION = register(
+        LivingEntity.class,
+        OPTIONAL_VEC3D_HANDLER,
+        Optional.empty()
+    );
+    public static final Entry<Optional<Vec3>> CONTRAPTION_MOUNT_LOCATION = register(
+        Player.class,
+        OPTIONAL_VEC3D_HANDLER,
+        Optional.empty()
+    );
+    public static final Entry<Boolean> IS_USING_LECTERN_CONTROLLER = register(
+        Player.class,
+        EntityDataSerializers.BOOLEAN,
+        false
+    );
     public static final Entry<CompoundTag> TOOLBOX = register(Player.class, NBT_COMPOUND_HANDLER, new CompoundTag());
-    public static final Entry<Integer> LAST_OVERRIDE_LIMB_SWING_UPDATE = register(Player.class, EntityDataSerializers.INT, -1);
+    public static final Entry<Integer> LAST_OVERRIDE_LIMB_SWING_UPDATE = register(
+        Player.class,
+        EntityDataSerializers.INT,
+        -1
+    );
     public static final Entry<Float> OVERRIDE_LIMB_SWING = register(Player.class, EntityDataSerializers.FLOAT, 0F);
     public static final Entry<Boolean> PARROT_TRAIN_HAT = register(Parrot.class, EntityDataSerializers.BOOLEAN, false);
 
-    private static <T> Entry<T> register(Class<? extends SyncedDataHolder> type, EntityDataSerializer<T> handler, T def) {
+    private static <T> Entry<T> register(
+        Class<? extends SyncedDataHolder> type,
+        EntityDataSerializer<T> handler,
+        T def
+    ) {
         return register(type, handler, def, null);
     }
 
-    private static <E extends SyncedDataHolder, T> Entry<T> register(Class<E> type, EntityDataSerializer<T> handler, T def, BiConsumer<E, T> onData) {
+    private static <E extends SyncedDataHolder, T> Entry<T> register(
+        Class<E> type,
+        EntityDataSerializer<T> handler,
+        T def,
+        BiConsumer<E, T> onData
+    ) {
         return ALL.computeIfAbsent(type, SynchedData::new).add(handler, def, onData);
     }
 
@@ -93,7 +129,8 @@ public class AllSynchedDatas {
     }
 
     public static void onData(SyncedDataHolder entity, DataValue<?> entry) {
-        ON_DATA.computeIfAbsent(entity.getClass(), AllSynchedDatas::getParentOrEmpty).ifPresent(data -> data.onData(entity, entry));
+        ON_DATA.computeIfAbsent(entity.getClass(), AllSynchedDatas::getParentOrEmpty)
+            .ifPresent(data -> data.onData(entity, entry));
     }
 
     private static Optional<SynchedData> getParentOrEmpty(Class<?> type) {
@@ -121,7 +158,11 @@ public class AllSynchedDatas {
             this.type = type;
         }
 
-        public <E extends SyncedDataHolder, T> Entry<T> add(EntityDataSerializer<T> handler, T def, BiConsumer<E, T> onData) {
+        public <E extends SyncedDataHolder, T> Entry<T> add(
+            EntityDataSerializer<T> handler,
+            T def,
+            BiConsumer<E, T> onData
+        ) {
             Entry<T> entry = new Entry<>(handler, def, onData);
             datas.add(entry);
             return entry;

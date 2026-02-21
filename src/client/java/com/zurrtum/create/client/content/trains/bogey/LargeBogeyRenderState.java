@@ -19,16 +19,19 @@ public class LargeBogeyRenderState extends StandardBogeyRenderState {
     @Override
     public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
         super.render(matricesEntry, vertexConsumer);
-        secondaryShaft.translate(-.5f, .25f, .5f).center().rotateX(angle).uncenter().light(light).overlay(OverlayTexture.NO_OVERLAY)
+        secondaryShaft.translate(-.5f, .25f, .5f).center().rotateX(angle).uncenter().light(light)
+            .overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+        secondaryShaft.translate(-.5f, .25f, -1.5f).center().rotateX(angle).uncenter().light(light)
+            .overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+        drive.scale(0.998046875f).light(light).overlay(OverlayTexture.NO_OVERLAY)
             .renderInto(matricesEntry, vertexConsumer);
-        secondaryShaft.translate(-.5f, .25f, -1.5f).center().rotateX(angle).uncenter().light(light).overlay(OverlayTexture.NO_OVERLAY)
+        belt.scale(0.998046875f).light(light).overlay(OverlayTexture.NO_OVERLAY)
+            .shiftUVScrolling(AllSpriteShifts.BOGEY_BELT, scroll).renderInto(matricesEntry, vertexConsumer);
+        piston.translate(0, 0, pistonOffset).light(light).overlay(OverlayTexture.NO_OVERLAY)
             .renderInto(matricesEntry, vertexConsumer);
-        drive.scale(0.998046875f).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-        belt.scale(0.998046875f).light(light).overlay(OverlayTexture.NO_OVERLAY).shiftUVScrolling(AllSpriteShifts.BOGEY_BELT, scroll)
+        wheels.translate(0, 1, 0).rotateX(angle).light(light).overlay(OverlayTexture.NO_OVERLAY)
             .renderInto(matricesEntry, vertexConsumer);
-        piston.translate(0, 0, pistonOffset).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-        wheels.translate(0, 1, 0).rotateX(angle).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-        pin.translate(0, 1, 0).rotateX(angle).translate(0, 0.25f, 0).rotateX(-angle).light(light).overlay(OverlayTexture.NO_OVERLAY)
-            .renderInto(matricesEntry, vertexConsumer);
+        pin.translate(0, 1, 0).rotateX(angle).translate(0, 0.25f, 0).rotateX(-angle).light(light)
+            .overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
     }
 }

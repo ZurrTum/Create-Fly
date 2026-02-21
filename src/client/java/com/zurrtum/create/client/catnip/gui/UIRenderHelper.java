@@ -19,11 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UIRenderHelper {
-    public static final Couple<Color> COLOR_TEXT = Couple.create(new Color(0xff_eeeeee), new Color(0xff_a3a3a3)).map(Color::setImmutable);
-    public static final Couple<Color> COLOR_TEXT_DARKER = Couple.create(new Color(0xff_a3a3a3), new Color(0xff_808080)).map(Color::setImmutable);
-    public static final Couple<Color> COLOR_TEXT_ACCENT = Couple.create(new Color(0xff_ddeeff), new Color(0xff_a0b0c0)).map(Color::setImmutable);
-    public static final Couple<Color> COLOR_TEXT_STRONG_ACCENT = Couple.create(new Color(0xff_8ab6d6), new Color(0xff_6e92ab))
+    public static final Couple<Color> COLOR_TEXT = Couple.create(new Color(0xff_eeeeee), new Color(0xff_a3a3a3))
         .map(Color::setImmutable);
+    public static final Couple<Color> COLOR_TEXT_DARKER = Couple.create(new Color(0xff_a3a3a3), new Color(0xff_808080))
+        .map(Color::setImmutable);
+    public static final Couple<Color> COLOR_TEXT_ACCENT = Couple.create(new Color(0xff_ddeeff), new Color(0xff_a0b0c0))
+        .map(Color::setImmutable);
+    public static final Couple<Color> COLOR_TEXT_STRONG_ACCENT = Couple.create(
+        new Color(0xff_8ab6d6),
+        new Color(0xff_6e92ab)
+    ).map(Color::setImmutable);
 
     public static final Color COLOR_STREAK = new Color(0x101010, false).setImmutable();
 
@@ -56,20 +61,36 @@ public class UIRenderHelper {
     }
 
     private static void streak(GuiGraphics graphics, int width, int height, Color c1, Color c2, Color c3, Color c4) {
-        if (NavigatableSimiScreen.isCurrentlyRenderingPreviousScreen())
+        if (NavigatableSimiScreen.isCurrentlyRenderingPreviousScreen()) {
             return;
+        }
 
         double split1 = .5;
         double split2 = .75;
         graphics.fillGradient(-width, 0, width, (int) (split1 * height), c1.getRGB(), c2.getRGB());
-        graphics.fillGradient(-width, (int) (split1 * height), width, (int) (split2 * height), c2.getRGB(), c3.getRGB());
+        graphics.fillGradient(
+            -width,
+            (int) (split1 * height),
+            width,
+            (int) (split2 * height),
+            c2.getRGB(),
+            c3.getRGB()
+        );
         graphics.fillGradient(-width, (int) (split2 * height), width, height, c3.getRGB(), c4.getRGB());
     }
 
     /**
      * @see #angledGradient(GuiGraphics, float, int, int, float, float, Color, Color)
      */
-    public static void angledGradient(GuiGraphics graphics, float angle, int x, int y, float breadth, float length, Couple<Color> c) {
+    public static void angledGradient(
+        GuiGraphics graphics,
+        float angle,
+        int x,
+        int y,
+        float breadth,
+        float length,
+        Couple<Color> c
+    ) {
         angledGradient(graphics, angle, x, y, breadth, length, c.getFirst(), c.getSecond());
     }
 
@@ -103,7 +124,15 @@ public class UIRenderHelper {
         poseStack.popMatrix();
     }
 
-    public static void drawGradientRect(GuiGraphics graphics, float left, float top, float right, float bottom, Color startColor, Color endColor) {
+    public static void drawGradientRect(
+        GuiGraphics graphics,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        Color startColor,
+        Color endColor
+    ) {
         graphics.guiRenderState.submitGuiElement(new GradientRectRenderState(
             new Matrix3x2f(graphics.pose()),
             left,
@@ -115,12 +144,29 @@ public class UIRenderHelper {
         ));
     }
 
-    public static void breadcrumbArrow(GuiGraphics graphics, int x, int y, int width, int height, int indent, Couple<Color> colors) {
+    public static void breadcrumbArrow(
+        GuiGraphics graphics,
+        int x,
+        int y,
+        int width,
+        int height,
+        int indent,
+        Couple<Color> colors
+    ) {
         breadcrumbArrow(graphics, x, y, width, height, indent, colors.getFirst(), colors.getSecond());
     }
 
     // draws a wide chevron-style breadcrumb arrow pointing left
-    public static void breadcrumbArrow(GuiGraphics graphics, int x, int y, int width, int height, int indent, Color startColor, Color endColor) {
+    public static void breadcrumbArrow(
+        GuiGraphics graphics,
+        int x,
+        int y,
+        int width,
+        int height,
+        int indent,
+        Color startColor,
+        Color endColor
+    ) {
         Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();
         poseStack.translate(x - indent, y);
@@ -269,7 +315,21 @@ public class UIRenderHelper {
         int sheet_width,
         int sheet_height
     ) {
-        drawColoredTexture(graphics, texture, c, x, x + width, y, y + height, width, height, tex_left, tex_top, sheet_width, sheet_height);
+        drawColoredTexture(
+            graphics,
+            texture,
+            c,
+            x,
+            x + width,
+            y,
+            y + height,
+            width,
+            height,
+            tex_left,
+            tex_top,
+            sheet_width,
+            sheet_height
+        );
     }
 
     public static void drawStretched(GuiGraphics graphics, int left, int top, int w, int h, TextureSheetSegment tex) {

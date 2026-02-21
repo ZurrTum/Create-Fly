@@ -78,11 +78,15 @@ public class DebugScenes {
         scene.idle(10);
         scene.overlay().showText(1000).independent(10).text("Blocks can be modified");
         scene.idle(20);
-        scene.world().replaceBlocks(util.select().fromTo(1, 1, 3, 2, 2, 4), Blocks.WHITE_CONCRETE.defaultBlockState(), true);
+        scene.world()
+            .replaceBlocks(util.select().fromTo(1, 1, 3, 2, 2, 4), Blocks.WHITE_CONCRETE.defaultBlockState(), true);
         scene.idle(10);
         scene.addKeyframe();
-        scene.world()
-            .replaceBlocks(util.select().position(3, 1, 1), Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedStoneWireBlock.POWER, 15), true);
+        scene.world().replaceBlocks(
+            util.select().position(3, 1, 1),
+            Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedStoneWireBlock.POWER, 15),
+            true
+        );
         scene.rotateCameraY(180);
 
         for (int i = 0; i < 20; i++) {
@@ -113,7 +117,8 @@ public class DebugScenes {
         Vec3 poi2 = boundingBox2.getCenter();
 
         for (int i = 0; i < 10; i++) {
-            scene.overlay().chaseBoundingBoxOutline(PonderPalette.RED, outlineSlot, i % 2 == 0 ? boundingBox1 : boundingBox2, 15);
+            scene.overlay()
+                .chaseBoundingBoxOutline(PonderPalette.RED, outlineSlot, i % 2 == 0 ? boundingBox1 : boundingBox2, 15);
             scene.idle(3);
             scene.special().movePointOfInterest(i % 2 == 0 ? poi1 : poi2);
             scene.idle(12);
@@ -144,8 +149,10 @@ public class DebugScenes {
         scene.idle(20);
         scene.addKeyframe();
 
-        scene.overlay().showOutlineWithText(out1, 100).colored(PonderPalette.BLACK).text("Blocks outside of the base plate do not affect scaling");
-        scene.overlay().showOutlineWithText(out2, 100).colored(PonderPalette.BLACK).text("configureBasePlate() makes sure of that.");
+        scene.overlay().showOutlineWithText(out1, 100).colored(PonderPalette.BLACK)
+            .text("Blocks outside of the base plate do not affect scaling");
+        scene.overlay().showOutlineWithText(out2, 100).colored(PonderPalette.BLACK)
+            .text("configureBasePlate() makes sure of that.");
         scene.markAsFinished();
     }
 
@@ -158,7 +165,8 @@ public class DebugScenes {
 
         Vec3 emitterPos = util.vector().of(2.5, 2.25, 2.5);
         ParticleEmitter emitter = scene.effects().simpleParticleEmitter(ParticleTypes.LAVA, util.vector().of(0, .1, 0));
-        ParticleEmitter rotation = scene.effects().simpleParticleEmitter(ParticleTypes.BUBBLE_COLUMN_UP, util.vector().of(0, .1, 0));
+        ParticleEmitter rotation = scene.effects()
+            .simpleParticleEmitter(ParticleTypes.BUBBLE_COLUMN_UP, util.vector().of(0, .1, 0));
 
         scene.overlay().showText(20).text("Incoming...").pointAt(emitterPos);
         scene.idle(30);
@@ -191,7 +199,8 @@ public class DebugScenes {
 
         scene.idle(20);
 
-        scene.overlay().showControls(util.vector().of(1, 4.5, 3.5), Pointing.LEFT, 20).rightClick().withItem(new ItemStack(Blocks.POLISHED_ANDESITE));
+        scene.overlay().showControls(util.vector().of(1, 4.5, 3.5), Pointing.LEFT, 20).rightClick()
+            .withItem(new ItemStack(Blocks.POLISHED_ANDESITE));
         scene.world().showSection(util.select().layer(4), Direction.DOWN);
 
         scene.idle(40);
@@ -216,7 +225,8 @@ public class DebugScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, chassisValueBoxHighlight, point, 1);
         scene.idle(1);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, chassisValueBoxHighlight, expanded, 120);
-        scene.overlay().showControls(chassisSurface, Pointing.UP, 40).scroll().withItem(Items.SALMON.getDefaultInstance());
+        scene.overlay().showControls(chassisSurface, Pointing.UP, 40).scroll()
+            .withItem(Items.SALMON.getDefaultInstance());
 
         PonderPalette white = PonderPalette.WHITE;
         scene.overlay().showOutline(white, chassisEffectHighlight, singleBlock, 10);
@@ -231,7 +241,8 @@ public class DebugScenes {
         scene.idle(10);
 
         scene.idle(30);
-        scene.overlay().showControls(chassisSurface, Pointing.UP, 40).whileCTRL().scroll().withItem(Items.SALMON.getDefaultInstance());
+        scene.overlay().showControls(chassisSurface, Pointing.UP, 40).whileCTRL().scroll()
+            .withItem(Items.SALMON.getDefaultInstance());
 
         scene.overlay().showOutline(white, chassisEffectHighlight, singleRow, 10);
         scene.idle(10);
@@ -257,13 +268,15 @@ public class DebugScenes {
         BlockPos pos = new BlockPos(1, 2, 3);
         scene.special().createBirb(util.vector().blockSurface(pos, Direction.UP), ParrotPose.FaceCursorPose::new);
         //scene.special.birbOnSpinnyShaft(pos);
-        scene.overlay().showText(100).colored(PonderPalette.GREEN).text("More birbs = More interesting").pointAt(util.vector().topOf(pos));
+        scene.overlay().showText(100).colored(PonderPalette.GREEN).text("More birbs = More interesting")
+            .pointAt(util.vector().topOf(pos));
 
         scene.idle(10);
         scene.special().createBirb(util.vector().topOf(0, 1, 2), ParrotPose.DancePose::new);
         scene.idle(10);
 
-        scene.special().createBirb(util.vector().centerOf(3, 1, 3).add(0, 0.25f, 0), ParrotPose.FacePointOfInterestPose::new);
+        scene.special()
+            .createBirb(util.vector().centerOf(3, 1, 3).add(0, 0.25f, 0), ParrotPose.FacePointOfInterestPose::new);
         scene.idle(20);
 
         BlockPos poi1 = util.grid().at(4, 1, 0);
@@ -306,7 +319,8 @@ public class DebugScenes {
 
         scene.idle(20);
 
-        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("This Section got merged to base.").pointAt(util.vector().topOf(mergePos));
+        scene.overlay().showText(40).colored(PonderPalette.GREEN).text("This Section got merged to base.")
+            .pointAt(util.vector().topOf(mergePos));
         scene.idle(10);
         scene.overlay().showText(40).colored(PonderPalette.RED).text("This Section renders independently.")
             .pointAt(util.vector().topOf(independentPos));
@@ -326,7 +340,8 @@ public class DebugScenes {
         scene.world().setBlocks(hiddenReplaceArea, Blocks.BLACK_CONCRETE.defaultBlockState(), false);
         scene.world().showSection(hiddenReplaceArea, Direction.DOWN);
         scene.idle(20);
-        scene.overlay().showOutlineWithText(hiddenReplaceArea, 30).colored(PonderPalette.BLUE).text("Seamless substitution of blocks");
+        scene.overlay().showOutlineWithText(hiddenReplaceArea, 30).colored(PonderPalette.BLUE)
+            .text("Seamless substitution of blocks");
 
         scene.idle(40);
 

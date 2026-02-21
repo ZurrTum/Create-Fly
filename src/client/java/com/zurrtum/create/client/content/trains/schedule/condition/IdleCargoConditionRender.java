@@ -9,6 +9,9 @@ import net.minecraft.world.item.ItemStack;
 public class IdleCargoConditionRender extends TimedWaitConditionRender<IdleCargoCondition> {
     @Override
     public Pair<ItemStack, Component> getSummary(IdleCargoCondition input) {
-        return Pair.of(ItemStack.EMPTY, CreateLang.translateDirect("schedule.condition.idle_short", formatTime(input, true)));
+        return Pair.of(
+            ItemStack.EMPTY,
+            CreateLang.translateDirect("schedule.condition.idle_short", formatTime(input, true))
+        );
     }
 }

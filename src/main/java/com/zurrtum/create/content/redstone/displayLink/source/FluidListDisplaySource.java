@@ -12,6 +12,9 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.TankManipul
 import com.zurrtum.create.foundation.utility.FluidFormatter;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Comparator;
@@ -20,23 +23,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.material.Fluid;
-
 public class FluidListDisplaySource extends ValueListDisplaySource {
     @Override
     protected Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
-        if (!(sourceBE instanceof SmartObserverBlockEntity cobe))
+        if (!(sourceBE instanceof SmartObserverBlockEntity cobe)) {
             return Stream.empty();
+        }
 
         TankManipulationBehaviour tankManipulationBehaviour = cobe.getBehaviour(TankManipulationBehaviour.OBSERVE);
         ServerFilteringBehaviour filteringBehaviour = cobe.getBehaviour(ServerFilteringBehaviour.TYPE);
         FluidInventory handler = tankManipulationBehaviour.getInventory();
 
-        if (handler == null)
+        if (handler == null) {
             return Stream.empty();
+        }
 
 
         Map<Fluid, Integer> fluids = new HashMap<>();
@@ -44,20 +45,25 @@ public class FluidListDisplaySource extends ValueListDisplaySource {
 
         for (int i = 0, size = handler.size(); i < size; i++) {
             FluidStack stack = handler.getStack(i);
-            if (stack.isEmpty())
+            if (stack.isEmpty()) {
                 continue;
+            }
             if (filteringBehaviour.test(stack)) {
                 fluids.merge(stack.getFluid(), stack.getAmount(), Integer::sum);
                 fluidNames.putIfAbsent(stack.getFluid(), stack);
             }
         }
 
-        return fluids.entrySet().stream().sorted(Comparator.<Map.Entry<Fluid, Integer>>comparingInt(Map.Entry::getValue).reversed()).limit(maxRows)
+        return fluids.entrySet().stream()
+            .sorted(Comparator.<Map.Entry<Fluid, Integer>>comparingInt(Map.Entry::getValue).reversed()).limit(maxRows)
             .map(entry -> IntAttached.with(entry.getValue(), fluidNames.get(entry.getKey()).getName().copy()));
     }
 
     @Override
-    protected List<MutableComponent> createComponentsFromEntry(DisplayLinkContext context, IntAttached<MutableComponent> entry) {
+    protected List<MutableComponent> createComponentsFromEntry(
+        DisplayLinkContext context,
+        IntAttached<MutableComponent> entry
+    ) {
         int amount = entry.getFirst();
         MutableComponent name = entry.getSecond().append(WHITESPACE);
 
@@ -67,22 +73,37 @@ public class FluidListDisplaySource extends ValueListDisplaySource {
     }
 
     @Override
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout
+    ) {
         Integer max = ((MutableInt) context.flapDisplayContext).getValue();
         boolean shorten = shortenNumbers(context);
         int length = FluidFormatter.asString(max, shorten).length();
         String layoutKey = "FluidList_" + length;
 
-        if (layout.isLayout(layoutKey))
+        if (layout.isLayout(layoutKey)) {
             return;
+        }
 
         int maxCharCount = flapDisplay.getMaxCharCount(1);
         int numberLength = Math.min(maxCharCount, Math.max(3, length - 2));
         int nameLength = Math.max(maxCharCount - numberLength - 2, 0);
 
-        FlapDisplaySection value = new FlapDisplaySection(FlapDisplaySection.MONOSPACE * numberLength, "number", false, false).rightAligned();
+        FlapDisplaySection value = new FlapDisplaySection(
+            FlapDisplaySection.MONOSPACE * numberLength,
+            "number",
+            false,
+            false
+        ).rightAligned();
         FlapDisplaySection unit = new FlapDisplaySection(FlapDisplaySection.MONOSPACE * 2, "fluid_units", true, true);
-        FlapDisplaySection name = new FlapDisplaySection(FlapDisplaySection.MONOSPACE * nameLength, "alphabet", false, false);
+        FlapDisplaySection name = new FlapDisplaySection(
+            FlapDisplaySection.MONOSPACE * nameLength,
+            "alphabet",
+            false,
+            false
+        );
 
         layout.configure(layoutKey, List.of(value, unit, name));
     }

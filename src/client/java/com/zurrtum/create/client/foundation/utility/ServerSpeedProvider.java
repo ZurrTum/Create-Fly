@@ -9,8 +9,9 @@ public class ServerSpeedProvider {
     public static boolean initialized = false;
 
     public static void clientTick(Minecraft mc) {
-        if (mc.hasSingleplayerServer() && mc.isPaused())
+        if (mc.hasSingleplayerServer() && mc.isPaused()) {
             return;
+        }
         modifier.tickChaser();
         clientTimer++;
     }

@@ -13,42 +13,56 @@ public class BeltTunnelShapes {
 
     private static final VoxelShape block = Block.box(0, -5, 0, 16, 16, 16);
 
-    private static final VoxelShaper opening = VoxelShaper.forHorizontal(Block.box(2, -5, 14, 14, 10, 16), Direction.SOUTH);
+    private static final VoxelShaper opening = VoxelShaper.forHorizontal(
+        Block.box(2, -5, 14, 14, 10, 16),
+        Direction.SOUTH
+    );
 
     private static final VoxelShaper STRAIGHT = VoxelShaper.forHorizontalAxis(
         Shapes.join(
             block,
             Shapes.or(opening.get(Direction.SOUTH), opening.get(Direction.NORTH)),
             BooleanOp.NOT_SAME
-        ), Axis.Z
+        ),
+        Axis.Z
     ),
 
     TEE = VoxelShaper.forHorizontal(
-        Shapes.join(block, Shapes.or(opening.get(Direction.NORTH), opening.get(Direction.WEST), opening.get(Direction.EAST)), BooleanOp.NOT_SAME),
-        Direction.SOUTH
+        Shapes.join(
+            block,
+            Shapes.or(opening.get(Direction.NORTH), opening.get(Direction.WEST), opening.get(Direction.EAST)),
+            BooleanOp.NOT_SAME
+        ), Direction.SOUTH
     );
 
     private static final VoxelShape CROSS = Shapes.join(
-        block,
-        Shapes.or(opening.get(Direction.SOUTH), opening.get(Direction.NORTH), opening.get(Direction.WEST), opening.get(Direction.EAST)),
-        BooleanOp.NOT_SAME
+        block, Shapes.or(
+            opening.get(Direction.SOUTH),
+            opening.get(Direction.NORTH),
+            opening.get(Direction.WEST),
+            opening.get(Direction.EAST)
+        ), BooleanOp.NOT_SAME
     );
 
     public static VoxelShape getShape(BlockState state) {
         BeltTunnelBlock.Shape shape = state.getValue(BeltTunnelBlock.SHAPE);
         Direction.Axis axis = state.getValue(BeltTunnelBlock.HORIZONTAL_AXIS);
 
-        if (shape == BeltTunnelBlock.Shape.CROSS)
+        if (shape == BeltTunnelBlock.Shape.CROSS) {
             return CROSS;
+        }
 
-        if (BeltTunnelBlock.isStraight(state))
+        if (BeltTunnelBlock.isStraight(state)) {
             return STRAIGHT.get(axis);
+        }
 
-        if (shape == BeltTunnelBlock.Shape.T_LEFT)
+        if (shape == BeltTunnelBlock.Shape.T_LEFT) {
             return TEE.get(axis == Direction.Axis.Z ? Direction.EAST : Direction.NORTH);
+        }
 
-        if (shape == BeltTunnelBlock.Shape.T_RIGHT)
+        if (shape == BeltTunnelBlock.Shape.T_RIGHT) {
             return TEE.get(axis == Direction.Axis.Z ? Direction.WEST : Direction.SOUTH);
+        }
 
         // something went wrong
         return Shapes.block();

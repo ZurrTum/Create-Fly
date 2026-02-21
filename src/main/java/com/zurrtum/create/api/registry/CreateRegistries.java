@@ -28,13 +28,16 @@ public class CreateRegistries {
     public static final Registry<ItemAttributeType> ITEM_ATTRIBUTE_TYPE = register(CreateRegistryKeys.ITEM_ATTRIBUTE_TYPE);
     public static final Registry<DisplaySource> DISPLAY_SOURCE = register(CreateRegistryKeys.DISPLAY_SOURCE);
     public static final Registry<DisplayTarget> DISPLAY_TARGET = register(CreateRegistryKeys.DISPLAY_TARGET);
-    public static final Registry<MountedItemStorageType<?>> MOUNTED_ITEM_STORAGE_TYPE = registerIntrusive(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE);
+    public static final Registry<MountedItemStorageType<?>> MOUNTED_ITEM_STORAGE_TYPE = registerIntrusive(
+        CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE);
     public static final Registry<MountedFluidStorageType<?>> MOUNTED_FLUID_STORAGE_TYPE = register(CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE);
     public static final Registry<ContraptionType> CONTRAPTION_TYPE = registerIntrusive(CreateRegistryKeys.CONTRAPTION_TYPE);
-    public static final Registry<MapCodec<? extends PotatoProjectileRenderMode>> POTATO_PROJECTILE_RENDER_MODE = register(CreateRegistryKeys.POTATO_PROJECTILE_RENDER_MODE);
+    public static final Registry<MapCodec<? extends PotatoProjectileRenderMode>> POTATO_PROJECTILE_RENDER_MODE = register(
+        CreateRegistryKeys.POTATO_PROJECTILE_RENDER_MODE);
     public static final Registry<MapCodec<? extends PotatoProjectileEntityHitAction>> POTATO_PROJECTILE_ENTITY_HIT_ACTION = register(
         CreateRegistryKeys.POTATO_PROJECTILE_ENTITY_HIT_ACTION);
-    public static final Registry<MapCodec<? extends PotatoProjectileBlockHitAction>> POTATO_PROJECTILE_BLOCK_HIT_ACTION = register(CreateRegistryKeys.POTATO_PROJECTILE_BLOCK_HIT_ACTION);
+    public static final Registry<MapCodec<? extends PotatoProjectileBlockHitAction>> POTATO_PROJECTILE_BLOCK_HIT_ACTION = register(
+        CreateRegistryKeys.POTATO_PROJECTILE_BLOCK_HIT_ACTION);
     public static final Registry<PackagePortTargetType> PACKAGE_PORT_TARGET_TYPE = register(CreateRegistryKeys.PACKAGE_PORT_TARGET_TYPE);
     public static final Registry<MenuType<?>> MENU_TYPE = register(CreateRegistryKeys.MENU_TYPE);
 
@@ -49,7 +52,11 @@ public class CreateRegistries {
     @SuppressWarnings("unchecked")
     private static <T> Registry<T> register(ResourceKey<? extends Registry<T>> key, boolean intrusive) {
         MappedRegistry<T> registry = new MappedRegistry<>(key, Lifecycle.stable(), intrusive);
-        BuiltInRegistries.WRITABLE_REGISTRY.register((ResourceKey<WritableRegistry<?>>) (Object) key, registry, RegistrationInfo.BUILT_IN);
+        BuiltInRegistries.WRITABLE_REGISTRY.register(
+            (ResourceKey<WritableRegistry<?>>) (Object) key,
+            registry,
+            RegistrationInfo.BUILT_IN
+        );
         return registry;
     }
 

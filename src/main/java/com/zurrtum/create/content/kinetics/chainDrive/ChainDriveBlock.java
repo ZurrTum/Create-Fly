@@ -9,9 +9,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -34,6 +31,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
+import java.util.Locale;
+
 public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<KineticBlockEntity>, TransformableBlock, WeakPowerControlBlock {
 
     public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
@@ -52,18 +51,30 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Axis placedAxis = context.getNearestLookingDirection().getAxis();
-        Axis axis = context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? placedAxis : getPreferredAxis(context);
-        if (axis == null)
+        Axis axis = context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? placedAxis : getPreferredAxis(
+            context);
+        if (axis == null) {
             axis = placedAxis;
+        }
 
         BlockState state = defaultBlockState().setValue(AXIS, axis);
         for (Direction facing : Iterate.directions) {
-            if (facing.getAxis() == axis)
+            if (facing.getAxis() == axis) {
                 continue;
+            }
             BlockPos pos = context.getClickedPos();
             BlockPos offset = pos.relative(facing);
             Level world = context.getLevel();
-            state = updateShape(state, world, world, pos, facing, offset, world.getBlockState(offset), world.getRandom());
+            state = updateShape(
+                state,
+                world,
+                world,
+                pos,
+                facing,
+                offset,
+                world.getBlockState(offset),
+                world.getRandom()
+            );
         }
         return state;
     }
@@ -88,16 +99,20 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
         boolean facingAlongFirst = axis == Axis.X ? faceAxis.isVertical() : faceAxis == Axis.X;
         boolean positive = face.getAxisDirection() == AxisDirection.POSITIVE;
 
-        if (axis == faceAxis)
+        if (axis == faceAxis) {
             return stateIn;
+        }
 
         if (!(neighbour.getBlock() instanceof ChainDriveBlock)) {
-            if (facingAlongFirst != connectionAlongFirst || part == Part.NONE)
+            if (facingAlongFirst != connectionAlongFirst || part == Part.NONE) {
                 return stateIn;
-            if (part == Part.MIDDLE)
+            }
+            if (part == Part.MIDDLE) {
                 return stateIn.setValue(PART, positive ? Part.END : Part.START);
-            if ((part == Part.START) == positive)
+            }
+            if ((part == Part.START) == positive) {
                 return stateIn.setValue(PART, Part.NONE);
+            }
             return stateIn;
         }
 
@@ -106,10 +121,12 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
         boolean otherConnection = neighbour.getValue(CONNECTED_ALONG_FIRST_COORDINATE);
         Axis otherConnectionAxis = otherConnection ? (otherAxis == Axis.X ? Axis.Y : Axis.X) : (otherAxis == Axis.Z ? Axis.Y : Axis.Z);
 
-        if (neighbour.getValue(AXIS) == faceAxis)
+        if (neighbour.getValue(AXIS) == faceAxis) {
             return stateIn;
-        if (otherPart != Part.NONE && otherConnectionAxis != faceAxis)
+        }
+        if (otherPart != Part.NONE && otherConnectionAxis != faceAxis) {
             return stateIn;
+        }
 
         if (part == Part.NONE) {
             part = positive ? Part.START : Part.END;
@@ -118,17 +135,22 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
             return stateIn;
         }
 
-        if ((part == Part.START) != positive)
+        if ((part == Part.START) != positive) {
             part = Part.MIDDLE;
+        }
 
         return stateIn.setValue(PART, part).setValue(CONNECTED_ALONG_FIRST_COORDINATE, connectionAlongFirst);
     }
 
     @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
-        if (originalState.getValue(PART) == Part.NONE)
+        if (originalState.getValue(PART) == Part.NONE) {
             return super.getRotatedBlockState(originalState, targetedFace);
-        return super.getRotatedBlockState(originalState, Direction.get(AxisDirection.POSITIVE, getConnectionAxis(originalState)));
+        }
+        return super.getRotatedBlockState(
+            originalState,
+            Direction.get(AxisDirection.POSITIVE, getConnectionAxis(originalState))
+        );
     }
 
     @Override
@@ -142,15 +164,29 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
         //			.updateNeighbors(context.getWorld(), context.getPos(), 1);
         Axis axis = newState.getValue(AXIS);
         newState = defaultBlockState().setValue(AXIS, axis);
-        if (newState.hasProperty(BlockStateProperties.POWERED))
-            newState = newState.setValue(BlockStateProperties.POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
+        if (newState.hasProperty(BlockStateProperties.POWERED)) {
+            newState = newState.setValue(
+                BlockStateProperties.POWERED,
+                context.getLevel().hasNeighborSignal(context.getClickedPos())
+            );
+        }
         for (Direction facing : Iterate.directions) {
-            if (facing.getAxis() == axis)
+            if (facing.getAxis() == axis) {
                 continue;
+            }
             BlockPos pos = context.getClickedPos();
             BlockPos offset = pos.relative(facing);
             Level world = context.getLevel();
-            newState = updateShape(newState, world, world, pos, facing, offset, world.getBlockState(offset), world.getRandom());
+            newState = updateShape(
+                newState,
+                world,
+                world,
+                pos,
+                facing,
+                offset,
+                world.getBlockState(offset),
+                world.getRandom()
+            );
         }
         //		newState.updateNeighbors(context.getWorld(), context.getPos(), 1 | 2);
         return newState;
@@ -171,14 +207,18 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
         Axis connectionAxis = getConnectionAxis(state);
         Axis otherConnectionAxis = getConnectionAxis(other);
 
-        if (otherConnectionAxis != connectionAxis)
+        if (otherConnectionAxis != connectionAxis) {
             return false;
-        if (facing.getAxis() != connectionAxis)
+        }
+        if (facing.getAxis() != connectionAxis) {
             return false;
-        if (facing.getAxisDirection() == AxisDirection.POSITIVE && (part == Part.MIDDLE || part == Part.START))
+        }
+        if (facing.getAxisDirection() == AxisDirection.POSITIVE && (part == Part.MIDDLE || part == Part.START)) {
             return true;
-        if (facing.getAxisDirection() == AxisDirection.NEGATIVE && (part == Part.MIDDLE || part == Part.END))
+        }
+        if (facing.getAxisDirection() == AxisDirection.NEGATIVE && (part == Part.MIDDLE || part == Part.END)) {
             return true;
+        }
 
         return false;
     }
@@ -192,18 +232,17 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
     public static float getRotationSpeedModifier(KineticBlockEntity from, KineticBlockEntity to) {
         float fromMod = 1;
         float toMod = 1;
-        if (from instanceof ChainGearshiftBlockEntity)
+        if (from instanceof ChainGearshiftBlockEntity) {
             fromMod = ((ChainGearshiftBlockEntity) from).getModifier();
-        if (to instanceof ChainGearshiftBlockEntity)
+        }
+        if (to instanceof ChainGearshiftBlockEntity) {
             toMod = ((ChainGearshiftBlockEntity) to).getModifier();
+        }
         return fromMod / toMod;
     }
 
     public enum Part implements StringRepresentable {
-        START,
-        MIDDLE,
-        END,
-        NONE;
+        START, MIDDLE, END, NONE;
 
         @Override
         public String getSerializedName() {
@@ -235,8 +274,9 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
             normal = normal.getClockWise(rotAxis);
         }
 
-        if (direction.getAxisDirection() == AxisDirection.NEGATIVE)
+        if (direction.getAxisDirection() == AxisDirection.NEGATIVE) {
             pState = reversePart(pState);
+        }
 
         Axis newAxis = normal.getAxis();
         Axis newConnectingDirection = direction.getAxis();
@@ -248,17 +288,21 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
     @Override
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         Axis connectionAxis = getConnectionAxis(pState);
-        if (pMirror.mirror(Direction.fromAxisAndDirection(connectionAxis, AxisDirection.POSITIVE)).getAxisDirection() == AxisDirection.POSITIVE)
+        if (pMirror.mirror(Direction.fromAxisAndDirection(connectionAxis, AxisDirection.POSITIVE))
+            .getAxisDirection() == AxisDirection.POSITIVE) {
             return pState;
+        }
         return reversePart(pState);
     }
 
     protected BlockState reversePart(BlockState pState) {
         Part part = pState.getValue(PART);
-        if (part == Part.START)
+        if (part == Part.START) {
             return pState.setValue(PART, Part.END);
-        if (part == Part.END)
+        }
+        if (part == Part.END) {
             return pState.setValue(PART, Part.START);
+        }
         return pState;
     }
 

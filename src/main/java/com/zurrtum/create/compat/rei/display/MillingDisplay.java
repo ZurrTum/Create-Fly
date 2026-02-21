@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record MillingDisplay(EntryIngredient input, List<ProcessingOutput> outputs, Optional<Identifier> location) implements Display {
+public record MillingDisplay(EntryIngredient input, List<ProcessingOutput> outputs,
+                             Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<MillingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(MillingDisplay::input),

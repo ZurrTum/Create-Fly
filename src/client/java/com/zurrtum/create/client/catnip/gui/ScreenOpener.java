@@ -24,18 +24,22 @@ public class ScreenOpener {
         backSteppedFrom = null;
         if (current != null) {
             if (backStack.size() >= 15) // don't go deeper than 15 steps
+            {
                 backStack.pollLast();
+            }
 
             backStack.push(current);
-        } else
+        } else {
             backStack.clear();
+        }
 
         openScreen(toOpen);
     }
 
     public static void openPreviousScreen(Screen current, @Nullable NavigatableSimiScreen screenWithContext) {
-        if (backStack.isEmpty())
+        if (backStack.isEmpty()) {
             return;
+        }
         backSteppedFrom = current;
         Screen previousScreen = backStack.pop();
         if (previousScreen instanceof NavigatableSimiScreen previousNavScreen) {
@@ -53,8 +57,9 @@ public class ScreenOpener {
     // transitions are only supported in simiScreens atm. they take care of all the
     // rendering for it
     public static void transitionTo(NavigatableSimiScreen screen) {
-        if (tryBackTracking(screen))
+        if (tryBackTracking(screen)) {
             return;
+        }
         screen.transition.startWithValue(0.001)
             //.chaseTimed(1, 8);
             //.chase(1, .2f, LerpedFloat.Chaser.LINEAR);
@@ -64,13 +69,16 @@ public class ScreenOpener {
 
     private static boolean tryBackTracking(NavigatableSimiScreen screen) {
         List<Screen> screenHistory = getScreenHistory();
-        if (screenHistory.isEmpty())
+        if (screenHistory.isEmpty()) {
             return false;
+        }
         Screen previouslyRenderedScreen = screenHistory.get(0);
-        if (!(previouslyRenderedScreen instanceof NavigatableSimiScreen))
+        if (!(previouslyRenderedScreen instanceof NavigatableSimiScreen)) {
             return false;
-        if (!screen.isEquivalentTo((NavigatableSimiScreen) previouslyRenderedScreen))
+        }
+        if (!screen.isEquivalentTo((NavigatableSimiScreen) previouslyRenderedScreen)) {
             return false;
+        }
 
         openPreviousScreen(Minecraft.getInstance().screen, screen);
         return true;
@@ -98,8 +106,9 @@ public class ScreenOpener {
         Minecraft.getInstance().schedule(() -> {
             Minecraft.getInstance().setScreen(screen);
             Screen previouslyRenderedScreen = getPreviouslyRenderedScreen();
-            if (previouslyRenderedScreen != null && screen instanceof NavigatableSimiScreen)
+            if (previouslyRenderedScreen != null && screen instanceof NavigatableSimiScreen) {
                 previouslyRenderedScreen.init(screen.width, screen.height);
+            }
         });
     }
 

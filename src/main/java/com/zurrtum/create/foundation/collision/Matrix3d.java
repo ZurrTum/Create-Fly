@@ -17,8 +17,9 @@ public class Matrix3d {
 
     public Matrix3d asXRotation(float radians) {
         asIdentity();
-        if (radians == 0)
+        if (radians == 0) {
             return this;
+        }
 
         double s = Mth.sin(radians);
         double c = Mth.cos(radians);
@@ -30,8 +31,9 @@ public class Matrix3d {
 
     public Matrix3d asYRotation(float radians) {
         asIdentity();
-        if (radians == 0)
+        if (radians == 0) {
             return this;
+        }
 
         double s = Mth.sin(radians);
         double c = Mth.cos(radians);
@@ -43,8 +45,9 @@ public class Matrix3d {
 
     public Matrix3d asZRotation(float radians) {
         asIdentity();
-        if (radians == 0)
+        if (radians == 0) {
             return this;
+        }
 
         double s = Mth.sin(radians);
         double c = Mth.cos(radians);

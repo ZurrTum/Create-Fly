@@ -84,36 +84,50 @@ public class CarriageContraption extends Contraption {
 
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
-        if (!searchMovedStructure(world, pos, null))
+        if (!searchMovedStructure(world, pos, null)) {
             return false;
-        if (blocks.size() <= 1)
+        }
+        if (blocks.size() <= 1) {
             return false;
-        if (bogeys == 0)
+        }
+        if (bogeys == 0) {
             return false;
-        if (bogeys > 2)
+        }
+        if (bogeys > 2) {
             throw new AssemblyException(Component.translatable("create.train_assembly.too_many_bogeys", bogeys));
-        if (sidewaysControls)
+        }
+        if (sidewaysControls) {
             throw new AssemblyException(Component.translatable("create.train_assembly.sideways_controls"));
+        }
 
-        for (BlockPos blazePos : assembledBlockConductors)
-            for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis()))
-                if (inControl(blazePos, direction))
+        for (BlockPos blazePos : assembledBlockConductors) {
+            for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis())) {
+                if (inControl(blazePos, direction)) {
                     blockConductors.set(direction != assemblyDirection, true);
-        for (BlockPos seatPos : getSeats())
-            for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis()))
-                if (inControl(seatPos, direction))
-                    conductorSeats.computeIfAbsent(seatPos, p -> Couple.create(false, false)).set(direction != assemblyDirection, true);
+                }
+            }
+        }
+        for (BlockPos seatPos : getSeats()) {
+            for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis())) {
+                if (inControl(seatPos, direction)) {
+                    conductorSeats.computeIfAbsent(seatPos, p -> Couple.create(false, false))
+                        .set(direction != assemblyDirection, true);
+                }
+            }
+        }
 
         return true;
     }
 
     public boolean inControl(BlockPos pos, Direction direction) {
         BlockPos controlsPos = pos.relative(direction);
-        if (!blocks.containsKey(controlsPos))
+        if (!blocks.containsKey(controlsPos)) {
             return false;
+        }
         StructureBlockInfo info = blocks.get(controlsPos);
-        if (!info.state().is(AllBlocks.TRAIN_CONTROLS))
+        if (!info.state().is(AllBlocks.TRAIN_CONTROLS)) {
             return false;
+        }
         return info.state().getValue(ControlsBlock.FACING) == direction.getOpposite();
     }
 
@@ -149,8 +163,9 @@ public class CarriageContraption extends Contraption {
 
         if (blockState.getBlock() instanceof AbstractBogeyBlock<?>) {
             bogeys++;
-            if (bogeys == 2)
+            if (bogeys == 2) {
                 secondBogeyPos = pos;
+            }
         }
 
         MovingInteractionBehaviour behaviour = MovingInteractionBehaviour.REGISTRY.get(blockState);
@@ -160,14 +175,15 @@ public class CarriageContraption extends Contraption {
 
         if (blockState.is(AllBlocks.TRAIN_CONTROLS)) {
             Direction facing = blockState.getValue(ControlsBlock.FACING);
-            if (facing.getAxis() != assemblyDirection.getAxis())
+            if (facing.getAxis() != assemblyDirection.getAxis()) {
                 sidewaysControls = true;
-            else {
+            } else {
                 boolean forwards = facing == assemblyDirection;
-                if (forwards)
+                if (forwards) {
                     forwardControls = true;
-                else
+                } else {
                     backwardControls = true;
+                }
             }
         }
 
@@ -198,7 +214,10 @@ public class CarriageContraption extends Contraption {
         assemblyDirection = view.read("AssemblyDirection", Direction.CODEC).orElse(Direction.DOWN);
         forwardControls = view.getBooleanOr("FrontControls", false);
         backwardControls = view.getBooleanOr("BackControls", false);
-        blockConductors = Couple.create(view.getBooleanOr("FrontBlazeConductor", false), view.getBooleanOr("BackBlazeConductor", false));
+        blockConductors = Couple.create(
+            view.getBooleanOr("FrontBlazeConductor", false),
+            view.getBooleanOr("BackBlazeConductor", false)
+        );
         conductorSeats.clear();
         view.childrenListOrEmpty("ConductorSeats").forEach(item -> {
             conductorSeats.put(
@@ -239,24 +258,28 @@ public class CarriageContraption extends Contraption {
     @Override
     @Nullable
     public CollisionList getSimplifiedEntityColliders() {
-        if (notInPortal())
+        if (notInPortal()) {
             return super.getSimplifiedEntityColliders();
+        }
         return null;
     }
 
     @Override
     public boolean isHiddenInPortal(BlockPos localPos) {
-        if (notInPortal())
+        if (notInPortal()) {
             return super.isHiddenInPortal(localPos);
+        }
         Direction facing = assemblyDirection;
         Axis axis = facing.getClockWise().getAxis();
-        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getAxisDirection().getStep();
+        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getAxisDirection()
+            .getStep();
         return !withinVisible(coord) || atSeam(coord);
     }
 
     public boolean isHiddenInPortal(int posAlongMovementAxis) {
-        if (notInPortal())
+        if (notInPortal()) {
             return false;
+        }
         return !withinVisible(posAlongMovementAxis) || atSeam(posAlongMovementAxis);
     }
 
@@ -267,14 +290,16 @@ public class CarriageContraption extends Contraption {
     public boolean atSeam(BlockPos localPos) {
         Direction facing = assemblyDirection;
         Axis axis = facing.getClockWise().getAxis();
-        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getAxisDirection().getStep();
+        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getAxisDirection()
+            .getStep();
         return coord == portalCutoffMin || coord == portalCutoffMax;
     }
 
     public boolean withinVisible(BlockPos localPos) {
         Direction facing = assemblyDirection;
         Axis axis = facing.getClockWise().getAxis();
-        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getAxisDirection().getStep();
+        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getAxisDirection()
+            .getStep();
         return withinVisible(coord);
     }
 
@@ -293,10 +318,12 @@ public class CarriageContraption extends Contraption {
 
     @Override
     public void writeStorage(ValueOutput view, boolean spawnPacket) {
-        if (!spawnPacket)
+        if (!spawnPacket) {
             return;
-        if (storageProxy != null)
+        }
+        if (storageProxy != null) {
             storageProxy.write(view, spawnPacket);
+        }
     }
 
 }

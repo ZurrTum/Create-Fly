@@ -43,7 +43,10 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/wand_of_symmetry");
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/item");
     public static final Identifier CORE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core");
-    public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core_glow");
+    public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/wand_of_symmetry/core_glow"
+    );
     public static final Identifier BITS_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/bits");
     private static final int[] TINTS = new int[0];
 
@@ -157,7 +160,8 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked::new);
 
         @Override
         public MapCodec<? extends ItemModel.Unbaked> type() {
@@ -179,7 +183,13 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
-            return new SymmetryWandModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, BITS_ID));
+            return new SymmetryWandModel(
+                settings,
+                quads,
+                bake(baker, CORE_ID),
+                bake(baker, CORE_GLOW_ID),
+                bake(baker, BITS_ID)
+            );
         }
 
         private static List<BakedQuad> bake(ModelBaker baker, Identifier id) {

@@ -11,21 +11,25 @@ import com.zurrtum.create.content.trains.display.FlapDisplaySection;
 import com.zurrtum.create.content.trains.display.GlobalTrainDisplayData;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.zurrtum.create.content.trains.display.FlapDisplaySection.MONOSPACE;
 
 public class StationSummaryDisplaySource extends DisplaySource {
 
     protected static final MutableComponent UNPREDICTABLE = Component.literal(" ~ ");
-    protected static final List<MutableComponent> EMPTY_ENTRY_4 = ImmutableList.of(WHITESPACE, Component.literal(" . "), WHITESPACE, WHITESPACE);
+    protected static final List<MutableComponent> EMPTY_ENTRY_4 = ImmutableList.of(
+        WHITESPACE,
+        Component.literal(" . "),
+        WHITESPACE,
+        WHITESPACE
+    );
     protected static final List<MutableComponent> EMPTY_ENTRY_5 = ImmutableList.of(
         WHITESPACE,
         Component.literal(" . "),
@@ -79,27 +83,35 @@ public class StationSummaryDisplaySource extends DisplaySource {
             }
 
             String platform = prediction.destination;
-            for (String string : filter.split("\\*"))
-                if (!string.isEmpty())
+            for (String string : filter.split("\\*")) {
+                if (!string.isEmpty()) {
                     platform = platform.replace(string, "");
+                }
+            }
             platform = platform.replace("*", "?");
 
             lines.add(Component.literal(platform.trim()));
             list.add(lines);
         });
 
-        if (!list.isEmpty())
+        if (!list.isEmpty()) {
             context.blockEntity().award(AllAdvancements.DISPLAY_BOARD);
+        }
 
         int toPad = stats.maxRows() - list.size();
-        for (int padding = 0; padding < toPad; padding++)
+        for (int padding = 0; padding < toPad; padding++) {
             list.add(hasPlatform ? EMPTY_ENTRY_5 : EMPTY_ENTRY_4);
+        }
 
         return list;
     }
 
     @Override
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout
+    ) {
         CompoundTag conf = context.sourceConfig();
         int columnWidth = conf.getIntOr("NameColumn", 0);
         int columnWidth2 = conf.getIntOr("PlatformColumn", 0);
@@ -107,8 +119,9 @@ public class StationSummaryDisplaySource extends DisplaySource {
 
         String layoutName = "StationSummary" + columnWidth + hasPlatform + columnWidth2;
 
-        if (layout.isLayout(layoutName))
+        if (layout.isLayout(layoutName)) {
             return;
+        }
 
         ArrayList<FlapDisplaySection> list = new ArrayList<>();
 
@@ -125,15 +138,22 @@ public class StationSummaryDisplaySource extends DisplaySource {
         platformWidth = Math.min(platformWidth, totalSize - gapSize);
         platformWidth = (int) (platformWidth / MONOSPACE) * MONOSPACE;
 
-        if (hasPlatform)
+        if (hasPlatform) {
             totalSize = totalSize - gapSize - platformWidth;
-        if (platformWidth == 0 && hasPlatform)
+        }
+        if (platformWidth == 0 && hasPlatform) {
             totalSize += gapSize;
+        }
 
         int trainNameWidth = (int) ((columnWidth / 100f) * totalSize / MONOSPACE);
         int destinationWidth = (int) Math.round((1 - columnWidth / 100f) * totalSize / MONOSPACE);
 
-        FlapDisplaySection trainName = new FlapDisplaySection(trainNameWidth * MONOSPACE, "alphabet", false, trainNameWidth > 0);
+        FlapDisplaySection trainName = new FlapDisplaySection(
+            trainNameWidth * MONOSPACE,
+            "alphabet",
+            false,
+            trainNameWidth > 0
+        );
         FlapDisplaySection destination = new FlapDisplaySection(
             destinationWidth * MONOSPACE,
             "alphabet",
@@ -148,8 +168,9 @@ public class StationSummaryDisplaySource extends DisplaySource {
         list.add(trainName);
         list.add(destination);
 
-        if (hasPlatform)
+        if (hasPlatform) {
             list.add(platform);
+        }
 
         layout.configure(layoutName, list);
     }
@@ -163,18 +184,23 @@ public class StationSummaryDisplaySource extends DisplaySource {
     public void populateData(DisplayLinkContext context) {
         CompoundTag conf = context.sourceConfig();
 
-        if (!conf.contains("PlatformColumn"))
+        if (!conf.contains("PlatformColumn")) {
             conf.putInt("PlatformColumn", 3);
-        if (!conf.contains("NameColumn"))
+        }
+        if (!conf.contains("NameColumn")) {
             conf.putInt("NameColumn", 50);
+        }
 
-        if (conf.contains("Filter"))
+        if (conf.contains("Filter")) {
             return;
-        if (!(context.getSourceBlockEntity() instanceof StationBlockEntity stationBe))
+        }
+        if (!(context.getSourceBlockEntity() instanceof StationBlockEntity stationBe)) {
             return;
+        }
         GlobalStation station = stationBe.getStation();
-        if (station == null)
+        if (station == null) {
             return;
+        }
         conf.putString("Filter", station.name);
     }
 

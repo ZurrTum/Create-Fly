@@ -19,8 +19,8 @@ import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
 
 public final class LineModelBuilder {
-    private static final Material MATERIAL = SimpleMaterial.builder().shaders(StandardMaterialShaders.LINE).backfaceCulling(false)
-        .cardinalLightingMode(CardinalLightingMode.OFF).build();
+    private static final Material MATERIAL = SimpleMaterial.builder().shaders(StandardMaterialShaders.LINE)
+        .backfaceCulling(false).cardinalLightingMode(CardinalLightingMode.OFF).build();
 
     @UnknownNullability
     private VertexView vertexView;

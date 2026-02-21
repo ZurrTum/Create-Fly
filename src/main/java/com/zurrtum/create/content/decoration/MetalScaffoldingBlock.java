@@ -33,18 +33,26 @@ public class MetalScaffoldingBlock extends ScaffoldingBlock implements IWrenchab
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        if (pState.getValue(BOTTOM))
+    public VoxelShape getCollisionShape(
+        BlockState pState,
+        BlockGetter pLevel,
+        BlockPos pPos,
+        CollisionContext pContext
+    ) {
+        if (pState.getValue(BOTTOM)) {
             return AllShapes.SCAFFOLD_HALF;
+        }
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
     }
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        if (pState.getValue(BOTTOM))
+        if (pState.getValue(BOTTOM)) {
             return AllShapes.SCAFFOLD_HALF;
-        if (pContext.isHoldingItem(Items.AIR) || !pContext.isHoldingItem(pState.getBlock().asItem()))
+        }
+        if (pContext.isHoldingItem(Items.AIR) || !pContext.isHoldingItem(pState.getBlock().asItem())) {
             return AllShapes.SCAFFOLD_FULL;
+        }
         return Shapes.block();
     }
 

@@ -1,13 +1,10 @@
 package com.zurrtum.create.content.kinetics.simpleRelays;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchableWithBracket;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
@@ -18,6 +15,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Optional;
 
 public abstract class AbstractSimpleShaftBlock extends AbstractShaftBlock implements IWrenchableWithBracket {
 
@@ -39,12 +38,18 @@ public abstract class AbstractSimpleShaftBlock extends AbstractShaftBlock implem
 
     @Override
     public Optional<ItemStack> removeBracket(BlockGetter world, BlockPos pos, boolean inOnReplacedContext) {
-        BracketedBlockEntityBehaviour behaviour = BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE);
-        if (behaviour == null)
+        BracketedBlockEntityBehaviour behaviour = BlockEntityBehaviour.get(
+            world,
+            pos,
+            BracketedBlockEntityBehaviour.TYPE
+        );
+        if (behaviour == null) {
             return Optional.empty();
+        }
         BlockState bracket = behaviour.removeBracket(inOnReplacedContext);
-        if (bracket == null)
+        if (bracket == null) {
             return Optional.empty();
+        }
         return Optional.of(new ItemStack(bracket.getBlock()));
     }
 

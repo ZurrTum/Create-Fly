@@ -27,19 +27,22 @@ public class PulleyContraption extends TranslatingContraption {
 
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
-        if (!searchMovedStructure(world, pos, null))
+        if (!searchMovedStructure(world, pos, null)) {
             return false;
+        }
         startMoving(world);
         return true;
     }
 
     @Override
     protected boolean isAnchoringBlockAt(BlockPos pos) {
-        if (pos.getX() != anchor.getX() || pos.getZ() != anchor.getZ())
+        if (pos.getX() != anchor.getX() || pos.getZ() != anchor.getZ()) {
             return false;
+        }
         int y = pos.getY();
-        if (y <= anchor.getY() || y > anchor.getY() + initialOffset + 1)
+        if (y <= anchor.getY() || y > anchor.getY() + initialOffset + 1) {
             return false;
+        }
         return true;
     }
 

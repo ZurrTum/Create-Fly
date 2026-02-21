@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.logistics.factoryBoard;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.content.logistics.packagerLink.LogisticallyLinkedClientHandler;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsBoard;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.PanelSlot;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -66,10 +66,12 @@ public class FactoryPanelBehaviour extends FilteringBehaviour<ServerFactoryPanel
 
     @Nullable
     public static FactoryPanelBehaviour at(BlockAndTintGetter world, FactoryPanelPosition pos) {
-        if (world instanceof Level l && !l.isLoaded(pos.pos()))
+        if (world instanceof Level l && !l.isLoaded(pos.pos())) {
             return null;
-        if (!(world.getBlockEntity(pos.pos()) instanceof FactoryPanelBlockEntity fpbe))
+        }
+        if (!(world.getBlockEntity(pos.pos()) instanceof FactoryPanelBlockEntity fpbe)) {
             return null;
+        }
         FactoryPanelBehaviour factoryPanel = fpbe.getBehaviour(getTypeForSlot(pos.slot()));
         if (factoryPanel.behaviour.isActive()) {
             return factoryPanel;
@@ -130,24 +132,27 @@ public class FactoryPanelBehaviour extends FilteringBehaviour<ServerFactoryPanel
     public MutableComponent getLabel() {
         String key = "";
 
-        if (!behaviour.targetedBy.isEmpty() && behaviour.count == 0)
+        if (!behaviour.targetedBy.isEmpty() && behaviour.count == 0) {
             return CreateLang.translate("gui.factory_panel.no_target_amount_set").style(ChatFormatting.RED).component();
+        }
 
-        if (behaviour.isMissingAddress())
+        if (behaviour.isMissingAddress()) {
             return CreateLang.translate("gui.factory_panel.address_missing").style(ChatFormatting.RED).component();
+        }
 
-        if (getFilter().isEmpty())
+        if (getFilter().isEmpty()) {
             key = "factory_panel.new_factory_task";
-        else if (behaviour.waitingForNetwork)
+        } else if (behaviour.waitingForNetwork) {
             key = "factory_panel.some_links_unloaded";
-        else if (behaviour.getAmount() == 0 || behaviour.targetedBy.isEmpty())
+        } else if (behaviour.getAmount() == 0 || behaviour.targetedBy.isEmpty()) {
             return behaviour.getFilter().getHoverName().plainCopy();
-        else {
+        } else {
             key = behaviour.getFilter().getHoverName().getString();
-            if (behaviour.redstonePowered)
+            if (behaviour.redstonePowered) {
                 key += " " + CreateLang.translate("factory_panel.redstone_paused").string();
-            else if (!behaviour.satisfied)
+            } else if (!behaviour.satisfied) {
                 key += " " + CreateLang.translate("factory_panel.in_progress").string();
+            }
             return CreateLang.text(key).component();
         }
 
@@ -166,8 +171,9 @@ public class FactoryPanelBehaviour extends FilteringBehaviour<ServerFactoryPanel
 
     @Override
     public MutableComponent getCountLabelForValueBox() {
-        if (getFilter().isEmpty())
+        if (getFilter().isEmpty()) {
             return Component.empty();
+        }
         if (behaviour.waitingForNetwork) {
             return Component.literal("?");
         }
@@ -183,8 +189,9 @@ public class FactoryPanelBehaviour extends FilteringBehaviour<ServerFactoryPanel
         }
 
         return CreateLang.text(inf ? "  ∞" : "   " + inStorage + stacks)
-            .color(behaviour.satisfied ? 0xD7FFA8 : behaviour.promisedSatisfied ? 0xffcd75 : 0xFFBFA8).add(CreateLang.text(promised == 0 ? "" : "⏶"))
-            .add(CreateLang.text("/").style(ChatFormatting.WHITE)).add(CreateLang.text(behaviour.count + stacks + "  ").color(0xF1EFE8)).component();
+            .color(behaviour.satisfied ? 0xD7FFA8 : behaviour.promisedSatisfied ? 0xffcd75 : 0xFFBFA8)
+            .add(CreateLang.text(promised == 0 ? "" : "⏶")).add(CreateLang.text("/").style(ChatFormatting.WHITE))
+            .add(CreateLang.text(behaviour.count + stacks + "  ").color(0xF1EFE8)).component();
     }
 
     @Override

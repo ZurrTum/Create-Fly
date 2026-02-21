@@ -46,29 +46,38 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<LinkedControllerModel.RenderData> {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/linked_controller");
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/item");
-    public static final Identifier POWERED_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/powered");
+    public static final Identifier POWERED_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/linked_controller/powered"
+    );
     public static final Identifier TORCH_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch");
-    public static final Identifier TORCH_OFF_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch_off");
+    public static final Identifier TORCH_OFF_ID = Identifier.fromNamespaceAndPath(
+        MOD_ID,
+        "item/linked_controller/torch_off"
+    );
     public static final Identifier BUTTON_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/button");
 
     private static final LerpedFloat equipProgress = LerpedFloat.linear().startWithValue(0);
     private static final List<LerpedFloat> buttons = Util.make(
         new ArrayList<>(6), list -> {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++) {
                 list.add(LerpedFloat.linear().startWithValue(0));
+            }
         }
     );
 
     public static void tick(Minecraft mc) {
-        if (mc.isPaused())
+        if (mc.isPaused()) {
             return;
+        }
 
         boolean active = LinkedControllerClientHandler.MODE != Mode.IDLE;
         equipProgress.chase(active ? 1 : 0, .2f, Chaser.EXP);
         equipProgress.tickChaser();
 
-        if (!active)
+        if (!active) {
             return;
+        }
 
         for (int i = 0; i < buttons.size(); i++) {
             LerpedFloat lerpedFloat = buttons.get(i);
@@ -293,7 +302,17 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         RenderType layer,
         List<BakedQuad> quads
     ) {
-        queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemStackRenderState.FoilType.NONE);
+        queue.submitItem(
+            matrices,
+            displayContext,
+            light,
+            overlay,
+            0,
+            tints,
+            quads,
+            layer,
+            ItemStackRenderState.FoilType.NONE
+        );
     }
 
     public record RenderData(boolean active, boolean equip, boolean bind) {
@@ -312,7 +331,8 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked> CODEC = MapCodec.unit(
+            com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked::new);
 
         @Override
         public MapCodec<com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked> type() {

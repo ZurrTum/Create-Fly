@@ -38,7 +38,16 @@ public abstract class ServerLevelMixin extends Level {
         long seed,
         int maxChainedNeighborUpdates
     ) {
-        super(properties, registryRef, registryManager, dimensionEntry, isClient, debugWorld, seed, maxChainedNeighborUpdates);
+        super(
+            properties,
+            registryRef,
+            registryManager,
+            dimensionEntry,
+            isClient,
+            debugWorld,
+            seed,
+            maxChainedNeighborUpdates
+        );
     }
 
     @Inject(method = "tickNonPassenger(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
@@ -69,7 +78,13 @@ public abstract class ServerLevelMixin extends Level {
     }
 
     @Inject(method = "updateNeighborsAtExceptFromFacing(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/redstone/Orientation;)V", at = @At("HEAD"))
-    private void updateNeighborsExcept(BlockPos pos, Block sourceBlock, Direction except, Orientation orientation, CallbackInfo ci) {
+    private void updateNeighborsExcept(
+        BlockPos pos,
+        Block sourceBlock,
+        Direction except,
+        Orientation orientation,
+        CallbackInfo ci
+    ) {
         if (neighborUpdater instanceof CollectingNeighborUpdater) {
             return;
         }

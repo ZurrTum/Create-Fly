@@ -10,9 +10,7 @@ import net.minecraft.world.level.Level;
 public abstract class TimedWaitCondition extends ScheduleWaitCondition {
 
     public enum TimeUnit {
-        TICKS(1, "t"),
-        SECONDS(20, "s"),
-        MINUTES(20 * 60, "min");
+        TICKS(1, "t"), SECONDS(20, "s"), MINUTES(20 * 60, "min");
 
         public final int ticksPer;
         public final String suffix;
@@ -25,10 +23,12 @@ public abstract class TimedWaitCondition extends ScheduleWaitCondition {
 
     protected void requestDisplayIfNecessary(CompoundTag context, int time) {
         int ticksUntilDeparture = totalWaitTicks() - time;
-        if (ticksUntilDeparture < 20 * 60 && ticksUntilDeparture % 100 == 0)
+        if (ticksUntilDeparture < 20 * 60 && ticksUntilDeparture % 100 == 0) {
             requestStatusToUpdate(context);
-        if (ticksUntilDeparture >= 20 * 60 && ticksUntilDeparture % (20 * 60) == 0)
+        }
+        if (ticksUntilDeparture >= 20 * 60 && ticksUntilDeparture % (20 * 60) == 0) {
             requestStatusToUpdate(context);
+        }
     }
 
     public int totalWaitTicks() {

@@ -49,11 +49,23 @@ public class FunnelRenderer extends SmartBlockEntityRenderer<FunnelBlockEntity, 
         PartialModel partialModel = (state.blockState.getBlock() instanceof FunnelBlock ? AllPartialModels.FUNNEL_FLAP : AllPartialModels.BELT_FUNNEL_FLAP);
         SuperByteBuffer flapBuffer = CachedBuffers.partial(partialModel, state.blockState);
         float f = be.flap.getValue(tickProgress);
-        state.flap = FlapStuffs.getFlapsRenderState(flapBuffer, FlapStuffs.FUNNEL_PIVOT, funnelFacing, f, -be.getFlapOffset(), state.lightCoords);
+        state.flap = FlapStuffs.getFlapsRenderState(
+            flapBuffer,
+            FlapStuffs.FUNNEL_PIVOT,
+            funnelFacing,
+            f,
+            -be.getFlapOffset(),
+            state.lightCoords
+        );
     }
 
     @Override
-    public void submit(FunnelRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        FunnelRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.flap != null) {
             state.flap.render(RenderTypes.solidMovingBlock(), matrices, queue);

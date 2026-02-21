@@ -16,7 +16,9 @@ public final class Uniforms {
     public static final String PLAYER_BLOCK_NAME = "_FlwPlayerUniforms";
     public static final String LEVEL_BLOCK_NAME = "_FlwLevelUniforms";
 
-    private static final UniformBuffer[] ALL_BUFFERS = {FrameUniforms.BUFFER, FogUniforms.BUFFER, OptionsUniforms.BUFFER, PlayerUniforms.BUFFER, LevelUniforms.BUFFER};
+    private static final UniformBuffer[] ALL_BUFFERS = {
+        FrameUniforms.BUFFER, FogUniforms.BUFFER, OptionsUniforms.BUFFER, PlayerUniforms.BUFFER, LevelUniforms.BUFFER
+    };
 
     private Uniforms() {
     }

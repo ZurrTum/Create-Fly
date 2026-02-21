@@ -34,7 +34,11 @@ import org.joml.Quaternionf;
 public class StabilizedBearingMovementRenderBehaviour implements MovementRenderBehaviour {
     @Nullable
     @Override
-    public ActorVisual createVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public ActorVisual createVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         return new StabilizedBearingVisual(visualizationContext, simulationWorld, movementContext);
     }
 
@@ -56,7 +60,11 @@ public class StabilizedBearingMovementRenderBehaviour implements MovementRenderB
         // rotate to match blockstate
         Quaternionf orientation = BearingVisual.getBlockStateOrientation(facing);
         // rotate against parent
-        float angle = getCounterRotationAngle(context, facing, AnimationTickHolder.getPartialTicks()) * facing.getAxisDirection().getStep();
+        float angle = getCounterRotationAngle(
+            context,
+            facing,
+            AnimationTickHolder.getPartialTicks()
+        ) * facing.getAxisDirection().getStep();
         Quaternionf rotation = Axis.of(facing.step()).rotationDegrees(angle);
         state.orientation = rotation.mul(orientation);
         state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
@@ -66,23 +74,26 @@ public class StabilizedBearingMovementRenderBehaviour implements MovementRenderB
     }
 
     static float getCounterRotationAngle(MovementContext context, Direction facing, float renderPartialTicks) {
-        if (!context.contraption.canBeStabilized(facing, context.localPos))
+        if (!context.contraption.canBeStabilized(facing, context.localPos)) {
             return 0;
+        }
 
         float offset = 0;
         Direction.Axis axis = facing.getAxis();
         AbstractContraptionEntity entity = context.contraption.entity;
 
         if (entity instanceof ControlledContraptionEntity controlledCE) {
-            if (context.contraption.canBeStabilized(facing, context.localPos))
+            if (context.contraption.canBeStabilized(facing, context.localPos)) {
                 offset = -controlledCE.getAngle(renderPartialTicks);
+            }
 
         } else if (entity instanceof OrientedContraptionEntity orientedCE) {
-            if (axis.isVertical())
+            if (axis.isVertical()) {
                 offset = -orientedCE.getViewYRot(renderPartialTicks);
-            else {
-                if (orientedCE.isInitialOrientationPresent() && orientedCE.getInitialOrientation().getAxis() == axis)
+            } else {
+                if (orientedCE.isInitialOrientationPresent() && orientedCE.getInitialOrientation().getAxis() == axis) {
                     offset = -orientedCE.getViewXRot(renderPartialTicks);
+                }
             }
         }
         return offset;
@@ -107,7 +118,8 @@ public class StabilizedBearingMovementRenderBehaviour implements MovementRenderB
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            top.rotateCentered(orientation).light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
+            top.rotateCentered(orientation).light(light).useLevelLight(world, worldMatrix4f)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

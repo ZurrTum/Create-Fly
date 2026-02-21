@@ -35,9 +35,14 @@ public class RecipeFinder {
      * @param cacheKey (can be null to prevent the caching)
      * @return A started search to continue with more specific conditions.
      */
-    public static List<RecipeHolder<?>> get(@Nullable Object cacheKey, ServerLevel level, Predicate<RecipeHolder<?>> conditions) {
-        if (cacheKey == null)
+    public static List<RecipeHolder<?>> get(
+        @Nullable Object cacheKey,
+        ServerLevel level,
+        Predicate<RecipeHolder<?>> conditions
+    ) {
+        if (cacheKey == null) {
             return startSearch(level, conditions);
+        }
 
         try {
             return CACHED_SEARCHES.get(cacheKey, () -> startSearch(level, conditions));
@@ -50,9 +55,11 @@ public class RecipeFinder {
 
     private static List<RecipeHolder<?>> startSearch(ServerLevel level, Predicate<? super RecipeHolder<?>> conditions) {
         List<RecipeHolder<?>> recipes = new ArrayList<>();
-        for (RecipeHolder<?> r : level.recipeAccess().getRecipes())
-            if (conditions.test(r))
+        for (RecipeHolder<?> r : level.recipeAccess().getRecipes()) {
+            if (conditions.test(r)) {
                 recipes.add(r);
+            }
+        }
         return recipes;
     }
 

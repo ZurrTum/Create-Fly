@@ -11,7 +11,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record SchematicUploadPacket(int code, long size, String schematic, byte[] data) implements Packet<ServerGamePacketListener> {
+public record SchematicUploadPacket(int code, long size, String schematic,
+                                    byte[] data) implements Packet<ServerGamePacketListener> {
     public static final int BEGIN = 0;
     public static final int WRITE = 1;
     public static final int FINISH = 2;

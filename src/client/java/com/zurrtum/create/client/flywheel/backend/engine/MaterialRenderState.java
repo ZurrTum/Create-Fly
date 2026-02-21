@@ -63,8 +63,13 @@ public final class MaterialRenderState {
         }
         GpuSampler textureSampler = texture.getSampler();
         FilterMode filterMode = material.blur() ? FilterMode.LINEAR : FilterMode.NEAREST;
-        GlSampler sampler = (GlSampler) RenderSystem.getSamplerCache()
-            .getSampler(textureSampler.getAddressModeU(), textureSampler.getAddressModeV(), filterMode, filterMode, material.mipmap());
+        GlSampler sampler = (GlSampler) RenderSystem.getSamplerCache().getSampler(
+            textureSampler.getAddressModeU(),
+            textureSampler.getAddressModeV(),
+            filterMode,
+            filterMode,
+            material.mipmap()
+        );
         GL33C.glBindSampler(Samplers.DIFFUSE.number, sampler.getId());
         GpuTextureView textureView = texture.getTextureView();
         int mipLevel = textureView.baseMipLevel();

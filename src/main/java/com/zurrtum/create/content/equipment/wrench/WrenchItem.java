@@ -28,20 +28,23 @@ public class WrenchItem extends Item {
     @NotNull
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
-        if (player == null || !player.mayBuild())
+        if (player == null || !player.mayBuild()) {
             return super.useOn(context);
+        }
 
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         Block block = state.getBlock();
 
         if (!(block instanceof IWrenchable actor)) {
-            if (player.isShiftKeyDown() && canWrenchPickup(state))
+            if (player.isShiftKeyDown() && canWrenchPickup(state)) {
                 return onItemUseOnOther(context);
+            }
             return super.useOn(context);
         }
 
-        if (player.isShiftKeyDown())
+        if (player.isShiftKeyDown()) {
             return actor.onSneakWrenched(state, context);
+        }
         return actor.onWrenched(state, context);
     }
 
@@ -54,11 +57,13 @@ public class WrenchItem extends Item {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = world.getBlockState(pos);
-        if (!(world instanceof ServerLevel serverWorld))
+        if (!(world instanceof ServerLevel serverWorld)) {
             return InteractionResult.SUCCESS;
-        if (player != null && !player.isCreative())
+        }
+        if (player != null && !player.isCreative()) {
             Block.getDrops(state, serverWorld, pos, world.getBlockEntity(pos), player, context.getItemInHand())
                 .forEach(itemStack -> player.getInventory().placeItemBackInInventory(itemStack));
+        }
         state.spawnAfterBreak(serverWorld, pos, ItemStack.EMPTY, true);
         world.destroyBlock(pos, false);
         AllSoundEvents.WRENCH_REMOVE.playOnServer(world, pos, 1, world.random.nextFloat() * .5f + .5f);
@@ -66,13 +71,16 @@ public class WrenchItem extends Item {
     }
 
     public static boolean wrenchInstaKillsMinecarts(ServerPlayer player, Entity target) {
-        if (!(target instanceof AbstractMinecart minecart))
+        if (!(target instanceof AbstractMinecart minecart)) {
             return false;
+        }
         ItemStack heldItem = player.getMainHandItem();
-        if (!heldItem.is(AllItems.WRENCH))
+        if (!heldItem.is(AllItems.WRENCH)) {
             return false;
-        if (player.isCreative())
+        }
+        if (player.isCreative()) {
             return false;
+        }
         minecart.hurtServer(player.level(), minecart.damageSources().playerAttack(player), 100);
         return true;
     }

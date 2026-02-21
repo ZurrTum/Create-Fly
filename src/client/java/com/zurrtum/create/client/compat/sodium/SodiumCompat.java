@@ -30,7 +30,10 @@ import java.util.Set;
 @SuppressWarnings("deprecation")
 public class SodiumCompat {
     private static final boolean DISABLE = !FabricLoader.getInstance().isModLoaded("sodium");
-    public static final Material SAW_TEXTURE = new Material(TextureAtlas.LOCATION_BLOCKS, Create.asResource("block/saw_reversed"));
+    public static final Material SAW_TEXTURE = new Material(
+        TextureAtlas.LOCATION_BLOCKS,
+        Create.asResource("block/saw_reversed")
+    );
     public static final Material FACTORY_PANEL_TEXTURE = new Material(
         TextureAtlas.LOCATION_BLOCKS,
         Create.asResource("block/factory_panel_connections_animated")
@@ -72,7 +75,8 @@ public class SodiumCompat {
                 continue;
             }
             if (panel && state.is(AllBlocks.FACTORY_GAUGE)) {
-                SpriteUtil.INSTANCE.markSpriteActive(Minecraft.getInstance().getAtlasManager().get(FACTORY_PANEL_TEXTURE));
+                SpriteUtil.INSTANCE.markSpriteActive(Minecraft.getInstance().getAtlasManager()
+                    .get(FACTORY_PANEL_TEXTURE));
                 panel = false;
                 continue;
             }

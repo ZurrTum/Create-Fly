@@ -96,12 +96,14 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
     }
 
     public float getRenderedHeadOffset(float partialTicks) {
-        if (!running)
+        if (!running) {
             return 0;
+        }
         int runningTicks = Math.abs(this.runningTicks);
         float ticks = Mth.lerpInt(partialTicks, prevRunningTicks, runningTicks);
-        if (runningTicks < (CYCLE * 2) / 3)
+        if (runningTicks < (CYCLE * 2) / 3) {
             return (float) Mth.clamp(Math.pow(ticks / CYCLE * 2, 3), 0, 1);
+        }
         return Mth.clamp((CYCLE - ticks) / CYCLE * 3, 0, 1);
     }
 
@@ -132,23 +134,36 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         if (!running || level == null) {
             if (level != null && !level.isClientSide()) {
 
-                if (specifics.getKineticSpeed() == 0)
+                if (specifics.getKineticSpeed() == 0) {
                     return;
-                if (entityScanCooldown > 0)
+                }
+                if (entityScanCooldown > 0) {
                     entityScanCooldown--;
+                }
                 if (entityScanCooldown <= 0) {
                     entityScanCooldown = ENTITY_SCAN;
 
-                    if (BlockEntityBehaviour.get(level, worldPosition.below(2), TransportedItemStackHandlerBehaviour.TYPE) != null)
+                    if (BlockEntityBehaviour.get(
+                        level,
+                        worldPosition.below(2),
+                        TransportedItemStackHandlerBehaviour.TYPE
+                    ) != null) {
                         return;
-                    if (BasinBlock.isBasin(level, worldPosition.below(2)))
+                    }
+                    if (BasinBlock.isBasin(level, worldPosition.below(2))) {
                         return;
+                    }
 
-                    for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, new AABB(worldPosition.below()).deflate(.125f))) {
-                        if (!itemEntity.isAlive() || !itemEntity.onGround())
+                    for (ItemEntity itemEntity : level.getEntitiesOfClass(
+                        ItemEntity.class,
+                        new AABB(worldPosition.below()).deflate(.125f)
+                    )) {
+                        if (!itemEntity.isAlive() || !itemEntity.onGround()) {
                             continue;
-                        if (!specifics.tryProcessInWorld(itemEntity, true))
+                        }
+                        if (!specifics.tryProcessInWorld(itemEntity, true)) {
                             continue;
+                        }
                         start(Mode.WORLD);
                         return;
                     }
@@ -164,23 +179,27 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         }
 
         if (runningTicks == CYCLE / 2 && specifics.getKineticSpeed() != 0) {
-            if (inWorld())
+            if (inWorld()) {
                 applyInWorld();
-            if (onBasin())
+            }
+            if (onBasin()) {
                 applyOnBasin();
+            }
 
-            if (level.getBlockState(worldPosition.below(2)).getSoundType() == SoundType.WOOL)
+            if (level.getBlockState(worldPosition.below(2)).getSoundType() == SoundType.WOOL) {
                 AllSoundEvents.MECHANICAL_PRESS_ACTIVATION_ON_BELT.playOnServer(level, worldPosition);
-            else
+            } else {
                 AllSoundEvents.MECHANICAL_PRESS_ACTIVATION.playOnServer(
                     level,
                     worldPosition,
                     .5f,
                     .75f + (Math.abs(specifics.getKineticSpeed()) / 1024f)
                 );
+            }
 
-            if (!level.isClientSide())
+            if (!level.isClientSide()) {
                 blockEntity.sendData();
+            }
         }
 
         if (!level.isClientSide() && runningTicks > CYCLE) {
@@ -197,18 +216,21 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         if (prevRunningTicks < CYCLE / 2 && runningTicks >= CYCLE / 2) {
             runningTicks = CYCLE / 2;
             // Pause the ticks until a packet is received
-            if (level.isClientSide() && !blockEntity.isVirtual())
+            if (level.isClientSide() && !blockEntity.isVirtual()) {
                 runningTicks = -(CYCLE / 2);
+            }
         }
     }
 
     protected void applyOnBasin() {
         Level level = getLevel();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         particleItems.clear();
-        if (specifics.tryProcessInBasin(false))
+        if (specifics.tryProcessInBasin(false)) {
             blockEntity.sendData();
+        }
     }
 
     protected void applyInWorld() {
@@ -219,42 +241,61 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
 
         particleItems.clear();
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         for (Entity entity : level.getEntities(null, bb)) {
-            if (!(entity instanceof ItemEntity itemEntity))
+            if (!(entity instanceof ItemEntity itemEntity)) {
                 continue;
-            if (!entity.isAlive() || !entity.onGround())
+            }
+            if (!entity.isAlive() || !entity.onGround()) {
                 continue;
+            }
 
             entityScanCooldown = 0;
-            if (specifics.tryProcessInWorld(itemEntity, false))
+            if (specifics.tryProcessInWorld(itemEntity, false)) {
                 blockEntity.sendData();
-            if (!bulk)
+            }
+            if (!bulk) {
                 break;
+            }
         }
     }
 
     public int getRunningTickSpeed() {
         float speed = specifics.getKineticSpeed();
-        if (speed == 0)
+        if (speed == 0) {
             return 0;
+        }
         return (int) Mth.lerpInt(Mth.clamp(Math.abs(speed) / 512f, 0, 1), 1, 60);
     }
 
     protected void spawnParticles() {
-        if (particleItems.isEmpty())
+        if (particleItems.isEmpty()) {
             return;
+        }
 
         BlockPos worldPosition = getPos();
 
-        if (mode == Mode.BASIN)
-            particleItems.forEach(stack -> makeCompactingParticleEffect(VecHelper.getCenterOf(worldPosition.below(2)), stack));
-        if (mode == Mode.BELT)
-            particleItems.forEach(stack -> makePressingParticleEffect(VecHelper.getCenterOf(worldPosition.below(2)).add(0, 8 / 16f, 0), stack));
-        if (mode == Mode.WORLD)
-            particleItems.forEach(stack -> makePressingParticleEffect(VecHelper.getCenterOf(worldPosition.below(1)).add(0, -1 / 4f, 0), stack));
+        if (mode == Mode.BASIN) {
+            particleItems.forEach(stack -> makeCompactingParticleEffect(
+                VecHelper.getCenterOf(worldPosition.below(2)),
+                stack
+            ));
+        }
+        if (mode == Mode.BELT) {
+            particleItems.forEach(stack -> makePressingParticleEffect(
+                VecHelper.getCenterOf(worldPosition.below(2))
+                    .add(0, 8 / 16f, 0), stack
+            ));
+        }
+        if (mode == Mode.WORLD) {
+            particleItems.forEach(stack -> makePressingParticleEffect(
+                VecHelper.getCenterOf(worldPosition.below(1))
+                    .add(0, -1 / 4f, 0), stack
+            ));
+        }
 
         particleItems.clear();
     }
@@ -265,29 +306,45 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
 
     public void makePressingParticleEffect(Vec3 pos, ItemStack stack, int amount) {
         Level level = getLevel();
-        if (level == null || !level.isClientSide())
+        if (level == null || !level.isClientSide()) {
             return;
+        }
         for (int i = 0; i < amount; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .125f).multiply(1, 0, 1);
             motion = motion.add(0, amount != 1 ? 0.125f : 1 / 16f, 0);
-            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), pos.x, pos.y - .25f, pos.z, motion.x, motion.y, motion.z);
+            level.addParticle(
+                new ItemParticleOption(ParticleTypes.ITEM, stack),
+                pos.x,
+                pos.y - .25f,
+                pos.z,
+                motion.x,
+                motion.y,
+                motion.z
+            );
         }
     }
 
     public void makeCompactingParticleEffect(Vec3 pos, ItemStack stack) {
         Level level = getLevel();
-        if (level == null || !level.isClientSide())
+        if (level == null || !level.isClientSide()) {
             return;
+        }
         for (int i = 0; i < 20; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .175f).multiply(1, 0, 1);
-            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), pos.x, pos.y, pos.z, motion.x, motion.y + .25f, motion.z);
+            level.addParticle(
+                new ItemParticleOption(ParticleTypes.ITEM, stack),
+                pos.x,
+                pos.y,
+                pos.z,
+                motion.x,
+                motion.y + .25f,
+                motion.z
+            );
         }
     }
 
     public enum Mode {
-        WORLD(1),
-        BELT(19f / 16f),
-        BASIN(22f / 16f);
+        WORLD(1), BELT(19f / 16f), BASIN(22f / 16f);
 
         public float headOffset;
 

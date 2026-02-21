@@ -16,8 +16,8 @@ public class RadialChassisBlock extends AbstractChassisBlock {
 
     public RadialChassisBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(STICKY_EAST, false).setValue(STICKY_SOUTH, false).setValue(STICKY_NORTH, false)
-            .setValue(STICKY_WEST, false));
+        registerDefaultState(defaultBlockState().setValue(STICKY_EAST, false).setValue(STICKY_SOUTH, false)
+            .setValue(STICKY_NORTH, false).setValue(STICKY_WEST, false));
     }
 
     @Override
@@ -31,36 +31,48 @@ public class RadialChassisBlock extends AbstractChassisBlock {
         Axis axis = state.getValue(AXIS);
 
         if (axis == Axis.X) {
-            if (face == Direction.NORTH)
+            if (face == Direction.NORTH) {
                 return STICKY_WEST;
-            if (face == Direction.SOUTH)
+            }
+            if (face == Direction.SOUTH) {
                 return STICKY_EAST;
-            if (face == Direction.UP)
+            }
+            if (face == Direction.UP) {
                 return STICKY_NORTH;
-            if (face == Direction.DOWN)
+            }
+            if (face == Direction.DOWN) {
                 return STICKY_SOUTH;
+            }
         }
 
         if (axis == Axis.Y) {
-            if (face == Direction.NORTH)
+            if (face == Direction.NORTH) {
                 return STICKY_NORTH;
-            if (face == Direction.SOUTH)
+            }
+            if (face == Direction.SOUTH) {
                 return STICKY_SOUTH;
-            if (face == Direction.EAST)
+            }
+            if (face == Direction.EAST) {
                 return STICKY_EAST;
-            if (face == Direction.WEST)
+            }
+            if (face == Direction.WEST) {
                 return STICKY_WEST;
+            }
         }
 
         if (axis == Axis.Z) {
-            if (face == Direction.UP)
+            if (face == Direction.UP) {
                 return STICKY_NORTH;
-            if (face == Direction.DOWN)
+            }
+            if (face == Direction.DOWN) {
                 return STICKY_SOUTH;
-            if (face == Direction.EAST)
+            }
+            if (face == Direction.EAST) {
                 return STICKY_EAST;
-            if (face == Direction.WEST)
+            }
+            if (face == Direction.WEST) {
                 return STICKY_WEST;
+            }
         }
 
         return null;

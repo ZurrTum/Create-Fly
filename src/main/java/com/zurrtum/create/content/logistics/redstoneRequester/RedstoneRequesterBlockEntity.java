@@ -42,20 +42,23 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 
     protected void onRedstonePowerChanged() {
         boolean hasNeighborSignal = level.hasNeighborSignal(worldPosition);
-        if (redstonePowered == hasNeighborSignal)
+        if (redstonePowered == hasNeighborSignal) {
             return;
+        }
 
         lastRequestSucceeded = false;
-        if (hasNeighborSignal)
+        if (hasNeighborSignal) {
             triggerRequest();
+        }
 
         redstonePowered = hasNeighborSignal;
         notifyUpdate();
     }
 
     public void triggerRequest() {
-        if (encodedRequest.isEmpty())
+        if (encodedRequest.isEmpty()) {
             return;
+        }
 
         boolean anySucceeded = false;
 
@@ -83,7 +86,7 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
         }
 
         broadcastPackageRequest(RequestType.REDSTONE, encodedRequest, null, encodedTargetAdress);
-        if (level instanceof ServerLevel serverLevel)
+        if (level instanceof ServerLevel serverLevel) {
             serverLevel.getServer().getPlayerList().broadcast(
                 null,
                 worldPosition.getX(),
@@ -93,6 +96,7 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
                 serverLevel.dimension(),
                 new RedstoneRequesterEffectPacket(worldPosition, anySucceeded)
             );
+        }
         lastRequestSucceeded = true;
     }
 
@@ -102,7 +106,8 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
         redstonePowered = view.getBooleanOr("Powered", false);
         lastRequestSucceeded = view.getBooleanOr("Success", false);
         allowPartialRequests = view.getBooleanOr("AllowPartial", false);
-        encodedRequest = view.read("EncodedRequest", PackageOrderWithCrafts.CODEC).orElse(PackageOrderWithCrafts.empty());
+        encodedRequest = view.read("EncodedRequest", PackageOrderWithCrafts.CODEC)
+            .orElse(PackageOrderWithCrafts.empty());
         encodedTargetAdress = view.getStringOr("EncodedAddress", "");
     }
 
@@ -125,14 +130,18 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
     }
 
     public InteractionResult use(Player player) {
-        if (player == null || player.isCrouching())
+        if (player == null || player.isCrouching()) {
             return InteractionResult.PASS;
-        if (FakePlayerHandler.has(player))
+        }
+        if (FakePlayerHandler.has(player)) {
             return InteractionResult.PASS;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
-        if (!behaviour.mayInteractMessage(player))
+        }
+        if (!behaviour.mayInteractMessage(player)) {
             return InteractionResult.SUCCESS;
+        }
 
         openHandledScreen((ServerPlayer) player);
         return InteractionResult.SUCCESS;
@@ -144,7 +153,12 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
     }
 
     @Override
-    public RedstoneRequesterMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer, RegistryFriendlyByteBuf extraData) {
+    public RedstoneRequesterMenu createMenu(
+        int pContainerId,
+        Inventory pPlayerInventory,
+        Player pPlayer,
+        RegistryFriendlyByteBuf extraData
+    ) {
         extraData.writeBlockPos(worldPosition);
         return new RedstoneRequesterMenu(pContainerId, pPlayerInventory, this);
     }

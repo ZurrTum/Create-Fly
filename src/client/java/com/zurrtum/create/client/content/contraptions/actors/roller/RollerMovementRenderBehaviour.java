@@ -33,7 +33,11 @@ import org.joml.Matrix4f;
 public class RollerMovementRenderBehaviour implements MovementRenderBehaviour {
     @Nullable
     @Override
-    public ActorVisual createVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public ActorVisual createVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         return new RollerActorVisual(visualizationContext, simulationWorld, movementContext);
     }
 
@@ -98,9 +102,11 @@ public class RollerMovementRenderBehaviour implements MovementRenderBehaviour {
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            wheel.translate(offset).rotateCentered(wheelAngle, Direction.UP).rotate(rotate, Direction.WEST).translate(0, -.5, .5).rotateY(yRot)
-                .light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
-            frame.rotateCentered(frameAngle, Direction.UP).light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
+            wheel.translate(offset).rotateCentered(wheelAngle, Direction.UP).rotate(rotate, Direction.WEST)
+                .translate(0, -.5, .5).rotateY(yRot).light(light).useLevelLight(world, worldMatrix4f)
+                .renderInto(matricesEntry, vertexConsumer);
+            frame.rotateCentered(frameAngle, Direction.UP).light(light).useLevelLight(world, worldMatrix4f)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

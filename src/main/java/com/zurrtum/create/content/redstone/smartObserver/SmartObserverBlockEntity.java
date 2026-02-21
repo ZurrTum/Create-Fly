@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.redstone.smartObserver;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntit
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase.InterfaceProvider;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
@@ -50,7 +50,10 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
         behaviours.add(filtering = new ServerFilteringBehaviour(this).withCallback($ -> invVersionTracker.reset()));
         behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
 
-        InterfaceProvider towardBlockFacing = (w, p, s) -> new BlockFace(p, DirectedDirectionalBlock.getTargetDirection(s));
+        InterfaceProvider towardBlockFacing = (w, p, s) -> new BlockFace(
+            p,
+            DirectedDirectionalBlock.getTargetDirection(s)
+        );
 
         behaviours.add(observedInventory = new InvManipulationBehaviour(this, towardBlockFacing).bypassSidedness());
         behaviours.add(observedTank = new TankManipulationBehaviour(this, towardBlockFacing).bypassSidedness());
@@ -60,18 +63,21 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
     public void tick() {
         super.tick();
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         BlockState state = getBlockState();
         if (turnOffTicks > 0) {
             turnOffTicks--;
-            if (turnOffTicks == 0)
+            if (turnOffTicks == 0) {
                 level.scheduleTick(worldPosition, state.getBlock(), 1);
+            }
         }
 
-        if (!isActive())
+        if (!isActive()) {
             return;
+        }
 
         BlockPos targetPos = worldPosition.relative(SmartObserverBlock.getTargetDirection(state));
         Block block = level.getBlockState(targetPos).getBlock();
@@ -82,12 +88,17 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
         }
 
         // Detect items on belt
-        TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(level, targetPos, TransportedItemStackHandlerBehaviour.TYPE);
+        TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(
+            level,
+            targetPos,
+            TransportedItemStackHandlerBehaviour.TYPE
+        );
         if (behaviour != null) {
             behaviour.handleCenteredProcessingOnAllItems(
                 .45f, stack -> {
-                    if (!filtering.test(stack.stack) || turnOffTicks == 6)
+                    if (!filtering.test(stack.stack) || turnOffTicks == 6) {
                         return TransportedResult.doNothing();
+                    }
                     activate();
                     return TransportedResult.doNothing();
                 }
@@ -96,14 +107,20 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
         }
 
         // Detect fluids in pipe
-        FluidTransportBehaviour fluidBehaviour = BlockEntityBehaviour.get(level, targetPos, FluidTransportBehaviour.TYPE);
+        FluidTransportBehaviour fluidBehaviour = BlockEntityBehaviour.get(
+            level,
+            targetPos,
+            FluidTransportBehaviour.TYPE
+        );
         if (fluidBehaviour != null) {
             for (Direction side : Iterate.directions) {
                 Flow flow = fluidBehaviour.getFlow(side);
-                if (flow == null || !flow.inbound || !flow.complete)
+                if (flow == null || !flow.inbound || !flow.complete) {
                     continue;
-                if (!filtering.test(flow.fluid))
+                }
+                if (!filtering.test(flow.fluid)) {
                     continue;
+                }
                 activate();
                 return;
             }
@@ -112,11 +129,12 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
 
         // Detect packages looping on a chain conveyor
         if (level.getBlockEntity(targetPos) instanceof ChainConveyorBlockEntity ccbe) {
-            for (ChainConveyorPackage box : ccbe.getLoopingPackages())
+            for (ChainConveyorPackage box : ccbe.getLoopingPackages()) {
                 if (filtering.test(box.item)) {
                     activate();
                     return;
                 }
+            }
             return;
         }
 
@@ -124,8 +142,9 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
             boolean skipInv = invVersionTracker.stillWaiting(observedInventory);
             invVersionTracker.awaitNewVersion(observedInventory);
 
-            if (skipInv && sustainSignal)
+            if (skipInv && sustainSignal) {
                 turnOffTicks = DEFAULT_DELAY;
+            }
 
             if (!skipInv) {
                 sustainSignal = false;
@@ -149,8 +168,9 @@ public class SmartObserverBlockEntity extends SmartBlockEntity implements Cleara
     public void activate(int ticks) {
         BlockState state = getBlockState();
         turnOffTicks = ticks;
-        if (state.getValue(SmartObserverBlock.POWERED))
+        if (state.getValue(SmartObserverBlock.POWERED)) {
             return;
+        }
         level.setBlockAndUpdate(worldPosition, state.setValue(SmartObserverBlock.POWERED, true));
         level.updateNeighborsAt(worldPosition, state.getBlock(), null);
     }

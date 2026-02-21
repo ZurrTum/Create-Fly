@@ -23,27 +23,33 @@ public class ContactMovementBehaviour extends MovementBehaviour {
         BlockState block = context.state;
         Level world = context.world;
 
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
-        if (context.firstMovement)
+        }
+        if (context.firstMovement) {
             return;
+        }
 
         deactivateLastVisitedContact(context);
         BlockState visitedState = world.getBlockState(pos);
-        if (!visitedState.is(AllBlocks.REDSTONE_CONTACT) && !visitedState.is(AllBlocks.ELEVATOR_CONTACT))
+        if (!visitedState.is(AllBlocks.REDSTONE_CONTACT) && !visitedState.is(AllBlocks.ELEVATOR_CONTACT)) {
             return;
+        }
 
         Vec3 contact = Vec3.atLowerCornerOf(block.getValue(RedstoneContactBlock.FACING).getUnitVec3i());
         contact = context.rotation.apply(contact);
         Direction direction = Direction.getApproximateNearest(contact.x, contact.y, contact.z);
 
-        if (visitedState.getValue(RedstoneContactBlock.FACING) != direction.getOpposite())
+        if (visitedState.getValue(RedstoneContactBlock.FACING) != direction.getOpposite()) {
             return;
+        }
 
-        if (visitedState.is(AllBlocks.REDSTONE_CONTACT))
+        if (visitedState.is(AllBlocks.REDSTONE_CONTACT)) {
             world.setBlockAndUpdate(pos, visitedState.setValue(RedstoneContactBlock.POWERED, true));
-        if (visitedState.is(AllBlocks.ELEVATOR_CONTACT) && context.contraption instanceof ElevatorContraption ec)
+        }
+        if (visitedState.is(AllBlocks.ELEVATOR_CONTACT) && context.contraption instanceof ElevatorContraption ec) {
             ec.broadcastFloorData(world, pos);
+        }
 
         context.data.store("lastContact", BlockPos.CODEC, pos);
     }
@@ -60,15 +66,17 @@ public class ContactMovementBehaviour extends MovementBehaviour {
     }
 
     public void deactivateLastVisitedContact(MovementContext context) {
-        if (!context.data.contains("lastContact"))
+        if (!context.data.contains("lastContact")) {
             return;
+        }
 
         BlockPos last = context.data.read("lastContact", BlockPos.CODEC).orElse(BlockPos.ZERO);
         context.data.remove("lastContact");
         BlockState blockState = context.world.getBlockState(last);
 
-        if (blockState.is(AllBlocks.REDSTONE_CONTACT))
+        if (blockState.is(AllBlocks.REDSTONE_CONTACT)) {
             context.world.scheduleTick(last, AllBlocks.REDSTONE_CONTACT, 1, TickPriority.NORMAL);
+        }
     }
 
 }

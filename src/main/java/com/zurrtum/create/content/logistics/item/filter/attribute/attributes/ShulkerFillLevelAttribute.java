@@ -7,15 +7,6 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Predicate;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,6 +18,14 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
 
 public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAttribute {
     public static final MapCodec<ShulkerFillLevelAttribute> CODEC = ShulkerLevels.CODEC.xmap(
@@ -34,8 +33,7 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
         ShulkerFillLevelAttribute::levels
     ).fieldOf("value");
 
-    public static final StreamCodec<ByteBuf, ShulkerFillLevelAttribute> PACKET_CODEC = ShulkerLevels.STREAM_CODEC.map(
-        ShulkerFillLevelAttribute::new,
+    public static final StreamCodec<ByteBuf, ShulkerFillLevelAttribute> PACKET_CODEC = ShulkerLevels.STREAM_CODEC.map(ShulkerFillLevelAttribute::new,
         ShulkerFillLevelAttribute::levels
     );
 
@@ -52,8 +50,10 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
     @Override
     public Object[] getTranslationParameters() {
         String parameter = "";
-        if (levels != null)
-            parameter = Component.translatable("create.item_attributes." + getTranslationKey() + "." + levels.key).getString();
+        if (levels != null) {
+            parameter = Component.translatable("create.item_attributes." + getTranslationKey() + "." + levels.key)
+                .getString();
+        }
         return new Object[]{parameter};
     }
 
@@ -63,12 +63,17 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
     }
 
     enum ShulkerLevels implements StringRepresentable {
-        EMPTY("empty", amount -> amount == 0),
-        PARTIAL("partial", amount -> amount > 0 && amount < Integer.MAX_VALUE),
-        FULL("full", amount -> amount == Integer.MAX_VALUE);
+        EMPTY("empty", amount -> amount == 0), PARTIAL(
+            "partial",
+            amount -> amount > 0 && amount < Integer.MAX_VALUE
+        ), FULL(
+            "full",
+            amount -> amount == Integer.MAX_VALUE
+        );
 
         public static final Codec<ShulkerLevels> CODEC = StringRepresentable.fromEnum(ShulkerLevels::values);
-        public static final StreamCodec<ByteBuf, ShulkerLevels> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(ShulkerLevels.class);
+        public static final StreamCodec<ByteBuf, ShulkerLevels> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(
+            ShulkerLevels.class);
 
         private final Predicate<Integer> requiredSize;
         private final String key;
@@ -80,7 +85,8 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
 
         @Nullable
         public static ShulkerFillLevelAttribute.ShulkerLevels fromKey(String key) {
-            return Arrays.stream(values()).filter(shulkerLevels -> shulkerLevels.key.equals(key)).findFirst().orElse(null);
+            return Arrays.stream(values()).filter(shulkerLevels -> shulkerLevels.key.equals(key)).findFirst()
+                .orElse(null);
         }
 
         private static boolean isShulker(ItemStack stack) {
@@ -93,17 +99,24 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
         }
 
         public boolean canApply(ItemStack testStack) {
-            if (!isShulker(testStack))
+            if (!isShulker(testStack)) {
                 return false;
-            ItemContainerContents contents = testStack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-            if (contents == ItemContainerContents.EMPTY)
+            }
+            ItemContainerContents contents = testStack.getOrDefault(
+                DataComponents.CONTAINER,
+                ItemContainerContents.EMPTY
+            );
+            if (contents == ItemContainerContents.EMPTY) {
                 return requiredSize.test(0);
-            if (testStack.has(DataComponents.CONTAINER_LOOT))
+            }
+            if (testStack.has(DataComponents.CONTAINER_LOOT)) {
                 return false;
+            }
             if (!contents.items.isEmpty()) {
                 int rawSize = contents.items.size();
-                if (rawSize < 27)
+                if (rawSize < 27) {
                     return requiredSize.test(rawSize);
+                }
 
                 NonNullList<ItemStack> inventory = NonNullList.withSize(27, ItemStack.EMPTY);
                 contents.copyInto(inventory);

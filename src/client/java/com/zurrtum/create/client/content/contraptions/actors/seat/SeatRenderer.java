@@ -30,6 +30,11 @@ public class SeatRenderer extends EntityRenderer<SeatEntity, EntityRenderState> 
     }
 
     @Override
-    public void submit(EntityRenderState renderState, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        EntityRenderState renderState,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
     }
 }

@@ -20,26 +20,34 @@ public record TrainIcon(TrainIconType type, Identifier sheet, int x, int y) {
     }
 
     public int getIconWidth(int lengthOrEngine) {
-        if (lengthOrEngine == FLIPPED_ENGINE)
+        if (lengthOrEngine == FLIPPED_ENGINE) {
             return 19;
-        if (lengthOrEngine == ENGINE)
+        }
+        if (lengthOrEngine == ENGINE) {
             return 19;
-        if (lengthOrEngine < 3)
+        }
+        if (lengthOrEngine < 3) {
             return 7;
-        if (lengthOrEngine < 9)
+        }
+        if (lengthOrEngine < 9) {
             return 13;
+        }
         return 19;
     }
 
     public int getIconOffset(int lengthOrEngine) {
-        if (lengthOrEngine == FLIPPED_ENGINE)
+        if (lengthOrEngine == FLIPPED_ENGINE) {
             return 0;
-        if (lengthOrEngine == ENGINE)
+        }
+        if (lengthOrEngine == ENGINE) {
             return 62;
-        if (lengthOrEngine < 3)
+        }
+        if (lengthOrEngine < 3) {
             return 34;
-        if (lengthOrEngine < 9)
+        }
+        if (lengthOrEngine < 9) {
             return 20;
+        }
         return 42;
     }
 

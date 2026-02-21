@@ -67,9 +67,7 @@ public class BlockMovementChecks {
     }
 
     public enum CheckResult {
-        SUCCESS,
-        FAIL,
-        PASS;
+        SUCCESS, FAIL, PASS;
 
         public static CheckResult of(boolean b) {
             return b ? SUCCESS : FAIL;

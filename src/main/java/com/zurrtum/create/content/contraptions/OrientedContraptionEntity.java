@@ -49,12 +49,10 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
     private static final Ingredient FUEL_ITEMS = Ingredient.of(Items.COAL, Items.CHARCOAL);
 
-    private static final EntityDataAccessor<Optional<UUID>> COUPLING = SynchedEntityData.defineId(
-        OrientedContraptionEntity.class,
+    private static final EntityDataAccessor<Optional<UUID>> COUPLING = SynchedEntityData.defineId(OrientedContraptionEntity.class,
         AllSynchedDatas.OPTIONAL_UUID_HANDLER
     );
-    private static final EntityDataAccessor<Direction> INITIAL_ORIENTATION = SynchedEntityData.defineId(
-        OrientedContraptionEntity.class,
+    private static final EntityDataAccessor<Direction> INITIAL_ORIENTATION = SynchedEntityData.defineId(OrientedContraptionEntity.class,
         EntityDataSerializers.DIRECTION
     );
 
@@ -87,7 +85,12 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         return entity;
     }
 
-    public static OrientedContraptionEntity createAtYaw(Level world, Contraption contraption, Direction initialOrientation, float initialYaw) {
+    public static OrientedContraptionEntity createAtYaw(
+        Level world,
+        Contraption contraption,
+        Direction initialOrientation,
+        float initialYaw
+    ) {
         OrientedContraptionEntity entity = create(world, contraption, initialOrientation);
         entity.startAtYaw(initialYaw);
         entity.manuallyPlaced = true;
@@ -136,8 +139,9 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
     @Override
     public void stopRiding() {
-        if (!level().isClientSide() && isAlive())
+        if (!level().isClientSide() && isAlive()) {
             disassemble();
+        }
         super.stopRiding();
     }
 
@@ -158,8 +162,9 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
         view.read("CachedMotion", Vec3.CODEC).ifPresent(motion -> {
             motionBeforeStall = motion;
-            if (!motionBeforeStall.equals(Vec3.ZERO))
+            if (!motionBeforeStall.equals(Vec3.ZERO)) {
                 targetYaw = prevYaw = yaw += yawFromVector(motionBeforeStall);
+            }
             setDeltaMovement(Vec3.ZERO);
         });
 
@@ -170,12 +175,14 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
     protected void writeAdditional(ValueOutput view, boolean spawnPacket) {
         super.writeAdditional(view, spawnPacket);
 
-        if (motionBeforeStall != null)
+        if (motionBeforeStall != null) {
             view.store("CachedMotion", Vec3.CODEC, motionBeforeStall);
+        }
 
         Direction optional = entityData.get(INITIAL_ORIENTATION);
-        if (optional.getAxis().isHorizontal())
+        if (optional.getAxis().isHorizontal()) {
             view.store("InitialOrientation", Direction.CODEC, optional);
+        }
         if (forceAngle) {
             view.putFloat("ForceYaw", yaw);
             forceAngle = false;
@@ -185,15 +192,17 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         view.putFloat("Yaw", yaw);
         view.putFloat("Pitch", pitch);
 
-        if (getCouplingId() != null)
+        if (getCouplingId() != null) {
             view.store("OnCoupling", UUIDUtil.CODEC, getCouplingId());
+        }
     }
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if (INITIAL_ORIENTATION.equals(key) && isInitialOrientationPresent() && !manuallyPlaced)
+        if (INITIAL_ORIENTATION.equals(key) && isInitialOrientationPresent() && !manuallyPlaced) {
             startAtInitialYaw();
+        }
     }
 
     public boolean isInitialOrientationPresent() {
@@ -235,11 +244,13 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
     @Override
     protected void tickContraption() {
-        if (nonDamageTicks > 0)
+        if (nonDamageTicks > 0) {
             nonDamageTicks--;
+        }
         Entity e = getVehicle();
-        if (e == null)
+        if (e == null) {
             return;
+        }
 
         boolean rotationLock = false;
         boolean pauseWhileRotating = false;
@@ -250,8 +261,9 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         }
 
         Entity riding = e;
-        while (riding.getVehicle() != null && !(contraption instanceof StabilizedContraption))
+        while (riding.getVehicle() != null && !(contraption instanceof StabilizedContraption)) {
             riding = riding.getVehicle();
+        }
 
         boolean isOnCoupling = false;
         UUID couplingId = getCouplingId();
@@ -263,8 +275,9 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         }
 
         boolean rotating = updateOrientation(rotationLock, wasStalled, riding, isOnCoupling);
-        if (!rotating || !pauseWhileRotating)
+        if (!rotating || !pauseWhileRotating) {
             tickActors();
+        }
         boolean isStalled = isStalled();
         boolean isClient = level().isClientSide();
 
@@ -280,8 +293,9 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         }
         if (isUpdate) {
             if (isStalled) {
-                if (!wasStalled)
+                if (!wasStalled) {
                     motionBeforeStall = riding.getDeltaMovement();
+                }
                 riding.setDeltaMovement(0, 0, 0);
             }
             if (wasStalled && !isStalled) {
@@ -290,14 +304,16 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
             }
         }
 
-        if (isClient)
+        if (isClient) {
             return;
+        }
 
         if (!isStalled()) {
             if (isOnCoupling) {
                 Couple<MinecartController> coupledCarts = getCoupledCartsIfPresent();
-                if (coupledCarts == null)
+                if (coupledCarts == null) {
                     return;
+                }
                 coupledCarts.map(MinecartController::cart).forEach(this::powerFurnaceCartWithFuelFromStorage);
                 return;
             }
@@ -310,16 +326,18 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         int y = Mth.floor(entity.getY());
         int z = Mth.floor(entity.getZ());
         BlockPos pos = new BlockPos(x, y, z);
-        if (entity.level().getBlockState(pos.below()).is(BlockTags.RAILS))
+        if (entity.level().getBlockState(pos.below()).is(BlockTags.RAILS)) {
             pos = pos.below();
+        }
         return pos;
     }
 
     protected boolean updateOrientation(boolean rotationLock, boolean wasStalled, Entity riding, boolean isOnCoupling) {
         if (isOnCoupling) {
             Couple<MinecartController> coupledCarts = getCoupledCartsIfPresent();
-            if (coupledCarts == null)
+            if (coupledCarts == null) {
                 return false;
+            }
 
             Vec3 positionVec = coupledCarts.getFirst().cart().position();
             Vec3 coupledVec = coupledCarts.getSecond().cart().position();
@@ -341,25 +359,29 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         }
 
         if (contraption instanceof StabilizedContraption stabilized) {
-            if (!(riding instanceof OrientedContraptionEntity parent))
+            if (!(riding instanceof OrientedContraptionEntity parent)) {
                 return false;
+            }
             Direction facing = stabilized.getFacing();
-            if (facing.getAxis().isVertical())
+            if (facing.getAxis().isVertical()) {
                 return false;
+            }
             prevYaw = yaw;
             yaw = AngleHelper.wrapAngle180(getInitialYaw() - parent.getInitialYaw()) - parent.getViewYRot(1);
             return false;
         }
 
         prevYaw = yaw;
-        if (wasStalled)
+        if (wasStalled) {
             return false;
+        }
 
         boolean rotating = false;
         Vec3 movementVector = riding.getDeltaMovement();
         Vec3 locationDiff = riding.position().subtract(riding.xo, riding.yo, riding.zo);
-        if (!(riding instanceof AbstractMinecart))
+        if (!(riding instanceof AbstractMinecart)) {
             movementVector = locationDiff;
+        }
         Vec3 motion = movementVector.normalize();
 
         if (!rotationLock) {
@@ -374,10 +396,12 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
             if (motion.length() > 0) {
                 targetYaw = yawFromVector(motion);
-                if (targetYaw < 0)
+                if (targetYaw < 0) {
                     targetYaw += 360;
-                if (yaw < 0)
+                }
+                if (yaw < 0) {
                     yaw += 360;
+                }
             }
 
             prevYaw = yaw;
@@ -386,17 +410,19 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
             float approach = AngleHelper.getShortestAngleDiff(yaw, targetYaw, yawHint);
             approach = Mth.clamp(approach, -maxApproachSpeed, maxApproachSpeed);
             yaw += approach;
-            if (Math.abs(AngleHelper.getShortestAngleDiff(yaw, targetYaw)) < 1f)
+            if (Math.abs(AngleHelper.getShortestAngleDiff(yaw, targetYaw)) < 1f) {
                 yaw = targetYaw;
-            else
+            } else {
                 rotating = true;
+            }
         }
         return rotating;
     }
 
     protected void powerFurnaceCartWithFuelFromStorage(Entity riding) {
-        if (!(riding instanceof MinecartFurnace furnaceCart))
+        if (!(riding instanceof MinecartFurnace furnaceCart)) {
             return;
+        }
 
         int fuel = furnaceCart.fuel;
         int fuelBefore = fuel;
@@ -406,19 +432,23 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         int i = Mth.floor(furnaceCart.getX());
         int j = Mth.floor(furnaceCart.getY());
         int k = Mth.floor(furnaceCart.getZ());
-        if (furnaceCart.level().getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.RAILS))
+        if (furnaceCart.level().getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.RAILS)) {
             --j;
+        }
 
         BlockPos blockpos = new BlockPos(i, j, k);
-        if (level().getBlockState(blockpos).is(BlockTags.RAILS))
-            if (fuel > 1)
+        if (level().getBlockState(blockpos).is(BlockTags.RAILS)) {
+            if (fuel > 1) {
                 riding.setDeltaMovement(riding.getDeltaMovement().normalize().scale(1));
+            }
+        }
         if (fuel < 5 && contraption != null) {
             MountedItemStorageWrapper fuelItems = contraption.getStorage().getFuelItems();
             if (fuelItems != null) {
                 ItemStack coal = fuelItems.extract(FUEL_ITEMS, 1);
-                if (!coal.isEmpty())
+                if (!coal.isEmpty()) {
                     fuel += 3600;
+                }
             }
         }
 
@@ -431,28 +461,33 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
     @Nullable
     public Couple<MinecartController> getCoupledCartsIfPresent() {
         UUID couplingId = getCouplingId();
-        if (couplingId == null)
+        if (couplingId == null) {
             return null;
+        }
         MinecartController controller = CapabilityMinecartController.getIfPresent(level(), couplingId);
-        if (controller == null || !controller.isPresent())
+        if (controller == null || !controller.isPresent()) {
             return null;
+        }
         UUID coupledCart = controller.getCoupledCart(true);
         MinecartController coupledController = CapabilityMinecartController.getIfPresent(level(), coupledCart);
-        if (coupledController == null || !coupledController.isPresent())
+        if (coupledController == null || !coupledController.isPresent()) {
             return null;
+        }
         return Couple.create(controller, coupledController);
     }
 
     protected void attachInventoriesFromRidingCarts(Entity riding, boolean isOnCoupling, UUID couplingId) {
-        if (!(contraption instanceof MountedContraption mc))
+        if (!(contraption instanceof MountedContraption mc)) {
             return;
+        }
         if (!isOnCoupling) {
             mc.addExtraInventories(riding);
             return;
         }
         Couple<MinecartController> coupledCarts = getCoupledCartsIfPresent();
-        if (coupledCarts == null)
+        if (coupledCarts == null) {
             return;
+        }
         coupledCarts.map(MinecartController::cart).forEach(mc::addExtraInventories);
     }
 

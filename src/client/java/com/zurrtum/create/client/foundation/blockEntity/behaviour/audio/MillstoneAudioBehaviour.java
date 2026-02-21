@@ -14,10 +14,12 @@ public class MillstoneAudioBehaviour extends KineticAudioBehaviour<MillstoneBloc
     public void tickAudio() {
         super.tickAudio();
 
-        if (blockEntity.getSpeed() == 0)
+        if (blockEntity.getSpeed() == 0) {
             return;
-        if (blockEntity.capability.getItem(0).isEmpty())
+        }
+        if (blockEntity.capability.getItem(0).isEmpty()) {
             return;
+        }
 
         float pitch = Mth.clamp((Math.abs(blockEntity.getSpeed()) / 256f) + .45f, .85f, 1f);
         SoundScapes.play(AmbienceGroup.MILLING, blockEntity.getBlockPos(), pitch);

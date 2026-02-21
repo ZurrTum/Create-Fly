@@ -21,7 +21,8 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Optional;
 
-public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output,
+                                 Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanBlastingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanBlastingDisplay::input),
@@ -44,7 +45,8 @@ public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, 
         }
         SingleItemRecipe recipe = (SingleItemRecipe) entry.value();
         Ingredient ingredient = recipe.input();
-        Optional<ItemStack> firstInput = ingredient.values.stream().findFirst().map(item -> item.value().getDefaultInstance());
+        Optional<ItemStack> firstInput = ingredient.values.stream().findFirst()
+            .map(item -> item.value().getDefaultInstance());
         if (firstInput.isEmpty()) {
             return null;
         }
@@ -53,14 +55,20 @@ public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, 
         ServerLevel world = server.getLevel(Level.OVERWORLD);
         RecipeManager recipeManager = server.getRecipeManager();
         if (recipe instanceof SmeltingRecipe) {
-            Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = recipeManager.getRecipeFor(RecipeType.BLASTING, input, world)
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+            Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = recipeManager.getRecipeFor(
+                RecipeType.BLASTING,
+                input,
+                world
+            ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             if (blastingRecipe.isPresent()) {
                 return null;
             }
         }
-        Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = recipeManager.getRecipeFor(RecipeType.SMOKING, input, world)
-            .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+        Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = recipeManager.getRecipeFor(
+            RecipeType.SMOKING,
+            input,
+            world
+        ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
         if (smokingRecipe.isPresent()) {
             return null;
         }

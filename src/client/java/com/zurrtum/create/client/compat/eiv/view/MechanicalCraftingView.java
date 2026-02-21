@@ -85,10 +85,21 @@ public class MechanicalCraftingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(context, 128, 53);
         AllGuiTextures.JEI_SHADOW.render(context, 113, 32);
-        context.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(new Matrix3x2f(context.pose()), 124, 12));
+        context.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(
+            new Matrix3x2f(context.pose()),
+            124,
+            12
+        ));
         String size = String.valueOf(ingredients.size());
         context.drawString(Minecraft.getInstance().font, size, 142, 33, 0xFFFFFFFF, true);
     }

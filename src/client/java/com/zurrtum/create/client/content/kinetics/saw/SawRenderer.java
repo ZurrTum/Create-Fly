@@ -95,7 +95,12 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
     }
 
     @Override
-    public void submit(SawRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        SawRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
         if (state.items != null) {
             renderItems(state, matrices, queue);
@@ -128,8 +133,9 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
                 partial = AllPartialModels.SAW_BLADE_VERTICAL_INACTIVE;
             }
 
-            if (blockState.getValue(SawBlock.AXIS_ALONG_FIRST_COORDINATE))
+            if (blockState.getValue(SawBlock.AXIS_ALONG_FIRST_COORDINATE)) {
                 rotate = true;
+            }
         }
 
         state.blade = CachedBuffers.partialFacing(partial, blockState);
@@ -187,21 +193,25 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
         if (moving) {
             float processingSpeed = Mth.clamp(Math.abs(speed) / 32, 1, 128);
             offset = Mth.clamp(offset + ((-state.partialTicks + .5f) * processingSpeed) / duration, 0.125f, 1f);
-            if (!state.appliedRecipe)
+            if (!state.appliedRecipe) {
                 offset += 1;
+            }
             offset /= 2;
         }
 
-        if (speed == 0)
+        if (speed == 0) {
             offset = .5f;
-        if (speed < 0 ^ alongZ)
+        }
+        if (speed < 0 ^ alongZ) {
             offset = 1 - offset;
+        }
 
         int outputs = state.outputs;
 
         ms.pushPose();
-        if (alongZ)
+        if (alongZ) {
             ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(90));
+        }
         ms.translate(outputs <= 1 ? .5 : .25, 0, offset);
         ms.translate(alongZ ? -1 : 0, 0, 0);
 
@@ -243,8 +253,12 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
     }
 
     protected SuperByteBuffer getRotatedModel(BlockState state, Axis axis) {
-        if (state.getValue(FACING).getAxis().isHorizontal())
-            return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.getBlock().rotate(state, Rotation.CLOCKWISE_180));
+        if (state.getValue(FACING).getAxis().isHorizontal()) {
+            return CachedBuffers.partialFacing(
+                AllPartialModels.SHAFT_HALF,
+                state.getBlock().rotate(state, Rotation.CLOCKWISE_180)
+            );
+        }
         return CachedBuffers.block(KineticBlockEntityRenderer.KINETIC_BLOCK, KineticBlockEntityRenderer.shaft(axis));
     }
 
@@ -274,7 +288,8 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
             }
             blade.color(0xFFFFFF).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
             if (shaft != null) {
-                shaft.light(lightCoords).rotateCentered(angle, direction).color(color).renderInto(matricesEntry, vertexConsumer);
+                shaft.light(lightCoords).rotateCentered(angle, direction).color(color)
+                    .renderInto(matricesEntry, vertexConsumer);
             }
         }
     }

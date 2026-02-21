@@ -2,25 +2,24 @@ package com.zurrtum.create.content.logistics;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 public class BigItemStack {
     public static final Codec<BigItemStack> CODEC = RecordCodecBuilder.create(i -> i.group(
-        ItemStack.OPTIONAL_CODEC.fieldOf("item_stack")
-            .forGetter(s -> s.stack), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("count").forGetter(s -> s.count)
+        ItemStack.OPTIONAL_CODEC.fieldOf(
+            "item_stack").forGetter(s -> s.stack),
+        ExtraCodecs.NON_NEGATIVE_INT.fieldOf("count").forGetter(s -> s.count)
     ).apply(i, BigItemStack::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, BigItemStack> STREAM_CODEC = StreamCodec.composite(
-        ItemStack.OPTIONAL_STREAM_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, BigItemStack> STREAM_CODEC = StreamCodec.composite(ItemStack.OPTIONAL_STREAM_CODEC,
         s -> s.stack,
         ByteBufCodecs.VAR_INT,
         s -> s.count,
@@ -55,10 +54,12 @@ public class BigItemStack {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj == this)
+        if (obj == this) {
             return true;
-        if (obj instanceof BigItemStack other)
+        }
+        if (obj instanceof BigItemStack other) {
             return ItemStack.isSameItemSameComponents(stack, other.stack) && count == other.count;
+        }
         return false;
     }
 
@@ -78,8 +79,9 @@ public class BigItemStack {
 
     public static List<BigItemStack> duplicateWrappers(List<BigItemStack> list) {
         List<BigItemStack> copy = new ArrayList<>();
-        for (BigItemStack bigItemStack : list)
+        for (BigItemStack bigItemStack : list) {
             copy.add(new BigItemStack(bigItemStack.stack, bigItemStack.count));
+        }
         return copy;
     }
 }

@@ -8,19 +8,18 @@ import com.mojang.serialization.RecordBuilder;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllMapDecorationTypes;
-import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class StationMarker {
     public static final Codec<StationMarker> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -45,8 +44,9 @@ public class StationMarker {
     public static StationMarker fromWorld(BlockGetter level, BlockPos pos) {
         Optional<StationBlockEntity> stationOption = level.getBlockEntity(pos, AllBlockEntityTypes.TRACK_STATION);
 
-        if (stationOption.isEmpty() || stationOption.get().getStation() == null)
+        if (stationOption.isEmpty() || stationOption.get().getStation() == null) {
             return null;
+        }
 
         String name = stationOption.get().getStation().name;
         return new StationMarker(
@@ -74,15 +74,18 @@ public class StationMarker {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         StationMarker that = (StationMarker) o;
 
-        if (!target.equals(that.target))
+        if (!target.equals(that.target)) {
             return false;
+        }
         return name.equals(that.name);
     }
 
@@ -119,7 +122,11 @@ public class StationMarker {
         public <T> DataResult<T> encode(MapItemSavedData input, DynamicOps<T> ops, T prefix) {
             return codec.encode(input, ops, prefix).flatMap(result -> {
                 RecordBuilder<T> map = ops.mapBuilder();
-                map.add(STATION_MARKERS_KEY, ((StationMapData) input).create$getStationMarkers().values().stream().toList(), LIST_CODEC);
+                map.add(
+                    STATION_MARKERS_KEY,
+                    ((StationMapData) input).create$getStationMarkers().values().stream().toList(),
+                    LIST_CODEC
+                );
                 return map.build(result);
             });
         }

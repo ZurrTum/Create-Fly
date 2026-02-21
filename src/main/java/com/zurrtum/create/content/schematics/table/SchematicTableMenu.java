@@ -24,14 +24,16 @@ public class SchematicTableMenu extends MenuBase<SchematicTableBlockEntity> {
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
         Slot clickedSlot = getSlot(index);
-        if (!clickedSlot.hasItem())
+        if (!clickedSlot.hasItem()) {
             return ItemStack.EMPTY;
+        }
 
         ItemStack stack = clickedSlot.getItem();
-        if (index < 2)
+        if (index < 2) {
             moveItemStackTo(stack, 2, slots.size(), true);
-        else
+        } else {
             moveItemStackTo(stack, 0, 1, false);
+        }
 
         return ItemStack.EMPTY;
     }

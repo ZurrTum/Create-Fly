@@ -85,7 +85,17 @@ public class GuiGameElement {
                 }
                 return;
             }
-            ItemTransformRenderState state = ItemTransformRenderState.create(graphics, stack, x, y, scale, padding, xRot, yRot, zRot);
+            ItemTransformRenderState state = ItemTransformRenderState.create(
+                graphics,
+                stack,
+                x,
+                y,
+                scale,
+                padding,
+                xRot,
+                yRot,
+                zRot
+            );
             key = state.getKey();
             graphics.guiRenderState.submitPicturesInPictureState(state);
         }
@@ -167,7 +177,14 @@ public class GuiGameElement {
         @Override
         public void clear() {
             if (rendering) {
-                BlockTransformElementRenderer.clear(BlockTransformRenderState.getKey(block, scale, padding, xRot, yRot, zRot));
+                BlockTransformElementRenderer.clear(BlockTransformRenderState.getKey(
+                    block,
+                    scale,
+                    padding,
+                    xRot,
+                    yRot,
+                    zRot
+                ));
                 rendering = false;
             }
         }

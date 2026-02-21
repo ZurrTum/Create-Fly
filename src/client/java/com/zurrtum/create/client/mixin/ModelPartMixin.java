@@ -14,7 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ModelPart.class)
 public class ModelPartMixin {
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V", at = @At("HEAD"), cancellable = true)
-    private void render(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color, CallbackInfo ci) {
+    private void render(
+        PoseStack matrices,
+        VertexConsumer vertices,
+        int light,
+        int overlay,
+        int color,
+        CallbackInfo ci
+    ) {
         if (vertices instanceof SpriteCoordinateExpander consumer) {
             VertexConsumer delegate = consumer.delegate;
             if (delegate instanceof ItemMeshEmitter emitter) {

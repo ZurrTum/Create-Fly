@@ -39,8 +39,9 @@ public class SchematicProcessor extends StructureProcessor implements EntityCont
             BlockEntity be = ((EntityBlock) info.state().getBlock()).newBlockEntity(info.pos(), info.state());
             if (be != null) {
                 CompoundTag nbt = NBTProcessors.process(info.state(), be, info.nbt(), false);
-                if (nbt != info.nbt())
+                if (nbt != info.nbt()) {
                     return new StructureTemplate.StructureBlockInfo(info.pos(), info.state(), nbt);
+                }
             }
         }
         return info;
@@ -48,8 +49,8 @@ public class SchematicProcessor extends StructureProcessor implements EntityCont
 
     @Override
     public boolean skip(Level world, StructureTemplate.StructureEntityInfo info) {
-        return info.nbt.read("id", EntityType.CODEC).map(type -> !type.onlyOpCanSetNbt() && type.create(world, EntitySpawnReason.LOAD) != null)
-            .orElse(false);
+        return info.nbt.read("id", EntityType.CODEC)
+            .map(type -> !type.onlyOpCanSetNbt() && type.create(world, EntitySpawnReason.LOAD) != null).orElse(false);
     }
 
     @Override

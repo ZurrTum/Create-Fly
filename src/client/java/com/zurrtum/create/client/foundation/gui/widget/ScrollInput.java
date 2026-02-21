@@ -5,15 +5,14 @@ import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour.StepContext;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ScrollInput extends AbstractSimiWidget {
 
@@ -94,8 +93,9 @@ public class ScrollInput extends AbstractSimiWidget {
 
     public ScrollInput writingTo(Label label) {
         this.displayLabel = label;
-        if (label != null)
+        if (label != null) {
             writeToLabel();
+        }
         return this;
     }
 
@@ -113,8 +113,9 @@ public class ScrollInput extends AbstractSimiWidget {
         this.state = state;
         clampState();
         updateTooltip();
-        if (displayLabel != null)
+        if (displayLabel != null) {
             writeToLabel();
+        }
         return this;
     }
 
@@ -125,8 +126,9 @@ public class ScrollInput extends AbstractSimiWidget {
 
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
-        if (inverted)
+        if (inverted) {
             pScrollY *= -1;
+        }
 
         StepContext context = new StepContext();
         context.control = AllKeys.hasControlDown();
@@ -139,15 +141,20 @@ public class ScrollInput extends AbstractSimiWidget {
         int step = (int) Math.signum(pScrollY) * this.step.apply(context);
 
         state += step;
-        if (shifted)
+        if (shifted) {
             state -= state % shiftStep;
+        }
 
         clampState();
 
         if (priorState != state) {
-            if (!soundPlayed)
+            if (!soundPlayed) {
                 Minecraft.getInstance().getSoundManager()
-                    .play(SimpleSoundInstance.forUI(AllSoundEvents.SCROLL_VALUE.getMainEvent(), 1.5f + 0.1f * (state - min) / (max - min)));
+                    .play(SimpleSoundInstance.forUI(
+                        AllSoundEvents.SCROLL_VALUE.getMainEvent(),
+                        1.5f + 0.1f * (state - min) / (max - min)
+                    ));
+            }
             soundPlayed = true;
             onChanged();
         }
@@ -156,17 +163,21 @@ public class ScrollInput extends AbstractSimiWidget {
     }
 
     protected void clampState() {
-        if (state >= max)
+        if (state >= max) {
             state = max - 1;
-        if (state < min)
+        }
+        if (state < min) {
             state = min;
+        }
     }
 
     public void onChanged() {
-        if (displayLabel != null)
+        if (displayLabel != null) {
             writeToLabel();
-        if (onScroll != null)
+        }
+        if (onScroll != null) {
             onScroll.accept(state);
+        }
         updateTooltip();
     }
 
@@ -176,11 +187,13 @@ public class ScrollInput extends AbstractSimiWidget {
 
     protected void updateTooltip() {
         toolTip.clear();
-        if (title == null)
+        if (title == null) {
             return;
+        }
         toolTip.add(title.plainCopy().withStyle(s -> s.withColor(HEADER_RGB.getRGB())));
-        if (hint != null)
+        if (hint != null) {
             toolTip.add(hint.plainCopy().withStyle(s -> s.withColor(HINT_RGB.getRGB())));
+        }
         toolTip.add(scrollToModify.plainCopy().withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
         toolTip.add(shiftScrollsFaster.plainCopy().withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
     }

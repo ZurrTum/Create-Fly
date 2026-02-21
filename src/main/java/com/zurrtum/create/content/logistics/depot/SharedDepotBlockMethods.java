@@ -2,11 +2,11 @@ package com.zurrtum.create.content.logistics.depot;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,16 +41,20 @@ public class SharedDepotBlockMethods {
         InteractionHand hand,
         BlockHitResult ray
     ) {
-        if (ray.getDirection() != Direction.UP)
+        if (ray.getDirection() != Direction.UP) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         DepotBehaviour behaviour = get(level, pos);
-        if (behaviour == null)
+        if (behaviour == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (!behaviour.canAcceptItems.get())
+        }
+        if (!behaviour.canAcceptItems.get()) {
             return InteractionResult.SUCCESS;
+        }
 
         boolean wasEmptyHanded = stack.isEmpty();
         boolean shouldntPlaceItem = stack.is(AllItems.MECHANICAL_ARM);
@@ -74,7 +78,14 @@ public class SharedDepotBlockMethods {
             if (!mainItemStack.isEmpty()) {
                 player.getInventory().placeItemBackInInventory(mainItemStack);
                 behaviour.removeHeldItem();
-                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + level.getRandom().nextFloat());
+                level.playSound(
+                    null,
+                    pos,
+                    SoundEvents.ITEM_PICKUP,
+                    SoundSource.PLAYERS,
+                    .2f,
+                    1f + level.getRandom().nextFloat()
+                );
             }
         }
         boolean change = false;
@@ -107,30 +118,37 @@ public class SharedDepotBlockMethods {
 
     public static void onLanded(BlockGetter worldIn, Entity entityIn) {
         ItemStack asItem = ItemHelper.fromItemEntity(entityIn);
-        if (asItem.isEmpty())
+        if (asItem.isEmpty()) {
             return;
-        if (entityIn.level().isClientSide())
+        }
+        if (entityIn.level().isClientSide()) {
             return;
+        }
 
         BlockPos pos = entityIn.blockPosition();
         DirectBeltInputBehaviour inputBehaviour = BlockEntityBehaviour.get(worldIn, pos, DirectBeltInputBehaviour.TYPE);
-        if (inputBehaviour == null)
+        if (inputBehaviour == null) {
             return;
+        }
         Vec3 targetLocation = VecHelper.getCenterOf(pos).add(0, 5 / 16f, 0);
-        if (!PackageEntity.centerPackage(entityIn, targetLocation))
+        if (!PackageEntity.centerPackage(entityIn, targetLocation)) {
             return;
+        }
 
         ItemStack remainder = inputBehaviour.handleInsertion(asItem, Direction.DOWN, false);
-        if (entityIn instanceof ItemEntity)
+        if (entityIn instanceof ItemEntity) {
             ((ItemEntity) entityIn).setItem(remainder);
-        if (remainder.isEmpty())
+        }
+        if (remainder.isEmpty()) {
             entityIn.discard();
+        }
     }
 
     public static int getComparatorInputOverride(BlockState blockState, Level worldIn, BlockPos pos) {
         DepotBehaviour depotBehaviour = get(worldIn, pos);
-        if (depotBehaviour == null)
+        if (depotBehaviour == null) {
             return 0;
+        }
         float f = depotBehaviour.getPresentStackSize();
         Integer max = depotBehaviour.maxStackSize.get();
         f = f / (max == 0 ? 64 : max);

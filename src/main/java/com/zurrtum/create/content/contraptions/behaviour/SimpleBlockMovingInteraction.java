@@ -24,12 +24,14 @@ public abstract class SimpleBlockMovingInteraction extends MovingInteractionBeha
         StructureBlockInfo info = contraption.getBlocks().get(localPos);
 
         BlockState newState = handle(player, contraption, localPos, info.state());
-        if (info.state() == newState)
+        if (info.state() == newState) {
             return false;
+        }
 
         setContraptionBlockData(contraptionEntity, localPos, new StructureBlockInfo(info.pos(), newState, info.nbt()));
-        if (updateColliders())
+        if (updateColliders()) {
             contraption.invalidateColliders();
+        }
         return true;
     }
 

@@ -12,6 +12,10 @@ public class ConnectedGlassBlock extends TransparentBlock {
 
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
-        return adjacentBlockState.getBlock() instanceof ConnectedGlassBlock || super.skipRendering(state, adjacentBlockState, side);
+        return adjacentBlockState.getBlock() instanceof ConnectedGlassBlock || super.skipRendering(
+            state,
+            adjacentBlockState,
+            side
+        );
     }
 }

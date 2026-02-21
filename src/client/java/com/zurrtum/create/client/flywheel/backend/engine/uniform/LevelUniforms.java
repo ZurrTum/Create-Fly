@@ -64,7 +64,10 @@ public final class LevelUniforms extends UniformWriter {
 
         ptr = writeInt(ptr, level.dimensionType().hasSkyLight() ? 1 : 0);
 
-        ptr = writeFloat(ptr, attributeProbe.getValue(EnvironmentAttributes.SUN_ANGLE, partialTick) * (float) (Math.PI / 180.0));
+        ptr = writeFloat(
+            ptr,
+            attributeProbe.getValue(EnvironmentAttributes.SUN_ANGLE, partialTick) * (float) (Math.PI / 180.0)
+        );
 
         MoonPhase moonPhase = attributeProbe.getValue(EnvironmentAttributes.MOON_PHASE, partialTick);
         ptr = writeFloat(ptr, DimensionType.MOON_BRIGHTNESS_PER_PHASE[moonPhase.index()]);
@@ -77,7 +80,10 @@ public final class LevelUniforms extends UniformWriter {
 
         ptr = writeFloat(ptr, level.getSkyDarken());
 
-        ptr = writeInt(ptr, level.dimensionType().cardinalLightType() == DimensionType.CardinalLightType.NETHER ? 1 : 0);
+        ptr = writeInt(
+            ptr,
+            level.dimensionType().cardinalLightType() == DimensionType.CardinalLightType.NETHER ? 1 : 0
+        );
 
         // TODO: use defines for custom dimension ids
         int dimensionId;

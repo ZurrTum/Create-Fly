@@ -32,7 +32,10 @@ public class VanillinConfig {
                 CustomValue overridesValue = meta.getCustomValue(VANILLIN_OVERRIDES);
 
                 if (overridesValue.getType() != CustomValue.CvType.OBJECT) {
-                    Vanillin.CONFIG_LOGGER.warn("Mod '{}' attempted to override options with an invalid value, ignoring", modid);
+                    Vanillin.CONFIG_LOGGER.warn(
+                        "Mod '{}' attempted to override options with an invalid value, ignoring",
+                        modid
+                    );
                     continue;
                 }
 
@@ -46,7 +49,13 @@ public class VanillinConfig {
         return new ModOverrides(blockEntities, entities);
     }
 
-    private static void readSection(List<VisualOverride> dst, String modid, CustomValue.CvObject overrides, String sectionName, String singular) {
+    private static void readSection(
+        List<VisualOverride> dst,
+        String modid,
+        CustomValue.CvObject overrides,
+        String sectionName,
+        String singular
+    ) {
         if (!overrides.containsKey(sectionName)) {
             return;
         }
@@ -54,7 +63,11 @@ public class VanillinConfig {
         var section = overrides.get(sectionName);
 
         if (section.getType() != CustomValue.CvType.OBJECT) {
-            Vanillin.CONFIG_LOGGER.warn("Mod '{}' attempted to override {} with an invalid value, ignoring", modid, sectionName);
+            Vanillin.CONFIG_LOGGER.warn(
+                "Mod '{}' attempted to override {} with an invalid value, ignoring",
+                modid,
+                sectionName
+            );
             return;
         }
 
@@ -62,7 +75,12 @@ public class VanillinConfig {
             var value = entry.getValue();
             var key = entry.getKey();
             if (value.getType() != CustomValue.CvType.STRING) {
-                Vanillin.CONFIG_LOGGER.warn("Mod '{}' attempted to override {} '{}' with an invalid value, ignoring", modid, singular, key);
+                Vanillin.CONFIG_LOGGER.warn(
+                    "Mod '{}' attempted to override {} '{}' with an invalid value, ignoring",
+                    modid,
+                    singular,
+                    key
+                );
                 continue;
             }
 

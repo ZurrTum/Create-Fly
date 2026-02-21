@@ -12,8 +12,9 @@ public class HauntedBellMovementBehaviour extends BellMovementBehaviour {
     @Override
     public void tick(MovementContext context) {
         int recharge = getRecharge(context);
-        if (recharge > 0)
+        if (recharge > 0) {
             setRecharge(context, recharge - 1);
+        }
     }
 
     @Override

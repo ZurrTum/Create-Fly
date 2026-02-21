@@ -11,10 +11,6 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.HolderGetter;
@@ -33,6 +29,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public abstract class LaunchedItem {
 
@@ -64,8 +63,9 @@ public abstract class LaunchedItem {
             ticksRemaining--;
             return false;
         }
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return false;
+        }
 
         place(world);
         return true;
@@ -139,7 +139,11 @@ public abstract class LaunchedItem {
 
         @Override
         void read(ValueInput view, HolderGetter<Block> holderGetter) {
-            read(view, holderGetter, view.read("BlockState", BlockState.CODEC).orElseGet(Blocks.AIR::defaultBlockState));
+            read(
+                view,
+                holderGetter,
+                view.read("BlockState", BlockState.CODEC).orElseGet(Blocks.AIR::defaultBlockState)
+            );
         }
 
         private void read(ValueInput view, HolderGetter<Block> holderGetter, BlockState state) {
@@ -186,8 +190,13 @@ public abstract class LaunchedItem {
             this.length = length;
             int[] intArray = view.getIntArray("Casing").orElseGet(() -> new int[0]);
             casings = new CasingType[length];
-            for (int i = 0; i < casings.length; i++)
-                casings[i] = i >= intArray.length ? CasingType.NONE : CasingType.values()[Mth.clamp(intArray[i], 0, CasingType.values().length - 1)];
+            for (int i = 0; i < casings.length; i++) {
+                casings[i] = i >= intArray.length ? CasingType.NONE : CasingType.values()[Mth.clamp(
+                    intArray[i],
+                    0,
+                    CasingType.values().length - 1
+                )];
+            }
             super.read(view, holderGetter);
         }
 
@@ -202,17 +211,30 @@ public abstract class LaunchedItem {
             boolean isStart = state.getValue(BeltBlock.PART) == BeltPart.START;
             BlockPos offset = BeltBlock.nextSegmentPosition(state, BlockPos.ZERO, isStart);
             int i = length - 1;
-            Axis axis = state.getValue(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS ? Axis.Y : state.getValue(BeltBlock.HORIZONTAL_FACING).getClockWise()
-                .getAxis();
-            world.setBlockAndUpdate(target, AllBlocks.SHAFT.defaultBlockState().setValue(AbstractSimpleShaftBlock.AXIS, axis));
-            BeltConnectorItem.createBelts(world, target, target.offset(offset.getX() * i, offset.getY() * i, offset.getZ() * i));
+            Axis axis = state.getValue(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS ? Axis.Y : state.getValue(BeltBlock.HORIZONTAL_FACING)
+                .getClockWise().getAxis();
+            world.setBlockAndUpdate(
+                target,
+                AllBlocks.SHAFT.defaultBlockState().setValue(AbstractSimpleShaftBlock.AXIS, axis)
+            );
+            BeltConnectorItem.createBelts(
+                world,
+                target,
+                target.offset(offset.getX() * i, offset.getY() * i, offset.getZ() * i)
+            );
 
             for (int segment = 0; segment < length; segment++) {
-                if (casings[segment] == CasingType.NONE)
+                if (casings[segment] == CasingType.NONE) {
                     continue;
-                BlockPos casingTarget = target.offset(offset.getX() * segment, offset.getY() * segment, offset.getZ() * segment);
-                if (world.getBlockEntity(casingTarget) instanceof BeltBlockEntity bbe)
+                }
+                BlockPos casingTarget = target.offset(
+                    offset.getX() * segment,
+                    offset.getY() * segment,
+                    offset.getZ() * segment
+                );
+                if (world.getBlockEntity(casingTarget) instanceof BeltBlockEntity bbe) {
                     bbe.setCasingType(casings[segment]);
+                }
             }
         }
 
@@ -240,8 +262,9 @@ public abstract class LaunchedItem {
                     )) {
                         ValueInput view = TagValueInput.create(logging, world.registryAccess(), deferredTag);
                         Optional<Entity> loadEntityUnchecked = EntityType.create(view, world, EntitySpawnReason.LOAD);
-                        if (loadEntityUnchecked.isEmpty())
+                        if (loadEntityUnchecked.isEmpty()) {
                             return true;
+                        }
                         entity = loadEntityUnchecked.get();
                     }
                 } catch (Exception var3) {
@@ -274,8 +297,9 @@ public abstract class LaunchedItem {
 
         @Override
         void place(Level world) {
-            if (entity != null)
+            if (entity != null) {
                 world.addFreshEntity(entity);
+            }
         }
 
     }

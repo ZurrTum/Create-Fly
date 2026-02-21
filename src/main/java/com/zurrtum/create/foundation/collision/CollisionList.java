@@ -46,7 +46,14 @@ public class CollisionList {
             );
         }
 
-        public void append(double centerX, double centerY, double centerZ, double extentsX, double extentsY, double extentsZ) {
+        public void append(
+            double centerX,
+            double centerY,
+            double centerZ,
+            double extentsX,
+            double extentsY,
+            double extentsZ
+        ) {
             // Out of space, must reallocate.
             if (collisionList.size == collisionList.centerX.length) {
                 int newCapacity = collisionList.centerX.length * 2;

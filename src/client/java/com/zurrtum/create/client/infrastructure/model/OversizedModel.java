@@ -86,7 +86,8 @@ public class OversizedModel implements ItemModel {
         int[] is = layerRenderState.prepareTintLayers(i);
 
         for (int j = 0; j < i; j++) {
-            int k = tints.get(j).calculate(stack, world, heldItemContext == null ? null : heldItemContext.asLivingEntity());
+            int k = tints.get(j)
+                .calculate(stack, world, heldItemContext == null ? null : heldItemContext.asLivingEntity());
             is[j] = k;
             state.appendModelIdentityElement(k);
         }
@@ -104,14 +105,18 @@ public class OversizedModel implements ItemModel {
         }
     }
 
-    public record Unbaked(Identifier model, List<ItemTintSource> tints, List<Double> min, List<Double> max) implements ItemModel.Unbaked {
+    public record Unbaked(Identifier model, List<ItemTintSource> tints, List<Double> min,
+                          List<Double> max) implements ItemModel.Unbaked {
         public static final MapCodec<com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                Identifier.CODEC.fieldOf("model").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::model),
+                Identifier.CODEC.fieldOf("model")
+                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::model),
                 ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
                     .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::tints),
-                Codec.DOUBLE.listOf(3, 3).fieldOf("min").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::min),
-                Codec.DOUBLE.listOf(3, 3).fieldOf("max").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::max)
+                Codec.DOUBLE.listOf(3, 3).fieldOf("min")
+                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::min),
+                Codec.DOUBLE.listOf(3, 3).fieldOf("max")
+                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::max)
             ).apply(instance, com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::new));
 
         @Override
@@ -124,8 +129,13 @@ public class OversizedModel implements ItemModel {
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel bakedSimpleModel = baker.getModel(this.model);
             TextureSlots modelTextures = bakedSimpleModel.getTopTextureSlots();
-            List<BakedQuad> quads = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.IDENTITY).getAll();
-            ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(baker, bakedSimpleModel, modelTextures);
+            List<BakedQuad> quads = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.IDENTITY)
+                .getAll();
+            ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(
+                baker,
+                bakedSimpleModel,
+                modelTextures
+            );
             Function<ItemStack, RenderType> renderTypeGetter = BlockModelWrapper.detectRenderType(quads);
             return new OversizedModel(
                 tints,

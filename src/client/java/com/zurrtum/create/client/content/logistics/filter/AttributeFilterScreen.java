@@ -78,7 +78,12 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        if (getChildAt(mouseX, mouseY).filter(element -> element.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)).isPresent()) {
+        if (getChildAt(mouseX, mouseY).filter(element -> element.mouseScrolled(
+            mouseX,
+            mouseY,
+            horizontalAmount,
+            verticalAmount
+        )).isPresent()) {
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
@@ -111,7 +116,11 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
         addRenderableWidgets(blacklist, whitelistCon, whitelistDis);
 
         addRenderableWidget(add = new IconButton(leftPos + 182, topPos + 26, AllIcons.I_ADD));
-        addRenderableWidget(addInverted = new IconButton(leftPos + 200, topPos + 26, AllIcons.I_ADD_INVERTED_ATTRIBUTE));
+        addRenderableWidget(addInverted = new IconButton(
+            leftPos + 200,
+            topPos + 26,
+            AllIcons.I_ADD_INVERTED_ATTRIBUTE
+        ));
         add.withCallback(() -> {
             handleAddedAttibute(false);
         });
@@ -123,7 +132,8 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
 
         handleIndicators();
 
-        attributeSelectorLabel = new Label(leftPos + 43, topPos + 31, CommonComponents.EMPTY).colored(0xFFF3EBDE).withShadow();
+        attributeSelectorLabel = new Label(leftPos + 43, topPos + 31, CommonComponents.EMPTY).colored(0xFFF3EBDE)
+            .withShadow();
         attributeSelector = new SelectionScrollInput(leftPos + 39, topPos + 26, 137, 18);
         attributeSelector.forOptions(Arrays.asList(CommonComponents.EMPTY));
         attributeSelector.removeCallback();
@@ -133,9 +143,11 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
         addRenderableWidget(attributeSelectorLabel);
 
         selectedAttributes.clear();
-        selectedAttributes.add((menu.selectedAttributes.isEmpty() ? noSelectedT : selectedT).plainCopy().withStyle(ChatFormatting.YELLOW));
+        selectedAttributes.add((menu.selectedAttributes.isEmpty() ? noSelectedT : selectedT).plainCopy()
+            .withStyle(ChatFormatting.YELLOW));
         menu.selectedAttributes.forEach(at -> {
-            selectedAttributes.add(Component.literal("- ").append(at.attribute().format(at.inverted())).withStyle(ChatFormatting.GRAY));
+            selectedAttributes.add(Component.literal("- ").append(at.attribute().format(at.inverted()))
+                .withStyle(ChatFormatting.GRAY));
         });
     }
 
@@ -157,10 +169,12 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
         add.active = true;
 
         addInverted.active = true;
-        attributeSelector.titled(CreateLang.text(stack.getHoverName().getString() + "...").color(ScrollInput.HEADER_RGB.getRGB()).component());
+        attributeSelector.titled(CreateLang.text(stack.getHoverName().getString() + "...")
+            .color(ScrollInput.HEADER_RGB.getRGB()).component());
         attributesOfItem.clear();
-        for (ItemAttributeType type : CreateRegistries.ITEM_ATTRIBUTE_TYPE)
+        for (ItemAttributeType type : CreateRegistries.ITEM_ATTRIBUTE_TYPE) {
             attributesOfItem.addAll(type.getAllAttributes(stack, minecraft.level));
+        }
         List<Component> options = attributesOfItem.stream().map(a -> a.format(false)).collect(Collectors.toList());
         attributeSelector.forOptions(options);
         attributeSelector.active = true;
@@ -187,7 +201,13 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
     @Override
     public void renderForeground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         ItemStack stack = menu.ghostInventory.getItem(1);
-        graphics.renderItemDecorations(font, stack, leftPos + 16, topPos + 62, String.valueOf(selectedAttributes.size() - 1));
+        graphics.renderItemDecorations(
+            font,
+            stack,
+            leftPos + 16,
+            topPos + 62,
+            String.valueOf(selectedAttributes.size() - 1)
+        );
 
         super.renderForeground(graphics, mouseX, mouseY, partialTicks);
     }
@@ -196,8 +216,9 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
     protected void containerTick() {
         super.containerTick();
         ItemStack stackInSlot = menu.ghostInventory.getItem(0);
-        if (!ItemStack.matches(stackInSlot, lastItemScanned))
+        if (!ItemStack.matches(stackInSlot, lastItemScanned)) {
             referenceItemChanged(stackInSlot);
+        }
     }
 
     @Override
@@ -224,17 +245,23 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
 
     protected boolean handleAddedAttibute(boolean inverted) {
         int index = attributeSelector.getState();
-        if (index >= attributesOfItem.size())
+        if (index >= attributesOfItem.size()) {
             return false;
+        }
         add.active = false;
         addInverted.active = false;
         ItemAttribute itemAttribute = attributesOfItem.get(index);
         CompoundTag tag = ItemAttribute.saveStatic(itemAttribute, minecraft.level.registryAccess());
-        minecraft.player.connection.send(new FilterScreenPacket(inverted ? Option.ADD_INVERTED_TAG : Option.ADD_TAG, tag));
+        minecraft.player.connection.send(new FilterScreenPacket(
+            inverted ? Option.ADD_INVERTED_TAG : Option.ADD_TAG,
+            tag
+        ));
         menu.appendSelectedAttribute(itemAttribute, inverted);
-        if (menu.selectedAttributes.size() == 1)
+        if (menu.selectedAttributes.size() == 1) {
             selectedAttributes.set(0, selectedT.plainCopy().withStyle(ChatFormatting.YELLOW));
-        selectedAttributes.add(Component.literal("- ").append(itemAttribute.format(inverted)).withStyle(ChatFormatting.GRAY));
+        }
+        selectedAttributes.add(Component.literal("- ").append(itemAttribute.format(inverted))
+            .withStyle(ChatFormatting.GRAY));
         return true;
     }
 
@@ -250,12 +277,15 @@ public class AttributeFilterScreen extends AbstractFilterScreen<AttributeFilterM
 
     @Override
     protected boolean isButtonEnabled(IconButton button) {
-        if (button == blacklist)
+        if (button == blacklist) {
             return menu.whitelistMode != AttributeFilterWhitelistMode.BLACKLIST;
-        if (button == whitelistCon)
+        }
+        if (button == whitelistCon) {
             return menu.whitelistMode != AttributeFilterWhitelistMode.WHITELIST_CONJ;
-        if (button == whitelistDis)
+        }
+        if (button == whitelistDis) {
             return menu.whitelistMode != AttributeFilterWhitelistMode.WHITELIST_DISJ;
+        }
         return true;
     }
 

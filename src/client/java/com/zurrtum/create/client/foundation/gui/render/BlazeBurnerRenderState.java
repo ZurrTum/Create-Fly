@@ -8,10 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record BlazeBurnerRenderState(
-    Matrix3x2f pose, int x, int y, Level world, BlockState block, BlazeBurnerBlock.HeatLevel heatLevel, float animation, boolean drawGoggles,
-    int hash, ScreenRectangle bounds
-) implements PictureInPictureRenderState {
+public record BlazeBurnerRenderState(Matrix3x2f pose, int x, int y, Level world, BlockState block,
+                                     BlazeBurnerBlock.HeatLevel heatLevel, float animation, boolean drawGoggles,
+                                     int hash, ScreenRectangle bounds) implements PictureInPictureRenderState {
     public BlazeBurnerRenderState(
         Matrix3x2f pose,
         int x,
@@ -23,7 +22,18 @@ public record BlazeBurnerRenderState(
         boolean drawGoggles,
         int hash
     ) {
-        this(pose, x, y, world, block, heatLevel, animation, drawGoggles, hash, new ScreenRectangle(x, y, 68, 68).transformMaxBounds(pose));
+        this(
+            pose,
+            x,
+            y,
+            world,
+            block,
+            heatLevel,
+            animation,
+            drawGoggles,
+            hash,
+            new ScreenRectangle(x, y, 68, 68).transformMaxBounds(pose)
+        );
     }
 
     @Override

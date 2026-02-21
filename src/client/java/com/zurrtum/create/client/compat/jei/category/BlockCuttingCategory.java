@@ -55,7 +55,8 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
                 continue;
             }
             StonecutterRecipe recipe = entry.value();
-            map.computeIfAbsent(recipe.input(), i -> Pair.of(entry.id().identifier(), new ArrayList<>())).getSecond().add(recipe.result());
+            map.computeIfAbsent(recipe.input(), i -> Pair.of(entry.id().identifier(), new ArrayList<>())).getSecond()
+                .add(recipe.result());
         }
         List<BlockCuttingDisplay> recipes = new ArrayList<>();
         for (Object2ObjectMap.Entry<Ingredient, Pair<Identifier, List<ItemStack>>> entry : map.object2ObjectEntrySet()) {
@@ -63,7 +64,11 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
             List<ItemStack> outputs = pair.getSecond();
             int size = outputs.size();
             if (size <= 15) {
-                recipes.add(new BlockCuttingDisplay(pair.getFirst(), entry.getKey(), outputs.stream().map(List::of).toList()));
+                recipes.add(new BlockCuttingDisplay(
+                    pair.getFirst(),
+                    entry.getKey(),
+                    outputs.stream().map(List::of).toList()
+                ));
                 continue;
             }
             List<List<ItemStack>> list = new ArrayList<>(15);
@@ -112,14 +117,25 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
         builder.addInputSlot(5, 5).setBackground(SLOT, -1, -1).add(display.input());
         List<List<ItemStack>> outputs = display.outputs();
         for (int i = 0, left = 78, top = 48, size = outputs.size(); i < size; i++) {
-            builder.addOutputSlot(left + (i % 5) * 19, top + (i / 5) * -19).setBackground(SLOT, -1, -1).addItemStacks(outputs.get(i));
+            builder.addOutputSlot(left + (i % 5) * 19, top + (i / 5) * -19).setBackground(SLOT, -1, -1)
+                .addItemStacks(outputs.get(i));
         }
     }
 
     @Override
-    public void draw(BlockCuttingDisplay recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        BlockCuttingDisplay recipe,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 31, 6);
         AllGuiTextures.JEI_SHADOW.render(graphics, 16, 50);
-        graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), 25, 26));
+        graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(
+            new Matrix3x2f(graphics.pose()),
+            25,
+            26
+        ));
     }
 }

@@ -17,12 +17,14 @@ import java.util.List;
 public class WaterEffectHandler implements OpenPipeEffectHandler {
     @Override
     public void apply(Level level, AABB area, FluidStack fluid) {
-        if (level.getGameTime() % 5 != 0)
+        if (level.getGameTime() % 5 != 0) {
             return;
+        }
 
         List<Entity> entities = level.getEntities((Entity) null, area, Entity::isOnFire);
-        for (Entity entity : entities)
+        for (Entity entity : entities) {
             entity.clearFire();
+        }
 
         BlockPos.betweenClosedStream(area).forEach(pos -> dowseFire(level, pos));
     }

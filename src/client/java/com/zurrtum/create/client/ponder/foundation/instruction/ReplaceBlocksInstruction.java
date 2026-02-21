@@ -14,7 +14,12 @@ public class ReplaceBlocksInstruction extends WorldModifyInstruction {
     private final boolean replaceAir;
     private final boolean spawnParticles;
 
-    public ReplaceBlocksInstruction(Selection selection, UnaryOperator<BlockState> stateToUse, boolean replaceAir, boolean spawnParticles) {
+    public ReplaceBlocksInstruction(
+        Selection selection,
+        UnaryOperator<BlockState> stateToUse,
+        boolean replaceAir,
+        boolean spawnParticles
+    ) {
         super(selection);
         this.stateToUse = stateToUse;
         this.replaceAir = replaceAir;
@@ -25,13 +30,16 @@ public class ReplaceBlocksInstruction extends WorldModifyInstruction {
     protected void runModification(Selection selection, PonderScene scene) {
         PonderLevel level = scene.getLevel();
         selection.forEach(pos -> {
-            if (!level.getBounds().isInside(pos))
+            if (!level.getBounds().isInside(pos)) {
                 return;
+            }
             BlockState prevState = level.getBlockState(pos);
-            if (!replaceAir && prevState == Blocks.AIR.defaultBlockState())
+            if (!replaceAir && prevState == Blocks.AIR.defaultBlockState()) {
                 return;
-            if (spawnParticles)
+            }
+            if (spawnParticles) {
                 level.addBlockDestroyEffects(pos, prevState);
+            }
             level.setBlockAndUpdate(pos, stateToUse.apply(prevState));
         });
     }

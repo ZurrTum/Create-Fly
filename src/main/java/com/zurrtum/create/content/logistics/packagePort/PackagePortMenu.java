@@ -66,9 +66,11 @@ public class PackagePortMenu extends MenuBase<PackagePortBlockEntity> {
         int x = 27;
         int y = 9;
 
-        for (int row = 0; row < 2; row++)
-            for (int col = 0; col < 9; col++)
+        for (int row = 0; row < 2; row++) {
+            for (int col = 0; col < 9; col++) {
                 addSlot(new MenuSlot(inventory, row * 9 + col, x + col * 18, y + row * 18));
+            }
+        }
 
         addPlayerSlots(38, 108);
     }
@@ -80,8 +82,9 @@ public class PackagePortMenu extends MenuBase<PackagePortBlockEntity> {
     @Override
     public void removed(Player playerIn) {
         super.removed(playerIn);
-        if (!playerIn.level().isClientSide())
+        if (!playerIn.level().isClientSide()) {
             BlockEntityBehaviour.get(contentHolder, AnimatedContainerBehaviour.TYPE).stopOpen(playerIn);
+        }
     }
 
     @Override

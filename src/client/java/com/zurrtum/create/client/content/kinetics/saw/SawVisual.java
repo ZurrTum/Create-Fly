@@ -10,13 +10,12 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.saw.SawBlock;
 import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+
+import java.util.function.Consumer;
 
 public class SawVisual extends KineticBlockEntityVisual<SawBlockEntity> {
 
@@ -34,11 +33,11 @@ public class SawVisual extends KineticBlockEntityVisual<SawBlockEntity> {
         // We could change this to return either an Oriented- or SingleAxisRotatingVisual
         if (axis.isHorizontal()) {
             Direction align = facing.getOpposite();
-            return instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF)).createInstance()
-                .rotateTo(0, 0, 1, align.getStepX(), align.getStepY(), align.getStepZ());
+            return instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF))
+                .createInstance().rotateTo(0, 0, 1, align.getStepX(), align.getStepY(), align.getStepZ());
         } else {
-            return instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT)).createInstance()
-                .rotateToFace(state.getValue(SawBlock.AXIS_ALONG_FIRST_COORDINATE) ? Axis.X : Axis.Z);
+            return instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT))
+                .createInstance().rotateToFace(state.getValue(SawBlock.AXIS_ALONG_FIRST_COORDINATE) ? Axis.X : Axis.Z);
         }
     }
 

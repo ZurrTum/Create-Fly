@@ -14,7 +14,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.List;
 
-public record StockKeeperCategoryHidingPacket(BlockPos pos, List<Integer> indices) implements Packet<ServerGamePacketListener> {
+public record StockKeeperCategoryHidingPacket(BlockPos pos,
+                                              List<Integer> indices) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, StockKeeperCategoryHidingPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         StockKeeperCategoryHidingPacket::pos,

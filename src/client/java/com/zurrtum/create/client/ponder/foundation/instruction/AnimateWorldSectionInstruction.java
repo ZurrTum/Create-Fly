@@ -2,15 +2,18 @@ package com.zurrtum.create.client.ponder.foundation.instruction;
 
 import com.zurrtum.create.client.ponder.api.element.ElementLink;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import net.minecraft.world.phys.Vec3;
-
 public class AnimateWorldSectionInstruction extends AnimateElementInstruction<WorldSectionElement> {
 
-    public static AnimateWorldSectionInstruction rotate(ElementLink<WorldSectionElement> link, Vec3 rotation, int ticks) {
+    public static AnimateWorldSectionInstruction rotate(
+        ElementLink<WorldSectionElement> link,
+        Vec3 rotation,
+        int ticks
+    ) {
         return new AnimateWorldSectionInstruction(
             link,
             rotation,

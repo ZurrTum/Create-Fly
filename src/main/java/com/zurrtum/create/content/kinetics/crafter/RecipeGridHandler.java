@@ -57,22 +57,27 @@ public class RecipeGridHandler {
             MechanicalCrafterBlockEntity current = pair.getFirst();
             MechanicalCrafterBlockEntity last = pair.getSecond();
 
-            if (visited.contains(current))
+            if (visited.contains(current)) {
                 return null;
-            if (!(test.test(current)))
+            }
+            if (!(test.test(current))) {
                 empty = true;
-            else
+            } else {
                 allEmpty = false;
+            }
 
             crafters.add(current);
             visited.add(current);
 
             MechanicalCrafterBlockEntity target = getTargetingCrafter(current);
-            if (target != last && target != null)
+            if (target != last && target != null) {
                 frontier.add(Pair.of(target, current));
-            for (MechanicalCrafterBlockEntity preceding : getPrecedingCrafters(current))
-                if (preceding != last)
+            }
+            for (MechanicalCrafterBlockEntity preceding : getPrecedingCrafters(current)) {
+                if (preceding != last) {
                     frontier.add(Pair.of(preceding, current));
+                }
+            }
         }
 
         return empty && !poweredStart || allEmpty ? null : crafters;
@@ -80,19 +85,23 @@ public class RecipeGridHandler {
 
     public static MechanicalCrafterBlockEntity getTargetingCrafter(MechanicalCrafterBlockEntity crafter) {
         BlockState state = crafter.getBlockState();
-        if (!isCrafter(state))
+        if (!isCrafter(state)) {
             return null;
+        }
 
         BlockPos targetPos = crafter.getBlockPos().relative(MechanicalCrafterBlock.getTargetDirection(state));
         MechanicalCrafterBlockEntity targetBE = CrafterHelper.getCrafter(crafter.getLevel(), targetPos);
-        if (targetBE == null)
+        if (targetBE == null) {
             return null;
+        }
 
         BlockState targetState = targetBE.getBlockState();
-        if (!isCrafter(targetState))
+        if (!isCrafter(targetState)) {
             return null;
-        if (state.getValue(HORIZONTAL_FACING) != targetState.getValue(HORIZONTAL_FACING))
+        }
+        if (state.getValue(HORIZONTAL_FACING) != targetState.getValue(HORIZONTAL_FACING)) {
             return null;
+        }
         return targetBE;
     }
 
@@ -101,28 +110,35 @@ public class RecipeGridHandler {
         Level world = crafter.getLevel();
         List<MechanicalCrafterBlockEntity> crafters = new ArrayList<>();
         BlockState blockState = crafter.getBlockState();
-        if (!isCrafter(blockState))
+        if (!isCrafter(blockState)) {
             return crafters;
+        }
 
         Direction blockFacing = blockState.getValue(HORIZONTAL_FACING);
         Direction blockPointing = MechanicalCrafterBlock.getTargetDirection(blockState);
         for (Direction facing : Iterate.directions) {
-            if (blockFacing.getAxis() == facing.getAxis())
+            if (blockFacing.getAxis() == facing.getAxis()) {
                 continue;
-            if (blockPointing == facing)
+            }
+            if (blockPointing == facing) {
                 continue;
+            }
 
             BlockPos neighbourPos = pos.relative(facing);
             BlockState neighbourState = world.getBlockState(neighbourPos);
-            if (!isCrafter(neighbourState))
+            if (!isCrafter(neighbourState)) {
                 continue;
-            if (MechanicalCrafterBlock.getTargetDirection(neighbourState) != facing.getOpposite())
+            }
+            if (MechanicalCrafterBlock.getTargetDirection(neighbourState) != facing.getOpposite()) {
                 continue;
-            if (blockFacing != neighbourState.getValue(HORIZONTAL_FACING))
+            }
+            if (blockFacing != neighbourState.getValue(HORIZONTAL_FACING)) {
                 continue;
+            }
             MechanicalCrafterBlockEntity be = CrafterHelper.getCrafter(world, neighbourPos);
-            if (be == null)
+            if (be == null) {
                 continue;
+            }
 
             crafters.add(be);
         }
@@ -141,12 +157,14 @@ public class RecipeGridHandler {
         RegistryAccess registryAccess = world.registryAccess();
         RecipeManager recipeManager = world.recipeAccess();
         if (AllConfigs.server().recipes.allowRegularCraftingInCrafter.get()) {
-            result = recipeManager.recipes.getRecipesFor(RecipeType.CRAFTING, craftingInput, world).filter(r -> isRecipeAllowed(r, craftingInput))
-                .findFirst().map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
+            result = recipeManager.recipes.getRecipesFor(RecipeType.CRAFTING, craftingInput, world)
+                .filter(r -> isRecipeAllowed(r, craftingInput)).findFirst()
+                .map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
         }
-        if (result == null)
+        if (result == null) {
             result = recipeManager.getRecipeFor(AllRecipeTypes.MECHANICAL_CRAFTING, craftingInput, world)
                 .map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
+        }
         return result;
     }
 
@@ -167,11 +185,12 @@ public class RecipeGridHandler {
 
     public static class GroupedItems {
         public static final Codec<Map<Pair<Integer, Integer>, ItemStack>> GRID_CODEC = CreateCodecs.getCodecMap(
-            Pair.codec(Codec.INT, Codec.INT),
-            ItemStack.OPTIONAL_CODEC
+            Pair.codec(Codec.INT,
+                Codec.INT
+            ), ItemStack.OPTIONAL_CODEC
         );
-        public static final Codec<GroupedItems> CODEC = RecordCodecBuilder.create(instance -> instance.group(GRID_CODEC.fieldOf("Grid")
-            .forGetter(i -> i.grid)).apply(instance, GroupedItems::new));
+        public static final Codec<GroupedItems> CODEC = RecordCodecBuilder.create(instance -> instance.group(GRID_CODEC.fieldOf(
+            "Grid").forGetter(i -> i.grid)).apply(instance, GroupedItems::new));
         public Map<Pair<Integer, Integer>, ItemStack> grid = new HashMap<>();
         public int minX;
         public int minY;
@@ -195,7 +214,10 @@ public class RecipeGridHandler {
         public void mergeOnto(GroupedItems other, Pointing pointing) {
             int xOffset = pointing == Pointing.LEFT ? 1 : pointing == Pointing.RIGHT ? -1 : 0;
             int yOffset = pointing == Pointing.DOWN ? 1 : pointing == Pointing.UP ? -1 : 0;
-            grid.forEach((pair, stack) -> other.grid.put(Pair.of(pair.getFirst() + xOffset, pair.getSecond() + yOffset), stack));
+            grid.forEach((pair, stack) -> other.grid.put(
+                Pair.of(pair.getFirst() + xOffset, pair.getSecond() + yOffset),
+                stack
+            ));
             other.statsReady = false;
         }
 
@@ -222,8 +244,9 @@ public class RecipeGridHandler {
         }
 
         public void calcStats() {
-            if (statsReady)
+            if (statsReady) {
                 return;
+            }
             statsReady = true;
 
             minX = 0;
@@ -245,9 +268,11 @@ public class RecipeGridHandler {
         }
 
         public boolean onlyEmptyItems() {
-            for (ItemStack stack : grid.values())
-                if (!stack.isEmpty())
+            for (ItemStack stack : grid.values()) {
+                if (!stack.isEmpty()) {
                     return false;
+                }
+            }
             return true;
         }
 
@@ -263,8 +288,9 @@ public class RecipeGridHandler {
                     int xp = x + this.minX;
                     int yp = y + this.minY;
                     ItemStack stack = grid.get(Pair.of(xp, yp));
-                    if (stack == null || stack.isEmpty())
+                    if (stack == null || stack.isEmpty()) {
                         continue;
+                    }
                     minX = Math.min(minX, xp);
                     maxX = Math.max(maxX, xp);
                     minY = Math.min(minY, yp);

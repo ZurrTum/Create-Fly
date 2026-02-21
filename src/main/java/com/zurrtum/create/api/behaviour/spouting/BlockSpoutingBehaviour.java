@@ -33,12 +33,14 @@ public interface BlockSpoutingBehaviour {
     static BlockSpoutingBehaviour get(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         BlockSpoutingBehaviour byBlock = BY_BLOCK.get(state.getBlock());
-        if (byBlock != null)
+        if (byBlock != null) {
             return byBlock;
+        }
 
         BlockEntity be = level.getBlockEntity(pos);
-        if (be == null)
+        if (be == null) {
             return null;
+        }
 
         return BY_BLOCK_ENTITY.get(be.getType());
     }

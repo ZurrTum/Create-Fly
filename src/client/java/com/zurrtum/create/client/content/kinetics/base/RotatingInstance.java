@@ -39,8 +39,9 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
     }
 
     public static int colorFromBE(KineticBlockEntity be) {
-        if (be.hasNetwork())
+        if (be.hasNetwork()) {
             return Color.generateFromLong(be.network).getRGB();
+        }
         return 0xFFFFFF;
     }
 
@@ -64,7 +65,11 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
         var blockState = blockEntity.getBlockState();
         var pos = blockEntity.getBlockPos();
         return setRotationAxis(axis).setRotationalSpeed(speed * RotatingInstance.SPEED_MULTIPLIER)
-            .setRotationOffset(KineticBlockEntityVisual.rotationOffset(blockState, axis, pos) + blockEntity.getRotationAngleOffset(axis));
+            .setRotationOffset(KineticBlockEntityVisual.rotationOffset(
+                blockState,
+                axis,
+                pos
+            ) + blockEntity.getRotationAngleOffset(axis));
     }
 
     public RotatingInstance rotateToFace(Direction.Axis axis) {
@@ -82,7 +87,14 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
     }
 
     public RotatingInstance rotateToFace(Direction from, Direction orientation) {
-        return rotateTo(from.getStepX(), from.getStepY(), from.getStepZ(), orientation.getStepX(), orientation.getStepY(), orientation.getStepZ());
+        return rotateTo(
+            from.getStepX(),
+            from.getStepY(),
+            from.getStepZ(),
+            orientation.getStepX(),
+            orientation.getStepY(),
+            orientation.getStepZ()
+        );
     }
 
     public RotatingInstance rotateToFace(float stepX, float stepY, float stepZ) {

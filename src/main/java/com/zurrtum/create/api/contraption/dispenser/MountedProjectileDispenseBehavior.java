@@ -21,9 +21,17 @@ public abstract class MountedProjectileDispenseBehavior extends DefaultMountedDi
         double x = pos.getX() + facing.x * .7 + .5;
         double y = pos.getY() + facing.y * .7 + .5;
         double z = pos.getZ() + facing.z * .7 + .5;
-        Projectile projectile = getProjectile(context.world, x, y, z, stack.copy(), MountedDispenseBehavior.getClosestFacingDirection(facing));
-        if (projectile == null)
+        Projectile projectile = getProjectile(
+            context.world,
+            x,
+            y,
+            z,
+            stack.copy(),
+            MountedDispenseBehavior.getClosestFacingDirection(facing)
+        );
+        if (projectile == null) {
             return stack;
+        }
 
         Vec3 motion = facing.scale(getPower()).add(context.motion);
         projectile.shoot(motion.x, motion.y, motion.z, (float) motion.length(), getUncertainty());
@@ -38,7 +46,14 @@ public abstract class MountedProjectileDispenseBehavior extends DefaultMountedDi
     }
 
     @Nullable
-    protected abstract Projectile getProjectile(Level level, double x, double y, double z, ItemStack stack, Direction facing);
+    protected abstract Projectile getProjectile(
+        Level level,
+        double x,
+        double y,
+        double z,
+        ItemStack stack,
+        Direction facing
+    );
 
     protected float getUncertainty() {
         return 6;
@@ -54,7 +69,14 @@ public abstract class MountedProjectileDispenseBehavior extends DefaultMountedDi
     public static MountedDispenseBehavior of(ProjectileDispenseBehavior vanillaBehaviour) {
         return new MountedProjectileDispenseBehavior() {
             @Override
-            protected Projectile getProjectile(Level level, double x, double y, double z, ItemStack stack, Direction facing) {
+            protected Projectile getProjectile(
+                Level level,
+                double x,
+                double y,
+                double z,
+                ItemStack stack,
+                Direction facing
+            ) {
                 return vanillaBehaviour.projectileItem.asProjectile(level, new Vec3(x, y, z), stack, facing);
             }
 

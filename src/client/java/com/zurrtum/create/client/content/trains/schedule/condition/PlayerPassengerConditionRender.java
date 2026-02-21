@@ -19,7 +19,10 @@ public class PlayerPassengerConditionRender implements IScheduleInput<PlayerPass
         int target = input.getTarget();
         return Pair.of(
             AllItems.YELLOW_SEAT.getDefaultInstance(),
-            CreateLang.translateDirect("schedule.condition.player_count." + (target == 1 ? "summary" : "summary_plural"), target)
+            CreateLang.translateDirect(
+                "schedule.condition.player_count." + (target == 1 ? "summary" : "summary_plural"),
+                target
+            )
         );
     }
 
@@ -27,7 +30,8 @@ public class PlayerPassengerConditionRender implements IScheduleInput<PlayerPass
     public List<Component> getTitleAs(PlayerPassengerCondition input, String type) {
         int target = input.getTarget();
         return ImmutableList.of(CreateLang.translateDirect(
-            "schedule.condition.player_count.seated", CreateLang.translateDirect(
+            "schedule.condition.player_count.seated",
+            CreateLang.translateDirect(
                 "schedule.condition.player_count." + (target == 1 ? "summary" : "summary_plural"),
                 Component.literal("" + target).withStyle(ChatFormatting.DARK_AQUA)
             )
@@ -38,7 +42,8 @@ public class PlayerPassengerConditionRender implements IScheduleInput<PlayerPass
     public void initConfigurationWidgets(PlayerPassengerCondition input, ModularGuiLineBuilder builder) {
         builder.addScrollInput(
             0, 31, (i, l) -> {
-                i.titled(CreateLang.translateDirect("schedule.condition.player_count.players")).withShiftStep(5).withRange(0, 21);
+                i.titled(CreateLang.translateDirect("schedule.condition.player_count.players")).withShiftStep(5)
+                    .withRange(0, 21);
             }, "Count"
         );
 

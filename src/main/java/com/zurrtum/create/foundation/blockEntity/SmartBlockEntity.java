@@ -65,13 +65,15 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     public void initialize() {
         if (firstNbtRead) {
             firstNbtRead = false;
-            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.FIRST_READ_REGISTRY.get(getType())) {
+            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.FIRST_READ_REGISTRY.get(
+                getType())) {
                 BlockEntityBehaviour<?> behaviour = factory.apply(this);
                 behaviours.put(behaviour.getType(), behaviour);
             }
         }
         if (level.isClientSide()) {
-            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.CLIENT_REGISTRY.get(getType())) {
+            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.CLIENT_REGISTRY.get(
+                getType())) {
                 BlockEntityBehaviour<?> behaviour = factory.apply(this);
                 behaviours.put(behaviour.getType(), behaviour);
             }
@@ -110,8 +112,9 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     public void writeSafe(ValueOutput view) {
         super.saveAdditional(view);
         forEachBehaviour(tb -> {
-            if (tb.isSafeNBT())
+            if (tb.isSafeNBT()) {
                 tb.writeSafe(view);
+            }
         });
     }
 
@@ -124,7 +127,8 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
             ArrayList<BlockEntityBehaviour<?>> list = new ArrayList<>();
             addBehavioursDeferred(list);
             list.forEach(b -> behaviours.put(b.getType(), b));
-            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.FIRST_READ_REGISTRY.get(getType())) {
+            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.FIRST_READ_REGISTRY.get(
+                getType())) {
                 BlockEntityBehaviour<?> behaviour = factory.apply(this);
                 behaviours.put(behaviour.getType(), behaviour);
             }
@@ -145,8 +149,9 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     @Override
     public void setRemoved() {
         super.setRemoved();
-        if (!chunkUnloaded)
+        if (!chunkUnloaded) {
             remove();
+        }
         invalidate();
     }
 
@@ -214,7 +219,8 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     }
 
     public ItemRequirement getRequiredItems(BlockState state) {
-        return getAllBehaviours().stream().reduce(ItemRequirement.NONE, (r, b) -> r.union(b.getRequiredItems()), ItemRequirement::union);
+        return getAllBehaviours().stream()
+            .reduce(ItemRequirement.NONE, (r, b) -> r.union(b.getRequiredItems()), ItemRequirement::union);
     }
 
     public void removeBehaviour(BehaviourType<?> type) {
@@ -243,9 +249,14 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
 
     @Override
     public boolean canPlayerUse(Player player) {
-        if (level == null || level.getBlockEntity(worldPosition) != this)
+        if (level == null || level.getBlockEntity(worldPosition) != this) {
             return false;
-        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 64.0D;
+        }
+        return player.distanceToSqr(
+            worldPosition.getX() + 0.5D,
+            worldPosition.getY() + 0.5D,
+            worldPosition.getZ() + 0.5D
+        ) <= 64.0D;
     }
 
     public void sendToMenu(RegistryFriendlyByteBuf buffer) {
@@ -261,7 +272,10 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     public void addAdvancementBehaviour(ServerPlayer player) {
         List<CreateTrigger> awardables = getAwardables();
         if (awardables != null) {
-            behaviours.put(AdvancementBehaviour.TYPE, new AdvancementBehaviour(this, player, awardables.toArray(CreateTrigger[]::new)));
+            behaviours.put(
+                AdvancementBehaviour.TYPE,
+                new AdvancementBehaviour(this, player, awardables.toArray(CreateTrigger[]::new))
+            );
         }
     }
 
@@ -271,14 +285,16 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
 
     public void award(CreateTrigger advancement) {
         AdvancementBehaviour behaviour = getBehaviour(AdvancementBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.awardPlayer(advancement);
+        }
     }
 
     public void awardIfNear(CreateTrigger advancement, int range) {
         AdvancementBehaviour behaviour = getBehaviour(AdvancementBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.awardPlayerIfNear(advancement, range);
+        }
     }
 
     public void resetTransferCache() {

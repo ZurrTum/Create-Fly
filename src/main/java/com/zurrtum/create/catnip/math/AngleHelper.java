@@ -7,11 +7,13 @@ import net.minecraft.util.Mth;
 public class AngleHelper {
 
     public static float horizontalAngle(Direction facing) {
-        if (facing.getAxis().isVertical())
+        if (facing.getAxis().isVertical()) {
             return 0;
+        }
         float angle = facing.toYRot();
-        if (facing.getAxis() == Axis.X)
+        if (facing.getAxis() == Axis.X) {
             angle = -angle;
+        }
         return angle;
     }
 
@@ -20,14 +22,16 @@ public class AngleHelper {
     }
 
     public static float rad(double angle) {
-        if (angle == 0)
+        if (angle == 0) {
             return 0;
+        }
         return (float) (angle / 180 * Math.PI);
     }
 
     public static float deg(double angle) {
-        if (angle == 0)
+        if (angle == 0) {
             return 0;
+        }
         return (float) (angle * 180 / Math.PI);
     }
 

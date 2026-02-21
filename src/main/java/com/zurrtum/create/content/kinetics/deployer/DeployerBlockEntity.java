@@ -71,10 +71,7 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     public BeltProcessingBehaviour processingBehaviour;
 
     public enum State implements StringRepresentable {
-        WAITING,
-        EXPANDING,
-        RETRACTING,
-        DUMPING;
+        WAITING, EXPANDING, RETRACTING, DUMPING;
 
         public static final Codec<State> CODEC = StringRepresentable.fromEnum(State::values);
 
@@ -85,8 +82,7 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     }
 
     public enum Mode implements StringRepresentable {
-        PUNCH,
-        USE;
+        PUNCH, USE;
 
         public static final Codec<Mode> CODEC = StringRepresentable.fromEnum(Mode::values);
 
@@ -116,8 +112,10 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         super.addBehaviours(behaviours);
         filtering = new ServerFilteringBehaviour.CustomInteract(this, List.of(AllItems.MECHANICAL_ARM));
         behaviours.add(filtering);
-        processingBehaviour = new BeltProcessingBehaviour(this).whenItemEnters((s, i) -> BeltDeployerCallbacks.onItemReceived(s, i, this))
-            .whileItemHeld((s, i) -> BeltDeployerCallbacks.whenItemHeld(s, i, this));
+        processingBehaviour = new BeltProcessingBehaviour(this).whenItemEnters((s, i) -> BeltDeployerCallbacks.onItemReceived(s,
+            i,
+            this
+        )).whileItemHeld((s, i) -> BeltDeployerCallbacks.whenItemHeld(s, i, this));
         behaviours.add(processingBehaviour);
     }
 
@@ -141,13 +139,17 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     }
 
     public void initHandler() {
-        if (invHandler != null)
+        if (invHandler != null) {
             return;
+        }
         if (level instanceof ServerLevel sLevel) {
             player = DeployerPlayer.create(sLevel, owner, ownerName);
             ServerPlayer serverPlayer = player.cast();
             if (deferredInventoryList != null) {
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), LOGGER)) {
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    problemPath(),
+                    LOGGER
+                )) {
                     ValueInput view = TagValueInput.create(logging, level.registryAccess(), deferredInventoryList);
                     serverPlayer.getInventory().load(view.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
                 }
@@ -175,8 +177,9 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     public void tick() {
         super.tick();
 
-        if (getSpeed() == 0)
+        if (getSpeed() == 0) {
             return;
+        }
         if (!level.isClientSide() && player != null && player.getBlockBreakingProgress() != null) {
             if (level.isEmptyBlock(player.getBlockBreakingProgress().getKey())) {
                 level.destroyBlockProgress(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
@@ -187,10 +190,12 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
             timer -= getTimerSpeed();
             return;
         }
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (player == null)
+        }
+        if (player == null) {
             return;
+        }
 
         ServerPlayer serverPlayer = player.cast();
         ItemStack stack = serverPlayer.getMainHandItem();
@@ -203,11 +208,13 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
             boolean changed = false;
             Inventory inventory = serverPlayer.getInventory();
             for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
-                if (overflowItems.size() > 10)
+                if (overflowItems.size() > 10) {
                     break;
+                }
                 ItemStack item = inventory.getItem(i);
-                if (item.isEmpty())
+                if (item.isEmpty()) {
                     continue;
+                }
                 if (item != stack || !filtering.test(item)) {
                     overflowItems.add(item);
                     inventory.setItem(i, ItemStack.EMPTY);
@@ -222,24 +229,32 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
             }
 
             Direction facing = getBlockState().getValue(FACING);
-            if (mode == Mode.USE && !DeployerHandler.shouldActivate(stack, level, worldPosition.relative(facing, 2), facing)) {
+            if (mode == Mode.USE && !DeployerHandler.shouldActivate(
+                stack,
+                level,
+                worldPosition.relative(facing, 2),
+                facing
+            )) {
                 timer = getTimerSpeed() * 10;
                 return;
             }
 
             // Check for advancement conditions
-            if (mode == Mode.PUNCH && !fistBump && startFistBump(facing))
+            if (mode == Mode.PUNCH && !fistBump && startFistBump(facing)) {
                 return;
-            if (redstoneLocked)
+            }
+            if (redstoneLocked) {
                 return;
+            }
 
             start();
             return;
         }
 
         if (state == State.EXPANDING) {
-            if (fistBump)
+            if (fistBump) {
                 triggerFistBump();
+            }
             activate();
 
             state = State.RETRACTING;
@@ -275,8 +290,9 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
 
         for (i = 2; i < 5; i++) {
             BlockPos otherDeployer = worldPosition.relative(facing, i);
-            if (!level.isLoaded(otherDeployer))
+            if (!level.isLoaded(otherDeployer)) {
                 return false;
+            }
             BlockEntity other = level.getBlockEntity(otherDeployer);
             if (other instanceof DeployerBlockEntity dpe) {
                 partner = dpe;
@@ -284,13 +300,17 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
             }
         }
 
-        if (partner == null)
+        if (partner == null) {
             return false;
+        }
 
-        if (level.getBlockState(partner.getBlockPos()).getValue(FACING).getOpposite() != facing || partner.mode != Mode.PUNCH)
+        if (level.getBlockState(partner.getBlockPos()).getValue(FACING)
+            .getOpposite() != facing || partner.mode != Mode.PUNCH) {
             return false;
-        if (partner.getSpeed() == 0)
+        }
+        if (partner.getSpeed() == 0) {
             return false;
+        }
 
         for (DeployerBlockEntity be : Arrays.asList(this, partner)) {
             be.fistBump = true;
@@ -308,20 +328,24 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         DeployerBlockEntity deployerBlockEntity = null;
         for (i = 2; i < 5; i++) {
             BlockPos pos = this.worldPosition.relative(getBlockState().getValue(BlockStateProperties.FACING), i);
-            if (!level.isLoaded(pos))
+            if (!level.isLoaded(pos)) {
                 return;
+            }
             if (level.getBlockEntity(pos) instanceof DeployerBlockEntity dpe) {
                 deployerBlockEntity = dpe;
                 break;
             }
         }
 
-        if (deployerBlockEntity == null)
+        if (deployerBlockEntity == null) {
             return;
-        if (!deployerBlockEntity.fistBump || deployerBlockEntity.state != State.EXPANDING)
+        }
+        if (!deployerBlockEntity.fistBump || deployerBlockEntity.state != State.EXPANDING) {
             return;
-        if (deployerBlockEntity.timer > 0)
+        }
+        if (deployerBlockEntity.timer > 0) {
             return;
+        }
 
         fistBump = false;
         deployerBlockEntity.fistBump = false;
@@ -330,8 +354,8 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         deployerBlockEntity.sendData();
         award(AllAdvancements.FIST_BUMP);
 
-        BlockPos soundLocation = BlockPos.containing(Vec3.atCenterOf(worldPosition).add(Vec3.atCenterOf(deployerBlockEntity.getBlockPos()))
-            .scale(.5f));
+        BlockPos soundLocation = BlockPos.containing(Vec3.atCenterOf(worldPosition)
+            .add(Vec3.atCenterOf(deployerBlockEntity.getBlockPos())).scale(.5f));
         level.playSound(null, soundLocation, SoundEvents.PLAYER_ATTACK_NODAMAGE, SoundSource.BLOCKS, .75f, .75f);
     }
 
@@ -344,8 +368,13 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         serverPlayer.setXRot(direction == Direction.UP ? -90 : direction == Direction.DOWN ? 90 : 0);
         serverPlayer.setYRot(direction.toYRot());
 
-        if (direction == Direction.DOWN && BlockEntityBehaviour.get(level, clickedPos, TransportedItemStackHandlerBehaviour.TYPE) != null)
+        if (direction == Direction.DOWN && BlockEntityBehaviour.get(
+            level,
+            clickedPos,
+            TransportedItemStackHandlerBehaviour.TYPE
+        ) != null) {
             return; // Belt processing handled in BeltDeployerCallbacks
+        }
 
         DeployerHandler.activate(player, center, clickedPos, movementVector, mode);
         award(AllAdvancements.DEPLOYER);
@@ -353,15 +382,17 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         if (player != null) {
             int count = heldItem.getCount();
             heldItem = serverPlayer.getMainHandItem();
-            if (count != heldItem.getCount())
+            if (count != heldItem.getCount()) {
                 setChanged();
+            }
         }
     }
 
     protected Vec3 getMovementVector() {
         BlockState state = getBlockState();
-        if (!state.is(AllBlocks.DEPLOYER))
+        if (!state.is(AllBlocks.DEPLOYER)) {
             return Vec3.ZERO;
+        }
         return Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i());
     }
 
@@ -380,12 +411,17 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         view.read("HeldItem", ItemStack.OPTIONAL_CODEC).ifPresent(item -> heldItem = item);
         super.read(view, clientPacket);
 
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
+        }
         fistBump = view.getBooleanOr("Fistbump", false);
         reach = view.getFloatOr("Reach", 0);
         view.read("Particle", ItemStack.CODEC).ifPresent(particleStack -> {
-            SandPaperItem.spawnParticles(VecHelper.getCenterOf(worldPosition).add(getMovementVector().scale(reach + 1)), particleStack, level);
+            SandPaperItem.spawnParticles(
+                VecHelper.getCenterOf(worldPosition).add(getMovementVector().scale(reach + 1)),
+                particleStack,
+                level
+            );
         });
     }
 
@@ -416,12 +452,14 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
 
         super.write(view, clientPacket);
 
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
+        }
         view.putBoolean("Fistbump", fistBump);
         view.putFloat("Reach", reach);
-        if (player == null)
+        if (player == null) {
             return;
+        }
         if (player.getSpawnedItemEffects() != null) {
             ItemStack stack = player.getSpawnedItemEffects();
             if (!stack.isEmpty()) {
@@ -442,11 +480,13 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     }
 
     public void redstoneUpdate() {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         boolean blockPowered = level.hasNeighborSignal(worldPosition);
-        if (blockPowered == redstoneLocked)
+        if (blockPowered == redstoneLocked) {
             return;
+        }
         redstoneLocked = blockPowered;
         sendData();
     }
@@ -457,8 +497,9 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
     }
 
     public void discardPlayer() {
-        if (player == null)
+        if (player == null) {
             return;
+        }
         ServerPlayer serverPlayer = player.cast();
         serverPlayer.getInventory().dropAll();
         overflowItems.forEach(itemstack -> serverPlayer.drop(itemstack, true, false));
@@ -483,19 +524,24 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
 
     @Nullable
     public Recipe<? extends RecipeInput> getRecipe(ItemStack stack) {
-        if (player == null || level == null)
+        if (player == null || level == null) {
             return null;
+        }
 
         ItemStack heldItemMainhand = player.cast().getMainHandItem();
         RecipeMap preparedRecipes = ((ServerLevel) level).recipeAccess().recipes;
         if (heldItemMainhand.getItem() instanceof SandPaperItem) {
-            return preparedRecipes.getRecipesFor(AllRecipeTypes.SANDPAPER_POLISHING, new SingleRecipeInput(stack), level)
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeHolder::value).findFirst().orElse(null);
+            return preparedRecipes.getRecipesFor(
+                AllRecipeTypes.SANDPAPER_POLISHING,
+                new SingleRecipeInput(stack),
+                level
+            ).filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeHolder::value).findFirst().orElse(null);
         }
 
         ItemApplicationInput input = new ItemApplicationInput(stack, heldItemMainhand);
-        return AllRecipeTypes.DEPLOYER_RECIPES.stream().flatMap(type -> preparedRecipes.getRecipesFor(type, input, level))
-            .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeHolder::value).findFirst().orElse(null);
+        return AllRecipeTypes.DEPLOYER_RECIPES.stream()
+            .flatMap(type -> preparedRecipes.getRecipesFor(type, input, level)).filter(AllRecipeTypes.CAN_BE_AUTOMATED)
+            .map(RecipeHolder::value).findFirst().orElse(null);
     }
 
     public DeployerPlayer getPlayer() {

@@ -79,7 +79,8 @@ public class SmartBlockEntityRenderer<T extends SmartBlockEntity, S extends Smar
             return null;
         }
         HitResult hitResult = Minecraft.getInstance().hitResult;
-        if (!(hitResult instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS || !bhr.getBlockPos().equals(pos)) {
+        if (!(hitResult instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS || !bhr.getBlockPos()
+            .equals(pos)) {
             return null;
         }
         Vec3 labelPos = new Vec3(0.5, yOffset - 0.25, 0.5);

@@ -24,8 +24,9 @@ public class PlayerSkyhookRenderer {
     }
 
     public static void afterSetupAnim(UUID uuid, HumanoidArm mainArm, ItemStack stack, PlayerModel model) {
-        if (hangingPlayers.contains(uuid))
+        if (hangingPlayers.contains(uuid)) {
             setHangingPose(mainArm == HumanoidArm.LEFT ^ !stack.is(AllItemTags.CHAIN_RIDEABLE), model);
+        }
     }
 
     private static void setHangingPose(boolean isLeftArmMain, PlayerModel model) {
@@ -42,8 +43,9 @@ public class PlayerSkyhookRenderer {
         float limbCycle = Mth.sin(((float) (time * 0.3f / Math.PI)));
         float bodySwing = AngleHelper.rad(15 + (mainCycle * 10));
         float limbSwing = AngleHelper.rad(limbCycle * 15);
-        if (isLeftArmMain)
+        if (isLeftArmMain) {
             bodySwing = -bodySwing;
+        }
         model.body.zRot = bodySwing;
         model.head.zRot = bodySwing;
 

@@ -66,7 +66,14 @@ public class DefaultMountedDispenseBehavior implements MountedDispenseBehavior {
         level.levelEvent(LevelEvent.PARTICLES_SHOOT_SMOKE, pos, direction.get3DDataValue());
     }
 
-    public static void spawnItem(Level level, ItemStack stack, int speed, Vec3 facing, BlockPos pos, MovementContext context) {
+    public static void spawnItem(
+        Level level,
+        ItemStack stack,
+        int speed,
+        Vec3 facing,
+        BlockPos pos,
+        MovementContext context
+    ) {
         double x = pos.getX() + facing.x + .5;
         double y = pos.getY() + facing.y + .5;
         double z = pos.getZ() + facing.z + .5;

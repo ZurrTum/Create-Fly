@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.flywheel.impl.task;
 
 import com.zurrtum.create.client.flywheel.impl.FlwImpl;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -8,8 +9,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
-
-import net.minecraft.util.Mth;
 
 // https://github.com/CaffeineMC/sodium-fabric/blob/5d364ed5ba63f9067fcf72a078ca310bff4db3e9/src/main/java/me/jellysquid/mods/sodium/client/render/chunk/compile/ChunkBuilder.java
 // https://stackoverflow.com/questions/29655531

@@ -62,8 +62,9 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (inUse == 0 && cooldown > 0)
+        if (inUse == 0 && cooldown > 0) {
             cooldown--;
+        }
         independentAngle = 0;
     }
 
@@ -72,12 +73,15 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
     }
 
     public boolean activate(boolean sneak) {
-        if (getTheoreticalSpeed() != 0)
+        if (getTheoreticalSpeed() != 0) {
             return false;
-        if (inUse > 0 || cooldown > 0)
+        }
+        if (inUse > 0 || cooldown > 0) {
             return false;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return true;
+        }
 
         // Always overshoot, target will stop early
         int value = angleInput.getValue();

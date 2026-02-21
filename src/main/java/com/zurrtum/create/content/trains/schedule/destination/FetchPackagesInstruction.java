@@ -32,8 +32,9 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
     }
 
     public String getFilterForRegex() {
-        if (getFilter().isBlank())
+        if (getFilter().isBlank()) {
             return Glob.toRegexPattern("*", "");
+        }
         return Glob.toRegexPattern(getFilter(), "");
     }
 
@@ -45,8 +46,9 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
     @Override
     public DiscoveredPath start(ScheduleRuntime runtime, Level level) {
         MinecraftServer server = level.getServer();
-        if (server == null)
+        if (server == null) {
             return null;
+        }
 
         String regex = getFilterForRegex();
         boolean anyMatch = false;
@@ -61,26 +63,31 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
 
         for (GlobalStation globalStation : train.graph.getPoints(EdgePointType.STATION)) {
             ServerLevel dimLevel = server.getLevel(globalStation.blockEntityDimension);
-            if (dimLevel == null)
+            if (dimLevel == null) {
                 continue;
+            }
 
             for (Map.Entry<BlockPos, GlobalPackagePort> entry : globalStation.connectedPorts.entrySet()) {
                 GlobalPackagePort port = entry.getValue();
                 BlockPos pos = entry.getKey();
 
                 Container postboxInventory = port.offlineBuffer;
-                if (dimLevel.isLoaded(pos) && dimLevel.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe)
+                if (dimLevel.isLoaded(pos) && dimLevel.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe) {
                     postboxInventory = ppbe.inventory;
+                }
 
                 for (int i = 0, size = postboxInventory.getContainerSize(); i < size; i++) {
                     ItemStack stack = postboxInventory.getItem(i);
-                    if (!PackageItem.isPackage(stack))
+                    if (!PackageItem.isPackage(stack)) {
                         continue;
-                    if (PackageItem.matchAddress(stack, port.address))
+                    }
+                    if (PackageItem.matchAddress(stack, port.address)) {
                         continue;
+                    }
                     try {
-                        if (!PackageItem.getAddress(stack).matches(regex))
+                        if (!PackageItem.getAddress(stack).matches(regex)) {
                             continue;
+                        }
                         anyMatch = true;
                         validStations.add(globalStation);
                     } catch (PatternSyntaxException ignored) {
@@ -98,8 +105,9 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
 
         DiscoveredPath best = train.navigation.findPathTo(validStations, Double.MAX_VALUE);
         if (best == null) {
-            if (anyMatch)
+            if (anyMatch) {
                 train.status.failedNavigation();
+            }
             runtime.startCooldown();
             return null;
         }

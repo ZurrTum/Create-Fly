@@ -35,7 +35,11 @@ public abstract class ShootableGadgetRenderHandler {
     }
 
     public float getAnimation(boolean rightHand, float partialTicks) {
-        return Mth.lerp(partialTicks, rightHand ? lastRightHandAnimation : lastLeftHandAnimation, rightHand ? rightHandAnimation : leftHandAnimation);
+        return Mth.lerp(
+            partialTicks,
+            rightHand ? lastRightHandAnimation : lastLeftHandAnimation,
+            rightHand ? rightHandAnimation : leftHandAnimation
+        );
     }
 
     protected float animationDecay() {
@@ -76,19 +80,26 @@ public abstract class ShootableGadgetRenderHandler {
         float equipProgress,
         float swingProgress
     ) {
-        if (!appliesTo(heldItem))
+        if (!appliesTo(heldItem)) {
             return false;
+        }
 
         AbstractClientPlayer player = mc.player;
         AvatarRenderer<AbstractClientPlayer> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
 
         boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
-        float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation) : Mth.lerp(pt, lastLeftHandAnimation, leftHandAnimation);
+        float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation) : Mth.lerp(
+            pt,
+            lastLeftHandAnimation,
+            leftHandAnimation
+        );
 
-        if (rightHand && (rightHandAnimation > .01f || dontReequipRight))
+        if (rightHand && (rightHandAnimation > .01f || dontReequipRight)) {
             equipProgress = 0;
-        if (!rightHand && (leftHandAnimation > .01f || dontReequipLeft))
+        }
+        if (!rightHand && (leftHandAnimation > .01f || dontReequipLeft)) {
             equipProgress = 0;
+        }
 
         // Render arm
         float flip = rightHand ? 1.0F : -1.0F;
@@ -112,10 +123,23 @@ public abstract class ShootableGadgetRenderHandler {
         ms.mulPose(Axis.YP.rotationDegrees(flip * 40.0F));
         transformHand(ms, flip, equipProgress, recoil, pt);
         Identifier texture = player.getSkin().body().texturePath();
-        if (rightHand)
-            playerrenderer.renderRightHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));
-        else
-            playerrenderer.renderLeftHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE));
+        if (rightHand) {
+            playerrenderer.renderRightHand(
+                ms,
+                queue,
+                light,
+                texture,
+                player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE)
+            );
+        } else {
+            playerrenderer.renderLeftHand(
+                ms,
+                queue,
+                light,
+                texture,
+                player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE)
+            );
+        }
         ms.popPose();
 
         // Render gadget

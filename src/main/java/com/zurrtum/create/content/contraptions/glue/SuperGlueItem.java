@@ -18,7 +18,12 @@ public class SuperGlueItem extends Item {
         super(settings);
     }
 
-    public static InteractionResult glueItemAlwaysPlacesWhenUsed(Level world, Player player, InteractionHand hand, BlockHitResult hit) {
+    public static InteractionResult glueItemAlwaysPlacesWhenUsed(
+        Level world,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult hit
+    ) {
         BlockState blockState = world.getBlockState(hit.getBlockPos());
         if (blockState.getBlock() instanceof AbstractChassisBlock cb) {
             if (cb.getGlueableSide(blockState, hit.getDirection()) != null) {

@@ -70,7 +70,10 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
             matrices.scale(size, size, size);
             partial.transform(matrices);
             Minecraft mc = Minecraft.getInstance();
-            ChunkSectionLayer blockRenderLayer = LayerBakedModel.getBlockRenderLayer(partial.model, () -> ChunkSectionLayer.SOLID);
+            ChunkSectionLayer blockRenderLayer = LayerBakedModel.getBlockRenderLayer(
+                partial.model,
+                () -> ChunkSectionLayer.SOLID
+            );
             RenderType layer = blockRenderLayer == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
             mc.getBlockRenderer().renderBatched(
@@ -88,7 +91,10 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
         }
         state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.singleTexture(texture.textureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+            TextureSetup.singleTexture(
+                texture.textureView(),
+                RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)
+            ),
             partial.pose,
             partial.x1,
             partial.y1,

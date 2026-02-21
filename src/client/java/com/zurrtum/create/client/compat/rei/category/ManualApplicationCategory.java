@@ -54,7 +54,15 @@ public class ManualApplicationCategory extends CreateCategory<ManualApplicationD
         List<EntryIngredient> chanceIngredients = new ArrayList<>();
         List<ProcessingOutput> results = display.outputs();
         for (int i = 0, size = results.size(), start = bounds.x + 137, y = bounds.y + 43; i < size; i++) {
-            addOutputData(results.get(i), i % 2 == 0 ? start : start + 19, y + (i / 2) * -19, outputs, outputIngredients, chances, chanceIngredients);
+            addOutputData(
+                results.get(i),
+                i % 2 == 0 ? start : start + 19,
+                y + (i / 2) * -19,
+                outputs,
+                outputIngredients,
+                chances,
+                chanceIngredients
+            );
         }
         Slot targetSlot = createInputSlot(target).entries(display.target());
         widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {

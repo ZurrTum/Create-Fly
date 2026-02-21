@@ -165,7 +165,8 @@ public class BakedItemModelBufferer {
         void accept(RenderType renderType, Material material, Mesh mesh, boolean translucent);
     }
 
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
 
     public static Map<RenderType, Integer> getChunkLayers() {
         return THREAD_LOCAL_OBJECTS.get().chunkLayers;

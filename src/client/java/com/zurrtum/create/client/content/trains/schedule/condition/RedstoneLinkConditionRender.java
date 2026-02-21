@@ -61,8 +61,11 @@ public class RedstoneLinkConditionRender implements IScheduleInput<RedstoneLinkC
         builder.addSelectionScrollInput(
             20,
             101,
-            (i, l) -> i.forOptions(CreateLang.translatedOptions("schedule.condition.redstone_link", "powered", "unpowered"))
-                .titled(CreateLang.translateDirect("schedule.condition.redstone_link.frequency_state")),
+            (i, l) -> i.forOptions(CreateLang.translatedOptions(
+                "schedule.condition.redstone_link",
+                "powered",
+                "unpowered"
+            )).titled(CreateLang.translateDirect("schedule.condition.redstone_link.frequency_state")),
             "Inverted"
         );
     }

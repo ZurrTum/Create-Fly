@@ -33,7 +33,13 @@ public class SchematicannonBlock extends Block implements IBE<SchematicannonBloc
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
+    public void setPlacedBy(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        @Nullable LivingEntity entity,
+        ItemStack stack
+    ) {
         if (entity != null) {
             withBlockEntityDo(
                 level, pos, be -> {
@@ -44,9 +50,16 @@ public class SchematicannonBlock extends Block implements IBE<SchematicannonBloc
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.isClientSide())
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         withBlockEntityDo(level, pos, be -> be.openHandledScreen((ServerPlayer) player));
         return InteractionResult.SUCCESS;
     }

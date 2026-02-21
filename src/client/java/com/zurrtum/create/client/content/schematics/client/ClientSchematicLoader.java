@@ -6,6 +6,9 @@ import com.zurrtum.create.foundation.utility.CreatePaths;
 import com.zurrtum.create.foundation.utility.FilesHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.c2s.SchematicUploadPacket;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,10 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Stream;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
 
 public class ClientSchematicLoader {
 
@@ -37,10 +36,12 @@ public class ClientSchematicLoader {
     }
 
     public void tick(Minecraft mc) {
-        if (activeUploads.isEmpty())
+        if (activeUploads.isEmpty()) {
             return;
-        if (packetCycle-- > 0)
+        }
+        if (packetCycle-- > 0) {
             return;
+        }
         packetCycle = PACKET_DELAY;
 
         for (String schematic : new HashSet<>(activeUploads.keySet())) {
@@ -61,14 +62,16 @@ public class ClientSchematicLoader {
             long size = Files.size(path);
 
             // Too big
-            if (!validateSizeLimitation(mc, size))
+            if (!validateSizeLimitation(mc, size)) {
                 return;
+            }
 
             // Validate if the file is encoded in a GZIP compatible format
             LocalPlayer player = mc.player;
             if (!isGZIPEncoded(path.toFile())) {
-                if (player != null)
+                if (player != null) {
                     player.displayClientMessage(CreateLang.translateDirect("schematics.wrongFormat"), false);
+                }
                 return;
             }
 
@@ -82,14 +85,20 @@ public class ClientSchematicLoader {
     }
 
     public static boolean validateSizeLimitation(Minecraft mc, long size) {
-        if (mc.hasSingleplayerServer())
+        if (mc.hasSingleplayerServer()) {
             return true;
+        }
         long maxSize = AllConfigs.server().schematics.maxTotalSchematicSize.get();
         if (size > maxSize * 1000) {
             LocalPlayer player = mc.player;
             if (player != null) {
-                player.displayClientMessage(CreateLang.translateDirect("schematics.uploadTooLarge").append(" (" + size / 1000 + " KB)."), false);
-                player.displayClientMessage(CreateLang.translateDirect("schematics.maxAllowedSize").append(" " + maxSize + " KB"), false);
+                player.displayClientMessage(
+                    CreateLang.translateDirect("schematics.uploadTooLarge")
+                        .append(" (" + size / 1000 + " KB)."),
+                    false
+                );
+                player.displayClientMessage(
+                    CreateLang.translateDirect("schematics.maxAllowedSize").append(" " + maxSize + " KB"), false);
             }
             return false;
         }
@@ -103,8 +112,9 @@ public class ClientSchematicLoader {
     public static boolean isGZIPEncoded(File file) {
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] bytes = new byte[2];
-            if (fis.read(bytes) != 2)
+            if (fis.read(bytes) != 2) {
                 return false;
+            }
 
             int byte1 = bytes[0] & 0xFF;
             int byte2 = bytes[1] & 0xFF;
@@ -123,19 +133,21 @@ public class ClientSchematicLoader {
                 int status = activeUploads.get(schematic).read(data);
 
                 if (status != -1) {
-                    if (status < maxPacketSize)
+                    if (status < maxPacketSize) {
                         data = Arrays.copyOf(data, status);
-                    if (mc.level != null)
+                    }
+                    if (mc.level != null) {
                         mc.player.connection.send(SchematicUploadPacket.write(schematic, data));
-                    else {
+                    } else {
                         //noinspection resource
                         activeUploads.remove(schematic);
                         return;
                     }
                 }
 
-                if (status < maxPacketSize)
+                if (status < maxPacketSize) {
                     finishUpload(mc, schematic);
+                }
             } catch (IOException e) {
                 Create.LOGGER.error("Encountered a error while uploading schematic", e);
             }
@@ -156,8 +168,9 @@ public class ClientSchematicLoader {
 
         try (Stream<Path> paths = Files.list(CreatePaths.SCHEMATICS_DIR)) {
             paths.filter(f -> !Files.isDirectory(f) && f.getFileName().toString().endsWith(".nbt")).forEach(path -> {
-                if (Files.isDirectory(path))
+                if (Files.isDirectory(path)) {
                     return;
+                }
 
                 availableSchematics.add(Component.literal(path.getFileName().toString()));
             });
@@ -170,10 +183,12 @@ public class ClientSchematicLoader {
         availableSchematics.sort((aT, bT) -> {
             String a = aT.getString();
             String b = bT.getString();
-            if (a.endsWith(".nbt"))
+            if (a.endsWith(".nbt")) {
                 a = a.substring(0, a.length() - 4);
-            if (b.endsWith(".nbt"))
+            }
+            if (b.endsWith(".nbt")) {
                 b = b.substring(0, b.length() - 4);
+            }
             int aLength = a.length();
             int bLength = b.length();
             int minSize = Math.min(aLength, bLength);
@@ -186,38 +201,47 @@ public class ClientSchematicLoader {
                 bChar = b.charAt(i);
                 aNumber = aChar >= '0' && aChar <= '9';
                 bNumber = bChar >= '0' && bChar <= '9';
-                if (asNumeric)
+                if (asNumeric) {
                     if (aNumber && bNumber) {
-                        if (lastNumericCompare == 0)
+                        if (lastNumericCompare == 0) {
                             lastNumericCompare = aChar - bChar;
-                    } else if (aNumber)
+                        }
+                    } else if (aNumber) {
                         return 1;
-                    else if (bNumber)
+                    } else if (bNumber) {
                         return -1;
-                    else if (lastNumericCompare == 0) {
-                        if (aChar != bChar)
+                    } else if (lastNumericCompare == 0) {
+                        if (aChar != bChar) {
                             return aChar - bChar;
+                        }
                         asNumeric = false;
-                    } else
+                    } else {
                         return lastNumericCompare;
-                else if (aNumber && bNumber) {
+                    }
+                } else if (aNumber && bNumber) {
                     asNumeric = true;
-                    if (lastNumericCompare == 0)
+                    if (lastNumericCompare == 0) {
                         lastNumericCompare = aChar - bChar;
-                } else if (aChar != bChar)
+                    }
+                } else if (aChar != bChar) {
                     return aChar - bChar;
+                }
             }
-            if (asNumeric)
+            if (asNumeric) {
                 if (aLength > bLength && a.charAt(bLength) >= '0' && a.charAt(bLength) <= '9') // as number
+                {
                     return 1; // a has bigger size, thus b is smaller
-                else if (bLength > aLength && b.charAt(aLength) >= '0' && b.charAt(aLength) <= '9') // as number
+                } else if (bLength > aLength && b.charAt(aLength) >= '0' && b.charAt(aLength) <= '9') // as number
+                {
                     return -1; // b has bigger size, thus a is smaller
-                else if (lastNumericCompare == 0)
+                } else if (lastNumericCompare == 0) {
                     return aLength - bLength;
-                else
+                } else {
                     return lastNumericCompare;
-            else
+                }
+            } else {
                 return aLength - bLength;
+            }
         });
     }
 

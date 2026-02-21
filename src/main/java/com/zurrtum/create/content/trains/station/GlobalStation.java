@@ -27,7 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GlobalStation extends SingleBlockEntityEdgePoint {
-    public static final Codec<Map<BlockPos, GlobalPackagePort>> PORTS_CODEC = CreateCodecs.getCodecMap(BlockPos.CODEC, GlobalPackagePort.CODEC);
+    public static final Codec<Map<BlockPos, GlobalPackagePort>> PORTS_CODEC = CreateCodecs.getCodecMap(
+        BlockPos.CODEC,
+        GlobalPackagePort.CODEC
+    );
 
     public String name;
     public WeakReference<Train> nearestTrain;
@@ -70,8 +73,9 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
         super.read(buffer, dimensions);
         name = buffer.readUtf();
         assembling = buffer.readBoolean();
-        if (buffer.readBoolean())
+        if (buffer.readBoolean()) {
             blockEntityPos = buffer.readBlockPos();
+        }
     }
 
     @Override
@@ -98,8 +102,9 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
         buffer.writeUtf(name);
         buffer.writeBoolean(assembling);
         buffer.writeBoolean(blockEntityPos != null);
-        if (blockEntityPos != null)
+        if (blockEntityPos != null) {
             buffer.writeBlockPos(blockEntityPos);
+        }
     }
 
     public boolean canApproachFrom(TrackNode side) {
@@ -113,13 +118,15 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 
     public void reserveFor(Train train) {
         Train nearestTrain = getNearestTrain();
-        if (nearestTrain == null || nearestTrain.navigation.distanceToDestination > train.navigation.distanceToDestination)
+        if (nearestTrain == null || nearestTrain.navigation.distanceToDestination > train.navigation.distanceToDestination) {
             this.nearestTrain = new WeakReference<>(train);
+        }
     }
 
     public void cancelReservation(Train train) {
-        if (nearestTrain.get() == train)
+        if (nearestTrain.get() == train) {
             nearestTrain = new WeakReference<>(null);
+        }
     }
 
     public void trainDeparted(Train train) {
@@ -129,22 +136,27 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
     @Nullable
     public Train getPresentTrain() {
         Train nearestTrain = getNearestTrain();
-        if (nearestTrain == null || nearestTrain.getCurrentStation() != this)
+        if (nearestTrain == null || nearestTrain.getCurrentStation() != this) {
             return null;
+        }
         return nearestTrain;
     }
 
     @Nullable
     public Train getImminentTrain() {
         Train nearestTrain = getNearestTrain();
-        if (nearestTrain == null)
+        if (nearestTrain == null) {
             return nearestTrain;
-        if (nearestTrain.getCurrentStation() == this)
+        }
+        if (nearestTrain.getCurrentStation() == this) {
             return nearestTrain;
-        if (!nearestTrain.navigation.isActive())
+        }
+        if (!nearestTrain.navigation.isActive()) {
             return null;
-        if (nearestTrain.navigation.distanceToDestination > 30)
+        }
+        if (nearestTrain.navigation.distanceToDestination > 30) {
             return null;
+        }
         return nearestTrain;
     }
 
@@ -155,15 +167,17 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 
     public void runMailTransfer() {
         Train train = getPresentTrain();
-        if (train == null || connectedPorts.isEmpty())
+        if (train == null || connectedPorts.isEmpty()) {
             return;
+        }
         MinecraftServer server = Create.SERVER;
         Level level = server.getLevel(getBlockEntityDimension());
 
         for (Carriage carriage : train.carriages) {
             Container carriageInventory = carriage.storage.getAllItems();
-            if (carriageInventory == null)
+            if (carriageInventory == null) {
                 continue;
+            }
 
             // Import from station
             for (Map.Entry<BlockPos, GlobalPackagePort> entry : connectedPorts.entrySet()) {
@@ -179,12 +193,14 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 
                 for (int slot = 0, size = postboxInventory.getContainerSize(); slot < size; slot++) {
                     ItemStack stack = postboxInventory.getItem(slot);
-                    if (PackageItem.matchAddress(stack, port.address))
+                    if (PackageItem.matchAddress(stack, port.address)) {
                         continue;
+                    }
 
                     int insert = carriageInventory.insert(stack);
-                    if (insert == 0)
+                    if (insert == 0) {
                         continue;
+                    }
 
                     int count = stack.getCount();
                     if (insert == count) {
@@ -203,16 +219,18 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 
             // Export to station
             for (ItemStack stack : carriageInventory) {
-                if (!PackageItem.isPackage(stack))
+                if (!PackageItem.isPackage(stack)) {
                     continue;
+                }
 
                 for (Map.Entry<BlockPos, GlobalPackagePort> entry : connectedPorts.entrySet()) {
                     GlobalPackagePort port = entry.getValue();
                     BlockPos pos = entry.getKey();
                     PostboxBlockEntity box = null;
 
-                    if (!PackageItem.matchAddress(stack, port.address))
+                    if (!PackageItem.matchAddress(stack, port.address)) {
                         continue;
+                    }
 
                     Container postboxInventory = port.offlineBuffer;
                     if (level != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe) {

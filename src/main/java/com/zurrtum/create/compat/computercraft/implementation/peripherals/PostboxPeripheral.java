@@ -41,18 +41,21 @@ public class PostboxPeripheral extends SyncedPeripheral<PostboxBlockEntity> {
 
     @LuaFunction(mainThread = true)
     public final String getConfiguration() throws LuaException {
-        if (blockEntity.target == null)
+        if (blockEntity.target == null) {
             return null;
-        if (blockEntity.acceptsPackages)
+        }
+        if (blockEntity.acceptsPackages) {
             return "send_recieve";
-        else
+        } else {
             return "send";
+        }
     }
 
     @LuaFunction(mainThread = true)
     public final boolean setConfiguration(String config) throws LuaException {
-        if (blockEntity.target == null)
+        if (blockEntity.target == null) {
             return false;
+        }
         if (config.equals("send_recieve")) {
             blockEntity.acceptsPackages = true;
             blockEntity.filterChanged();

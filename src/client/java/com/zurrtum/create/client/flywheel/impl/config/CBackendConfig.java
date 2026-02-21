@@ -5,7 +5,11 @@ import com.zurrtum.create.client.flywheel.backend.BackendConfig;
 import com.zurrtum.create.client.flywheel.backend.compile.LightSmoothness;
 
 public class CBackendConfig extends ConfigBase implements BackendConfig {
-    public final ConfigEnum<LightSmoothness> lightSmoothness = e(LightSmoothness.SMOOTH, "lightSmoothness", Comments.lightSmoothness);
+    public final ConfigEnum<LightSmoothness> lightSmoothness = e(
+        LightSmoothness.SMOOTH,
+        "lightSmoothness",
+        Comments.lightSmoothness
+    );
 
     @Override
     public String getName() {

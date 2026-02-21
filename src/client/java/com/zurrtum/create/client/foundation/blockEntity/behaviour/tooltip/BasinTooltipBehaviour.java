@@ -28,10 +28,12 @@ public class BasinTooltipBehaviour extends TooltipBehaviour<BasinBlockEntity> im
         if (itemCapability != null) {
             for (int i = 0, size = itemCapability.getContainerSize(); i < size; i++) {
                 ItemStack stackInSlot = itemCapability.getItem(i);
-                if (stackInSlot.isEmpty())
+                if (stackInSlot.isEmpty()) {
                     continue;
+                }
                 CreateLang.text("").add(stackInSlot.getItemName().copy().withStyle(ChatFormatting.GRAY))
-                    .add(CreateLang.text(" x" + stackInSlot.getCount()).style(ChatFormatting.GREEN)).forGoggles(tooltip, 1);
+                    .add(CreateLang.text(" x" + stackInSlot.getCount()).style(ChatFormatting.GREEN))
+                    .forGoggles(tooltip, 1);
                 isEmpty = false;
             }
         }
@@ -41,16 +43,20 @@ public class BasinTooltipBehaviour extends TooltipBehaviour<BasinBlockEntity> im
             LangBuilder mb = CreateLang.translate("generic.unit.millibuckets");
             for (int i = 0, size = fluidCapability.size(); i < size; i++) {
                 FluidStack fluidStack = fluidCapability.getStack(i);
-                if (fluidStack.isEmpty())
+                if (fluidStack.isEmpty()) {
                     continue;
-                CreateLang.text("").add(CreateLang.fluidName(fluidStack).add(CreateLang.text(" ")).style(ChatFormatting.GRAY)
-                    .add(CreateLang.number((double) fluidStack.getAmount() / 81).add(mb).style(ChatFormatting.BLUE))).forGoggles(tooltip, 1);
+                }
+                CreateLang.text("")
+                    .add(CreateLang.fluidName(fluidStack).add(CreateLang.text(" ")).style(ChatFormatting.GRAY)
+                        .add(CreateLang.number((double) fluidStack.getAmount() / 81).add(mb)
+                            .style(ChatFormatting.BLUE))).forGoggles(tooltip, 1);
                 isEmpty = false;
             }
         }
 
-        if (isEmpty)
+        if (isEmpty) {
             tooltip.removeFirst();
+        }
 
         return true;
     }

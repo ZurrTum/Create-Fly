@@ -4,6 +4,11 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizerRegistry;
 import com.zurrtum.create.client.vanillin.Vanillin;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -11,21 +16,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-
 public class Configurator {
     public final Map<BlockEntityType<?>, ConfiguredBlockEntity<?>> blockEntities = new LinkedHashMap<>();
     public final Map<EntityType<?>, ConfiguredEntity<?>> entities = new LinkedHashMap<>();
 
-    public <T extends BlockEntity> void register(BlockEntityType<T> type, BlockEntityVisualizer<? super T> visualizer, boolean enabledByDefault) {
+    public <T extends BlockEntity> void register(
+        BlockEntityType<T> type,
+        BlockEntityVisualizer<? super T> visualizer,
+        boolean enabledByDefault
+    ) {
         blockEntities.put(type, new ConfiguredBlockEntity<>(type, visualizer, enabledByDefault));
     }
 
-    public <T extends Entity> void register(EntityType<T> type, EntityVisualizer<? super T> visualizer, boolean enabledByDefault) {
+    public <T extends Entity> void register(
+        EntityType<T> type,
+        EntityVisualizer<? super T> visualizer,
+        boolean enabledByDefault
+    ) {
         entities.put(type, new ConfiguredEntity<>(type, visualizer, enabledByDefault));
     }
 
@@ -65,7 +72,11 @@ public class Configurator {
             if (modIds.isEmpty()) {
                 return false;
             } else {
-                Vanillin.CONFIG_LOGGER.warn("Disabling {} visual due to overrides from mods: {}", configKey(), String.join(", ", modIds));
+                Vanillin.CONFIG_LOGGER.warn(
+                    "Disabling {} visual due to overrides from mods: {}",
+                    configKey(),
+                    String.join(", ", modIds)
+                );
                 return true;
             }
         }
@@ -78,7 +89,11 @@ public class Configurator {
             var modIds = disablingModIds(overrides);
 
             if (!modIds.isEmpty()) {
-                Vanillin.CONFIG_LOGGER.warn("Enabling {} visual despite overrides from mods: {}", configKey(), String.join(", ", modIds));
+                Vanillin.CONFIG_LOGGER.warn(
+                    "Enabling {} visual despite overrides from mods: {}",
+                    configKey(),
+                    String.join(", ", modIds)
+                );
             }
         }
 
@@ -104,7 +119,11 @@ public class Configurator {
         public final BlockEntityType<T> type;
         public final BlockEntityVisualizer<? super T> visualizer;
 
-        private ConfiguredBlockEntity(BlockEntityType<T> type, BlockEntityVisualizer<? super T> visualizer, boolean enabledByDefault) {
+        private ConfiguredBlockEntity(
+            BlockEntityType<T> type,
+            BlockEntityVisualizer<? super T> visualizer,
+            boolean enabledByDefault
+        ) {
             super(enabledByDefault);
             this.type = type;
             this.visualizer = visualizer;

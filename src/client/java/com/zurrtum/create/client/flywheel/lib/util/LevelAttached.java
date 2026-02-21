@@ -3,6 +3,7 @@ package com.zurrtum.create.client.flywheel.lib.util;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.lang.ref.Cleaner;
 import java.lang.ref.WeakReference;
@@ -10,8 +11,6 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import net.minecraft.world.level.LevelAccessor;
 
 public final class LevelAttached<T> {
     private static final ConcurrentLinkedDeque<WeakReference<LevelAttached<?>>> ALL = new ConcurrentLinkedDeque<>();
@@ -23,12 +22,13 @@ public final class LevelAttached<T> {
         WeakReference<LevelAttached<?>> thisRef = new WeakReference<>(this);
         ALL.add(thisRef);
 
-        cache = CacheBuilder.newBuilder().<LevelAccessor, T>removalListener(n -> finalizer.accept(n.getValue())).build(new CacheLoader<>() {
-            @Override
-            public T load(LevelAccessor key) {
-                return factory.apply(key);
-            }
-        });
+        cache = CacheBuilder.newBuilder().<LevelAccessor, T>removalListener(n -> finalizer.accept(n.getValue()))
+            .build(new CacheLoader<>() {
+                @Override
+                public T load(LevelAccessor key) {
+                    return factory.apply(key);
+                }
+            });
 
         CLEANER.register(this, new CleaningAction(thisRef, cache));
     }

@@ -40,7 +40,8 @@ public class GameProtocolsMixin {
         Operation<UnboundProtocol<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context>> original
     ) {
         return original.call(
-            type, (Consumer<ProtocolInfoBuilder<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context>>) (builder -> {
+            type,
+            (Consumer<ProtocolInfoBuilder<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context>>) (builder -> {
                 registrar.accept(builder);
                 AllPackets.C2S.forEach(builder::addPacket);
             })

@@ -12,7 +12,6 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
-import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.*;
@@ -27,6 +26,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -46,17 +46,22 @@ public class FluidStack implements DataComponentHolder {
     public static final Codec<Holder<Fluid>> FLUID_ENTRY_CODEC = BuiltInRegistries.FLUID.holderByNameCodec()
         .validate(entry -> entry.is(Fluids.EMPTY.builtInRegistryHolder()) ? DataResult.error(() -> "Fluid must not be minecraft:empty") : DataResult.success(
             entry));
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Fluid>> FLUID_ENTRY_PACKET_CODEC = ByteBufCodecs.holderRegistry(Registries.FLUID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Fluid>> FLUID_ENTRY_PACKET_CODEC = ByteBufCodecs.holderRegistry(
+        Registries.FLUID);
     public static final MapCodec<FluidStack> MAP_CODEC = MapCodec.recursive(
         "FluidStack", codec -> RecordCodecBuilder.mapCodec(instance -> instance.group(
             FLUID_ENTRY_CODEC.fieldOf("id").forGetter(FluidStack::getRegistryEntry),
             ExtraCodecs.POSITIVE_INT.fieldOf("amount").orElse(1).forGetter(FluidStack::getAmount),
-            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(stack -> stack.components.asPatch())
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+                .forGetter(stack -> stack.components.asPatch())
         ).apply(instance, FluidStack::new))
     );
     public static final Codec<FluidStack> CODEC = Codec.lazyInitialized(MAP_CODEC::codec);
     public static final Codec<FluidStack> OPTIONAL_CODEC = ExtraCodecs.optionalEmptyMap(CODEC)
-        .xmap(optional -> optional.orElse(FluidStack.EMPTY), stack -> stack.isEmpty() ? Optional.empty() : Optional.of(stack));
+        .xmap(
+            optional -> optional.orElse(FluidStack.EMPTY),
+            stack -> stack.isEmpty() ? Optional.empty() : Optional.of(stack)
+        );
     public static final StreamCodec<RegistryFriendlyByteBuf, FluidStack> OPTIONAL_PACKET_CODEC = new StreamCodec<RegistryFriendlyByteBuf, FluidStack>() {
         public FluidStack decode(RegistryFriendlyByteBuf registryByteBuf) {
             int i = registryByteBuf.readVarInt();
@@ -170,7 +175,8 @@ public class FluidStack implements DataComponentHolder {
                 }
                 return true;
             }
-            return stackComponentMap.reference2ObjectEntrySet().containsAll(otherStackComponentMap.reference2ObjectEntrySet());
+            return stackComponentMap.reference2ObjectEntrySet()
+                .containsAll(otherStackComponentMap.reference2ObjectEntrySet());
         }
         return false;
     }

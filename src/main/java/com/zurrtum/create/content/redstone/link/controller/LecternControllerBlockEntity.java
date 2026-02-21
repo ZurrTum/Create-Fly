@@ -1,12 +1,8 @@
 package com.zurrtum.create.content.redstone.link.controller;
 
 import com.zurrtum.create.*;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.UUID;
-
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.UUIDUtil;
@@ -23,6 +19,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.UUID;
 
 public class LecternControllerBlockEntity extends SmartBlockEntity {
     private ItemContainerContents controllerData = ItemContainerContents.EMPTY;
@@ -48,8 +47,9 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
     protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.store("ControllerData", ItemContainerContents.CODEC, controllerData);
-        if (user != null)
+        if (user != null) {
             view.store("User", UUIDUtil.CODEC, user);
+        }
     }
 
     @Override
@@ -79,13 +79,19 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
     }
 
     public void tryStartUsing(Player player) {
-        if (!deactivatedThisTick && !hasUser() && !playerIsUsingLectern(player) && playerInRange(player, level, worldPosition))
+        if (!deactivatedThisTick && !hasUser() && !playerIsUsingLectern(player) && playerInRange(
+            player,
+            level,
+            worldPosition
+        )) {
             startUsing(player);
+        }
     }
 
     public void tryStopUsing(Player player) {
-        if (isUsedBy(player))
+        if (isUsedBy(player)) {
             stopUsing(player);
+        }
     }
 
     private void startUsing(Player player) {
@@ -96,8 +102,9 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
 
     private void stopUsing(Player player) {
         user = null;
-        if (player != null)
+        if (player != null) {
             AllSynchedDatas.IS_USING_LECTERN_CONTROLLER.set(player, false);
+        }
         deactivatedThisTick = true;
         sendData();
     }
@@ -118,10 +125,12 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
         if (!level.isClientSide()) {
             deactivatedThisTick = false;
 
-            if (!(level instanceof ServerLevel))
+            if (!(level instanceof ServerLevel)) {
                 return;
-            if (user == null)
+            }
+            if (user == null) {
                 return;
+            }
 
             Entity entity = level.getEntity(user);
             if (!(entity instanceof Player player)) {
@@ -129,14 +138,18 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
                 return;
             }
 
-            if (!playerInRange(player, level, worldPosition) || !playerIsUsingLectern(player))
+            if (!playerInRange(player, level, worldPosition) || !playerIsUsingLectern(player)) {
                 stopUsing(player);
+            }
         }
     }
 
     public void setController(ItemStack newController) {
         if (newController != null) {
-            controllerData = newController.getOrDefault(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemContainerContents.EMPTY);
+            controllerData = newController.getOrDefault(
+                AllDataComponents.LINKED_CONTROLLER_ITEMS,
+                ItemContainerContents.EMPTY
+            );
             AllSoundEvents.CONTROLLER_PUT.playOnServer(level, worldPosition);
         }
     }
@@ -154,8 +167,9 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
 
     public void dropController(BlockState state) {
         Entity entity = level.getEntity(user);
-        if (entity instanceof Player player)
+        if (entity instanceof Player player) {
             stopUsing(player);
+        }
 
         Direction dir = state.getValue(LecternControllerBlock.FACING);
         double x = worldPosition.getX() + 0.5 + 0.25 * dir.getStepX();

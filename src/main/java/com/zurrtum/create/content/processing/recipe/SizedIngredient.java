@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class SizedIngredient {
-    public static Codec<List<SizedIngredient>> LIST_CODEC = Ingredient.CODEC.listOf().xmap(SizedIngredient::of, SizedIngredient::unpack);
+    public static Codec<List<SizedIngredient>> LIST_CODEC = Ingredient.CODEC.listOf()
+        .xmap(SizedIngredient::of, SizedIngredient::unpack);
     public static StreamCodec<RegistryFriendlyByteBuf, SizedIngredient> PACKET_CODEC = StreamCodec.composite(
         Ingredient.CONTENTS_STREAM_CODEC,
         i -> i.ingredient,

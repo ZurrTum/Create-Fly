@@ -106,14 +106,15 @@ public class VisualizationManagerImpl implements VisualizationManager {
                 context -> effects.getStorage().recreateAll(visualizationContext, context.partialTick())
             );
 
-            var update = MapContextPlan.map(this::createVisualFrameContext).to(NestedPlan.of(
-                blockEntities.framePlan(visualizationContext),
-                entities.framePlan(visualizationContext),
-                effects.framePlan(visualizationContext)
-            ));
+            var update = MapContextPlan.map(this::createVisualFrameContext)
+                .to(NestedPlan.of(
+                    blockEntities.framePlan(visualizationContext),
+                    entities.framePlan(visualizationContext),
+                    effects.framePlan(visualizationContext)
+                ));
 
-            framePlan = IfElsePlan.on((RenderContext ctx) -> engine.updateRenderOrigin(ctx.camera())).ifTrue(recreate).ifFalse(update).plan()
-                .then(SimplePlan.of(() -> {
+            framePlan = IfElsePlan.on((RenderContext ctx) -> engine.updateRenderOrigin(ctx.camera())).ifTrue(recreate)
+                .ifFalse(update).plan().then(SimplePlan.of(() -> {
                     if (blockEntities.areGpuLightSectionsDirty() || entities.areGpuLightSectionsDirty() || effects.areGpuLightSectionsDirty()) {
                         var out = new LongOpenHashSet();
                         out.addAll(blockEntities.gpuLightSections());
@@ -194,7 +195,8 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
     public static VisualizationManagerImpl getOrThrow(@Nullable LevelAccessor level) {
         if (!supportsVisualization(level)) {
-            throw new IllegalStateException("Cannot retrieve visualization manager when visualization is not supported by level '" + level + "'!");
+            throw new IllegalStateException(
+                "Cannot retrieve visualization manager when visualization is not supported by level '" + level + "'!");
         }
 
         return MANAGERS.get(level);
@@ -276,7 +278,10 @@ public class VisualizationManagerImpl implements VisualizationManager {
         lateInit().engine.render(context);
     }
 
-    private void renderCrumbling(RenderContext context, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress) {
+    private void renderCrumbling(
+        RenderContext context,
+        Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress
+    ) {
         if (destructionProgress.isEmpty()) {
             return;
         }
@@ -312,7 +317,11 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
             var maxDestruction = set.last();
 
-            crumblingBlocks.add(new CrumblingBlockImpl(maxDestruction.getPos(), maxDestruction.getProgress(), instances));
+            crumblingBlocks.add(new CrumblingBlockImpl(
+                maxDestruction.getPos(),
+                maxDestruction.getProgress(),
+                instances
+            ));
         }
 
         if (!crumblingBlocks.isEmpty()) {
@@ -372,13 +381,14 @@ public class VisualizationManagerImpl implements VisualizationManager {
         }
 
         @Override
-        public void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress) {
+        public void beforeCrumbling(
+            RenderContext ctx,
+            Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress
+        ) {
             renderCrumbling(ctx, destructionProgress);
         }
     }
 
-    private record CrumblingBlockImpl(
-        BlockPos pos, int progress, List<Instance> instances
-    ) implements CrumblingBlock {
+    private record CrumblingBlockImpl(BlockPos pos, int progress, List<Instance> instances) implements CrumblingBlock {
     }
 }

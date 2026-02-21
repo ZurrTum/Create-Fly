@@ -5,14 +5,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation.DiscoveredLocation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.resources.ResourceKey;
@@ -22,6 +14,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public interface ITrackBlock {
 
@@ -47,13 +46,19 @@ public interface ITrackBlock {
         return isSlope(world, pos, state) ? .5 : 0;
     }
 
-    static Collection<DiscoveredLocation> walkConnectedTracks(BlockGetter worldIn, TrackNodeLocation location, boolean linear) {
-        BlockGetter world = location != null && worldIn instanceof ServerLevel sl ? sl.getServer().getLevel(location.dimension) : worldIn;
+    static Collection<DiscoveredLocation> walkConnectedTracks(
+        BlockGetter worldIn,
+        TrackNodeLocation location,
+        boolean linear
+    ) {
+        BlockGetter world = location != null && worldIn instanceof ServerLevel sl ? sl.getServer()
+            .getLevel(location.dimension) : worldIn;
         List<DiscoveredLocation> list = new ArrayList<>();
         for (BlockPos blockPos : location.allAdjacent()) {
             BlockState blockState = world.getBlockState(blockPos);
-            if (blockState.getBlock() instanceof ITrackBlock track)
+            if (blockState.getBlock() instanceof ITrackBlock track) {
                 list.addAll(track.getConnected(world, blockPos, blockState, linear, location));
+            }
         }
         return list;
     }
@@ -65,7 +70,8 @@ public interface ITrackBlock {
         boolean linear,
         @Nullable TrackNodeLocation connectedTo
     ) {
-        BlockGetter world = connectedTo != null && worldIn instanceof ServerLevel sl ? sl.getServer().getLevel(connectedTo.dimension) : worldIn;
+        BlockGetter world = connectedTo != null && worldIn instanceof ServerLevel sl ? sl.getServer()
+            .getLevel(connectedTo.dimension) : worldIn;
         Vec3 center = Vec3.atBottomCenterOf(pos).add(0, getElevationAtCenter(world, pos, state), 0);
         List<DiscoveredLocation> list = new ArrayList<>();
         TrackShape shape = state.getValue(TrackBlock.SHAPE);
@@ -97,8 +103,9 @@ public interface ITrackBlock {
     }
 
     static TrackMaterial getMaterialSimple(BlockGetter world, Vec3 pos, TrackMaterial defaultMaterial) {
-        if (defaultMaterial == null)
+        if (defaultMaterial == null) {
             defaultMaterial = AllTrackMaterials.ANDESITE;
+        }
         if (world != null) {
             Block block = world.getBlockState(BlockPos.containing(pos)).getBlock();
             if (block instanceof ITrackBlock track) {
@@ -121,16 +128,16 @@ public interface ITrackBlock {
     ) {
 
         Vec3 firstOffset = offsetFactory.apply(0.5d, true);
-        DiscoveredLocation firstLocation = new DiscoveredLocation(dimensionFactory.apply(true), firstOffset).viaTurn(viaTurn)
-            .materialA(materialFactory.apply(true, offsetFactory.apply(0.0d, true)))
-            .materialB(materialFactory.apply(true, offsetFactory.apply(1.0d, true))).withNormal(normalFactory.apply(true)).withDirection(axis)
-            .withYOffset(yOffsetFactory.apply(firstOffset));
+        DiscoveredLocation firstLocation = new DiscoveredLocation(dimensionFactory.apply(true), firstOffset).viaTurn(
+                viaTurn).materialA(materialFactory.apply(true, offsetFactory.apply(0.0d, true)))
+            .materialB(materialFactory.apply(true, offsetFactory.apply(1.0d, true)))
+            .withNormal(normalFactory.apply(true)).withDirection(axis).withYOffset(yOffsetFactory.apply(firstOffset));
 
         Vec3 secondOffset = offsetFactory.apply(0.5d, false);
-        DiscoveredLocation secondLocation = new DiscoveredLocation(dimensionFactory.apply(false), secondOffset).viaTurn(viaTurn)
-            .materialA(materialFactory.apply(false, offsetFactory.apply(0.0d, false)))
-            .materialB(materialFactory.apply(false, offsetFactory.apply(1.0d, false))).withNormal(normalFactory.apply(false)).withDirection(axis)
-            .withYOffset(yOffsetFactory.apply(secondOffset));
+        DiscoveredLocation secondLocation = new DiscoveredLocation(dimensionFactory.apply(false), secondOffset).viaTurn(
+                viaTurn).materialA(materialFactory.apply(false, offsetFactory.apply(0.0d, false)))
+            .materialB(materialFactory.apply(false, offsetFactory.apply(1.0d, false)))
+            .withNormal(normalFactory.apply(false)).withDirection(axis).withYOffset(yOffsetFactory.apply(secondOffset));
 
         if (!firstLocation.dimension.equals(secondLocation.dimension)) {
             firstLocation.forceNode();
@@ -145,38 +152,52 @@ public interface ITrackBlock {
             boolean equalsSecond = secondLocation.equals(fromEnd);
 
             // not reachable from this end
-            if (!equalsFirst && !equalsSecond)
+            if (!equalsFirst && !equalsSecond) {
                 return;
+            }
 
-            if (equalsFirst)
+            if (equalsFirst) {
                 skipFirst = true;
-            if (equalsSecond)
+            }
+            if (equalsSecond) {
                 skipSecond = true;
+            }
         }
 
-        if (!skipFirst)
+        if (!skipFirst) {
             list.add(firstLocation);
-        if (!skipSecond)
+        }
+        if (!skipSecond) {
             list.add(secondLocation);
+        }
     }
 
     default boolean isSlope(BlockGetter world, BlockPos pos, BlockState state) {
         return getTrackAxes(world, pos, state).get(0).y != 0;
     }
 
-    default Pair<Vec3, AxisDirection> getNearestTrackAxis(BlockGetter world, BlockPos pos, BlockState state, Vec3 lookVec) {
+    default Pair<Vec3, AxisDirection> getNearestTrackAxis(
+        BlockGetter world,
+        BlockPos pos,
+        BlockState state,
+        Vec3 lookVec
+    ) {
         Vec3 best = null;
         double bestDiff = Double.MAX_VALUE;
         for (Vec3 vec3 : getTrackAxes(world, pos, state)) {
             for (int opposite : Iterate.positiveAndNegative) {
                 double distanceTo = vec3.normalize().distanceTo(lookVec.scale(opposite));
-                if (distanceTo > bestDiff)
+                if (distanceTo > bestDiff) {
                     continue;
+                }
                 bestDiff = distanceTo;
                 best = vec3;
             }
         }
-        return Pair.of(best, lookVec.dot(best.multiply(1, 0, 1).normalize()) < 0 ? AxisDirection.POSITIVE : AxisDirection.NEGATIVE);
+        return Pair.of(
+            best,
+            lookVec.dot(best.multiply(1, 0, 1).normalize()) < 0 ? AxisDirection.POSITIVE : AxisDirection.NEGATIVE
+        );
     }
 
     TrackMaterial getMaterial();

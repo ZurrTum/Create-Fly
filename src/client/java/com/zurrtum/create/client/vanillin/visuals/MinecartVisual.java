@@ -138,7 +138,11 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
 
     private void updatePosition(T entity, double posX, double posY, double posZ) {
         var renderOrigin = renderOrigin();
-        stack.translate((float) (posX - renderOrigin.getX()), (float) (posY - renderOrigin.getY()), (float) (posZ - renderOrigin.getZ()));
+        stack.translate(
+            (float) (posX - renderOrigin.getX()),
+            (float) (posY - renderOrigin.getY()),
+            (float) (posZ - renderOrigin.getZ())
+        );
         long randomBits = entity.getId() * 493286711L;
         randomBits = randomBits * randomBits * 4392167121L + randomBits * 98761L;
         float nudgeX = (((float) (randomBits >> 16 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
@@ -156,7 +160,11 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
         if (vec != null) {
             Vec3 offset1 = Objects.requireNonNullElse(behavior.getPosOffs(posX, posY, posZ, 0.3F), vec);
             Vec3 offset2 = Objects.requireNonNullElse(behavior.getPosOffs(posX, posY, posZ, -0.3F), vec);
-            stack.translate((float) (vec.x - posX), (float) ((offset1.y + offset2.y) / 2.0D - posY), (float) (vec.z - posZ));
+            stack.translate(
+                (float) (vec.x - posX),
+                (float) ((offset1.y + offset2.y) / 2.0D - posY),
+                (float) (vec.z - posZ)
+            );
             vec = offset2.add(-offset1.x, -offset1.y, -offset1.z);
             vec = vec.length() != 0.0D ? vec.normalize() : null;
         }

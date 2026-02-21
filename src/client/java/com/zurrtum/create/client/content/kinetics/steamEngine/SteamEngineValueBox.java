@@ -17,19 +17,24 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
     @Override
     protected boolean isSideActive(BlockState state, Direction side) {
         Direction engineFacing = SteamEngineBlock.getFacing(state);
-        if (engineFacing.getAxis() == side.getAxis())
+        if (engineFacing.getAxis() == side.getAxis()) {
             return false;
+        }
 
         float roll = 0;
-        for (Pointing p : Pointing.values())
-            if (p.getCombinedDirection(engineFacing) == side)
+        for (Pointing p : Pointing.values()) {
+            if (p.getCombinedDirection(engineFacing) == side) {
                 roll = p.getXRotation();
-        if (engineFacing == Direction.UP)
+            }
+        }
+        if (engineFacing == Direction.UP) {
             roll += 180;
+        }
 
         boolean recessed = roll % 180 == 0;
-        if (engineFacing.getAxis() == Axis.Y)
+        if (engineFacing.getAxis() == Axis.Y) {
             recessed ^= state.getValue(SteamEngineBlock.FACING).getAxis() == Axis.X;
+        }
 
         return !recessed;
     }
@@ -40,11 +45,14 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
         Direction engineFacing = SteamEngineBlock.getFacing(state);
 
         float roll = 0;
-        for (Pointing p : Pointing.values())
-            if (p.getCombinedDirection(engineFacing) == side)
+        for (Pointing p : Pointing.values()) {
+            if (p.getCombinedDirection(engineFacing) == side) {
                 roll = p.getXRotation();
-        if (engineFacing == Direction.UP)
+            }
+        }
+        if (engineFacing == Direction.UP) {
             roll += 180;
+        }
 
         float horizontalAngle = AngleHelper.horizontalAngle(engineFacing);
         float verticalAngle = AngleHelper.verticalAngle(engineFacing);
@@ -67,12 +75,15 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
         }
 
         float roll = 0;
-        for (Pointing p : Pointing.values())
-            if (p.getCombinedDirection(facing) == getSide())
+        for (Pointing p : Pointing.values()) {
+            if (p.getCombinedDirection(facing) == getSide()) {
                 roll = p.getXRotation();
+            }
+        }
 
         float yRot = AngleHelper.horizontalAngle(facing) + (facing == Direction.DOWN ? 180 : 0);
-        TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(facing == Direction.DOWN ? -90 : 90).rotateYDegrees(roll);
+        TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(facing == Direction.DOWN ? -90 : 90)
+            .rotateYDegrees(roll);
     }
 
     @Override

@@ -12,10 +12,9 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
+import net.minecraft.core.Direction;
 
 import java.util.function.Consumer;
-
-import net.minecraft.core.Direction;
 
 public class MixerVisual extends SingleAxisRotatingVisual<MechanicalMixerBlockEntity> implements SimpleDynamicVisual {
 
@@ -27,11 +26,17 @@ public class MixerVisual extends SingleAxisRotatingVisual<MechanicalMixerBlockEn
         super(context, blockEntity, partialTick, Models.partial(AllPartialModels.SHAFTLESS_COGWHEEL));
         this.mixer = blockEntity;
 
-        mixerHead = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.MECHANICAL_MIXER_HEAD)).createInstance();
+        mixerHead = instancerProvider().instancer(
+            AllInstanceTypes.ROTATING,
+            Models.partial(AllPartialModels.MECHANICAL_MIXER_HEAD)
+        ).createInstance();
 
         mixerHead.setRotationAxis(Direction.Axis.Y);
 
-        mixerPole = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(AllPartialModels.MECHANICAL_MIXER_POLE)).createInstance();
+        mixerPole = instancerProvider().instancer(
+            InstanceTypes.ORIENTED,
+            Models.partial(AllPartialModels.MECHANICAL_MIXER_POLE)
+        ).createInstance();
 
         animate(partialTick);
     }
@@ -51,8 +56,8 @@ public class MixerVisual extends SingleAxisRotatingVisual<MechanicalMixerBlockEn
     private void transformHead(float renderedHeadOffset, float pt) {
         float speed = mixer.getRenderedHeadRotationSpeed(pt);
 
-        mixerHead.setPosition(getVisualPosition()).nudge(0, -renderedHeadOffset, 0).setRotationalSpeed(speed * 2 * RotatingInstance.SPEED_MULTIPLIER)
-            .setChanged();
+        mixerHead.setPosition(getVisualPosition()).nudge(0, -renderedHeadOffset, 0)
+            .setRotationalSpeed(speed * 2 * RotatingInstance.SPEED_MULTIPLIER).setChanged();
     }
 
     private void transformPole(float renderedHeadOffset) {

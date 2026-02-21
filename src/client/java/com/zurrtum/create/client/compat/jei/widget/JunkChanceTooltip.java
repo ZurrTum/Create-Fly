@@ -11,8 +11,10 @@ public record JunkChanceTooltip(Component chance) implements IRecipeSlotRichTool
     private static final Component JUNK = CreateLang.translateDirect("recipe.assembly.junk");
 
     public JunkChanceTooltip(float chance) {
-        this(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : chance > 0.99 ? ">99" : Math.round(chance * 100))
-            .withStyle(ChatFormatting.GOLD));
+        this(CreateLang.translateDirect(
+            "recipe.processing.chance",
+            chance < 0.01 ? "<1" : chance > 0.99 ? ">99" : Math.round(chance * 100)
+        ).withStyle(ChatFormatting.GOLD));
     }
 
     @Override

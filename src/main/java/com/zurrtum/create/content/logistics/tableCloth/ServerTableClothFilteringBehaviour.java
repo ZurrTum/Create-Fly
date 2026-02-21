@@ -50,8 +50,9 @@ public class ServerTableClothFilteringBehaviour extends ServerFilteringBehaviour
 
     @Override
     public void setValueSettings(Player player, ValueSettings settings, boolean ctrlDown) {
-        if (getValueSettings().equals(settings))
+        if (getValueSettings().equals(settings)) {
             return;
+        }
         count = Math.max(1, settings.value());
         blockEntity.setChanged();
         blockEntity.sendData();

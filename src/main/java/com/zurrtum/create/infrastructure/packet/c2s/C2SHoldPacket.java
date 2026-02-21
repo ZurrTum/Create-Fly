@@ -13,9 +13,8 @@ import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record C2SHoldPacket(
-    PacketType<Packet<ServerGamePacketListener>> id, Consumer<ServerGamePacketListenerImpl> consumer
-) implements Packet<ServerGamePacketListener> {
+public record C2SHoldPacket(PacketType<Packet<ServerGamePacketListener>> id,
+                            Consumer<ServerGamePacketListenerImpl> consumer) implements Packet<ServerGamePacketListener> {
     public C2SHoldPacket(String id, Consumer<ServerGamePacketListenerImpl> callback) {
         this(new PacketType<>(PacketFlow.SERVERBOUND, Identifier.fromNamespaceAndPath(MOD_ID, id)), callback);
     }

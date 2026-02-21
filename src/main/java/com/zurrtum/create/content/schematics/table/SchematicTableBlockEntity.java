@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.schematics.table;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
@@ -96,8 +96,9 @@ public class SchematicTableBlockEntity extends SmartBlockEntity implements MenuP
     protected void read(ValueInput view, boolean clientPacket) {
         inventory.read(view);
         super.read(view, clientPacket);
-        if (!clientPacket)
+        if (!clientPacket) {
             return;
+        }
         if (view.getBooleanOr("Uploading", false)) {
             isUploading = true;
             uploadingSchematic = view.getStringOr("Schematic", "");
@@ -165,7 +166,11 @@ public class SchematicTableBlockEntity extends SmartBlockEntity implements MenuP
         if (level == null || level.getBlockEntity(worldPosition) != this) {
             return false;
         }
-        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 64.0D;
+        return player.distanceToSqr(
+            worldPosition.getX() + 0.5D,
+            worldPosition.getY() + 0.5D,
+            worldPosition.getZ() + 0.5D
+        ) <= 64.0D;
     }
 
     @Override

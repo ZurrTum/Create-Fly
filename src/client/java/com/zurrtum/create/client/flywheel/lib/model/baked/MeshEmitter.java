@@ -27,7 +27,11 @@ class MeshEmitter {
 
     private int currentIndex = 0;
 
-    MeshEmitter(MeshEmitterManager<?> manager, ByteBufferBuilderStack byteBufferBuilderStack, ChunkSectionLayer renderType) {
+    MeshEmitter(
+        MeshEmitterManager<?> manager,
+        ByteBufferBuilderStack byteBufferBuilderStack,
+        ChunkSectionLayer renderType
+    ) {
         this.manager = manager;
         this.byteBufferBuilderStack = byteBufferBuilderStack;
         this.renderType = renderType;
@@ -47,7 +51,10 @@ class MeshEmitter {
 
             if (renderedBuffer != null) {
                 Material material = materials[index];
-                Mesh mesh = MeshHelper.blockVerticesToMesh(renderedBuffer, "source=ModelBuilder" + ",material=" + material);
+                Mesh mesh = MeshHelper.blockVerticesToMesh(
+                    renderedBuffer,
+                    "source=ModelBuilder" + ",material=" + material
+                );
                 out.add(new Model.ConfiguredMesh(material, mesh));
                 renderedBuffer.close();
             }
@@ -89,7 +96,11 @@ class MeshEmitter {
 
         // Trust that the RenderType mode/format don't change out from underneath us.
         RenderPipeline pipeline = renderType.pipeline();
-        BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder, pipeline.getVertexFormatMode(), pipeline.getVertexFormat());
+        BufferBuilder bufferBuilder = new BufferBuilder(
+            byteBufferBuilder,
+            pipeline.getVertexFormatMode(),
+            pipeline.getVertexFormat()
+        );
 
         // currentIndex == numBufferBuildersPopulated here.
         materials[currentIndex] = material;

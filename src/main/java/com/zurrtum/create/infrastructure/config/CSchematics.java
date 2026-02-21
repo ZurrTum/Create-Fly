@@ -4,15 +4,31 @@ import com.zurrtum.create.catnip.config.ConfigBase;
 
 public class CSchematics extends ConfigBase {
 
-    public final ConfigBool creativePrintIncludesAir = b(false, "creativePrintIncludesAir", Comments.creativePrintIncludesAir);
+    public final ConfigBool creativePrintIncludesAir = b(
+        false,
+        "creativePrintIncludesAir",
+        Comments.creativePrintIncludesAir
+    );
     public final ConfigInt maxSchematics = i(10, 1, "maxSchematics", Comments.maxSchematics);
     public final ConfigInt maxTotalSchematicSize = i(256, 16, "maxTotalSchematicSize", Comments.kb, Comments.maxSize);
-    public final ConfigInt maxSchematicPacketSize = i(1024, 256, 32767, "maxSchematicPacketSize", Comments.b, Comments.maxPacketSize);
+    public final ConfigInt maxSchematicPacketSize = i(
+        1024,
+        256,
+        32767,
+        "maxSchematicPacketSize",
+        Comments.b,
+        Comments.maxPacketSize
+    );
     public final ConfigInt schematicIdleTimeout = i(600, 100, "schematicIdleTimeout", Comments.idleTimeout);
 
     public final ConfigGroup schematicannon = group(0, "schematicannon", "Schematicannon");
     public final ConfigInt schematicannonDelay = i(10, 1, "schematicannonDelay", Comments.delay);
-    public final ConfigInt schematicannonShotsPerGunpowder = i(400, 1, "schematicannonShotsPerGunpowder", Comments.schematicannonShotsPerGunpowder);
+    public final ConfigInt schematicannonShotsPerGunpowder = i(
+        400,
+        1,
+        "schematicannonShotsPerGunpowder",
+        Comments.schematicannonShotsPerGunpowder
+    );
 
     @Override
     public String getName() {

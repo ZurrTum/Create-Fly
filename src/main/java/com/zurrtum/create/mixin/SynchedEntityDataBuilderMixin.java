@@ -23,7 +23,12 @@ public class SynchedEntityDataBuilderMixin {
     private SynchedEntityData.DataItem<?>[] itemsById;
 
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ClassTreeIdRegistry;getCount(Ljava/lang/Class;)I"))
-    private int getSize(ClassTreeIdRegistry map, Class<?> type, Operation<Integer> original, @Share("data") LocalRef<SynchedData> data) {
+    private int getSize(
+        ClassTreeIdRegistry map,
+        Class<?> type,
+        Operation<Integer> original,
+        @Share("data") LocalRef<SynchedData> data
+    ) {
         SynchedData synchedData = AllSynchedDatas.get(type);
         data.set(synchedData);
         return synchedData.preparse(map, original::call);

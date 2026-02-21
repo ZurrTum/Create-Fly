@@ -25,9 +25,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-public record CompactingRecipe(
-    List<ProcessingOutput> results, HeatCondition heat, List<FluidIngredient> fluidIngredients, List<SizedIngredient> ingredients
-) implements BasinRecipe {
+public record CompactingRecipe(List<ProcessingOutput> results, HeatCondition heat,
+                               List<FluidIngredient> fluidIngredients,
+                               List<SizedIngredient> ingredients) implements BasinRecipe {
     @Override
     public int getIngredientSize() {
         return fluidIngredients.size() + ingredients.size();
@@ -90,9 +90,12 @@ public record CompactingRecipe(
     public static class Serializer implements RecipeSerializer<CompactingRecipe> {
         public static final MapCodec<CompactingRecipe> CODEC = RecordCodecBuilder.mapCodec((Instance<CompactingRecipe> instance) -> instance.group(
             ProcessingOutput.CODEC.listOf(1, 4).fieldOf("results").forGetter(CompactingRecipe::results),
-            HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(CompactingRecipe::heat),
-            FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(CompactingRecipe::fluidIngredients),
-            SizedIngredient.LIST_CODEC.optionalFieldOf("ingredients", List.of()).forGetter(CompactingRecipe::ingredients)
+            HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE)
+                .forGetter(CompactingRecipe::heat),
+            FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of())
+                .forGetter(CompactingRecipe::fluidIngredients),
+            SizedIngredient.LIST_CODEC.optionalFieldOf("ingredients", List.of())
+                .forGetter(CompactingRecipe::ingredients)
         ).apply(instance, CompactingRecipe::new)).validate(recipe -> {
             if (recipe.fluidIngredients.isEmpty() && recipe.ingredients.isEmpty()) {
                 return DataResult.error(() -> "CompactingRecipe must have a ingredient or a fluid ingredient");

@@ -15,9 +15,8 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 
-public record SchematicSyncPacket(
-    int slot, boolean deployed, BlockPos anchor, Rotation rotation, Mirror mirror
-) implements Packet<ServerGamePacketListener> {
+public record SchematicSyncPacket(int slot, boolean deployed, BlockPos anchor, Rotation rotation,
+                                  Mirror mirror) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, SchematicSyncPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT,
         SchematicSyncPacket::slot,

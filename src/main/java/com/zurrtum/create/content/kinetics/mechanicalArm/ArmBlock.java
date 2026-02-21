@@ -49,7 +49,12 @@ public class ArmBlock extends KineticBlock implements IBE<ArmBlockEntity>, ICogW
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState state,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return state.getValue(CEILING) ? AllShapes.MECHANICAL_ARM_CEILING : AllShapes.MECHANICAL_ARM;
     }
 
@@ -99,25 +104,29 @@ public class ArmBlock extends KineticBlock implements IBE<ArmBlockEntity>, ICogW
         if (stack.is(AllItems.GOGGLES)) {
             InteractionResult gogglesResult = onBlockEntityUseItemOn(
                 level, pos, ate -> {
-                    if (ate.goggles)
+                    if (ate.goggles) {
                         return InteractionResult.TRY_WITH_EMPTY_HAND;
+                    }
                     ate.goggles = true;
                     ate.notifyUpdate();
                     return InteractionResult.SUCCESS;
                 }
             );
-            if (gogglesResult.consumesAction())
+            if (gogglesResult.consumesAction()) {
                 return gogglesResult;
+            }
         }
 
         MutableBoolean success = new MutableBoolean(false);
         withBlockEntityDo(
             level, pos, be -> {
-                if (be.heldItem.isEmpty())
+                if (be.heldItem.isEmpty()) {
                     return;
+                }
                 success.setTrue();
-                if (level.isClientSide())
+                if (level.isClientSide()) {
                     return;
+                }
                 player.getInventory().placeItemBackInInventory(be.heldItem);
                 be.heldItem = ItemStack.EMPTY;
                 be.phase = Phase.SEARCH_INPUTS;

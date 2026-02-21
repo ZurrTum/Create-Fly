@@ -7,9 +7,6 @@ import com.zurrtum.create.content.equipment.symmetryWand.mirror.CrossPlaneMirror
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.EmptyMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.PlaneMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.TriplePlaneMirror;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,6 +17,8 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public abstract class SymmetryMirror {
     public static final String EMPTY = "empty";
@@ -104,7 +103,10 @@ public abstract class SymmetryMirror {
         positions.addAll(result);
     }
 
-    public abstract Map<BlockPos, Pair<Direction, BlockState>> process(BlockPos position, Pair<Direction, BlockState> block);
+    public abstract Map<BlockPos, Pair<Direction, BlockState>> process(
+        BlockPos position,
+        Pair<Direction, BlockState> block
+    );
 
     public abstract Set<BlockPos> process(BlockPos position);
 
@@ -158,12 +160,20 @@ public abstract class SymmetryMirror {
 
     protected BlockPos flipD2(BlockPos position) {
         BlockPos diff = getIDiff(position);
-        return new BlockPos(position.getX() - diff.getX() + diff.getZ(), position.getY(), position.getZ() - diff.getZ() + diff.getX());
+        return new BlockPos(
+            position.getX() - diff.getX() + diff.getZ(),
+            position.getY(),
+            position.getZ() - diff.getZ() + diff.getX()
+        );
     }
 
     protected BlockPos flipD1(BlockPos position) {
         BlockPos diff = getIDiff(position);
-        return new BlockPos(position.getX() - diff.getX() - diff.getZ(), position.getY(), position.getZ() - diff.getZ() - diff.getX());
+        return new BlockPos(
+            position.getX() - diff.getX() - diff.getZ(),
+            position.getY(),
+            position.getZ() - diff.getZ() - diff.getX()
+        );
     }
 
     protected Direction flipZ(Direction side) {
@@ -252,13 +262,14 @@ public abstract class SymmetryMirror {
 
     @Override
     public final boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof SymmetryMirror that))
+        }
+        if (!(o instanceof SymmetryMirror that)) {
             return false;
+        }
 
-        return getOrientationIndex() == that.getOrientationIndex() && enable == that.enable && Objects.equals(
-            getPosition(),
+        return getOrientationIndex() == that.getOrientationIndex() && enable == that.enable && Objects.equals(getPosition(),
             that.getPosition()
         ) && Objects.equals(getOrientation(), that.getOrientation());
     }

@@ -49,7 +49,15 @@ public class MillingCategory extends CreateCategory<MillingDisplay> {
         List<ProcessingOutput> results = display.outputs();
         int outputSize = results.size();
         if (outputSize == 1) {
-            addOutputData(results.getFirst(), bounds.x + 144, bounds.y + 32, outputs, outputIngredients, chances, chanceIngredients);
+            addOutputData(
+                results.getFirst(),
+                bounds.x + 144,
+                bounds.y + 32,
+                outputs,
+                outputIngredients,
+                chances,
+                chanceIngredients
+            );
         } else {
             for (int i = 0; i < outputSize; i++) {
                 int xOffset = i % 2 == 0 ? 0 : 19;

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.infrastructure.ponder.scenes.highLogistics;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.client.foundation.ponder.CreateSceneBuilder;
 import com.zurrtum.create.client.ponder.api.PonderPalette;
@@ -14,7 +15,6 @@ import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -57,11 +57,12 @@ public class PackagerScenes {
         scene.overlay().showControls(util.vector().of(2.5, 3, 2.5), Pointing.DOWN, 40).withItem(dirt);
         scene.idle(20);
 
-        scene.overlay().showText(80).text("Attach packagers to the inventory they should target").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().of(2, 2.5, 2.5));
+        scene.overlay().showText(80).text("Attach packagers to the inventory they should target").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().of(2, 2.5, 2.5));
         scene.idle(60);
 
-        ElementLink<WorldSectionElement> leverL = scene.world().showIndependentSection(util.select().position(lever), Direction.DOWN);
+        ElementLink<WorldSectionElement> leverL = scene.world()
+            .showIndependentSection(util.select().position(lever), Direction.DOWN);
         scene.world().moveSection(leverL, util.vector().of(-2, -1, 0), 0);
         scene.idle(30);
 
@@ -74,8 +75,9 @@ public class PackagerScenes {
         PonderHilo.packagerCreate(scene, packager1, box);
         scene.idle(30);
 
-        scene.overlay().showText(80).text("Given redstone power, it will pack items from the inventory into a package").attachKeyFrame()
-            .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 1, 2), Direction.UP));
+        scene.overlay().showText(80).text("Given redstone power, it will pack items from the inventory into a package")
+            .attachKeyFrame().placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 2), Direction.UP));
         scene.idle(30);
 
         scene.idle(80);
@@ -98,8 +100,8 @@ public class PackagerScenes {
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 16f);
 
-        scene.overlay().showText(70).text("These can be picked up and transported like any other item").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(util.grid().at(3, 2, 2), Direction.EAST));
+        scene.overlay().showText(70).text("These can be picked up and transported like any other item").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 2, 2), Direction.EAST));
 
         scene.idle(80);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 16f);
@@ -122,7 +124,8 @@ public class PackagerScenes {
         scene.overlay().showControls(util.vector().topOf(util.grid().at(1, 2, 4)), Pointing.DOWN, 40).withItem(dirt);
         scene.idle(20);
 
-        scene.overlay().showText(90).text("Packages inserted will be destroyed, unpacking the contents into the inventory").attachKeyFrame()
+        scene.overlay().showText(90)
+            .text("Packages inserted will be destroyed, unpacking the contents into the inventory").attachKeyFrame()
             .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(1, 2, 3), Direction.WEST));
         scene.idle(100);
 
@@ -135,11 +138,13 @@ public class PackagerScenes {
         PonderHilo.packagerClear(scene, packager1);
         scene.idle(30);
 
-        scene.overlay().showText(60).text("Full").colored(PonderPalette.RED).placeNearTarget().pointAt(util.vector().topOf(util.grid().at(1, 2, 4)));
+        scene.overlay().showText(60).text("Full").colored(PonderPalette.RED).placeNearTarget()
+            .pointAt(util.vector().topOf(util.grid().at(1, 2, 4)));
         scene.idle(80);
 
         scene.overlay().showOutlineWithText(util.select().fromTo(1, 2, 3, 1, 2, 4), 90)
-            .text("Packagers will not accept packages they cannot fully unpack").colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
+            .text("Packagers will not accept packages they cannot fully unpack").colored(PonderPalette.RED)
+            .placeNearTarget().attachKeyFrame()
             .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 3), Direction.WEST));
         scene.idle(39);
 
@@ -214,8 +219,9 @@ public class PackagerScenes {
             .pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.NORTH));
         scene.idle(50);
 
-        scene.overlay().showText(100).text("Created packages will carry the written lines of text as their address").attachKeyFrame()
-            .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.NORTH).add(-0.5, 0, 0));
+        scene.overlay().showText(100).text("Created packages will carry the written lines of text as their address")
+            .attachKeyFrame().placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.NORTH).add(-0.5, 0, 0));
         scene.idle(120);
 
         scene.world().hideIndependentSection(chestL, Direction.NORTH);
@@ -234,13 +240,14 @@ public class PackagerScenes {
         scene.rotateCameraY(-15);
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().of(4, 2.825, 4.5), Pointing.DOWN, 60).withItem(AllItems.PACKAGE_FILTER.getDefaultInstance());
+        scene.overlay().showControls(util.vector().of(4, 2.825, 4.5), Pointing.DOWN, 60)
+            .withItem(AllItems.PACKAGE_FILTER.getDefaultInstance());
         scene.idle(10);
         scene.overlay().showFilterSlotInput(util.vector().of(4.1, 2.825, 4.5), 50);
         scene.idle(30);
 
-        scene.overlay().showText(70).text("Package filters route packages based on their address").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().of(4, 2.825, 4.5));
+        scene.overlay().showText(70).text("Package filters route packages based on their address").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().of(4, 2.825, 4.5));
         scene.idle(70);
 
         ItemStack warehouseBox = PackageStyles.getDefaultBox().copy();
@@ -254,7 +261,8 @@ public class PackagerScenes {
 
         scene.overlay().showText(50).text("→ Warehouse").colored(PonderPalette.OUTPUT).placeNearTarget()
             .pointAt(util.vector().blockSurface(util.grid().at(7, 2, 4), Direction.WEST));
-        scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Factory").placeNearTarget().pointAt(util.vector().of(4, 2.825, 4.5));
+        scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Factory").placeNearTarget()
+            .pointAt(util.vector().of(4, 2.825, 4.5));
         scene.idle(60);
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 32f);
@@ -267,7 +275,8 @@ public class PackagerScenes {
 
         scene.overlay().showText(50).text("→ Factory").colored(PonderPalette.OUTPUT).placeNearTarget()
             .pointAt(util.vector().blockSurface(util.grid().at(7, 2, 4), Direction.WEST));
-        scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Factory").placeNearTarget().pointAt(util.vector().of(4, 2.825, 4.5));
+        scene.overlay().showText(50).colored(PonderPalette.BLUE).text("Factory").placeNearTarget()
+            .pointAt(util.vector().of(4, 2.825, 4.5));
         scene.idle(60);
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 32f);
@@ -298,14 +307,18 @@ public class PackagerScenes {
             sawPos, SawBlockEntity.class, be -> {
                 ProcessingInventory inventory = be.inventory;
                 inventory.setItem(1, ItemStack.EMPTY);
-                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getLevel(), util.grid().at(1, 1, 4), DirectBeltInputBehaviour.TYPE);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(
+                    be.getLevel(),
+                    util.grid().at(1, 1, 4),
+                    DirectBeltInputBehaviour.TYPE
+                );
                 behaviour.handleInsertion(iron, Direction.WEST, false);
             }
         );
         scene.idle(19);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 32f);
-        scene.overlay().showText(100).text("For compactness, mechanical saws can unpack straight onto a belt").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(util.grid().at(2, 1, 4)));
+        scene.overlay().showText(100).text("For compactness, mechanical saws can unpack straight onto a belt")
+            .attachKeyFrame().placeNearTarget().pointAt(util.vector().topOf(util.grid().at(2, 1, 4)));
         scene.idle(110);
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 32f);
@@ -329,8 +342,9 @@ public class PackagerScenes {
         scene.world().showSectionAndMerge(frogport, Direction.DOWN, extrasL);
         scene.idle(20);
 
-        scene.overlay().showText(100).text("Aside from filters, Frogports and Postboxes have package routing abilities").attachKeyFrame()
-            .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.NORTH));
+        scene.overlay().showText(100).text("Aside from filters, Frogports and Postboxes have package routing abilities")
+            .attachKeyFrame().placeNearTarget()
+            .pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.NORTH));
         scene.idle(110);
 
         scene.overlay().showText(80).text("Inspect them to find out more about their behaviour").placeNearTarget()

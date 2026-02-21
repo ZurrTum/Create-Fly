@@ -72,8 +72,7 @@ public final class FluidInteractionRegistry {
     static {
         // Lava + Water = Obsidian (Source Lava) / Cobblestone (Flowing Lava)
         addInteraction(
-            Fluids.LAVA,
-            new InteractionInformation(
+            Fluids.LAVA, new InteractionInformation(
                 Fluids.WATER,
                 fluidState -> fluidState.isSource() ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.COBBLESTONE.defaultBlockState()
             )
@@ -82,8 +81,9 @@ public final class FluidInteractionRegistry {
         // Lava + Soul Soil (Below) + Blue Ice = Basalt
         addInteraction(
             Fluids.LAVA, new InteractionInformation(
-                (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below()).is(Blocks.SOUL_SOIL) && level.getBlockState(
-                    relativePos).is(Blocks.BLUE_ICE), Blocks.BASALT.defaultBlockState()
+                (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below())
+                    .is(Blocks.SOUL_SOIL) && level.getBlockState(relativePos).is(Blocks.BLUE_ICE),
+                Blocks.BASALT.defaultBlockState()
             )
         );
         addInteraction(

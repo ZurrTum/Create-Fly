@@ -1,12 +1,11 @@
 package com.zurrtum.create.client.ponder.api.scene;
 
 import com.zurrtum.create.client.ponder.api.element.*;
-
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Supplier;
 
 public interface SpecialInstructions {
     ElementLink<ParrotElement> createBirb(Vec3 location, Supplier<? extends ParrotPose> pose);
@@ -17,7 +16,13 @@ public interface SpecialInstructions {
 
     void movePointOfInterest(BlockPos location);
 
-    void rotateParrot(ElementLink<ParrotElement> link, double xRotation, double yRotation, double zRotation, int duration);
+    void rotateParrot(
+        ElementLink<ParrotElement> link,
+        double xRotation,
+        double yRotation,
+        double zRotation,
+        int duration
+    );
 
     void moveParrot(ElementLink<ParrotElement> link, Vec3 offset, int duration);
 

@@ -15,7 +15,8 @@ public abstract class TextScheduleInstructionRender<T extends TextScheduleInstru
     @Override
     public List<Component> getTitleAs(T input, String type) {
         return ImmutableList.of(
-            CreateLang.translateDirect("schedule." + type + "." + input.getId().getPath() + ".summary").withStyle(ChatFormatting.GOLD),
+            CreateLang.translateDirect("schedule." + type + "." + input.getId().getPath() + ".summary")
+                .withStyle(ChatFormatting.GOLD),
             CreateLang.translateDirect("generic.in_quotes", Component.literal(input.getLabelText()))
         );
     }

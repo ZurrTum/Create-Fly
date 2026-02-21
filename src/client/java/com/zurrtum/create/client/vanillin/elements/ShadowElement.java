@@ -141,7 +141,13 @@ public final class ShadowElement extends AbstractVisual implements SimpleDynamic
         }
     }
 
-    private void setupInstance(ChunkAccess chunk, BlockPos.MutableBlockPos pos, double entityX, double entityZ, float strength) {
+    private void setupInstance(
+        ChunkAccess chunk,
+        BlockPos.MutableBlockPos pos,
+        double entityX,
+        double entityZ,
+        float strength
+    ) {
         // TODO: cache this?
         var maxLocalRawBrightness = level.getMaxLocalRawBrightness(pos);
         if (maxLocalRawBrightness <= 3) {

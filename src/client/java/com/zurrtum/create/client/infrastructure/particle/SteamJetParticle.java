@@ -72,7 +72,23 @@ public class SteamJetParticle extends SimpleAnimatedParticle {
             Quaternionf rotation = Axis.YP.rotation(yaw);
             rotation.mul(Axis.XP.rotation(pitch));
             rotation.mul(Axis.YP.rotation(f3 + Mth.PI / 2 * i + roll));
-            submittable.add(renderType, f, f1, f2, rotation.x, rotation.y, rotation.z, rotation.w, f4, f7, f8, f5, f6, color, brightness);
+            submittable.add(
+                renderType,
+                f,
+                f1,
+                f2,
+                rotation.x,
+                rotation.y,
+                rotation.z,
+                rotation.w,
+                f4,
+                f7,
+                f8,
+                f5,
+                f6,
+                color,
+                brightness
+            );
         }
     }
 

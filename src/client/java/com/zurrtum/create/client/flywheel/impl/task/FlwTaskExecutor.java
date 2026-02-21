@@ -1,10 +1,9 @@
 package com.zurrtum.create.client.flywheel.impl.task;
 
 import com.zurrtum.create.client.flywheel.impl.FlwConfig;
+import net.minecraft.util.Mth;
 
 import java.util.concurrent.atomic.AtomicReference;
-
-import net.minecraft.util.Mth;
 
 public final class FlwTaskExecutor {
     private static final AtomicLazy INSTANCE = new AtomicLazy();

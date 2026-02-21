@@ -18,12 +18,11 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
-
-import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 
 public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implements SimpleDynamicVisual {
 
@@ -45,11 +44,16 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
         var msr = TransformStack.of(ms);
         msr.translate(getVisualPosition());
 
-        float progress = Mth.lerp(AnimationTickHolder.getPartialTicks(), blockEntity.prevDialState, blockEntity.dialState);
+        float progress = Mth.lerp(
+            AnimationTickHolder.getPartialTicks(),
+            blockEntity.prevDialState,
+            blockEntity.dialState
+        );
 
         for (Direction facing : Iterate.directions) {
-            if (!gaugeBlock.shouldRenderHeadOnFace(level, pos, blockState, facing))
+            if (!gaugeBlock.shouldRenderHeadOnFace(level, pos, blockState, facing)) {
                 continue;
+            }
 
             DialFace face = makeFace(facing, dialModel, headModel);
 
@@ -59,14 +63,19 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
         }
     }
 
-    private DialFace makeFace(Direction face, Instancer<TransformedInstance> dialModel, Instancer<TransformedInstance> headModel) {
+    private DialFace makeFace(
+        Direction face,
+        Instancer<TransformedInstance> dialModel,
+        Instancer<TransformedInstance> headModel
+    ) {
         return new DialFace(face, dialModel.createInstance(), headModel.createInstance());
     }
 
     @Override
     public void beginFrame(DynamicVisual.Context ctx) {
-        if (Mth.equal(blockEntity.prevDialState, blockEntity.dialState))
+        if (Mth.equal(blockEntity.prevDialState, blockEntity.dialState)) {
             return;
+        }
 
         float progress = Mth.lerp(ctx.partialTick(), blockEntity.prevDialState, blockEntity.dialState);
 
@@ -118,7 +127,8 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
             getSecond().setTransform(ms).setChanged();
 
-            msr.translate(0, dialPivot, dialPivot).rotate((float) (Math.PI / 2 * -progress), Direction.EAST).translate(0, -dialPivot, -dialPivot);
+            msr.translate(0, dialPivot, dialPivot).rotate((float) (Math.PI / 2 * -progress), Direction.EAST)
+                .translate(0, -dialPivot, -dialPivot);
 
             getFirst().setTransform(ms).setChanged();
 
@@ -130,8 +140,8 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
             msr.pushPose();
 
-            rotateToFace(msr).translate(0, dialPivot, dialPivot).rotate((float) (Math.PI / 2 * -progress), Direction.EAST)
-                .translate(0, -dialPivot, -dialPivot);
+            rotateToFace(msr).translate(0, dialPivot, dialPivot)
+                .rotate((float) (Math.PI / 2 * -progress), Direction.EAST).translate(0, -dialPivot, -dialPivot);
 
             getFirst().setTransform(ms).setChanged();
 
@@ -155,7 +165,10 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
         @Override
         protected Instancer<TransformedInstance> getHeadModel() {
-            return instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.GAUGE_HEAD_SPEED));
+            return instancerProvider().instancer(
+                InstanceTypes.TRANSFORMED,
+                Models.partial(AllPartialModels.GAUGE_HEAD_SPEED)
+            );
         }
     }
 
@@ -166,7 +179,10 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
         @Override
         protected Instancer<TransformedInstance> getHeadModel() {
-            return instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.GAUGE_HEAD_STRESS));
+            return instancerProvider().instancer(
+                InstanceTypes.TRANSFORMED,
+                Models.partial(AllPartialModels.GAUGE_HEAD_STRESS)
+            );
         }
     }
 }

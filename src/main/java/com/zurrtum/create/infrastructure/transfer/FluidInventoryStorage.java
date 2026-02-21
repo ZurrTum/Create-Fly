@@ -47,7 +47,8 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
         if (stackComponents == variantComponents) {
             return true;
         }
-        return stackComponents.map.reference2ObjectEntrySet().containsAll(variantComponents.map.reference2ObjectEntrySet());
+        return stackComponents.map.reference2ObjectEntrySet()
+            .containsAll(variantComponents.map.reference2ObjectEntrySet());
     }
 
     @Override

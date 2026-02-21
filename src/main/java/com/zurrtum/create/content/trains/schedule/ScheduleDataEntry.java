@@ -28,7 +28,10 @@ public abstract class ScheduleDataEntry {
 
     public void setData(HolderLookup.Provider registries, CompoundTag data) {
         this.data = data;
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleDataEntry", Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "ScheduleDataEntry",
+            Create.LOGGER
+        )) {
             ValueInput view = TagValueInput.create(logging, registries, data);
             readAdditional(view);
         }

@@ -37,8 +37,9 @@ public class ChainDriveScenes {
         for (int i = 0; i < 3; i++) {
             scene.idle(5);
             scene.world().showSection(util.select().position(3, 1, 2 - i), Direction.DOWN);
-            if (i != 0)
+            if (i != 0) {
                 scene.world().showSection(util.select().position(3, 1, 2 + i), Direction.DOWN);
+            }
         }
 
         scene.idle(10);
@@ -50,8 +51,8 @@ public class ChainDriveScenes {
         scene.world().setKineticSpeed(gauge, 64);
         scene.effects().indicateSuccess(gaugePos);
         scene.idle(20);
-        scene.overlay().showText(60).text("Chain Drives relay rotation to each other in a row").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 4), Direction.WEST));
+        scene.overlay().showText(60).text("Chain Drives relay rotation to each other in a row").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(3, 1, 4), Direction.WEST));
         scene.idle(60);
 
         Selection shafts = util.select().fromTo(2, 1, 0, 2, 1, 1);
@@ -63,14 +64,16 @@ public class ChainDriveScenes {
         scene.effects().rotationDirectionIndicator(util.grid().at(2, 1, 0));
         scene.effects().rotationDirectionIndicator(util.grid().at(2, 1, 1));
         scene.idle(20);
-        scene.overlay().showText(60).text("All shafts connected like this will rotate in the same direction").attachKeyFrame().placeNearTarget()
+        scene.overlay().showText(60).text("All shafts connected like this will rotate in the same direction")
+            .attachKeyFrame().placeNearTarget()
             .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 1), Direction.WEST));
         scene.idle(50);
         scene.world().hideSection(shafts, Direction.WEST);
         scene.idle(25);
 
         scene.addKeyframe();
-        scene.overlay().showControls(util.vector().topOf(rotatedECD), Pointing.DOWN, 30).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(util.vector().topOf(rotatedECD), Pointing.DOWN, 30).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().modifyBlock(rotatedECD, s -> s.setValue(ChainDriveBlock.AXIS, Axis.Y), true);
         scene.idle(40);
@@ -100,16 +103,21 @@ public class ChainDriveScenes {
         BlockPos middleGauge = eastGauge.west().below();
         BlockPos westGauge = eastGauge.west(2).below(2);
 
-        ElementLink<WorldSectionElement> lever = scene.world().showIndependentSection(util.select().fromTo(leverPos, leverPos.south()), Direction.UP);
+        ElementLink<WorldSectionElement> lever = scene.world()
+            .showIndependentSection(util.select().fromTo(leverPos, leverPos.south()), Direction.UP);
 
         scene.idle(5);
         scene.world().showSection(util.select().fromTo(4, 1, 3, 4, 2, 3), Direction.DOWN);
         scene.idle(10);
-        scene.world().showSection(util.select().fromTo(eastDrive, eastDrive.west(2)).add(util.select().position(eastDrive.above())), Direction.DOWN);
+        scene.world()
+            .showSection(
+                util.select().fromTo(eastDrive, eastDrive.west(2)).add(util.select().position(eastDrive.above())),
+                Direction.DOWN
+            );
         scene.idle(10);
 
-        scene.overlay().showText(60).text("Unpowered Chain Gearshifts behave exactly like Chain Drives").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(eastDrive, Direction.NORTH));
+        scene.overlay().showText(60).text("Unpowered Chain Gearshifts behave exactly like Chain Drives")
+            .attachKeyFrame().placeNearTarget().pointAt(util.vector().blockSurface(eastDrive, Direction.NORTH));
         scene.idle(60);
 
         scene.world().showSection(util.select().fromTo(eastGauge, eastGauge.below()), Direction.DOWN);
@@ -121,7 +129,8 @@ public class ChainDriveScenes {
 
         for (BlockPos gauge : new BlockPos[]{eastGauge, middleGauge, westGauge}) {
             scene.idle(5);
-            scene.overlay().showText(50).sharedText(gauge == eastGauge ? "rpm16_source" : "rpm16").colored(PonderPalette.MEDIUM).placeNearTarget()
+            scene.overlay().showText(50).sharedText(gauge == eastGauge ? "rpm16_source" : "rpm16")
+                .colored(PonderPalette.MEDIUM).placeNearTarget()
                 .pointAt(util.vector().blockSurface(gauge, Direction.NORTH));
         }
 
@@ -135,11 +144,18 @@ public class ChainDriveScenes {
 
         AABB bb = new AABB(eastDrive);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.MEDIUM, eastDrive, bb, 160);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.FAST, eastDrive.west(), bb.move(-2, 0, 0).expandTowards(15 / 16f, 0, 0), 160);
+        scene.overlay().chaseBoundingBoxOutline(
+            PonderPalette.FAST,
+            eastDrive.west(),
+            bb.move(-2, 0, 0).expandTowards(15 / 16f, 0, 0),
+            160
+        );
         scene.idle(20);
 
-        scene.overlay().showText(80).text("When Powered, the speed transmitted to other Chain Drives in the row is doubled").attachKeyFrame()
-            .placeNearTarget().colored(PonderPalette.FAST).pointAt(util.vector().blockSurface(eastDrive.west(2), Direction.WEST));
+        scene.overlay().showText(80)
+            .text("When Powered, the speed transmitted to other Chain Drives in the row is doubled").attachKeyFrame()
+            .placeNearTarget().colored(PonderPalette.FAST)
+            .pointAt(util.vector().blockSurface(eastDrive.west(2), Direction.WEST));
         scene.idle(80);
 
         for (BlockPos gauge : new BlockPos[]{eastGauge, middleGauge, westGauge}) {
@@ -172,24 +188,29 @@ public class ChainDriveScenes {
         scene.idle(10);
 
         bb = new AABB(eastDrive);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.MEDIUM, eastDrive, bb.expandTowards(-15 / 16f, 0, 0), 160);
+        scene.overlay()
+            .chaseBoundingBoxOutline(PonderPalette.MEDIUM, eastDrive, bb.expandTowards(-15 / 16f, 0, 0), 160);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.SLOW, eastDrive.west(), bb.move(-2, 0, 0), 160);
         scene.idle(20);
 
-        scene.overlay().showText(80).text("Whenever the Powered Gearshift is not at the source, its speed will be halved instead").attachKeyFrame()
-            .placeNearTarget().colored(PonderPalette.SLOW).pointAt(util.vector().blockSurface(eastDrive.west(2), Direction.WEST));
+        scene.overlay().showText(80)
+            .text("Whenever the Powered Gearshift is not at the source, its speed will be halved instead")
+            .attachKeyFrame().placeNearTarget().colored(PonderPalette.SLOW)
+            .pointAt(util.vector().blockSurface(eastDrive.west(2), Direction.WEST));
         scene.idle(80);
 
         for (BlockPos gauge : new BlockPos[]{eastGauge, middleGauge, westGauge}) {
             scene.idle(5);
-            scene.overlay().showText(180).sharedText(gauge == westGauge ? "rpm8" : gauge == eastGauge ? "rpm16_source" : "rpm16")
+            scene.overlay().showText(180)
+                .sharedText(gauge == westGauge ? "rpm8" : gauge == eastGauge ? "rpm16_source" : "rpm16")
                 .colored(gauge == westGauge ? PonderPalette.SLOW : PonderPalette.MEDIUM).placeNearTarget()
                 .pointAt(util.vector().blockSurface(gauge, Direction.NORTH));
         }
 
         scene.idle(80);
 
-        scene.overlay().showText(100).text("In both cases, Chain Drives in the row always run at 2x the speed of the Powered Gearshift")
+        scene.overlay().showText(100)
+            .text("In both cases, Chain Drives in the row always run at 2x the speed of the Powered Gearshift")
             .attachKeyFrame().placeNearTarget().pointAt(util.vector().blockSurface(eastDrive.west(2), Direction.WEST));
         scene.idle(100);
 
@@ -202,7 +223,11 @@ public class ChainDriveScenes {
         scene.world().showSection(util.select().fromTo(analogPos, analogPos.south()), Direction.DOWN);
 
         scene.idle(15);
-        scene.world().modifyBlockEntityNBT(util.select().position(analogPos), AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", 8));
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(analogPos),
+            AnalogLeverBlockEntity.class,
+            nbt -> nbt.putInt("State", 8)
+        );
         scene.world().modifyBlock(analogPos.south(), s -> s.setValue(RedStoneWireBlock.POWER, 8), false);
         scene.world().toggleRedstonePower(util.select().position(1, 1, 4));
         scene.world().modifyKineticSpeed(util.select().position(westGauge), f -> .75f * f);
@@ -210,18 +235,21 @@ public class ChainDriveScenes {
 
         scene.idle(20);
 
-        scene.overlay().showText(100).text("Using analog signals, the ratio can be adjusted more precisely between 1 and 2").attachKeyFrame()
+        scene.overlay().showText(100)
+            .text("Using analog signals, the ratio can be adjusted more precisely between 1 and 2").attachKeyFrame()
             .placeNearTarget().pointAt(util.vector().blockSurface(eastDrive.west(2), Direction.WEST));
         scene.idle(40);
 
         for (BlockPos gauge : new BlockPos[]{eastGauge, middleGauge, westGauge}) {
             scene.idle(5);
-            TextElementBuilder textBuilder = scene.overlay().showText(180).colored(gauge == westGauge ? PonderPalette.SLOW : PonderPalette.MEDIUM)
-                .placeNearTarget().pointAt(util.vector().blockSurface(gauge, Direction.NORTH));
-            if (gauge == westGauge)
+            TextElementBuilder textBuilder = scene.overlay().showText(180)
+                .colored(gauge == westGauge ? PonderPalette.SLOW : PonderPalette.MEDIUM).placeNearTarget()
+                .pointAt(util.vector().blockSurface(gauge, Direction.NORTH));
+            if (gauge == westGauge) {
                 textBuilder.text("12 RPM");
-            else
+            } else {
                 textBuilder.sharedText(gauge == eastGauge ? "rpm16_source" : "rpm16");
+            }
         }
     }
 

@@ -11,7 +11,10 @@ import java.util.function.BiFunction;
 public class KeepHeldTooltip implements BiFunction<EntryStack<ItemStack>, Tooltip, Tooltip> {
     @Override
     public Tooltip apply(EntryStack<ItemStack> entryStack, Tooltip tooltip) {
-        tooltip.entries().add(1, Tooltip.entry(CreateLang.translateDirect("recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD)));
+        tooltip.entries().add(
+            1,
+            Tooltip.entry(CreateLang.translateDirect("recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD))
+        );
         return tooltip;
     }
 }

@@ -1,10 +1,10 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.fluid;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
@@ -108,8 +108,9 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     @Override
     public void initialize() {
         super.initialize();
-        if (getLevel().isClientSide())
+        if (getLevel().isClientSide()) {
             return;
+        }
         forEach(ts -> {
             ts.fluidLevel.forceNextSync();
             ts.markDirty();
@@ -122,14 +123,16 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
 
         if (syncCooldown > 0) {
             syncCooldown--;
-            if (syncCooldown == 0 && queuedSync)
+            if (syncCooldown == 0 && queuedSync) {
                 updateFluids();
+            }
         }
 
         forEach(be -> {
             LerpedFloat fluidLevel = be.getFluidLevel();
-            if (fluidLevel != null)
+            if (fluidLevel != null) {
                 fluidLevel.tickChaser();
+            }
         });
     }
 
@@ -168,15 +171,18 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     }
 
     public boolean isEmpty() {
-        for (TankSegment tankSegment : tanks)
-            if (!tankSegment.getFluid().isEmpty())
+        for (TankSegment tankSegment : tanks) {
+            if (!tankSegment.getFluid().isEmpty()) {
                 return false;
+            }
+        }
         return true;
     }
 
     public void forEach(Consumer<TankSegment> action) {
-        for (TankSegment tankSegment : tanks)
+        for (TankSegment tankSegment : tanks) {
             action.accept(tankSegment);
+        }
     }
 
     public SidedFluidInventory getCapability() {
@@ -196,8 +202,9 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         int i = 0;
         int size = tanks.length;
         for (ValueInput item : view.childrenListOrEmpty(getType().getName() + "Tanks")) {
-            if (i >= size)
+            if (i >= size) {
                 break;
+            }
             tanks[i].read(item, clientPacket);
             i++;
         }
@@ -362,13 +369,16 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
 
         @Override
         public void markDirty() {
-            if (!blockEntity.hasLevel())
+            if (!blockEntity.hasLevel()) {
                 return;
+            }
             fluidLevel.chase(fluid.getAmount() / (float) capacity, .25, Chaser.EXP);
-            if (!getLevel().isClientSide())
+            if (!getLevel().isClientSide()) {
                 sendDataLazily();
-            if (blockEntity.isVirtual() && !fluid.isEmpty())
+            }
+            if (blockEntity.isVirtual() && !fluid.isEmpty()) {
                 renderedFluid = fluid;
+            }
         }
 
         public FluidStack getRenderedFluid() {
@@ -391,13 +401,15 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         public void read(ValueInput view, boolean clientPacket) {
             fluid = view.read("TankContent", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
             fluidLevel.read(view, clientPacket);
-            if (!fluid.isEmpty())
+            if (!fluid.isEmpty()) {
                 renderedFluid = fluid;
+            }
         }
 
         public boolean isEmpty(float partialTicks) {
-            if (getRenderedFluid().isEmpty())
+            if (getRenderedFluid().isEmpty()) {
                 return true;
+            }
             return getTotalUnits(partialTicks) < 1;
         }
 

@@ -57,8 +57,9 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         double expandY = -offset;
         if (sharedMirrorContraption != null) {
             AbstractContraptionEntity ace = sharedMirrorContraption.get();
-            if (ace != null)
+            if (ace != null) {
                 expandY = ace.getY() - worldPosition.getY();
+            }
         }
         return super.createRenderBoundingBox().inflate(0, expandY, 0);
     }
@@ -73,19 +74,24 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         float prevOffset = offset;
         super.tick();
 
-        if (level.isClientSide() && mirrorParent != null)
-            if (sharedMirrorContraption == null || sharedMirrorContraption.get() == null || !sharedMirrorContraption.get().isAlive()) {
+        if (level.isClientSide() && mirrorParent != null) {
+            if (sharedMirrorContraption == null || sharedMirrorContraption.get() == null || !sharedMirrorContraption.get()
+                .isAlive()) {
                 sharedMirrorContraption = null;
-                if (level.getBlockEntity(mirrorParent) instanceof PulleyBlockEntity pte && pte.movedContraption != null)
+                if (level.getBlockEntity(mirrorParent) instanceof PulleyBlockEntity pte && pte.movedContraption != null) {
                     sharedMirrorContraption = new WeakReference<>(pte.movedContraption);
+                }
             }
+        }
 
-        if (isVirtual())
+        if (isVirtual()) {
             prevAnimatedOffset = offset;
+        }
         invalidateRenderBoundingBox();
 
-        if (prevOffset < 200 && offset >= 200)
+        if (prevOffset < 200 && offset >= 200) {
             award(AllAdvancements.PULLEY_MAXED);
+        }
     }
 
     @Override
@@ -100,10 +106,12 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     @Override
     protected void assemble() throws AssemblyException {
-        if (!(level.getBlockState(worldPosition).getBlock() instanceof PulleyBlock))
+        if (!(level.getBlockState(worldPosition).getBlock() instanceof PulleyBlock)) {
             return;
-        if (speed == 0 && mirrorParent == null)
+        }
+        if (speed == 0 && mirrorParent == null) {
             return;
+        }
         int maxLength = AllConfigs.server().kinetics.maxRopeLength.get();
         int i = 1;
         while (i <= maxLength) {
@@ -115,10 +123,12 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
             ++i;
         }
         offset = i - 1;
-        if (offset >= getExtensionRange() && getSpeed() > 0)
+        if (offset >= getExtensionRange() && getSpeed() > 0) {
             return;
-        if (offset <= 0 && getSpeed() < 0)
+        }
+        if (offset <= 0 && getSpeed() < 0) {
             return;
+        }
 
         // Collect Construct
         if (!level.isClientSide() && mirrorParent == null) {
@@ -130,12 +140,19 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
             if (canAssembleStructure) {
                 Direction movementDirection = getSpeed() > 0 ? Direction.DOWN : Direction.UP;
-                if (ContraptionCollider.isCollidingWithWorld(level, contraption, anchor.relative(movementDirection), movementDirection))
+                if (ContraptionCollider.isCollidingWithWorld(
+                    level,
+                    contraption,
+                    anchor.relative(movementDirection),
+                    movementDirection
+                )) {
                     canAssembleStructure = false;
+                }
             }
 
-            if (!canAssembleStructure && getSpeed() > 0)
+            if (!canAssembleStructure && getSpeed() > 0) {
                 return;
+            }
 
             removeRopes();
 
@@ -147,21 +164,29 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
                 forceMove = true;
                 needsContraption = true;
 
-                if (contraption.containsBlockBreakers())
+                if (contraption.containsBlockBreakers()) {
                     award(AllAdvancements.CONTRAPTION_ACTORS);
+                }
 
                 for (BlockPos pos : contraption.createColliders(level, Direction.UP)) {
-                    if (pos.getY() != 0)
+                    if (pos.getY() != 0) {
                         continue;
+                    }
                     pos = pos.offset(anchor);
-                    if (level.getBlockEntity(new BlockPos(pos.getX(), this.worldPosition.getY(), pos.getZ())) instanceof PulleyBlockEntity pbe)
+                    if (level.getBlockEntity(new BlockPos(
+                        pos.getX(),
+                        this.worldPosition.getY(),
+                        pos.getZ()
+                    )) instanceof PulleyBlockEntity pbe) {
                         pbe.startMirroringOther(this.worldPosition);
+                    }
                 }
             }
         }
 
-        if (mirrorParent != null)
+        if (mirrorParent != null) {
             removeRopes();
+        }
 
         clientOffsetDiff = 0;
         running = true;
@@ -172,17 +197,23 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         for (int i = ((int) offset); i > 0; i--) {
             BlockPos offset = worldPosition.below(i);
             BlockState oldState = level.getBlockState(offset);
-            level.setBlock(offset, oldState.getFluidState().createLegacyBlock(), Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON);
+            level.setBlock(
+                offset,
+                oldState.getFluidState().createLegacyBlock(),
+                Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON
+            );
         }
     }
 
     @Override
     public void disassemble() {
-        if (!running && movedContraption == null && mirrorParent == null)
+        if (!running && movedContraption == null && mirrorParent == null) {
             return;
+        }
         offset = getGridOffset(offset);
-        if (movedContraption != null)
+        if (movedContraption != null) {
             resetContraptionToOffset();
+        }
 
         if (!level.isClientSide()) {
             if (shouldCreateRopes()) {
@@ -191,11 +222,16 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
                     FluidState ifluidstate = level.getFluidState(magnetPos);
                     if (level.getBlockState(magnetPos).getDestroySpeed(level, magnetPos) != -1) {
 
-                        level.destroyBlock(magnetPos, level.getBlockState(magnetPos).getCollisionShape(level, magnetPos).isEmpty());
+                        level.destroyBlock(
+                            magnetPos,
+                            level.getBlockState(magnetPos).getCollisionShape(level, magnetPos).isEmpty()
+                        );
                         level.setBlock(
                             magnetPos,
-                            AllBlocks.PULLEY_MAGNET.defaultBlockState()
-                                .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER)),
+                            AllBlocks.PULLEY_MAGNET.defaultBlockState().setValue(
+                                BlockStateProperties.WATERLOGGED,
+                                Boolean.valueOf(ifluidstate.getType() == Fluids.WATER)
+                            ),
                             Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON
                         );
                     }
@@ -206,13 +242,17 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
                 for (boolean destroyPass : Iterate.trueAndFalse) {
                     for (int i = 1; i <= ((int) offset) - 1; i++) {
                         BlockPos ropePos = worldPosition.below(i);
-                        if (level.getBlockState(ropePos).getDestroySpeed(level, ropePos) == -1)
+                        if (level.getBlockState(ropePos).getDestroySpeed(level, ropePos) == -1) {
                             continue;
+                        }
 
                         if (destroyPass) {
                             FluidState ifluidstate = level.getFluidState(ropePos);
                             waterlog[i] = ifluidstate.getType() == Fluids.WATER;
-                            level.destroyBlock(ropePos, level.getBlockState(ropePos).getCollisionShape(level, ropePos).isEmpty());
+                            level.destroyBlock(
+                                ropePos,
+                                level.getBlockState(ropePos).getCollisionShape(level, ropePos).isEmpty()
+                            );
                             continue;
                         }
 
@@ -226,13 +266,15 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
             }
 
-            if (movedContraption != null && mirrorParent == null)
+            if (movedContraption != null && mirrorParent == null) {
                 movedContraption.disassemble();
+            }
             notifyMirrorsOfDisassembly();
         }
 
-        if (movedContraption != null)
+        if (movedContraption != null) {
             movedContraption.discard();
+        }
 
         movedContraption = null;
         initialOffset = 0;
@@ -256,19 +298,24 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     @Override
     protected void visitNewPosition() {
         super.visitNewPosition();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (movedContraption != null)
+        }
+        if (movedContraption != null) {
             return;
-        if (getSpeed() <= 0)
+        }
+        if (getSpeed() <= 0) {
             return;
+        }
 
         BlockPos posBelow = worldPosition.below((int) (offset + getMovementSpeed()) + 1);
         BlockState state = level.getBlockState(posBelow);
-        if (!BlockMovementChecks.isMovementNecessary(state, level, posBelow))
+        if (!BlockMovementChecks.isMovementNecessary(state, level, posBelow)) {
             return;
-        if (BlockMovementChecks.isBrittle(state))
+        }
+        if (BlockMovementChecks.isBrittle(state)) {
             return;
+        }
 
         disassemble();
         assembleNextTick = true;
@@ -282,16 +329,19 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
         BlockPos prevMirrorParent = mirrorParent;
         mirrorParent = view.read("MirrorParent", BlockPos.CODEC).orElse(null);
-        mirrorChildren = view.read("MirrorChildren", CreateCodecs.BLOCK_POS_LIST_CODEC).map(ArrayList::new).orElse(null);
+        mirrorChildren = view.read("MirrorChildren", CreateCodecs.BLOCK_POS_LIST_CODEC).map(ArrayList::new)
+            .orElse(null);
 
         if (mirrorParent != null) {
             offset = 0;
-            if (prevMirrorParent == null || !prevMirrorParent.equals(mirrorParent))
+            if (prevMirrorParent == null || !prevMirrorParent.equals(mirrorParent)) {
                 sharedMirrorContraption = null;
+            }
         }
 
-        if (mirrorParent == null)
+        if (mirrorParent == null) {
             sharedMirrorContraption = null;
+        }
     }
 
     @Override
@@ -299,21 +349,27 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         view.putInt("InitialOffset", initialOffset);
         super.write(view, clientPacket);
 
-        if (mirrorParent != null)
+        if (mirrorParent != null) {
             view.store("MirrorParent", BlockPos.CODEC, mirrorParent);
-        if (mirrorChildren != null)
+        }
+        if (mirrorChildren != null) {
             view.store("MirrorChildren", CreateCodecs.BLOCK_POS_LIST_CODEC, mirrorChildren);
+        }
     }
 
     public void startMirroringOther(BlockPos parent) {
-        if (parent.equals(worldPosition))
+        if (parent.equals(worldPosition)) {
             return;
-        if (!(level.getBlockEntity(parent) instanceof PulleyBlockEntity pbe))
+        }
+        if (!(level.getBlockEntity(parent) instanceof PulleyBlockEntity pbe)) {
             return;
-        if (pbe.getType() != getType())
+        }
+        if (pbe.getType() != getType()) {
             return;
-        if (pbe.mirrorChildren == null)
+        }
+        if (pbe.mirrorChildren == null) {
             pbe.mirrorChildren = new ArrayList<>();
+        }
         pbe.mirrorChildren.add(worldPosition);
         pbe.notifyUpdate();
 
@@ -326,11 +382,13 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     }
 
     public void notifyMirrorsOfDisassembly() {
-        if (mirrorChildren == null)
+        if (mirrorChildren == null) {
             return;
+        }
         for (BlockPos blockPos : mirrorChildren) {
-            if (!(level.getBlockEntity(blockPos) instanceof PulleyBlockEntity pbe))
+            if (!(level.getBlockEntity(blockPos) instanceof PulleyBlockEntity pbe)) {
                 continue;
+            }
             pbe.offset = offset;
             pbe.disassemble();
             pbe.mirrorParent = null;
@@ -342,7 +400,10 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     @Override
     protected int getExtensionRange() {
-        return Math.max(0, Math.min(AllConfigs.server().kinetics.maxRopeLength.get(), (worldPosition.getY() - 1) - level.getMinY()));
+        return Math.max(
+            0,
+            Math.min(AllConfigs.server().kinetics.maxRopeLength.get(), (worldPosition.getY() - 1) - level.getMinY())
+        );
     }
 
     @Override
@@ -357,8 +418,9 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     @Override
     public float getInterpolatedOffset(float partialTicks) {
-        if (isVirtual())
+        if (isVirtual()) {
             return Mth.lerp(partialTicks, prevAnimatedOffset, offset);
+        }
         boolean moving = running && (movedContraption == null || !movedContraption.isStalled());
         return super.getInterpolatedOffset(moving ? partialTicks : 0.5f);
     }

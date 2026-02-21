@@ -220,7 +220,8 @@ public class AllBlocks {
     public static final GearboxBlock GEARBOX = register(
         "gearbox",
         GearboxBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion().pushReaction(PushReaction.PUSH_ONLY)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
+            .pushReaction(PushReaction.PUSH_ONLY)
     );
     public static final WaterWheelBlock WATER_WHEEL = register(
         "water_wheel",
@@ -235,7 +236,8 @@ public class AllBlocks {
     public static final WaterWheelStructuralBlock WATER_WHEEL_STRUCTURAL = register(
         "water_wheel_structure",
         WaterWheelStructuralBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.DIRT).noOcclusion().pushReaction(PushReaction.BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.DIRT).noOcclusion()
+            .pushReaction(PushReaction.BLOCK)
     );
     public static final CasingBlock ANDESITE_CASING = register(
         "andesite_casing",
@@ -250,7 +252,8 @@ public class AllBlocks {
     public static final CasingBlock COPPER_CASING = register(
         "copper_casing",
         CasingBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_LIGHT_GRAY).sound(SoundType.COPPER)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+            .sound(SoundType.COPPER)
     );
     public static final CasingBlock SHADOW_STEEL_CASING = register(
         "shadow_steel_casing",
@@ -260,18 +263,20 @@ public class AllBlocks {
     public static final CasingBlock REFINED_RADIANCE_CASING = register(
         "refined_radiance_casing",
         CasingBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.SNOW).sound(SoundType.WOOD).lightLevel($ -> 12)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.SNOW).sound(SoundType.WOOD)
+            .lightLevel($ -> 12)
     );
     public static final CasingBlock RAILWAY_CASING = register(
         "railway_casing",
         CasingBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_CYAN).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_CYAN)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final ItemVaultBlock ITEM_VAULT = register(
         "item_vault",
         ItemVaultBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).sound(SoundType.NETHERITE_BLOCK).mapColor(MapColor.TERRACOTTA_BLUE)
-            .explosionResistance(1200)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).sound(SoundType.NETHERITE_BLOCK)
+            .mapColor(MapColor.TERRACOTTA_BLUE).explosionResistance(1200)
     );
     public static final ArmBlock MECHANICAL_ARM = register(
         "mechanical_arm",
@@ -487,90 +492,104 @@ public class AllBlocks {
     public static final SailBlock SAIL_FRAME = register(
         "sail_frame",
         SailBlock::frame,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.DIRT).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.DIRT)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock SAIL = register(
         "white_sail",
         SailBlock.withCanvas(DyeColor.WHITE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.SNOW).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.SNOW)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock ORANGE_SAIL = register(
         "orange_sail",
         SailBlock.withCanvas(DyeColor.ORANGE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_ORANGE).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_ORANGE)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock MAGENTA_SAIL = register(
         "magenta_sail",
         SailBlock.withCanvas(DyeColor.MAGENTA),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_MAGENTA).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_MAGENTA)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock LIGHT_BLUE_SAIL = register(
         "light_blue_sail",
         SailBlock.withCanvas(DyeColor.LIGHT_BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_BLUE).sound(SoundType.SCAFFOLDING)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_BLUE)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock YELLOW_SAIL = register(
         "yellow_sail",
         SailBlock.withCanvas(DyeColor.YELLOW),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_YELLOW).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_YELLOW)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock LIME_SAIL = register(
         "lime_sail",
         SailBlock.withCanvas(DyeColor.LIME),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GREEN).sound(SoundType.SCAFFOLDING)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GREEN)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock PINK_SAIL = register(
         "pink_sail",
         SailBlock.withCanvas(DyeColor.PINK),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_PINK).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_PINK)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock GRAY_SAIL = register(
         "gray_sail",
         SailBlock.withCanvas(DyeColor.GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_GRAY).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock LIGHT_GRAY_SAIL = register(
         "light_gray_sail",
         SailBlock.withCanvas(DyeColor.LIGHT_GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GRAY).sound(SoundType.SCAFFOLDING)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GRAY)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock CYAN_SAIL = register(
         "cyan_sail",
         SailBlock.withCanvas(DyeColor.CYAN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_CYAN).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_CYAN)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock PURPLE_SAIL = register(
         "purple_sail",
         SailBlock.withCanvas(DyeColor.PURPLE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_PURPLE).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_PURPLE)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock BLUE_SAIL = register(
         "blue_sail",
         SailBlock.withCanvas(DyeColor.BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_BLUE).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_BLUE)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock BROWN_SAIL = register(
         "brown_sail",
         SailBlock.withCanvas(DyeColor.BROWN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_BROWN).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_BROWN)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock GREEN_SAIL = register(
         "green_sail",
         SailBlock.withCanvas(DyeColor.GREEN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_GREEN).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_GREEN)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock RED_SAIL = register(
         "red_sail",
         SailBlock.withCanvas(DyeColor.RED),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_RED).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_RED)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     public static final SailBlock BLACK_SAIL = register(
         "black_sail",
         SailBlock.withCanvas(DyeColor.BLACK),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_BLACK).sound(SoundType.SCAFFOLDING).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_BLACK)
+            .sound(SoundType.SCAFFOLDING).noOcclusion()
     );
     @SuppressWarnings("deprecation")
     public static final FluidPipeBlock FLUID_PIPE = register(
@@ -596,18 +615,20 @@ public class AllBlocks {
     public static final BlazeBurnerBlock BLAZE_BURNER = register(
         "blaze_burner",
         BlazeBurnerBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).lightLevel(BlazeBurnerBlock::getLight)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .lightLevel(BlazeBurnerBlock::getLight)
     );
     public static final LitBlazeBurnerBlock LIT_BLAZE_BURNER = register(
         "lit_blaze_burner",
         LitBlazeBurnerBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_LIGHT_GRAY).lightLevel(LitBlazeBurnerBlock::getLight)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_LIGHT_GRAY)
+            .lightLevel(LitBlazeBurnerBlock::getLight)
     );
     public static final FluidTankBlock FLUID_TANK = register(
         "fluid_tank",
         FluidTankBlock::regular,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).noOcclusion().isRedstoneConductor((p1, p2, p3) -> true)
-            .lightLevel(FluidTankBlock::getLight)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).noOcclusion()
+            .isRedstoneConductor((p1, p2, p3) -> true).lightLevel(FluidTankBlock::getLight)
     );
     public static final FluidTankBlock CREATIVE_FLUID_TANK = register(
         "creative_fluid_tank",
@@ -632,7 +653,8 @@ public class AllBlocks {
     public static final PulleyBlock.RopeBlock ROPE = register(
         "rope",
         PulleyBlock.RopeBlock::new,
-        BlockBehaviour.Properties.of().sound(SoundType.WOOL).mapColor(MapColor.COLOR_BROWN).pushReaction(PushReaction.BLOCK)
+        BlockBehaviour.Properties.of().sound(SoundType.WOOL).mapColor(MapColor.COLOR_BROWN)
+            .pushReaction(PushReaction.BLOCK)
     );
     public static final PulleyBlock.MagnetBlock PULLEY_MAGNET = register(
         "pulley_magnet",
@@ -652,30 +674,33 @@ public class AllBlocks {
     public static final PeculiarBellBlock PECULIAR_BELL = register(
         "peculiar_bell",
         PeculiarBellBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.GOLD).sound(SoundType.ANVIL).noOcclusion().forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.GOLD).sound(SoundType.ANVIL)
+            .noOcclusion().forceSolidOn()
     );
     public static final HauntedBellBlock HAUNTED_BELL = register(
         "haunted_bell",
         HauntedBellBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.SAND).sound(SoundType.ANVIL).noOcclusion().forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.SAND).sound(SoundType.ANVIL)
+            .noOcclusion().forceSolidOn()
     );
     public static final Block INDUSTRIAL_IRON_BLOCK = register(
         "industrial_iron_block",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK)
-            .requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops()
     );
     public static final Block WEATHERED_IRON_BLOCK = register(
         "weathered_iron_block",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK)
-            .requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops()
     );
     public static final WindowBlock INDUSTRIAL_IRON_WINDOW = register(
         "industrial_iron_window",
         WindowBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
-            .isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never).mapColor(MapColor.COLOR_GRAY)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+            .mapColor(MapColor.COLOR_GRAY)
     );
     public static final ConnectedGlassPaneBlock INDUSTRIAL_IRON_WINDOW_PANE = register(
         "industrial_iron_window_pane",
@@ -685,8 +710,9 @@ public class AllBlocks {
     public static final WindowBlock WEATHERED_IRON_WINDOW = register(
         "weathered_iron_window",
         WindowBlock::translucent,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
-            .isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never).mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+            .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
     );
     public static final ConnectedGlassPaneBlock WEATHERED_IRON_WINDOW_PANE = register(
         "weathered_iron_window_pane",
@@ -701,7 +727,8 @@ public class AllBlocks {
     public static final BasinBlock BASIN = register(
         "basin",
         BasinBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final AndesiteFunnelBlock ANDESITE_FUNNEL = register(
         "andesite_funnel",
@@ -736,14 +763,15 @@ public class AllBlocks {
     public static final ChuteBlock CHUTE = register(
         "chute",
         ChuteBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK).noOcclusion()
-            .isSuffocating(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK).noOcclusion().isSuffocating(AllBlocks::never)
     );
     public static final SmartChuteBlock SMART_CHUTE = register(
         "smart_chute",
         SmartChuteBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK).noOcclusion()
-            .isSuffocating(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK).noOcclusion().isSuffocating(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never)
     );
     public static final ControllerRailBlock CONTROLLER_RAIL = register(
         "controller_rail",
@@ -753,7 +781,8 @@ public class AllBlocks {
     public static final CartAssemblerBlock CART_ASSEMBLER = register(
         "cart_assembler",
         CartAssemblerBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY).noOcclusion().pushReaction(PushReaction.BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY).noOcclusion()
+            .pushReaction(PushReaction.BLOCK)
     );
     public static final MinecartAnchorBlock MINECART_ANCHOR = register(
         "minecart_anchor",
@@ -810,7 +839,11 @@ public class AllBlocks {
         HosePulleyBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).mapColor(MapColor.STONE).noOcclusion()
     );
-    public static final SpoutBlock SPOUT = register("spout", SpoutBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK));
+    public static final SpoutBlock SPOUT = register(
+        "spout",
+        SpoutBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK)
+    );
     public static final ItemDrainBlock ITEM_DRAIN = register(
         "item_drain",
         ItemDrainBlock::new,
@@ -864,33 +897,38 @@ public class AllBlocks {
     public static final CrushingWheelControllerBlock CRUSHING_WHEEL_CONTROLLER = register(
         "crushing_wheel_controller",
         CrushingWheelControllerBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.STONE).noLootTable().noCollision().pushReaction(PushReaction.BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.STONE).noLootTable().noCollision()
+            .pushReaction(PushReaction.BLOCK)
     );
     public static final Block RAW_ZINC_BLOCK = register(
         "raw_zinc_block",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.RAW_GOLD_BLOCK).mapColor(MapColor.GLOW_LICHEN).requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.RAW_GOLD_BLOCK).mapColor(MapColor.GLOW_LICHEN)
+            .requiresCorrectToolForDrops()
     );
     public static final Block ZINC_BLOCK = register(
         "zinc_block",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).mapColor(MapColor.GLOW_LICHEN).requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).mapColor(MapColor.GLOW_LICHEN)
+            .requiresCorrectToolForDrops()
     );
     public static final Block ZINC_ORE = register(
         "zinc_ore",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_ORE).mapColor(MapColor.METAL).requiresCorrectToolForDrops().sound(SoundType.STONE)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_ORE).mapColor(MapColor.METAL).requiresCorrectToolForDrops()
+            .sound(SoundType.STONE)
     );
     public static final Block DEEPSLATE_ZINC_ORE = register(
         "deepslate_zinc_ore",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE_GOLD_ORE).mapColor(MapColor.STONE).requiresCorrectToolForDrops()
-            .sound(SoundType.DEEPSLATE)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE_GOLD_ORE).mapColor(MapColor.STONE)
+            .requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)
     );
     public static final Block BRASS_BLOCK = register(
         "brass_block",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).mapColor(MapColor.TERRACOTTA_YELLOW).requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).mapColor(MapColor.TERRACOTTA_YELLOW)
+            .requiresCorrectToolForDrops()
     );
     public static final FlapDisplayBlock DISPLAY_BOARD = register(
         "display_board",
@@ -910,82 +948,98 @@ public class AllBlocks {
     public static final NixieTubeBlock ORANGE_NIXIE_TUBE = register(
         "nixie_tube",
         NixieTubeBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_ORANGE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_ORANGE)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock WHITE_NIXIE_TUBE = register(
         "white_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.WHITE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.SNOW).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.SNOW)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock MAGENTA_NIXIE_TUBE = register(
         "magenta_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.MAGENTA),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_MAGENTA).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_MAGENTA)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock LIGHT_BLUE_NIXIE_TUBE = register(
         "light_blue_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.LIGHT_BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_BLUE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_BLUE)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock YELLOW_NIXIE_TUBE = register(
         "yellow_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.YELLOW),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_YELLOW).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_YELLOW)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock LIME_NIXIE_TUBE = register(
         "lime_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.LIME),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_GREEN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_GREEN)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock PINK_NIXIE_TUBE = register(
         "pink_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.PINK),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_PINK).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_PINK)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock GRAY_NIXIE_TUBE = register(
         "gray_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_GRAY).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_GRAY)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock LIGHT_GRAY_NIXIE_TUBE = register(
         "light_gray_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.LIGHT_GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_GRAY).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_LIGHT_GRAY)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock CYAN_NIXIE_TUBE = register(
         "cyan_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.CYAN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_CYAN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_CYAN)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock PURPLE_NIXIE_TUBE = register(
         "purple_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.PURPLE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_PURPLE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_PURPLE)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock BLUE_NIXIE_TUBE = register(
         "blue_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BLUE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BLUE)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock BROWN_NIXIE_TUBE = register(
         "brown_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.BROWN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BROWN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BROWN)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock GREEN_NIXIE_TUBE = register(
         "green_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.GREEN),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_GREEN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_GREEN)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock RED_NIXIE_TUBE = register(
         "red_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.RED),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_RED).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_RED)
+            .forceSolidOn()
     );
     public static final NixieTubeBlock BLACK_NIXIE_TUBE = register(
         "black_nixie_tube",
         NixieTubeBlock.dyed(DyeColor.BLACK),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BLACK).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).lightLevel($ -> 5).mapColor(MapColor.COLOR_BLACK)
+            .forceSolidOn()
     );
     public static final BracketBlock WOODEN_BRACKET = register(
         "wooden_bracket",
@@ -1000,17 +1054,20 @@ public class AllBlocks {
     public static final GirderBlock METAL_GIRDER = register(
         "metal_girder",
         GirderBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final GirderEncasedShaftBlock METAL_GIRDER_ENCASED_SHAFT = register(
         "metal_girder_encased_shaft",
         GirderEncasedShaftBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final FluidValveBlock FLUID_VALVE = register(
         "fluid_valve",
         FluidValveBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).mapColor(MapColor.COLOR_GRAY)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final SmartFluidPipeBlock SMART_FLUID_PIPE = register(
         "smart_fluid_pipe",
@@ -1030,7 +1087,8 @@ public class AllBlocks {
     public static final RedstoneLinkBlock REDSTONE_LINK = register(
         "redstone_link",
         RedstoneLinkBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.TERRACOTTA_BROWN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.TERRACOTTA_BROWN)
+            .forceSolidOn()
     );
     public static final BrassDiodeBlock PULSE_REPEATER = register(
         "pulse_repeater",
@@ -1066,12 +1124,14 @@ public class AllBlocks {
     public static final SmartObserverBlock SMART_OBSERVER = register(
         "content_observer",
         SmartObserverBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN).noOcclusion().isRedstoneConductor(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN).noOcclusion()
+            .isRedstoneConductor(AllBlocks::never)
     );
     public static final ThresholdSwitchBlock THRESHOLD_SWITCH = register(
         "stockpile_switch",
         ThresholdSwitchBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN).noOcclusion().isRedstoneConductor(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN).noOcclusion()
+            .isRedstoneConductor(AllBlocks::never)
     );
     public static final StickerBlock STICKER = register(
         "sticker",
@@ -1091,44 +1151,49 @@ public class AllBlocks {
     public static final ElevatorContactBlock ELEVATOR_CONTACT = register(
         "elevator_contact",
         ElevatorContactBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_YELLOW).lightLevel(ElevatorContactBlock::getLight)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_YELLOW)
+            .lightLevel(ElevatorContactBlock::getLight)
     );
     public static final SlidingDoorBlock ANDESITE_DOOR = register(
         "andesite_door",
         SlidingDoorBlock::stone_fold,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).requiresCorrectToolForDrops().strength(3.0F, 6.0F).mapColor(MapColor.STONE)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).requiresCorrectToolForDrops().strength(3.0F, 6.0F)
+            .mapColor(MapColor.STONE).noOcclusion()
     );
     public static final SlidingDoorBlock BRASS_DOOR = register(
         "brass_door",
         SlidingDoorBlock::stone_slide,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).requiresCorrectToolForDrops().strength(3.0F, 6.0F).mapColor(MapColor.TERRACOTTA_YELLOW)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).requiresCorrectToolForDrops().strength(3.0F, 6.0F)
+            .mapColor(MapColor.TERRACOTTA_YELLOW).noOcclusion()
     );
     public static final SlidingDoorBlock COPPER_DOOR = register(
         "copper_door",
         SlidingDoorBlock::stone_fold,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).requiresCorrectToolForDrops().strength(3.0F, 6.0F).mapColor(MapColor.COLOR_ORANGE)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).requiresCorrectToolForDrops().strength(3.0F, 6.0F)
+            .mapColor(MapColor.COLOR_ORANGE).noOcclusion()
     );
     public static final SlidingDoorBlock TRAIN_DOOR = register(
         "train_door",
         SlidingDoorBlock::metal_slide,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).requiresCorrectToolForDrops().strength(3.0F, 6.0F).mapColor(MapColor.TERRACOTTA_CYAN)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).requiresCorrectToolForDrops().strength(3.0F, 6.0F)
+            .mapColor(MapColor.TERRACOTTA_CYAN).noOcclusion()
     );
     public static final SlidingDoorBlock FRAMED_GLASS_DOOR = register(
         "framed_glass_door",
         SlidingDoorBlock::glass_slide,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).requiresCorrectToolForDrops().strength(3.0F, 6.0F).mapColor(MapColor.NONE)
-            .noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).requiresCorrectToolForDrops().strength(3.0F, 6.0F)
+            .mapColor(MapColor.NONE).noOcclusion()
     );
     public static final NozzleBlock NOZZLE = register(
         "nozzle",
         NozzleBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_LIGHT_GRAY)
     );
-    public static final DeskBellBlock DESK_BELL = register("desk_bell", DeskBellBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.SAND));
+    public static final DeskBellBlock DESK_BELL = register(
+        "desk_bell",
+        DeskBellBlock::new,
+        BlockBehaviour.Properties.of().mapColor(MapColor.SAND)
+    );
     public static final MechanicalCrafterBlock MECHANICAL_CRAFTER = register(
         "mechanical_crafter",
         MechanicalCrafterBlock::new,
@@ -1142,8 +1207,8 @@ public class AllBlocks {
     public static final TrackBlock TRACK = register(
         "track",
         TrackBlock::andesite,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion()
-            .forceSolidOn().pushReaction(PushReaction.BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.METAL).strength(0.8F)
+            .sound(SoundType.METAL).noOcclusion().forceSolidOn().pushReaction(PushReaction.BLOCK)
     );
     public static final FakeTrackBlock FAKE_TRACK = register(
         "fake_track",
@@ -1153,32 +1218,38 @@ public class AllBlocks {
     public static final SignalBlock TRACK_SIGNAL = register(
         "track_signal",
         SignalBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).noOcclusion().sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).noOcclusion()
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final StandardBogeyBlock SMALL_BOGEY = register(
         "small_bogey",
         StandardBogeyBlock::small,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).sound(SoundType.NETHERITE_BLOCK).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL)
+            .sound(SoundType.NETHERITE_BLOCK).noOcclusion()
     );
     public static final StandardBogeyBlock LARGE_BOGEY = register(
         "large_bogey",
         StandardBogeyBlock::large,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).sound(SoundType.NETHERITE_BLOCK).noOcclusion()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL)
+            .sound(SoundType.NETHERITE_BLOCK).noOcclusion()
     );
     public static final ControlsBlock TRAIN_CONTROLS = register(
         "controls",
         ControlsBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_BROWN).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_BROWN)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final StationBlock TRACK_STATION = register(
         "track_station",
         StationBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final TrackObserverBlock TRACK_OBSERVER = register(
         "track_observer",
         TrackObserverBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).noOcclusion().sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PODZOL).noOcclusion()
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final SeatBlock WHITE_SEAT = register(
         "white_seat",
@@ -1273,18 +1344,20 @@ public class AllBlocks {
     public static final PackagerBlock PACKAGER = register(
         "packager",
         PackagerBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().isRedstoneConductor(AllBlocks::never).mapColor(MapColor.TERRACOTTA_BLUE)
-            .sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().isRedstoneConductor(AllBlocks::never)
+            .mapColor(MapColor.TERRACOTTA_BLUE).sound(SoundType.NETHERITE_BLOCK)
     );
     public static final CardboardBlock CARDBOARD_BLOCK = register(
         "cardboard_block",
         CardboardBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.MUSHROOM_STEM).mapColor(MapColor.COLOR_BROWN).sound(SoundType.CHISELED_BOOKSHELF).ignitedByLava()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.MUSHROOM_STEM).mapColor(MapColor.COLOR_BROWN)
+            .sound(SoundType.CHISELED_BOOKSHELF).ignitedByLava()
     );
     public static final PackagerLinkBlock STOCK_LINK = register(
         "stock_link",
         PackagerLinkBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_BLUE).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_BLUE)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final RedstoneRequesterBlock REDSTONE_REQUESTER = register(
         "redstone_requester",
@@ -1294,8 +1367,8 @@ public class AllBlocks {
     public static final RepackagerBlock REPACKAGER = register(
         "repackager",
         RepackagerBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().isRedstoneConductor(AllBlocks::never).mapColor(MapColor.TERRACOTTA_BLUE)
-            .sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().isRedstoneConductor(AllBlocks::never)
+            .mapColor(MapColor.TERRACOTTA_BLUE).sound(SoundType.NETHERITE_BLOCK)
     );
     public static final StockTickerBlock STOCK_TICKER = register(
         "stock_ticker",
@@ -1390,7 +1463,8 @@ public class AllBlocks {
     public static final TableClothBlock BRASS_TABLE_CLOTH = register(
         "brass_table_cloth",
         TableClothBlock.styled("brass"),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_YELLOW).requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_YELLOW)
+            .requiresCorrectToolForDrops()
     );
     public static final TableClothBlock COPPER_TABLE_CLOTH = register(
         "copper_table_cloth",
@@ -1480,7 +1554,8 @@ public class AllBlocks {
     public static final FrogportBlock PACKAGE_FROGPORT = register(
         "package_frogport",
         FrogportBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().mapColor(MapColor.TERRACOTTA_BLUE).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().mapColor(MapColor.TERRACOTTA_BLUE)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final FactoryPanelBlock FACTORY_GAUGE = register(
         "factory_gauge",
@@ -1495,7 +1570,8 @@ public class AllBlocks {
     public static final ItemHatchBlock ITEM_HATCH = register(
         "item_hatch",
         ItemHatchBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_BLUE).sound(SoundType.NETHERITE_BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.TERRACOTTA_BLUE)
+            .sound(SoundType.NETHERITE_BLOCK)
     );
     public static final PlacardBlock PLACARD = register(
         "placard",
@@ -1515,12 +1591,14 @@ public class AllBlocks {
     public static final ToolboxBlock MAGENTA_TOOLBOX = register(
         "magenta_toolbox",
         ToolboxBlock.dyed(DyeColor.MAGENTA),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_MAGENTA).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_MAGENTA)
+            .forceSolidOn()
     );
     public static final ToolboxBlock LIGHT_BLUE_TOOLBOX = register(
         "light_blue_toolbox",
         ToolboxBlock.dyed(DyeColor.LIGHT_BLUE),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_BLUE).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_BLUE)
+            .forceSolidOn()
     );
     public static final ToolboxBlock YELLOW_TOOLBOX = register(
         "yellow_toolbox",
@@ -1530,7 +1608,8 @@ public class AllBlocks {
     public static final ToolboxBlock LIME_TOOLBOX = register(
         "lime_toolbox",
         ToolboxBlock.dyed(DyeColor.LIME),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GREEN).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GREEN)
+            .forceSolidOn()
     );
     public static final ToolboxBlock PINK_TOOLBOX = register(
         "pink_toolbox",
@@ -1545,7 +1624,8 @@ public class AllBlocks {
     public static final ToolboxBlock LIGHT_GRAY_TOOLBOX = register(
         "light_gray_toolbox",
         ToolboxBlock.dyed(DyeColor.LIGHT_GRAY),
-        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GRAY).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.COLOR_LIGHT_GRAY)
+            .forceSolidOn()
     );
     public static final ToolboxBlock CYAN_TOOLBOX = register(
         "cyan_toolbox",
@@ -1585,7 +1665,8 @@ public class AllBlocks {
     public static final SchematicTableBlock SCHEMATIC_TABLE = register(
         "schematic_table",
         SchematicTableBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.LECTERN).mapColor(MapColor.PODZOL).forceSolidOn().pushReaction(PushReaction.BLOCK)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.LECTERN).mapColor(MapColor.PODZOL).forceSolidOn()
+            .pushReaction(PushReaction.BLOCK)
     );
     public static final SchematicannonBlock SCHEMATICANNON = register(
         "schematicannon",
@@ -1595,8 +1676,9 @@ public class AllBlocks {
     public static final WindowBlock ORNATE_IRON_WINDOW = register(
         "ornate_iron_window",
         WindowBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
-            .isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never).mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+            .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
     );
     public static final MetalLadderBlock ANDESITE_LADDER = register(
         "andesite_ladder",
@@ -1621,7 +1703,8 @@ public class AllBlocks {
     public static final MetalScaffoldingBlock BRASS_SCAFFOLD = register(
         "brass_scaffolding",
         MetalScaffoldingBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.SCAFFOLDING).sound(SoundType.COPPER).mapColor(MapColor.TERRACOTTA_YELLOW)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.SCAFFOLDING).sound(SoundType.COPPER)
+            .mapColor(MapColor.TERRACOTTA_YELLOW)
     );
     public static final MetalScaffoldingBlock COPPER_SCAFFOLD = register(
         "copper_scaffolding",
@@ -1636,7 +1719,8 @@ public class AllBlocks {
     public static final IronBarsBlock BRASS_BARS = register(
         "brass_bars",
         IronBarsBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).sound(SoundType.COPPER).mapColor(MapColor.TERRACOTTA_YELLOW)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).sound(SoundType.COPPER)
+            .mapColor(MapColor.TERRACOTTA_YELLOW)
     );
     public static final IronBarsBlock COPPER_BARS = register(
         "copper_bars",
@@ -1661,29 +1745,32 @@ public class AllBlocks {
     public static final CardboardBlock BOUND_CARDBOARD_BLOCK = register(
         "bound_cardboard_block",
         CardboardBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.MUSHROOM_STEM).mapColor(MapColor.COLOR_BROWN).sound(SoundType.CHISELED_BOOKSHELF).ignitedByLava()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.MUSHROOM_STEM).mapColor(MapColor.COLOR_BROWN)
+            .sound(SoundType.CHISELED_BOOKSHELF).ignitedByLava()
     );
     public static final ExperienceBlock EXPERIENCE_BLOCK = register(
         "experience_block",
         ExperienceBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PLANT).sound(ExperienceBlock.SOUND).requiresCorrectToolForDrops()
-            .lightLevel(s -> 15)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).mapColor(MapColor.PLANT).sound(ExperienceBlock.SOUND)
+            .requiresCorrectToolForDrops().lightLevel(s -> 15)
     );
     public static final RotatedPillarBlock ROSE_QUARTZ_BLOCK = register(
         "rose_quartz_block",
         RotatedPillarBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.AMETHYST_BLOCK).mapColor(MapColor.TERRACOTTA_PINK).requiresCorrectToolForDrops()
-            .sound(SoundType.DEEPSLATE)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.AMETHYST_BLOCK).mapColor(MapColor.TERRACOTTA_PINK)
+            .requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)
     );
     public static final Block ROSE_QUARTZ_TILES = register(
         "rose_quartz_tiles",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).mapColor(MapColor.TERRACOTTA_PINK).requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).mapColor(MapColor.TERRACOTTA_PINK)
+            .requiresCorrectToolForDrops()
     );
     public static final Block SMALL_ROSE_QUARTZ_TILES = register(
         "small_rose_quartz_tiles",
         Block::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).mapColor(MapColor.TERRACOTTA_PINK).requiresCorrectToolForDrops()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).mapColor(MapColor.TERRACOTTA_PINK)
+            .requiresCorrectToolForDrops()
     );
     public static final WeatheringCopperFullBlock COPPER_SHINGLES = register(
         "copper_shingles",
@@ -1767,22 +1854,38 @@ public class AllBlocks {
     );
     public static final WeatheringCopperStairBlock COPPER_SHINGLE_STAIRS = register(
         "copper_shingle_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.UNAFFECTED, COPPER_SHINGLES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.UNAFFECTED,
+            COPPER_SHINGLES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK)
     );
     public static final WeatheringCopperStairBlock EXPOSED_COPPER_SHINGLE_STAIRS = register(
         "exposed_copper_shingle_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.EXPOSED, EXPOSED_COPPER_SHINGLES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.EXPOSED,
+            EXPOSED_COPPER_SHINGLES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.EXPOSED_COPPER)
     );
     public static final WeatheringCopperStairBlock WEATHERED_COPPER_SHINGLE_STAIRS = register(
         "weathered_copper_shingle_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.WEATHERED, WEATHERED_COPPER_SHINGLES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.WEATHERED,
+            WEATHERED_COPPER_SHINGLES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.WEATHERED_COPPER)
     );
     public static final WeatheringCopperStairBlock OXIDIZED_COPPER_SHINGLE_STAIRS = register(
         "oxidized_copper_shingle_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.OXIDIZED, OXIDIZED_COPPER_SHINGLES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.OXIDIZED,
+            OXIDIZED_COPPER_SHINGLES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.OXIDIZED_COPPER)
     );
     public static final StairBlock WAXED_COPPER_SHINGLE_STAIRS = register(
@@ -1892,17 +1995,29 @@ public class AllBlocks {
     );
     public static final WeatheringCopperStairBlock EXPOSED_COPPER_TILE_STAIRS = register(
         "exposed_copper_tile_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.EXPOSED, EXPOSED_COPPER_TILES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.EXPOSED,
+            EXPOSED_COPPER_TILES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.EXPOSED_COPPER)
     );
     public static final WeatheringCopperStairBlock WEATHERED_COPPER_TILE_STAIRS = register(
         "weathered_copper_tile_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.WEATHERED, WEATHERED_COPPER_TILES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.WEATHERED,
+            WEATHERED_COPPER_TILES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.WEATHERED_COPPER)
     );
     public static final WeatheringCopperStairBlock OXIDIZED_COPPER_TILE_STAIRS = register(
         "oxidized_copper_tile_stairs",
-        settings -> new WeatheringCopperStairBlock(WeatherState.OXIDIZED, OXIDIZED_COPPER_TILES.defaultBlockState(), settings),
+        settings -> new WeatheringCopperStairBlock(
+            WeatherState.OXIDIZED,
+            OXIDIZED_COPPER_TILES.defaultBlockState(),
+            settings
+        ),
         BlockBehaviour.Properties.ofFullCopy(Blocks.OXIDIZED_COPPER)
     );
     public static final StairBlock WAXED_COPPER_TILE_STAIRS = register(
@@ -1933,20 +2048,20 @@ public class AllBlocks {
     public static final ConnectedGlassBlock FRAMED_GLASS = register(
         "framed_glass",
         ConnectedGlassBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
-            .isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
     );
     public static final ConnectedGlassBlock HORIZONTAL_FRAMED_GLASS = register(
         "horizontal_framed_glass",
         ConnectedGlassBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
-            .isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
     );
     public static final ConnectedGlassBlock VERTICAL_FRAMED_GLASS = register(
         "vertical_framed_glass",
         ConnectedGlassBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never)
-            .isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(AllBlocks::never)
+            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
     );
     public static final GlassPaneBlock TILED_GLASS_PANE = register(
         "tiled_glass_pane",
@@ -1995,8 +2110,9 @@ public class AllBlocks {
     public static final WindowBlock ACACIA_WINDOW = register(
         "acacia_window",
         WindowBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.COLOR_ORANGE).isValidSpawn(AllBlocks::never)
-            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.COLOR_ORANGE)
+            .isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never)
+            .isViewBlocking(AllBlocks::never)
     );
     public static final WindowBlock DARK_OAK_WINDOW = register(
         "dark_oak_window",
@@ -2013,8 +2129,9 @@ public class AllBlocks {
     public static final WindowBlock CRIMSON_WINDOW = register(
         "crimson_window",
         WindowBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.CRIMSON_STEM).isValidSpawn(AllBlocks::never)
-            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.CRIMSON_STEM)
+            .isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never)
+            .isViewBlocking(AllBlocks::never)
     );
     public static final WindowBlock WARPED_WINDOW = register(
         "warped_window",
@@ -2025,14 +2142,16 @@ public class AllBlocks {
     public static final WindowBlock CHERRY_WINDOW = register(
         "cherry_window",
         WindowBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.TERRACOTTA_WHITE).isValidSpawn(AllBlocks::never)
-            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.TERRACOTTA_WHITE)
+            .isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never)
+            .isViewBlocking(AllBlocks::never)
     );
     public static final WindowBlock BAMBOO_WINDOW = register(
         "bamboo_window",
         WindowBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.COLOR_YELLOW).isValidSpawn(AllBlocks::never)
-            .isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never).isViewBlocking(AllBlocks::never)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).mapColor(MapColor.COLOR_YELLOW)
+            .isValidSpawn(AllBlocks::never).isRedstoneConductor(AllBlocks::never).isSuffocating(AllBlocks::never)
+            .isViewBlocking(AllBlocks::never)
     );
     public static final ConnectedGlassPaneBlock OAK_WINDOW_PANE = register(
         "oak_window_pane",
@@ -2094,7 +2213,11 @@ public class AllBlocks {
         ConnectedGlassPaneBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS_PANE).mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
     );
-    public static final Block CUT_GRANITE = register("cut_granite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE));
+    public static final Block CUT_GRANITE = register(
+        "cut_granite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE)
+    );
     public static final StairBlock CUT_GRANITE_STAIRS = register(
         "cut_granite_stairs",
         settings -> new StairBlock(CUT_GRANITE.defaultBlockState(), settings),
@@ -2130,7 +2253,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE).forceSolidOn()
     );
-    public static final Block CUT_GRANITE_BRICKS = register("cut_granite_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE));
+    public static final Block CUT_GRANITE_BRICKS = register(
+        "cut_granite_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE)
+    );
     public static final StairBlock CUT_GRANITE_BRICK_STAIRS = register(
         "cut_granite_brick_stairs",
         settings -> new StairBlock(CUT_GRANITE_BRICKS.defaultBlockState(), settings),
@@ -2166,13 +2293,21 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE).forceSolidOn()
     );
-    public static final Block LAYERED_GRANITE = register("layered_granite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE));
+    public static final Block LAYERED_GRANITE = register(
+        "layered_granite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE)
+    );
     public static final ConnectedPillarBlock GRANITE_PILLAR = register(
         "granite_pillar",
         ConnectedPillarBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GRANITE)
     );
-    public static final Block CUT_DIORITE = register("cut_diorite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE));
+    public static final Block CUT_DIORITE = register(
+        "cut_diorite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE)
+    );
     public static final StairBlock CUT_DIORITE_STAIRS = register(
         "cut_diorite_stairs",
         settings -> new StairBlock(CUT_DIORITE.defaultBlockState(), settings),
@@ -2208,7 +2343,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE).forceSolidOn()
     );
-    public static final Block CUT_DIORITE_BRICKS = register("cut_diorite_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE));
+    public static final Block CUT_DIORITE_BRICKS = register(
+        "cut_diorite_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE)
+    );
     public static final StairBlock CUT_DIORITE_BRICK_STAIRS = register(
         "cut_diorite_brick_stairs",
         settings -> new StairBlock(CUT_DIORITE_BRICKS.defaultBlockState(), settings),
@@ -2244,13 +2383,21 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE).forceSolidOn()
     );
-    public static final Block LAYERED_DIORITE = register("layered_diorite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE));
+    public static final Block LAYERED_DIORITE = register(
+        "layered_diorite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE)
+    );
     public static final ConnectedPillarBlock DIORITE_PILLAR = register(
         "diorite_pillar",
         ConnectedPillarBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DIORITE)
     );
-    public static final Block CUT_ANDESITE = register("cut_andesite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE));
+    public static final Block CUT_ANDESITE = register(
+        "cut_andesite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE)
+    );
     public static final StairBlock CUT_ANDESITE_STAIRS = register(
         "cut_andesite_stairs",
         settings -> new StairBlock(CUT_ANDESITE.defaultBlockState(), settings),
@@ -2326,13 +2473,21 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).forceSolidOn()
     );
-    public static final Block LAYERED_ANDESITE = register("layered_andesite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE));
+    public static final Block LAYERED_ANDESITE = register(
+        "layered_andesite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE)
+    );
     public static final ConnectedPillarBlock ANDESITE_PILLAR = register(
         "andesite_pillar",
         ConnectedPillarBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE)
     );
-    public static final Block CUT_CALCITE = register("cut_calcite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE));
+    public static final Block CUT_CALCITE = register(
+        "cut_calcite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE)
+    );
     public static final StairBlock CUT_CALCITE_STAIRS = register(
         "cut_calcite_stairs",
         settings -> new StairBlock(CUT_CALCITE.defaultBlockState(), settings),
@@ -2368,7 +2523,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE).forceSolidOn()
     );
-    public static final Block CUT_CALCITE_BRICKS = register("cut_calcite_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE));
+    public static final Block CUT_CALCITE_BRICKS = register(
+        "cut_calcite_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE)
+    );
     public static final StairBlock CUT_CALCITE_BRICK_STAIRS = register(
         "cut_calcite_brick_stairs",
         settings -> new StairBlock(CUT_CALCITE_BRICKS.defaultBlockState(), settings),
@@ -2404,13 +2563,21 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE).forceSolidOn()
     );
-    public static final Block LAYERED_CALCITE = register("layered_calcite", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE));
+    public static final Block LAYERED_CALCITE = register(
+        "layered_calcite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE)
+    );
     public static final ConnectedPillarBlock CALCITE_PILLAR = register(
         "calcite_pillar",
         ConnectedPillarBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE)
     );
-    public static final Block CUT_DRIPSTONE = register("cut_dripstone", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DRIPSTONE_BLOCK));
+    public static final Block CUT_DRIPSTONE = register(
+        "cut_dripstone",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DRIPSTONE_BLOCK)
+    );
     public static final StairBlock CUT_DRIPSTONE_STAIRS = register(
         "cut_dripstone_stairs",
         settings -> new StairBlock(CUT_DRIPSTONE.defaultBlockState(), settings),
@@ -2496,7 +2663,11 @@ public class AllBlocks {
         ConnectedPillarBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DRIPSTONE_BLOCK)
     );
-    public static final Block CUT_DEEPSLATE = register("cut_deepslate", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE));
+    public static final Block CUT_DEEPSLATE = register(
+        "cut_deepslate",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE)
+    );
     public static final StairBlock CUT_DEEPSLATE_STAIRS = register(
         "cut_deepslate_stairs",
         settings -> new StairBlock(CUT_DEEPSLATE.defaultBlockState(), settings),
@@ -2572,25 +2743,41 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).forceSolidOn()
     );
-    public static final Block LAYERED_DEEPSLATE = register("layered_deepslate", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE));
+    public static final Block LAYERED_DEEPSLATE = register(
+        "layered_deepslate",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE)
+    );
     public static final ConnectedPillarBlock DEEPSLATE_PILLAR = register(
         "deepslate_pillar",
         ConnectedPillarBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE)
     );
-    public static final Block CUT_TUFF = register("cut_tuff", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF));
+    public static final Block CUT_TUFF = register(
+        "cut_tuff",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
+    );
     public static final StairBlock CUT_TUFF_STAIRS = register(
         "cut_tuff_stairs",
         settings -> new StairBlock(CUT_TUFF.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
     );
-    public static final SlabBlock CUT_TUFF_SLAB = register("cut_tuff_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF));
+    public static final SlabBlock CUT_TUFF_SLAB = register(
+        "cut_tuff_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
+    );
     public static final WallBlock CUT_TUFF_WALL = register(
         "cut_tuff_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_TUFF = register("polished_cut_tuff", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF));
+    public static final Block POLISHED_CUT_TUFF = register(
+        "polished_cut_tuff",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
+    );
     public static final StairBlock POLISHED_CUT_TUFF_STAIRS = register(
         "polished_cut_tuff_stairs",
         settings -> new StairBlock(POLISHED_CUT_TUFF.defaultBlockState(), settings),
@@ -2606,7 +2793,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF).forceSolidOn()
     );
-    public static final Block CUT_TUFF_BRICKS = register("cut_tuff_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF));
+    public static final Block CUT_TUFF_BRICKS = register(
+        "cut_tuff_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
+    );
     public static final StairBlock CUT_TUFF_BRICK_STAIRS = register(
         "cut_tuff_brick_stairs",
         settings -> new StairBlock(CUT_TUFF_BRICKS.defaultBlockState(), settings),
@@ -2622,7 +2813,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF).forceSolidOn()
     );
-    public static final Block SMALL_TUFF_BRICKS = register("small_tuff_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF));
+    public static final Block SMALL_TUFF_BRICKS = register(
+        "small_tuff_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
+    );
     public static final StairBlock SMALL_TUFF_BRICK_STAIRS = register(
         "small_tuff_brick_stairs",
         settings -> new StairBlock(SMALL_TUFF_BRICKS.defaultBlockState(), settings),
@@ -2638,7 +2833,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF).forceSolidOn()
     );
-    public static final Block LAYERED_TUFF = register("layered_tuff", Block::new, BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF));
+    public static final Block LAYERED_TUFF = register(
+        "layered_tuff",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF)
+    );
     public static final ConnectedPillarBlock TUFF_PILLAR = register(
         "tuff_pillar",
         ConnectedPillarBlock::new,
@@ -2649,19 +2848,31 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).mapColor(MapColor.COLOR_BLUE).destroyTime(1.25f)
     );
-    public static final Block CUT_ASURINE = register("cut_asurine", Block::new, BlockBehaviour.Properties.ofFullCopy(ASURINE));
+    public static final Block CUT_ASURINE = register(
+        "cut_asurine",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(ASURINE)
+    );
     public static final StairBlock CUT_ASURINE_STAIRS = register(
         "cut_asurine_stairs",
         settings -> new StairBlock(CUT_ASURINE.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(ASURINE)
     );
-    public static final SlabBlock CUT_ASURINE_SLAB = register("cut_asurine_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(ASURINE));
+    public static final SlabBlock CUT_ASURINE_SLAB = register(
+        "cut_asurine_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(ASURINE)
+    );
     public static final WallBlock CUT_ASURINE_WALL = register(
         "cut_asurine_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(ASURINE).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_ASURINE = register("polished_cut_asurine", Block::new, BlockBehaviour.Properties.ofFullCopy(ASURINE));
+    public static final Block POLISHED_CUT_ASURINE = register(
+        "polished_cut_asurine",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(ASURINE)
+    );
     public static final StairBlock POLISHED_CUT_ASURINE_STAIRS = register(
         "polished_cut_asurine_stairs",
         settings -> new StairBlock(POLISHED_CUT_ASURINE.defaultBlockState(), settings),
@@ -2677,7 +2888,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(ASURINE).forceSolidOn()
     );
-    public static final Block CUT_ASURINE_BRICKS = register("cut_asurine_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(ASURINE));
+    public static final Block CUT_ASURINE_BRICKS = register(
+        "cut_asurine_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(ASURINE)
+    );
     public static final StairBlock CUT_ASURINE_BRICK_STAIRS = register(
         "cut_asurine_brick_stairs",
         settings -> new StairBlock(CUT_ASURINE_BRICKS.defaultBlockState(), settings),
@@ -2693,7 +2908,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(ASURINE).forceSolidOn()
     );
-    public static final Block SMALL_ASURINE_BRICKS = register("small_asurine_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(ASURINE));
+    public static final Block SMALL_ASURINE_BRICKS = register(
+        "small_asurine_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(ASURINE)
+    );
     public static final StairBlock SMALL_ASURINE_BRICK_STAIRS = register(
         "small_asurine_brick_stairs",
         settings -> new StairBlock(SMALL_ASURINE_BRICKS.defaultBlockState(), settings),
@@ -2709,7 +2928,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(ASURINE).forceSolidOn()
     );
-    public static final Block LAYERED_ASURINE = register("layered_asurine", Block::new, BlockBehaviour.Properties.ofFullCopy(ASURINE));
+    public static final Block LAYERED_ASURINE = register(
+        "layered_asurine",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(ASURINE)
+    );
     public static final ConnectedPillarBlock ASURINE_PILLAR = register(
         "asurine_pillar",
         ConnectedPillarBlock::new,
@@ -2720,19 +2943,31 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE).mapColor(MapColor.COLOR_RED).destroyTime(1.25f)
     );
-    public static final Block CUT_CRIMSITE = register("cut_crimsite", Block::new, BlockBehaviour.Properties.ofFullCopy(CRIMSITE));
+    public static final Block CUT_CRIMSITE = register(
+        "cut_crimsite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
+    );
     public static final StairBlock CUT_CRIMSITE_STAIRS = register(
         "cut_crimsite_stairs",
         settings -> new StairBlock(CUT_CRIMSITE.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
     );
-    public static final SlabBlock CUT_CRIMSITE_SLAB = register("cut_crimsite_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(CRIMSITE));
+    public static final SlabBlock CUT_CRIMSITE_SLAB = register(
+        "cut_crimsite_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
+    );
     public static final WallBlock CUT_CRIMSITE_WALL = register(
         "cut_crimsite_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(CRIMSITE).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_CRIMSITE = register("polished_cut_crimsite", Block::new, BlockBehaviour.Properties.ofFullCopy(CRIMSITE));
+    public static final Block POLISHED_CUT_CRIMSITE = register(
+        "polished_cut_crimsite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
+    );
     public static final StairBlock POLISHED_CUT_CRIMSITE_STAIRS = register(
         "polished_cut_crimsite_stairs",
         settings -> new StairBlock(POLISHED_CUT_CRIMSITE.defaultBlockState(), settings),
@@ -2748,7 +2983,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(CRIMSITE).forceSolidOn()
     );
-    public static final Block CUT_CRIMSITE_BRICKS = register("cut_crimsite_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(CRIMSITE));
+    public static final Block CUT_CRIMSITE_BRICKS = register(
+        "cut_crimsite_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
+    );
     public static final StairBlock CUT_CRIMSITE_BRICK_STAIRS = register(
         "cut_crimsite_brick_stairs",
         settings -> new StairBlock(CUT_CRIMSITE_BRICKS.defaultBlockState(), settings),
@@ -2764,7 +3003,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(CRIMSITE).forceSolidOn()
     );
-    public static final Block SMALL_CRIMSITE_BRICKS = register("small_crimsite_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(CRIMSITE));
+    public static final Block SMALL_CRIMSITE_BRICKS = register(
+        "small_crimsite_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
+    );
     public static final StairBlock SMALL_CRIMSITE_BRICK_STAIRS = register(
         "small_crimsite_brick_stairs",
         settings -> new StairBlock(SMALL_CRIMSITE_BRICKS.defaultBlockState(), settings),
@@ -2780,7 +3023,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(CRIMSITE).forceSolidOn()
     );
-    public static final Block LAYERED_CRIMSITE = register("layered_crimsite", Block::new, BlockBehaviour.Properties.ofFullCopy(CRIMSITE));
+    public static final Block LAYERED_CRIMSITE = register(
+        "layered_crimsite",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(CRIMSITE)
+    );
     public static final ConnectedPillarBlock CRIMSITE_PILLAR = register(
         "crimsite_pillar",
         ConnectedPillarBlock::new,
@@ -2791,7 +3038,11 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE).mapColor(MapColor.SAND).destroyTime(1.25f)
     );
-    public static final Block CUT_LIMESTONE = register("cut_limestone", Block::new, BlockBehaviour.Properties.ofFullCopy(LIMESTONE));
+    public static final Block CUT_LIMESTONE = register(
+        "cut_limestone",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(LIMESTONE)
+    );
     public static final StairBlock CUT_LIMESTONE_STAIRS = register(
         "cut_limestone_stairs",
         settings -> new StairBlock(CUT_LIMESTONE.defaultBlockState(), settings),
@@ -2827,7 +3078,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(LIMESTONE).forceSolidOn()
     );
-    public static final Block CUT_LIMESTONE_BRICKS = register("cut_limestone_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(LIMESTONE));
+    public static final Block CUT_LIMESTONE_BRICKS = register(
+        "cut_limestone_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(LIMESTONE)
+    );
     public static final StairBlock CUT_LIMESTONE_BRICK_STAIRS = register(
         "cut_limestone_brick_stairs",
         settings -> new StairBlock(CUT_LIMESTONE_BRICKS.defaultBlockState(), settings),
@@ -2863,7 +3118,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(LIMESTONE).forceSolidOn()
     );
-    public static final Block LAYERED_LIMESTONE = register("layered_limestone", Block::new, BlockBehaviour.Properties.ofFullCopy(LIMESTONE));
+    public static final Block LAYERED_LIMESTONE = register(
+        "layered_limestone",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(LIMESTONE)
+    );
     public static final ConnectedPillarBlock LIMESTONE_PILLAR = register(
         "limestone_pillar",
         ConnectedPillarBlock::new,
@@ -2874,19 +3133,31 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE).mapColor(MapColor.TERRACOTTA_YELLOW).destroyTime(1.25f)
     );
-    public static final Block CUT_OCHRUM = register("cut_ochrum", Block::new, BlockBehaviour.Properties.ofFullCopy(OCHRUM));
+    public static final Block CUT_OCHRUM = register(
+        "cut_ochrum",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(OCHRUM)
+    );
     public static final StairBlock CUT_OCHRUM_STAIRS = register(
         "cut_ochrum_stairs",
         settings -> new StairBlock(CUT_OCHRUM.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(OCHRUM)
     );
-    public static final SlabBlock CUT_OCHRUM_SLAB = register("cut_ochrum_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(OCHRUM));
+    public static final SlabBlock CUT_OCHRUM_SLAB = register(
+        "cut_ochrum_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(OCHRUM)
+    );
     public static final WallBlock CUT_OCHRUM_WALL = register(
         "cut_ochrum_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(OCHRUM).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_OCHRUM = register("polished_cut_ochrum", Block::new, BlockBehaviour.Properties.ofFullCopy(OCHRUM));
+    public static final Block POLISHED_CUT_OCHRUM = register(
+        "polished_cut_ochrum",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(OCHRUM)
+    );
     public static final StairBlock POLISHED_CUT_OCHRUM_STAIRS = register(
         "polished_cut_ochrum_stairs",
         settings -> new StairBlock(POLISHED_CUT_OCHRUM.defaultBlockState(), settings),
@@ -2902,7 +3173,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(OCHRUM).forceSolidOn()
     );
-    public static final Block CUT_OCHRUM_BRICKS = register("cut_ochrum_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(OCHRUM));
+    public static final Block CUT_OCHRUM_BRICKS = register(
+        "cut_ochrum_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(OCHRUM)
+    );
     public static final StairBlock CUT_OCHRUM_BRICK_STAIRS = register(
         "cut_ochrum_brick_stairs",
         settings -> new StairBlock(CUT_OCHRUM_BRICKS.defaultBlockState(), settings),
@@ -2918,7 +3193,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(OCHRUM).forceSolidOn()
     );
-    public static final Block SMALL_OCHRUM_BRICKS = register("small_ochrum_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(OCHRUM));
+    public static final Block SMALL_OCHRUM_BRICKS = register(
+        "small_ochrum_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(OCHRUM)
+    );
     public static final StairBlock SMALL_OCHRUM_BRICK_STAIRS = register(
         "small_ochrum_brick_stairs",
         settings -> new StairBlock(SMALL_OCHRUM_BRICKS.defaultBlockState(), settings),
@@ -2934,7 +3213,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(OCHRUM).forceSolidOn()
     );
-    public static final Block LAYERED_OCHRUM = register("layered_ochrum", Block::new, BlockBehaviour.Properties.ofFullCopy(OCHRUM));
+    public static final Block LAYERED_OCHRUM = register(
+        "layered_ochrum",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(OCHRUM)
+    );
     public static final ConnectedPillarBlock OCHRUM_PILLAR = register(
         "ochrum_pillar",
         ConnectedPillarBlock::new,
@@ -2945,19 +3228,31 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.BLACKSTONE).mapColor(MapColor.COLOR_BROWN)
     );
-    public static final Block CUT_SCORIA = register("cut_scoria", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORIA));
+    public static final Block CUT_SCORIA = register(
+        "cut_scoria",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORIA)
+    );
     public static final StairBlock CUT_SCORIA_STAIRS = register(
         "cut_scoria_stairs",
         settings -> new StairBlock(CUT_SCORIA.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(SCORIA)
     );
-    public static final SlabBlock CUT_SCORIA_SLAB = register("cut_scoria_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(SCORIA));
+    public static final SlabBlock CUT_SCORIA_SLAB = register(
+        "cut_scoria_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORIA)
+    );
     public static final WallBlock CUT_SCORIA_WALL = register(
         "cut_scoria_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORIA).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_SCORIA = register("polished_cut_scoria", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORIA));
+    public static final Block POLISHED_CUT_SCORIA = register(
+        "polished_cut_scoria",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORIA)
+    );
     public static final StairBlock POLISHED_CUT_SCORIA_STAIRS = register(
         "polished_cut_scoria_stairs",
         settings -> new StairBlock(POLISHED_CUT_SCORIA.defaultBlockState(), settings),
@@ -2973,7 +3268,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORIA).forceSolidOn()
     );
-    public static final Block CUT_SCORIA_BRICKS = register("cut_scoria_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORIA));
+    public static final Block CUT_SCORIA_BRICKS = register(
+        "cut_scoria_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORIA)
+    );
     public static final StairBlock CUT_SCORIA_BRICK_STAIRS = register(
         "cut_scoria_brick_stairs",
         settings -> new StairBlock(CUT_SCORIA_BRICKS.defaultBlockState(), settings),
@@ -2989,7 +3288,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORIA).forceSolidOn()
     );
-    public static final Block SMALL_SCORIA_BRICKS = register("small_scoria_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORIA));
+    public static final Block SMALL_SCORIA_BRICKS = register(
+        "small_scoria_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORIA)
+    );
     public static final StairBlock SMALL_SCORIA_BRICK_STAIRS = register(
         "small_scoria_brick_stairs",
         settings -> new StairBlock(SMALL_SCORIA_BRICKS.defaultBlockState(), settings),
@@ -3005,7 +3308,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORIA).forceSolidOn()
     );
-    public static final Block LAYERED_SCORIA = register("layered_scoria", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORIA));
+    public static final Block LAYERED_SCORIA = register(
+        "layered_scoria",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORIA)
+    );
     public static final ConnectedPillarBlock SCORIA_PILLAR = register(
         "scoria_pillar",
         ConnectedPillarBlock::new,
@@ -3016,19 +3323,31 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.BLACKSTONE).mapColor(MapColor.TERRACOTTA_GRAY).destroyTime(1.25f)
     );
-    public static final Block CUT_SCORCHIA = register("cut_scorchia", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORCHIA));
+    public static final Block CUT_SCORCHIA = register(
+        "cut_scorchia",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
+    );
     public static final StairBlock CUT_SCORCHIA_STAIRS = register(
         "cut_scorchia_stairs",
         settings -> new StairBlock(CUT_SCORCHIA.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
     );
-    public static final SlabBlock CUT_SCORCHIA_SLAB = register("cut_scorchia_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(SCORCHIA));
+    public static final SlabBlock CUT_SCORCHIA_SLAB = register(
+        "cut_scorchia_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
+    );
     public static final WallBlock CUT_SCORCHIA_WALL = register(
         "cut_scorchia_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORCHIA).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_SCORCHIA = register("polished_cut_scorchia", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORCHIA));
+    public static final Block POLISHED_CUT_SCORCHIA = register(
+        "polished_cut_scorchia",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
+    );
     public static final StairBlock POLISHED_CUT_SCORCHIA_STAIRS = register(
         "polished_cut_scorchia_stairs",
         settings -> new StairBlock(POLISHED_CUT_SCORCHIA.defaultBlockState(), settings),
@@ -3044,7 +3363,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORCHIA).forceSolidOn()
     );
-    public static final Block CUT_SCORCHIA_BRICKS = register("cut_scorchia_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORCHIA));
+    public static final Block CUT_SCORCHIA_BRICKS = register(
+        "cut_scorchia_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
+    );
     public static final StairBlock CUT_SCORCHIA_BRICK_STAIRS = register(
         "cut_scorchia_brick_stairs",
         settings -> new StairBlock(CUT_SCORCHIA_BRICKS.defaultBlockState(), settings),
@@ -3060,7 +3383,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORCHIA).forceSolidOn()
     );
-    public static final Block SMALL_SCORCHIA_BRICKS = register("small_scorchia_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORCHIA));
+    public static final Block SMALL_SCORCHIA_BRICKS = register(
+        "small_scorchia_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
+    );
     public static final StairBlock SMALL_SCORCHIA_BRICK_STAIRS = register(
         "small_scorchia_brick_stairs",
         settings -> new StairBlock(SMALL_SCORCHIA_BRICKS.defaultBlockState(), settings),
@@ -3076,7 +3403,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(SCORCHIA).forceSolidOn()
     );
-    public static final Block LAYERED_SCORCHIA = register("layered_scorchia", Block::new, BlockBehaviour.Properties.ofFullCopy(SCORCHIA));
+    public static final Block LAYERED_SCORCHIA = register(
+        "layered_scorchia",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(SCORCHIA)
+    );
     public static final ConnectedPillarBlock SCORCHIA_PILLAR = register(
         "scorchia_pillar",
         ConnectedPillarBlock::new,
@@ -3087,19 +3418,31 @@ public class AllBlocks {
         Block::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.TUFF).mapColor(MapColor.WARPED_NYLIUM).destroyTime(1.25f)
     );
-    public static final Block CUT_VERIDIUM = register("cut_veridium", Block::new, BlockBehaviour.Properties.ofFullCopy(VERIDIUM));
+    public static final Block CUT_VERIDIUM = register(
+        "cut_veridium",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
+    );
     public static final StairBlock CUT_VERIDIUM_STAIRS = register(
         "cut_veridium_stairs",
         settings -> new StairBlock(CUT_VERIDIUM.defaultBlockState(), settings),
         BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
     );
-    public static final SlabBlock CUT_VERIDIUM_SLAB = register("cut_veridium_slab", SlabBlock::new, BlockBehaviour.Properties.ofFullCopy(VERIDIUM));
+    public static final SlabBlock CUT_VERIDIUM_SLAB = register(
+        "cut_veridium_slab",
+        SlabBlock::new,
+        BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
+    );
     public static final WallBlock CUT_VERIDIUM_WALL = register(
         "cut_veridium_wall",
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(VERIDIUM).forceSolidOn()
     );
-    public static final Block POLISHED_CUT_VERIDIUM = register("polished_cut_veridium", Block::new, BlockBehaviour.Properties.ofFullCopy(VERIDIUM));
+    public static final Block POLISHED_CUT_VERIDIUM = register(
+        "polished_cut_veridium",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
+    );
     public static final StairBlock POLISHED_CUT_VERIDIUM_STAIRS = register(
         "polished_cut_veridium_stairs",
         settings -> new StairBlock(POLISHED_CUT_VERIDIUM.defaultBlockState(), settings),
@@ -3115,7 +3458,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(VERIDIUM).forceSolidOn()
     );
-    public static final Block CUT_VERIDIUM_BRICKS = register("cut_veridium_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(VERIDIUM));
+    public static final Block CUT_VERIDIUM_BRICKS = register(
+        "cut_veridium_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
+    );
     public static final StairBlock CUT_VERIDIUM_BRICK_STAIRS = register(
         "cut_veridium_brick_stairs",
         settings -> new StairBlock(CUT_VERIDIUM_BRICKS.defaultBlockState(), settings),
@@ -3131,7 +3478,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(VERIDIUM).forceSolidOn()
     );
-    public static final Block SMALL_VERIDIUM_BRICKS = register("small_veridium_bricks", Block::new, BlockBehaviour.Properties.ofFullCopy(VERIDIUM));
+    public static final Block SMALL_VERIDIUM_BRICKS = register(
+        "small_veridium_bricks",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
+    );
     public static final StairBlock SMALL_VERIDIUM_BRICK_STAIRS = register(
         "small_veridium_brick_stairs",
         settings -> new StairBlock(SMALL_VERIDIUM_BRICKS.defaultBlockState(), settings),
@@ -3147,7 +3498,11 @@ public class AllBlocks {
         WallBlock::new,
         BlockBehaviour.Properties.ofFullCopy(VERIDIUM).forceSolidOn()
     );
-    public static final Block LAYERED_VERIDIUM = register("layered_veridium", Block::new, BlockBehaviour.Properties.ofFullCopy(VERIDIUM));
+    public static final Block LAYERED_VERIDIUM = register(
+        "layered_veridium",
+        Block::new,
+        BlockBehaviour.Properties.ofFullCopy(VERIDIUM)
+    );
     public static final ConnectedPillarBlock VERIDIUM_PILLAR = register(
         "veridium_pillar",
         ConnectedPillarBlock::new,
@@ -3166,14 +3521,14 @@ public class AllBlocks {
     public static final CopycatStepBlock COPYCAT_STEP = register(
         "copycat_step",
         CopycatStepBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).forceSolidOn().noOcclusion().mapColor(MapColor.NONE).isValidSpawn(AllBlocks::never)
-            .emissiveRendering(CopycatStepBlock::hasEmissiveLighting)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).forceSolidOn().noOcclusion().mapColor(MapColor.NONE)
+            .isValidSpawn(AllBlocks::never).emissiveRendering(CopycatStepBlock::hasEmissiveLighting)
     );
     public static final CopycatPanelBlock COPYCAT_PANEL = register(
         "copycat_panel",
         CopycatPanelBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().mapColor(MapColor.NONE).isValidSpawn(AllBlocks::never)
-            .emissiveRendering(CopycatPanelBlock::hasEmissiveLighting)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().mapColor(MapColor.NONE)
+            .isValidSpawn(AllBlocks::never).emissiveRendering(CopycatPanelBlock::hasEmissiveLighting)
     );
 
     public static final FluidBlock HONEY = register(
@@ -3200,12 +3555,20 @@ public class AllBlocks {
         BiFunction<FlowableFluid, BlockBehaviour.Properties, T> factory,
         BlockBehaviour.Properties settings
     ) {
-        T block = register(BuiltInRegistries.FLUID.getKey(fluid).getPath(), blockSettings -> factory.apply(fluid, blockSettings), settings);
+        T block = register(
+            BuiltInRegistries.FLUID.getKey(fluid).getPath(),
+            blockSettings -> factory.apply(fluid, blockSettings),
+            settings
+        );
         fluid.getEntry().block = block;
         return block;
     }
 
-    private static <T extends Block> T register(String id, Function<BlockBehaviour.Properties, T> factory, BlockBehaviour.Properties settings) {
+    private static <T extends Block> T register(
+        String id,
+        Function<BlockBehaviour.Properties, T> factory,
+        BlockBehaviour.Properties settings
+    ) {
         ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MOD_ID, id));
         return Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(settings.setId(key)));
     }

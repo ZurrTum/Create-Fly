@@ -17,9 +17,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 
-public record ValueSettingsPacket(
-    BlockPos pos, int row, int value, InteractionHand interactHand, BlockHitResult hitResult, Direction side, boolean ctrlDown, int behaviourIndex
-) implements Packet<ServerGamePacketListener> {
+public record ValueSettingsPacket(BlockPos pos, int row, int value, InteractionHand interactHand,
+                                  BlockHitResult hitResult, Direction side, boolean ctrlDown,
+                                  int behaviourIndex) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ValueSettingsPacket> CODEC = CatnipLargerStreamCodecs.composite(
         BlockPos.STREAM_CODEC,
         ValueSettingsPacket::pos,

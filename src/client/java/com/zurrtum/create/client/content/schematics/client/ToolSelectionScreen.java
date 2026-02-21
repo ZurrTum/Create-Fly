@@ -46,8 +46,9 @@ public class ToolSelectionScreen extends Screen {
     }
 
     public void setSelectedElement(ToolType tool) {
-        if (!tools.contains(tool))
+        if (!tools.contains(tool)) {
             return;
+        }
         selection = tools.indexOf(tool);
     }
 
@@ -61,8 +62,9 @@ public class ToolSelectionScreen extends Screen {
         Window mainWindow = minecraft.getWindow();
         int scaledWidth = mainWindow.getGuiScaledWidth();
         int scaledHeight = mainWindow.getGuiScaledHeight();
-        if (!initialized)
+        if (!initialized) {
             init(scaledWidth, scaledHeight);
+        }
 
         int x = (scaledWidth - w) / 2 + 15;
         int y = scaledHeight - h - 75;
@@ -105,22 +107,33 @@ public class ToolSelectionScreen extends Screen {
                 0xB2B2CC | stringAlphaComponent
             );
 
-            if (toolTip.size() > 0)
+            if (toolTip.size() > 0) {
                 graphics.drawString(font, toolTip.get(0), x - 10, y + 38, 0xEEEEEE | stringAlphaComponent, false);
-            if (toolTip.size() > 1)
+            }
+            if (toolTip.size() > 1) {
                 graphics.drawString(font, toolTip.get(1), x - 10, y + 50, 0xCCDDFF | stringAlphaComponent, false);
-            if (toolTip.size() > 2)
+            }
+            if (toolTip.size() > 2) {
                 graphics.drawString(font, toolTip.get(2), x - 10, y + 60, 0xCCDDFF | stringAlphaComponent, false);
-            if (toolTip.size() > 3)
+            }
+            if (toolTip.size() > 3) {
                 graphics.drawString(font, toolTip.get(3), x - 10, y + 72, 0xCCCCDD | stringAlphaComponent, false);
+            }
         }
 
         if (tools.size() > 1) {
             String keyName = AllKeys.TOOL_MENU.getTranslatedKeyMessage().getString().toUpperCase();
-            if (!focused)
-                graphics.drawCenteredString(font, CreateLang.translateDirect(holdToFocus, keyName), scaledWidth / 2, y - 10, 0xFFCCDDFF);
-            else
+            if (!focused) {
+                graphics.drawCenteredString(
+                    font,
+                    CreateLang.translateDirect(holdToFocus, keyName),
+                    scaledWidth / 2,
+                    y - 10,
+                    0xFFCCDDFF
+                );
+            } else {
                 graphics.drawCenteredString(font, scrollToCycle, scaledWidth / 2, y - 10, 0xFFCCDDFF);
+            }
         } else {
             x += 65;
         }
@@ -132,7 +145,13 @@ public class ToolSelectionScreen extends Screen {
             float alpha = focused ? 1 : .2f;
             if (i == selection) {
                 matrixStack.translate(0, -10);
-                graphics.drawCenteredString(font, tools.get(i).getDisplayName().getString(), x + i * 50 + 24, y + 28, 0xFFCCDDFF);
+                graphics.drawCenteredString(
+                    font,
+                    tools.get(i).getDisplayName().getString(),
+                    x + i * 50 + 24,
+                    y + 28,
+                    0xFFCCDDFF
+                );
                 alpha = 1;
             }
             int color = ((int) (alpha * 0xFF)) << 24;
@@ -146,10 +165,11 @@ public class ToolSelectionScreen extends Screen {
     }
 
     public void update() {
-        if (focused)
+        if (focused) {
             yOffset += (10 - yOffset) * .1f;
-        else
+        } else {
             yOffset *= .9f;
+        }
     }
 
     public void renderPassive(GuiGraphics graphics, float partialTicks) {

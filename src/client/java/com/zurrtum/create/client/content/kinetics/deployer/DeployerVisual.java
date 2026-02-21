@@ -51,7 +51,8 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
         xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
         zRot = rotatePole ? 90 : 0;
 
-        pole = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(AllPartialModels.DEPLOYER_POLE)).createInstance();
+        pole = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(AllPartialModels.DEPLOYER_POLE))
+            .createInstance();
 
         currentHand = DeployerRenderer.getHandPose(blockEntity);
 
@@ -76,8 +77,9 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
     public void beginFrame(DynamicVisual.Context ctx) {
         float newProgress = getProgress(ctx.partialTick());
 
-        if (Mth.equal(newProgress, progress))
+        if (Mth.equal(newProgress, progress)) {
             return;
+        }
 
         progress = newProgress;
 
@@ -100,12 +102,14 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
     private float getProgress(float partialTicks) {
         if (blockEntity.state == DeployerBlockEntity.State.EXPANDING) {
             float f = 1 - (blockEntity.timer - partialTicks * blockEntity.getTimerSpeed()) / 1000f;
-            if (blockEntity.fistBump)
+            if (blockEntity.fistBump) {
                 f *= f;
+            }
             return f;
         }
-        if (blockEntity.state == DeployerBlockEntity.State.RETRACTING)
+        if (blockEntity.state == DeployerBlockEntity.State.RETRACTING) {
             return (blockEntity.timer - partialTicks * blockEntity.getTimerSpeed()) / 1000f;
+        }
         return 0;
     }
 

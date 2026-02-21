@@ -31,7 +31,8 @@ import java.util.*;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> outputs, Optional<Identifier> location) implements Display {
+public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> outputs,
+                                  Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<BlockCuttingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(BlockCuttingDisplay::input),
@@ -49,21 +50,22 @@ public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> o
     );
 
     public static void register(ServerDisplayRegistry registry) {
-        Object2ObjectMap<Ingredient, Pair<EntryIngredient, List<ItemStack>>> map = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<>() {
-            public boolean equals(Ingredient ingredient, Ingredient other) {
-                return Objects.equals(ingredient, other);
-            }
+        Object2ObjectMap<Ingredient, Pair<EntryIngredient, List<ItemStack>>> map = new Object2ObjectOpenCustomHashMap<>(
+            new Hash.Strategy<>() {
+                public boolean equals(Ingredient ingredient, Ingredient other) {
+                    return Objects.equals(ingredient, other);
+                }
 
-            public int hashCode(Ingredient ingredient) {
-                if (ingredient.values instanceof HolderSet.Direct<Item> direct) {
-                    return direct.hashCode();
+                public int hashCode(Ingredient ingredient) {
+                    if (ingredient.values instanceof HolderSet.Direct<Item> direct) {
+                        return direct.hashCode();
+                    }
+                    if (ingredient.values instanceof HolderSet.Named<Item> named) {
+                        return named.key().location().hashCode();
+                    }
+                    return ingredient.hashCode();
                 }
-                if (ingredient.values instanceof HolderSet.Named<Item> named) {
-                    return named.key().location().hashCode();
-                }
-                return ingredient.hashCode();
-            }
-        });
+            });
         for (RecipeHolder<StonecutterRecipe> entry : Create.SERVER.getRecipeManager().recipes.byType(RecipeType.STONECUTTING)) {
             if (AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
                 continue;

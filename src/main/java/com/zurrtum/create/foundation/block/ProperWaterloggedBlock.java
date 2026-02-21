@@ -28,8 +28,9 @@ public interface ProperWaterloggedBlock extends SimpleWaterloggedBlock {
     }
 
     default void updateWater(LevelReader level, ScheduledTickAccess tickView, BlockState state, BlockPos pos) {
-        if (state.getValue(BlockStateProperties.WATERLOGGED))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
     }
 
     default BlockState withWater(BlockState placementState, BlockPlaceContext ctx) {
@@ -37,13 +38,16 @@ public interface ProperWaterloggedBlock extends SimpleWaterloggedBlock {
     }
 
     static BlockState withWater(LevelReader level, BlockState placementState, BlockPos pos) {
-        if (placementState == null)
+        if (placementState == null) {
             return null;
+        }
         FluidState ifluidstate = level.getFluidState(pos);
-        if (placementState.isAir())
+        if (placementState.isAir()) {
             return ifluidstate.getType() == Fluids.WATER ? ifluidstate.createLegacyBlock() : placementState;
-        if (!(placementState.getBlock() instanceof SimpleWaterloggedBlock))
+        }
+        if (!(placementState.getBlock() instanceof SimpleWaterloggedBlock)) {
             return placementState;
+        }
         return placementState.setValue(BlockStateProperties.WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
     }
 

@@ -28,12 +28,14 @@ public class ItemThresholdCondition extends CargoThresholdCondition {
         int foundItems = 0;
         for (Carriage carriage : train.carriages) {
             for (ItemStack stackInSlot : carriage.storage.getAllItems()) {
-                if (!stack.test(level, stackInSlot))
+                if (!stack.test(level, stackInSlot)) {
                     continue;
-                if (stacks)
+                }
+                if (stacks) {
                     foundItems += stackInSlot.getCount() == stackInSlot.getMaxStackSize() ? 1 : 0;
-                else
+                } else {
                     foundItems += stackInSlot.getCount();
+                }
             }
         }
 
@@ -65,8 +67,9 @@ public class ItemThresholdCondition extends CargoThresholdCondition {
     @Override
     public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
         int lastDisplaySnapshot = getLastDisplaySnapshot(tag);
-        if (lastDisplaySnapshot == -1)
+        if (lastDisplaySnapshot == -1) {
             return Component.empty();
+        }
         int offset = getOperator() == Ops.LESS ? -1 : getOperator() == Ops.GREATER ? 1 : 0;
         return Component.translatable(
             "create.schedule.condition.threshold.status",

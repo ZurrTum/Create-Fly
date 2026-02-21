@@ -32,7 +32,13 @@ public class EncasedFanBlock extends DirectionalKineticBlock implements IBE<Enca
     }
 
     @Override
-    public void updateIndirectNeighbourShapes(BlockState stateIn, LevelAccessor worldIn, BlockPos pos, int flags, int count) {
+    public void updateIndirectNeighbourShapes(
+        BlockState stateIn,
+        LevelAccessor worldIn,
+        BlockPos pos,
+        int flags,
+        int count
+    ) {
         super.updateIndirectNeighbourShapes(stateIn, worldIn, pos, flags, count);
         blockUpdate(stateIn, worldIn, pos);
     }
@@ -57,23 +63,28 @@ public class EncasedFanBlock extends DirectionalKineticBlock implements IBE<Enca
 
         BlockState placedOn = world.getBlockState(pos.relative(face.getOpposite()));
         BlockState placedOnOpposite = world.getBlockState(pos.relative(face));
-        if (AbstractChuteBlock.isChute(placedOn))
+        if (AbstractChuteBlock.isChute(placedOn)) {
             return defaultBlockState().setValue(FACING, face.getOpposite());
-        if (AbstractChuteBlock.isChute(placedOnOpposite))
+        }
+        if (AbstractChuteBlock.isChute(placedOnOpposite)) {
             return defaultBlockState().setValue(FACING, face);
+        }
 
         Direction preferredFacing = getPreferredFacing(context);
-        if (preferredFacing == null)
+        if (preferredFacing == null) {
             preferredFacing = context.getNearestLookingDirection();
+        }
         return defaultBlockState().setValue(
             FACING,
-            context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? preferredFacing : preferredFacing.getOpposite()
+            context.getPlayer() != null && context.getPlayer()
+                .isShiftKeyDown() ? preferredFacing : preferredFacing.getOpposite()
         );
     }
 
     protected void blockUpdate(BlockState state, LevelAccessor worldIn, BlockPos pos) {
-        if (worldIn instanceof WrappedLevel)
+        if (worldIn instanceof WrappedLevel) {
             return;
+        }
         notifyFanBlockEntity(worldIn, pos);
     }
 

@@ -27,8 +27,9 @@ public class ValveHandleVisual extends KineticBlockEntityVisual<ValveHandleBlock
 
         BlockState state = blockEntity.getBlockState();
         DyeColor color = null;
-        if (state != null && state.getBlock() instanceof ValveHandleBlock vhb)
+        if (state != null && state.getBlock() instanceof ValveHandleBlock vhb) {
             color = vhb.color;
+        }
 
         crank = instancerProvider().instancer(
             InstanceTypes.TRANSFORMED,
@@ -49,7 +50,8 @@ public class ValveHandleVisual extends KineticBlockEntityVisual<ValveHandleBlock
 
         crank.setIdentityTransform().translate(getVisualPosition()).center()
             .rotate(angle, Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()))
-            .rotate(new Quaternionf().rotateTo(0, 1, 0, facing.getStepX(), facing.getStepY(), facing.getStepZ())).uncenter().setChanged();
+            .rotate(new Quaternionf().rotateTo(0, 1, 0, facing.getStepX(), facing.getStepY(), facing.getStepZ()))
+            .uncenter().setChanged();
     }
 
     @Override

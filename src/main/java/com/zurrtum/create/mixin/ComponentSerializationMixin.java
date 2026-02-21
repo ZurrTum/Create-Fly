@@ -13,7 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ComponentSerialization.class)
 public class ComponentSerializationMixin {
     @Inject(method = "bootstrap(Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;)V", at = @At("TAIL"))
-    private static void registerTypes(ExtraCodecs.LateBoundIdMapper<String, MapCodec<? extends ComponentContents>> idMapper, CallbackInfo ci) {
+    private static void registerTypes(
+        ExtraCodecs.LateBoundIdMapper<String, MapCodec<? extends ComponentContents>> idMapper,
+        CallbackInfo ci
+    ) {
         idMapper.put("ingredient", IngredientTextContent.CODEC);
     }
 }

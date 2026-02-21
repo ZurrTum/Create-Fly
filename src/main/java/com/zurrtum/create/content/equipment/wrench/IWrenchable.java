@@ -29,13 +29,15 @@ public interface IWrenchable {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState rotated = getRotatedBlockState(state, context.getClickedFace());
-        if (!rotated.canSurvive(level, context.getClickedPos()))
+        if (!rotated.canSurvive(level, context.getClickedPos())) {
             return InteractionResult.PASS;
+        }
 
         KineticBlockEntity.switchToBlockState(level, pos, updateAfterWrenched(rotated, context));
 
-        if (level.getBlockState(pos) != state)
+        if (level.getBlockState(pos) != state) {
             playRotateSound(level, pos);
+        }
 
         return InteractionResult.SUCCESS;
     }
@@ -50,8 +52,9 @@ public interface IWrenchable {
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
 
-        if (!(world instanceof ServerLevel serverLevel))
+        if (!(world instanceof ServerLevel serverLevel)) {
             return InteractionResult.SUCCESS;
+        }
 
         BlockEntity be = world.getBlockEntity(pos);
         //TODO
@@ -62,9 +65,10 @@ public interface IWrenchable {
         //        }
 
         if (player != null && !player.isCreative()) {
-            Block.getDrops(state, serverLevel, pos, world.getBlockEntity(pos), player, context.getItemInHand()).forEach(itemStack -> {
-                player.getInventory().placeItemBackInInventory(itemStack);
-            });
+            Block.getDrops(state, serverLevel, pos, world.getBlockEntity(pos), player, context.getItemInHand())
+                .forEach(itemStack -> {
+                    player.getInventory().placeItemBackInInventory(itemStack);
+                });
         }
 
         state.spawnAfterBreak(serverLevel, pos, ItemStack.EMPTY, true);
@@ -78,43 +82,51 @@ public interface IWrenchable {
         BlockState newState = originalState;
 
         if (targetedFace.getAxis() == Direction.Axis.Y) {
-            if (originalState.hasProperty(HorizontalAxisKineticBlock.HORIZONTAL_AXIS))
+            if (originalState.hasProperty(HorizontalAxisKineticBlock.HORIZONTAL_AXIS)) {
                 return originalState.setValue(
                     HorizontalAxisKineticBlock.HORIZONTAL_AXIS,
-                    VoxelShaper.axisAsFace(originalState.getValue(HorizontalAxisKineticBlock.HORIZONTAL_AXIS)).getClockWise(targetedFace.getAxis())
-                        .getAxis()
+                    VoxelShaper.axisAsFace(originalState.getValue(HorizontalAxisKineticBlock.HORIZONTAL_AXIS))
+                        .getClockWise(targetedFace.getAxis()).getAxis()
                 );
-            if (originalState.hasProperty(HorizontalKineticBlock.HORIZONTAL_FACING))
+            }
+            if (originalState.hasProperty(HorizontalKineticBlock.HORIZONTAL_FACING)) {
                 return originalState.setValue(
                     HorizontalKineticBlock.HORIZONTAL_FACING,
-                    originalState.getValue(HorizontalKineticBlock.HORIZONTAL_FACING).getClockWise(targetedFace.getAxis())
+                    originalState.getValue(HorizontalKineticBlock.HORIZONTAL_FACING)
+                        .getClockWise(targetedFace.getAxis())
                 );
+            }
         }
 
-        if (originalState.hasProperty(RotatedPillarKineticBlock.AXIS))
+        if (originalState.hasProperty(RotatedPillarKineticBlock.AXIS)) {
             return originalState.setValue(
                 RotatedPillarKineticBlock.AXIS,
-                VoxelShaper.axisAsFace(originalState.getValue(RotatedPillarKineticBlock.AXIS)).getClockWise(targetedFace.getAxis()).getAxis()
+                VoxelShaper.axisAsFace(originalState.getValue(RotatedPillarKineticBlock.AXIS))
+                    .getClockWise(targetedFace.getAxis()).getAxis()
             );
+        }
 
-        if (!originalState.hasProperty(DirectionalKineticBlock.FACING))
+        if (!originalState.hasProperty(DirectionalKineticBlock.FACING)) {
             return originalState;
+        }
 
         Direction stateFacing = originalState.getValue(DirectionalKineticBlock.FACING);
 
         if (stateFacing.getAxis().equals(targetedFace.getAxis())) {
-            if (originalState.hasProperty(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE))
+            if (originalState.hasProperty(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE)) {
                 return originalState.cycle(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE);
-            else
+            } else {
                 return originalState;
+            }
         } else {
             do {
                 newState = newState.setValue(
                     DirectionalKineticBlock.FACING,
                     newState.getValue(DirectionalKineticBlock.FACING).getClockWise(targetedFace.getAxis())
                 );
-                if (targetedFace.getAxis() == Direction.Axis.Y && newState.hasProperty(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE))
+                if (targetedFace.getAxis() == Direction.Axis.Y && newState.hasProperty(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE)) {
                     newState = newState.cycle(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE);
+                }
             } while (newState.getValue(DirectionalKineticBlock.FACING).getAxis().equals(targetedFace.getAxis()));
         }
         return newState;

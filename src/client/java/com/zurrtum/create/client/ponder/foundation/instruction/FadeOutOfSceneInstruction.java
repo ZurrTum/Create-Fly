@@ -22,8 +22,9 @@ public class FadeOutOfSceneInstruction<T extends AnimatedSceneElement> extends T
     protected void firstTick(PonderScene scene) {
         super.firstTick(scene);
         element = scene.resolve(link);
-        if (element == null)
+        if (element == null) {
             return;
+        }
         element.setVisible(true);
         element.setFade(1);
         element.setFadeVec(fadeOutTo == null ? Vec3.ZERO : Vec3.atLowerCornerOf(fadeOutTo.getUnitVec3i()).scale(.5f));
@@ -32,8 +33,9 @@ public class FadeOutOfSceneInstruction<T extends AnimatedSceneElement> extends T
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
-        if (element == null)
+        if (element == null) {
             return;
+        }
         float fade = (remainingTicks / (float) totalTicks);
         element.setFade(1 - (1 - fade) * (1 - fade));
         if (remainingTicks == 0) {

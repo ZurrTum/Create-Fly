@@ -45,11 +45,13 @@ public class TrackTargetingClient {
         BezierTrackPointLocation hoveredBezier = null;
 
         ItemStack stack = player.getMainHandItem();
-        if (stack.getItem() instanceof TrackTargetingBlockItem ttbi)
+        if (stack.getItem() instanceof TrackTargetingBlockItem ttbi) {
             type = ttbi.getType(stack);
+        }
 
-        if (type == EdgePointType.SIGNAL)
+        if (type == EdgePointType.SIGNAL) {
             GlobalRailwayManagerClient.tickSignalOverlay(mc);
+        }
 
         boolean alreadySelected = stack.has(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
 
@@ -75,7 +77,8 @@ public class TrackTargetingClient {
                     BlockPos pos = blockHitResult.getBlockPos();
                     BlockState blockState = mc.level.getBlockState(pos);
                     if (blockState.getBlock() instanceof ITrackBlock track) {
-                        direction = track.getNearestTrackAxis(mc.level, pos, blockState, lookAngle).getSecond() == AxisDirection.POSITIVE;
+                        direction = track.getNearestTrackAxis(mc.level, pos, blockState, lookAngle)
+                            .getSecond() == AxisDirection.POSITIVE;
                         hovered = pos;
                     }
                 }
@@ -93,8 +96,9 @@ public class TrackTargetingClient {
         if (Objects.equal(hovered, lastHovered) && Objects.equal(
             hoveredBezier,
             lastHoveredBezierSegment
-        ) && direction == lastDirection && type == lastType)
+        ) && direction == lastDirection && type == lastType) {
             return;
+        }
 
         lastType = type;
         lastHovered = hovered;
@@ -110,8 +114,9 @@ public class TrackTargetingClient {
     }
 
     public static void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
-        if (lastLocation == null || lastResult.feedback != null)
+        if (lastLocation == null || lastResult.feedback != null) {
             return;
+        }
 
         BlockPos pos = lastHovered;
         AxisDirection direction = lastDirection ? AxisDirection.POSITIVE : AxisDirection.NEGATIVE;
@@ -119,8 +124,9 @@ public class TrackTargetingClient {
         RenderedTrackOverlayType type = lastType == EdgePointType.SIGNAL ? RenderedTrackOverlayType.SIGNAL : lastType == EdgePointType.OBSERVER ? RenderedTrackOverlayType.OBSERVER : RenderedTrackOverlayType.STATION;
 
         BlockState state = mc.level.getBlockState(pos);
-        if (!(state.getBlock() instanceof ITrackBlock track))
+        if (!(state.getBlock() instanceof ITrackBlock track)) {
             return;
+        }
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
         if (renderer != null) {
             renderer.getRenderState(

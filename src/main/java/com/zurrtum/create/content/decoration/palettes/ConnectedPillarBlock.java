@@ -26,7 +26,8 @@ public class ConnectedPillarBlock extends LayeredBlock {
 
     public ConnectedPillarBlock(Properties p_55926_) {
         super(p_55926_);
-        registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(WEST, false).setValue(EAST, false).setValue(SOUTH, false));
+        registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(WEST, false).setValue(EAST, false)
+            .setValue(SOUTH, false));
     }
 
     @Override
@@ -45,16 +46,18 @@ public class ConnectedPillarBlock extends LayeredBlock {
         Axis axis = state.getValue(AXIS);
 
         for (Direction connection : Iterate.directions) {
-            if (connection.getAxis() == axis)
+            if (connection.getAxis() == axis) {
                 continue;
+            }
 
             boolean connect = true;
             Move:
             for (Direction movement : Iterate.directionsInAxis(axis)) {
                 currentPos.set(pos);
                 for (int i = 0; i < 1000; i++) {
-                    if (!level.isLoaded(currentPos))
+                    if (!level.isLoaded(currentPos)) {
                         break;
+                    }
 
                     BlockState other1 = currentPos.equals(pos) ? state : level.getBlockState(currentPos);
                     BlockState other2 = level.getBlockState(currentPos.relative(connection));
@@ -62,10 +65,12 @@ public class ConnectedPillarBlock extends LayeredBlock {
                     boolean col2 = canConnect(state, other2);
                     currentPos.move(movement);
 
-                    if (!col1 && !col2)
+                    if (!col1 && !col2) {
                         break;
-                    if (col1 && col2)
+                    }
+                    if (col1 && col2) {
                         continue;
+                    }
 
                     connect = false;
                     break Move;
@@ -78,21 +83,28 @@ public class ConnectedPillarBlock extends LayeredBlock {
 
     @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
-        if (pOldState.getBlock() == this)
+        if (pOldState.getBlock() == this) {
             return;
+        }
         LevelTickAccess<Block> blockTicks = pLevel.getBlockTicks();
-        if (!blockTicks.hasScheduledTick(pPos, this))
+        if (!blockTicks.hasScheduledTick(pPos, this)) {
             pLevel.scheduleTick(pPos, this, 1);
+        }
     }
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        if (pState.getBlock() != this)
+        if (pState.getBlock() != this) {
             return;
-        BlockPos belowPos = pPos.relative(Direction.fromAxisAndDirection(pState.getValue(AXIS), AxisDirection.NEGATIVE));
+        }
+        BlockPos belowPos = pPos.relative(Direction.fromAxisAndDirection(
+            pState.getValue(AXIS),
+            AxisDirection.NEGATIVE
+        ));
         BlockState belowState = pLevel.getBlockState(belowPos);
-        if (!canConnect(pState, belowState))
+        if (!canConnect(pState, belowState)) {
             pLevel.setBlock(pPos, updateColumn(pLevel, pPos, pState, true), Block.UPDATE_ALL);
+        }
     }
 
     @Override
@@ -106,10 +118,12 @@ public class ConnectedPillarBlock extends LayeredBlock {
         BlockState pNeighborState,
         RandomSource random
     ) {
-        if (!canConnect(state, pNeighborState))
+        if (!canConnect(state, pNeighborState)) {
             return setConnection(state, pDirection, false);
-        if (pDirection.getAxis() == state.getValue(AXIS))
+        }
+        if (pDirection.getAxis() == state.getValue(AXIS)) {
             return withPropertiesOf(pNeighborState);
+        }
 
         return setConnection(state, pDirection, getConnection(pNeighborState, pDirection.getOpposite()));
     }
@@ -120,13 +134,15 @@ public class ConnectedPillarBlock extends LayeredBlock {
 
     @Override
     public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
-        if (pIsMoving)
+        if (pIsMoving) {
             return;
+        }
         for (Direction d : Iterate.directionsInAxis(pState.getValue(AXIS))) {
             BlockPos relative = pPos.relative(d);
             BlockState adjacent = pLevel.getBlockState(relative);
-            if (canConnect(pState, adjacent))
+            if (canConnect(pState, adjacent)) {
                 pLevel.setBlock(relative, updateColumn(pLevel, relative, adjacent, false), Block.UPDATE_ALL);
+            }
         }
     }
 
@@ -137,14 +153,16 @@ public class ConnectedPillarBlock extends LayeredBlock {
 
     public static BlockState setConnection(BlockState state, Direction side, boolean connect) {
         BooleanProperty property = connection(state.getValue(AXIS), side);
-        if (property != null)
+        if (property != null) {
             state = state.setValue(property, connect);
+        }
         return state;
     }
 
     public static BooleanProperty connection(Axis axis, Direction side) {
-        if (side.getAxis() == axis)
+        if (side.getAxis() == axis) {
             return null;
+        }
 
         if (axis == Axis.X) {
             return switch (side) {

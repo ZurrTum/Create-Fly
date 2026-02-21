@@ -35,19 +35,30 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
     }
 
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity e, InsideBlockEffectApplier handler, boolean bl) {
-        if (!e.onGround())
+    public void entityInside(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Entity e,
+        InsideBlockEffectApplier handler,
+        boolean bl
+    ) {
+        if (!e.onGround()) {
             return;
-        if (e.getDeltaMovement().y > 0)
+        }
+        if (e.getDeltaMovement().y > 0) {
             return;
-        if (e.getY() < pos.getY() + .5f)
+        }
+        if (e.getY() < pos.getY() + .5f) {
             return;
+        }
 
         withBlockEntityDo(
             worldIn, pos, be -> {
                 float speed = be.getSpeed() * 3 / 10;
-                if (speed == 0)
+                if (speed == 0) {
                     return;
+                }
 
                 Level world = e.level();
                 if (world.isClientSide() && (e instanceof Player)) {
@@ -61,10 +72,12 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
                     }
                 }
 
-                if ((e instanceof Player))
+                if ((e instanceof Player)) {
                     return;
-                if (world.isClientSide())
+                }
+                if (world.isClientSide()) {
                     return;
+                }
 
                 if ((e instanceof LivingEntity livingEntity)) {
                     float diff = e.getYHeadRot() - speed;

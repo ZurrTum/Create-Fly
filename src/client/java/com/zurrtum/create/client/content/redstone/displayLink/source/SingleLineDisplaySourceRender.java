@@ -11,9 +11,15 @@ import net.minecraft.ChatFormatting;
 
 public class SingleLineDisplaySourceRender implements DisplaySourceRender {
     @Override
-    public void initConfigurationWidgets(DisplaySource source, DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
-        if (isFirstLine && ((SingleLineDisplaySource) source).allowsLabeling(context))
+    public void initConfigurationWidgets(
+        DisplaySource source,
+        DisplayLinkContext context,
+        ModularGuiLineBuilder builder,
+        boolean isFirstLine
+    ) {
+        if (isFirstLine && ((SingleLineDisplaySource) source).allowsLabeling(context)) {
             addLabelingTextBox(builder);
+        }
     }
 
     protected void addLabelingTextBox(ModularGuiLineBuilder builder) {
@@ -22,7 +28,8 @@ public class SingleLineDisplaySourceRender implements DisplaySourceRender {
                 e.setValue("");
                 t.withTooltip(ImmutableList.of(
                     CreateLang.translateDirect("display_source.label").withStyle(s -> s.withColor(0x5391E1)),
-                    CreateLang.translateDirect("gui.schedule.lmb_edit").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
+                    CreateLang.translateDirect("gui.schedule.lmb_edit")
+                        .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
                 ));
             }, "Label"
         );

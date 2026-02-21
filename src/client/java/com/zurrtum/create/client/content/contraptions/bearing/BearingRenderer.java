@@ -56,7 +56,12 @@ public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity>
     }
 
     @Override
-    public void updateBaseRenderState(T be, BearingRenderState state, Level world, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void updateBaseRenderState(
+        T be,
+        BearingRenderState state,
+        Level world,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+    ) {
         super.updateBaseRenderState(be, state, world, crumblingOverlay);
         state.facing = state.blockState.getValue(BlockStateProperties.FACING);
     }

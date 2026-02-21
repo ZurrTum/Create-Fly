@@ -51,7 +51,13 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, MechanicalCrafterBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        MechanicalCrafterBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.getInvCapability();
     }
 
@@ -74,8 +80,9 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
         if ((blockState.getBlock() != this) || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
             BlockState stateForPlacement = super.getStateForPlacement(context);
             Direction direction = stateForPlacement.getValue(HORIZONTAL_FACING);
-            if (direction != face)
+            if (direction != face) {
                 stateForPlacement = stateForPlacement.setValue(POINTING, pointingFromFacing(face, direction));
+            }
             return stateForPlacement;
         }
 
@@ -89,8 +96,9 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
         super.onPlace(state, worldIn, pos, oldState, isMoving);
         if (oldState.is(this) && getTargetDirection(state) != getTargetDirection(oldState)) {
             MechanicalCrafterBlockEntity crafter = CrafterHelper.getCrafter(worldIn, pos);
-            if (crafter != null)
+            if (crafter != null) {
                 crafter.blockChanged();
+            }
         }
     }
 
@@ -99,24 +107,29 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
         if (state.hasBlockEntity()) {
             MechanicalCrafterBlockEntity crafter = CrafterHelper.getCrafter(worldIn, pos);
             if (crafter != null) {
-                if (crafter.covered)
+                if (crafter.covered) {
                     Block.popResource(worldIn, pos, AllItems.CRAFTER_SLOT_COVER.getDefaultInstance());
-                if (!isMoving)
+                }
+                if (!isMoving) {
                     crafter.ejectWholeGrid();
+                }
             }
 
             for (Direction direction : Iterate.directions) {
-                if (direction.getAxis() == state.getValue(HORIZONTAL_FACING).getAxis())
+                if (direction.getAxis() == state.getValue(HORIZONTAL_FACING).getAxis()) {
                     continue;
+                }
 
                 BlockPos otherPos = pos.relative(direction);
                 ConnectedInput thisInput = CrafterHelper.getInput(worldIn, pos);
                 ConnectedInput otherInput = CrafterHelper.getInput(worldIn, otherPos);
 
-                if (thisInput == null || otherInput == null)
+                if (thisInput == null || otherInput == null) {
                     continue;
-                if (!pos.offset(thisInput.data.getFirst()).equals(otherPos.offset(otherInput.data.getFirst())))
+                }
+                if (!pos.offset(thisInput.data.getFirst()).equals(otherPos.offset(otherInput.data.getFirst()))) {
                     continue;
+                }
 
                 ConnectedInputHandler.toggleConnection(worldIn, pos, otherPos);
             }
@@ -129,22 +142,31 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
         boolean positive = blockFacing.getAxisDirection() == AxisDirection.POSITIVE;
 
         Pointing pointing = pointingFace == Direction.DOWN ? Pointing.UP : Pointing.DOWN;
-        if (pointingFace == Direction.EAST)
+        if (pointingFace == Direction.EAST) {
             pointing = positive ? Pointing.LEFT : Pointing.RIGHT;
-        if (pointingFace == Direction.WEST)
+        }
+        if (pointingFace == Direction.WEST) {
             pointing = positive ? Pointing.RIGHT : Pointing.LEFT;
-        if (pointingFace == Direction.NORTH)
+        }
+        if (pointingFace == Direction.NORTH) {
             pointing = positive ? Pointing.LEFT : Pointing.RIGHT;
-        if (pointingFace == Direction.SOUTH)
+        }
+        if (pointingFace == Direction.SOUTH) {
             pointing = positive ? Pointing.RIGHT : Pointing.LEFT;
+        }
         return pointing;
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         if (context.getClickedFace() == state.getValue(HORIZONTAL_FACING)) {
-            if (!context.getLevel().isClientSide())
-                KineticBlockEntity.switchToBlockState(context.getLevel(), context.getClickedPos(), state.cycle(POINTING));
+            if (!context.getLevel().isClientSide()) {
+                KineticBlockEntity.switchToBlockState(
+                    context.getLevel(),
+                    context.getClickedPos(),
+                    state.cycle(POINTING)
+                );
+            }
             return InteractionResult.SUCCESS;
         }
 
@@ -162,11 +184,13 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
         BlockHitResult hitResult
     ) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (!(blockEntity instanceof MechanicalCrafterBlockEntity crafter))
+        if (!(blockEntity instanceof MechanicalCrafterBlockEntity crafter)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
-        if (stack.is(AllItems.MECHANICAL_ARM))
+        if (stack.is(AllItems.MECHANICAL_ARM)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         boolean isHand = stack.isEmpty() && hand == InteractionHand.MAIN_HAND;
         boolean wrenched = stack.is(AllItems.WRENCH);
@@ -179,25 +203,30 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
             }
 
             if (crafter.phase == Phase.IDLE && !isHand && !wrenched) {
-                if (level.isClientSide())
+                if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
+                }
 
                 if (stack.is(AllItems.CRAFTER_SLOT_COVER)) {
-                    if (crafter.covered)
+                    if (crafter.covered) {
                         return InteractionResult.TRY_WITH_EMPTY_HAND;
-                    if (!crafter.inventory.isEmpty())
+                    }
+                    if (!crafter.inventory.isEmpty()) {
                         return InteractionResult.TRY_WITH_EMPTY_HAND;
+                    }
                     crafter.covered = true;
                     crafter.setChanged();
                     crafter.sendData();
-                    if (!player.isCreative())
+                    if (!player.isCreative()) {
                         stack.shrink(1);
+                    }
                     return InteractionResult.SUCCESS;
                 }
 
                 Container capability = crafter.getInvCapability();
-                if (capability == null)
+                if (capability == null) {
                     return InteractionResult.TRY_WITH_EMPTY_HAND;
+                }
                 int count = stack.getCount();
                 int insert = capability.insert(stack);
                 if (!player.isCreative()) {
@@ -215,21 +244,26 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
             ItemStack inSlot = handler.getStack();
             if (inSlot.isEmpty()) {
                 if (crafter.covered && !wrenched) {
-                    if (level.isClientSide())
+                    if (level.isClientSide()) {
                         return InteractionResult.SUCCESS;
+                    }
                     crafter.covered = false;
                     crafter.setChanged();
                     crafter.sendData();
-                    if (!player.isCreative())
-                        player.getInventory().placeItemBackInInventory(AllItems.CRAFTER_SLOT_COVER.getDefaultInstance());
+                    if (!player.isCreative()) {
+                        player.getInventory()
+                            .placeItemBackInInventory(AllItems.CRAFTER_SLOT_COVER.getDefaultInstance());
+                    }
                     return InteractionResult.SUCCESS;
                 }
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
             }
-            if (!isHand && !handler.matches(stack, inSlot))
+            if (!isHand && !handler.matches(stack, inSlot)) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
-            if (level.isClientSide())
+            }
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
+            }
             player.getInventory().placeItemBackInInventory(handler.onExtract(inSlot));
             handler.setStack(ItemStack.EMPTY);
             handler.setChanged();
@@ -240,10 +274,18 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+    public void neighborUpdate(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos fromPos,
+        boolean isMoving
+    ) {
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
-        if (behaviour != null)
+        if (behaviour != null) {
             behaviour.onNeighborChanged(fromPos);
+        }
     }
 
     @Override
@@ -257,8 +299,9 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
     }
 
     public static Direction getTargetDirection(BlockState state) {
-        if (!state.is(AllBlocks.MECHANICAL_CRAFTER))
+        if (!state.is(AllBlocks.MECHANICAL_CRAFTER)) {
             return Direction.UP;
+        }
         Direction facing = state.getValue(HORIZONTAL_FACING);
         Pointing point = state.getValue(POINTING);
         Vec3 targetVec = new Vec3(0, 1, 0);
@@ -269,13 +312,17 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
 
     public static boolean isValidTarget(Level world, BlockPos targetPos, BlockState crafterState) {
         BlockState targetState = world.getBlockState(targetPos);
-        if (!world.isLoaded(targetPos))
+        if (!world.isLoaded(targetPos)) {
             return false;
-        if (!targetState.is(AllBlocks.MECHANICAL_CRAFTER))
+        }
+        if (!targetState.is(AllBlocks.MECHANICAL_CRAFTER)) {
             return false;
-        if (crafterState.getValue(HORIZONTAL_FACING) != targetState.getValue(HORIZONTAL_FACING))
+        }
+        if (crafterState.getValue(HORIZONTAL_FACING) != targetState.getValue(HORIZONTAL_FACING)) {
             return false;
-        return Math.abs(crafterState.getValue(POINTING).getXRotation() - targetState.getValue(POINTING).getXRotation()) != 180;
+        }
+        return Math.abs(crafterState.getValue(POINTING).getXRotation() - targetState.getValue(POINTING)
+            .getXRotation()) != 180;
     }
 
     @Override

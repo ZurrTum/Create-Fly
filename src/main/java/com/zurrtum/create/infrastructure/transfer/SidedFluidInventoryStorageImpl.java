@@ -23,13 +23,20 @@ public class SidedFluidInventoryStorageImpl extends CombinedStorage<FluidVariant
         return parts;
     }
 
-    private static List<SingleSlotStorage<FluidVariant>> createWrapperList(FluidInventoryStorageImpl storage, Direction direction) {
+    private static List<SingleSlotStorage<FluidVariant>> createWrapperList(
+        FluidInventoryStorageImpl storage,
+        Direction direction
+    ) {
         SidedFluidInventory inventory = (SidedFluidInventory) storage.inventory;
         int[] availableSlots = inventory.getAvailableSlots(direction);
         SidedFluidInventorySlotWrapper[] slots = new SidedFluidInventorySlotWrapper[availableSlots.length];
 
         for (int i = 0; i < availableSlots.length; ++i) {
-            slots[i] = new SidedFluidInventorySlotWrapper(storage.backingList.get(availableSlots[i]), inventory, direction);
+            slots[i] = new SidedFluidInventorySlotWrapper(
+                storage.backingList.get(availableSlots[i]),
+                inventory,
+                direction
+            );
         }
 
         return Arrays.asList(slots);

@@ -22,12 +22,15 @@ public class BeltPressingCallbacks {
         TransportedItemStackHandlerBehaviour handler,
         PressingBehaviour behaviour
     ) {
-        if (behaviour.specifics.getKineticSpeed() == 0)
+        if (behaviour.specifics.getKineticSpeed() == 0) {
             return PASS;
-        if (behaviour.running)
+        }
+        if (behaviour.running) {
             return HOLD;
-        if (!behaviour.specifics.tryProcessOnBelt(transported, null))
+        }
+        if (!behaviour.specifics.tryProcessOnBelt(transported, null)) {
             return PASS;
+        }
 
         behaviour.start(Mode.BELT);
         return HOLD;
@@ -39,17 +42,21 @@ public class BeltPressingCallbacks {
         PressingBehaviour behaviour
     ) {
 
-        if (behaviour.specifics.getKineticSpeed() == 0)
+        if (behaviour.specifics.getKineticSpeed() == 0) {
             return PASS;
-        if (!behaviour.running)
+        }
+        if (!behaviour.running) {
             return PASS;
-        if (behaviour.runningTicks != PressingBehaviour.CYCLE / 2)
+        }
+        if (behaviour.runningTicks != PressingBehaviour.CYCLE / 2) {
             return HOLD;
+        }
 
         behaviour.particleItems.clear();
         ArrayList<ItemStack> results = new ArrayList<>();
-        if (!behaviour.specifics.tryProcessOnBelt(transported, results))
+        if (!behaviour.specifics.tryProcessOnBelt(transported, results)) {
             return PASS;
+        }
 
         boolean bulk = behaviour.specifics.canProcessInBulk() || transported.stack.getCount() == 1;
 
@@ -65,19 +72,21 @@ public class BeltPressingCallbacks {
         }).collect(Collectors.toList());
 
         if (bulk) {
-            if (collect.isEmpty())
+            if (collect.isEmpty()) {
                 handler.handleProcessingOnItem(transported, TransportedResult.removeItem());
-            else
+            } else {
                 handler.handleProcessingOnItem(transported, TransportedResult.convertTo(collect));
+            }
 
         } else {
             TransportedItemStack left = transported.copy();
             left.stack.shrink(1);
 
-            if (collect.isEmpty())
+            if (collect.isEmpty()) {
                 handler.handleProcessingOnItem(transported, TransportedResult.convertTo(left));
-            else
+            } else {
                 handler.handleProcessingOnItem(transported, TransportedResult.convertToAndLeaveHeld(collect, left));
+            }
         }
 
         behaviour.blockEntity.sendData();

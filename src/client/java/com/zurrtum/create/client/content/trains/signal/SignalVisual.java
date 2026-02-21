@@ -38,9 +38,11 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
     public SignalVisual(VisualizationContext ctx, SignalBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);
 
-        signalLight = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.SIGNAL_OFF)).createInstance();
+        signalLight = ctx.instancerProvider()
+            .instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.SIGNAL_OFF)).createInstance();
 
-        signalOverlay = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.TRACK_SIGNAL_OVERLAY))
+        signalOverlay = ctx.instancerProvider()
+            .instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.TRACK_SIGNAL_OVERLAY))
             .createInstance();
 
         setupVisual();
@@ -76,13 +78,15 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
 
             if (isRedLight != previousIsRedLight) {
                 PartialModel partial = isRedLight ? AllPartialModels.SIGNAL_ON : AllPartialModels.SIGNAL_OFF;
-                instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(partial)).stealInstance(signalLight);
+                instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(partial))
+                    .stealInstance(signalLight);
             }
 
             signalLight.setIdentityTransform().translate(getVisualPosition());
 
-            if (isRedLight)
+            if (isRedLight) {
                 signalLight.light(LightTexture.FULL_BLOCK);
+            }
 
             signalLight.setChanged();
 
@@ -117,7 +121,8 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
                     partial = AllPartialModels.TRACK_SIGNAL_OVERLAY;
                 }
 
-                instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(partial)).stealInstance(signalOverlay);
+                instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(partial))
+                    .stealInstance(signalOverlay);
 
                 signalOverlay.setIdentityTransform().translate(targetPosition.subtract(renderOrigin()));
 

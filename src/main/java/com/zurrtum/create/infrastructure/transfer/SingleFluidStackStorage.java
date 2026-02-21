@@ -52,8 +52,12 @@ public abstract class SingleFluidStackStorage extends SnapshotParticipant<FluidS
 
         FluidStack currentStack = getStack();
 
-        if ((FluidInventoryStorage.matches(insertedVariant, currentStack) || currentStack.isEmpty()) && canInsert(insertedVariant)) {
-            int insertedAmount = (int) Math.min(maxAmount, getCapacity(insertedVariant, currentStack) - currentStack.getAmount());
+        if ((FluidInventoryStorage.matches(insertedVariant, currentStack) || currentStack.isEmpty()) && canInsert(
+            insertedVariant)) {
+            int insertedAmount = (int) Math.min(
+                maxAmount,
+                getCapacity(insertedVariant, currentStack) - currentStack.getAmount()
+            );
 
             if (insertedAmount > 0) {
                 updateSnapshots(transaction);
@@ -61,7 +65,11 @@ public abstract class SingleFluidStackStorage extends SnapshotParticipant<FluidS
 
                 if (currentStack.isEmpty()) {
                     Integer capacity = currentStack.get(AllDataComponents.FLUID_MAX_CAPACITY);
-                    currentStack = new FluidStack(insertedVariant.getFluid(), insertedAmount, insertedVariant.getComponents());
+                    currentStack = new FluidStack(
+                        insertedVariant.getFluid(),
+                        insertedAmount,
+                        insertedVariant.getComponents()
+                    );
                     if (capacity != null) {
                         currentStack.set(AllDataComponents.FLUID_MAX_CAPACITY, capacity);
                     }

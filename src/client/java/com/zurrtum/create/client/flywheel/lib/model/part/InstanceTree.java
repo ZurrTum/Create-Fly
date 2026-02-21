@@ -7,6 +7,8 @@ import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -17,9 +19,6 @@ import org.joml.Vector3fc;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.ObjIntConsumer;
-
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.geom.PartPose;
 
 public final class InstanceTree {
     private final ModelTree source;

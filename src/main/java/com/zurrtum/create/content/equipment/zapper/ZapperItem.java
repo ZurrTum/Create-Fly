@@ -5,10 +5,6 @@ import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import com.zurrtum.create.foundation.item.SwingControlItem;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.packet.s2c.ZapperBeamPacket;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -34,6 +30,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 public abstract class ZapperItem extends Item implements SwingControlItem {
 
@@ -52,8 +51,10 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
     ) {
         if (stack.has(AllDataComponents.SHAPER_BLOCK_USED)) {
             MutableComponent usedBlock = stack.get(AllDataComponents.SHAPER_BLOCK_USED).getBlock().getName();
-            tooltip.accept(Component.translatable("create.terrainzapper.usingBlock", usedBlock.withStyle(ChatFormatting.GRAY))
-                .withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.accept(Component.translatable(
+                "create.terrainzapper.usingBlock",
+                usedBlock.withStyle(ChatFormatting.GRAY)
+            ).withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
@@ -98,8 +99,9 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
             return InteractionResult.SUCCESS;
         }
 
-        if (ShootableGadgetItemMethods.shouldSwap(player, item, hand, this::isZapper))
+        if (ShootableGadgetItemMethods.shouldSwap(player, item, hand, this::isZapper)) {
             return InteractionResult.FAIL;
+        }
 
         // Check if can be used
         Component msg = validateUsage(item);
@@ -110,8 +112,9 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         }
 
         BlockState stateToUse = Blocks.AIR.defaultBlockState();
-        if (item.has(AllDataComponents.SHAPER_BLOCK_USED))
+        if (item.has(AllDataComponents.SHAPER_BLOCK_USED)) {
             stateToUse = item.get(AllDataComponents.SHAPER_BLOCK_USED);
+        }
         stateToUse = BlockHelper.setZeroAge(stateToUse);
         CompoundTag data = null;
         if (stateToUse.is(AllBlockTags.SAFE_NBT) && item.has(AllDataComponents.SHAPER_BLOCK_DATA)) {
@@ -121,7 +124,13 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         // Raytrace - Find the target
         Vec3 start = player.position().add(0, player.getEyeHeight(), 0);
         Vec3 range = player.getLookAngle().scale(getZappingRange(item));
-        BlockHitResult raytrace = world.clip(new ClipContext(start, start.add(range), Block.OUTLINE, Fluid.NONE, player));
+        BlockHitResult raytrace = world.clip(new ClipContext(
+            start,
+            start.add(range),
+            Block.OUTLINE,
+            Fluid.NONE,
+            player
+        ));
         BlockPos pos = raytrace.getBlockPos();
         BlockState stateReplaced = world.getBlockState(pos);
 
@@ -145,7 +154,10 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         // Server side
         if (activate(world, player, item, stateToUse, raytrace, data)) {
             ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, getCooldownDelay(item));
-            ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, hand, b, raytrace.getLocation()));
+            ShootableGadgetItemMethods.sendPackets(
+                player,
+                b -> new ZapperBeamPacket(barrelPos, hand, b, raytrace.getLocation())
+            );
         }
 
         player.stopUsingItem();
@@ -153,12 +165,20 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
     }
 
     public Component validateUsage(ItemStack item) {
-        if (!canActivateWithoutSelectedBlock(item) && !item.has(AllDataComponents.SHAPER_BLOCK_USED))
+        if (!canActivateWithoutSelectedBlock(item) && !item.has(AllDataComponents.SHAPER_BLOCK_USED)) {
             return Component.translatable("create.terrainzapper.leftClickToSet");
+        }
         return null;
     }
 
-    protected abstract boolean activate(Level world, Player player, ItemStack item, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data);
+    protected abstract boolean activate(
+        Level world,
+        Player player,
+        ItemStack item,
+        BlockState stateToUse,
+        BlockHitResult raytrace,
+        CompoundTag data
+    );
 
     protected abstract void openHandgunGUI(ItemStack item, InteractionHand hand);
 
@@ -180,17 +200,27 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         return false;
     }
 
-    public static void setBlockEntityData(Level world, BlockPos pos, BlockState state, CompoundTag data, Player player) {
+    public static void setBlockEntityData(
+        Level world,
+        BlockPos pos,
+        BlockState state,
+        CompoundTag data,
+        Player player
+    ) {
         if (data != null && state.is(AllBlockTags.SAFE_NBT)) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity != null) {
                 data = NBTProcessors.process(state, blockEntity, data, !player.isCreative());
-                if (data == null)
+                if (data == null) {
                     return;
+                }
                 data.putInt("x", pos.getX());
                 data.putInt("y", pos.getY());
                 data.putInt("z", pos.getZ());
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), Create.LOGGER)) {
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    blockEntity.problemPath(),
+                    Create.LOGGER
+                )) {
                     blockEntity.loadWithComponents(TagValueInput.create(logging, world.registryAccess(), data));
                 }
             }

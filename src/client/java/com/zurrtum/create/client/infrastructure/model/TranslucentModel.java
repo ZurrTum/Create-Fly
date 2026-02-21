@@ -75,7 +75,8 @@ public class TranslucentModel implements ItemModel {
         int[] is = layerRenderState.prepareTintLayers(i);
 
         for (int j = 0; j < i; j++) {
-            int k = tints.get(j).calculate(stack, world, heldItemContext == null ? null : heldItemContext.asLivingEntity());
+            int k = tints.get(j)
+                .calculate(stack, world, heldItemContext == null ? null : heldItemContext.asLivingEntity());
             is[j] = k;
             state.appendModelIdentityElement(k);
         }
@@ -92,7 +93,8 @@ public class TranslucentModel implements ItemModel {
     public record Unbaked(Identifier model, List<ItemTintSource> tints) implements ItemModel.Unbaked {
         public static final MapCodec<com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                Identifier.CODEC.fieldOf("model").forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::model),
+                Identifier.CODEC.fieldOf("model")
+                    .forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::model),
                 ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
                     .forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::tints)
             ).apply(instance, com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::new));
@@ -107,8 +109,13 @@ public class TranslucentModel implements ItemModel {
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel bakedSimpleModel = baker.getModel(model);
             TextureSlots modelTextures = bakedSimpleModel.getTopTextureSlots();
-            List<BakedQuad> list = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.IDENTITY).getAll();
-            ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(baker, bakedSimpleModel, modelTextures);
+            List<BakedQuad> list = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.IDENTITY)
+                .getAll();
+            ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(
+                baker,
+                bakedSimpleModel,
+                modelTextures
+            );
             return new TranslucentModel(tints, list, modelSettings);
         }
 

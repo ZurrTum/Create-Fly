@@ -31,19 +31,24 @@ public class ChainGearshiftBlock extends ChainDriveBlock {
     @Override
     public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, worldIn, pos, oldState, isMoving);
-        if (oldState.getBlock() == state.getBlock())
+        if (oldState.getBlock() == state.getBlock()) {
             return;
+        }
         withBlockEntityDo(worldIn, pos, kbe -> ((ChainGearshiftBlockEntity) kbe).neighbourChanged());
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return super.getStateForPlacement(context).setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
+        return super.getStateForPlacement(context)
+            .setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
     }
 
     @Override
     protected boolean areStatesKineticallyEquivalent(BlockState oldState, BlockState newState) {
-        return super.areStatesKineticallyEquivalent(oldState, newState) && oldState.getValue(POWERED) == newState.getValue(POWERED);
+        return super.areStatesKineticallyEquivalent(
+            oldState,
+            newState
+        ) && oldState.getValue(POWERED) == newState.getValue(POWERED);
     }
 
     @Override
@@ -55,14 +60,16 @@ public class ChainGearshiftBlock extends ChainDriveBlock {
         @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         withBlockEntityDo(worldIn, pos, kbe -> ((ChainGearshiftBlockEntity) kbe).neighbourChanged());
 
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
             worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+        }
     }
 
     @Override

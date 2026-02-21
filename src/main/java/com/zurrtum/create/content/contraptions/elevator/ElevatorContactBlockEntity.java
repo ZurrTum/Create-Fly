@@ -1,20 +1,19 @@
 package com.zurrtum.create.content.contraptions.elevator;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn.ColumnCoords;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControlBehaviour;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
+import java.util.Optional;
 
 public class ElevatorContactBlockEntity extends SmartBlockEntity {
 
@@ -49,21 +48,26 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
         view.putString("ShortName", shortName);
         view.putString("LongName", longName);
 
-        if (lastReportedCurrentFloor != null)
+        if (lastReportedCurrentFloor != null) {
             view.putString("LastReportedCurrentFloor", lastReportedCurrentFloor);
+        }
 
-        if (clientPacket)
+        if (clientPacket) {
             return;
+        }
         view.putBoolean("Activate", activateBlock);
-        if (columnCoords == null)
+        if (columnCoords == null) {
             return;
+        }
 
         ElevatorColumn column = ElevatorColumn.get(level, columnCoords);
-        if (column == null)
+        if (column == null) {
             return;
+        }
         view.putInt("ColumnTarget", column.getTargetedYLevel());
-        if (column.isActive())
+        if (column.isActive()) {
             view.putBoolean("ColumnActive", true);
+        }
     }
 
     @Override
@@ -75,12 +79,14 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
 
         lastReportedCurrentFloor = view.getStringOr("LastReportedCurrentFloor", null);
 
-        if (clientPacket)
+        if (clientPacket) {
             return;
+        }
         activateBlock = view.getBooleanOr("Activate", false);
         Optional<Integer> columnTarget = view.getInt("ColumnTarget");
-        if (columnTarget.isEmpty())
+        if (columnTarget.isEmpty()) {
             return;
+        }
 
         int target = columnTarget.get();
         boolean active = view.getBooleanOr("ColumnActive", false);
@@ -96,8 +102,9 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
     }
 
     public void updateDisplayedFloor(String floor) {
-        if (floor.equals(lastReportedCurrentFloor))
+        if (floor.equals(lastReportedCurrentFloor)) {
             return;
+        }
         lastReportedCurrentFloor = floor;
         DisplayLinkBlock.notifyGatherers(level, worldPosition);
     }
@@ -105,17 +112,21 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         columnCoords = ElevatorContactBlock.getColumnCoords(level, worldPosition);
-        if (columnCoords == null)
+        if (columnCoords == null) {
             return;
+        }
         ElevatorColumn column = ElevatorColumn.getOrCreate(level, columnCoords);
         column.add(worldPosition);
-        if (shortName.isBlank())
+        if (shortName.isBlank()) {
             deferNameGenerator = true;
-        if (yTargetFromNBT == Integer.MIN_VALUE)
+        }
+        if (yTargetFromNBT == Integer.MIN_VALUE) {
             return;
+        }
         column.target(yTargetFromNBT);
         yTargetFromNBT = Integer.MIN_VALUE;
     }
@@ -123,10 +134,12 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!deferNameGenerator)
+        if (!deferNameGenerator) {
             return;
-        if (columnCoords != null)
+        }
+        if (columnCoords != null) {
             ElevatorColumn.getOrCreate(level, columnCoords).initNames(level);
+        }
         deferNameGenerator = false;
     }
 
@@ -134,8 +147,9 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
     public void invalidate() {
         if (columnCoords != null) {
             ElevatorColumn column = ElevatorColumn.get(level, columnCoords);
-            if (column != null)
+            if (column != null) {
                 column.remove(worldPosition);
+            }
         }
         super.invalidate();
     }
@@ -147,8 +161,9 @@ public class ElevatorContactBlockEntity extends SmartBlockEntity {
         notifyUpdate();
 
         ElevatorColumn column = ElevatorColumn.get(level, columnCoords);
-        if (column != null)
+        if (column != null) {
             column.namesChanged();
+        }
     }
 
     public Couple<String> getNames() {

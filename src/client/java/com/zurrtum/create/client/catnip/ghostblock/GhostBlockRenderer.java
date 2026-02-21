@@ -27,11 +27,23 @@ public abstract class GhostBlockRenderer {
         return TRANSPARENT;
     }
 
-    public abstract void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, GhostBlockParams params);
+    public abstract void render(
+        Minecraft mc,
+        PoseStack ms,
+        SuperRenderTypeBuffer buffer,
+        Vec3 camera,
+        GhostBlockParams params
+    );
 
     private static class DefaultGhostBlockRenderer extends GhostBlockRenderer {
         @Override
-        public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, GhostBlockParams params) {
+        public void render(
+            Minecraft mc,
+            PoseStack ms,
+            SuperRenderTypeBuffer buffer,
+            Vec3 camera,
+            GhostBlockParams params
+        ) {
             BlockState state = params.state;
             BlockStateModel model = mc.getBlockRenderer().getBlockModel(state);
             BlockPos pos = params.pos;
@@ -53,12 +65,24 @@ public abstract class GhostBlockRenderer {
 
     private static class TransparentGhostBlockRenderer extends GhostBlockRenderer {
         @Override
-        public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, GhostBlockParams params) {
+        public void render(
+            Minecraft mc,
+            PoseStack ms,
+            SuperRenderTypeBuffer buffer,
+            Vec3 camera,
+            GhostBlockParams params
+        ) {
             BlockState state = params.state;
             BlockStateModel model = mc.getBlockRenderer().getBlockModel(state);
             BlockPos pos = params.pos;
             float alpha = params.alphaSupplier.get() * .75f * PlacementClient.getCurrentAlpha();
-            VertexConsumer vb = new ColoringVertexConsumer(buffer.getEarlyBuffer(ChunkSectionLayer.TRANSLUCENT), 1, 1, 1, alpha);
+            VertexConsumer vb = new ColoringVertexConsumer(
+                buffer.getEarlyBuffer(ChunkSectionLayer.TRANSLUCENT),
+                1,
+                1,
+                1,
+                alpha
+            );
 
             ms.pushPose();
             ms.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
@@ -66,7 +90,14 @@ public abstract class GhostBlockRenderer {
             ms.translate(.5, .5, .5);
             ms.scale(.85f, .85f, .85f);
             ms.translate(-.5, -.5, -.5);
-            BakedModelBufferer.bufferModel(model, pos, EmptyVirtualBlockGetter.FULL_BRIGHT, state, ms, (layer, shade) -> vb);
+            BakedModelBufferer.bufferModel(
+                model,
+                pos,
+                EmptyVirtualBlockGetter.FULL_BRIGHT,
+                state,
+                ms,
+                (layer, shade) -> vb
+            );
             ms.popPose();
         }
     }

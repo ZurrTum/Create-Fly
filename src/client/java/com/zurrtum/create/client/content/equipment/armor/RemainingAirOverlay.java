@@ -24,19 +24,23 @@ import java.util.List;
 public class RemainingAirOverlay {
     public static void render(Minecraft mc, GuiGraphics guiGraphics) {
         LocalPlayer player = mc.player;
-        if (player == null)
+        if (player == null) {
             return;
-        if (player.isCreative())
+        }
+        if (player.isCreative()) {
             return;
+        }
         int timeLeft = AllSynchedDatas.VISUAL_BACKTANK_AIR.get(player);
         if (timeLeft == 0) {
             return;
         }
         boolean isAir = !player.isEyeInFluid(FluidTags.WATER) || player.level()
-            .getBlockState(BlockPos.containing(player.getX(), player.getEyeY(), player.getZ())).is(Blocks.BUBBLE_COLUMN);
+            .getBlockState(BlockPos.containing(player.getX(), player.getEyeY(), player.getZ()))
+            .is(Blocks.BUBBLE_COLUMN);
         boolean canBreathe = MobEffectUtil.hasWaterBreathing(player) || player.getAbilities().invulnerable;
-        if ((isAir || canBreathe) && !player.isInLava())
+        if ((isAir || canBreathe) && !player.isInLava()) {
             return;
+        }
 
         Matrix3x2fStack poseStack = guiGraphics.pose();
         poseStack.pushMatrix();
@@ -47,7 +51,10 @@ public class RemainingAirOverlay {
             guiGraphics.guiHeight() - 53 + (backtank.canBeHurtBy(mc.level.damageSources().lava()) ? 0 : 9)
         );
 
-        Component text = Component.literal(StringUtil.formatTickDuration(Math.max(0, timeLeft - 1) * 20, mc.level.tickRateManager().tickrate()));
+        Component text = Component.literal(StringUtil.formatTickDuration(
+            Math.max(0, timeLeft - 1) * 20,
+            mc.level.tickRateManager().tickrate()
+        ));
         guiGraphics.renderItem(backtank, 0, 0);
         int color = 0xFF_FFFFFF;
         if (timeLeft < 60 && timeLeft % 2 == 0) {
@@ -101,14 +108,16 @@ public class RemainingAirOverlay {
         }
 
         List<ItemStack> backtanks = BacktankUtil.getAllWithAir(player);
-        if (backtanks.isEmpty() || (lavaDiving && backtanks.stream().allMatch(backtank -> backtank.canBeHurtBy(world.damageSources().lava())))) {
+        if (backtanks.isEmpty() || (lavaDiving && backtanks.stream()
+            .allMatch(backtank -> backtank.canBeHurtBy(world.damageSources().lava())))) {
             resetAirData(player);
             return;
         }
 
         int visualBacktankAir = 0;
-        for (ItemStack stack : backtanks)
+        for (ItemStack stack : backtanks) {
             visualBacktankAir += BacktankUtil.getAir(stack);
+        }
 
         if (AllSynchedDatas.VISUAL_BACKTANK_AIR.get(player) == visualBacktankAir) {
             return;

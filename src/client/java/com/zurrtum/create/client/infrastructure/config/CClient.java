@@ -11,12 +11,27 @@ public class CClient extends ConfigBase {
 
     //no group
     public final ConfigBool tooltips = b(true, "enableTooltips", Comments.tooltips);
-    public final ConfigBool enableOverstressedTooltip = b(true, "enableOverstressedTooltip", Comments.enableOverstressedTooltip);
+    public final ConfigBool enableOverstressedTooltip = b(
+        true,
+        "enableOverstressedTooltip",
+        Comments.enableOverstressedTooltip
+    );
     public final ConfigBool explainRenderErrors = b(false, "explainRenderErrors", Comments.explainRenderErrors);
     public final ConfigFloat fanParticleDensity = f(.5f, 0, 1, "fanParticleDensity", Comments.fanParticleDensity);
-    public final ConfigFloat filterItemRenderDistance = f(10f, 1, "filterItemRenderDistance", Comments.filterItemRenderDistance);
+    public final ConfigFloat filterItemRenderDistance = f(
+        10f,
+        1,
+        "filterItemRenderDistance",
+        Comments.filterItemRenderDistance
+    );
     // no group
-    public final ConfigInt mainMenuConfigButtonRow = i(2, 0, 4, "mainMenuConfigButtonRow", Comments.mainMenuConfigButtonRow);
+    public final ConfigInt mainMenuConfigButtonRow = i(
+        2,
+        0,
+        4,
+        "mainMenuConfigButtonRow",
+        Comments.mainMenuConfigButtonRow
+    );
     public final ConfigInt mainMenuConfigButtonOffsetX = i(
         -4,
         Integer.MIN_VALUE,
@@ -24,7 +39,13 @@ public class CClient extends ConfigBase {
         "mainMenuConfigButtonOffsetX",
         Comments.mainMenuConfigButtonOffsetX
     );
-    public final ConfigInt ingameMenuConfigButtonRow = i(3, 0, 5, "ingameMenuConfigButtonRow", Comments.ingameMenuConfigButtonRow);
+    public final ConfigInt ingameMenuConfigButtonRow = i(
+        3,
+        0,
+        5,
+        "ingameMenuConfigButtonRow",
+        Comments.ingameMenuConfigButtonRow
+    );
     public final ConfigInt ingameMenuConfigButtonOffsetX = i(
         -4,
         Integer.MIN_VALUE,
@@ -37,13 +58,37 @@ public class CClient extends ConfigBase {
 
     // custom fluid fog
     public final ConfigGroup fluidFogSettings = group(1, "fluidFogSettings", Comments.fluidFogSettings);
-    public final ConfigFloat honeyTransparencyMultiplier = f(1, .125f, 256, "honey", Comments.honeyTransparencyMultiplier);
-    public final ConfigFloat chocolateTransparencyMultiplier = f(1, .125f, 256, "chocolate", Comments.chocolateTransparencyMultiplier);
+    public final ConfigFloat honeyTransparencyMultiplier = f(
+        1,
+        .125f,
+        256,
+        "honey",
+        Comments.honeyTransparencyMultiplier
+    );
+    public final ConfigFloat chocolateTransparencyMultiplier = f(
+        1,
+        .125f,
+        256,
+        "chocolate",
+        Comments.chocolateTransparencyMultiplier
+    );
 
     //overlay group
     public final ConfigGroup overlay = group(1, "goggleOverlay", Comments.overlay);
-    public final ConfigInt overlayOffsetX = i(20, Integer.MIN_VALUE, Integer.MAX_VALUE, "overlayOffsetX", Comments.overlayOffset);
-    public final ConfigInt overlayOffsetY = i(0, Integer.MIN_VALUE, Integer.MAX_VALUE, "overlayOffsetY", Comments.overlayOffset);
+    public final ConfigInt overlayOffsetX = i(
+        20,
+        Integer.MIN_VALUE,
+        Integer.MAX_VALUE,
+        "overlayOffsetX",
+        Comments.overlayOffset
+    );
+    public final ConfigInt overlayOffsetY = i(
+        0,
+        Integer.MIN_VALUE,
+        Integer.MAX_VALUE,
+        "overlayOffsetY",
+        Comments.overlayOffset
+    );
     public final ConfigBool overlayCustomColor = b(false, "customColorsOverlay", Comments.overlayCustomColor);
     public final ConfigInt overlayBackgroundColor = i(
         0xf0_100010,
@@ -84,9 +129,17 @@ public class CClient extends ConfigBase {
     public final ConfigGroup trains = group(1, "trains", Comments.trains);
     public final ConfigFloat mountedZoomMultiplier = f(3, 0, "mountedZoomMultiplier", Comments.mountedZoomMultiplier);
     public final ConfigBool showTrackGraphOnF3 = b(false, "showTrackGraphOnF3", Comments.showTrackGraphOnF3);
-    public final ConfigBool showExtendedTrackGraphOnF3 = b(false, "showExtendedTrackGraphOnF3", Comments.showExtendedTrackGraphOnF3);
+    public final ConfigBool showExtendedTrackGraphOnF3 = b(
+        false,
+        "showExtendedTrackGraphOnF3",
+        Comments.showExtendedTrackGraphOnF3
+    );
     public final ConfigBool showTrainMapOverlay = b(true, "showTrainMapOverlay", Comments.showTrainMapOverlay);
-    public final ConfigEnum<TrainMapTheme> trainMapColorTheme = e(TrainMapTheme.RED, "trainMapColorTheme", Comments.trainMapColorTheme);
+    public final ConfigEnum<TrainMapTheme> trainMapColorTheme = e(
+        TrainMapTheme.RED,
+        "trainMapColorTheme",
+        Comments.trainMapColorTheme
+    );
 
     @Override
     public String getName() {
@@ -94,15 +147,11 @@ public class CClient extends ConfigBase {
     }
 
     public enum PlacementIndicatorSetting {
-        TEXTURE,
-        TRIANGLE,
-        NONE
+        TEXTURE, TRIANGLE, NONE
     }
 
     public enum TrainMapTheme {
-        RED,
-        GREY,
-        WHITE
+        RED, GREY, WHITE
     }
 
     private static class Comments {
@@ -111,19 +160,45 @@ public class CClient extends ConfigBase {
         static String enableOverstressedTooltip = "Display a tooltip when looking at overstressed components.";
         static String explainRenderErrors = "Log a stack-trace when rendering issues happen within a moving contraption.";
         static String fanParticleDensity = "Higher density means more spawned particles.";
-        static String[] filterItemRenderDistance = new String[]{"[in Blocks]", "Maximum Distance to the player at which items in Blocks' filter slots will be displayed"};
-        static String[] mainMenuConfigButtonRow = new String[]{"Choose the menu row that the Create config button appears on in the main menu", "Set to 0 to disable the button altogether"};
-        static String[] mainMenuConfigButtonOffsetX = new String[]{"Offset the Create config button in the main menu by this many pixels on the X axis", "The sign (-/+) of this value determines what side of the row the button appears on (left/right)"};
-        static String[] ingameMenuConfigButtonRow = new String[]{"Choose the menu row that the Create config button appears on in the in-game menu", "Set to 0 to disable the button altogether"};
-        static String[] ingameMenuConfigButtonOffsetX = new String[]{"Offset the Create config button in the in-game menu by this many pixels on the X axis", "The sign (-/+) of this value determines what side of the row the button appears on (left/right)"};
+        static String[] filterItemRenderDistance = new String[]{
+            "[in Blocks]", "Maximum Distance to the player at which items in Blocks' filter slots will be displayed"
+        };
+        static String[] mainMenuConfigButtonRow = new String[]{
+            "Choose the menu row that the Create config button appears on in the main menu",
+            "Set to 0 to disable the button altogether"
+        };
+        static String[] mainMenuConfigButtonOffsetX = new String[]{
+            "Offset the Create config button in the main menu by this many pixels on the X axis",
+            "The sign (-/+) of this value determines what side of the row the button appears on (left/right)"
+        };
+        static String[] ingameMenuConfigButtonRow = new String[]{
+            "Choose the menu row that the Create config button appears on in the in-game menu",
+            "Set to 0 to disable the button altogether"
+        };
+        static String[] ingameMenuConfigButtonOffsetX = new String[]{
+            "Offset the Create config button in the in-game menu by this many pixels on the X axis",
+            "The sign (-/+) of this value determines what side of the row the button appears on (left/right)"
+        };
         static String ignoreFabulousWarning = "Setting this to true will prevent Create from sending you a warning when playing with Fabulous graphics enabled";
         static String rotatewhenSeated = "Disable to prevent being rotated while seated on a Moving Contraption";
         static String overlay = "Settings for the Goggle Overlay";
         static String overlayOffset = "Offset the overlay from goggle- and hover- information by this many pixels on the respective axis; Use /create overlay";
         static String overlayCustomColor = "Enable this to use your custom colors for the Goggle- and Hover- Overlay";
-        static String[] overlayBackgroundColor = new String[]{"The custom background color to use for the Goggle- and Hover- Overlays, if enabled", "[in Hex: #AaRrGgBb]", ConfigAnnotations.IntDisplay.HEX.asComment()};
-        static String[] overlayBorderColorTop = new String[]{"The custom top color of the border gradient to use for the Goggle- and Hover- Overlays, if enabled", "[in Hex: #AaRrGgBb]", ConfigAnnotations.IntDisplay.HEX.asComment()};
-        static String[] overlayBorderColorBot = new String[]{"The custom bot color of the border gradient to use for the Goggle- and Hover- Overlays, if enabled", "[in Hex: #AaRrGgBb]", ConfigAnnotations.IntDisplay.HEX.asComment()};
+        static String[] overlayBackgroundColor = new String[]{
+            "The custom background color to use for the Goggle- and Hover- Overlays, if enabled",
+            "[in Hex: #AaRrGgBb]",
+            ConfigAnnotations.IntDisplay.HEX.asComment()
+        };
+        static String[] overlayBorderColorTop = new String[]{
+            "The custom top color of the border gradient to use for the Goggle- and Hover- Overlays, if enabled",
+            "[in Hex: #AaRrGgBb]",
+            ConfigAnnotations.IntDisplay.HEX.asComment()
+        };
+        static String[] overlayBorderColorBot = new String[]{
+            "The custom bot color of the border gradient to use for the Goggle- and Hover- Overlays, if enabled",
+            "[in Hex: #AaRrGgBb]",
+            ConfigAnnotations.IntDisplay.HEX.asComment()
+        };
         static String sound = "Sound settings";
         static String enableAmbientSounds = "Make cogs rumble and machines clatter.";
         static String ambientVolumeCap = "Maximum volume modifier of Ambient noise";

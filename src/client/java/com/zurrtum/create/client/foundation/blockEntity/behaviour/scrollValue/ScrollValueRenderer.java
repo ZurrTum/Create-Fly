@@ -29,8 +29,9 @@ public class ScrollValueRenderer {
 
     public static void tick(Minecraft mc) {
         HitResult target = mc.hitResult;
-        if (!(target instanceof BlockHitResult result))
+        if (!(target instanceof BlockHitResult result)) {
             return;
+        }
 
         ClientLevel world = mc.level;
         if (world == null) {
@@ -55,8 +56,9 @@ public class ScrollValueRenderer {
 
         ItemStack mainhandItem = mc.player.getItemInHand(InteractionHand.MAIN_HAND);
         boolean clipboard = behaviour.bypassesInput(mainhandItem);
-        if (behaviour.needsWrench && !mainhandItem.is(AllItems.WRENCH) && !clipboard)
+        if (behaviour.needsWrench && !mainhandItem.is(AllItems.WRENCH) && !clipboard) {
             return;
+        }
         boolean highlight = behaviour.testHit(target.getLocation()) && !clipboard;
 
         if (AllKeys.hasControlDown()) {
@@ -74,8 +76,9 @@ public class ScrollValueRenderer {
             addBox(pos, face, behaviour, highlight);
         }
 
-        if (!highlight)
+        if (!highlight) {
             return;
+        }
 
         List<MutableComponent> tip = new ArrayList<>();
         tip.add(behaviour.label.copy());
@@ -83,7 +86,12 @@ public class ScrollValueRenderer {
         Create.VALUE_SETTINGS_HANDLER.showHoverTip(mc, tip);
     }
 
-    protected static void addBox(BlockPos pos, Direction face, ScrollValueBehaviour<?, ?> behaviour, boolean highlight) {
+    protected static void addBox(
+        BlockPos pos,
+        Direction face,
+        ScrollValueBehaviour<?, ?> behaviour,
+        boolean highlight
+    ) {
         AABB bb = new AABB(Vec3.ZERO, Vec3.ZERO).inflate(.5f).contract(0, 0, -.5f).move(0, 0, -.125f);
         Component label = behaviour.label;
         ValueBox box;

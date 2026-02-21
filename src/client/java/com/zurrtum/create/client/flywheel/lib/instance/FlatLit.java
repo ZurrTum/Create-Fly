@@ -1,12 +1,11 @@
 package com.zurrtum.create.client.flywheel.lib.instance;
 
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
+import net.minecraft.client.renderer.LightTexture;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.stream.Stream;
-
-import net.minecraft.client.renderer.LightTexture;
 
 /**
  * An interface that implementors of {@link Instance} should also implement if they wish to make use of

@@ -16,8 +16,9 @@ public class SawAudioBehaviour extends KineticAudioBehaviour<SawBlockEntity> {
     @Override
     public void tickAudio() {
         super.tickAudio();
-        if (blockEntity.getSpeed() == 0)
+        if (blockEntity.getSpeed() == 0) {
             return;
+        }
 
         if (!blockEntity.playEvent.isEmpty()) {
             boolean isWood = false;
@@ -28,10 +29,11 @@ public class SawAudioBehaviour extends KineticAudioBehaviour<SawBlockEntity> {
             }
             blockEntity.spawnEventParticles(blockEntity.playEvent);
             blockEntity.playEvent = ItemStack.EMPTY;
-            if (!isWood)
+            if (!isWood) {
                 AllSoundEvents.SAW_ACTIVATE_STONE.playAt(getLevel(), getPos(), 3, 1, true);
-            else
+            } else {
                 AllSoundEvents.SAW_ACTIVATE_WOOD.playAt(getLevel(), getPos(), 3, 1, true);
+            }
         }
     }
 }

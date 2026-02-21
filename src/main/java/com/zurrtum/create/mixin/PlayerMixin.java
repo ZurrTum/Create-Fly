@@ -43,12 +43,24 @@ public abstract class PlayerMixin {
     }
 
     @Inject(method = "itemAttackInteraction(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/damagesource/DamageSource;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtEnemy(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z"))
-    private void attack(Entity entity, ItemStack attackingItemStack, DamageSource damageSource, boolean applyToTarget, CallbackInfo ci) {
+    private void attack(
+        Entity entity,
+        ItemStack attackingItemStack,
+        DamageSource damageSource,
+        boolean applyToTarget,
+        CallbackInfo ci
+    ) {
         ExtendoGripItem.postDamageEntity((Player) (Object) this);
     }
 
     @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtOrSimulate(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private boolean damage(Entity entity, DamageSource source, float amount, Operation<Boolean> original, @Local ItemStack stack) {
+    private boolean damage(
+        Entity entity,
+        DamageSource source,
+        float amount,
+        Operation<Boolean> original,
+        @Local ItemStack stack
+    ) {
         if (stack.getItem() instanceof DamageControlItem item && !item.damage(entity)) {
             return true;
         }
@@ -64,9 +76,24 @@ public abstract class PlayerMixin {
     }
 
     @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;playServerSideSound(Lnet/minecraft/sounds/SoundEvent;)V"))
-    private void playSound(Player player, SoundEvent sound, Operation<Void> original, @Local ItemStack attackingItemStack) {
+    private void playSound(
+        Player player,
+        SoundEvent sound,
+        Operation<Void> original,
+        @Local ItemStack attackingItemStack
+    ) {
         if (attackingItemStack.getItem() instanceof CustomAttackSoundItem item) {
-            item.playSound(player.level(), player, player.getX(), player.getY(), player.getZ(), sound, player.getSoundSource(), 1f, 1f);
+            item.playSound(
+                player.level(),
+                player,
+                player.getX(),
+                player.getY(),
+                player.getZ(),
+                sound,
+                player.getSoundSource(),
+                1f,
+                1f
+            );
         } else {
             original.call(player, sound);
         }
@@ -95,7 +122,17 @@ public abstract class PlayerMixin {
                 sound = null;
             }
             if (sound != null) {
-                item.playSound(player.level(), player, player.getX(), player.getY(), player.getZ(), sound, player.getSoundSource(), 1f, 1f);
+                item.playSound(
+                    player.level(),
+                    player,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    sound,
+                    player.getSoundSource(),
+                    1f,
+                    1f
+                );
                 original.call(player, entity, false, true, fullStrengthAttack, stabAttack, magicBoost);
                 return;
             }
@@ -113,6 +150,7 @@ public abstract class PlayerMixin {
 
     @Inject(method = "readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("TAIL"))
     private void readCustomData(ValueInput view, CallbackInfo ci) {
-        view.read("CreateToolboxData", CompoundTag.CODEC).ifPresent(compound -> AllSynchedDatas.TOOLBOX.set((Player) (Object) this, compound));
+        view.read("CreateToolboxData", CompoundTag.CODEC)
+            .ifPresent(compound -> AllSynchedDatas.TOOLBOX.set((Player) (Object) this, compound));
     }
 }

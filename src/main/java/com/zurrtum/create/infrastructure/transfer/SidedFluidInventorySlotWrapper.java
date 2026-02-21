@@ -12,7 +12,11 @@ public class SidedFluidInventorySlotWrapper implements SingleSlotStorage<FluidVa
     private final SidedFluidInventory sidedInventory;
     private final Direction direction;
 
-    SidedFluidInventorySlotWrapper(FluidInventorySlotWrapper slotWrapper, SidedFluidInventory sidedInventory, Direction direction) {
+    SidedFluidInventorySlotWrapper(
+        FluidInventorySlotWrapper slotWrapper,
+        SidedFluidInventory sidedInventory,
+        Direction direction
+    ) {
         this.slotWrapper = slotWrapper;
         this.sidedInventory = sidedInventory;
         this.direction = direction;
@@ -63,6 +67,10 @@ public class SidedFluidInventorySlotWrapper implements SingleSlotStorage<FluidVa
 
     @Override
     public String toString() {
-        return "SidedInventorySlotWrapper[%s#%d/%s]".formatted(FluidInventoryStorage.toString(sidedInventory), slotWrapper.slot, direction.name());
+        return "SidedInventorySlotWrapper[%s#%d/%s]".formatted(
+            FluidInventoryStorage.toString(sidedInventory),
+            slotWrapper.slot,
+            direction.name()
+        );
     }
 }

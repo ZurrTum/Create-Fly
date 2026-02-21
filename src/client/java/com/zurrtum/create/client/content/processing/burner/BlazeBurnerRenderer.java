@@ -51,8 +51,9 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
         HeatLevel heatLevel = be.getHeatLevelForRender();
-        if (heatLevel == HeatLevel.NONE)
+        if (heatLevel == HeatLevel.NONE) {
             return;
+        }
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         Level level = be.getLevel();
         float animation = be.headAnimation.getValue(tickProgress) * .175f;
@@ -75,7 +76,12 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
     }
 
     @Override
-    public void submit(BlazeBurnerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BlazeBurnerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         state.data.render(matrices, queue);
     }
 
@@ -114,9 +120,8 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
             be.headAngle.tickChaser();
         } else {
             be.headAngle.chase(
-                (AngleHelper.horizontalAngle(be.getBlockState().getOptionalValue(BlazeBurnerBlock.FACING).orElse(Direction.SOUTH)) + 180) % 360,
-                .125f,
-                Chaser.EXP
+                (AngleHelper.horizontalAngle(be.getBlockState().getOptionalValue(BlazeBurnerBlock.FACING)
+                    .orElse(Direction.SOUTH)) + 180) % 360, .125f, Chaser.EXP
             );
             be.headAngle.tickChaser();
         }

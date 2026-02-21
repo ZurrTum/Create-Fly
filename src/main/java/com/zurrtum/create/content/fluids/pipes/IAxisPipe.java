@@ -8,8 +8,9 @@ public interface IAxisPipe {
 
     @Nullable
     static Axis getAxisOf(BlockState state) {
-        if (state.getBlock() instanceof IAxisPipe)
+        if (state.getBlock() instanceof IAxisPipe) {
             return ((IAxisPipe) state.getBlock()).getAxis(state);
+        }
         return null;
     }
 

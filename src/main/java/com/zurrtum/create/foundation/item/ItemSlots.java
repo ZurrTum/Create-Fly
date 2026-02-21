@@ -6,11 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.IntFunction;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,12 +13,17 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.IntFunction;
+
 /**
  * Utility class representing non-empty slots in an item inventory.
  */
 public class ItemSlots {
     public static final Codec<ItemSlots> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.unboundedMap(CreateCodecs.boundedIntStr(0), ItemStack.CODEC).fieldOf("items").forGetter(ItemSlots::toBoxedMap),
+        Codec.unboundedMap(CreateCodecs.boundedIntStr(0), ItemStack.CODEC).fieldOf("items")
+            .forGetter(ItemSlots::toBoxedMap),
         ExtraCodecs.NON_NEGATIVE_INT.fieldOf("size").forGetter(ItemSlots::getSize)
     ).apply(instance, ItemSlots::deserialize));
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemSlots> STREAM_CODEC = StreamCodec.composite(

@@ -281,7 +281,14 @@ public class AllClientHandle {
         return null;
     }
 
-    public void spawnPipeParticles(Level world, BlockPos pos, PipeConnection.Flow flow, boolean openEnd, Direction side, int amount) {
+    public void spawnPipeParticles(
+        Level world,
+        BlockPos pos,
+        PipeConnection.Flow flow,
+        boolean openEnd,
+        Direction side,
+        int amount
+    ) {
         warn();
     }
 

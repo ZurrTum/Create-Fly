@@ -20,7 +20,10 @@ public class SuperByteBufferCache {
     protected final Map<Compartment<?>, Cache<Object, SuperByteBuffer>> caches = new HashMap<>();
 
     public synchronized void registerCompartment(Compartment<?> compartment) {
-        caches.put(compartment, CacheBuilder.newBuilder().<Object, SuperByteBuffer>removalListener(n -> n.getValue().delete()).build());
+        caches.put(
+            compartment,
+            CacheBuilder.newBuilder().<Object, SuperByteBuffer>removalListener(n -> n.getValue().delete()).build()
+        );
     }
 
     public synchronized void registerCompartment(Compartment<?> compartment, long ticksUntilExpired) {
@@ -34,16 +37,18 @@ public class SuperByteBufferCache {
     public <T> SuperByteBuffer get(Compartment<T> compartment, T key, Callable<SuperByteBuffer> callable) {
         Cache<Object, SuperByteBuffer> cache = caches.get(compartment);
 
-        if (cache == null)
+        if (cache == null) {
             throw new IllegalArgumentException("Trying to access Buffer Cache for not registered Compartment: " + compartment + " <" + key.getClass()
                 .getSimpleName() + ">");
+        }
 
 
         try {
             return cache.get(key, callable);
         } catch (ExecutionException e) {
             e.printStackTrace();
-            throw new RuntimeException("Unable to populate Buffer Cache for key: " + key + " <" + key.getClass().getSimpleName() + ">");
+            throw new RuntimeException("Unable to populate Buffer Cache for key: " + key + " <" + key.getClass()
+                .getSimpleName() + ">");
         }
     }
 

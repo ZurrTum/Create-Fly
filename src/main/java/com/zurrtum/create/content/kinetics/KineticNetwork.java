@@ -34,8 +34,9 @@ public class KineticNetwork {
     }
 
     public void addSilently(KineticBlockEntity be, float lastCapacity, float lastStress) {
-        if (members.containsKey(be))
+        if (members.containsKey(be)) {
             return;
+        }
         if (be.isSource()) {
             unloadedCapacity -= lastCapacity * getStressMultiplierForSpeed(be.getGeneratedSpeed());
             float addedStressCapacity = be.calculateAddedStressCapacity();
@@ -47,19 +48,24 @@ public class KineticNetwork {
         members.put(be, stressApplied);
 
         unloadedMembers--;
-        if (unloadedMembers < 0)
+        if (unloadedMembers < 0) {
             unloadedMembers = 0;
-        if (unloadedCapacity < 0)
+        }
+        if (unloadedCapacity < 0) {
             unloadedCapacity = 0;
-        if (unloadedStress < 0)
+        }
+        if (unloadedStress < 0) {
             unloadedStress = 0;
+        }
     }
 
     public void add(KineticBlockEntity be) {
-        if (members.containsKey(be))
+        if (members.containsKey(be)) {
             return;
-        if (be.isSource())
+        }
+        if (be.isSource()) {
             sources.put(be, be.calculateAddedStressCapacity());
+        }
         members.put(be, be.calculateStressApplied());
         updateFromNetwork(be);
         be.networkDirty = true;
@@ -76,10 +82,12 @@ public class KineticNetwork {
     }
 
     public void remove(KineticBlockEntity be) {
-        if (!members.containsKey(be))
+        if (!members.containsKey(be)) {
             return;
-        if (be.isSource())
+        }
+        if (be.isSource()) {
             sources.remove(be);
+        }
         members.remove(be);
         be.updateFromNetwork(0, 0, 0);
 
@@ -92,8 +100,9 @@ public class KineticNetwork {
     }
 
     public void sync() {
-        for (KineticBlockEntity be : members.keySet())
+        for (KineticBlockEntity be : members.keySet()) {
             updateFromNetwork(be);
+        }
     }
 
     private void updateFromNetwork(KineticBlockEntity be) {

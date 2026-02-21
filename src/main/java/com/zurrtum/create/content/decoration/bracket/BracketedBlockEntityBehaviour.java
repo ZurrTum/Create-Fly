@@ -1,10 +1,10 @@
 package com.zurrtum.create.content.decoration.bracket;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
@@ -43,8 +43,9 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
         reRender = true;
         blockEntity.notifyUpdate();
         Level world = getLevel();
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
         blockEntity.getBlockState().updateNeighbourShapes(world, getPos(), 3);
     }
 
@@ -63,8 +64,9 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
 
         BlockState removed = this.bracket;
         Level world = getLevel();
-        if (!world.isClientSide())
+        if (!world.isClientSide()) {
             world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, getPos(), Block.getId(bracket));
+        }
         this.bracket = null;
         reRender = true;
         if (inOnReplacedContext) {
@@ -72,8 +74,9 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
             return removed;
         }
         blockEntity.notifyUpdate();
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return removed;
+        }
         blockEntity.getBlockState().updateNeighbourShapes(world, getPos(), 3);
         return removed;
     }
@@ -124,11 +127,13 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
     public void read(ValueInput view, boolean clientPacket) {
         view.read("Bracket", BlockState.CODEC).ifPresent(state -> {
             bracket = null;
-            if (isBracketValid(state))
+            if (isBracketValid(state)) {
                 bracket = state;
+            }
         });
-        if (clientPacket && view.getBooleanOr("Redraw", false))
+        if (clientPacket && view.getBooleanOr("Redraw", false)) {
             getLevel().sendBlockUpdated(getPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 16);
+        }
         super.read(view, clientPacket);
     }
 

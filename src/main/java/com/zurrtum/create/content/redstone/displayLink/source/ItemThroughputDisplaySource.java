@@ -4,16 +4,15 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
-
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class ItemThroughputDisplaySource extends AccumulatedItemCountDisplaySource {
     private final NumberFormat format = NumberFormat.getNumberInstance(Locale.ROOT);
@@ -23,8 +22,9 @@ public class ItemThroughputDisplaySource extends AccumulatedItemCountDisplaySour
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         CompoundTag conf = context.sourceConfig();
-        if (conf.contains("Inactive"))
+        if (conf.contains("Inactive")) {
             return ZERO.copy();
+        }
 
         double interval = 20 * Math.pow(60, conf.getIntOr("Interval", 0));
         double rate = conf.getFloatOr("Rate", 0) * interval;
@@ -37,8 +37,9 @@ public class ItemThroughputDisplaySource extends AccumulatedItemCountDisplaySour
                 // Too long since last item
                 int lastAmount = conf.getIntOr("LastReceivedAmount", 0);
                 double timeBetweenStacks = lastAmount / rate;
-                if (diff > timeBetweenStacks * 2)
+                if (diff > timeBetweenStacks * 2) {
                     conf.putBoolean("Inactive", true);
+                }
             }
         }
 
@@ -49,8 +50,9 @@ public class ItemThroughputDisplaySource extends AccumulatedItemCountDisplaySour
     }
 
     public void itemReceived(DisplayLinkBlockEntity be, int amount) {
-        if (be.getBlockState().getValueOrElse(DisplayLinkBlock.POWERED, true))
+        if (be.getBlockState().getValueOrElse(DisplayLinkBlock.POWERED, true)) {
             return;
+        }
 
         CompoundTag conf = be.getSourceConfig();
         long gameTime = be.getLevel().getGameTime();
@@ -65,8 +67,9 @@ public class ItemThroughputDisplaySource extends AccumulatedItemCountDisplaySour
 
         if (rates.size() != POOL_SIZE) {
             rates = new ListTag();
-            for (int i = 0; i < POOL_SIZE; i++)
+            for (int i = 0; i < POOL_SIZE; i++) {
                 rates.add(FloatTag.valueOf(-1));
+            }
         }
 
         int poolIndex = conf.getIntOr("Index", 0) % POOL_SIZE;

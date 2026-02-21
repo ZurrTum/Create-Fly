@@ -8,23 +8,22 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.util.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public record FluidContentsAttribute(@Nullable Fluid fluid) implements ItemAttribute {
     public static final MapCodec<FluidContentsAttribute> CODEC = BuiltInRegistries.FLUID.byNameCodec()
@@ -58,7 +57,10 @@ public record FluidContentsAttribute(@Nullable Fluid fluid) implements ItemAttri
         if (fluid != null) {
             Block block = fluid.defaultFluidState().createLegacyBlock().getBlock();
             if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
-                parameter = Component.translatable(Util.makeDescriptionId("block", BuiltInRegistries.FLUID.getKey(fluid)));
+                parameter = Component.translatable(Util.makeDescriptionId(
+                    "block",
+                    BuiltInRegistries.FLUID.getKey(fluid)
+                ));
             } else {
                 parameter = block.getName();
             }

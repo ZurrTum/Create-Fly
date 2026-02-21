@@ -54,16 +54,18 @@ public class ChestMountedStorage extends SimpleMountedStorage {
     protected Container getHandlerForMenu(StructureBlockInfo info, Contraption contraption) {
         BlockState state = info.state();
         ChestType type = state.getValue(ChestBlock.TYPE);
-        if (type == ChestType.SINGLE)
+        if (type == ChestType.SINGLE) {
             return this;
+        }
 
         Direction facing = state.getValue(ChestBlock.FACING);
         Direction connectedDirection = ChestBlock.getConnectedDirection(state);
         BlockPos otherHalfPos = info.pos().relative(connectedDirection);
 
         MountedItemStorage otherHalf = this.getOtherHalf(contraption, otherHalfPos, state.getBlock(), facing, type);
-        if (otherHalf == null)
+        if (otherHalf == null) {
             return this;
+        }
 
         if (type == ChestType.RIGHT) {
             return new CompoundContainer(this, otherHalf);
@@ -73,18 +75,27 @@ public class ChestMountedStorage extends SimpleMountedStorage {
     }
 
     @Nullable
-    protected MountedItemStorage getOtherHalf(Contraption contraption, BlockPos localPos, Block block, Direction thisFacing, ChestType thisType) {
+    protected MountedItemStorage getOtherHalf(
+        Contraption contraption,
+        BlockPos localPos,
+        Block block,
+        Direction thisFacing,
+        ChestType thisType
+    ) {
         StructureBlockInfo info = contraption.getBlocks().get(localPos);
-        if (info == null)
+        if (info == null) {
             return null;
+        }
         BlockState state = info.state();
-        if (!state.is(block))
+        if (!state.is(block)) {
             return null;
+        }
 
         Direction facing = state.getValue(ChestBlock.FACING);
         ChestType type = state.getValue(ChestBlock.TYPE);
 
-        return facing == thisFacing && type == thisType.getOpposite() ? contraption.getStorage().getMountedItems().storages.get(localPos) : null;
+        return facing == thisFacing && type == thisType.getOpposite() ? contraption.getStorage()
+            .getMountedItems().storages.get(localPos) : null;
     }
 
     @Override

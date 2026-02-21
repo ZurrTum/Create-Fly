@@ -51,7 +51,8 @@ public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCar
         Direction facing = blockState.getValue(GantryCarriageBlock.FACING);
         Boolean alongFirst = blockState.getValue(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
         Axis rotationAxis = state.axis;
-        BlockPos visualPos = facing.getAxisDirection() == AxisDirection.POSITIVE ? be.getBlockPos() : be.getBlockPos().relative(facing.getOpposite());
+        BlockPos visualPos = facing.getAxisDirection() == AxisDirection.POSITIVE ? be.getBlockPos() : be.getBlockPos()
+            .relative(facing.getOpposite());
         float angleForBE = getAngleForBE(be, visualPos, rotationAxis);
         Axis gantryAxis = Axis.X;
         for (Axis axis : Iterate.axes) {

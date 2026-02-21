@@ -52,11 +52,17 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
     @Override
     protected void init() {
         renderedFlag = GuiGameElement.partial().scale(2.5F).transform(this::transform).padding(13);
-        renderedItem = GuiGameElement.of(blockEntity.getBlockState().setValue(BlockStateProperties.WATERLOGGED, false)).rotate(-22, 63, 0).scale(2.5F)
-            .padding(17);
+        renderedItem = GuiGameElement.of(blockEntity.getBlockState().setValue(BlockStateProperties.WATERLOGGED, false))
+            .rotate(-22, 63, 0).scale(2.5F).padding(17);
         AbstractComputerBehaviour computer = blockEntity.getBehaviour(AbstractComputerBehaviour.TYPE);
         if (computer != null && computer.hasAttachedComputer()) {
-            minecraft.setScreen(new ComputerScreen(title, () -> Component.literal(station.name), this, this, computer::hasAttachedComputer));
+            minecraft.setScreen(new ComputerScreen(
+                title,
+                () -> Component.literal(station.name),
+                this,
+                this,
+                computer::hasAttachedComputer
+            ));
         }
 
         setWindowSize(background.getWidth(), background.getHeight());
@@ -66,7 +72,11 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
         int x = guiLeft;
         int y = guiTop;
 
-        confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            x + background.getWidth() - 33,
+            y + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(this::onClose);
         addRenderableWidget(confirmButton);
         addAdditional(this, x, y, background);
@@ -74,8 +84,14 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
 
     @Override
     public void addAdditional(Screen screen, int x, int y, AllGuiTextures background) {
-        screen.addRenderableWidget(new ElementWidget(x + background.getWidth() + 25, y + background.getHeight() - 62).showingElement(renderedFlag));
-        screen.addRenderableWidget(new ElementWidget(x + background.getWidth() + 3, y + background.getHeight() - 46).showingElement(renderedItem));
+        screen.addRenderableWidget(new ElementWidget(
+            x + background.getWidth() + 25,
+            y + background.getHeight() - 62
+        ).showingElement(renderedFlag));
+        screen.addRenderableWidget(new ElementWidget(
+            x + background.getWidth() + 3,
+            y + background.getHeight() - 46
+        ).showingElement(renderedItem));
     }
 
     @Override
@@ -99,8 +115,9 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
         List<Carriage> carriages = train.carriages;
 
         int w = icon.getIconWidth(TrainIcon.ENGINE);
-        if (carriages.size() == 1)
+        if (carriages.size() == 1) {
             return w;
+        }
 
         for (int i = 1; i < carriages.size(); i++) {
             if (i == carriages.size() - 1 && train.doubleEnded) {
@@ -119,7 +136,13 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
         super.tick();
         AbstractComputerBehaviour computer = blockEntity.getBehaviour(AbstractComputerBehaviour.TYPE);
         if (computer != null && computer.hasAttachedComputer()) {
-            minecraft.setScreen(new ComputerScreen(title, () -> Component.literal(station.name), this, this, computer::hasAttachedComputer));
+            minecraft.setScreen(new ComputerScreen(
+                title,
+                () -> Component.literal(station.name),
+                this,
+                this,
+                computer::hasAttachedComputer
+            ));
         }
     }
 

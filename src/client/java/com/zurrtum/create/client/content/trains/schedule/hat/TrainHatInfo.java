@@ -2,12 +2,11 @@ package com.zurrtum.create.client.content.trains.schedule.hat;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.phys.Vec3;
 
 public record TrainHatInfo(String part, int cubeIndex, Vec3 offset, float scale) {
     public static final Codec<TrainHatInfo> CODEC = RecordCodecBuilder.create(instance -> instance.group(

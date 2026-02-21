@@ -15,7 +15,10 @@ import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 public class NbtSpawnPacket extends ClientboundAddEntityPacket {
-    public static final StreamCodec<RegistryFriendlyByteBuf, NbtSpawnPacket> CODEC = Packet.codec(NbtSpawnPacket::write, NbtSpawnPacket::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, NbtSpawnPacket> CODEC = Packet.codec(
+        NbtSpawnPacket::write,
+        NbtSpawnPacket::new
+    );
     @Nullable
     private final CompoundTag nbt;
 

@@ -105,11 +105,14 @@ public class ControlsMovementRenderBehaviour implements MovementRenderBehaviour 
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            cover.center().rotateY(yRot).uncenter().light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
-            lever.center().rotateY(yRot).translate(0, 0.25f, 0.25f).rotateX(firstAngle).translate(0, offsetY, 0).rotateX(xRot).uncenter()
-                .translate(0, -0.375f, -0.1875f).light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
-            lever.center().rotateY(yRot).translate(0, 0.25f, 0.25f).rotateX(secondAngle).translate(0, offsetY, 0).rotateX(xRot).uncenter()
-                .translate(0.375f, -0.375f, -0.1875f).light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
+            cover.center().rotateY(yRot).uncenter().light(light).useLevelLight(world, worldMatrix4f)
+                .renderInto(matricesEntry, vertexConsumer);
+            lever.center().rotateY(yRot).translate(0, 0.25f, 0.25f).rotateX(firstAngle).translate(0, offsetY, 0)
+                .rotateX(xRot).uncenter().translate(0, -0.375f, -0.1875f).light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
+            lever.center().rotateY(yRot).translate(0, 0.25f, 0.25f).rotateX(secondAngle).translate(0, offsetY, 0)
+                .rotateX(xRot).uncenter().translate(0.375f, -0.375f, -0.1875f).light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

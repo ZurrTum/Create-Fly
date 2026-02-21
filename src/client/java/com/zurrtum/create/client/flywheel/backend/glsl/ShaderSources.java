@@ -2,16 +2,15 @@ package com.zurrtum.create.client.flywheel.backend.glsl;
 
 import com.zurrtum.create.client.flywheel.backend.compile.FlwPrograms;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
 
 /**
  * The main object for loading and parsing source files.
@@ -30,7 +29,11 @@ public class ShaderSources {
 
         long loadEnd = System.nanoTime();
 
-        FlwPrograms.LOGGER.info("Loaded {} shader sources in {}", sourceFinder.results.size(), StringUtil.formatTime(loadEnd - loadStart));
+        FlwPrograms.LOGGER.info(
+            "Loaded {} shader sources in {}",
+            sourceFinder.results.size(),
+            StringUtil.formatTime(loadEnd - loadStart)
+        );
 
         this.cache = sourceFinder.results;
     }

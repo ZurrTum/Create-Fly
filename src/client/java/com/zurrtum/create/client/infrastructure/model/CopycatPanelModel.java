@@ -50,7 +50,8 @@ public class CopycatPanelModel extends CopycatModel {
         OcclusionData occlusionData = gatherOcclusionData(world, pos, state, material, block);
         if (CopycatSpecialCases.isBarsMaterial(material)) {
             Direction facing = state.getValueOrElse(CopycatPanelBlock.FACING, Direction.UP);
-            BlockState bars = AllBlocks.COPYCAT_BARS.defaultBlockState().setValue(WrenchableDirectionalBlock.FACING, facing);
+            BlockState bars = AllBlocks.COPYCAT_BARS.defaultBlockState()
+                .setValue(WrenchableDirectionalBlock.FACING, facing);
             BlockStateModel model = getModelOf(material);
             addBarsParts(
                 occlusionData,
@@ -62,7 +63,13 @@ public class CopycatPanelModel extends CopycatModel {
                 parts
             );
         } else {
-            addPanelParts(occlusionData, state, block, getMaterialParts(world, pos, material, random, getModelOf(material)), parts);
+            addPanelParts(
+                occlusionData,
+                state,
+                block,
+                getMaterialParts(world, pos, material, random, getModelOf(material)),
+                parts
+            );
         }
     }
 
@@ -81,8 +88,9 @@ public class CopycatPanelModel extends CopycatModel {
             QuadCollection.Builder builder = new QuadCollection.Builder();
             addBarsCroppedQuads(particle, part.getQuads(null), builder::addUnculledFace);
             for (Direction direction : Iterate.directions) {
-                if (occlusionData.isOccluded(direction))
+                if (occlusionData.isOccluded(direction)) {
                     continue;
+                }
                 List<BakedQuad> quads = part.getQuads(direction);
                 TextureAtlasSprite targetSprite = particle;
                 if (vertical || direction.getAxis() == Axis.Y) {
@@ -91,8 +99,9 @@ public class CopycatPanelModel extends CopycatModel {
                     } else {
                         for (BlockModelPart materialPart : material) {
                             for (BakedQuad quad : materialPart.getQuads(null)) {
-                                if (quad.direction() != Direction.UP)
+                                if (quad.direction() != Direction.UP) {
                                     continue;
+                                }
                                 targetSprite = findSprite = quad.sprite();
                                 break;
                             }
@@ -105,7 +114,10 @@ public class CopycatPanelModel extends CopycatModel {
                 addBarsCroppedQuads(
                     targetSprite,
                     quads,
-                    block.shouldFaceAlwaysRender(state, direction) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
+                    block.shouldFaceAlwaysRender(
+                        state,
+                        direction
+                    ) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
                         direction,
                         quad
                     )
@@ -115,7 +127,11 @@ public class CopycatPanelModel extends CopycatModel {
         }
     }
 
-    protected void addBarsCroppedQuads(TextureAtlasSprite targetSprite, List<BakedQuad> quads, Consumer<BakedQuad> consumer) {
+    protected void addBarsCroppedQuads(
+        TextureAtlasSprite targetSprite,
+        List<BakedQuad> quads,
+        Consumer<BakedQuad> consumer
+    ) {
         if (targetSprite == null) {
             quads.forEach(consumer);
             return;
@@ -160,13 +176,23 @@ public class CopycatPanelModel extends CopycatModel {
         double frontContract = 15d / 16;
         double contract = 14d / 16;
         AABB frontBB = CUBE_AABB.contract(normal.x * frontContract, normal.y * frontContract, normal.z * frontContract);
-        AABB bb = CUBE_AABB.contract(normal.x * contract, normal.y * contract, normal.z * contract).move(normalScaled14);
+        AABB bb = CUBE_AABB.contract(normal.x * contract, normal.y * contract, normal.z * contract)
+            .move(normalScaled14);
         for (BlockModelPart part : original) {
             QuadCollection.Builder builder = new QuadCollection.Builder();
-            addPanelCroppedQuads(facing, frontBB, bb, frontNormalScaledN13, normalScaledN13, part.getQuads(null), builder::addUnculledFace);
+            addPanelCroppedQuads(
+                facing,
+                frontBB,
+                bb,
+                frontNormalScaledN13,
+                normalScaledN13,
+                part.getQuads(null),
+                builder::addUnculledFace
+            );
             for (Direction direction : Iterate.directions) {
-                if (occlusionData.isOccluded(direction))
+                if (occlusionData.isOccluded(direction)) {
                     continue;
+                }
                 addPanelCroppedQuads(
                     facing,
                     frontBB,
@@ -174,7 +200,10 @@ public class CopycatPanelModel extends CopycatModel {
                     frontNormalScaledN13,
                     normalScaledN13,
                     part.getQuads(direction),
-                    block.shouldFaceAlwaysRender(state, direction) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
+                    block.shouldFaceAlwaysRender(
+                        state,
+                        direction
+                    ) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
                         direction,
                         quad
                     )
@@ -211,10 +240,12 @@ public class CopycatPanelModel extends CopycatModel {
                 BakedQuad quad = quads.get(i);
                 Direction direction = quad.direction();
 
-                if (front && direction == facing)
+                if (front && direction == facing) {
                     continue;
-                if (!front && direction == facing.getOpposite())
+                }
+                if (!front && direction == facing.getOpposite()) {
                     continue;
+                }
 
                 consumer.accept(BakedModelHelper.cropAndMove(quad, crop, move));
             }

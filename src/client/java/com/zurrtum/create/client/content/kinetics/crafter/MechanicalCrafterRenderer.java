@@ -123,7 +123,12 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
     }
 
     @Override
-    public void submit(MechanicalCrafterRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        MechanicalCrafterRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
         if (state.item != null) {
             matrices.translate(state.offset);
@@ -180,10 +185,14 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         }
     }
 
-    public record CogwheelRenderState(
-        SuperByteBuffer cogwheel, float angle, Direction direction, Color color, float upAngle
-    ) {
-        public static CogwheelRenderState create(MechanicalCrafterBlockEntity be, BlockState blockState, BlockPos pos, Direction facing) {
+    public record CogwheelRenderState(SuperByteBuffer cogwheel, float angle, Direction direction, Color color,
+                                      float upAngle) {
+        public static CogwheelRenderState create(
+            MechanicalCrafterBlockEntity be,
+            BlockState blockState,
+            BlockPos pos,
+            Direction facing
+        ) {
             SuperByteBuffer model = CachedBuffers.partial(AllPartialModels.SHAFTLESS_COGWHEEL, blockState);
             net.minecraft.core.Direction.Axis axis = facing.getAxis();
             float angle = KineticBlockEntityRenderer.getAngleForBe(be, pos, axis);
@@ -194,8 +203,8 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         }
 
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer, int light) {
-            cogwheel.rotateCentered(angle, direction).rotateCentered(upAngle, Direction.UP).rotateCentered(Mth.HALF_PI, Direction.EAST).light(light)
-                .renderInto(matricesEntry, vertexConsumer);
+            cogwheel.rotateCentered(angle, direction).rotateCentered(upAngle, Direction.UP)
+                .rotateCentered(Mth.HALF_PI, Direction.EAST).light(light).renderInto(matricesEntry, vertexConsumer);
         }
     }
 
@@ -203,9 +212,8 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         void render(SubmitNodeCollector queue, PoseStack ms, int light);
     }
 
-    public record MechanicalCrafterSingleItemRenderState(
-        float offset, float yRot, ItemStackRenderState state
-    ) implements MechanicalCrafterItemRenderState {
+    public record MechanicalCrafterSingleItemRenderState(float offset, float yRot,
+                                                         ItemStackRenderState state) implements MechanicalCrafterItemRenderState {
         public static MechanicalCrafterSingleItemRenderState create(
             ItemModelResolver itemModelManager,
             MechanicalCrafterBlockEntity be,
@@ -233,10 +241,10 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         }
     }
 
-    public record MechanicalCrafterCraftingItemRenderState(
-        float scale, Vec3 centering, List<GridItemRenderState> before, float yRot, float zRot, float upScaling, float downScaling,
-        List<ItemStackRenderState> states
-    ) implements MechanicalCrafterItemRenderState {
+    public record MechanicalCrafterCraftingItemRenderState(float scale, Vec3 centering,
+                                                           List<GridItemRenderState> before, float yRot, float zRot,
+                                                           float upScaling, float downScaling,
+                                                           List<ItemStackRenderState> states) implements MechanicalCrafterItemRenderState {
         public static MechanicalCrafterCraftingItemRenderState create(
             ItemModelResolver itemModelManager,
             MechanicalCrafterBlockEntity be,
@@ -263,8 +271,11 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
                 float progress = Mth.clamp((2000 - value) / 1000f, 0, 1);
                 float earlyProgress = Mth.clamp(progress * 2, 0, 1);
                 scale = 1 - Mth.clamp(progress * 2 - 1, 0, 1);
-                centering = new Vec3(-items.minX + (-items.width + 1) / 2f, -items.minY + (-items.height + 1) / 2f, 0).scale(earlyProgress)
-                    .multiply(0.5, 0.5, 1);
+                centering = new Vec3(
+                    -items.minX + (-items.width + 1) / 2f,
+                    -items.minY + (-items.height + 1) / 2f,
+                    0
+                ).scale(earlyProgress).multiply(0.5, 0.5, 1);
                 float distance = .5f + (-4 * (progress - .5f) * (progress - .5f) + 1) * .25f;
                 boolean onlyRenderFirst = be.countDown < 1000;
                 before = new ArrayList<>(items.grid.size());
@@ -306,7 +317,16 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
                     states.add(state);
                 });
             }
-            return new MechanicalCrafterCraftingItemRenderState(scale, centering, before, yRot, zRot, upScaling, downScaling, states);
+            return new MechanicalCrafterCraftingItemRenderState(
+                scale,
+                centering,
+                before,
+                yRot,
+                zRot,
+                upScaling,
+                downScaling,
+                states
+            );
         }
 
         @Override
@@ -334,7 +354,8 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
         }
     }
 
-    public record MechanicalCrafterPhaseItemRenderState(List<GridItemRenderState> states, float yRot) implements MechanicalCrafterItemRenderState {
+    public record MechanicalCrafterPhaseItemRenderState(List<GridItemRenderState> states,
+                                                        float yRot) implements MechanicalCrafterItemRenderState {
         public static MechanicalCrafterPhaseItemRenderState create(
             ItemModelResolver itemModelManager,
             MechanicalCrafterBlockEntity be,

@@ -67,7 +67,12 @@ public class EdgePointStorage {
         }
     }
 
-    public static <T> DataResult<T> encode(final EdgePointStorage input, final DynamicOps<T> ops, final T empty, DimensionPalette dimensions) {
+    public static <T> DataResult<T> encode(
+        final EdgePointStorage input,
+        final DynamicOps<T> ops,
+        final T empty,
+        DimensionPalette dimensions
+    ) {
         RecordBuilder<T> map = ops.mapBuilder();
         for (Map.Entry<EdgePointType<?>, Map<UUID, TrackEdgePoint>> entry : input.pointsByType.entrySet()) {
             EdgePointType<?> type = entry.getKey();

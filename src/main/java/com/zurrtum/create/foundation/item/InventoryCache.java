@@ -25,7 +25,12 @@ public class InventoryCache implements Supplier<Container> {
     public Container inventory;
     public Supplier<Container> getter = this::refresh;
 
-    public InventoryCache(ServerLevel world, BlockPos pos, Direction direction, BiPredicate<BlockEntity, Direction> filter) {
+    public InventoryCache(
+        ServerLevel world,
+        BlockPos pos,
+        Direction direction,
+        BiPredicate<BlockEntity, Direction> filter
+    ) {
         this.world = world;
         this.direction = direction;
         this.pos = pos;

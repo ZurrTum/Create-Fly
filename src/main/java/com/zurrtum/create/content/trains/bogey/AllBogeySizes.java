@@ -1,10 +1,9 @@
 package com.zurrtum.create.content.trains.bogey;
 
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
-
-import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 

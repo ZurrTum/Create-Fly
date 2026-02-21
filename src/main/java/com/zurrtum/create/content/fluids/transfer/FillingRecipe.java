@@ -19,7 +19,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
-public record FillingRecipe(ItemStack result, Ingredient ingredient, FluidIngredient fluidIngredient) implements CreateRecipe<FillingInput> {
+public record FillingRecipe(ItemStack result, Ingredient ingredient,
+                            FluidIngredient fluidIngredient) implements CreateRecipe<FillingInput> {
     @Override
     public boolean matches(FillingInput input, Level world) {
         return ingredient.test(input.item()) && fluidIngredient.test(input.fluid());
@@ -47,8 +48,10 @@ public record FillingRecipe(ItemStack result, Ingredient ingredient, FluidIngred
     public static Component getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
         return FluidIngredient.CODEC.parse(ops, object.get("fluid_ingredient")).result()
             .flatMap(fluidIngredient -> fluidIngredient.getMatchingFluidStacks().stream().findFirst())
-            .map(stack -> Component.translatable("create.recipe.assembly.spout_filling_fluid", stack.getName().getString()))
-            .orElseGet(() -> Component.literal("Invalid"));
+            .map(stack -> Component.translatable(
+                "create.recipe.assembly.spout_filling_fluid",
+                stack.getName().getString()
+            )).orElseGet(() -> Component.literal("Invalid"));
     }
 
     public static class Serializer implements RecipeSerializer<FillingRecipe> {

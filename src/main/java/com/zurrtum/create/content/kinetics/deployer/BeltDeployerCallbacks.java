@@ -34,48 +34,67 @@ import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.F
 
 public class BeltDeployerCallbacks {
 
-    public static ProcessingResult onItemReceived(TransportedItemStack s, TransportedItemStackHandlerBehaviour i, DeployerBlockEntity blockEntity) {
+    public static ProcessingResult onItemReceived(
+        TransportedItemStack s,
+        TransportedItemStackHandlerBehaviour i,
+        DeployerBlockEntity blockEntity
+    ) {
 
-        if (blockEntity.getSpeed() == 0)
+        if (blockEntity.getSpeed() == 0) {
             return ProcessingResult.PASS;
-        if (blockEntity.mode == Mode.PUNCH)
+        }
+        if (blockEntity.mode == Mode.PUNCH) {
             return ProcessingResult.PASS;
+        }
         BlockState blockState = blockEntity.getBlockState();
-        if (!blockState.hasProperty(FACING) || blockState.getValue(FACING) != Direction.DOWN)
+        if (!blockState.hasProperty(FACING) || blockState.getValue(FACING) != Direction.DOWN) {
             return ProcessingResult.PASS;
-        if (blockEntity.state != State.WAITING)
+        }
+        if (blockEntity.state != State.WAITING) {
             return ProcessingResult.HOLD;
-        if (blockEntity.redstoneLocked)
+        }
+        if (blockEntity.redstoneLocked) {
             return ProcessingResult.PASS;
+        }
 
         DeployerPlayer player = blockEntity.getPlayer();
         ItemStack held = player == null ? ItemStack.EMPTY : player.cast().getMainHandItem();
 
-        if (held.isEmpty())
+        if (held.isEmpty()) {
             return ProcessingResult.HOLD;
-        if (blockEntity.getRecipe(s.stack) == null)
+        }
+        if (blockEntity.getRecipe(s.stack) == null) {
             return ProcessingResult.PASS;
+        }
 
         blockEntity.start();
         return ProcessingResult.HOLD;
     }
 
-    public static ProcessingResult whenItemHeld(TransportedItemStack s, TransportedItemStackHandlerBehaviour i, DeployerBlockEntity blockEntity) {
+    public static ProcessingResult whenItemHeld(
+        TransportedItemStack s,
+        TransportedItemStackHandlerBehaviour i,
+        DeployerBlockEntity blockEntity
+    ) {
 
-        if (blockEntity.getSpeed() == 0)
+        if (blockEntity.getSpeed() == 0) {
             return ProcessingResult.PASS;
+        }
         BlockState blockState = blockEntity.getBlockState();
-        if (!blockState.hasProperty(FACING) || blockState.getValue(FACING) != Direction.DOWN)
+        if (!blockState.hasProperty(FACING) || blockState.getValue(FACING) != Direction.DOWN) {
             return ProcessingResult.PASS;
+        }
 
         DeployerPlayer player = blockEntity.getPlayer();
         ItemStack held = player == null ? ItemStack.EMPTY : player.cast().getMainHandItem();
-        if (held.isEmpty())
+        if (held.isEmpty()) {
             return ProcessingResult.HOLD;
+        }
 
         Recipe<?> recipe = blockEntity.getRecipe(s.stack);
-        if (recipe == null)
+        if (recipe == null) {
             return ProcessingResult.PASS;
+        }
 
         if (blockEntity.state == State.RETRACTING && blockEntity.timer == 1000) {
             activate(s, i, blockEntity, recipe);
@@ -83,8 +102,9 @@ public class BeltDeployerCallbacks {
         }
 
         if (blockEntity.state == State.WAITING) {
-            if (blockEntity.redstoneLocked)
+            if (blockEntity.redstoneLocked) {
                 return ProcessingResult.PASS;
+            }
             blockEntity.start();
         }
 
@@ -103,7 +123,10 @@ public class BeltDeployerCallbacks {
         ItemStack heldItem = player.getMainHandItem();
         boolean keepHeld;
         if (recipe instanceof SandPaperPolishingRecipe polishingRecipe) {
-            ItemStack result = polishingRecipe.assemble(new SingleRecipeInput(transported.stack), world.registryAccess());
+            ItemStack result = polishingRecipe.assemble(
+                new SingleRecipeInput(transported.stack),
+                world.registryAccess()
+            );
             TransportedItemStack copy = transported.copy();
             copy.stack = result;
             copy.angle = BeltHelper.isItemUpright(result) ? 180 : world.getRandom().nextInt(360);
@@ -165,15 +188,18 @@ public class BeltDeployerCallbacks {
             }
         }
 
-        if (!resultItem.isEmpty())
+        if (!resultItem.isEmpty()) {
             awardAdvancements(blockEntity, resultItem);
+        }
 
         BlockPos pos = blockEntity.getBlockPos();
-        if (heldItem.isEmpty())
+        if (heldItem.isEmpty()) {
             world.playSound(null, pos, SoundEvents.ITEM_BREAK.value(), SoundSource.BLOCKS, .25f, 1);
+        }
         world.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, .25f, .75f);
-        if (recipe instanceof SandPaperPolishingRecipe)
+        if (recipe instanceof SandPaperPolishingRecipe) {
             AllSoundEvents.SANDING_SHORT.playOnServer(world, pos, .35f, 1f);
+        }
 
         blockEntity.notifyUpdate();
     }
@@ -181,16 +207,17 @@ public class BeltDeployerCallbacks {
     private static void awardAdvancements(DeployerBlockEntity blockEntity, ItemStack created) {
         CreateTrigger advancement;
 
-        if (created.is(AllItems.ANDESITE_CASING))
+        if (created.is(AllItems.ANDESITE_CASING)) {
             advancement = AllAdvancements.ANDESITE_CASING;
-        else if (created.is(AllItems.BRASS_CASING))
+        } else if (created.is(AllItems.BRASS_CASING)) {
             advancement = AllAdvancements.BRASS_CASING;
-        else if (created.is(AllItems.COPPER_CASING))
+        } else if (created.is(AllItems.COPPER_CASING)) {
             advancement = AllAdvancements.COPPER_CASING;
-        else if (created.is(AllItems.RAILWAY_CASING))
+        } else if (created.is(AllItems.RAILWAY_CASING)) {
             advancement = AllAdvancements.TRAIN_CASING;
-        else
+        } else {
             return;
+        }
 
         blockEntity.award(advancement);
     }

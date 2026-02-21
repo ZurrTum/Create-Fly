@@ -39,7 +39,11 @@ public class DeployerActorVisual extends ActorVisual {
     Matrix4fc baseHandTransform;
     Matrix4fc basePoleTransform;
 
-    public DeployerActorVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext context) {
+    public DeployerActorVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext context
+    ) {
         super(visualizationContext, simulationWorld, context);
         BlockState state = context.state;
         Mode mode = context.blockEntityData.read("Mode", Mode.CODEC).orElse(Mode.PUNCH);
@@ -53,24 +57,28 @@ public class DeployerActorVisual extends ActorVisual {
         float xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
         float zRot = rotatePole ? 90 : 0;
 
-        pole = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.DEPLOYER_POLE)).createInstance();
+        pole = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.DEPLOYER_POLE))
+            .createInstance();
         hand = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(handPose)).createInstance();
 
         Direction.Axis axis = KineticBlockEntityVisual.rotationAxis(state);
-        shaft = instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT)).createInstance().rotateToFace(axis);
+        shaft = instancerProvider.instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT))
+            .createInstance().rotateToFace(axis);
 
         int blockLight = localBlockLight();
 
-        shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(state, axis, context.localPos))
+        shaft.setRotationAxis(axis)
+            .setRotationOffset(KineticBlockEntityVisual.rotationOffset(state, axis, context.localPos))
             .setPosition(context.localPos).light(blockLight, 0).setChanged();
 
-        pole.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP).rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST)
-            .rotate(zRot * Mth.DEG_TO_RAD, Direction.SOUTH).uncenter().light(blockLight, 0).setChanged();
+        pole.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP)
+            .rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST).rotate(zRot * Mth.DEG_TO_RAD, Direction.SOUTH).uncenter()
+            .light(blockLight, 0).setChanged();
 
         basePoleTransform = new Matrix4f(pole.pose);
 
-        hand.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP).rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST).uncenter()
-            .light(blockLight, 0).setChanged();
+        hand.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP)
+            .rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST).uncenter().light(blockLight, 0).setChanged();
 
         baseHandTransform = new Matrix4f(hand.pose);
     }

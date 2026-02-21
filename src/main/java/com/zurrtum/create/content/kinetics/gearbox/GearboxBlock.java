@@ -4,9 +4,6 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -17,6 +14,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams.Builder;
 
+import java.util.List;
+
 public class GearboxBlock extends RotatedPillarKineticBlock implements IBE<GearboxBlockEntity> {
 
     public GearboxBlock(Properties properties) {
@@ -25,15 +24,17 @@ public class GearboxBlock extends RotatedPillarKineticBlock implements IBE<Gearb
 
     @Override
     public List<ItemStack> getDrops(BlockState state, Builder builder) {
-        if (state.getValue(AXIS).isVertical())
+        if (state.getValue(AXIS).isVertical()) {
             return super.getDrops(state, builder);
+        }
         return List.of(new ItemStack(AllItems.VERTICAL_GEARBOX));
     }
 
     @Override
     protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
-        if (state.getValue(AXIS).isVertical())
+        if (state.getValue(AXIS).isVertical()) {
             return super.getCloneItemStack(world, pos, state, includeData);
+        }
         return AllItems.VERTICAL_GEARBOX.getDefaultInstance();
     }
 

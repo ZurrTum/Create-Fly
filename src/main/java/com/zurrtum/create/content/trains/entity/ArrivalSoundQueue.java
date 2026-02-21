@@ -8,12 +8,6 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -24,6 +18,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArrivalSoundQueue {
     public int offset;
@@ -48,27 +47,32 @@ public class ArrivalSoundQueue {
 
     public boolean tick(CarriageContraptionEntity entity, int tick, boolean backwards) {
         tick = tick - offset;
-        if (!sources.containsKey(tick))
+        if (!sources.containsKey(tick)) {
             return backwards ? tick > min : tick < max;
+        }
         Contraption contraption = entity.getContraption();
-        for (BlockPos blockPos : sources.get(tick))
+        for (BlockPos blockPos : sources.get(tick)) {
             play(entity, contraption.getBlocks().get(blockPos));
+        }
         return backwards ? tick > min : tick < max;
     }
 
     public Pair<Boolean, Integer> getFirstWhistle(CarriageContraptionEntity entity) {
         Integer firstTick = firstTick();
         Integer lastTick = lastTick();
-        if (firstTick == null || lastTick == null || firstTick > lastTick)
+        if (firstTick == null || lastTick == null || firstTick > lastTick) {
             return null;
+        }
         for (int i = firstTick; i <= lastTick; i++) {
-            if (!sources.containsKey(i - offset))
+            if (!sources.containsKey(i - offset)) {
                 continue;
+            }
             Contraption contraption = entity.getContraption();
             for (BlockPos blockPos : sources.get(i - offset)) {
                 StructureBlockInfo info = contraption.getBlocks().get(blockPos);
-                if (info == null)
+                if (info == null) {
                     continue;
+                }
                 BlockState state = info.state();
                 if (state.getBlock() instanceof WhistleBlock && info.nbt() != null) {
                     int pitch = info.nbt().getIntOr("Pitch", 0);
@@ -105,23 +109,27 @@ public class ArrivalSoundQueue {
     }
 
     public static boolean isPlayable(BlockState state) {
-        if (state.getBlock() instanceof BellBlock)
+        if (state.getBlock() instanceof BellBlock) {
             return true;
-        if (state.getBlock() instanceof NoteBlock)
+        }
+        if (state.getBlock() instanceof NoteBlock) {
             return true;
+        }
         return state.getBlock() instanceof WhistleBlock;
     }
 
     public static void play(CarriageContraptionEntity entity, StructureBlockInfo info) {
-        if (info == null)
+        if (info == null) {
             return;
+        }
         BlockState state = info.state();
 
         if (state.getBlock() instanceof BellBlock) {
-            if (state.is(AllBlocks.HAUNTED_BELL))
+            if (state.is(AllBlocks.HAUNTED_BELL)) {
                 playSimple(entity, AllSoundEvents.HAUNTED_BELL_USE.getMainEvent(), 1, 1);
-            else
+            } else {
                 playSimple(entity, SoundEvents.BELL_BLOCK, 1, 1);
+            }
         }
 
         if (state.getBlock() instanceof NoteBlock nb) {
@@ -133,7 +141,12 @@ public class ArrivalSoundQueue {
             int pitch = info.nbt().getIntOr("Pitch", 0);
             WhistleSize size = state.getValue(WhistleBlock.SIZE);
             float f = (float) Math.pow(2, ((size == WhistleSize.SMALL ? 12 : 0) - pitch) / 12.0);
-            playSimple(entity, (size == WhistleSize.LARGE ? AllSoundEvents.WHISTLE_TRAIN_LOW : AllSoundEvents.WHISTLE_TRAIN).getMainEvent(), 1, f);
+            playSimple(
+                entity,
+                (size == WhistleSize.LARGE ? AllSoundEvents.WHISTLE_TRAIN_LOW : AllSoundEvents.WHISTLE_TRAIN).getMainEvent(),
+                1,
+                f
+            );
             //			playSimple(entity, AllSoundEvents.WHISTLE_CHIFF.getMainEvent(), .75f,
             //				size == WhistleSize.SMALL ? f + .75f : f);
         }

@@ -15,7 +15,12 @@ public class CreativeFluidTankMountedStorageType extends MountedFluidStorageType
 
     @Override
     @Nullable
-    public CreativeFluidTankMountedStorage mount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
+    public CreativeFluidTankMountedStorage mount(
+        Level level,
+        BlockState state,
+        BlockPos pos,
+        @Nullable BlockEntity be
+    ) {
         if (be instanceof CreativeFluidTankBlockEntity tank) {
             return CreativeFluidTankMountedStorage.fromTank(tank);
         }

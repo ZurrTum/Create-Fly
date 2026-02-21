@@ -46,7 +46,8 @@ public class SawRenderer extends PictureInPictureRenderer<SawRenderState> {
         VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
 
         matrices.pushPose();
-        blockState = AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.X);
+        blockState = AllBlocks.SHAFT.defaultBlockState()
+            .setValue(BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.X);
         world.blockState(blockState);
         parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
         matrices.translate(0.5f, 0.5f, 0.5f);

@@ -131,7 +131,17 @@ public class SchematicChunkSource extends ChunkSource {
             private final WorldBorder border = new WorldBorder();
 
             private DummyLevel(Level level) {
-                this(null, null, level.registryAccess(), level.dimensionTypeRegistration(), level.environmentAttributes(), false, false, 0, 0);
+                this(
+                    null,
+                    null,
+                    level.registryAccess(),
+                    level.dimensionTypeRegistration(),
+                    level.environmentAttributes(),
+                    false,
+                    false,
+                    0,
+                    0
+                );
             }
 
             @Override
@@ -223,7 +233,14 @@ public class SchematicChunkSource extends ChunkSource {
             }
 
             @Override
-            public void playSound(Entity pPlayer, Entity pEntity, SoundEvent pEvent, SoundSource pCategory, float pVolume, float pPitch) {
+            public void playSound(
+                Entity pPlayer,
+                Entity pEntity,
+                SoundEvent pEvent,
+                SoundSource pCategory,
+                float pVolume,
+                float pPitch
+            ) {
             }
 
             @Override

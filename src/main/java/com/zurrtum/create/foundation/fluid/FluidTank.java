@@ -2,11 +2,10 @@ package com.zurrtum.create.foundation.fluid;
 
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.Optional;
-
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.Optional;
 
 public class FluidTank implements FluidInventory {
     protected FluidStack fluid = FluidStack.EMPTY;

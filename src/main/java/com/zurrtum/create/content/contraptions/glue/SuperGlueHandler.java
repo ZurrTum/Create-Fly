@@ -5,10 +5,6 @@ import com.zurrtum.create.api.contraption.BlockMovementChecks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.levelWrappers.RayTraceLevel;
 import com.zurrtum.create.infrastructure.packet.s2c.GlueEffectPacket;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -26,6 +22,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class SuperGlueHandler {
 
@@ -47,13 +46,16 @@ public class SuperGlueHandler {
 
     public static void glueInOffHandAppliesOnBlockPlace(ServerLevel world, Player placer, BlockPos pos) {
         AttributeInstance reachAttribute = placer.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
-        if (reachAttribute == null)
+        if (reachAttribute == null) {
             return;
+        }
         ItemStack itemstack = placer.getOffhandItem();
-        if (!itemstack.is(AllItems.SUPER_GLUE))
+        if (!itemstack.is(AllItems.SUPER_GLUE)) {
             return;
-        if (placer.getMainHandItem().is(AllItems.WRENCH))
+        }
+        if (placer.getMainHandItem().is(AllItems.WRENCH)) {
             return;
+        }
         //TODO
         //        if (event.getPlacedAgainst() == IPlacementHelper.ID)
         //            return;
@@ -63,25 +65,42 @@ public class SuperGlueHandler {
         Vec3 look = placer.getViewVector(1);
         Vec3 end = start.add(look.x * distance, look.y * distance, look.z * distance);
 
-        RayTraceLevel rayTraceLevel = new RayTraceLevel(world, (p, state) -> p.equals(pos) ? Blocks.AIR.defaultBlockState() : state);
-        BlockHitResult ray = rayTraceLevel.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, placer));
+        RayTraceLevel rayTraceLevel = new RayTraceLevel(
+            world,
+            (p, state) -> p.equals(pos) ? Blocks.AIR.defaultBlockState() : state
+        );
+        BlockHitResult ray = rayTraceLevel.clip(new ClipContext(
+            start,
+            end,
+            ClipContext.Block.OUTLINE,
+            ClipContext.Fluid.NONE,
+            placer
+        ));
 
         Direction face = ray.getDirection();
-        if (face == null || ray.getType() == Type.MISS)
+        if (face == null || ray.getType() == Type.MISS) {
             return;
+        }
 
         BlockPos gluePos = ray.getBlockPos();
         if (!gluePos.relative(face).equals(pos)) {
             return;
         }
 
-        if (SuperGlueEntity.isGlued(world, gluePos, face, null))
+        if (SuperGlueEntity.isGlued(world, gluePos, face, null)) {
             return;
+        }
 
         SuperGlueEntity entity = new SuperGlueEntity(world, SuperGlueEntity.span(gluePos, gluePos.relative(face)));
         CustomData customData = itemstack.get(DataComponents.CUSTOM_DATA);
-        if (customData != null)
-            EntityType.updateCustomEntityTag(world, placer, entity, TypedEntityData.of(entity.getType(), customData.copyTag()));
+        if (customData != null) {
+            EntityType.updateCustomEntityTag(
+                world,
+                placer,
+                entity,
+                TypedEntityData.of(entity.getType(), customData.copyTag())
+            );
+        }
 
         if (SuperGlueEntity.isValidFace(world, gluePos, face)) {
             world.addFreshEntity(entity);

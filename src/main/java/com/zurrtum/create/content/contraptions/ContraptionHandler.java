@@ -3,12 +3,11 @@ package com.zurrtum.create.content.contraptions;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityAccess;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
-
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.entity.EntityAccess;
 
 public class ContraptionHandler {
 
@@ -26,8 +25,9 @@ public class ContraptionHandler {
         Map<Integer, WeakReference<AbstractContraptionEntity>> map = loadedContraptions.get(world);
         List<AbstractContraptionEntity> queued = queuedAdditions.get(world);
 
-        for (AbstractContraptionEntity contraptionEntity : queued)
+        for (AbstractContraptionEntity contraptionEntity : queued) {
             map.put(contraptionEntity.getId(), new WeakReference<>(contraptionEntity));
+        }
         queued.clear();
 
         Collection<WeakReference<AbstractContraptionEntity>> values = map.values();
@@ -48,8 +48,9 @@ public class ContraptionHandler {
     }
 
     public static void addSpawnedContraptionsToCollisionList(EntityAccess entity) {
-        if (entity instanceof AbstractContraptionEntity abstractContraptionEntity)
+        if (entity instanceof AbstractContraptionEntity abstractContraptionEntity) {
             queuedAdditions.get(abstractContraptionEntity.level()).add(abstractContraptionEntity);
+        }
     }
 
 }

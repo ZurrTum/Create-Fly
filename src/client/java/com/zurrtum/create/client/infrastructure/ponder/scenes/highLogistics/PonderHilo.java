@@ -37,7 +37,12 @@ public class PonderHilo {
         scene.world().modifyBlockEntity(pos, PackagerBlockEntity.class, be -> be.heldBox = ItemStack.EMPTY);
     }
 
-    public static ElementLink<EntityElement> packageHopsOffBelt(CreateSceneBuilder scene, BlockPos beltPos, Direction side, ItemStack box) {
+    public static ElementLink<EntityElement> packageHopsOffBelt(
+        CreateSceneBuilder scene,
+        BlockPos beltPos,
+        Direction side,
+        ItemStack box
+    ) {
         scene.world().removeItemsFromBelt(beltPos);
         return scene.world().createEntity(l -> {
             int offsetX = side.getStepX();

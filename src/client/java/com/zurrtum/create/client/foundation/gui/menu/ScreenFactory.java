@@ -11,5 +11,12 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 
 @FunctionalInterface
 public interface ScreenFactory<T extends AbstractContainerMenu, U extends Screen & MenuAccess<T>, H> {
-    U create(Minecraft mc, MenuType<H> type, int syncId, Inventory playerInventory, Component title, RegistryFriendlyByteBuf extraData);
+    U create(
+        Minecraft mc,
+        MenuType<H> type,
+        int syncId,
+        Inventory playerInventory,
+        Component title,
+        RegistryFriendlyByteBuf extraData
+    );
 }

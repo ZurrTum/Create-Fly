@@ -19,7 +19,12 @@ public class BlockEntityDataInstruction extends WorldModifyInstruction {
     private final UnaryOperator<CompoundTag> data;
     private final Class<? extends BlockEntity> type;
 
-    public BlockEntityDataInstruction(Selection selection, Class<? extends BlockEntity> type, UnaryOperator<CompoundTag> data, boolean redraw) {
+    public BlockEntityDataInstruction(
+        Selection selection,
+        Class<? extends BlockEntity> type,
+        UnaryOperator<CompoundTag> data,
+        boolean redraw
+    ) {
         super(selection);
         this.type = type;
         this.data = data;
@@ -30,16 +35,21 @@ public class BlockEntityDataInstruction extends WorldModifyInstruction {
     protected void runModification(Selection selection, PonderScene scene) {
         PonderLevel level = scene.getLevel();
         selection.forEach(pos -> {
-            if (!level.getBounds().isInside(pos))
+            if (!level.getBounds().isInside(pos)) {
                 return;
+            }
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (!type.isInstance(blockEntity))
+            if (!type.isInstance(blockEntity)) {
                 return;
+            }
             RegistryAccess registryManager = level.registryAccess();
             CompoundTag apply = data.apply(blockEntity.saveWithFullMetadata(registryManager));
             //if (blockEntity instanceof SyncedBlockEntity) //TODO
             //	((SyncedBlockEntity) blockEntity).readClient(apply);
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), Ponder.LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                blockEntity.problemPath(),
+                Ponder.LOGGER
+            )) {
                 ValueInput view = TagValueInput.create(logging, registryManager, apply);
                 blockEntity.loadWithComponents(view);
             }

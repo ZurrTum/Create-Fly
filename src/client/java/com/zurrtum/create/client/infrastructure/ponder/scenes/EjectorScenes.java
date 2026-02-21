@@ -42,7 +42,8 @@ public class EjectorScenes {
 
         scene.idle(10);
         ItemStack asStack = AllItems.WEIGHTED_EJECTOR.getDefaultInstance();
-        scene.overlay().showControls(util.vector().topOf(targetPos), Pointing.DOWN, 50).rightClick().whileSneaking().withItem(asStack);
+        scene.overlay().showControls(util.vector().topOf(targetPos), Pointing.DOWN, 50).rightClick().whileSneaking()
+            .withItem(asStack);
         scene.idle(7);
         Object slot = new Object();
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, slot, new AABB(targetPos), 160);
@@ -63,7 +64,8 @@ public class EjectorScenes {
         scene.world().showSection(ejectorS, Direction.DOWN);
         scene.idle(10);
 
-        scene.overlay().showText(60).colored(PonderPalette.OUTPUT).text("The placed ejector will now launch objects to the marked location")
+        scene.overlay().showText(60).colored(PonderPalette.OUTPUT)
+            .text("The placed ejector will now launch objects to the marked location")
             .pointAt(util.vector().blockSurface(ejectorPos, Direction.WEST)).placeNearTarget();
         scene.idle(70);
 
@@ -75,8 +77,8 @@ public class EjectorScenes {
         scene.idle(10);
 
         scene.overlay().showText(60).attachKeyFrame().colored(PonderPalette.GREEN)
-            .text("A valid target can be at any height or distance within range").pointAt(util.vector().blockSurface(targetPos, Direction.WEST))
-            .placeNearTarget();
+            .text("A valid target can be at any height or distance within range")
+            .pointAt(util.vector().blockSurface(targetPos, Direction.WEST)).placeNearTarget();
         scene.idle(70);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.RED, new Object(), bb.move(-2, 0, -1), 60);
         scene.idle(10);
@@ -84,7 +86,8 @@ public class EjectorScenes {
             .pointAt(util.vector().blockSurface(targetPos.north().east(), Direction.WEST)).placeNearTarget();
         scene.idle(70);
         scene.overlay().showOutlineWithText(util.select().position(ejectorPos.west()), 70).colored(PonderPalette.OUTPUT)
-            .text("If no valid Target was selected, it will simply target the block directly in front").placeNearTarget();
+            .text("If no valid Target was selected, it will simply target the block directly in front")
+            .placeNearTarget();
         scene.idle(80);
 
         scene.world().showSection(util.select().position(3, 0, 5), Direction.UP);
@@ -92,18 +95,19 @@ public class EjectorScenes {
         scene.idle(12);
         scene.world().setKineticSpeed(ejectorS, 32);
         scene.idle(10);
-        scene.overlay().showText(50).attachKeyFrame().text("Supply Rotational Force in order to charge it up").pointAt(util.vector().topOf(4, 1, 3))
-            .placeNearTarget();
+        scene.overlay().showText(50).attachKeyFrame().text("Supply Rotational Force in order to charge it up")
+            .pointAt(util.vector().topOf(4, 1, 3)).placeNearTarget();
         scene.idle(60);
 
         ItemStack copperBlock = new ItemStack(Items.COPPER_BLOCK);
         ItemStack copperIngot = new ItemStack(Items.COPPER_INGOT);
-        scene.overlay().showControls(util.vector().topOf(ejectorPos).add(0.5, 0, 0), Pointing.RIGHT, 30).withItem(copperBlock);
+        scene.overlay().showControls(util.vector().topOf(ejectorPos).add(0.5, 0, 0), Pointing.RIGHT, 30)
+            .withItem(copperBlock);
         scene.idle(7);
         scene.world().createItemOnBeltLike(ejectorPos, Direction.NORTH, copperBlock);
         scene.idle(20);
-        scene.overlay().showText(50).text("Items placed on the ejector cause it to trigger").pointAt(util.vector().topOf(ejectorPos))
-            .placeNearTarget();
+        scene.overlay().showText(50).text("Items placed on the ejector cause it to trigger")
+            .pointAt(util.vector().topOf(ejectorPos)).placeNearTarget();
         scene.idle(60);
 
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
@@ -115,7 +119,8 @@ public class EjectorScenes {
         scene.world().createItemOnBeltLike(targetPos, Direction.SOUTH, copperIngot);
         scene.idle(20);
         scene.world().createItemOnBeltLike(ejectorPos, Direction.SOUTH, copperBlock);
-        scene.overlay().showText(60).attachKeyFrame().text("If Inventories are targeted, the ejector will wait until there is space")
+        scene.overlay().showText(60).attachKeyFrame()
+            .text("If Inventories are targeted, the ejector will wait until there is space")
             .pointAt(util.vector().topOf(targetPos)).placeNearTarget();
         scene.idle(70);
         scene.effects().indicateSuccess(targetPos);
@@ -131,8 +136,9 @@ public class EjectorScenes {
         scene.overlay().showControls(topOfSlot, Pointing.DOWN, 60).rightClick();
         scene.overlay().showFilterSlotInput(input, Direction.WEST, 80);
         scene.idle(10);
-        scene.overlay().showText(80).attachKeyFrame().text("Using the value panel, a required Stack Size can be configured")
-            .pointAt(input.add(0, 0, 0.125)).placeNearTarget();
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("Using the value panel, a required Stack Size can be configured").pointAt(input.add(0, 0, 0.125))
+            .placeNearTarget();
         scene.world().modifyBlockEntityNBT(
             ejectorS, EjectorBlockEntity.class, nbt -> {
                 nbt.putInt("ScrollValue", 10);
@@ -146,7 +152,8 @@ public class EjectorScenes {
 
         BlockPos beltPos = util.grid().at(4, 1, 0);
         scene.world().createItemOnBeltLike(beltPos, Direction.UP, copperBlock);
-        scene.overlay().showText(100).text("It is now limited to this stack size, and only activates when its held stack reaches this amount")
+        scene.overlay().showText(100)
+            .text("It is now limited to this stack size, and only activates when its held stack reaches this amount")
             .pointAt(util.vector().topOf(ejectorPos)).placeNearTarget();
         for (int i = 0; i < 4; i++) {
             scene.idle(20);
@@ -162,7 +169,8 @@ public class EjectorScenes {
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
 
         scene.addKeyframe();
-        ElementLink<ParrotElement> birb = scene.special().createBirb(util.vector().topOf(ejectorPos).add(0, -3 / 16f, 0), ParrotPose.FlappyPose::new);
+        ElementLink<ParrotElement> birb = scene.special()
+            .createBirb(util.vector().topOf(ejectorPos).add(0, -3 / 16f, 0), ParrotPose.FlappyPose::new);
         scene.idle(15);
         scene.world().modifyBlockEntity(ejectorPos, EjectorBlockEntity.class, EjectorBlockEntity::activateDeferred);
         scene.special().moveParrot(birb, util.vector().of(-2, 3, 0), 5);
@@ -199,12 +207,14 @@ public class EjectorScenes {
 
         BlockPos ejectorPos = util.grid().at(2, 1, 2);
 
-        scene.overlay().showText(80).attachKeyFrame().text("Combined with Brass Tunnels, Ejectors can split item stacks by specific amounts")
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("Combined with Brass Tunnels, Ejectors can split item stacks by specific amounts")
             .pointAt(util.vector().topOf(ejectorPos)).placeNearTarget();
         scene.idle(90);
 
         BlockPos tunnel = util.grid().at(2, 2, 3);
-        scene.overlay().showControls(util.vector().topOf(tunnel), Pointing.DOWN, 80).showing(AllIcons.I_TUNNEL_PREFER_NEAREST);
+        scene.overlay().showControls(util.vector().topOf(tunnel), Pointing.DOWN, 80)
+            .showing(AllIcons.I_TUNNEL_PREFER_NEAREST);
         scene.idle(10);
         scene.overlay().showCenteredScrollInput(tunnel, Direction.UP, 100);
         scene.idle(10);
@@ -217,8 +227,9 @@ public class EjectorScenes {
         Vec3 topOfSlot = input.add(0, 2 / 16f, 0);
         scene.overlay().showFilterSlotInput(input, Direction.NORTH, 80);
         scene.idle(10);
-        scene.overlay().showText(80).attachKeyFrame().text("The Stack Size set on the Ejector now determines the amount to be split off")
-            .pointAt(topOfSlot).placeNearTarget();
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("The Stack Size set on the Ejector now determines the amount to be split off").pointAt(topOfSlot)
+            .placeNearTarget();
         scene.world().modifyBlockEntityNBT(
             util.select().position(2, 1, 2), EjectorBlockEntity.class, nbt -> {
                 nbt.putInt("ScrollValue", 10);
@@ -226,13 +237,15 @@ public class EjectorScenes {
         );
         scene.idle(90);
 
-        scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 1, 3)), Pointing.DOWN, 20).withItem(new ItemStack(Items.COPPER_INGOT));
+        scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 1, 3)), Pointing.DOWN, 20)
+            .withItem(new ItemStack(Items.COPPER_INGOT));
         scene.world().showSection(coverbelt, Direction.SOUTH);
         scene.idle(7);
         scene.world().createItemOnBelt(util.grid().at(4, 1, 3), Direction.UP, new ItemStack(Items.COPPER_INGOT, 64));
         scene.idle(40);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 16f);
-        scene.overlay().showText(80).attachKeyFrame().text("While a new stack of the configured size exits the side output...")
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("While a new stack of the configured size exits the side output...")
             .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 1), Direction.WEST)).placeNearTarget();
         scene.idle(90);
         scene.overlay().showText(80).text("...the remainder will continue on its path")
@@ -269,22 +282,32 @@ public class EjectorScenes {
             if (i == 1) {
                 scene.world().toggleRedstonePower(redstone);
                 scene.effects().indicateRedstone(util.grid().at(2, 1, 2));
-                scene.world().modifyBlockEntityNBT(util.select().position(4, 1, 2), EjectorBlockEntity.class, nbt -> nbt.putBoolean("Powered", true));
+                scene.world().modifyBlockEntityNBT(
+                    util.select().position(4, 1, 2),
+                    EjectorBlockEntity.class,
+                    nbt -> nbt.putBoolean("Powered", true)
+                );
             }
         }
 
         scene.idle(10);
-        scene.overlay().showText(60).colored(PonderPalette.RED).attachKeyFrame().pointAt(util.vector().topOf(ejectorPos)).placeNearTarget()
+        scene.overlay().showText(60).colored(PonderPalette.RED).attachKeyFrame()
+            .pointAt(util.vector().topOf(ejectorPos)).placeNearTarget()
             .text("When powered by Redstone, Ejectors will not activate");
         scene.idle(70);
 
         scene.world().toggleRedstonePower(redstone);
         scene.idle(2);
-        scene.world().modifyBlockEntityNBT(util.select().position(4, 1, 2), EjectorBlockEntity.class, nbt -> nbt.putBoolean("Powered", false));
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(4, 1, 2),
+            EjectorBlockEntity.class,
+            nbt -> nbt.putBoolean("Powered", false)
+        );
         scene.idle(5);
         scene.world().hideSection(redstone, Direction.WEST);
         scene.idle(30);
-        ElementLink<WorldSectionElement> observer = scene.world().showIndependentSection(util.select().position(4, 1, 1), Direction.SOUTH);
+        ElementLink<WorldSectionElement> observer = scene.world()
+            .showIndependentSection(util.select().position(4, 1, 1), Direction.SOUTH);
         scene.world().moveSection(observer, util.vector().of(0.5, 1.5, -0.5), 0);
         scene.world().rotateSection(observer, 0, 30 - 180, 0, 0);
         scene.idle(20);
@@ -304,11 +327,13 @@ public class EjectorScenes {
             scene.idle(3);
             scene.world().toggleRedstonePower(observerRedstone);
             scene.idle(16);
-            if (i == 3)
+            if (i == 3) {
                 scene.markAsFinished();
+            }
             if (i == 1) {
-                scene.overlay().showText(60).attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(4, 1, 1), Direction.NORTH))
-                    .placeNearTarget().text("Observers can detect when Ejectors activate");
+                scene.overlay().showText(60).attachKeyFrame()
+                    .pointAt(util.vector().blockSurface(util.grid().at(4, 1, 1), Direction.NORTH)).placeNearTarget()
+                    .text("Observers can detect when Ejectors activate");
             }
         }
 

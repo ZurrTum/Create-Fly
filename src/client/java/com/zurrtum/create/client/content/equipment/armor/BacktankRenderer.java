@@ -54,7 +54,12 @@ public class BacktankRenderer extends KineticBlockEntityRenderer<BacktankBlockEn
     }
 
     @Override
-    public void submit(BacktankRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        BacktankRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 

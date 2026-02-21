@@ -43,8 +43,9 @@ public abstract class MovementBehaviour {
     @Nullable
     public ItemStack canBeDisabledVia(MovementContext context) {
         Block block = context.state.getBlock();
-        if (block == null)
+        if (block == null) {
             return null;
+        }
         return new ItemStack(block);
     }
 
@@ -78,13 +79,15 @@ public abstract class MovementBehaviour {
                 }
             }
         }
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
             return;
+        }
 
         // Actors might void items if their positions is undefined
         Vec3 vec = context.position;
-        if (vec == null)
+        if (vec == null) {
             return;
+        }
 
         ItemEntity itemEntity = new ItemEntity(context.world, vec.x, vec.y, vec.z, stack);
         itemEntity.setDeltaMovement(context.motion.add(0, 0.5f, 0).scale(context.world.random.nextFloat() * .3f));

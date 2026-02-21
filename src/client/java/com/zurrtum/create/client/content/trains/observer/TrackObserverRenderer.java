@@ -55,17 +55,29 @@ public class TrackObserverRenderer extends SmartBlockEntityRenderer<TrackObserve
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
         if (renderer != null) {
             state.block = renderer.getRenderState(
-                world, new Vec3(
+                world,
+                new Vec3(
                     targetPosition.getX() - state.blockPos.getX(),
                     targetPosition.getY() - state.blockPos.getY(),
                     targetPosition.getZ() - state.blockPos.getZ()
-                ), trackState, targetPosition, target.getTargetDirection(), target.getTargetBezier(), RenderedTrackOverlayType.OBSERVER, 1
+                ),
+                trackState,
+                targetPosition,
+                target.getTargetDirection(),
+                target.getTargetBezier(),
+                RenderedTrackOverlayType.OBSERVER,
+                1
             );
         }
     }
 
     @Override
-    public void submit(TrackObserverRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        TrackObserverRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.block != null) {
             state.block.render(matrices, queue);

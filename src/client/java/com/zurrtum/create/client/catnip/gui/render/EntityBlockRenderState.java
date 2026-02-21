@@ -11,10 +11,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record EntityBlockRenderState(
-    int id, Matrix3x2f pose, Level world, BlockPos pos, BlockEntity entity, BlockState state, int x0, int y0, int x1, int y1, float scale, float size,
-    float xRot, float yRot, float zRot, ScreenRectangle bounds
-) implements PictureInPictureRenderState {
+public record EntityBlockRenderState(int id, Matrix3x2f pose, Level world, BlockPos pos, BlockEntity entity,
+                                     BlockState state, int x0, int y0, int x1, int y1, float scale, float size,
+                                     float xRot, float yRot, float zRot,
+                                     ScreenRectangle bounds) implements PictureInPictureRenderState {
     public static EntityBlockRenderState create(
         int id,
         GuiGraphics graphics,

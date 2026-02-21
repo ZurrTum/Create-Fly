@@ -44,7 +44,12 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState state,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return AllShapes.FLUID_VALVE.get(getPipeAxis(state));
     }
 
@@ -65,13 +70,15 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
 
     @NotNull
     public static Axis getPipeAxis(BlockState state) {
-        if (!(state.getBlock() instanceof FluidValveBlock))
+        if (!(state.getBlock() instanceof FluidValveBlock)) {
             throw new IllegalStateException("Provided BlockState is for a different block.");
+        }
         Direction facing = state.getValue(FACING);
         boolean alongFirst = !state.getValue(AXIS_ALONG_FIRST_COORDINATE);
         for (Axis axis : Iterate.axes) {
-            if (axis == facing.getAxis())
+            if (axis == facing.getAxis()) {
                 continue;
+            }
             if (!alongFirst) {
                 alongFirst = true;
                 continue;
@@ -88,26 +95,38 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
 
     @Override
     public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
-        if (!world.isClientSide())
+        if (!world.isClientSide()) {
             FluidPropagator.propagateChangedPipe(world, pos, state);
+        }
     }
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, world, pos, oldState, isMoving);
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
-        if (state != oldState)
+        }
+        if (state != oldState) {
             world.scheduleTick(pos, this, 1, TickPriority.HIGH);
+        }
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos neighborPos, boolean isMoving) {
+    public void neighborUpdate(
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        Block otherBlock,
+        BlockPos neighborPos,
+        boolean isMoving
+    ) {
         Direction d = FluidPropagator.validateNeighbourChange(state, world, pos, otherBlock, neighborPos, isMoving);
-        if (d == null)
+        if (d == null) {
             return;
-        if (!isOpenAt(state, d))
+        }
+        if (!isOpenAt(state, d)) {
             return;
+        }
         world.scheduleTick(pos, this, 1, TickPriority.HIGH);
     }
 

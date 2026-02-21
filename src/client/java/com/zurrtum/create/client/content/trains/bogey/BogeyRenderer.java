@@ -5,5 +5,11 @@ import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
 public interface BogeyRenderer {
-    BogeyRenderState getRenderData(@Nullable CompoundTag bogeyData, float wheelAngle, float tickProgress, int light, boolean inContraption);
+    BogeyRenderState getRenderData(
+        @Nullable CompoundTag bogeyData,
+        float wheelAngle,
+        float tickProgress,
+        int light,
+        boolean inContraption
+    );
 }

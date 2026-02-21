@@ -35,11 +35,13 @@ public class WaterWheelBlock extends DirectionalKineticBlock implements IBE<Wate
         for (Direction direction : Iterate.directions) {
             BlockPos neighbourPos = pos.relative(direction);
             BlockState neighbourState = worldIn.getBlockState(neighbourPos);
-            if (!neighbourState.is(AllBlocks.WATER_WHEEL))
+            if (!neighbourState.is(AllBlocks.WATER_WHEEL)) {
                 continue;
+            }
             Axis axis = state.getValue(FACING).getAxis();
-            if (neighbourState.getValue(FACING).getAxis() != axis || axis != direction.getAxis())
+            if (neighbourState.getValue(FACING).getAxis() != axis || axis != direction.getAxis()) {
                 return false;
+            }
         }
         return true;
     }
@@ -68,22 +70,27 @@ public class WaterWheelBlock extends DirectionalKineticBlock implements IBE<Wate
         BlockState facingState,
         RandomSource random
     ) {
-        if (worldIn instanceof WrappedLevel)
+        if (worldIn instanceof WrappedLevel) {
             return stateIn;
-        if (worldIn.isClientSide())
+        }
+        if (worldIn.isClientSide()) {
             return stateIn;
-        if (!tickView.getBlockTicks().hasScheduledTick(currentPos, this))
+        }
+        if (!tickView.getBlockTicks().hasScheduledTick(currentPos, this)) {
             tickView.scheduleTick(currentPos, this, 1);
+        }
         return stateIn;
     }
 
     @Override
     public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, worldIn, pos, oldState, isMoving);
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
-        if (!worldIn.getBlockTicks().hasScheduledTick(pos, this))
+        }
+        if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
             worldIn.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override

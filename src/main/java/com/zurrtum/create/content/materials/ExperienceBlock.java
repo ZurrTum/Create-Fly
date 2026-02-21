@@ -28,9 +28,11 @@ public class ExperienceBlock extends Block {
 
     @Override
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRand) {
-        if (pRand.nextInt(5) != 0)
+        if (pRand.nextInt(5) != 0) {
             return;
-        Vec3 vec3 = VecHelper.clampComponentWise(VecHelper.offsetRandomly(Vec3.ZERO, pRand, .75f), .55f).add(VecHelper.getCenterOf(pPos));
+        }
+        Vec3 vec3 = VecHelper.clampComponentWise(VecHelper.offsetRandomly(Vec3.ZERO, pRand, .75f), .55f)
+            .add(VecHelper.getCenterOf(pPos));
         pLevel.addParticle(
             ParticleTypes.END_ROD,
             vec3.x,

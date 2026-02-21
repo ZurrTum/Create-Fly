@@ -16,23 +16,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.*;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -57,9 +50,7 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
 
     public enum WhistleSize implements StringRepresentable {
 
-        SMALL,
-        MEDIUM,
-        LARGE;
+        SMALL, MEDIUM, LARGE;
 
         @Override
         public String getSerializedName() {
@@ -70,7 +61,8 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
 
     public WhistleBlock(Properties p_49795_) {
         super(p_49795_);
-        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(WALL, false).setValue(SIZE, WhistleSize.MEDIUM));
+        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(WALL, false)
+            .setValue(SIZE, WhistleSize.MEDIUM));
     }
 
     @Override
@@ -107,8 +99,9 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
 
         BlockState state = super.getStateForPlacement(pContext).setValue(FACING, face.getOpposite())
             .setValue(POWERED, level.hasNeighborSignal(clickedPos)).setValue(WALL, wall);
-        if (!canSurvive(state, level, clickedPos))
+        if (!canSurvive(state, level, clickedPos)) {
             return null;
+        }
         return state;
     }
 
@@ -122,8 +115,9 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null)
+        if (player == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         if (stack.is(AllItems.STEAM_WHISTLE)) {
             incrementSize(level, pos);
@@ -135,8 +129,9 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
 
     public static void incrementSize(LevelAccessor pLevel, BlockPos pPos) {
         BlockState base = pLevel.getBlockState(pPos);
-        if (!base.hasProperty(SIZE))
+        if (!base.hasProperty(SIZE)) {
             return;
+        }
         WhistleSize size = base.getValue(SIZE);
         SoundType soundtype = base.getSoundType();
         BlockPos currentPos = pPos.above();
@@ -149,7 +144,11 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
 
             if (blockState.is(AllBlocks.STEAM_WHISTLE_EXTENSION)) {
                 if (blockState.getValue(WhistleExtenderBlock.SHAPE) == WhistleExtenderShape.SINGLE) {
-                    pLevel.setBlock(currentPos, blockState.setValue(WhistleExtenderBlock.SHAPE, WhistleExtenderShape.DOUBLE), 3);
+                    pLevel.setBlock(
+                        currentPos,
+                        blockState.setValue(WhistleExtenderBlock.SHAPE, WhistleExtenderShape.DOUBLE),
+                        3
+                    );
                     float pPitch = (float) Math.pow(2, -(i * 2) / 12.0);
                     pLevel.playSound(null, currentPos, growSound, SoundSource.BLOCKS, pVolume / 4f, pPitch);
                     pLevel.playSound(null, currentPos, hitSound, SoundSource.BLOCKS, pVolume, pPitch);
@@ -159,8 +158,9 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
                 continue;
             }
 
-            if (!blockState.canBeReplaced())
+            if (!blockState.canBeReplaced()) {
                 return;
+            }
 
             pLevel.setBlock(currentPos, AllBlocks.STEAM_WHISTLE_EXTENSION.defaultBlockState().setValue(SIZE, size), 3);
             float pPitch = (float) Math.pow(2, -(i * 2 - 1) / 12.0);
@@ -172,8 +172,10 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
 
     public static void queuePitchUpdate(LevelAccessor level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos);
-        if (blockState.getBlock() instanceof WhistleBlock whistle && !level.getBlockTicks().hasScheduledTick(pos, whistle))
+        if (blockState.getBlock() instanceof WhistleBlock whistle && !level.getBlockTicks()
+            .hasScheduledTick(pos, whistle)) {
             level.scheduleTick(pos, whistle, 1);
+        }
     }
 
     @Override
@@ -184,8 +186,9 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
     @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
         FluidTankBlock.updateBoilerState(pState, pLevel, pPos.relative(getAttachedDirection(pState)));
-        if (pOldState.getBlock() != this || pOldState.getValue(SIZE) != pState.getValue(SIZE))
+        if (pOldState.getBlock() != this || pOldState.getValue(SIZE) != pState.getValue(SIZE)) {
             queuePitchUpdate(pLevel, pPos);
+        }
     }
 
     @Override
@@ -202,11 +205,13 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
         @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
             worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
+        }
     }
 
     @Override
@@ -220,14 +225,18 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
         BlockState pFacingState,
         RandomSource random
     ) {
-        return getAttachedDirection(pState) == pFacing && !pState.canSurvive(pLevel, pCurrentPos) ? Blocks.AIR.defaultBlockState() : pState;
+        return getAttachedDirection(pState) == pFacing && !pState.canSurvive(
+            pLevel,
+            pCurrentPos
+        ) ? Blocks.AIR.defaultBlockState() : pState;
     }
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         WhistleSize size = pState.getValue(SIZE);
-        if (!pState.getValue(WALL))
+        if (!pState.getValue(WALL)) {
             return size == WhistleSize.SMALL ? AllShapes.WHISTLE_SMALL_FLOOR : size == WhistleSize.MEDIUM ? AllShapes.WHISTLE_MEDIUM_FLOOR : AllShapes.WHISTLE_LARGE_FLOOR;
+        }
         Direction direction = pState.getValue(FACING);
         return (size == WhistleSize.SMALL ? AllShapes.WHISTLE_SMALL_WALL : size == WhistleSize.MEDIUM ? AllShapes.WHISTLE_MEDIUM_WALL : AllShapes.WHISTLE_LARGE_WALL).get(
             direction);

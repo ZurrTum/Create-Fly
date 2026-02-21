@@ -27,12 +27,14 @@ public class GhostIngredientHandler<T extends AbstractSimiContainerScreen<? exte
         if (ingredient.getType() == VanillaTypes.ITEM_STACK) {
             List<Slot> slots = gui.getMenu().slots;
             if (gui instanceof AttributeFilterScreen) {
-                if (slots.get(36).isActive())
+                if (slots.get(36).isActive()) {
                     targets.add(new GhostTarget<>(gui, 0, true));
+                }
             } else {
                 for (int i = 36; i < slots.size(); i++) {
-                    if (slots.get(i).isActive())
+                    if (slots.get(i).isActive()) {
                         targets.add(new GhostTarget<>(gui, i - 36, false));
+                    }
                 }
             }
         }
@@ -77,8 +79,9 @@ public class GhostIngredientHandler<T extends AbstractSimiContainerScreen<? exte
             stack.setCount(1);
             gui.getMenu().ghostInventory.setItem(slotIndex, stack);
 
-            if (isAttributeFilter)
+            if (isAttributeFilter) {
                 return;
+            }
 
             // sync new filter contents with server
             LocalPlayer player = Minecraft.getInstance().player;

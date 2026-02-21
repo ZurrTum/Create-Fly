@@ -53,14 +53,14 @@ public class FanBlastingDisplay extends CreateDisplay {
         }
         ItemStack stack = firstInput.get().value().getDefaultInstance();
         if (smeltingRecipes != null) {
-            Optional<RecipeHolder<SmeltingRecipe>> smeltingRecipe = smeltingRecipes.stream().filter(e -> e.value().input().test(stack)).findFirst()
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+            Optional<RecipeHolder<SmeltingRecipe>> smeltingRecipe = smeltingRecipes.stream()
+                .filter(e -> e.value().input().test(stack)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             if (smeltingRecipe.isPresent()) {
                 return null;
             }
         }
-        Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = smokingRecipes.stream().filter(e -> e.value().input().test(stack)).findFirst()
-            .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+        Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = smokingRecipes.stream()
+            .filter(e -> e.value().input().test(stack)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
         if (smokingRecipe.map(e -> ItemStack.isSameItem(e.value().result(), recipe.result())).orElse(false)) {
             return null;
         }

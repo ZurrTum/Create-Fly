@@ -1,16 +1,16 @@
 package com.zurrtum.create;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.minecraft.util.Util;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -89,7 +89,10 @@ public class AllItemTags {
     private static final Map<TagKey<Item>, DyeColor> dyesTag = Util.make(
         new HashMap<>(), map -> {
             for (DyeColor color : DyeColor.values()) {
-                map.put(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dyes/" + color.getName())), color);
+                map.put(
+                    TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dyes/" + color.getName())),
+                    color
+                );
             }
         }
     );
@@ -98,7 +101,8 @@ public class AllItemTags {
         if (stack.getItem() instanceof DyeItem dyeItem) {
             return dyeItem.getDyeColor();
         }
-        return dyesTag.entrySet().stream().filter(entry -> stack.is(entry.getKey())).map(Map.Entry::getValue).findAny().orElse(null);
+        return dyesTag.entrySet().stream().filter(entry -> stack.is(entry.getKey())).map(Map.Entry::getValue).findAny()
+            .orElse(null);
     }
 
     public static void register() {

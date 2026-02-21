@@ -92,11 +92,17 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
 
     @Override
     public boolean addFreshEntity(Entity entityIn) {
-        if (entityIn instanceof ItemFrame itemFrame)
+        if (entityIn instanceof ItemFrame itemFrame) {
             itemFrame.setItem(ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getItem()));
-        if (entityIn instanceof ArmorStand armorStand)
-            for (EquipmentSlot equipmentSlot : EquipmentSlot.values())
-                armorStand.setItemSlot(equipmentSlot, ComponentProcessors.withUnsafeComponentsDiscarded(armorStand.getItemBySlot(equipmentSlot)));
+        }
+        if (entityIn instanceof ArmorStand armorStand) {
+            for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+                armorStand.setItemSlot(
+                    equipmentSlot,
+                    ComponentProcessors.withUnsafeComponentsDiscarded(armorStand.getItemBySlot(equipmentSlot))
+                );
+            }
+        }
 
         return entities.add(entityIn);
     }
@@ -108,12 +114,15 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
 
     @Override
     public BlockEntity getBlockEntity(BlockPos pos) {
-        if (isOutsideBuildHeight(pos))
+        if (isOutsideBuildHeight(pos)) {
             return null;
-        if (blockEntities.containsKey(pos))
+        }
+        if (blockEntities.containsKey(pos)) {
             return blockEntities.get(pos);
-        if (!blocks.containsKey(pos.subtract(anchor)))
+        }
+        if (!blocks.containsKey(pos.subtract(anchor))) {
             return null;
+        }
 
         BlockState blockState = getBlockState(pos);
         if (blockState.hasBlockEntity()) {
@@ -140,10 +149,12 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
     public BlockState getBlockState(BlockPos globalPos) {
         BlockPos pos = globalPos.subtract(anchor);
 
-        if (pos.getY() - bounds.minY() == -1 && !renderMode)
+        if (pos.getY() - bounds.minY() == -1 && !renderMode) {
             return Blocks.DIRT.defaultBlockState();
-        if (getBounds().isInside(pos) && blocks.containsKey(pos))
+        }
+        if (getBounds().isInside(pos) && blocks.containsKey(pos)) {
             return processBlockStateForPrinting(blocks.get(pos));
+        }
         return Blocks.AIR.defaultBlockState();
     }
 
@@ -232,8 +243,9 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
         }
 
         BlockEntity blockEntity = getBlockEntity(pos);
-        if (blockEntity != null)
+        if (blockEntity != null) {
             blockEntities.put(pos, blockEntity);
+        }
 
         return true;
     }
@@ -263,8 +275,9 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
     }
 
     protected BlockState processBlockStateForPrinting(BlockState state) {
-        if (state.getBlock() instanceof AbstractFurnaceBlock && state.hasProperty(BlockStateProperties.LIT))
+        if (state.getBlock() instanceof AbstractFurnaceBlock && state.hasProperty(BlockStateProperties.LIT)) {
             state = state.setValue(BlockStateProperties.LIT, false);
+        }
         return state;
     }
 

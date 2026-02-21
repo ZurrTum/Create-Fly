@@ -23,16 +23,19 @@ public class ValveHandleRenderer extends HandCrankRenderer {
     }
 
     public static float getValveHandleIndependentAngle(ValveHandleBlockEntity be, float partialTicks) {
-        if (be.inUse == 0 && be.source != null && be.getSpeed() != 0)
-            return AngleHelper.deg(KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), KineticBlockEntityRenderer.getRotationAxisOf(be)));
+        if (be.inUse == 0 && be.source != null && be.getSpeed() != 0) {
+            return AngleHelper.deg(KineticBlockEntityRenderer.getAngleForBe(
+                be,
+                be.getBlockPos(),
+                KineticBlockEntityRenderer.getRotationAxisOf(be)
+            ));
+        }
 
-        int step = be.getBlockState().getOptionalValue(ValveHandleBlock.FACING).orElse(Direction.SOUTH).getAxisDirection().getStep();
+        int step = be.getBlockState().getOptionalValue(ValveHandleBlock.FACING).orElse(Direction.SOUTH)
+            .getAxisDirection().getStep();
 
         return (be.inUse > 0 && be.totalUseTicks > 0 ? Mth.lerpInt(
-            Math.min(
-                be.totalUseTicks,
-                be.totalUseTicks - be.inUse + partialTicks
-            ) / (float) be.totalUseTicks,
+            Math.min(be.totalUseTicks, be.totalUseTicks - be.inUse + partialTicks) / (float) be.totalUseTicks,
             be.startAngle,
             be.targetAngle
         ) : be.targetAngle) * (be.backwards ? -1 : 1) * step;

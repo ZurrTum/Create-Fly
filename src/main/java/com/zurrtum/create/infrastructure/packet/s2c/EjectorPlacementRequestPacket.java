@@ -10,8 +10,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record EjectorPlacementRequestPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, EjectorPlacementRequestPacket> CODEC = BlockPos.STREAM_CODEC.map(
-        EjectorPlacementRequestPacket::new,
+    public static final StreamCodec<ByteBuf, EjectorPlacementRequestPacket> CODEC = BlockPos.STREAM_CODEC.map(EjectorPlacementRequestPacket::new,
         EjectorPlacementRequestPacket::pos
     );
 

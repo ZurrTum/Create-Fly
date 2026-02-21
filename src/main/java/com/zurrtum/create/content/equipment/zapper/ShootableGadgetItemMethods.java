@@ -15,35 +15,52 @@ import java.util.function.Predicate;
 
 public class ShootableGadgetItemMethods {
 
-    public static void applyCooldown(Player player, ItemStack item, InteractionHand hand, Predicate<ItemStack> predicate, int cooldown) {
-        if (cooldown <= 0)
+    public static void applyCooldown(
+        Player player,
+        ItemStack item,
+        InteractionHand hand,
+        Predicate<ItemStack> predicate,
+        int cooldown
+    ) {
+        if (cooldown <= 0) {
             return;
+        }
 
         boolean gunInOtherHand = predicate.test(player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND));
         player.getCooldowns().addCooldown(item, gunInOtherHand ? cooldown * 2 / 3 : cooldown);
     }
 
     public static void sendPackets(Player player, Function<Boolean, Packet<ClientGamePacketListener>> factory) {
-        if (!(player instanceof ServerPlayer serverPlayer))
+        if (!(player instanceof ServerPlayer serverPlayer)) {
             return;
+        }
         serverPlayer.level().getChunkSource().sendToTrackingPlayers(player, factory.apply(false));
         serverPlayer.connection.send(factory.apply(true));
     }
 
-    public static boolean shouldSwap(Player player, ItemStack item, InteractionHand hand, Predicate<ItemStack> predicate) {
+    public static boolean shouldSwap(
+        Player player,
+        ItemStack item,
+        InteractionHand hand,
+        Predicate<ItemStack> predicate
+    ) {
         boolean isSwap = item.has(AllDataComponents.SHAPER_SWAP);
         boolean mainHand = hand == InteractionHand.MAIN_HAND;
         boolean gunInOtherHand = predicate.test(player.getItemInHand(mainHand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND));
 
         // Pass To Offhand
-        if (mainHand && isSwap && gunInOtherHand)
+        if (mainHand && isSwap && gunInOtherHand) {
             return true;
-        if (mainHand && !isSwap && gunInOtherHand)
+        }
+        if (mainHand && !isSwap && gunInOtherHand) {
             item.set(AllDataComponents.SHAPER_SWAP, true);
-        if (!mainHand && isSwap)
+        }
+        if (!mainHand && isSwap) {
             item.remove(AllDataComponents.SHAPER_SWAP);
-        if (!mainHand && gunInOtherHand)
+        }
+        if (!mainHand && gunInOtherHand) {
             player.getItemInHand(InteractionHand.MAIN_HAND).remove(AllDataComponents.SHAPER_SWAP);
+        }
         player.startUsingItem(hand);
         return false;
     }

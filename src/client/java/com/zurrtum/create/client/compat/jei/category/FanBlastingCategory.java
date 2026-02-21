@@ -56,20 +56,21 @@ public class FanBlastingCategory extends CreateCategory<RecipeHolder<? extends S
         }
         SingleItemRecipe recipe = entry.value();
         Ingredient ingredient = recipe.input();
-        Optional<ItemStack> firstInput = ingredient.values.stream().findFirst().map(item -> item.value().getDefaultInstance());
+        Optional<ItemStack> firstInput = ingredient.values.stream().findFirst()
+            .map(item -> item.value().getDefaultInstance());
         if (firstInput.isEmpty()) {
             return;
         }
         SingleRecipeInput input = new SingleRecipeInput(firstInput.get());
         if (blastingRecipes != null) {
-            Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = blastingRecipes.stream().filter(e -> e.value().matches(input, world)).findFirst()
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+            Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = blastingRecipes.stream()
+                .filter(e -> e.value().matches(input, world)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             if (blastingRecipe.isPresent()) {
                 return;
             }
         }
-        Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = smokingRecipes.stream().filter(e -> e.value().matches(input, world)).findFirst()
-            .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+        Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = smokingRecipes.stream()
+            .filter(e -> e.value().matches(input, world)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
         if (smokingRecipe.isPresent()) {
             return;
         }
@@ -99,7 +100,11 @@ public class FanBlastingCategory extends CreateCategory<RecipeHolder<? extends S
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends SingleItemRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<? extends SingleItemRecipe> entry,
+        IFocusGroup focuses
+    ) {
         SingleItemRecipe recipe = entry.value();
         builder.addInputSlot(21, 48).setBackground(SLOT, -1, -1).add(recipe.input());
         builder.addOutputSlot(141, 48).setBackground(SLOT, -1, -1).add(recipe.result());

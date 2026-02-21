@@ -6,12 +6,11 @@ import com.zurrtum.create.content.trains.graph.DiscoveredPath;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.station.GlobalStation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.Level;
 
 public class DestinationInstruction extends TextScheduleInstruction {
     public DestinationInstruction(Identifier id) {
@@ -47,18 +46,20 @@ public class DestinationInstruction extends TextScheduleInstruction {
 
 
         for (GlobalStation globalStation : train.graph.getPoints(EdgePointType.STATION)) {
-            if (!globalStation.name.matches(regex))
+            if (!globalStation.name.matches(regex)) {
                 continue;
+            }
             anyMatch = true;
             validStations.add(globalStation);
         }
 
         DiscoveredPath best = train.navigation.findPathTo(validStations, Double.MAX_VALUE);
         if (best == null) {
-            if (anyMatch)
+            if (anyMatch) {
                 train.status.failedNavigation();
-            else
+            } else {
                 train.status.failedNavigationNoTarget(getFilter());
+            }
             runtime.startCooldown();
             return null;
         }

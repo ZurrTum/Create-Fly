@@ -49,12 +49,14 @@ public class ItemCopyingRecipe extends CustomRecipe {
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         IntAttached<ItemStack> copyCheck = copyCheck(input);
-        if (copyCheck == null)
+        if (copyCheck == null) {
             return ItemStack.EMPTY;
+        }
 
         ItemStack itemToCopy = copyCheck.getValue();
-        if (!(itemToCopy.getItem() instanceof SupportsItemCopying sic))
+        if (!(itemToCopy.getItem() instanceof SupportsItemCopying sic)) {
             return ItemStack.EMPTY;
+        }
 
         return sic.createCopy(itemToCopy, copyCheck.getFirst() + 1);
     }
@@ -67,34 +69,44 @@ public class ItemCopyingRecipe extends CustomRecipe {
         int size = input.size();
         for (int j = 0; j < size; ++j) {
             ItemStack itemInSlot = input.getItem(j);
-            if (itemInSlot.isEmpty())
+            if (itemInSlot.isEmpty()) {
                 continue;
-            if (!(itemInSlot.getItem() instanceof SupportsItemCopying sic))
+            }
+            if (!(itemInSlot.getItem() instanceof SupportsItemCopying sic)) {
                 return null;
-            if (!sic.canCopyFromItem(itemInSlot))
+            }
+            if (!sic.canCopyFromItem(itemInSlot)) {
                 continue;
+            }
             itemToCopy = itemInSlot;
             break;
         }
-        if (itemToCopy.isEmpty())
+        if (itemToCopy.isEmpty()) {
             return null;
+        }
 
         for (int j = 0; j < size; ++j) {
             ItemStack itemInSlot = input.getItem(j);
-            if (itemInSlot.isEmpty() || itemInSlot == itemToCopy)
+            if (itemInSlot.isEmpty() || itemInSlot == itemToCopy) {
                 continue;
-            if (itemToCopy.getItem() != itemInSlot.getItem())
+            }
+            if (itemToCopy.getItem() != itemInSlot.getItem()) {
                 return null;
-            if (!(itemInSlot.getItem() instanceof SupportsItemCopying sic))
+            }
+            if (!(itemInSlot.getItem() instanceof SupportsItemCopying sic)) {
                 return null;
-            if (sic.canCopyFromItem(itemInSlot))
+            }
+            if (sic.canCopyFromItem(itemInSlot)) {
                 return null;
-            if (!sic.canCopyToItem(itemInSlot))
+            }
+            if (!sic.canCopyToItem(itemInSlot)) {
                 return null;
+            }
             copyTargets++;
         }
-        if (copyTargets == 0)
+        if (copyTargets == 0) {
             return null;
+        }
 
         return IntAttached.with(copyTargets, itemToCopy);
     }

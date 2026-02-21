@@ -64,17 +64,20 @@ public class CartAssemblerScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.idle(10);
 
-        scene.overlay().showText(70).text("Powered Cart Assemblers mount attached structures to passing Minecarts").attachKeyFrame()
-            .pointAt(util.vector().topOf(assemblerPos)).placeNearTarget();
+        scene.overlay().showText(70).text("Powered Cart Assemblers mount attached structures to passing Minecarts")
+            .attachKeyFrame().pointAt(util.vector().topOf(assemblerPos)).placeNearTarget();
         scene.idle(80);
 
-        ElementLink<MinecartElement> cart = scene.special().createCart(util.vector().topOf(2, 0, 4), 90, EntityType.MINECART::create);
+        ElementLink<MinecartElement> cart = scene.special()
+            .createCart(util.vector().topOf(2, 0, 4), 90, EntityType.MINECART::create);
         scene.world().showSection(util.select().position(assemblerPos.above()), Direction.DOWN);
         scene.idle(10);
         scene.special().moveCart(cart, util.vector().of(0, 0, -2), 20);
         scene.idle(20);
-        ElementLink<WorldSectionElement> plank = scene.world().makeSectionIndependent(util.select().position(assemblerPos.above()));
-        ElementLink<WorldSectionElement> anchor = scene.world().showIndependentSectionImmediately(util.select().position(assemblerPos.east()));
+        ElementLink<WorldSectionElement> plank = scene.world()
+            .makeSectionIndependent(util.select().position(assemblerPos.above()));
+        ElementLink<WorldSectionElement> anchor = scene.world()
+            .showIndependentSectionImmediately(util.select().position(assemblerPos.east()));
         scene.world().moveSection(anchor, util.vector().of(-1, 0, 0), 0);
         scene.effects().indicateSuccess(assemblerPos);
         scene.idle(1);
@@ -86,7 +89,8 @@ public class CartAssemblerScenes {
         scene.world().toggleRedstonePower(toggle);
         scene.idle(10);
 
-        scene.overlay().showText(70).text("Without a redstone signal, it disassembles passing cart contraptions back into blocks")
+        scene.overlay().showText(70)
+            .text("Without a redstone signal, it disassembles passing cart contraptions back into blocks")
             .colored(PonderPalette.RED).attachKeyFrame().pointAt(util.vector().topOf(assemblerPos)).placeNearTarget();
         scene.idle(80);
 
@@ -104,8 +108,10 @@ public class CartAssemblerScenes {
 
         scene.world().destroyBlock(assemblerPos.above());
         scene.idle(5);
-        scene.world().replaceBlocks(util.select().fromTo(3, 3, 2, 1, 4, 2), Blocks.OAK_PLANKS.defaultBlockState(), false);
-        ElementLink<WorldSectionElement> contraption = scene.world().showIndependentSection(util.select().fromTo(1, 4, 2, 3, 3, 2), Direction.DOWN);
+        scene.world()
+            .replaceBlocks(util.select().fromTo(3, 3, 2, 1, 4, 2), Blocks.OAK_PLANKS.defaultBlockState(), false);
+        ElementLink<WorldSectionElement> contraption = scene.world()
+            .showIndependentSection(util.select().fromTo(1, 4, 2, 3, 3, 2), Direction.DOWN);
         scene.world().moveSection(contraption, util.vector().of(0, -1, 0), 0);
         scene.idle(10);
         scene.world().showSectionAndMerge(util.select().position(3, 3, 1), Direction.SOUTH, contraption);
@@ -114,7 +120,8 @@ public class CartAssemblerScenes {
         scene.overlay().showOutline(
             PonderPalette.GREEN,
             "glue",
-            util.select().position(1, 3, 2).add(util.select().fromTo(3, 2, 2, 1, 2, 2)).add(util.select().position(3, 2, 1)),
+            util.select().position(1, 3, 2).add(util.select().fromTo(3, 2, 2, 1, 2, 2))
+                .add(util.select().position(3, 2, 1)),
             40
         );
         scene.overlay().showControls(util.vector().centerOf(util.grid().at(3, 2, 2)), Pointing.RIGHT, 40)
@@ -137,16 +144,19 @@ public class CartAssemblerScenes {
         scene.idle(25);
 
         Vec3 cartCenter = util.vector().centerOf(assemblerPos.north(2));
-        scene.overlay().showControls(cartCenter, Pointing.LEFT, 40).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
+        scene.overlay().showControls(cartCenter, Pointing.LEFT, 40).rightClick()
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.special().moveCart(cart, util.vector().of(0, -100, 4), 0);
         scene.world().moveSection(anchor, util.vector().of(0, -100, 4), 0);
         scene.world().moveSection(contraption, util.vector().of(0, -100, 4), 0);
         ItemStack asStack = AllItems.MINECART_CONTRAPTION.getDefaultInstance();
-        ElementLink<EntityElement> itemEntity = scene.world().createItemEntity(cartCenter, util.vector().of(0, .1, 0), asStack);
+        ElementLink<EntityElement> itemEntity = scene.world()
+            .createItemEntity(cartCenter, util.vector().of(0, .1, 0), asStack);
         scene.idle(40);
-        scene.overlay().showText(80).attachKeyFrame().text("Using a Wrench on the Minecart will let you carry the Contraption elsewhere")
-            .pointAt(cartCenter).placeNearTarget();
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("Using a Wrench on the Minecart will let you carry the Contraption elsewhere").pointAt(cartCenter)
+            .placeNearTarget();
         scene.idle(80);
         scene.world().modifyEntity(itemEntity, Entity::discard);
 
@@ -187,18 +197,21 @@ public class CartAssemblerScenes {
         );
         scene.idle(5);
         scene.world().showSection(util.select().fromTo(3, 1, 1, 3, 1, 2), Direction.SOUTH);
-        ElementLink<WorldSectionElement> contraption = scene.world().showIndependentSection(util.select().position(3, 2, 3), Direction.DOWN);
+        ElementLink<WorldSectionElement> contraption = scene.world()
+            .showIndependentSection(util.select().position(3, 2, 3), Direction.DOWN);
         scene.idle(10);
         scene.world().glueBlockOnto(util.grid().at(2, 2, 3), Direction.EAST, contraption);
         scene.world().toggleRedstonePower(util.select().fromTo(3, 1, 1, 3, 1, 3));
         scene.effects().indicateRedstone(util.grid().at(3, 1, 1));
         scene.idle(10);
 
-        ElementLink<MinecartElement> cart = scene.special().createCart(util.vector().topOf(util.grid().at(4, 0, 3)), 0, EntityType.MINECART::create);
+        ElementLink<MinecartElement> cart = scene.special()
+            .createCart(util.vector().topOf(util.grid().at(4, 0, 3)), 0, EntityType.MINECART::create);
         scene.idle(20);
         scene.special().moveCart(cart, util.vector().of(-1, 0, 0), 10);
         scene.idle(10);
-        ElementLink<WorldSectionElement> anchor = scene.world().showIndependentSectionImmediately(util.select().position(assemblerPos.south()));
+        ElementLink<WorldSectionElement> anchor = scene.world()
+            .showIndependentSectionImmediately(util.select().position(assemblerPos.south()));
         scene.world().moveSection(anchor, util.vector().of(0, 0, -1), 0);
         scene.idle(1);
 
@@ -221,11 +234,13 @@ public class CartAssemblerScenes {
         scene.idle(15);
         scene.world().setKineticSpeed(util.select().position(2, 2, 3), 0);
 
-        scene.overlay().showText(80).attachKeyFrame().text("Cart Contraptions will rotate to face towards their carts' motion")
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("Cart Contraptions will rotate to face towards their carts' motion")
             .pointAt(util.vector().of(1.5, 2.5, 0)).placeNearTarget();
         scene.idle(90);
 
-        scene.overlay().showText(80).attachKeyFrame().text("This Arrow indicates which side of the Structure will be considered the front")
+        scene.overlay().showText(80).attachKeyFrame()
+            .text("This Arrow indicates which side of the Structure will be considered the front")
             .pointAt(util.vector().topOf(assemblerPos)).placeNearTarget();
         scene.idle(90);
 
@@ -238,7 +253,8 @@ public class CartAssemblerScenes {
         scene.overlay().showFilterSlotInput(blockSurface, Direction.NORTH, 60);
         scene.overlay().showControls(blockSurface, Pointing.DOWN, 60).rightClick();
         scene.idle(10);
-        scene.overlay().showText(60).pointAt(util.vector().of(3, 1.5, 3)).placeNearTarget().sharedText("behaviour_modify_value_panel");
+        scene.overlay().showText(60).pointAt(util.vector().of(3, 1.5, 3)).placeNearTarget()
+            .sharedText("behaviour_modify_value_panel");
         scene.idle(70);
 
         contraption = scene.world().showIndependentSection(util.select().fromTo(3, 2, 3, 2, 2, 3), Direction.DOWN);
@@ -268,8 +284,8 @@ public class CartAssemblerScenes {
         scene.world().setKineticSpeed(util.select().position(2, 2, 3), 0);
 
         scene.overlay().showText(80).attachKeyFrame()
-            .text("If the Assembler is set to Lock Rotation, the contraptions' orientation will never change").pointAt(util.vector().of(0, 2.5, 1.5))
-            .placeNearTarget();
+            .text("If the Assembler is set to Lock Rotation, the contraptions' orientation will never change")
+            .pointAt(util.vector().of(0, 2.5, 1.5)).placeNearTarget();
         scene.idle(90);
     }
 
@@ -297,7 +313,8 @@ public class CartAssemblerScenes {
         scene.idle(5);
         scene.world().showSection(util.select().fromTo(2, 1, 3, 2, 1, 2), Direction.SOUTH);
         scene.idle(5);
-        ElementLink<MinecartElement> cart = scene.special().createCart(util.vector().topOf(assembler1.below()), 0, EntityType.MINECART::create);
+        ElementLink<MinecartElement> cart = scene.special()
+            .createCart(util.vector().topOf(assembler1.below()), 0, EntityType.MINECART::create);
         ElementLink<MinecartElement> cart2 = scene.special()
             .createCart(util.vector().topOf(assembler2.below()), 0, EntityType.CHEST_MINECART::create);
         scene.idle(15);
@@ -324,8 +341,8 @@ public class CartAssemblerScenes {
             .text("Whenever two Cart Assemblers share an attached structure...").attachKeyFrame();
         scene.idle(70);
 
-        scene.overlay().showText(60).pointAt(util.vector().blockSurface(util.grid().at(2, 1, 4), Direction.NORTH)).placeNearTarget()
-            .text("Powering either of them will create a Carriage Contraption");
+        scene.overlay().showText(60).pointAt(util.vector().blockSurface(util.grid().at(2, 1, 4), Direction.NORTH))
+            .placeNearTarget().text("Powering either of them will create a Carriage Contraption");
         scene.idle(70);
 
         scene.effects().indicateRedstone(util.grid().at(2, 1, 2));
@@ -377,7 +394,8 @@ public class CartAssemblerScenes {
         scene.special().rotateCart(cart2, -45, 2);
         scene.idle(10);
 
-        scene.overlay().showText(70).attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(1, 1, 3), Direction.WEST)).placeNearTarget()
+        scene.overlay().showText(70).attachKeyFrame()
+            .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 3), Direction.WEST)).placeNearTarget()
             .text("The carts will behave like those connected via Minecart Coupling");
         scene.idle(80);
 
@@ -401,8 +419,8 @@ public class CartAssemblerScenes {
         Selection chassis = util.select().fromTo(4, 2, 3, 2, 2, 3);
 
         scene.idle(5);
-        scene.overlay().showText(70).attachKeyFrame().pointAt(util.vector().blockSurface(assembler, Direction.DOWN)).placeNearTarget()
-            .text("Cart Assemblers on Regular Tracks will not affect the passing carts' motion");
+        scene.overlay().showText(70).attachKeyFrame().pointAt(util.vector().blockSurface(assembler, Direction.DOWN))
+            .placeNearTarget().text("Cart Assemblers on Regular Tracks will not affect the passing carts' motion");
         scene.idle(10);
         scene.world().setBlock(
             assembler,
@@ -414,7 +432,8 @@ public class CartAssemblerScenes {
 
         ElementLink<MinecartElement> cart = scene.special()
             .createCart(util.vector().topOf(assembler.east(2).below()), 0, EntityType.MINECART::create);
-        ElementLink<WorldSectionElement> anchor = scene.world().showIndependentSection(util.select().position(assembler.south()), Direction.DOWN);
+        ElementLink<WorldSectionElement> anchor = scene.world()
+            .showIndependentSection(util.select().position(assembler.south()), Direction.DOWN);
         ElementLink<WorldSectionElement> contraption = scene.world()
             .showIndependentSection(util.select().position(assembler.south().above()), Direction.DOWN);
         scene.world().moveSection(contraption, util.vector().of(2, 0, -1), 0);
@@ -429,7 +448,8 @@ public class CartAssemblerScenes {
         scene.world().moveSection(anchor, util.vector().of(0, -3, 0), 0);
         scene.idle(30);
 
-        scene.overlay().showControls(util.vector().topOf(assembler), Pointing.DOWN, 50).withItem(new ItemStack(Items.POWERED_RAIL));
+        scene.overlay().showControls(util.vector().topOf(assembler), Pointing.DOWN, 50)
+            .withItem(new ItemStack(Items.POWERED_RAIL));
         scene.idle(7);
         scene.world().setBlock(
             assembler,
@@ -442,9 +462,11 @@ public class CartAssemblerScenes {
         scene.idle(110);
 
         scene.world().hideIndependentSection(anchor, Direction.DOWN);
-        cart = scene.special().createCart(util.vector().topOf(assembler.east(2).below()), 0, EntityType.MINECART::create);
+        cart = scene.special()
+            .createCart(util.vector().topOf(assembler.east(2).below()), 0, EntityType.MINECART::create);
         anchor = scene.world().showIndependentSection(util.select().position(assembler.south()), Direction.DOWN);
-        contraption = scene.world().showIndependentSection(util.select().position(assembler.south().above()), Direction.DOWN);
+        contraption = scene.world()
+            .showIndependentSection(util.select().position(assembler.south().above()), Direction.DOWN);
         scene.world().moveSection(contraption, util.vector().of(2, 0, -1), 0);
         scene.world().moveSection(anchor, util.vector().of(2, 0, -1), 0);
         scene.idle(10);
@@ -468,7 +490,8 @@ public class CartAssemblerScenes {
         scene.world().hideIndependentSection(contraption, Direction.UP);
         scene.idle(20);
 
-        cart = scene.special().createCart(util.vector().topOf(assembler.east(2).below()), 0, EntityType.FURNACE_MINECART::create);
+        cart = scene.special()
+            .createCart(util.vector().topOf(assembler.east(2).below()), 0, EntityType.FURNACE_MINECART::create);
         scene.idle(10);
         scene.overlay().showText(50).attachKeyFrame().pointAt(util.vector().topOf(assembler.east(2))).placeNearTarget()
             .text("Other types of Minecarts can be used as the anchor");
@@ -478,13 +501,16 @@ public class CartAssemblerScenes {
         scene.world().glueBlockOnto(assembler.above(2), Direction.DOWN, contraption);
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().topOf(assembler.above()), Pointing.UP, 40).withItem(new ItemStack(Items.CHARCOAL));
+        scene.overlay().showControls(util.vector().topOf(assembler.above()), Pointing.UP, 40)
+            .withItem(new ItemStack(Items.CHARCOAL));
         scene.idle(7);
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(assembler.above(2), Direction.WEST)).placeNearTarget()
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(assembler.above(2), Direction.WEST))
+            .placeNearTarget()
             .text("Furnace Carts will keep themselves powered, pulling fuel from any attached inventories");
         scene.idle(85);
 
-        ParticleEmitter smoke = scene.effects().simpleParticleEmitter(ParticleTypes.LARGE_SMOKE, util.vector().of(0, 0, 0));
+        ParticleEmitter smoke = scene.effects()
+            .simpleParticleEmitter(ParticleTypes.LARGE_SMOKE, util.vector().of(0, 0, 0));
 
         scene.special().moveCart(cart, util.vector().of(-5, 0, 0), 50);
         scene.idle(20);

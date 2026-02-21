@@ -53,7 +53,14 @@ public class FanBlastingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         AllGuiTextures.JEI_SHADOW.render(context, 42, 23);
         AllGuiTextures.JEI_LIGHT.render(context, 61, 35);
         AllGuiTextures.JEI_LONG_ARROW.render(context, 50, 47);

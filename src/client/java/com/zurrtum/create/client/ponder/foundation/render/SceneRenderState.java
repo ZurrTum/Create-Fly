@@ -8,10 +8,9 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record SceneRenderState(
-    int id, PonderScene scene, int width, int height, double slide, boolean userViewMode, LerpedFloat finishingFlash, float partialTicks,
-    Matrix3x2f pose, int x1, int y1, ScreenRectangle bounds
-) implements PictureInPictureRenderState {
+public record SceneRenderState(int id, PonderScene scene, int width, int height, double slide, boolean userViewMode,
+                               LerpedFloat finishingFlash, float partialTicks, Matrix3x2f pose, int x1, int y1,
+                               ScreenRectangle bounds) implements PictureInPictureRenderState {
     public SceneRenderState(
         int id,
         PonderScene scene,

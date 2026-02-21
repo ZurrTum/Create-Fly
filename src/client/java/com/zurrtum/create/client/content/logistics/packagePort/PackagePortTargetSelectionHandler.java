@@ -47,19 +47,24 @@ public class PackagePortTargetSelectionHandler {
     public static boolean onUse(Minecraft mc) {
         HitResult hitResult = mc.hitResult;
 
-        if (hitResult == null || hitResult.getType() == Type.MISS)
+        if (hitResult == null || hitResult.getType() == Type.MISS) {
             return false;
-        if (!(hitResult instanceof BlockHitResult bhr))
+        }
+        if (!(hitResult instanceof BlockHitResult bhr)) {
             return false;
+        }
 
         BlockPos pos = bhr.getBlockPos();
-        if (!(mc.level.getBlockEntity(pos) instanceof StationBlockEntity sbe))
+        if (!(mc.level.getBlockEntity(pos) instanceof StationBlockEntity sbe)) {
             return false;
-        if (sbe.edgePoint == null)
+        }
+        if (sbe.edgePoint == null) {
             return false;
+        }
         ItemStack mainHandItem = mc.player.getMainHandItem();
-        if (!mainHandItem.is(AllItemTags.POSTBOXES))
+        if (!mainHandItem.is(AllItemTags.POSTBOXES)) {
             return false;
+        }
 
         PackagePortTargetSelectionHandler.exactPositionOfTarget = Vec3.atCenterOf(pos);
         PackagePortTargetSelectionHandler.activePackageTarget = new PackagePortTarget.TrainStationFrogportTarget(pos);
@@ -74,58 +79,71 @@ public class PackagePortTargetSelectionHandler {
         boolean isWrench = stack.is(AllItemTags.TOOLS_WRENCH);
 
         if (!isWrench) {
-            if (activePackageTarget == null)
+            if (activePackageTarget == null) {
                 return;
-            if (!stack.is(AllItems.PACKAGE_FROGPORT) && !isPostbox)
+            }
+            if (!stack.is(AllItems.PACKAGE_FROGPORT) && !isPostbox) {
                 return;
+            }
         }
 
         HitResult objectMouseOver = mc.hitResult;
-        if (!(objectMouseOver instanceof BlockHitResult blockRayTraceResult))
+        if (!(objectMouseOver instanceof BlockHitResult blockRayTraceResult)) {
             return;
+        }
 
         if (isWrench) {
-            if (blockRayTraceResult.getType() == Type.MISS)
+            if (blockRayTraceResult.getType() == Type.MISS) {
                 return;
+            }
             BlockPos pos = blockRayTraceResult.getBlockPos();
-            if (!(mc.level.getBlockEntity(pos) instanceof PackagePortBlockEntity ppbe))
+            if (!(mc.level.getBlockEntity(pos) instanceof PackagePortBlockEntity ppbe)) {
                 return;
-            if (ppbe.target == null)
+            }
+            if (ppbe.target == null) {
                 return;
+            }
             Vec3 source = Vec3.atBottomCenterOf(pos);
             Vec3 target = ppbe.target.getExactTargetLocation(ppbe, mc.level, pos);
-            if (target == Vec3.ZERO)
+            if (target == Vec3.ZERO) {
                 return;
+            }
             Color color = new Color(0x9ede73);
             animateConnection(mc, source, target, color);
-            Outliner.getInstance().chaseAABB("ChainPointSelected", new AABB(target, target)).colored(color).lineWidth(1 / 5f).disableLineNormals();
+            Outliner.getInstance().chaseAABB("ChainPointSelected", new AABB(target, target)).colored(color)
+                .lineWidth(1 / 5f).disableLineNormals();
             return;
         }
 
         Vec3 target = exactPositionOfTarget;
         if (blockRayTraceResult.getType() == Type.MISS) {
-            Outliner.getInstance().chaseAABB("ChainPointSelected", new AABB(target, target)).colored(0x9ede73).lineWidth(1 / 5f).disableLineNormals();
+            Outliner.getInstance().chaseAABB("ChainPointSelected", new AABB(target, target)).colored(0x9ede73)
+                .lineWidth(1 / 5f).disableLineNormals();
             return;
         }
 
         BlockPos pos = blockRayTraceResult.getBlockPos();
-        if (!mc.level.getBlockState(pos).canBeReplaced())
+        if (!mc.level.getBlockState(pos).canBeReplaced()) {
             pos = pos.relative(blockRayTraceResult.getDirection());
+        }
 
         String validateDiff = validateDiff(target, pos);
         boolean valid = validateDiff == null;
         Color color = new Color(valid ? 0x9ede73 : 0xff7171);
         Vec3 source = Vec3.atBottomCenterOf(pos);
 
-        CreateLang.translate(validateDiff != null ? validateDiff : "package_port.valid").color(color.getRGB()).sendStatus(player);
+        CreateLang.translate(validateDiff != null ? validateDiff : "package_port.valid").color(color.getRGB())
+            .sendStatus(player);
 
-        Outliner.getInstance().chaseAABB("ChainPointSelected", new AABB(target, target)).colored(color).lineWidth(1 / 5f).disableLineNormals();
+        Outliner.getInstance().chaseAABB("ChainPointSelected", new AABB(target, target)).colored(color)
+            .lineWidth(1 / 5f).disableLineNormals();
 
-        if (!mc.level.getBlockState(pos).canBeReplaced())
+        if (!mc.level.getBlockState(pos).canBeReplaced()) {
             return;
+        }
 
-        Outliner.getInstance().chaseAABB("TargetedFrogPos", new AABB(pos).contract(0, 1, 0).deflate(0.125, 0, 0.125)).colored(color)
-            .lineWidth(1 / 16f).disableLineNormals();
+        Outliner.getInstance().chaseAABB("TargetedFrogPos", new AABB(pos).contract(0, 1, 0).deflate(0.125, 0, 0.125))
+            .colored(color).lineWidth(1 / 16f).disableLineNormals();
 
         animateConnection(mc, source, target, color);
 
@@ -149,10 +167,12 @@ public class PackagePortTargetSelectionHandler {
     public static String validateDiff(Vec3 target, BlockPos placedPos) {
         Vec3 source = Vec3.atBottomCenterOf(placedPos);
         Vec3 diff = target.subtract(source);
-        if (diff.y < 0 && !isPostbox)
+        if (diff.y < 0 && !isPostbox) {
             return "package_port.cannot_reach_down";
-        if (diff.length() > AllConfigs.server().logistics.packagePortRange.get())
+        }
+        if (diff.length() > AllConfigs.server().logistics.packagePortRange.get()) {
             return "package_port.too_far";
+        }
         return null;
     }
 

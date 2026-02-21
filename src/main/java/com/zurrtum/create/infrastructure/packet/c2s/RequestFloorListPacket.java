@@ -12,8 +12,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record RequestFloorListPacket(int entityId) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<ByteBuf, RequestFloorListPacket> CODEC = ByteBufCodecs.INT.map(
-        RequestFloorListPacket::new,
+    public static final StreamCodec<ByteBuf, RequestFloorListPacket> CODEC = ByteBufCodecs.INT.map(RequestFloorListPacket::new,
         RequestFloorListPacket::entityId
     );
 

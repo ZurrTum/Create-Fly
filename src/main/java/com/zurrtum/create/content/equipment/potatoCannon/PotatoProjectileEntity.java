@@ -69,17 +69,19 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
         this.stack = stack;
         RegistryAccess registryManager = registryAccess();
         type = PotatoCannonProjectileType.getTypeForItem(registryManager, stack.getItem())
-            .orElseGet(() -> registryManager.lookupOrThrow(CreateRegistryKeys.POTATO_PROJECTILE_TYPE).getOrThrow(AllPotatoProjectileTypes.FALLBACK))
-            .value();
+            .orElseGet(() -> registryManager.lookupOrThrow(CreateRegistryKeys.POTATO_PROJECTILE_TYPE)
+                .getOrThrow(AllPotatoProjectileTypes.FALLBACK)).value();
     }
 
     public void setEnchantmentEffectsFromCannon(ItemStack cannon) {
         Registry<Enchantment> enchantmentRegistry = registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
 
-        int recovery = cannon.getEnchantments().getLevel(enchantmentRegistry.getOrThrow(AllEnchantments.POTATO_RECOVERY));
+        int recovery = cannon.getEnchantments()
+            .getLevel(enchantmentRegistry.getOrThrow(AllEnchantments.POTATO_RECOVERY));
 
-        if (recovery > 0)
+        if (recovery > 0) {
             recoveryChance = .125f + recovery * .125f;
+        }
     }
 
     public ItemStack getItem() {
@@ -113,10 +115,12 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
 
     @Nullable
     public Entity getStuckEntity() {
-        if (stuckEntity == null)
+        if (stuckEntity == null) {
             return null;
-        if (!stuckEntity.isAlive())
+        }
+        if (!stuckEntity.isAlive()) {
             return null;
+        }
         return stuckEntity;
     }
 
@@ -129,8 +133,9 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
     }
 
     public PotatoProjectileRenderMode getRenderMode() {
-        if (getStuckEntity() != null)
+        if (getStuckEntity() != null) {
             return stuckRenderer;
+        }
 
         return type.renderMode();
     }
@@ -181,8 +186,9 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
     protected void onHitEntity(EntityHitResult ray) {
         super.onHitEntity(ray);
 
-        if (getStuckEntity() != null)
+        if (getStuckEntity() != null) {
             return;
+        }
 
         Vec3 hit = ray.getLocation();
         Entity target = ray.getEntity();
@@ -190,33 +196,41 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
         float knockback = type.knockback() + additionalKnockback;
         Entity owner = this.getOwner();
 
-        if (!target.isAlive())
+        if (!target.isAlive()) {
             return;
-        if (owner instanceof LivingEntity entity)
+        }
+        if (owner instanceof LivingEntity entity) {
             entity.setLastHurtMob(target);
+        }
 
         if (target instanceof PotatoProjectileEntity ppe) {
-            if (tickCount < 10 && target.tickCount < 10)
+            if (tickCount < 10 && target.tickCount < 10) {
                 return;
+            }
             if (ppe.getProjectileType() != getProjectileType()) {
-                if (owner instanceof ServerPlayer p)
+                if (owner instanceof ServerPlayer p) {
                     AllAdvancements.POTATO_CANNON_COLLIDE.trigger(p);
-                if (ppe.getOwner() instanceof ServerPlayer p)
+                }
+                if (ppe.getOwner() instanceof ServerPlayer p) {
                     AllAdvancements.POTATO_CANNON_COLLIDE.trigger(p);
+                }
             }
         }
 
         pop(hit);
 
-        if (target instanceof WitherBoss wither && wither.isPowered())
+        if (target instanceof WitherBoss wither && wither.isPowered()) {
             return;
-        if (type.preEntityHit(stack, ray))
+        }
+        if (type.preEntityHit(stack, ray)) {
             return;
+        }
 
         boolean targetIsEnderman = target.getType() == EntityType.ENDERMAN;
         int k = target.getRemainingFireTicks();
-        if (this.isOnFire() && !targetIsEnderman)
+        if (this.isOnFire() && !targetIsEnderman) {
             target.igniteForSeconds(5);
+        }
 
         Level world = level();
         boolean onServer = !world.isClientSide();
@@ -227,8 +241,9 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
             return;
         }
 
-        if (targetIsEnderman)
+        if (targetIsEnderman) {
             return;
+        }
 
         if (!type.onEntityHit(stack, ray) && onServer) {
             if (random.nextDouble() <= recoveryChance) {
@@ -246,13 +261,15 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
             return;
         }
 
-        if (type.reloadTicks() < 10)
+        if (type.reloadTicks() < 10) {
             livingentity.invulnerableTime = type.reloadTicks() + 10;
+        }
 
         if (onServer && knockback > 0) {
             Vec3 appliedMotion = getDeltaMovement().multiply(1.0D, 0.0D, 1.0D).normalize();
-            if (appliedMotion.lengthSqr() > 0.0D)
+            if (appliedMotion.lengthSqr() > 0.0D) {
                 livingentity.knockback(knockback * 0.6, -appliedMotion.x, -appliedMotion.z);
+            }
         }
 
         if (onServer && owner instanceof LivingEntity) {
@@ -267,8 +284,10 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
         }
 
         if (onServer && owner instanceof ServerPlayer serverplayerentity) {
-            if (!target.isAlive() && target.getType().getCategory() == MobCategory.MONSTER || (target instanceof Player && target != owner))
+            if (!target.isAlive() && target.getType()
+                .getCategory() == MobCategory.MONSTER || (target instanceof Player && target != owner)) {
                 AllAdvancements.POTATO_CANNON.trigger(serverplayerentity);
+            }
         }
 
         if (type.sticky() && target.isAlive()) {
@@ -280,8 +299,9 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
     }
 
     private void recoverItem() {
-        if (!stack.isEmpty() && level() instanceof ServerLevel serverWorld)
+        if (!stack.isEmpty() && level() instanceof ServerLevel serverWorld) {
             spawnAtLocation(serverWorld, stack.copyWithCount(1));
+        }
     }
 
     public static void playHitSound(Level world, Vec3 location) {
@@ -313,10 +333,12 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
 
     @Override
     public boolean hurtServer(ServerLevel world, @NotNull DamageSource source, float amt) {
-        if (source.is(DamageTypeTags.IS_FIRE))
+        if (source.is(DamageTypeTags.IS_FIRE)) {
             return false;
-        if (isInvulnerableToBase(source))
+        }
+        if (isInvulnerableToBase(source)) {
             return false;
+        }
         pop(position());
         kill(world);
         return true;
@@ -326,11 +348,20 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
         if (!stack.isEmpty()) {
             for (int i = 0; i < 7; i++) {
                 Vec3 m = VecHelper.offsetRandomly(Vec3.ZERO, this.random, .25f);
-                level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), hit.x, hit.y, hit.z, m.x, m.y, m.z);
+                level().addParticle(
+                    new ItemParticleOption(ParticleTypes.ITEM, stack),
+                    hit.x,
+                    hit.y,
+                    hit.z,
+                    m.x,
+                    m.y,
+                    m.z
+                );
             }
         }
-        if (!level().isClientSide())
+        if (!level().isClientSide()) {
             playHitSound(level(), position());
+        }
     }
 
     private DamageSource causePotatoDamage() {
@@ -339,7 +370,10 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entityTrackerEntry) {
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            problemPath(),
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
             addAdditionalSaveData(view);
             return new NbtSpawnPacket(this, entityTrackerEntry, view.buildResult());
@@ -353,7 +387,10 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
         if (nbt == null) {
             return;
         }
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            problemPath(),
+            Create.LOGGER
+        )) {
             readAdditionalSaveData(TagValueInput.create(logging, registryAccess(), nbt));
         }
     }

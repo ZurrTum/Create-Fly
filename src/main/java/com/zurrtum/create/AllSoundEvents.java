@@ -1,8 +1,5 @@
 package com.zurrtum.create;
 
-import static com.zurrtum.create.Create.MOD_ID;
-import static net.minecraft.sounds.SoundSource.*;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,16 +11,38 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import static com.zurrtum.create.Create.MOD_ID;
+import static net.minecraft.sounds.SoundSource.*;
+
 public class AllSoundEvents {
-    public static final SoundEntry SCHEMATICANNON_LAUNCH_BLOCK = register("schematicannon_launch_block", BLOCKS, .1f, 1.1f);
+    public static final SoundEntry SCHEMATICANNON_LAUNCH_BLOCK = register(
+        "schematicannon_launch_block",
+        BLOCKS,
+        .1f,
+        1.1f
+    );
     public static final SoundEntry SCHEMATICANNON_FINISH = register("schematicannon_finish", BLOCKS, 1, .7f);
     public static final SoundEntry DEPOT_SLIDE = register("depot_slide", BLOCKS, .125f, 1.5f);
     public static final SoundEntry DEPOT_PLOP = register("depot_plop", BLOCKS, .25f, 1.25f);
     public static final SoundEntry FUNNEL_FLAP = register("funnel_flap", BLOCKS, .125f, 1.5f, .0425f, .75f);
     public static final SoundEntry PACKAGER = register("packager", BLOCKS, 0.5f, 0.75f);
     public static final SoundEntry SLIME_ADDED = register("slime_added", BLOCKS);
-    public static final SoundEntry MECHANICAL_PRESS_ACTIVATION = register("mechanical_press_activation", BLOCKS, .125f, 1f, .5f, 1f);
-    public static final SoundEntry MECHANICAL_PRESS_ACTIVATION_ON_BELT = register("mechanical_press_activation_belt", BLOCKS, .75f, 1f, .15f, .75f);
+    public static final SoundEntry MECHANICAL_PRESS_ACTIVATION = register(
+        "mechanical_press_activation",
+        BLOCKS,
+        .125f,
+        1f,
+        .5f,
+        1f
+    );
+    public static final SoundEntry MECHANICAL_PRESS_ACTIVATION_ON_BELT = register(
+        "mechanical_press_activation_belt",
+        BLOCKS,
+        .75f,
+        1f,
+        .15f,
+        .75f
+    );
     public static final SoundEntry MIXING = register("mixing", BLOCKS, .125f, .5f, .125f, .5f);
     public static final SoundEntry SPOUTING = register("spout", BLOCKS);
     public static final SoundEntry CRANKING = register("cranking", BLOCKS, .075f, .5f, .025f, .5f);
@@ -41,7 +60,14 @@ public class AllSoundEvents {
     public static final SoundEntry STOCK_LINK = register("stock_link", BLOCKS);
     public static final SoundEntry FROGPORT_DEPOSIT = register("frogport_deposit", BLOCKS);
     public static final SoundEntry POTATO_HIT = register("potato_hit", PLAYERS, .75f, .75f, .75f, 1.25f);
-    public static final SoundEntry CONTRAPTION_ASSEMBLE = register("contraption_assemble", BLOCKS, .5f, .5f, .045f, .74f);
+    public static final SoundEntry CONTRAPTION_ASSEMBLE = register(
+        "contraption_assemble",
+        BLOCKS,
+        .5f,
+        .5f,
+        .045f,
+        .74f
+    );
     public static final SoundEntry CONTRAPTION_DISASSEMBLE = register("contraption_disassemble", BLOCKS, .35f, .75f);
     public static final SoundEntry WRENCH_ROTATE = register("wrench_rotate", BLOCKS, .25f, 1.25f);
     public static final SoundEntry WRENCH_REMOVE = register("wrench_remove", BLOCKS, .25f, .75f, .25f, .75f);
@@ -90,10 +116,18 @@ public class AllSoundEvents {
         Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, name);
         int count = data.length / 2;
         CompiledSoundEvent[] compiledEvents = new CompiledSoundEvent[count];
-        SoundEvent event = Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
+        SoundEvent event = Registry.register(
+            BuiltInRegistries.SOUND_EVENT,
+            id,
+            SoundEvent.createVariableRangeEvent(id)
+        );
         compiledEvents[0] = new CompiledSoundEvent(event, data[0], data[1]);
         for (int i = 2, j = 1; j < count; i += 2, j++) {
-            event = Registry.register(BuiltInRegistries.SOUND_EVENT, id.withSuffix("_compounded_" + j), SoundEvent.createVariableRangeEvent(id));
+            event = Registry.register(
+                BuiltInRegistries.SOUND_EVENT,
+                id.withSuffix("_compounded_" + j),
+                SoundEvent.createVariableRangeEvent(id)
+            );
             compiledEvents[j] = new CompiledSoundEvent(event, data[i], data[i + 1]);
         }
         return new SoundEntry(category, compiledEvents);
@@ -133,8 +167,9 @@ public class AllSoundEvents {
         }
 
         public void playFrom(Entity entity, float volume, float pitch) {
-            if (!entity.isSilent())
+            if (!entity.isSilent()) {
                 play(entity.level(), null, entity.blockPosition(), volume, pitch);
+            }
         }
 
         public void play(Level world, Player entity, Vec3i pos, float volume, float pitch) {
@@ -155,11 +190,29 @@ public class AllSoundEvents {
     }
 
     private record CompiledSoundEvent(SoundEvent event, float volume, float pitch) {
-        public void play(Level world, Player entity, double x, double y, double z, SoundSource category, float volume, float pitch) {
+        public void play(
+            Level world,
+            Player entity,
+            double x,
+            double y,
+            double z,
+            SoundSource category,
+            float volume,
+            float pitch
+        ) {
             world.playSound(entity, x, y, z, event(), category, volume() * volume, pitch() * pitch);
         }
 
-        public void playAt(Level world, double x, double y, double z, SoundSource category, float volume, float pitch, boolean fade) {
+        public void playAt(
+            Level world,
+            double x,
+            double y,
+            double z,
+            SoundSource category,
+            float volume,
+            float pitch,
+            boolean fade
+        ) {
             world.playLocalSound(x, y, z, event(), category, volume() * volume, pitch() * pitch, fade);
         }
     }

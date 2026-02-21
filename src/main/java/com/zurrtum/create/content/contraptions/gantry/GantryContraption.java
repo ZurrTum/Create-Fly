@@ -25,8 +25,9 @@ public class GantryContraption extends TranslatingContraption {
 
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
-        if (!searchMovedStructure(world, pos, null))
+        if (!searchMovedStructure(world, pos, null)) {
             return false;
+        }
         startMoving(world);
         return true;
     }

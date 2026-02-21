@@ -1,17 +1,16 @@
 package com.zurrtum.create.content.trains.display;
 
 import com.google.common.base.Strings;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class FlapDisplaySection {
     static final Map<String, String[]> LOADED_FLAP_CYCLES = new HashMap<>();
@@ -60,38 +59,46 @@ public class FlapDisplaySection {
     }
 
     public void refresh(boolean transition) {
-        if (component == null)
+        if (component == null) {
             return;
+        }
 
         String newText = component.getString();
 
         if (!singleFlap) {
-            if (rightAligned)
+            if (rightAligned) {
                 newText = newText.trim();
+            }
             newText = newText.toUpperCase(Locale.ROOT);
             newText = newText.substring(0, Math.min(spinning.length, newText.length()));
             String whitespace = Strings.repeat(" ", spinning.length - newText.length());
             newText = rightAligned ? whitespace + newText : newText + whitespace;
-            if (!text.isEmpty())
-                for (int i = 0; i < spinning.length; i++)
+            if (!text.isEmpty()) {
+                for (int i = 0; i < spinning.length; i++) {
                     spinning[i] |= transition && text.charAt(i) != newText.charAt(i);
-        } else if (!text.isEmpty())
+                }
+            }
+        } else if (!text.isEmpty()) {
             spinning[0] |= transition && !newText.equals(text);
+        }
 
         text = newText;
         spinningTicks = 0;
     }
 
     public int tick(boolean instant, RandomSource random) {
-        if (cyclingOptions == null)
+        if (cyclingOptions == null) {
             return 0;
+        }
         int max = Math.max(4, (int) (cyclingOptions.length * 1.75f));
-        if (spinningTicks > max)
+        if (spinningTicks > max) {
             return 0;
+        }
 
         spinningTicks++;
-        if (spinningTicks <= max && spinningTicks < 2)
+        if (spinningTicks <= max && spinningTicks < 2) {
             return spinningTicks == 1 ? 0 : spinning.length;
+        }
 
         int spinningFlaps = 0;
         for (int i = 0; i < spinning.length; i++) {
@@ -100,15 +107,19 @@ public class FlapDisplaySection {
             continueSpin &= max > 5 || spinningTicks < 2;
             spinning[i] &= continueSpin;
 
-            if (i > 0 && random.nextInt(3) > 0)
+            if (i > 0 && random.nextInt(3) > 0) {
                 spinning[i - 1] &= continueSpin;
-            if (i < spinning.length - 1 && random.nextInt(3) > 0)
+            }
+            if (i < spinning.length - 1 && random.nextInt(3) > 0) {
                 spinning[i + 1] &= continueSpin;
-            if (spinningTicks > max)
+            }
+            if (spinningTicks > max) {
                 spinning[i] = false;
+            }
 
-            if (spinning[i])
+            if (spinning[i]) {
                 spinningFlaps++;
+            }
         }
 
         return spinningFlaps;
@@ -121,18 +132,24 @@ public class FlapDisplaySection {
     public void write(ValueOutput view) {
         view.putFloat("Width", size);
         view.putString("Cycle", cycle);
-        if (rightAligned)
+        if (rightAligned) {
             view.putBoolean("RightAligned", true);
-        if (singleFlap)
+        }
+        if (singleFlap) {
             view.putBoolean("SingleFlap", true);
-        if (hasGap)
+        }
+        if (hasGap) {
             view.putBoolean("Gap", true);
-        if (wideFlaps)
+        }
+        if (wideFlaps) {
             view.putBoolean("Wide", true);
-        if (component != null)
+        }
+        if (component != null) {
             view.store("Text", ComponentSerialization.CODEC, component);
-        if (sendTransition)
+        }
+        if (sendTransition) {
             view.putBoolean("Transition", true);
+        }
         sendTransition = false;
     }
 
@@ -156,8 +173,9 @@ public class FlapDisplaySection {
 
     public void update(ValueInput view) {
         view.read("Text", ComponentSerialization.CODEC).ifPresent(text -> component = text);
-        if (cyclingOptions == null)
+        if (cyclingOptions == null) {
             cyclingOptions = getFlapCycle(cycle);
+        }
         refresh(view.getBooleanOr("Transition", false));
     }
 
@@ -170,7 +188,10 @@ public class FlapDisplaySection {
     }
 
     public static String[] getFlapCycle(String key) {
-        return LOADED_FLAP_CYCLES.computeIfAbsent(key, k -> Component.translatable("create.flap_display.cycles." + key).getString().split(";"));
+        return LOADED_FLAP_CYCLES.computeIfAbsent(
+            key,
+            k -> Component.translatable("create.flap_display.cycles." + key).getString().split(";")
+        );
     }
 
 }

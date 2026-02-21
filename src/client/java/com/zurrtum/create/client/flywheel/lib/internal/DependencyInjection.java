@@ -17,7 +17,10 @@ public final class DependencyInjection {
         }
 
         if (!apiClass.isAssignableFrom(implClass)) {
-            throw new RuntimeException("Class %s does not implement interface %s".formatted(implClass.getName(), apiClass.getName()));
+            throw new RuntimeException("Class %s does not implement interface %s".formatted(
+                implClass.getName(),
+                apiClass.getName()
+            ));
         }
 
         Constructor<?> implConstructor;

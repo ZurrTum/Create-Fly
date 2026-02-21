@@ -20,11 +20,13 @@ public class ServerBrassDiodeScrollValueBehaviour extends ServerScrollValueBehav
 
     @Override
     public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
-        if (getLevel().isClientSide())
+        if (getLevel().isClientSide()) {
             return;
+        }
         BlockState blockState = blockEntity.getBlockState();
-        if (blockState.getBlock() instanceof BrassDiodeBlock bdb)
+        if (blockState.getBlock() instanceof BrassDiodeBlock bdb) {
             bdb.toggle(getLevel(), getPos(), blockState, player, hand);
+        }
     }
 
     @Override
@@ -35,8 +37,9 @@ public class ServerBrassDiodeScrollValueBehaviour extends ServerScrollValueBehav
             case 1 -> 20;
             default -> 60 * 20;
         };
-        if (!valueSetting.equals(getValueSettings()))
+        if (!valueSetting.equals(getValueSettings())) {
             playFeedbackSound(this);
+        }
         setValue(Math.max(2, Math.max(1, value) * multiplier));
     }
 

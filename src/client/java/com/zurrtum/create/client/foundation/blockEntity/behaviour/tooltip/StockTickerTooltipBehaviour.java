@@ -20,18 +20,23 @@ public class StockTickerTooltipBehaviour extends TooltipBehaviour<StockTickerBlo
     @Override
     public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         StockTickerInventory receivedPayments = blockEntity.receivedPayments;
-        if (receivedPayments.isEmpty())
+        if (receivedPayments.isEmpty()) {
             return false;
-        if (!blockEntity.behaviour.mayAdministrate(Minecraft.getInstance().player))
+        }
+        if (!blockEntity.behaviour.mayAdministrate(Minecraft.getInstance().player)) {
             return false;
+        }
 
         CreateLang.translate("stock_ticker.contains_payments").style(ChatFormatting.WHITE).forGoggles(tooltip);
 
         InventorySummary summary = new InventorySummary();
-        for (int i = 0, size = receivedPayments.getContainerSize(); i < size; i++)
+        for (int i = 0, size = receivedPayments.getContainerSize(); i < size; i++) {
             summary.add(receivedPayments.getItem(i));
-        for (BigItemStack entry : summary.getStacksByCount())
-            CreateLang.builder().text(entry.stack.getHoverName().getString() + " x" + entry.count).style(ChatFormatting.GREEN).forGoggles(tooltip);
+        }
+        for (BigItemStack entry : summary.getStacksByCount()) {
+            CreateLang.builder().text(entry.stack.getHoverName().getString() + " x" + entry.count)
+                .style(ChatFormatting.GREEN).forGoggles(tooltip);
+        }
 
         CreateLang.translate("stock_ticker.click_to_retrieve").style(ChatFormatting.GRAY).forGoggles(tooltip);
         return true;

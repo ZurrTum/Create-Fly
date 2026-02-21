@@ -36,8 +36,9 @@ public class WiFiParticle extends CustomRotationParticle {
     @Override
     public void tick() {
         setSpriteFromAge(sprites);
-        if (age++ >= lifetime)
+        if (age++ >= lifetime) {
             remove();
+        }
     }
 
     @Override

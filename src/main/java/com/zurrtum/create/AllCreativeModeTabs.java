@@ -1,17 +1,17 @@
 package com.zurrtum.create;
 
-import static com.zurrtum.create.Create.MOD_ID;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters;
 import net.minecraft.world.item.CreativeModeTab.Output;
 import net.minecraft.world.item.ItemStack;
+
+import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllCreativeModeTabs {
     public static final ResourceKey<CreativeModeTab> BASE_GROUP = ResourceKey.create(
@@ -27,14 +27,15 @@ public class AllCreativeModeTabs {
         Registry.register(
             BuiltInRegistries.CREATIVE_MODE_TAB,
             BASE_GROUP,
-            CreativeModeTab.builder(null, -1).title(Component.translatable("itemGroup.create.base")).icon(() -> new ItemStack(AllBlocks.COGWHEEL))
-                .displayItems(AllCreativeModeTabs::base).build()
+            CreativeModeTab.builder(null, -1).title(Component.translatable("itemGroup.create.base"))
+                .icon(() -> new ItemStack(AllBlocks.COGWHEEL)).displayItems(AllCreativeModeTabs::base).build()
         );
         Registry.register(
             BuiltInRegistries.CREATIVE_MODE_TAB,
             PALETTES_GROUP,
             CreativeModeTab.builder(null, -1).title(Component.translatable("itemGroup.create.palettes"))
-                .icon(() -> new ItemStack(AllBlocks.ORNATE_IRON_WINDOW)).displayItems(AllCreativeModeTabs::palettes).build()
+                .icon(() -> new ItemStack(AllBlocks.ORNATE_IRON_WINDOW)).displayItems(AllCreativeModeTabs::palettes)
+                .build()
         );
     }
 

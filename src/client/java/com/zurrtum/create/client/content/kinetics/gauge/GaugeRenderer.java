@@ -94,9 +94,11 @@ public class GaugeRenderer extends ShaftRenderer<GaugeBlockEntity, GaugeRenderer
             super.render(matricesEntry, vertexConsumer);
             if (angles != null) {
                 for (float angle : angles) {
-                    dial.rotateCentered(angle, Direction.UP).translate(0, dialPivot, dialPivot).rotate(rotate, Direction.EAST)
-                        .translate(0, -dialPivot, -dialPivot).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-                    head.rotateCentered(angle, Direction.UP).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+                    dial.rotateCentered(angle, Direction.UP).translate(0, dialPivot, dialPivot)
+                        .rotate(rotate, Direction.EAST).translate(0, -dialPivot, -dialPivot).light(lightCoords)
+                        .renderInto(matricesEntry, vertexConsumer);
+                    head.rotateCentered(angle, Direction.UP).light(lightCoords)
+                        .renderInto(matricesEntry, vertexConsumer);
                 }
             }
         }

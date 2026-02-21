@@ -29,8 +29,9 @@ public class PoweredShaftBlockEntity extends GeneratingKineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (initialTicks > 0)
+        if (initialTicks > 0) {
             initialTicks--;
+        }
     }
 
     public void update(BlockPos sourcePos, int direction, float efficiency) {
@@ -39,8 +40,9 @@ public class PoweredShaftBlockEntity extends GeneratingKineticBlockEntity {
         float prev = engineEfficiency;
         engineEfficiency = efficiency;
         int prevDirection = this.movementDirection;
-        if (Mth.equal(efficiency, prev) && prevDirection == direction)
+        if (Mth.equal(efficiency, prev) && prevDirection == direction) {
             return;
+        }
 
         capacityKey = level.getBlockState(sourcePos).getBlock();
         this.movementDirection = direction;
@@ -48,8 +50,9 @@ public class PoweredShaftBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     public void remove(BlockPos sourcePos) {
-        if (!isPoweredBy(sourcePos))
+        if (!isPoweredBy(sourcePos)) {
             return;
+        }
 
         enginePos = null;
         engineEfficiency = 0;
@@ -70,8 +73,9 @@ public class PoweredShaftBlockEntity extends GeneratingKineticBlockEntity {
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
         view.putInt("Direction", movementDirection);
-        if (initialTicks > 0)
+        if (initialTicks > 0) {
             view.putInt("Warmup", initialTicks);
+        }
         if (enginePos != null && capacityKey != null) {
             view.store("EnginePos", BlockPos.CODEC, enginePos);
             view.putFloat("EnginePower", engineEfficiency);

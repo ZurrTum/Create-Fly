@@ -18,8 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 public class TrackGraphSyncPacket extends TrackGraphPacket {
-    public static final StreamCodec<FriendlyByteBuf, TrackGraphSyncPacket> CODEC = StreamCodec.ofMember(
-        TrackGraphSyncPacket::write,
+    public static final StreamCodec<FriendlyByteBuf, TrackGraphSyncPacket> CODEC = StreamCodec.ofMember(TrackGraphSyncPacket::write,
         TrackGraphSyncPacket::new
     );
 
@@ -65,8 +64,9 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
         packetDeletesGraph = buffer.readBoolean();
         fullWipe = buffer.readBoolean();
 
-        if (packetDeletesGraph)
+        if (packetDeletesGraph) {
             return;
+        }
 
         DimensionPalette dimensions = DimensionPalette.PACKET_CODEC.decode(buffer);
 
@@ -79,27 +79,35 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
         updatedEdgeData = new HashMap<>();
 
         size = buffer.readVarInt();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             removedNodes.add(buffer.readVarInt());
+        }
 
         size = buffer.readVarInt();
-        for (int i = 0; i < size; i++)
-            addedNodes.put(buffer.readVarInt(), Pair.of(TrackNodeLocation.receive(buffer, dimensions), VecHelper.read(buffer)));
+        for (int i = 0; i < size; i++) {
+            addedNodes.put(
+                buffer.readVarInt(),
+                Pair.of(TrackNodeLocation.receive(buffer, dimensions), VecHelper.read(buffer))
+            );
+        }
 
         size = buffer.readVarInt();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             addedEdges.add(Pair.of(
                 Pair.of(Couple.create(buffer::readVarInt), TrackMaterial.PACKET_CODEC.decode(buffer)),
                 buffer.readBoolean() ? new BezierConnection(buffer) : null
             ));
+        }
 
         size = buffer.readVarInt();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             addedEdgePoints.add(EdgePointType.read(buffer, dimensions));
+        }
 
         size = buffer.readVarInt();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             removedEdgePoints.add(buffer.readUUID());
+        }
 
         size = buffer.readVarInt();
         for (int i = 0; i < size; i++) {
@@ -107,14 +115,16 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
             Couple<Integer> key = Couple.create(buffer::readInt);
             Pair<Integer, List<UUID>> entry = Pair.of(buffer.readVarInt(), list);
             int size2 = buffer.readVarInt();
-            for (int j = 0; j < size2; j++)
+            for (int j = 0; j < size2; j++) {
                 list.add(buffer.readUUID());
+            }
             updatedEdgeData.put(key, entry);
         }
 
         size = buffer.readVarInt();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             splitSubGraphs.put(buffer.readVarInt(), Pair.of(buffer.readInt(), buffer.readUUID()));
+        }
     }
 
     public void write(FriendlyByteBuf buffer) {
@@ -123,8 +133,9 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
         buffer.writeBoolean(packetDeletesGraph);
         buffer.writeBoolean(fullWipe);
 
-        if (packetDeletesGraph)
+        if (packetDeletesGraph) {
             return;
+        }
 
         // Populate and send palette ahead of time
         DimensionPalette dimensions = new DimensionPalette();
@@ -148,8 +159,9 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
             TrackMaterial.PACKET_CODEC.encode(buffer, pair.getFirst().getSecond());
             BezierConnection turn = pair.getSecond();
             buffer.writeBoolean(turn != null);
-            if (turn != null)
+            if (turn != null) {
                 turn.write(buffer);
+            }
         });
 
         buffer.writeVarInt(addedEdgePoints.size());
@@ -181,10 +193,12 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
         List<UUID> list = new ArrayList<>();
         EdgeData edgeData = edge.getEdgeData();
         int groupType = edgeData.hasSignalBoundaries() ? NULL_GROUP : EdgeData.passiveGroup.equals(edgeData.getSingleSignalGroup()) ? PASSIVE_GROUP : GROUP;
-        if (groupType == GROUP)
+        if (groupType == GROUP) {
             list.add(edgeData.getSingleSignalGroup());
-        for (TrackEdgePoint point : edgeData.getPoints())
+        }
+        for (TrackEdgePoint point : edgeData.getPoints()) {
             list.add(point.getId());
+        }
         updatedEdgeData.put(key, Pair.of(groupType, list));
     }
 }

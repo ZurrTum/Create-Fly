@@ -98,7 +98,10 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
                 } else if (axis == Axis.Z) {
                     axis = alongFirst ? Axis.X : Axis.Y;
                 }
-                state.shaft = CachedBuffers.block(KineticBlockEntityRenderer.KINETIC_BLOCK, KineticBlockEntityRenderer.shaft(axis));
+                state.shaft = CachedBuffers.block(
+                    KineticBlockEntityRenderer.KINETIC_BLOCK,
+                    KineticBlockEntityRenderer.shaft(axis)
+                );
             }
             state.angle = Mth.DEG_TO_RAD * KineticBlockEntityVisual.rotationOffset(blockState, axis, context.localPos);
             state.direction = Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
@@ -130,10 +133,11 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            saw.center().rotateY(yRot).rotateX(xRot).rotateZ(zRot).uncenter().light(light).useLevelLight(world, worldMatrix4f)
-                .renderInto(matricesEntry, vertexConsumer);
+            saw.center().rotateY(yRot).rotateX(xRot).rotateZ(zRot).uncenter().light(light)
+                .useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
             if (shaft != null) {
-                shaft.light(light).useLevelLight(world, worldMatrix4f).rotateCentered(angle, direction).renderInto(matricesEntry, vertexConsumer);
+                shaft.light(light).useLevelLight(world, worldMatrix4f).rotateCentered(angle, direction)
+                    .renderInto(matricesEntry, vertexConsumer);
             }
         }
     }

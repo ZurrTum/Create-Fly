@@ -14,7 +14,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.List;
 
-public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, List<BigItemStack> items) implements Packet<ClientGamePacketListener> {
+public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos,
+                                            List<BigItemStack> items) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, LogisticalStockResponsePacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.BOOL,
         LogisticalStockResponsePacket::lastPacket,

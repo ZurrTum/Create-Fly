@@ -76,7 +76,8 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
     }
 
     private TransformedInstance getInstance() {
-        return visualizationContext.instancerProvider().instancer(InstanceTypes.TRANSFORMED, currentModel).createInstance();
+        return visualizationContext.instancerProvider().instancer(InstanceTypes.TRANSFORMED, currentModel)
+            .createInstance();
     }
 
     private void animate(float partialTick) {

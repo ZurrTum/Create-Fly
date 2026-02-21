@@ -2,6 +2,7 @@ package com.zurrtum.create.content.schematics.cannon;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.schematics.SchematicPrinter;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
@@ -123,12 +123,14 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         for (Direction facing : Iterate.directions) {
 
             BlockPos target = worldPosition.relative(facing);
-            if (!level.isLoaded(target))
+            if (!level.isLoaded(target)) {
                 continue;
+            }
 
             BlockState state = level.getBlockState(target);
-            if (state.is(AllBlocks.CREATIVE_CRATE))
+            if (state.is(AllBlocks.CREATIVE_CRATE)) {
                 hasCreativeCrate = true;
+            }
 
             BlockEntity blockEntity = level.getBlockEntity(target);
             if (blockEntity != null) {
@@ -238,18 +240,24 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         view.putInt("AmountPlaced", blocksPlaced);
         view.putInt("AmountToPlace", blocksToPlace);
 
-        if (missingItem != null)
+        if (missingItem != null) {
             view.store("MissingItem", ItemStack.OPTIONAL_CODEC, missingItem);
+        }
 
         // Settings
-        view.store("Options", SchematicannonOptions.CODEC, new SchematicannonOptions(replaceMode, skipMissing, replaceBlockEntities));
+        view.store(
+            "Options",
+            SchematicannonOptions.CODEC,
+            new SchematicannonOptions(replaceMode, skipMissing, replaceBlockEntities)
+        );
 
         // Printer & Flying Blocks
         printer.write(view.child("Printer"));
 
         ValueOutput.ValueOutputList blocks = view.childrenList("FlyingBlocks");
-        for (LaunchedItem b : flyingBlocks)
+        for (LaunchedItem b : flyingBlocks) {
             b.write(blocks.addChild());
+        }
 
         view.putFloat("DefaultYaw", defaultYaw);
 
@@ -269,8 +277,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         previousTarget = printer.getCurrentTarget();
         tickFlyingBlocks();
 
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         // Update Fuel and Paper
         tickPaperPrinter();
@@ -280,12 +289,14 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         skipsLeft = 1000;
         blockSkipped = true;
 
-        while (blockSkipped && skipsLeft-- > 0)
+        while (blockSkipped && skipsLeft-- > 0) {
             tickPrinter();
+        }
 
         schematicProgress = 0;
-        if (blocksToPlace > 0)
+        if (blocksToPlace > 0) {
             schematicProgress = (float) blocksPlaced / blocksToPlace;
+        }
 
         // Update Client block entity
         if (sendUpdate) {
@@ -311,13 +322,15 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 
         // Skip if not Active
         if (state == State.STOPPED) {
-            if (printer.isLoaded())
+            if (printer.isLoaded()) {
                 resetPrinter();
+            }
             return;
         }
 
-        if (state == State.PAUSED && !positionNotLoaded && missingItem == null && remainingFuel > 0)
+        if (state == State.PAUSED && !positionNotLoaded && missingItem == null && remainingFuel > 0) {
             return;
+        }
 
         // Initialize Printer
         if (!printer.isLoaded()) {
@@ -403,8 +416,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 }
             }
 
-            for (ItemRequirement.StackRequirement required : requiredItems)
+            for (ItemRequirement.StackRequirement required : requiredItems) {
                 grabItemsFromAttachedInventories(required, false);
+            }
         }
 
         // Success
@@ -491,8 +505,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
     }
 
     protected boolean grabItemsFromAttachedInventories(ItemRequirement.StackRequirement required, boolean simulate) {
-        if (hasCreativeCrate)
+        if (hasCreativeCrate) {
             return true;
+        }
 
         attachedInventories.removeIf(Objects::isNull);
 
@@ -558,8 +573,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
     }
 
     public void finishedPrinting() {
-        if (replaceMode == ConfigureSchematicannonPacket.Option.REPLACE_EMPTY.ordinal())
+        if (replaceMode == ConfigureSchematicannonPacket.Option.REPLACE_EMPTY.ordinal()) {
             printer.sendBlockUpdates(level);
+        }
         inventory.setItem(0, ItemStack.EMPTY);
         inventory.setItem(1, new ItemStack(AllItems.EMPTY_SCHEMATIC, inventory.getItem(1).getCount() + 1));
         state = State.STOPPED;
@@ -586,74 +602,94 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         BlockState toReplaceOther,
         boolean isNormalCube
     ) {
-        if (pos.closerThan(getBlockPos(), 2f))
+        if (pos.closerThan(getBlockPos(), 2f)) {
             return false;
-        if (!replaceBlockEntities && (toReplace.hasBlockEntity() || (toReplaceOther != null && toReplaceOther.hasBlockEntity())))
+        }
+        if (!replaceBlockEntities && (toReplace.hasBlockEntity() || (toReplaceOther != null && toReplaceOther.hasBlockEntity()))) {
             return false;
+        }
 
-        if (shouldIgnoreBlockState(state, be))
+        if (shouldIgnoreBlockState(state, be)) {
             return false;
+        }
 
         boolean placingAir = state.isAir();
 
-        if (replaceMode == 3)
+        if (replaceMode == 3) {
             return true;
-        if (replaceMode == 2 && !placingAir)
+        }
+        if (replaceMode == 2 && !placingAir) {
             return true;
+        }
         if (replaceMode == 1 && (isNormalCube || (!toReplace.isRedstoneConductor(
             level,
             pos
-        ) && (toReplaceOther == null || !toReplaceOther.isRedstoneConductor(level, pos)))) && !placingAir)
-            return true;
-        return replaceMode == 0 && !toReplace.isRedstoneConductor(level, pos) && (toReplaceOther == null || !toReplaceOther.isRedstoneConductor(
+        ) && (toReplaceOther == null || !toReplaceOther.isRedstoneConductor(
             level,
             pos
-        )) && !placingAir;
+        )))) && !placingAir) {
+            return true;
+        }
+        return replaceMode == 0 && !toReplace.isRedstoneConductor(
+            level,
+            pos
+        ) && (toReplaceOther == null || !toReplaceOther.isRedstoneConductor(level, pos)) && !placingAir;
     }
 
     protected boolean shouldIgnoreBlockState(BlockState state, BlockEntity be) {
         // Block doesn't have a mapping (Water, lava, etc)
-        if (state.getBlock() == Blocks.STRUCTURE_VOID)
+        if (state.getBlock() == Blocks.STRUCTURE_VOID) {
             return true;
+        }
 
         ItemRequirement requirement = ItemRequirement.of(state, be);
-        if (requirement.isEmpty())
+        if (requirement.isEmpty()) {
             return false;
-        if (requirement.isInvalid())
+        }
+        if (requirement.isInvalid()) {
             return false;
+        }
 
         // Block doesn't need to be placed twice (Doors, beds, double plants)
-        if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER)
+        if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
             return true;
-        if (state.hasProperty(BlockStateProperties.BED_PART) && state.getValue(BlockStateProperties.BED_PART) == BedPart.HEAD)
+        }
+        if (state.hasProperty(BlockStateProperties.BED_PART) && state.getValue(BlockStateProperties.BED_PART) == BedPart.HEAD) {
             return true;
-        if (state.getBlock() instanceof PistonHeadBlock)
+        }
+        if (state.getBlock() instanceof PistonHeadBlock) {
             return true;
-        if (state.is(AllBlocks.BELT))
+        }
+        if (state.is(AllBlocks.BELT)) {
             return state.getValue(BeltBlock.PART) == BeltPart.MIDDLE;
+        }
 
         return false;
     }
 
     protected void tickFlyingBlocks() {
         List<LaunchedItem> toRemove = new LinkedList<>();
-        for (LaunchedItem b : flyingBlocks)
-            if (b.update(level))
+        for (LaunchedItem b : flyingBlocks) {
+            if (b.update(level)) {
                 toRemove.add(b);
+            }
+        }
         flyingBlocks.removeAll(toRemove);
     }
 
     protected void refillFuelIfPossible() {
-        if (hasCreativeCrate)
+        if (hasCreativeCrate) {
             return;
+        }
         if (remainingFuel > getShotsPerGunpowder()) {
             remainingFuel = getShotsPerGunpowder();
             sendUpdate = true;
             return;
         }
 
-        if (remainingFuel > 0)
+        if (remainingFuel > 0) {
             return;
+        }
 
         ItemStack gunpowder = inventory.getItem(4);
         if (!gunpowder.isEmpty()) {
@@ -664,19 +700,22 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 if (cap == null) {
                     continue;
                 }
-                if (cap.extractAll(stack -> inventory.canPlaceItem(4, stack), 1) == 0)
+                if (cap.extractAll(stack -> inventory.canPlaceItem(4, stack), 1) == 0) {
                     continue;
+                }
                 externalGunpowderFound = true;
                 break;
             }
-            if (!externalGunpowderFound)
+            if (!externalGunpowderFound) {
                 return;
+            }
         }
 
         remainingFuel += getShotsPerGunpowder();
         if (statusMsg.equals("noGunpowder")) {
-            if (blocksPlaced > 0)
+            if (blocksPlaced > 0) {
                 state = State.RUNNING;
+            }
             statusMsg = "ready";
         }
         sendUpdate = true;
@@ -691,18 +730,21 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         ItemStack output = inventory.getItem(BookOutput);
         boolean outputFull = output.getCount() == output.getMaxStackSize();
 
-        if (printer.isErrored())
+        if (printer.isErrored()) {
             return;
+        }
 
         if (!printer.isLoaded()) {
-            if (!blueprint.isEmpty())
+            if (!blueprint.isEmpty()) {
                 initializePrinter(blueprint);
+            }
             return;
         }
 
         if (paper.isEmpty() || outputFull) {
-            if (bookPrintingProgress != 0)
+            if (bookPrintingProgress != 0) {
                 sendUpdate = true;
+            }
             bookPrintingProgress = 0;
             dontUpdateChecklist = false;
             return;
@@ -711,8 +753,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         if (bookPrintingProgress >= 1) {
             bookPrintingProgress = 0;
 
-            if (!dontUpdateChecklist)
+            if (!dontUpdateChecklist) {
                 updateChecklist();
+            }
 
             dontUpdateChecklist = true;
             inventory.setItem(BookInput, ItemStack.EMPTY);
@@ -730,8 +773,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 
     public static BlockState stripBeltIfNotLast(BlockState blockState) {
         BeltPart part = blockState.getValue(BeltBlock.PART);
-        if (part == BeltPart.MIDDLE)
+        if (part == BeltPart.MIDDLE) {
             return Blocks.AIR.defaultBlockState();
+        }
 
         // is highest belt?
         boolean isLastSegment = false;
@@ -751,11 +795,14 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
             default:
                 isLastSegment = positive && end || !positive && start;
         }
-        if (isLastSegment)
+        if (isLastSegment) {
             return blockState;
+        }
 
-        return AllBlocks.SHAFT.defaultBlockState()
-            .setValue(AbstractSimpleShaftBlock.AXIS, slope == BeltSlope.SIDEWAYS ? Axis.Y : facing.getClockWise().getAxis());
+        return AllBlocks.SHAFT.defaultBlockState().setValue(
+            AbstractSimpleShaftBlock.AXIS,
+            slope == BeltSlope.SIDEWAYS ? Axis.Y : facing.getClockWise().getAxis()
+        );
     }
 
     protected void launchBlockOrBelt(BlockPos target, ItemStack icon, BlockState blockState, BlockEntity blockEntity) {
@@ -767,16 +814,23 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 BlockPos currentPos = target;
                 for (int i = 0; i < bbe.beltLength; i++) {
                     BlockState currentState = bbe.getLevel().getBlockState(currentPos);
-                    if (!(currentState.getBlock() instanceof BeltBlock))
+                    if (!(currentState.getBlock() instanceof BeltBlock)) {
                         break;
-                    if (!(bbe.getLevel().getBlockEntity(currentPos) instanceof BeltBlockEntity beltAtSegment))
+                    }
+                    if (!(bbe.getLevel().getBlockEntity(currentPos) instanceof BeltBlockEntity beltAtSegment)) {
                         break;
+                    }
                     casings[i] = beltAtSegment.casing;
-                    currentPos = BeltBlock.nextSegmentPosition(currentState, currentPos, blockState.getValue(BeltBlock.PART) != BeltPart.END);
+                    currentPos = BeltBlock.nextSegmentPosition(
+                        currentState,
+                        currentPos,
+                        blockState.getValue(BeltBlock.PART) != BeltPart.END
+                    );
                 }
                 launchBelt(target, blockState, bbe.beltLength, casings);
-            } else if (blockState != Blocks.AIR.defaultBlockState())
+            } else if (blockState != Blocks.AIR.defaultBlockState()) {
                 launchBlock(target, icon, blockState, null);
+            }
             return;
         }
 
@@ -792,8 +846,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
     }
 
     protected void launchBlock(BlockPos target, ItemStack stack, BlockState state, @Nullable CompoundTag data) {
-        if (!state.isAir())
+        if (!state.isAir()) {
             blocksPlaced++;
+        }
         flyingBlocks.add(new LaunchedItem.ForBlockState(getBlockPos(), target, stack, state, data));
         playFiringSound();
     }
@@ -833,8 +888,9 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         checklist.gathered.clear();
         findInventories();
         for (Container cap : attachedInventories) {
-            if (cap == null)
+            if (cap == null) {
                 continue;
+            }
             for (ItemStack stack : cap) {
                 checklist.collect(stack);
             }
@@ -871,13 +927,14 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 
     @Override
     protected void collectImplicitComponents(Builder components) {
-        components.set(AllDataComponents.SCHEMATICANNON_OPTIONS, new SchematicannonOptions(replaceMode, skipMissing, replaceBlockEntities));
+        components.set(
+            AllDataComponents.SCHEMATICANNON_OPTIONS,
+            new SchematicannonOptions(replaceMode, skipMissing, replaceBlockEntities)
+        );
     }
 
     public enum State implements StringRepresentable {
-        STOPPED,
-        PAUSED,
-        RUNNING;
+        STOPPED, PAUSED, RUNNING;
 
         public static final Codec<State> CODEC = StringRepresentable.fromEnum(State::values);
 

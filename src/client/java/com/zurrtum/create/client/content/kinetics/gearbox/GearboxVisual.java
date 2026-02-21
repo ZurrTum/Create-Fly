@@ -11,14 +11,13 @@ import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.gearbox.GearboxBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> {
 
@@ -32,7 +31,10 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
 
         updateSourceFacing();
 
-        var instancer = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF));
+        var instancer = instancerProvider().instancer(
+            AllInstanceTypes.ROTATING,
+            Models.partial(AllPartialModels.SHAFT_HALF)
+        );
 
         for (Direction direction : Iterate.directions) {
             final Direction.Axis axis = direction.getAxis();
@@ -42,8 +44,8 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
 
             RotatingInstance instance = instancer.createInstance();
 
-            instance.setup(blockEntity, axis, getSpeed(direction)).setPosition(getVisualPosition()).rotateToFace(Direction.SOUTH, direction)
-                .setChanged();
+            instance.setup(blockEntity, axis, getSpeed(direction)).setPosition(getVisualPosition())
+                .rotateToFace(Direction.SOUTH, direction).setChanged();
 
             keys.put(direction, instance);
         }
@@ -53,10 +55,11 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
         float speed = blockEntity.getSpeed();
 
         if (speed != 0 && sourceFacing != null) {
-            if (sourceFacing.getAxis() == direction.getAxis())
+            if (sourceFacing.getAxis() == direction.getAxis()) {
                 speed *= sourceFacing == direction ? 1 : -1;
-            else if (sourceFacing.getAxisDirection() == direction.getAxisDirection())
+            } else if (sourceFacing.getAxisDirection() == direction.getAxisDirection()) {
                 speed *= -1;
+            }
         }
         return speed;
     }

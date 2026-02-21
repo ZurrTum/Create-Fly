@@ -36,8 +36,9 @@ public class SmartPipeFilterSlot extends ValueBoxTransform {
     protected float angleY(BlockState state) {
         AttachFace face = state.getValue(SmartFluidPipeBlock.FACE);
         float horizontalAngle = AngleHelper.horizontalAngle(state.getValue(SmartFluidPipeBlock.FACING));
-        if (face == AttachFace.WALL)
+        if (face == AttachFace.WALL) {
             horizontalAngle += 180;
+        }
         return horizontalAngle;
     }
 }

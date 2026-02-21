@@ -9,16 +9,15 @@ import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Widely-applicable mounted storage implementation.
@@ -44,8 +43,9 @@ public class SimpleMountedStorage extends WrapperMountedItemStorage<ItemStackHan
 
     @Override
     public void unmount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
-        if (be == null)
+        if (be == null) {
             return;
+        }
 
         Container cap = ItemHelper.getInventory(level, pos, state, be, null);
         if (cap != null) {

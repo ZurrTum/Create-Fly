@@ -10,7 +10,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record BlueprintPreviewRequestPacket(int entityId, int index, boolean sneaking) implements Packet<ServerGamePacketListener> {
+public record BlueprintPreviewRequestPacket(int entityId, int index,
+                                            boolean sneaking) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintPreviewRequestPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         BlueprintPreviewRequestPacket::entityId,

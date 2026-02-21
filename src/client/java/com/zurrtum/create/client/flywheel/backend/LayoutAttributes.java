@@ -100,8 +100,8 @@ public class LayoutAttributes {
 
     private static boolean isNormalized(FloatRepr repr) {
         return switch (repr) {
-            case NORMALIZED_BYTE, NORMALIZED_UNSIGNED_BYTE, NORMALIZED_SHORT, NORMALIZED_UNSIGNED_SHORT, NORMALIZED_INT, NORMALIZED_UNSIGNED_INT ->
-                true;
+            case NORMALIZED_BYTE, NORMALIZED_UNSIGNED_BYTE, NORMALIZED_SHORT, NORMALIZED_UNSIGNED_SHORT, NORMALIZED_INT,
+                 NORMALIZED_UNSIGNED_INT -> true;
             default -> false;
         };
     }

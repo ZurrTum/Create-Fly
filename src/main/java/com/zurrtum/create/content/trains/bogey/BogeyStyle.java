@@ -2,6 +2,12 @@ package com.zurrtum.create.content.trains.bogey;
 
 import com.zurrtum.create.AllBogeyStyles;
 import com.zurrtum.create.AllSoundEvents;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,13 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundEvent;
 
 public class BogeyStyle {
     public final Identifier id;
@@ -61,8 +60,8 @@ public class BogeyStyle {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public AbstractBogeyBlock<?> getNextBlock(BogeySize currentSize) {
-        return Stream.iterate(currentSize.nextBySize(), BogeySize::nextBySize).filter(sizes::containsKey).findFirst().map(this::getBlockForSize)
-            .orElse((AbstractBogeyBlock) getBlockForSize(currentSize));
+        return Stream.iterate(currentSize.nextBySize(), BogeySize::nextBySize).filter(sizes::containsKey).findFirst()
+            .map(this::getBlockForSize).orElse((AbstractBogeyBlock) getBlockForSize(currentSize));
     }
 
     public static class Builder {
@@ -112,7 +111,16 @@ public class BogeyStyle {
         }
 
         public BogeyStyle build() {
-            BogeyStyle entry = new BogeyStyle(id, cycleGroup, displayName, soundEvent, contactParticle, smokeParticle, defaultData, sizes);
+            BogeyStyle entry = new BogeyStyle(
+                id,
+                cycleGroup,
+                displayName,
+                soundEvent,
+                contactParticle,
+                smokeParticle,
+                defaultData,
+                sizes
+            );
             AllBogeyStyles.BOGEY_STYLES.put(id, entry);
             AllBogeyStyles.CYCLE_GROUPS.computeIfAbsent(cycleGroup, l -> new HashMap<>()).put(id, entry);
             return entry;

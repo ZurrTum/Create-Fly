@@ -54,20 +54,24 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
     public void setMaterial(BlockState blockState) {
         BlockState wrapperState = getBlockState();
 
-        if (!material.is(blockState.getBlock()))
+        if (!material.is(blockState.getBlock())) {
             for (Direction side : Iterate.directions) {
                 BlockPos neighbour = worldPosition.relative(side);
                 BlockState neighbourState = level.getBlockState(neighbour);
-                if (neighbourState != wrapperState)
+                if (neighbourState != wrapperState) {
                     continue;
-                if (!(level.getBlockEntity(neighbour) instanceof CopycatBlockEntity cbe))
+                }
+                if (!(level.getBlockEntity(neighbour) instanceof CopycatBlockEntity cbe)) {
                     continue;
+                }
                 BlockState otherMaterial = cbe.getMaterial();
-                if (!otherMaterial.is(blockState.getBlock()))
+                if (!otherMaterial.is(blockState.getBlock())) {
                     continue;
+                }
                 blockState = otherMaterial;
                 break;
             }
+        }
 
         material = blockState;
         if (!level.isClientSide()) {
@@ -78,25 +82,26 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
     }
 
     public boolean cycleMaterial() {
-        if (material.hasProperty(TrapDoorBlock.HALF) && material.getValueOrElse(TrapDoorBlock.OPEN, false))
+        if (material.hasProperty(TrapDoorBlock.HALF) && material.getValueOrElse(TrapDoorBlock.OPEN, false)) {
             setMaterial(material.cycle(TrapDoorBlock.HALF));
-        else if (material.hasProperty(BlockStateProperties.FACING))
+        } else if (material.hasProperty(BlockStateProperties.FACING)) {
             setMaterial(material.cycle(BlockStateProperties.FACING));
-        else if (material.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
+        } else if (material.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
             setMaterial(material.setValue(
                 BlockStateProperties.HORIZONTAL_FACING,
                 material.getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise()
             ));
-        else if (material.hasProperty(BlockStateProperties.AXIS))
+        } else if (material.hasProperty(BlockStateProperties.AXIS)) {
             setMaterial(material.cycle(BlockStateProperties.AXIS));
-        else if (material.hasProperty(BlockStateProperties.HORIZONTAL_AXIS))
+        } else if (material.hasProperty(BlockStateProperties.HORIZONTAL_AXIS)) {
             setMaterial(material.cycle(BlockStateProperties.HORIZONTAL_AXIS));
-        else if (material.hasProperty(BlockStateProperties.LIT))
+        } else if (material.hasProperty(BlockStateProperties.LIT)) {
             setMaterial(material.cycle(BlockStateProperties.LIT));
-        else if (material.hasProperty(RoseQuartzLampBlock.POWERING))
+        } else if (material.hasProperty(RoseQuartzLampBlock.POWERING)) {
             setMaterial(material.cycle(RoseQuartzLampBlock.POWERING));
-        else
+        } else {
             return false;
+        }
 
         return true;
     }
@@ -123,8 +128,9 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
 
     @Override
     public ItemRequirement getRequiredItems(BlockState state) {
-        if (consumedItem.isEmpty())
+        if (consumedItem.isEmpty()) {
             return ItemRequirement.NONE;
+        }
         return new ItemRequirement(ItemUseType.CONSUME, consumedItem);
     }
 
@@ -152,26 +158,34 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
         // Validate Material
         if (!clientPacket) {
             BlockState blockState = getBlockState();
-            if (blockState == null)
+            if (blockState == null) {
                 return;
-            if (!(blockState.getBlock() instanceof CopycatBlock cb))
+            }
+            if (!(blockState.getBlock() instanceof CopycatBlock cb)) {
                 return;
+            }
             BlockState acceptedBlockState = cb.getAcceptedBlockState(level, worldPosition, consumedItem, null);
-            if (acceptedBlockState != null && material.is(acceptedBlockState.getBlock()))
+            if (acceptedBlockState != null && material.is(acceptedBlockState.getBlock())) {
                 return;
+            }
             consumedItem = ItemStack.EMPTY;
             material = AllBlocks.COPYCAT_BASE.defaultBlockState();
         }
 
-        if (clientPacket && prevMaterial != material)
+        if (clientPacket && prevMaterial != material) {
             redraw();
+        }
     }
 
     @Override
     public void writeSafe(ValueOutput view) {
         super.writeSafe(view);
 
-        ItemStack stackWithoutComponents = new ItemStack(consumedItem.getItemHolder(), consumedItem.getCount(), DataComponentPatch.EMPTY);
+        ItemStack stackWithoutComponents = new ItemStack(
+            consumedItem.getItemHolder(),
+            consumedItem.getCount(),
+            DataComponentPatch.EMPTY
+        );
 
         write(view, stackWithoutComponents, material);
     }

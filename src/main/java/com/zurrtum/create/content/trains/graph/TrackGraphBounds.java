@@ -1,15 +1,14 @@
 package com.zurrtum.create.content.trains.graph;
 
 import com.zurrtum.create.content.trains.track.BezierConnection;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class TrackGraphBounds {
 
@@ -21,17 +20,21 @@ public class TrackGraphBounds {
         box = null;
 
         for (TrackNode node : graph.nodes.values()) {
-            if (node.location.dimension != dimension)
+            if (node.location.dimension != dimension) {
                 continue;
+            }
             include(node);
             Map<TrackNode, TrackEdge> connections = graph.getConnectionsFrom(node);
-            for (TrackEdge edge : connections.values())
-                if (edge.turn != null && edge.turn.isPrimary())
+            for (TrackEdge edge : connections.values()) {
+                if (edge.turn != null && edge.turn.isPrimary()) {
                     beziers.add(edge.turn);
+                }
+            }
         }
 
-        if (box != null)
+        if (box != null) {
             box = box.inflate(2);
+        }
     }
 
     private void include(TrackNode node) {

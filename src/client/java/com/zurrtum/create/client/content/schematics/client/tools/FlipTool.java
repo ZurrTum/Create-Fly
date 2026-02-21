@@ -56,10 +56,12 @@ public class FlipTool extends PlacementToolBase {
         Direction facing = selectedFace.getClockWise();
         AABB bounds = schematicHandler.getBounds();
 
-        Vec3 directionVec = Vec3.atLowerCornerOf(Direction.get(AxisDirection.POSITIVE, facing.getAxis()).getUnitVec3i());
+        Vec3 directionVec = Vec3.atLowerCornerOf(Direction.get(AxisDirection.POSITIVE, facing.getAxis())
+            .getUnitVec3i());
         Vec3 boundsSize = new Vec3(bounds.getXsize(), bounds.getYsize(), bounds.getZsize());
         Vec3 vec = boundsSize.multiply(directionVec);
-        bounds = bounds.contract(vec.x, vec.y, vec.z).inflate(1 - directionVec.x, 1 - directionVec.y, 1 - directionVec.z);
+        bounds = bounds.contract(vec.x, vec.y, vec.z)
+            .inflate(1 - directionVec.x, 1 - directionVec.y, 1 - directionVec.z);
         bounds = bounds.move(directionVec.scale(.5f).multiply(boundsSize));
 
         outline.setBounds(bounds);

@@ -47,14 +47,20 @@ public class LinkedControllerItem extends Item implements MenuProvider {
                 BlockState hitState = world.getBlockState(pos);
                 if (player.isShiftKeyDown()) {
                     if (hitState.is(AllBlocks.LECTERN_CONTROLLER)) {
-                        if (!world.isClientSide())
-                            AllBlocks.LECTERN_CONTROLLER.withBlockEntityDo(world, pos, be -> be.swapControllers(stack, player, hand, hitState));
+                        if (!world.isClientSide()) {
+                            AllBlocks.LECTERN_CONTROLLER.withBlockEntityDo(
+                                world,
+                                pos,
+                                be -> be.swapControllers(stack, player, hand, hitState)
+                            );
+                        }
                         return InteractionResult.SUCCESS;
                     }
                 } else {
                     if (hitState.is(AllBlocks.REDSTONE_LINK)) {
-                        if (world.isClientSide())
+                        if (world.isClientSide()) {
                             AllClientHandle.INSTANCE.toggleLinkedControllerBindMode(pos);
+                        }
                         player.getCooldowns().addCooldown(stack, 2);
                         return InteractionResult.CONSUME;
                     }
@@ -67,8 +73,9 @@ public class LinkedControllerItem extends Item implements MenuProvider {
                         return InteractionResult.SUCCESS;
                     }
 
-                    if (hitState.is(AllBlocks.LECTERN_CONTROLLER))
+                    if (hitState.is(AllBlocks.LECTERN_CONTROLLER)) {
                         return InteractionResult.PASS;
+                    }
                 }
             }
 
@@ -82,14 +89,16 @@ public class LinkedControllerItem extends Item implements MenuProvider {
         ItemStack heldItem = player.getItemInHand(hand);
 
         if (player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
-            if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer && player.mayBuild())
+            if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer && player.mayBuild()) {
                 openHandledScreen(serverPlayer);
+            }
             return InteractionResult.SUCCESS;
         }
 
         if (!player.isShiftKeyDown()) {
-            if (world.isClientSide())
+            if (world.isClientSide()) {
                 AllClientHandle.INSTANCE.toggleLinkedControllerActive();
+            }
             player.getCooldowns().addCooldown(heldItem, 2);
         }
 
@@ -98,17 +107,27 @@ public class LinkedControllerItem extends Item implements MenuProvider {
 
     public static ItemStackHandler getFrequencyItems(ItemStack stack) {
         ItemStackHandler newInv = new ItemStackHandler(12);
-        if (!stack.is(AllItems.LINKED_CONTROLLER))
+        if (!stack.is(AllItems.LINKED_CONTROLLER)) {
             throw new IllegalArgumentException("Cannot get frequency items from non-controller: " + stack);
-        if (!stack.has(AllDataComponents.LINKED_CONTROLLER_ITEMS))
+        }
+        if (!stack.has(AllDataComponents.LINKED_CONTROLLER_ITEMS)) {
             return newInv;
-        ItemHelper.fillItemStackHandler(stack.getOrDefault(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemContainerContents.EMPTY), newInv);
+        }
+        ItemHelper.fillItemStackHandler(
+            stack.getOrDefault(
+                AllDataComponents.LINKED_CONTROLLER_ITEMS,
+                ItemContainerContents.EMPTY
+            ), newInv
+        );
         return newInv;
     }
 
     public static Couple<Frequency> toFrequency(ItemStack controller, int slot) {
         ItemStackHandler frequencyItems = getFrequencyItems(controller);
-        return Couple.create(Frequency.of(frequencyItems.getItem(slot * 2)), Frequency.of(frequencyItems.getItem(slot * 2 + 1)));
+        return Couple.create(
+            Frequency.of(frequencyItems.getItem(slot * 2)),
+            Frequency.of(frequencyItems.getItem(slot * 2 + 1))
+        );
     }
 
     @Override

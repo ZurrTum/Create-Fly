@@ -16,16 +16,19 @@ public class BigOutlines {
     static BlockHitResult result = null;
 
     public static void pick(Minecraft mc) {
-        if (!(mc.getCameraEntity() instanceof LocalPlayer player))
+        if (!(mc.getCameraEntity() instanceof LocalPlayer player)) {
             return;
-        if (mc.level == null)
+        }
+        if (mc.level == null) {
             return;
+        }
 
         result = null;
 
         Vec3 origin = player.getEyePosition(AnimationTickHolder.getPartialTicks(mc.level));
 
-        double maxRange = mc.hitResult == null ? Double.MAX_VALUE : mc.hitResult.getLocation().distanceToSqr(origin) + 0.5;
+        double maxRange = mc.hitResult == null ? Double.MAX_VALUE : mc.hitResult.getLocation()
+            .distanceToSqr(origin) + 0.5;
 
         double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE);
         Vec3 target = RaycastHelper.getTraceTarget(player, Math.min(maxRange, range) + 1, origin);
@@ -40,21 +43,26 @@ public class BigOutlines {
                             p.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
                             BlockState blockState = mc.level.getBlockState(p);
 
-                            if (!AllExtensions.BIG_OUTLINE.contains(blockState.getBlock()))
+                            if (!AllExtensions.BIG_OUTLINE.contains(blockState.getBlock())) {
                                 continue;
+                            }
 
-                            BlockHitResult hit = blockState.getInteractionShape(mc.level, p).clip(origin, target, p.immutable());
-                            if (hit == null)
+                            BlockHitResult hit = blockState.getInteractionShape(mc.level, p)
+                                .clip(origin, target, p.immutable());
+                            if (hit == null) {
                                 continue;
+                            }
 
-                            if (result != null && Vec3.atCenterOf(p).distanceToSqr(origin) >= Vec3.atCenterOf(result.getBlockPos())
-                                .distanceToSqr(origin))
+                            if (result != null && Vec3.atCenterOf(p)
+                                .distanceToSqr(origin) >= Vec3.atCenterOf(result.getBlockPos()).distanceToSqr(origin)) {
                                 continue;
+                            }
 
                             Vec3 vec = hit.getLocation();
                             double interactionDist = vec.distanceToSqr(origin);
-                            if (interactionDist >= maxRange)
+                            if (interactionDist >= maxRange) {
                                 continue;
+                            }
 
                             BlockPos hitPos = hit.getBlockPos();
 
@@ -72,7 +80,8 @@ public class BigOutlines {
             }
         );
 
-        if (result != null)
+        if (result != null) {
             mc.hitResult = result;
+        }
     }
 }

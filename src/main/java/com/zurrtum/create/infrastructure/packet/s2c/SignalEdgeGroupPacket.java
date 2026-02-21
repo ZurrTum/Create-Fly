@@ -16,7 +16,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import java.util.List;
 import java.util.UUID;
 
-public record SignalEdgeGroupPacket(List<UUID> ids, List<EdgeGroupColor> colors, boolean add) implements Packet<ClientGamePacketListener> {
+public record SignalEdgeGroupPacket(List<UUID> ids, List<EdgeGroupColor> colors,
+                                    boolean add) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, SignalEdgeGroupPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecBuilders.list(UUIDUtil.STREAM_CODEC),
         SignalEdgeGroupPacket::ids,

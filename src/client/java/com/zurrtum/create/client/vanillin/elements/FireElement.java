@@ -37,9 +37,13 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
     // Parameterize by the material instead of the sprite
     // because Material#sprite is a surprisingly heavy operation
     // and because sprites are invalidated after a resource reload.
-    private static final RendererReloadCache<net.minecraft.client.resources.model.Material, Model> FIRE_MODELS = new RendererReloadCache<>(texture -> {
-        return new SingleMeshModel(new FireMesh(Minecraft.getInstance().getAtlasManager().get(texture)), FIRE_MATERIAL);
-    });
+    private static final RendererReloadCache<net.minecraft.client.resources.model.Material, Model> FIRE_MODELS = new RendererReloadCache<>(
+        texture -> {
+            return new SingleMeshModel(
+                new FireMesh(Minecraft.getInstance().getAtlasManager().get(texture)),
+                FIRE_MATERIAL
+            );
+        });
 
     private final Entity entity;
     private final PoseStack stack = new PoseStack();
@@ -55,7 +59,8 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
     }
 
     private TransformedInstance createInstance(Model model) {
-        TransformedInstance instance = visualizationContext.instancerProvider().instancer(InstanceTypes.TRANSFORMED, model).createInstance();
+        TransformedInstance instance = visualizationContext.instancerProvider()
+            .instancer(InstanceTypes.TRANSFORMED, model).createInstance();
         instance.light(LightTexture.FULL_BLOCK);
         instance.setChanged();
         return instance;
@@ -97,8 +102,8 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
         stack.translate(0.0F, 0.0F, -0.3F + (float) ((int) maxHeight) * 0.02F);
 
         for (int i = 0; y < maxHeight; ++i) {
-            var instance = recycler.get(FIRE_MODELS.get(i % 2 == 0 ? ModelBakery.FIRE_0 : ModelBakery.FIRE_1)).setTransform(stack).scaleX(width)
-                .translate(0, y, z);
+            var instance = recycler.get(FIRE_MODELS.get(i % 2 == 0 ? ModelBakery.FIRE_0 : ModelBakery.FIRE_1))
+                .setTransform(stack).scaleX(width).translate(0, y, z);
 
             if (i / 2 % 2 == 0) {
                 // Vanilla flips the uv directly, but it's easier for us to flip the whole model.

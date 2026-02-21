@@ -2,6 +2,7 @@ package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.google.common.cache.Cache;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.logistics.packager.IdentifiedInventory;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
@@ -9,7 +10,6 @@ import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
@@ -48,14 +48,17 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     private boolean global;
 
     public enum RequestType {
-        RESTOCK,
-        REDSTONE,
-        PLAYER
+        RESTOCK, REDSTONE, PLAYER
     }
 
-    private static final Cache<UUID, Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>>> LINKS = new TickBasedCache<>(20, true);
+    private static final Cache<UUID, Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>>> LINKS = new TickBasedCache<>(20,
+        true
+    );
 
-    private static final Cache<UUID, Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>>> CLIENT_LINKS = new TickBasedCache<>(20, true, true);
+    private static final Cache<UUID, Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>>> CLIENT_LINKS = new TickBasedCache<>(20,
+        true,
+        true
+    );
 
     public LogisticallyLinkedBehaviour(SmartBlockEntity be, boolean global) {
         super(be);
@@ -68,33 +71,44 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
         return getAllPresent(freq, sortByPriority, false);
     }
 
-    public static Collection<LogisticallyLinkedBehaviour> getAllPresent(UUID freq, boolean sortByPriority, boolean clientSide) {
-        Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>> cache = (clientSide ? CLIENT_LINKS : LINKS).getIfPresent(freq);
-        if (cache == null)
+    public static Collection<LogisticallyLinkedBehaviour> getAllPresent(
+        UUID freq,
+        boolean sortByPriority,
+        boolean clientSide
+    ) {
+        Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>> cache = (clientSide ? CLIENT_LINKS : LINKS).getIfPresent(
+            freq);
+        if (cache == null) {
             return Collections.emptyList();
-        Stream<LogisticallyLinkedBehaviour> stream = new LinkedList<>(cache.asMap().values()).stream().map(WeakReference::get)
-            .filter(LogisticallyLinkedBehaviour::isValidLink);
+        }
+        Stream<LogisticallyLinkedBehaviour> stream = new LinkedList<>(cache.asMap().values()).stream()
+            .map(WeakReference::get).filter(LogisticallyLinkedBehaviour::isValidLink);
 
-        if (sortByPriority)
+        if (sortByPriority) {
             stream = stream.sorted((e1, e2) -> Integer.compare(e1.redstonePower, e2.redstonePower));
+        }
 
         return stream.toList();
     }
 
     public static void keepAlive(LogisticallyLinkedBehaviour behaviour) {
         boolean onClient = behaviour.blockEntity.getLevel().isClientSide();
-        if (behaviour.redstonePower == 15)
+        if (behaviour.redstonePower == 15) {
             return;
+        }
         try {
-            Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>> cache = (onClient ? CLIENT_LINKS : LINKS).get(
-                behaviour.freqId,
+            Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>> cache = (onClient ? CLIENT_LINKS : LINKS).get(behaviour.freqId,
                 () -> new TickBasedCache<>(400, false)
             );
 
-            if (cache == null)
+            if (cache == null) {
                 return;
+            }
 
-            WeakReference<LogisticallyLinkedBehaviour> reference = cache.get(behaviour.linkId, () -> new WeakReference<>(behaviour));
+            WeakReference<LogisticallyLinkedBehaviour> reference = cache.get(
+                behaviour.linkId,
+                () -> new WeakReference<>(behaviour)
+            );
             cache.put(behaviour.linkId, reference.get() != behaviour ? new WeakReference<>(behaviour) : reference);
 
         } catch (ExecutionException e) {
@@ -104,16 +118,18 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
 
     public static void remove(LogisticallyLinkedBehaviour behaviour) {
         Cache<Integer, WeakReference<LogisticallyLinkedBehaviour>> cache = LINKS.getIfPresent(behaviour.freqId);
-        if (cache != null)
+        if (cache != null) {
             cache.invalidate(behaviour.linkId);
+        }
     }
 
     //
 
     @Override
     public void unload() {
-        if (loadedGlobally && global && getLevel() != null)
+        if (loadedGlobally && global && getLevel() != null) {
             Create.LOGISTICS.linkInvalidated(freqId, getGlobalPos());
+        }
         super.unload();
         remove(this);
     }
@@ -126,8 +142,9 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     @Override
     public void initialize() {
         super.initialize();
-        if (getLevel().isClientSide())
+        if (getLevel().isClientSide()) {
             return;
+        }
 
         if (!loadedGlobally && global) {
             loadedGlobally = true;
@@ -141,8 +158,9 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
         if (!addedGlobally && global) {
             addedGlobally = true;
             blockEntity.setChanged();
-            if (blockEntity instanceof PackagerLinkBlockEntity plbe)
+            if (blockEntity instanceof PackagerLinkBlockEntity plbe) {
                 Create.LOGISTICS.linkAdded(freqId, getGlobalPos(), plbe.placedBy);
+            }
         }
 
     }
@@ -154,20 +172,23 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     @Override
     public void destroy() {
         super.destroy();
-        if (addedGlobally && global && getLevel() != null)
+        if (addedGlobally && global && getLevel() != null) {
             Create.LOGISTICS.linkRemoved(freqId, getGlobalPos());
+        }
     }
 
     public void redstonePowerChanged(int power) {
-        if (power == redstonePower)
+        if (power == redstonePower) {
             return;
+        }
         redstonePower = power;
         blockEntity.setChanged();
 
-        if (power == 15)
+        if (power == 15) {
             remove(this);
-        else
+        } else {
             keepAlive(this);
+        }
     }
 
     public Pair<PackagerBlockEntity, PackagingRequest> processRequest(
@@ -181,26 +202,30 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
         @Nullable IdentifiedInventory ignoredHandler
     ) {
 
-        if (blockEntity instanceof PackagerLinkBlockEntity plbe)
+        if (blockEntity instanceof PackagerLinkBlockEntity plbe) {
             return plbe.processRequest(stack, amount, address, linkIndex, finalLink, orderId, context, ignoredHandler);
+        }
 
         return null;
     }
 
     public InventorySummary getSummary(@Nullable IdentifiedInventory ignoredHandler) {
-        if (blockEntity instanceof PackagerLinkBlockEntity plbe)
+        if (blockEntity instanceof PackagerLinkBlockEntity plbe) {
             return plbe.fetchSummaryFromPackager(ignoredHandler);
+        }
         return InventorySummary.EMPTY;
     }
 
     public void deductFromAccurateSummary(ItemStackHandler packageContents) {
         InventorySummary summary = LogisticsManager.ACCURATE_SUMMARIES.getIfPresent(freqId);
-        if (summary == null)
+        if (summary == null) {
             return;
+        }
         for (int i = 0, size = packageContents.getContainerSize(); i < size; i++) {
             ItemStack orderedStack = packageContents.getItem(i);
-            if (orderedStack.isEmpty())
+            if (orderedStack.isEmpty()) {
                 continue;
+            }
             summary.add(orderedStack, -Math.min(summary.getCountOf(orderedStack), orderedStack.getCount()));
         }
     }
@@ -213,8 +238,12 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
 
     public boolean mayInteractMessage(Player player) {
         boolean mayInteract = Create.LOGISTICS.mayInteract(freqId, player);
-        if (!mayInteract)
-            player.displayClientMessage(Component.translatable("create.logistically_linked.protected").withStyle(ChatFormatting.RED), true);
+        if (!mayInteract) {
+            player.displayClientMessage(
+                Component.translatable("create.logistically_linked.protected")
+                    .withStyle(ChatFormatting.RED), true
+            );
+        }
         return mayInteract;
     }
 

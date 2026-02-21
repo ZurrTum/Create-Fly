@@ -5,7 +5,13 @@ import com.zurrtum.create.catnip.config.ConfigBase;
 public class CClient extends ConfigBase {
     public final ConfigString backend = s("DEFAULT", "backend", Comments.backend, Comments.backend_allowed);
     public final ConfigBool limitUpdates = b(true, "limitUpdates", Comments.limitUpdates);
-    public final ConfigInt workerThreads = i(-1, -1, Runtime.getRuntime().availableProcessors(), "workerThreads", Comments.workerThreads);
+    public final ConfigInt workerThreads = i(
+        -1,
+        -1,
+        Runtime.getRuntime().availableProcessors(),
+        "workerThreads",
+        Comments.workerThreads
+    );
 
     public final CBackendConfig flwBackends = nested(0, CBackendConfig::new, Comments.flwBackends);
 

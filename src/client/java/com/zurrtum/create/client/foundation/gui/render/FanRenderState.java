@@ -6,7 +6,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record FanRenderState(Matrix3x2f pose, int x0, int y0, BlockState target, ScreenRectangle bounds) implements PictureInPictureRenderState {
+public record FanRenderState(Matrix3x2f pose, int x0, int y0, BlockState target,
+                             ScreenRectangle bounds) implements PictureInPictureRenderState {
     public FanRenderState(Matrix3x2f pose, int x, int y, BlockState target) {
         this(pose, x, y, target, new ScreenRectangle(x, y, 50, 44).transformMaxBounds(pose));
     }

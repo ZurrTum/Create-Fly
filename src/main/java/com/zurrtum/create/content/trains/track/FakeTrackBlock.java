@@ -11,11 +11,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -76,13 +72,15 @@ public class FakeTrackBlock extends Block implements EntityBlock, ProperWaterlog
 
     @Override
     public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        if (pLevel.getBlockEntity(pPos) instanceof FakeTrackBlockEntity be)
+        if (pLevel.getBlockEntity(pPos) instanceof FakeTrackBlockEntity be) {
             be.randomTick();
+        }
     }
 
     public static void keepAlive(LevelAccessor level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof FakeTrackBlockEntity be)
+        if (level.getBlockEntity(pos) instanceof FakeTrackBlockEntity be) {
             be.keepAlive();
+        }
     }
 
     @Override
@@ -91,7 +89,13 @@ public class FakeTrackBlock extends Block implements EntityBlock, ProperWaterlog
     }
 
     @Override
-    public boolean addLandingEffects(BlockState state, ServerLevel world, BlockPos pos, LivingEntity entity, double distance) {
+    public boolean addLandingEffects(
+        BlockState state,
+        ServerLevel world,
+        BlockPos pos,
+        LivingEntity entity,
+        double distance
+    ) {
         return true;
     }
 

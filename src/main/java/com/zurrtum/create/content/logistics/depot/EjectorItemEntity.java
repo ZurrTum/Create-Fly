@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.logistics.depot;
 
 import com.zurrtum.create.AllEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.EjectorItemSpawnPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -215,8 +215,10 @@ public class EjectorItemEntity extends ItemEntity {
 
         if (!miss && rayTraceBlocks.getType() == HitResult.Type.BLOCK) {
             BlockState blockState = world.getBlockState(rayTraceBlocks.getBlockPos());
-            if (FunnelBlock.isFunnel(blockState) && blockState.hasProperty(FunnelBlock.EXTRACTING) && blockState.getValue(FunnelBlock.EXTRACTING))
+            if (FunnelBlock.isFunnel(blockState) && blockState.hasProperty(FunnelBlock.EXTRACTING) && blockState.getValue(
+                FunnelBlock.EXTRACTING)) {
                 miss = true;
+            }
         }
 
         if (miss) {
@@ -228,7 +230,10 @@ public class EjectorItemEntity extends ItemEntity {
         }
 
         Vec3 vec = rayTraceBlocks.getLocation();
-        earlyTarget = Pair.of(vec.add(Vec3.atLowerCornerOf(rayTraceBlocks.getDirection().getUnitVec3i()).scale(.25f)), rayTraceBlocks.getBlockPos());
+        earlyTarget = Pair.of(
+            vec.add(Vec3.atLowerCornerOf(rayTraceBlocks.getDirection().getUnitVec3i()).scale(.25f)),
+            rayTraceBlocks.getBlockPos()
+        );
         earlyTargetTime = (float) (time + (source.distanceTo(vec) / source.distanceTo(target)));
         return true;
     }

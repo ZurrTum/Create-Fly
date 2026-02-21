@@ -20,9 +20,7 @@ public class CartMovementScrollBehaviour extends ScrollOptionBehaviour<CartMovem
 
     public enum CartMovementModeIcon implements INamedIconOptions {
 
-        ROTATE(AllIcons.I_CART_ROTATE),
-        ROTATE_PAUSED(AllIcons.I_CART_ROTATE_PAUSED),
-        ROTATION_LOCKED(AllIcons.I_CART_ROTATE_LOCKED);
+        ROTATE(AllIcons.I_CART_ROTATE), ROTATE_PAUSED(AllIcons.I_CART_ROTATE_PAUSED), ROTATION_LOCKED(AllIcons.I_CART_ROTATE_LOCKED);
 
         private final String translationKey;
         private final AllIcons icon;

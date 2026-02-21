@@ -16,14 +16,17 @@ public class LargeWaterWheelBlockItem extends BlockItem {
     @Override
     public InteractionResult place(BlockPlaceContext ctx) {
         InteractionResult result = super.place(ctx);
-        if (result != InteractionResult.FAIL)
+        if (result != InteractionResult.FAIL) {
             return result;
+        }
         Direction clickedFace = ctx.getClickedFace();
         Direction.Axis axis = ((LargeWaterWheelBlock) getBlock()).getAxisForPlacement(ctx);
-        if (clickedFace.getAxis() != axis)
+        if (clickedFace.getAxis() != axis) {
             result = super.place(BlockPlaceContext.at(ctx, ctx.getClickedPos().relative(clickedFace), clickedFace));
-        if (result == InteractionResult.FAIL && ctx.getLevel().isClientSide())
+        }
+        if (result == InteractionResult.FAIL && ctx.getLevel().isClientSide()) {
             AllClientHandle.INSTANCE.showWaterBounds(axis, ctx);
+        }
         return result;
     }
 }

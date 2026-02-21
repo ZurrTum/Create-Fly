@@ -29,38 +29,51 @@ public class FunnelVisual extends AbstractBlockEntityVisual<FunnelBlockEntity> i
         var funnelFacing = FunnelBlock.getFunnelFacing(blockState);
         PartialModel flapPartial = (blockState.getBlock() instanceof FunnelBlock ? AllPartialModels.FUNNEL_FLAP : AllPartialModels.BELT_FUNNEL_FLAP);
 
-        var commonTransform = FlapStuffs.commonTransform(getVisualPosition(), funnelFacing, -blockEntity.getFlapOffset());
-        flaps = new FlapStuffs.Visual(instancerProvider(), commonTransform, FlapStuffs.FUNNEL_PIVOT, Models.partial(flapPartial));
+        var commonTransform = FlapStuffs.commonTransform(
+            getVisualPosition(),
+            funnelFacing,
+            -blockEntity.getFlapOffset()
+        );
+        flaps = new FlapStuffs.Visual(
+            instancerProvider(),
+            commonTransform,
+            FlapStuffs.FUNNEL_PIVOT,
+            Models.partial(flapPartial)
+        );
 
         flaps.update(blockEntity.flap.getValue(partialTick));
     }
 
     @Override
     public void beginFrame(DynamicVisual.Context ctx) {
-        if (flaps == null)
+        if (flaps == null) {
             return;
+        }
 
         flaps.update(blockEntity.flap.getValue(ctx.partialTick()));
     }
 
     @Override
     public void updateLight(float partialTick) {
-        if (flaps != null)
+        if (flaps != null) {
             flaps.updateLight(computePackedLight());
+        }
     }
 
     @Override
     protected void _delete() {
-        if (flaps == null)
+        if (flaps == null) {
             return;
+        }
 
         flaps.delete();
     }
 
     @Override
     public void collectCrumblingInstances(Consumer<Instance> consumer) {
-        if (flaps == null)
+        if (flaps == null) {
             return;
+        }
 
         flaps.collectCrumblingInstances(consumer);
     }

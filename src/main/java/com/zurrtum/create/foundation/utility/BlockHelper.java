@@ -78,32 +78,45 @@ public class BlockHelper {
     );
 
     public static BlockState setZeroAge(BlockState blockState) {
-        if (blockState.hasProperty(BlockStateProperties.AGE_1))
+        if (blockState.hasProperty(BlockStateProperties.AGE_1)) {
             return blockState.setValue(BlockStateProperties.AGE_1, 0);
-        if (blockState.hasProperty(BlockStateProperties.AGE_2))
+        }
+        if (blockState.hasProperty(BlockStateProperties.AGE_2)) {
             return blockState.setValue(BlockStateProperties.AGE_2, 0);
-        if (blockState.hasProperty(BlockStateProperties.AGE_3))
+        }
+        if (blockState.hasProperty(BlockStateProperties.AGE_3)) {
             return blockState.setValue(BlockStateProperties.AGE_3, 0);
-        if (blockState.hasProperty(BlockStateProperties.AGE_5))
+        }
+        if (blockState.hasProperty(BlockStateProperties.AGE_5)) {
             return blockState.setValue(BlockStateProperties.AGE_5, 0);
-        if (blockState.hasProperty(BlockStateProperties.AGE_7))
+        }
+        if (blockState.hasProperty(BlockStateProperties.AGE_7)) {
             return blockState.setValue(BlockStateProperties.AGE_7, 0);
-        if (blockState.hasProperty(BlockStateProperties.AGE_15))
+        }
+        if (blockState.hasProperty(BlockStateProperties.AGE_15)) {
             return blockState.setValue(BlockStateProperties.AGE_15, 0);
-        if (blockState.hasProperty(BlockStateProperties.AGE_25))
+        }
+        if (blockState.hasProperty(BlockStateProperties.AGE_25)) {
             return blockState.setValue(BlockStateProperties.AGE_25, 0);
-        if (blockState.hasProperty(BlockStateProperties.LEVEL_HONEY))
+        }
+        if (blockState.hasProperty(BlockStateProperties.LEVEL_HONEY)) {
             return blockState.setValue(BlockStateProperties.LEVEL_HONEY, 0);
-        if (blockState.hasProperty(BlockStateProperties.HATCH))
+        }
+        if (blockState.hasProperty(BlockStateProperties.HATCH)) {
             return blockState.setValue(BlockStateProperties.HATCH, 0);
-        if (blockState.hasProperty(BlockStateProperties.STAGE))
+        }
+        if (blockState.hasProperty(BlockStateProperties.STAGE)) {
             return blockState.setValue(BlockStateProperties.STAGE, 0);
-        if (blockState.is(BlockTags.CAULDRONS))
+        }
+        if (blockState.is(BlockTags.CAULDRONS)) {
             return Blocks.CAULDRON.defaultBlockState();
-        if (blockState.hasProperty(BlockStateProperties.LEVEL_COMPOSTER))
+        }
+        if (blockState.hasProperty(BlockStateProperties.LEVEL_COMPOSTER)) {
             return blockState.setValue(BlockStateProperties.LEVEL_COMPOSTER, 0);
-        if (blockState.hasProperty(BlockStateProperties.EXTENDED))
+        }
+        if (blockState.hasProperty(BlockStateProperties.EXTENDED)) {
             return blockState.setValue(BlockStateProperties.EXTENDED, false);
+        }
         return blockState;
     }
 
@@ -113,12 +126,15 @@ public class BlockHelper {
 
         boolean needsTwo = block.hasProperty(BlockStateProperties.SLAB_TYPE) && block.getValue(BlockStateProperties.SLAB_TYPE) == SlabType.DOUBLE;
 
-        if (needsTwo)
+        if (needsTwo) {
             amount *= 2;
+        }
 
-        for (IntegerProperty property : COUNT_STATES)
-            if (block.hasProperty(property))
+        for (IntegerProperty property : COUNT_STATES) {
+            if (block.hasProperty(property)) {
                 amount *= block.getValue(property);
+            }
+        }
 
         if (VINELIKE_BLOCKS.contains(block.getBlock())) {
             int vineCount = 0;
@@ -146,8 +162,9 @@ public class BlockHelper {
 
         // Search inventory
         for (int i = 0; i < player.getInventory().getContainerSize(); ++i) {
-            if (amountFound == amount)
+            if (amountFound == amount) {
                 break;
+            }
 
             ItemStack itemstack = player.getInventory().getItem(i);
             int count = itemstack.getCount();
@@ -160,8 +177,9 @@ public class BlockHelper {
 
         if (needsTwo) {
             // Give back 1 if uneven amount was removed
-            if (amountFound % 2 != 0)
+            if (amountFound % 2 != 0) {
                 player.getInventory().add(new ItemStack(required));
+            }
             amountFound /= 2;
         }
 
@@ -196,7 +214,8 @@ public class BlockHelper {
             int vineCount = 0;
 
             for (BooleanProperty vineState : VINELIKE_STATES) {
-                if (block.hasProperty(vineState) && block.getValue(vineState) && (replaceable || !replace.getValue(vineState))) {
+                if (block.hasProperty(vineState) && block.getValue(vineState) && (replaceable || !replace.getValue(
+                    vineState))) {
                     vineCount++;
                 }
             }
@@ -249,8 +268,9 @@ public class BlockHelper {
                         task.add(() -> itemstack.setCount(count - taken));
                     }
                     amountFound += taken;
-                    if (amountFound == amount)
+                    if (amountFound == amount) {
                         break;
+                    }
                 }
             }
         }
@@ -269,8 +289,9 @@ public class BlockHelper {
     public static ItemStack getRequiredItem(BlockState state) {
         ItemStack itemStack = new ItemStack(state.getBlock());
         Item item = itemStack.getItem();
-        if (item == Items.FARMLAND || item == Items.DIRT_PATH)
+        if (item == Items.FARMLAND || item == Items.DIRT_PATH) {
             itemStack = new ItemStack(Items.DIRT);
+        }
         return itemStack;
     }
 
@@ -278,7 +299,12 @@ public class BlockHelper {
         destroyBlock(world, pos, effectChance, stack -> Block.popResource(world, pos, stack));
     }
 
-    public static void destroyBlock(Level world, BlockPos pos, float effectChance, Consumer<ItemStack> droppedItemCallback) {
+    public static void destroyBlock(
+        Level world,
+        BlockPos pos,
+        float effectChance,
+        Consumer<ItemStack> droppedItemCallback
+    ) {
         destroyBlockAs(world, pos, null, ItemStack.EMPTY, effectChance, droppedItemCallback);
     }
 
@@ -293,8 +319,9 @@ public class BlockHelper {
         FluidState fluidState = world.getFluidState(pos);
         BlockState state = world.getBlockState(pos);
 
-        if (world.random.nextFloat() < effectChance)
+        if (world.random.nextFloat() < effectChance) {
             world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
+        }
         BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
 
         if (player != null) {
@@ -321,8 +348,9 @@ public class BlockHelper {
                 //                        state.getBlock().popExperience(serverLevel, pos, event.getDroppedExperience());
                 //                }
             }
-            for (ItemStack itemStack : drops)
+            for (ItemStack itemStack : drops) {
                 droppedItemCallback.accept(itemStack);
+            }
 
             // Simulating IceBlock#playerDestroy. Not calling method directly as it would drop item
             // entities as a side-effect
@@ -382,7 +410,14 @@ public class BlockHelper {
         world.neighborChanged(target, sourceBlock, null);
     }
 
-    public static void markAndNotifyBlock(Level world, BlockPos pos, LevelChunk worldChunk, BlockState blockState, BlockState state, int flags) {
+    public static void markAndNotifyBlock(
+        Level world,
+        BlockPos pos,
+        LevelChunk worldChunk,
+        BlockState blockState,
+        BlockState state,
+        int flags
+    ) {
         BlockState blockState2 = world.getBlockState(pos);
         if (blockState2 == state) {
             if (blockState != blockState2) {
@@ -414,8 +449,9 @@ public class BlockHelper {
 
     public static CompoundTag prepareBlockEntityData(Level level, BlockState blockState, BlockEntity blockEntity) {
         CompoundTag data = null;
-        if (blockEntity == null)
+        if (blockEntity == null) {
             return null;
+        }
         RegistryAccess access = level.registryAccess();
         SafeNbtWriter writer = SafeNbtWriterRegistry.REGISTRY.get(blockEntity.getType());
         if (blockState.is(AllBlockTags.SAFE_NBT)) {
@@ -424,7 +460,10 @@ public class BlockHelper {
             data = new CompoundTag();
             writer.writeSafe(blockEntity, data, access);
         } else if (blockEntity instanceof PartialSafeNBT safeNbtBE) {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), LOGGER)) {
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                blockEntity.problemPath(),
+                LOGGER
+            )) {
                 TagValueOutput view = TagValueOutput.createWithContext(logging, access);
                 safeNbtBE.writeSafe(view);
                 data = view.buildResult();
@@ -437,7 +476,13 @@ public class BlockHelper {
         return NBTProcessors.process(blockState, blockEntity, data, true);
     }
 
-    public static void placeSchematicBlock(Level world, BlockState state, BlockPos target, ItemStack stack, @Nullable CompoundTag data) {
+    public static void placeSchematicBlock(
+        Level world,
+        BlockState state,
+        BlockPos target,
+        ItemStack stack,
+        @Nullable CompoundTag data
+    ) {
         Block block = state.getBlock();
         BlockEntity existingBlockEntity = world.getBlockEntity(target);
         boolean alreadyPlaced = false;
@@ -450,10 +495,12 @@ public class BlockHelper {
         }
 
         // Piston
-        if (state.hasProperty(BlockStateProperties.EXTENDED))
+        if (state.hasProperty(BlockStateProperties.EXTENDED)) {
             state = state.setValue(BlockStateProperties.EXTENDED, Boolean.FALSE);
-        if (state.hasProperty(BlockStateProperties.WATERLOGGED))
+        }
+        if (state.hasProperty(BlockStateProperties.WATERLOGGED)) {
             state = state.setValue(BlockStateProperties.WATERLOGGED, Boolean.FALSE);
+        }
 
         if (block == Blocks.COMPOSTER) {
             state = Blocks.COMPOSTER.defaultBlockState();
@@ -466,7 +513,8 @@ public class BlockHelper {
             state = Blocks.CAULDRON.defaultBlockState();
         }
 
-        if (world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, target) && state.getFluidState().is(FluidTags.WATER)) {
+        if (world.environmentAttributes()
+            .getValue(EnvironmentAttributes.WATER_EVAPORATES, target) && state.getFluidState().is(FluidTags.WATER)) {
             int i = target.getX();
             int j = target.getY();
             int k = target.getZ();
@@ -480,7 +528,15 @@ public class BlockHelper {
             );
 
             for (int l = 0; l < 8; ++l) {
-                world.addParticle(ParticleTypes.LARGE_SMOKE, i + Math.random(), j + Math.random(), k + Math.random(), 0.0D, 0.0D, 0.0D);
+                world.addParticle(
+                    ParticleTypes.LARGE_SMOKE,
+                    i + Math.random(),
+                    j + Math.random(),
+                    k + Math.random(),
+                    0.0D,
+                    0.0D,
+                    0.0D
+                );
             }
             Block.dropResources(state, world, target);
             return;
@@ -512,12 +568,18 @@ public class BlockHelper {
                 data.putInt("x", target.getX());
                 data.putInt("y", target.getY());
                 data.putInt("z", target.getZ());
-                if (blockEntity instanceof KineticBlockEntity kbe)
+                if (blockEntity instanceof KineticBlockEntity kbe) {
                     kbe.warnOfMovement();
-                if (blockEntity instanceof IMultiBlockEntityContainer imbe)
-                    if (!imbe.isController())
+                }
+                if (blockEntity instanceof IMultiBlockEntityContainer imbe) {
+                    if (!imbe.isController()) {
                         data.store("Controller", BlockPos.CODEC, imbe.getController());
-                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), LOGGER)) {
+                    }
+                }
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                    blockEntity.problemPath(),
+                    LOGGER
+                )) {
                     blockEntity.loadWithComponents(TagValueInput.create(logging, world.registryAccess(), data));
                 }
             }
@@ -530,10 +592,12 @@ public class BlockHelper {
     }
 
     public static double getBounceMultiplier(Block block) {
-        if (block instanceof SlimeBlock)
+        if (block instanceof SlimeBlock) {
             return 0.8D;
-        if (block instanceof BedBlock)
+        }
+        if (block instanceof BedBlock) {
             return 0.66 * 0.8D;
+        }
         return 0;
     }
 
@@ -559,7 +623,11 @@ public class BlockHelper {
         return toState;
     }
 
-    public static <T extends Comparable<T>> BlockState copyProperty(Property<T> property, BlockState fromState, BlockState toState) {
+    public static <T extends Comparable<T>> BlockState copyProperty(
+        Property<T> property,
+        BlockState fromState,
+        BlockState toState
+    ) {
         if (fromState.hasProperty(property) && toState.hasProperty(property)) {
             return toState.setValue(property, fromState.getValue(property));
         }
@@ -576,7 +644,13 @@ public class BlockHelper {
         return true;
     }
 
-    public static InteractionResult invokeUse(BlockState state, Level level, Player player, InteractionHand hand, BlockHitResult ray) {
+    public static InteractionResult invokeUse(
+        BlockState state,
+        Level level,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
         InteractionResult iteminteractionresult = state.useItemOn(player.getItemInHand(hand), level, player, hand, ray);
         if (iteminteractionresult.consumesAction()) {
             return iteminteractionresult;

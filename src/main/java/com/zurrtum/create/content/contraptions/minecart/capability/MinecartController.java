@@ -90,8 +90,9 @@ public class MinecartController {
         couplings.forEachWithContext((opt, main) -> opt.ifPresent(cd -> {
             UUID idOfOther = cd.idOfCart(!main);
             MinecartController otherCart = CapabilityMinecartController.getIfPresent(cart.level(), idOfOther);
-            if (otherCart == null)
+            if (otherCart == null) {
                 return;
+            }
 
             removeConnection(main);
             otherCart.removeConnection(!main);
@@ -132,8 +133,9 @@ public class MinecartController {
     @Nullable
     public UUID getCoupledCart(boolean asMain) {
         Optional<CouplingData> optional = couplings.get(asMain);
-        if (optional.isEmpty())
+        if (optional.isEmpty()) {
             return null;
+        }
         CouplingData couplingData = optional.get();
         return asMain ? couplingData.connectedCartID : couplingData.mainCartID;
     }
@@ -203,14 +205,17 @@ public class MinecartController {
             for (MinecartController minecartController : cartsToFlip) {
                 minecartController.couplings.forEachWithContext((opt, leading) -> opt.ifPresent(cd -> {
                     cd.flip();
-                    if (!cd.contraption)
+                    if (!cd.contraption) {
                         return;
+                    }
                     List<Entity> passengers = minecartController.cart().getPassengers();
-                    if (passengers.isEmpty())
+                    if (passengers.isEmpty()) {
                         return;
+                    }
                     Entity entity = passengers.getFirst();
-                    if (!(entity instanceof OrientedContraptionEntity contraption))
+                    if (!(entity instanceof OrientedContraptionEntity contraption)) {
                         return;
+                    }
                     UUID couplingId = contraption.getCouplingId();
                     if (couplingId == cd.mainCartID) {
                         contraption.setCouplingId(cd.connectedCartID);
@@ -222,8 +227,9 @@ public class MinecartController {
                 }));
                 minecartController.couplings = minecartController.couplings.swap();
                 minecartController.needsEntryRefresh = true;
-                if (minecartController == this)
+                if (minecartController == this) {
                     continue;
+                }
                 minecartController.sendData();
             }
         }
@@ -236,8 +242,9 @@ public class MinecartController {
                 List<Entity> passengers = cart().getPassengers();
                 if (!passengers.isEmpty()) {
                     Entity entity = passengers.getFirst();
-                    if (entity instanceof AbstractContraptionEntity abstractContraptionEntity)
+                    if (entity instanceof AbstractContraptionEntity abstractContraptionEntity) {
                         abstractContraptionEntity.disassemble();
+                    }
                 }
             }
         }
@@ -267,8 +274,9 @@ public class MinecartController {
     }
 
     private void setStalled(boolean stall, boolean internal) {
-        if (isStalled(internal) == stall || cart == null)
+        if (isStalled(internal) == stall || cart == null) {
             return;
+        }
 
         if (stall) {
             stallData.set(internal, Optional.of(new StallData(cart)));
@@ -276,8 +284,9 @@ public class MinecartController {
             return;
         }
 
-        if (!isStalled(!internal))
+        if (!isStalled(!internal)) {
             stallData.get(internal).ifPresent(data -> data.release(cart));
+        }
         stallData.set(internal, Optional.empty());
 
         sendData();
@@ -308,7 +317,8 @@ public class MinecartController {
 
             UUID idOfOther = cd.idOfCart(!main);
             MinecartController otherCart = CapabilityMinecartController.getIfPresent(world, idOfOther);
-            internalStall.setValue(internalStall.booleanValue() || otherCart == null || !otherCart.isPresent() || otherCart.isStalled(false));
+            internalStall.setValue(internalStall.booleanValue() || otherCart == null || !otherCart.isPresent() || otherCart.isStalled(
+                false));
 
         }));
         if (!world.isClientSide()) {

@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record DeployingDisplay(
-    EntryIngredient input, EntryIngredient target, List<ProcessingOutput> outputs, boolean keepHeldItem, Optional<Identifier> location
-) implements Display {
+public record DeployingDisplay(EntryIngredient input, EntryIngredient target, List<ProcessingOutput> outputs,
+                               boolean keepHeldItem, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<DeployingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(DeployingDisplay::input),

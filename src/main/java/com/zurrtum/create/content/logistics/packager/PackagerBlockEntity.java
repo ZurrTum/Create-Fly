@@ -125,8 +125,9 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     public void tick() {
         super.tick();
 
-        if (buttonCooldown > 0)
+        if (buttonCooldown > 0) {
             buttonCooldown--;
+        }
 
         if (animationTicks == 0) {
             previouslyUnwrapped = ItemStack.EMPTY;
@@ -136,8 +137,9 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
                 heldBox = entry.stack.copy();
 
                 entry.count--;
-                if (entry.count <= 0)
+                if (entry.count <= 0) {
                     queuedExitingPackages.removeFirst();
+                }
 
                 animationInward = false;
                 animationTicks = CYCLE;
@@ -148,10 +150,19 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         }
 
         if (level.isClientSide()) {
-            if (animationTicks == CYCLE - (animationInward ? 5 : 1))
+            if (animationTicks == CYCLE - (animationInward ? 5 : 1)) {
                 AllSoundEvents.PACKAGER.playAt(level, worldPosition, 1, 1, true);
-            if (animationTicks == (animationInward ? 1 : 5))
-                level.playLocalSound(worldPosition, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.25f, 0.75f, true);
+            }
+            if (animationTicks == (animationInward ? 1 : 5)) {
+                level.playLocalSound(
+                    worldPosition,
+                    SoundEvents.IRON_TRAPDOOR_CLOSE,
+                    SoundSource.BLOCKS,
+                    0.25f,
+                    0.75f,
+                    true
+                );
+            }
         }
 
         animationTicks--;
@@ -167,8 +178,9 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public InventorySummary getAvailableItems() {
-        if (availableItems != null && invVersionTracker.stillWaiting(targetInventory.getInventory()))
+        if (availableItems != null && invVersionTracker.stillWaiting(targetInventory.getInventory())) {
             return availableItems;
+        }
 
         InventorySummary availableItems = new InventorySummary();
 
@@ -195,78 +207,98 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     private void submitNewArrivals(InventorySummary before, InventorySummary after) {
-        if (before == null || after.isEmpty())
+        if (before == null || after.isEmpty()) {
             return;
+        }
 
         Set<RequestPromiseQueue> promiseQueues = new HashSet<>();
 
         for (Direction d : Iterate.directions) {
-            if (!level.isLoaded(worldPosition.relative(d)))
+            if (!level.isLoaded(worldPosition.relative(d))) {
                 continue;
+            }
 
             BlockState adjacentState = level.getBlockState(worldPosition.relative(d));
             if (adjacentState.is(AllBlocks.FACTORY_GAUGE)) {
-                if (FactoryPanelBlock.connectedDirection(adjacentState) != d)
+                if (FactoryPanelBlock.connectedDirection(adjacentState) != d) {
                     continue;
-                if (!(level.getBlockEntity(worldPosition.relative(d)) instanceof FactoryPanelBlockEntity fpbe))
+                }
+                if (!(level.getBlockEntity(worldPosition.relative(d)) instanceof FactoryPanelBlockEntity fpbe)) {
                     continue;
-                if (!fpbe.restocker)
+                }
+                if (!fpbe.restocker) {
                     continue;
+                }
                 for (ServerFactoryPanelBehaviour behaviour : fpbe.panels.values()) {
-                    if (!behaviour.isActive())
+                    if (!behaviour.isActive()) {
                         continue;
+                    }
                     promiseQueues.add(behaviour.restockerPromises);
                 }
             }
 
             if (adjacentState.is(AllBlocks.STOCK_LINK)) {
-                if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
+                if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d) {
                     continue;
-                if (!(level.getBlockEntity(worldPosition.relative(d)) instanceof PackagerLinkBlockEntity plbe))
+                }
+                if (!(level.getBlockEntity(worldPosition.relative(d)) instanceof PackagerLinkBlockEntity plbe)) {
                     continue;
+                }
                 UUID freqId = plbe.behaviour.freqId;
-                if (!Create.LOGISTICS.hasQueuedPromises(freqId))
+                if (!Create.LOGISTICS.hasQueuedPromises(freqId)) {
                     continue;
+                }
                 promiseQueues.add(Create.LOGISTICS.getQueuedPromises(freqId));
             }
         }
 
-        if (promiseQueues.isEmpty())
+        if (promiseQueues.isEmpty()) {
             return;
+        }
 
-        for (BigItemStack entry : after.getStacks())
+        for (BigItemStack entry : after.getStacks()) {
             before.add(entry.stack, -entry.count);
-        for (RequestPromiseQueue queue : promiseQueues)
-            for (BigItemStack entry : before.getStacks())
-                if (entry.count < 0)
+        }
+        for (RequestPromiseQueue queue : promiseQueues) {
+            for (BigItemStack entry : before.getStacks()) {
+                if (entry.count < 0) {
                     queue.itemEnteredSystem(entry.stack, -entry.count);
+                }
+            }
+        }
     }
 
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         recheckIfLinksPresent();
-        if (!redstonePowered)
+        if (!redstonePowered) {
             return;
+        }
         redstonePowered = getBlockState().getValueOrElse(PackagerBlock.POWERED, false);
-        if (!redstoneModeActive())
+        if (!redstoneModeActive()) {
             return;
+        }
         updateSignAddress();
         attemptToSend();
     }
 
     public void recheckIfLinksPresent() {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         BlockState blockState = getBlockState();
-        if (!blockState.hasProperty(PackagerBlock.LINKED))
+        if (!blockState.hasProperty(PackagerBlock.LINKED)) {
             return;
+        }
         boolean shouldBeLinked = getLinkPos() != null;
         boolean isLinked = blockState.getValue(PackagerBlock.LINKED);
-        if (shouldBeLinked == isLinked)
+        if (shouldBeLinked == isLinked) {
             return;
+        }
         level.setBlockAndUpdate(worldPosition, blockState.cycle(PackagerBlock.LINKED));
     }
 
@@ -277,10 +309,12 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     private BlockPos getLinkPos() {
         for (Direction d : Iterate.directions) {
             BlockState adjacentState = level.getBlockState(worldPosition.relative(d));
-            if (!adjacentState.is(AllBlocks.STOCK_LINK))
+            if (!adjacentState.is(AllBlocks.STOCK_LINK)) {
                 continue;
-            if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
+            }
+            if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d) {
                 continue;
+            }
             return worldPosition.relative(d);
         }
         return null;
@@ -293,10 +327,12 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         for (Direction d : Iterate.directions) {
             BlockPos adjacentPos = worldPosition.relative(d);
             BlockState adjacentState = level.getBlockState(adjacentPos);
-            if (!adjacentState.is(AllBlocks.STOCK_LINK))
+            if (!adjacentState.is(AllBlocks.STOCK_LINK)) {
                 continue;
-            if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
+            }
+            if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d) {
                 continue;
+            }
             serverWorld.getServer().getPlayerList().broadcast(
                 null,
                 adjacentPos.getX(),
@@ -324,8 +360,9 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         setChanged();
 
         recheckIfLinksPresent();
-        if (!redstoneModeActive())
+        if (!redstoneModeActive()) {
             return;
+        }
 
         updateSignAddress();
         attemptToSend();
@@ -337,15 +374,17 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public boolean unwrapBox(ItemStack box, boolean simulate) {
-        if (animationTicks > 0)
+        if (animationTicks > 0) {
             return false;
+        }
 
         Objects.requireNonNull(level);
 
         ItemStackHandler contents = PackageItem.getContents(box);
         List<ItemStack> items = ItemHelper.getNonEmptyStacks(contents);
-        if (items.isEmpty())
+        if (items.isEmpty()) {
             return true;
+        }
 
         PackageOrderWithCrafts orderContext = PackageItem.getOrderContext(box);
         Direction facing = getBlockState().getValueOrElse(PackagerBlock.FACING, Direction.UP);
@@ -552,11 +591,27 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
             int end = packages.size() - 1;
             for (int i = 0; i < end; i++) {
                 stack = packages.get(i);
-                PackageItem.setOrder(stack, fixedOrderId, linkIndexInOrder, finalLinkInOrder, packageIndexAtLink++, false, orderContext);
+                PackageItem.setOrder(
+                    stack,
+                    fixedOrderId,
+                    linkIndexInOrder,
+                    finalLinkInOrder,
+                    packageIndexAtLink++,
+                    false,
+                    orderContext
+                );
                 queuePackage(stack, fixedAddress);
             }
             stack = packages.get(end);
-            PackageItem.setOrder(stack, fixedOrderId, linkIndexInOrder, finalLinkInOrder, packageIndexAtLink, true, orderContext);
+            PackageItem.setOrder(
+                stack,
+                fixedOrderId,
+                linkIndexInOrder,
+                finalLinkInOrder,
+                packageIndexAtLink,
+                true,
+                orderContext
+            );
             queuePackage(stack, fixedAddress);
             if (nextRequest == null) {
                 break;
@@ -580,33 +635,38 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         signBasedAddress = "";
         for (Direction side : Iterate.directions) {
             String address = getSign(side);
-            if (address == null || address.isBlank())
+            if (address == null || address.isBlank()) {
                 continue;
+            }
             signBasedAddress = address;
         }
     }
 
     protected String getSign(Direction side) {
         BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(side));
-        if (!(blockEntity instanceof SignBlockEntity sign))
+        if (!(blockEntity instanceof SignBlockEntity sign)) {
             return null;
+        }
         for (boolean front : Iterate.trueAndFalse) {
             SignText text = sign.getText(front);
             String address = "";
             for (Component component : text.getMessages(false)) {
                 String string = component.getString();
-                if (!string.isBlank())
+                if (!string.isBlank()) {
                     address += string.trim() + " ";
+                }
             }
-            if (!address.isBlank())
+            if (!address.isBlank()) {
                 return address.trim();
+            }
         }
         return null;
     }
 
     protected void wakeTheFrogs() {
-        if (level.getBlockEntity(worldPosition.relative(Direction.UP)) instanceof FrogportBlockEntity port)
+        if (level.getBlockEntity(worldPosition.relative(Direction.UP)) instanceof FrogportBlockEntity port) {
             port.tryPullingFromOwnAndAdjacentInventories();
+        }
     }
 
     @Override
@@ -620,8 +680,9 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         hasCustomComputerAddress = view.getBooleanOr("HasComputerAddress", false);
         heldBox = view.read("HeldBox", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         previouslyUnwrapped = view.read("InsertedBox", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        if (clientPacket)
+        if (clientPacket) {
             return;
+        }
         queuedExitingPackages.clear();
         view.read("QueuedExitingPackages", EXITING_CODEC).ifPresent(list -> queuedExitingPackages.addAll(list));
         view.read("LastSummary", InventorySummary.CODEC).ifPresent(summary -> availableItems = summary);
@@ -642,11 +703,13 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         if (!previouslyUnwrapped.isEmpty()) {
             view.store("InsertedBox", ItemStack.CODEC, previouslyUnwrapped);
         }
-        if (clientPacket)
+        if (clientPacket) {
             return;
+        }
         view.store("QueuedExitingPackages", EXITING_CODEC, queuedExitingPackages);
-        if (availableItems != null)
+        if (availableItems != null) {
             view.store("LastSummary", InventorySummary.CODEC, availableItems);
+        }
     }
 
     @Override
@@ -660,8 +723,15 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         super.destroy();
         Containers.dropContents(level, worldPosition, inventory);
         queuedExitingPackages.forEach(bigStack -> {
-            for (int i = 0; i < bigStack.count; i++)
-                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), bigStack.stack.copy());
+            for (int i = 0; i < bigStack.count; i++) {
+                Containers.dropItemStack(
+                    level,
+                    worldPosition.getX(),
+                    worldPosition.getY(),
+                    worldPosition.getZ(),
+                    bigStack.stack.copy()
+                );
+            }
         });
         queuedExitingPackages.clear();
     }
@@ -674,18 +744,21 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public ItemStack getRenderedBox() {
-        if (animationInward)
+        if (animationInward) {
             return animationTicks <= CYCLE / 2 ? ItemStack.EMPTY : previouslyUnwrapped;
+        }
         return animationTicks >= CYCLE / 2 ? ItemStack.EMPTY : heldBox;
     }
 
     public boolean isTargetingSameInventory(@Nullable IdentifiedInventory inventory) {
-        if (inventory == null)
+        if (inventory == null) {
             return false;
+        }
 
         Container targetHandler = targetInventory.getInventory();
-        if (targetHandler == null)
+        if (targetHandler == null) {
             return false;
+        }
 
         if (inventory.identifier() != null) {
             BlockFace face = targetInventory.getTarget().getOpposite();
@@ -696,18 +769,22 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     private static boolean isSameInventoryFallback(Container first, Container second) {
-        if (first == second)
+        if (first == second) {
             return true;
+        }
 
         // If a contained ItemStack instance is the same, we can be pretty sure these
         // inventories are the same (works for compound inventories)
         for (int i = 0, secondSize = second.getContainerSize(); i < secondSize; i++) {
             ItemStack stackInSlot = second.getItem(i);
-            if (stackInSlot.isEmpty())
+            if (stackInSlot.isEmpty()) {
                 continue;
-            for (int j = 0, firstSize = first.getContainerSize(); j < firstSize; j++)
-                if (stackInSlot == first.getItem(j))
+            }
+            for (int j = 0, firstSize = first.getContainerSize(); j < firstSize; j++) {
+                if (stackInSlot == first.getItem(j)) {
                     return true;
+                }
+            }
             break;
         }
 

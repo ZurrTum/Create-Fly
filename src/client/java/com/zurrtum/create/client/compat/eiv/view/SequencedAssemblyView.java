@@ -160,7 +160,14 @@ public class SequencedAssemblyView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         boolean checkHover = screen.hoveredSlot == null;
         boolean checkStep = mouseY >= 7 && mouseY <= 86;
         Font textRenderer = screen.getFont();
@@ -187,12 +194,21 @@ public class SequencedAssemblyView extends CreateView {
             }
             if (checkHover && checkStep && mouseX > x - 7 && mouseX < x + 22) {
                 checkHover = false;
-                Component text = draw != null ? SequencedRenderer.getSequenceName(draw, recipe, stack) : SequencedRenderer.getSequenceName(recipe);
+                Component text = draw != null ? SequencedRenderer.getSequenceName(
+                    draw,
+                    recipe,
+                    stack
+                ) : SequencedRenderer.getSequenceName(recipe);
                 List<Component> tooltip = List.of(
                     CreateLang.translateDirect("recipe.assembly.step", i + 1),
                     text.copy().withStyle(ChatFormatting.DARK_GREEN)
                 );
-                context.setComponentTooltipForNextFrame(textRenderer, tooltip, mouseX + position.left(), mouseY + position.top());
+                context.setComponentTooltipForNextFrame(
+                    textRenderer,
+                    tooltip,
+                    mouseX + position.left(),
+                    mouseY + position.top()
+                );
             }
         }
         int xOffset = 0;
@@ -210,7 +226,12 @@ public class SequencedAssemblyView extends CreateView {
                     CreateLang.translateDirect("recipe.assembly.junk"),
                     CreateLang.translateDirect("recipe.processing.chance", number).withStyle(ChatFormatting.GOLD)
                 );
-                context.setComponentTooltipForNextFrame(textRenderer, tooltip, mouseX + position.left(), mouseY + position.top());
+                context.setComponentTooltipForNextFrame(
+                    textRenderer,
+                    tooltip,
+                    mouseX + position.left(),
+                    mouseY + position.top()
+                );
             }
         }
         AllGuiTextures.JEI_LONG_ARROW.render(context, xOffset + 47, 96);
@@ -266,7 +287,13 @@ public class SequencedAssemblyView extends CreateView {
             matrices.translate(x, y);
             matrices.scale(scale, scale);
             matrices.translate(-x, -y);
-            graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(i, new Matrix3x2f(matrices), x - 3, y + 18, i));
+            graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(
+                i,
+                new Matrix3x2f(matrices),
+                x - 3,
+                y + 18,
+                i
+            ));
             matrices.popMatrix();
         }
     }
@@ -280,7 +307,13 @@ public class SequencedAssemblyView extends CreateView {
             matrices.translate(x, y);
             matrices.scale(scale, scale);
             matrices.translate(-x, -y);
-            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(i, new Matrix3x2f(matrices), x - 3, y + 18, i));
+            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(
+                i,
+                new Matrix3x2f(matrices),
+                x - 3,
+                y + 18,
+                i
+            ));
             matrices.popMatrix();
         }
 
@@ -327,13 +360,19 @@ public class SequencedAssemblyView extends CreateView {
                 Fluid fluid = item.getFluid();
                 if (fluid == AllFluids.POTION) {
                     PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-                    BottleType bottleType = stack.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
+                    BottleType bottleType = stack.getOrDefault(
+                        AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
+                        BottleType.REGULAR
+                    );
                     ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(bottleType);
                     return contents.getName(itemFromBottleType.asItem().getDescriptionId() + ".effect.");
                 }
                 Block block = fluid.defaultFluidState().createLegacyBlock().getBlock();
                 if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
-                    return Component.translatable(Util.makeDescriptionId("block", BuiltInRegistries.FLUID.getKey(fluid)));
+                    return Component.translatable(Util.makeDescriptionId(
+                        "block",
+                        BuiltInRegistries.FLUID.getKey(fluid)
+                    ));
                 }
                 name = block.getName();
             } else {

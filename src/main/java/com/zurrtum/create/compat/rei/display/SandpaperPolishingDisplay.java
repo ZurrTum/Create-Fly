@@ -16,7 +16,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
-public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient output,
+                                        Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<SandpaperPolishingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SandpaperPolishingDisplay::input),

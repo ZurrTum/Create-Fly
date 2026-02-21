@@ -9,10 +9,6 @@ import com.zurrtum.create.catnip.placement.PlacementHelpers;
 import com.zurrtum.create.content.contraptions.actors.AttachedActorBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -32,6 +28,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Predicate;
 
 public class RollerBlock extends AttachedActorBlock implements IBE<RollerBlockEntity> {
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
@@ -86,7 +85,8 @@ public class RollerBlock extends AttachedActorBlock implements IBE<RollerBlockEn
         IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
         if (!player.isShiftKeyDown() && player.mayBuild()) {
             if (placementHelper.matchesItem(stack)) {
-                placementHelper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+                placementHelper.getOffset(player, level, state, pos, hitResult)
+                    .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -97,7 +97,11 @@ public class RollerBlock extends AttachedActorBlock implements IBE<RollerBlockEn
     private static class PlacementHelper extends PoleHelper<Direction> {
 
         public PlacementHelper() {
-            super(state -> state.is(AllBlocks.MECHANICAL_ROLLER), state -> state.getValue(FACING).getClockWise().getAxis(), FACING);
+            super(
+                state -> state.is(AllBlocks.MECHANICAL_ROLLER),
+                state -> state.getValue(FACING).getClockWise().getAxis(),
+                FACING
+            );
         }
 
         @Override

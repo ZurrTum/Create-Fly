@@ -46,31 +46,49 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         super.visitNewPosition(context, pos);
         Level world = context.world;
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
         BlockPos below = pos.below();
-        if (!world.isLoaded(below))
+        if (!world.isLoaded(below)) {
             return;
+        }
 
         Vec3 vec = VecHelper.getCenterOf(pos);
 
-        BlockHitResult ray = world.clip(new ClipContext(vec, vec.add(0, -1, 0), Block.OUTLINE, Fluid.NONE, CollisionContext.empty()));
-        if (ray.getType() != HitResult.Type.BLOCK)
+        BlockHitResult ray = world.clip(new ClipContext(
+            vec,
+            vec.add(0, -1, 0),
+            Block.OUTLINE,
+            Fluid.NONE,
+            CollisionContext.empty()
+        ));
+        if (ray.getType() != HitResult.Type.BLOCK) {
             return;
+        }
 
-        UseOnContext ctx = new UseOnContext(world, null, InteractionHand.MAIN_HAND, Items.DIAMOND_HOE.getDefaultInstance(), ray);
+        UseOnContext ctx = new UseOnContext(
+            world,
+            null,
+            InteractionHand.MAIN_HAND,
+            Items.DIAMOND_HOE.getDefaultInstance(),
+            ray
+        );
         Items.DIAMOND_HOE.useOn(ctx);
     }
 
     @Override
     protected void throwEntity(MovementContext context, Entity entity) {
         super.throwEntity(context, entity);
-        if (!(entity instanceof FallingBlockEntity fbe))
+        if (!(entity instanceof FallingBlockEntity fbe)) {
             return;
-        if (!(fbe.getBlockState().getBlock() instanceof AnvilBlock))
+        }
+        if (!(fbe.getBlockState().getBlock() instanceof AnvilBlock)) {
             return;
-        if (entity.getDeltaMovement().length() < 0.25f)
+        }
+        if (entity.getDeltaMovement().length() < 0.25f) {
             return;
+        }
         entity.level().getEntitiesOfClass(Player.class, new AABB(entity.blockPosition()).inflate(32)).stream()
             .map(player -> player instanceof ServerPlayer serverPlayer ? serverPlayer : null).filter(Objects::nonNull)
             .forEach(AllAdvancements.ANVIL_PLOUGH::trigger);
@@ -88,20 +106,27 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public boolean canBreak(Level world, BlockPos breakingPos, BlockState state) {
-        if (state.isAir())
+        if (state.isAir()) {
             return false;
-        if (world.getBlockState(breakingPos.below()).getBlock() instanceof FarmBlock)
+        }
+        if (world.getBlockState(breakingPos.below()).getBlock() instanceof FarmBlock) {
             return false;
-        if (state.getBlock() instanceof LiquidBlock)
+        }
+        if (state.getBlock() instanceof LiquidBlock) {
             return false;
-        if (state.getBlock() instanceof BubbleColumnBlock)
+        }
+        if (state.getBlock() instanceof BubbleColumnBlock) {
             return false;
-        if (state.getBlock() instanceof NetherPortalBlock)
+        }
+        if (state.getBlock() instanceof NetherPortalBlock) {
             return false;
-        if (state.getBlock() instanceof ITrackBlock)
+        }
+        if (state.getBlock() instanceof ITrackBlock) {
             return true;
-        if (state.getBlock() instanceof FakeTrackBlock)
+        }
+        if (state.getBlock() instanceof FakeTrackBlock) {
             return false;
+        }
         return state.getCollisionShape(world, breakingPos).isEmpty();
     }
 
@@ -111,9 +136,10 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
 
         if (brokenState.getBlock() == Blocks.SNOW && context.world instanceof ServerLevel world) {
             brokenState.getDrops(new LootParams.Builder(world).withParameter(LootContextParams.BLOCK_STATE, brokenState)
-                .withParameter(LootContextParams.THIS_ENTITY, context.contraption.entity)
-                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                .withParameter(LootContextParams.TOOL, new ItemStack(Items.IRON_SHOVEL))).forEach(s -> collectOrDropItem(context, s));
+                    .withParameter(LootContextParams.THIS_ENTITY, context.contraption.entity)
+                    .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+                    .withParameter(LootContextParams.TOOL, new ItemStack(Items.IRON_SHOVEL)))
+                .forEach(s -> collectOrDropItem(context, s));
         }
     }
 }

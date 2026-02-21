@@ -5,16 +5,15 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.AmbienceGroup;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.PitchGroup;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoundScape {
     private final float pitch;
@@ -55,8 +54,9 @@ public class SoundScape {
     }
 
     public void tick() {
-        if (AnimationTickHolder.getTicks() % SoundScapes.UPDATE_INTERVAL == 0)
+        if (AnimationTickHolder.getTicks() % SoundScapes.UPDATE_INTERVAL == 0) {
             meanPos = null;
+        }
         repeating.forEach(RepeatingSound::tick);
     }
 
@@ -75,8 +75,9 @@ public class SoundScape {
             meanPos = meanPos.add(VecHelper.getCenterOf(blockPos));
             amount++;
         }
-        if (amount == 0)
+        if (amount == 0) {
             return meanPos;
+        }
         return meanPos.scale(1f / amount);
     }
 

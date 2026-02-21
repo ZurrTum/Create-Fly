@@ -54,20 +54,25 @@ public class LargeWaterWheelBlock extends RotatedPillarKineticBlock implements I
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    if (axis.choose(x, y, z) != 0)
+                    if (axis.choose(x, y, z) != 0) {
                         continue;
+                    }
                     BlockPos offset = new BlockPos(x, y, z);
-                    if (offset.equals(BlockPos.ZERO))
+                    if (offset.equals(BlockPos.ZERO)) {
                         continue;
+                    }
                     BlockState occupiedState = context.getLevel().getBlockState(pos.offset(offset));
-                    if (!occupiedState.canBeReplaced())
+                    if (!occupiedState.canBeReplaced()) {
                         return null;
+                    }
                 }
             }
         }
 
-        if (context.getLevel().getBlockState(pos.relative(Direction.fromAxisAndDirection(axis, AxisDirection.NEGATIVE))).is(this))
+        if (context.getLevel().getBlockState(pos.relative(Direction.fromAxisAndDirection(axis, AxisDirection.NEGATIVE)))
+            .is(this)) {
             stateForPlacement = stateForPlacement.setValue(EXTENSION, true);
+        }
 
         return stateForPlacement;
     }
@@ -101,32 +106,36 @@ public class LargeWaterWheelBlock extends RotatedPillarKineticBlock implements I
         BlockState pNeighborState,
         RandomSource random
     ) {
-        if (pDirection != Direction.fromAxisAndDirection(pState.getValue(AXIS), AxisDirection.NEGATIVE))
+        if (pDirection != Direction.fromAxisAndDirection(pState.getValue(AXIS), AxisDirection.NEGATIVE)) {
             return pState;
+        }
         return pState.setValue(EXTENSION, pNeighborState.is(this));
     }
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        if (!level.getBlockTicks().hasScheduledTick(pos, this))
+        if (!level.getBlockTicks().hasScheduledTick(pos, this)) {
             level.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         Axis axis = pState.getValue(AXIS);
         for (Direction side : Iterate.directions) {
-            if (side.getAxis() == axis)
+            if (side.getAxis() == axis) {
                 continue;
+            }
             for (boolean secondary : Iterate.falseAndTrue) {
                 Direction targetSide = secondary ? side.getClockWise(axis) : side;
                 BlockPos structurePos = (secondary ? pPos.relative(side) : pPos).relative(targetSide);
                 BlockState occupiedState = pLevel.getBlockState(structurePos);
                 BlockState requiredStructure = AllBlocks.WATER_WHEEL_STRUCTURAL.defaultBlockState()
                     .setValue(WaterWheelStructuralBlock.FACING, targetSide.getOpposite());
-                if (occupiedState == requiredStructure)
+                if (occupiedState == requiredStructure) {
                     continue;
+                }
                 if (!occupiedState.canBeReplaced()) {
                     pLevel.destroyBlock(pPos, false);
                     return;

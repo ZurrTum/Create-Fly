@@ -78,8 +78,9 @@ public class TrackPaverV2 {
             }
 
             if (placeRow) {
-                if (Math.abs(currentOffset % 2) == 1)
+                if (Math.abs(currentOffset % 2) == 1) {
                     targetVec = mainPos.add(mainNormal.scale(flip * (int) ((currentOffset + 1) / 2.0)));
+                }
                 toPlaceOn.add(BlockPos.containing(targetVec));
             }
 
@@ -115,19 +116,23 @@ public class TrackPaverV2 {
             float t = i == segCount ? 1 : i * lut[i] / segCount;
             float t1 = (i + 1) == segCount ? 1 : (i + 1) * lut[(i + 1)] / segCount;
 
-            if (t1 < localFrom)
+            if (t1 < localFrom) {
                 continue;
-            if (t > localTo)
+            }
+            if (t > localTo) {
                 continue;
+            }
 
             Vec3 vt = VecHelper.bezier(start, end, startHandle, endHandle, t);
             Vec3 vNormal = startNormal.equals(endNormal) ? startNormal : VecHelper.slerp(t, startNormal, endNormal);
-            Vec3 hNormal = vNormal.cross(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t).normalize()).normalize();
+            Vec3 hNormal = vNormal.cross(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t).normalize())
+                .normalize();
             vt = vt.add(vNormal.scale(-1.175f));
 
             Vec3 vt1 = VecHelper.bezier(start, end, startHandle, endHandle, t1);
             Vec3 vNormal1 = startNormal.equals(endNormal) ? startNormal : VecHelper.slerp(t1, startNormal, endNormal);
-            Vec3 hNormal1 = vNormal1.cross(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t1).normalize()).normalize();
+            Vec3 hNormal1 = vNormal1.cross(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t1)
+                .normalize()).normalize();
             vt1 = vt1.add(vNormal1.scale(-1.175f));
 
             Vec3 a3 = vt.add(hNormal.scale(r2));
@@ -147,8 +152,9 @@ public class TrackPaverV2 {
                 for (int scanZ = Mth.floor(aabb.minZ); scanZ <= aabb.maxZ; scanZ++) {
 
                     Vec2 p = new Vec2(scanX + .5f, scanZ + .5f);
-                    if (!isInTriangle(a, b, c, p) && !isInTriangle(a, c, d, p))
+                    if (!isInTriangle(a, b, c, p) && !isInTriangle(a, c, d, p)) {
                         continue;
+                    }
 
                     Pair<Integer, Integer> key = Pair.of(scanX, scanZ);
                     if (!yLevels.containsKey(key) || yLevels.get(key) > y) {
@@ -165,7 +171,8 @@ public class TrackPaverV2 {
         for (Map.Entry<Pair<Integer, Integer>, Double> entry : yLevels.entrySet()) {
             double yValue = entry.getValue();
             int floor = Mth.floor(yValue);
-            BlockPos targetPos = new BlockPos(entry.getKey().getFirst(), floor, entry.getKey().getSecond()).offset(bePosition);
+            BlockPos targetPos = new BlockPos(entry.getKey().getFirst(), floor, entry.getKey().getSecond()).offset(
+                bePosition);
             task.put(targetPos.getX(), targetPos.getZ(), targetPos.getY() + (yValue - floor >= .5 ? .5f : 0));
         }
     }

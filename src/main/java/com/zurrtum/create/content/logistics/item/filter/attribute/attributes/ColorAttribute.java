@@ -6,10 +6,6 @@ import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -21,16 +17,24 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 public record ColorAttribute(DyeColor color) implements ItemAttribute {
-    public static final MapCodec<ColorAttribute> CODEC = DyeColor.CODEC.xmap(ColorAttribute::new, ColorAttribute::color).fieldOf("value");
+    public static final MapCodec<ColorAttribute> CODEC = DyeColor.CODEC.xmap(ColorAttribute::new, ColorAttribute::color)
+        .fieldOf("value");
 
-    public static final StreamCodec<ByteBuf, ColorAttribute> PACKET_CODEC = DyeColor.STREAM_CODEC.map(ColorAttribute::new, ColorAttribute::color);
+    public static final StreamCodec<ByteBuf, ColorAttribute> PACKET_CODEC = DyeColor.STREAM_CODEC.map(
+        ColorAttribute::new,
+        ColorAttribute::color
+    );
 
     private static Collection<DyeColor> findMatchingDyeColors(ItemStack stack) {
         DyeColor color = AllItemTags.getDyeColor(stack);
-        if (color != null)
+        if (color != null) {
             return Collections.singletonList(color);
+        }
 
         Set<DyeColor> colors = new HashSet<>();
         if (stack.has(DataComponents.FIREWORKS)) {
@@ -42,7 +46,8 @@ public record ColorAttribute(DyeColor color) implements ItemAttribute {
             }
         }
 
-        Arrays.stream(DyeColor.values()).filter(c -> BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().startsWith(c.getName() + "_"))
+        Arrays.stream(DyeColor.values())
+            .filter(c -> BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().startsWith(c.getName() + "_"))
             .forEach(colors::add);
 
         return colors;

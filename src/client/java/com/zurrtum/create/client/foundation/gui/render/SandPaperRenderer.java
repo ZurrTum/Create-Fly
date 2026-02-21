@@ -36,7 +36,13 @@ public class SandPaperRenderer extends PictureInPictureRenderer<SandPaperRenderS
         stack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(state.stack()));
         FeatureRenderDispatcher renderDispatcher = mc.gameRenderer.getFeatureRenderDispatcher();
         mc.getItemModelResolver().updateForTopItem(renderState, stack, ItemDisplayContext.GUI, null, null, 0);
-        renderState.submit(matrices, renderDispatcher.getSubmitNodeStorage(), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        renderState.submit(
+            matrices,
+            renderDispatcher.getSubmitNodeStorage(),
+            LightTexture.FULL_BRIGHT,
+            OverlayTexture.NO_OVERLAY,
+            0
+        );
         renderDispatcher.renderAllFeatures();
     }
 

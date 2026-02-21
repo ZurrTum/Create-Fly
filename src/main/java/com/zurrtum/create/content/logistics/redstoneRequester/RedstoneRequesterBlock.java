@@ -64,8 +64,9 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
-        if (stateForPlacement == null)
+        if (stateForPlacement == null) {
             return null;
+        }
         return stateForPlacement.setValue(AXIS, pContext.getHorizontalDirection().getAxis())
             .setValue(POWERED, pContext.getLevel().hasNeighborSignal(pContext.getClickedPos()));
     }
@@ -87,16 +88,28 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hitResult
+    ) {
         return onBlockEntityUse(level, pos, be -> be.use(player));
     }
 
-    public static void programRequester(ServerPlayer player, StockTickerBlockEntity be, PackageOrderWithCrafts order, String address) {
+    public static void programRequester(
+        ServerPlayer player,
+        StockTickerBlockEntity be,
+        PackageOrderWithCrafts order,
+        String address
+    ) {
         ItemStack stack = player.getMainHandItem();
         boolean isRequester = stack.is(AllItems.REDSTONE_REQUESTER);
         boolean isShopCloth = stack.is(AllItemTags.TABLE_CLOTHS);
-        if (!isRequester && !isShopCloth)
+        if (!isRequester && !isShopCloth) {
             return;
+        }
 
         String targetDim = player.level().dimension().identifier().toString();
         AutoRequestData autoRequestData = new AutoRequestData(order, address, be.getBlockPos(), targetDim, false);
@@ -123,27 +136,37 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
     }
 
     public static void appendRequesterTooltip(ItemStack pStack, Consumer<Component> pTooltip) {
-        if (!pStack.has(AllDataComponents.AUTO_REQUEST_DATA))
+        if (!pStack.has(AllDataComponents.AUTO_REQUEST_DATA)) {
             return;
+        }
 
         AutoRequestData data = pStack.get(AllDataComponents.AUTO_REQUEST_DATA);
 
         //noinspection DataFlowIssue
         for (BigItemStack entry : data.encodedRequest().stacks()) {
-            pTooltip.accept(entry.stack.getHoverName().copy().append(" x").append(String.valueOf(entry.count)).withStyle(ChatFormatting.GRAY));
+            pTooltip.accept(entry.stack.getHoverName().copy().append(" x").append(String.valueOf(entry.count))
+                .withStyle(ChatFormatting.GRAY));
         }
 
-        pTooltip.accept(Component.translatable("create.logistically_linked.tooltip_clear").withStyle(ChatFormatting.DARK_GRAY));
+        pTooltip.accept(Component.translatable("create.logistically_linked.tooltip_clear")
+            .withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override
-    public void setPlacedBy(Level pLevel, BlockPos requesterPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(
+        Level pLevel,
+        BlockPos requesterPos,
+        BlockState pState,
+        LivingEntity pPlacer,
+        ItemStack pStack
+    ) {
         Player player = pPlacer instanceof Player ? (Player) pPlacer : null;
         withBlockEntityDo(
             pLevel, requesterPos, rrbe -> {
                 AutoRequestData data = AutoRequestData.readFromItem(pLevel, player, requesterPos, pStack);
-                if (data == null)
+                if (data == null) {
                     return;
+                }
                 rrbe.encodedRequest = data.encodedRequest();
                 rrbe.encodedTargetAdress = data.encodedTargetAddress();
             }
@@ -159,8 +182,9 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
         @Nullable Orientation wireOrientation,
         boolean pMovedByPiston
     ) {
-        if (pLevel.isClientSide())
+        if (pLevel.isClientSide()) {
             return;
+        }
         pLevel.setBlockAndUpdate(pPos, pState.setValue(POWERED, pLevel.hasNeighborSignal(pPos)));
         withBlockEntityDo(pLevel, pPos, RedstoneRequesterBlockEntity::onRedstonePowerChanged);
     }
@@ -182,7 +206,10 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
 
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
-        return pState.setValue(AXIS, pRotation.rotate(Direction.get(AxisDirection.POSITIVE, pState.getValue(AXIS))).getAxis());
+        return pState.setValue(
+            AXIS,
+            pRotation.rotate(Direction.get(AxisDirection.POSITIVE, pState.getValue(AXIS))).getAxis()
+        );
     }
 
 }

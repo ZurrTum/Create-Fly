@@ -26,13 +26,18 @@ public class PlayerPassengerCondition extends ScheduleWaitCondition {
         int present = train.countPlayerPassengers();
         int target = getTarget();
         context.putInt("PrevPlayerCount", present);
-        if (prev != present)
+        if (prev != present) {
             requestStatusToUpdate(context);
+        }
         return canOvershoot() ? present >= target : present == target;
     }
 
     @Override
     public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
-        return Component.translatable("create.schedule.condition.player_count.status", train.countPlayerPassengers(), getTarget());
+        return Component.translatable(
+            "create.schedule.condition.player_count.status",
+            train.countPlayerPassengers(),
+            getTarget()
+        );
     }
 }

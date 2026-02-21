@@ -26,9 +26,9 @@ public class BellMovementBehaviour extends MovementBehaviour {
         boolean moved = context.temporaryData instanceof Boolean b && b;
         Contraption contraption = context.contraption;
 
-        if (contraption instanceof ElevatorContraption ec && !ec.arrived)
+        if (contraption instanceof ElevatorContraption ec && !ec.arrived) {
             context.temporaryData = Boolean.TRUE;
-        else if (moved) {
+        } else if (moved) {
             playSound(context);
             context.temporaryData = null;
         }
@@ -36,18 +36,21 @@ public class BellMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void onSpeedChanged(MovementContext context, Vec3 oldMotion, Vec3 motion) {
-        if (context.contraption instanceof ElevatorContraption)
+        if (context.contraption instanceof ElevatorContraption) {
             return;
+        }
 
         double dotProduct = oldMotion.dot(motion);
-        if (dotProduct <= 0 && (context.relativeMotion.length() != 0) || context.firstMovement)
+        if (dotProduct <= 0 && (context.relativeMotion.length() != 0) || context.firstMovement) {
             playSound(context);
+        }
     }
 
     @Override
     public void stopMoving(MovementContext context) {
-        if (context.position != null && isActive(context))
+        if (context.position != null && isActive(context)) {
             playSound(context);
+        }
     }
 
     public static void playSound(MovementContext context) {

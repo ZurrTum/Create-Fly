@@ -47,10 +47,12 @@ public class PackagerLinkBlock extends FaceAttachedHorizontalDirectionalBlock im
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         BlockState placed = super.getStateForPlacement(context);
-        if (placed == null)
+        if (placed == null) {
             return null;
-        if (placed.getValue(FACE) == AttachFace.CEILING)
+        }
+        if (placed.getValue(FACE) == AttachFace.CEILING) {
             placed = placed.setValue(FACING, placed.getValue(FACING).getOpposite());
+        }
         return withWater(placed.setValue(POWERED, getPower(placed, context.getLevel(), pos) > 0), context);
     }
 
@@ -92,22 +94,26 @@ public class PackagerLinkBlock extends FaceAttachedHorizontalDirectionalBlock im
         @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         int power = getPower(state, worldIn, pos);
         boolean powered = power > 0;
         boolean previouslyPowered = state.getValue(POWERED);
-        if (previouslyPowered != powered)
+        if (previouslyPowered != powered) {
             worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
+        }
         withBlockEntityDo(worldIn, pos, link -> link.behaviour.redstonePowerChanged(power));
     }
 
     public static int getPower(BlockState state, Level worldIn, BlockPos pos) {
         int power = 0;
-        for (Direction d : Iterate.directions)
-            if (d.getOpposite() != getConnectedDirection(state))
+        for (Direction d : Iterate.directions) {
+            if (d.getOpposite() != getConnectedDirection(state)) {
                 power = Math.max(power, worldIn.getSignal(pos.relative(d), d));
+            }
+        }
         return power;
     }
 

@@ -47,20 +47,21 @@ public class ItemVaultScenes {
         scene.idle(10);
 
         BlockPos frontVault = util.grid().at(3, 2, 1);
-        scene.overlay().showText(60).text("Item Vaults can be used to store large amounts of items").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(frontVault, Direction.NORTH));
+        scene.overlay().showText(60).text("Item Vaults can be used to store large amounts of items").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().blockSurface(frontVault, Direction.NORTH));
         scene.idle(70);
 
         scene.world().hideIndependentSection(chestLink, Direction.DOWN);
         scene.idle(15);
 
         ItemStack hand = AllItems.BRASS_HAND.getDefaultInstance();
-        scene.overlay().showControls(util.vector().blockSurface(frontVault, Direction.NORTH), Pointing.RIGHT, 40).showing(AllIcons.I_MTD_CLOSE)
-            .withItem(hand);
+        scene.overlay().showControls(util.vector().blockSurface(frontVault, Direction.NORTH), Pointing.RIGHT, 40)
+            .showing(AllIcons.I_MTD_CLOSE).withItem(hand);
         scene.idle(7);
 
-        scene.overlay().showText(60).text("However, contents cannot be added or taken manually").attachKeyFrame().colored(PonderPalette.RED)
-            .placeNearTarget().pointAt(util.vector().blockSurface(frontVault, Direction.WEST));
+        scene.overlay().showText(60).text("However, contents cannot be added or taken manually").attachKeyFrame()
+            .colored(PonderPalette.RED).placeNearTarget()
+            .pointAt(util.vector().blockSurface(frontVault, Direction.WEST));
         scene.idle(70);
 
         scene.world().showSection(largeCog, Direction.UP);
@@ -68,10 +69,12 @@ public class ItemVaultScenes {
         scene.world().showSection(belt1, Direction.EAST);
         scene.idle(20);
 
-        scene.overlay().showText(80).text("Any components for item transfer can both insert...").attachKeyFrame().colored(PonderPalette.GREEN)
-            .placeNearTarget().pointAt(util.vector().topOf(2, 2, 3));
+        scene.overlay().showText(80).text("Any components for item transfer can both insert...").attachKeyFrame()
+            .colored(PonderPalette.GREEN).placeNearTarget().pointAt(util.vector().topOf(2, 2, 3));
 
-        ItemStack[] junk = {new ItemStack(Items.APPLE), new ItemStack(Items.GOLD_INGOT, 8), new ItemStack(Items.TUFF, 32)};
+        ItemStack[] junk = {
+            new ItemStack(Items.APPLE), new ItemStack(Items.GOLD_INGOT, 8), new ItemStack(Items.TUFF, 32)
+        };
         for (int i = 0; i < junk.length + 2; i++) {
             scene.idle(4);
 
@@ -81,8 +84,9 @@ public class ItemVaultScenes {
             }
 
             scene.idle(5);
-            if (i < junk.length)
+            if (i < junk.length) {
                 scene.world().createItemOnBeltLike(util.grid().at(0, 1, 3), Direction.SOUTH, junk[i]);
+            }
             scene.idle(9);
         }
 
@@ -91,8 +95,8 @@ public class ItemVaultScenes {
         scene.world().showSection(belt2, Direction.EAST);
         scene.idle(15);
 
-        scene.overlay().showText(80).text("...and take contents from this container").colored(PonderPalette.GREEN).placeNearTarget()
-            .pointAt(util.vector().topOf(2, 1, 1));
+        scene.overlay().showText(80).text("...and take contents from this container").colored(PonderPalette.GREEN)
+            .placeNearTarget().pointAt(util.vector().topOf(2, 1, 1));
 
         for (ItemStack stack : junk) {
             scene.world().createItemOnBeltLike(util.grid().at(2, 1, 1), Direction.EAST, stack);
@@ -117,8 +121,8 @@ public class ItemVaultScenes {
         scene.world().moveSection(s1, util.vector().of(0, -3, 0), 0);
         scene.idle(10);
 
-        scene.overlay().showText(60).text("Item Vaults can be combined to increase the total capacity").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().topOf(2, 1, 2));
+        scene.overlay().showText(60).text("Item Vaults can be combined to increase the total capacity").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().topOf(2, 1, 2));
         scene.idle(40);
 
         ElementLink<WorldSectionElement> s2 = scene.world().showIndependentSection(single, Direction.DOWN);
@@ -148,8 +152,8 @@ public class ItemVaultScenes {
         scene.world().hideIndependentSection(s4, Direction.DOWN);
         scene.idle(25);
 
-        scene.overlay().showText(60).text("Their base square can be up to 3 blocks wide...").attachKeyFrame().placeNearTarget()
-            .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH));
+        scene.overlay().showText(60).text("Their base square can be up to 3 blocks wide...").attachKeyFrame()
+            .placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH));
         scene.idle(40);
 
         s1 = scene.world().showIndependentSection(single, Direction.DOWN);
@@ -178,9 +182,11 @@ public class ItemVaultScenes {
         ElementLink<WorldSectionElement> t = scene.world().showIndependentSectionImmediately(single3);
         scene.world().moveSection(t, util.vector().of(0, -3, -2), 0);
 
-        for (int i = 1; i < 4; i++)
-            for (int j = 2; j < 5; j++)
+        for (int i = 1; i < 4; i++) {
+            for (int j = 2; j < 5; j++) {
                 scene.effects().indicateSuccess(util.grid().at(j, i, 2));
+            }
+        }
 
         scene.world().hideIndependentSection(d, Direction.DOWN);
         scene.world().hideIndependentSection(s1, Direction.DOWN);
@@ -205,7 +211,8 @@ public class ItemVaultScenes {
         scene.idle(10);
 
         Vec3 blockSurface = util.vector().blockSurface(util.grid().at(1, 3, 3), Direction.NORTH);
-        scene.overlay().showText(60).text("...and grow in length up to 3x their diameter").attachKeyFrame().placeNearTarget().pointAt(blockSurface);
+        scene.overlay().showText(60).text("...and grow in length up to 3x their diameter").attachKeyFrame()
+            .placeNearTarget().pointAt(blockSurface);
         scene.idle(40);
     }
 

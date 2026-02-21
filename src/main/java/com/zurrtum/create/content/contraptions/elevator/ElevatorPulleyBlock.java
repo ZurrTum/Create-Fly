@@ -36,14 +36,18 @@ public class ElevatorPulleyBlock extends HorizontalKineticBlock implements IBE<E
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.mayBuild())
+        if (!player.mayBuild()) {
             return InteractionResult.FAIL;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.FAIL;
-        if (!stack.isEmpty())
+        }
+        if (!stack.isEmpty()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
         return onBlockEntityUseItemOn(
             level, pos, be -> {
                 be.clicked();

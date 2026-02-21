@@ -17,7 +17,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BeltFunnelInteractionHandler {
 
-    public static boolean checkForFunnels(BeltInventory beltInventory, TransportedItemStack currentItem, float nextOffset) {
+    public static boolean checkForFunnels(
+        BeltInventory beltInventory,
+        TransportedItemStack currentItem,
+        float nextOffset
+    ) {
         boolean beltMovementPositive = beltInventory.beltMovementPositive;
         int firstUpcomingSegment = (int) Math.floor(currentItem.beltPosition);
         int step = beltMovementPositive ? 1 : -1;
@@ -27,90 +31,109 @@ public class BeltFunnelInteractionHandler {
             BlockPos funnelPos = BeltHelper.getPositionForOffset(beltInventory.belt, segment).above();
             Level world = beltInventory.belt.getLevel();
             BlockState funnelState = world.getBlockState(funnelPos);
-            if (!(funnelState.getBlock() instanceof BeltFunnelBlock))
+            if (!(funnelState.getBlock() instanceof BeltFunnelBlock)) {
                 continue;
+            }
             Direction funnelFacing = funnelState.getValue(BeltFunnelBlock.HORIZONTAL_FACING);
             Direction movementFacing = beltInventory.belt.getMovementFacing();
             boolean blocking = funnelFacing == movementFacing.getOpposite();
-            if (funnelFacing == movementFacing)
+            if (funnelFacing == movementFacing) {
                 continue;
-            if (funnelState.getValue(BeltFunnelBlock.SHAPE) == Shape.PUSHING)
+            }
+            if (funnelState.getValue(BeltFunnelBlock.SHAPE) == Shape.PUSHING) {
                 continue;
+            }
 
             float funnelEntry = segment + .5f;
-            if (funnelState.getValue(BeltFunnelBlock.SHAPE) == Shape.EXTENDED)
+            if (funnelState.getValue(BeltFunnelBlock.SHAPE) == Shape.EXTENDED) {
                 funnelEntry += .499f * (beltMovementPositive ? -1 : 1);
+            }
             boolean hasCrossed = nextOffset > funnelEntry && beltMovementPositive || nextOffset < funnelEntry && !beltMovementPositive;
-            if (!hasCrossed)
+            if (!hasCrossed) {
                 return false;
-            if (blocking)
+            }
+            if (blocking) {
                 currentItem.beltPosition = funnelEntry;
+            }
 
-            if (world.isClientSide() || funnelState.getValueOrElse(BeltFunnelBlock.POWERED, false))
-                if (blocking)
+            if (world.isClientSide() || funnelState.getValueOrElse(BeltFunnelBlock.POWERED, false)) {
+                if (blocking) {
                     return true;
-                else
+                } else {
                     continue;
+                }
+            }
 
             BlockEntity be = world.getBlockEntity(funnelPos);
-            if (!(be instanceof FunnelBlockEntity funnelBE))
+            if (!(be instanceof FunnelBlockEntity funnelBE)) {
                 return true;
+            }
 
             InvManipulationBehaviour inserting = funnelBE.getBehaviour(InvManipulationBehaviour.TYPE);
             ServerFilteringBehaviour filtering = funnelBE.getBehaviour(ServerFilteringBehaviour.TYPE);
 
-            if (inserting == null || filtering != null && !filtering.test(currentItem.stack))
-                if (blocking)
+            if (inserting == null || filtering != null && !filtering.test(currentItem.stack)) {
+                if (blocking) {
                     return true;
-                else
+                } else {
                     continue;
+                }
+            }
 
-            if (beltInventory.belt.invVersionTracker.stillWaiting(inserting))
+            if (beltInventory.belt.invVersionTracker.stillWaiting(inserting)) {
                 continue;
+            }
 
             int amountToExtract = funnelBE.getAmountToExtract();
             ExtractionCountMode modeToExtract = funnelBE.getModeToExtract();
 
             ItemStack toInsert = currentItem.stack.copy();
-            if (amountToExtract > toInsert.getCount() && modeToExtract != ExtractionCountMode.UPTO)
-                if (blocking)
+            if (amountToExtract > toInsert.getCount() && modeToExtract != ExtractionCountMode.UPTO) {
+                if (blocking) {
                     return true;
-                else
+                } else {
                     continue;
+                }
+            }
 
             if (amountToExtract != -1 && modeToExtract != ExtractionCountMode.UPTO) {
                 toInsert.setCount(Math.min(amountToExtract, toInsert.getCount()));
                 ItemStack remainder = inserting.simulate().insert(toInsert);
-                if (!remainder.isEmpty())
-                    if (blocking)
+                if (!remainder.isEmpty()) {
+                    if (blocking) {
                         return true;
-                    else
+                    } else {
                         continue;
-                else
+                    }
+                } else {
                     beltInventory.belt.invVersionTracker.awaitNewVersion(inserting);
+                }
             }
 
             ItemStack remainder = inserting.insert(toInsert);
             if (ItemStack.matches(toInsert, remainder)) {
                 beltInventory.belt.invVersionTracker.awaitNewVersion(inserting);
-                if (blocking)
+                if (blocking) {
                     return true;
-                else
+                } else {
                     continue;
+                }
             }
 
             int notFilled = currentItem.stack.getCount() - toInsert.getCount();
             if (!remainder.isEmpty()) {
                 remainder.grow(notFilled);
-            } else if (notFilled > 0)
+            } else if (notFilled > 0) {
                 remainder = currentItem.stack.copyWithCount(notFilled);
+            }
 
             funnelBE.flap(true);
             funnelBE.onTransfer(toInsert);
             currentItem.stack = remainder;
             beltInventory.belt.notifyUpdate();
-            if (blocking)
+            if (blocking) {
                 return true;
+            }
         }
 
         return false;

@@ -20,7 +20,10 @@ public class JunkWidget extends Widget {
     private final float chance;
 
     private final NumberAnimator<Float> darkHighlightedAlpha = ValueAnimator.ofFloat()
-        .withConvention(() -> REIRuntime.getInstance().isDarkThemeEnabled() ? 1.0F : 0.0F, ValueAnimator.typicalTransitionTime()).asFloat();
+        .withConvention(
+            () -> REIRuntime.getInstance().isDarkThemeEnabled() ? 1.0F : 0.0F,
+            ValueAnimator.typicalTransitionTime()
+        ).asFloat();
 
     public JunkWidget(int x, int y, float chance) {
         this.bounds = new Rectangle(x, y, 16, 16);

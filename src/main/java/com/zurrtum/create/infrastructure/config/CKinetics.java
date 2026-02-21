@@ -8,7 +8,12 @@ public class CKinetics extends ConfigBase {
     public final ConfigBool disableStress = b(false, "disableStress", Comments.disableStress);
     public final ConfigInt maxBeltLength = i(20, 5, "maxBeltLength", Comments.maxBeltLength);
     public final ConfigInt maxChainConveyorLength = i(32, 5, "maxChainConveyorLength", Comments.maxChainConveyorLength);
-    public final ConfigInt maxChainConveyorConnections = i(4, 1, "maxChainConveyorConnections", Comments.maxChainConveyorConnections);
+    public final ConfigInt maxChainConveyorConnections = i(
+        4,
+        1,
+        "maxChainConveyorConnections",
+        Comments.maxChainConveyorConnections
+    );
     public final ConfigInt crushingDamage = i(4, 0, "crushingDamage", Comments.crushingDamage);
     public final ConfigInt maxRotationSpeed = i(256, 64, "maxRotationSpeed", Comments.rpm, Comments.maxRotationSpeed);
     public final ConfigEnum<DeployerAggroSetting> ignoreDeployerAttacks = e(
@@ -16,8 +21,19 @@ public class CKinetics extends ConfigBase {
         "ignoreDeployerAttacks",
         Comments.ignoreDeployerAttacks
     );
-    public final ConfigInt kineticValidationFrequency = i(60, 5, "kineticValidationFrequency", Comments.kineticValidationFrequency);
-    public final ConfigFloat crankHungerMultiplier = f(.01f, 0, 1, "crankHungerMultiplier", Comments.crankHungerMultiplier);
+    public final ConfigInt kineticValidationFrequency = i(
+        60,
+        5,
+        "kineticValidationFrequency",
+        Comments.kineticValidationFrequency
+    );
+    public final ConfigFloat crankHungerMultiplier = f(
+        .01f,
+        0,
+        1,
+        "crankHungerMultiplier",
+        Comments.crankHungerMultiplier
+    );
     public final ConfigInt minimumWindmillSails = i(8, 0, "minimumWindmillSails", Comments.minimumWindmillSails);
     public final ConfigInt windmillSailsPerRPM = i(8, 1, "windmillSailsPerRPM", Comments.windmillSailsPerRPM);
     public final ConfigInt maxEjectorDistance = i(32, 0, "maxEjectorDistance", Comments.maxEjectorDistance);
@@ -27,7 +43,13 @@ public class CKinetics extends ConfigBase {
     public final ConfigInt fanPushDistance = i(20, 5, "fanPushDistance", Comments.fanPushDistance);
     public final ConfigInt fanPullDistance = i(20, 5, "fanPullDistance", Comments.fanPullDistance);
     public final ConfigInt fanBlockCheckRate = i(30, 10, "fanBlockCheckRate", Comments.fanBlockCheckRate);
-    public final ConfigInt fanRotationArgmax = i(256, 64, "fanRotationArgmax", Comments.rpm, Comments.fanRotationArgmax);
+    public final ConfigInt fanRotationArgmax = i(
+        256,
+        64,
+        "fanRotationArgmax",
+        Comments.rpm,
+        Comments.fanRotationArgmax
+    );
     public final ConfigInt fanProcessingTime = i(150, 0, "fanProcessingTime", Comments.fanProcessingTime);
 
     public final ConfigGroup contraptions = group(1, "contraptions", "Moving Contraptions");
@@ -37,7 +59,11 @@ public class CKinetics extends ConfigBase {
     public final ConfigInt maxRopeLength = i(384, 1, "maxRopeLength", Comments.maxRopeLength);
     public final ConfigInt maxCartCouplingLength = i(32, 1, "maxCartCouplingLength", Comments.maxCartCouplingLength);
     public final ConfigInt rollerFillDepth = i(12, 1, "rollerFillDepth", Comments.rollerFillDepth);
-    public final ConfigBool survivalContraptionPickup = b(true, "survivalContraptionPickup", Comments.survivalContraptionPickup);
+    public final ConfigBool survivalContraptionPickup = b(
+        true,
+        "survivalContraptionPickup",
+        Comments.survivalContraptionPickup
+    );
     public final ConfigEnum<ContraptionMovementSetting> spawnerMovement = e(
         ContraptionMovementSetting.NO_PICKUP,
         "movableSpawners",
@@ -61,7 +87,11 @@ public class CKinetics extends ConfigBase {
     public final ConfigBool moveItemsToStorage = b(true, "moveItemsToStorage", Comments.moveItemsToStorage);
     public final ConfigBool harvestPartiallyGrown = b(false, "harvestPartiallyGrown", Comments.harvestPartiallyGrown);
     public final ConfigBool harvesterReplants = b(true, "harvesterReplants", Comments.harvesterReplants);
-    public final ConfigBool minecartContraptionInContainers = b(false, "minecartContraptionInContainers", Comments.minecartContraptionInContainers);
+    public final ConfigBool minecartContraptionInContainers = b(
+        false,
+        "minecartContraptionInContainers",
+        Comments.minecartContraptionInContainers
+    );
     public final ConfigBool stabiliseStableContraptions = b(
         false,
         "stabiliseStableContraptions",
@@ -83,8 +113,22 @@ public class CKinetics extends ConfigBase {
     public final ConfigGroup stats = group(1, "stats", Comments.stats);
     public final ConfigFloat mediumSpeed = f(30, 0, 4096, "mediumSpeed", Comments.rpm, Comments.mediumSpeed);
     public final ConfigFloat fastSpeed = f(100, 0, 65535, "fastSpeed", Comments.rpm, Comments.fastSpeed);
-    public final ConfigFloat mediumStressImpact = f(4, 0, 4096, "mediumStressImpact", Comments.su, Comments.mediumStressImpact);
-    public final ConfigFloat highStressImpact = f(8, 0, 65535, "highStressImpact", Comments.su, Comments.highStressImpact);
+    public final ConfigFloat mediumStressImpact = f(
+        4,
+        0,
+        4096,
+        "mediumStressImpact",
+        Comments.su,
+        Comments.mediumStressImpact
+    );
+    public final ConfigFloat highStressImpact = f(
+        8,
+        0,
+        65535,
+        "highStressImpact",
+        Comments.su,
+        Comments.highStressImpact
+    );
     public final ConfigFloat mediumCapacity = f(256, 0, 4096, "mediumCapacity", Comments.su, Comments.mediumCapacity);
     public final ConfigFloat highCapacity = f(1024, 0, 65535, "highCapacity", Comments.su, Comments.highCapacity);
 
@@ -96,9 +140,7 @@ public class CKinetics extends ConfigBase {
     }
 
     public enum DeployerAggroSetting {
-        ALL,
-        CREEPERS,
-        NONE
+        ALL, CREEPERS, NONE
     }
 
     private static class Comments {

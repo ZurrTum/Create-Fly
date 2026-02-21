@@ -7,11 +7,10 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-
-import java.util.List;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+
+import java.util.List;
 
 public abstract class SingleLineDisplaySource extends DisplaySource {
 
@@ -22,8 +21,9 @@ public abstract class SingleLineDisplaySource extends DisplaySource {
     @Override
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
         MutableComponent line = provideLine(context, stats);
-        if (line == EMPTY_LINE)
+        if (line == EMPTY_LINE) {
             return EMPTY;
+        }
 
         if (allowsLabeling(context)) {
             String label = context.sourceConfig().getStringOr("Label", "");
@@ -49,39 +49,56 @@ public abstract class SingleLineDisplaySource extends DisplaySource {
     }
 
     @Override
-    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
+    public void loadFlapDisplayLayout(
+        DisplayLinkContext context,
+        FlapDisplayBlockEntity flapDisplay,
+        FlapDisplayLayout layout
+    ) {
         String layoutKey = getFlapDisplayLayoutName(context);
 
         if (!allowsLabeling(context)) {
-            if (!layout.isLayout(layoutKey))
-                layout.configure(layoutKey, ImmutableList.of(createSectionForValue(context, flapDisplay.getMaxCharCount())));
+            if (!layout.isLayout(layoutKey)) {
+                layout.configure(
+                    layoutKey,
+                    ImmutableList.of(createSectionForValue(context, flapDisplay.getMaxCharCount()))
+                );
+            }
             return;
         }
 
         String label = context.sourceConfig().getStringOr("Label", "");
 
         if (label.isEmpty()) {
-            if (!layout.isLayout(layoutKey))
-                layout.configure(layoutKey, ImmutableList.of(createSectionForValue(context, flapDisplay.getMaxCharCount())));
+            if (!layout.isLayout(layoutKey)) {
+                layout.configure(
+                    layoutKey,
+                    ImmutableList.of(createSectionForValue(context, flapDisplay.getMaxCharCount()))
+                );
+            }
             return;
         }
 
         String layoutName = label.length() + "_Labeled_" + layoutKey;
-        if (layout.isLayout(layoutName))
+        if (layout.isLayout(layoutName)) {
             return;
+        }
 
         int maxCharCount = flapDisplay.getMaxCharCount();
         FlapDisplaySection labelSection = new FlapDisplaySection(
-            Math.min(maxCharCount, label.length() + 1) * FlapDisplaySection.MONOSPACE,
-            "alphabet",
-            false,
-            false
+            Math.min(
+                maxCharCount,
+                label.length() + 1
+        ) * FlapDisplaySection.MONOSPACE, "alphabet", false, false
         );
 
-        if (label.length() + 1 < maxCharCount)
-            layout.configure(layoutName, ImmutableList.of(labelSection, createSectionForValue(context, maxCharCount - label.length() - 1)));
-        else
+        if (label.length() + 1 < maxCharCount) {
+            layout.configure(
+                layoutName,
+                ImmutableList.of(labelSection, createSectionForValue(context, maxCharCount - label.length() - 1))
+            );
+        } else {
             layout.configure(layoutName, ImmutableList.of(labelSection));
+        }
     }
 
     protected String getFlapDisplayLayoutName(DisplayLinkContext context) {

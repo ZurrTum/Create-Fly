@@ -25,8 +25,9 @@ public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (isVirtual() || level.isClientSide())
+        if (isVirtual() || level.isClientSide()) {
             glow.tickChaser();
+        }
     }
 
     public float getGlow(float partialTicks) {
@@ -53,8 +54,9 @@ public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket && view.getBooleanOr("Pulse", false))
+        if (clientPacket && view.getBooleanOr("Pulse", false)) {
             pulse();
+        }
     }
 
     public Vec3 getBulbOffset(BlockState state) {

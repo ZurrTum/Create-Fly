@@ -15,15 +15,11 @@ public interface IControlContraption {
     BlockPos getBlockPosition();
 
     enum MovementMode {
-        MOVE_PLACE,
-        MOVE_PLACE_RETURNED,
-        MOVE_NEVER_PLACE;
+        MOVE_PLACE, MOVE_PLACE_RETURNED, MOVE_NEVER_PLACE;
     }
 
     enum RotationMode {
-        ROTATE_PLACE,
-        ROTATE_PLACE_RETURNED,
-        ROTATE_NEVER_PLACE;
+        ROTATE_PLACE, ROTATE_PLACE_RETURNED, ROTATE_NEVER_PLACE;
     }
 
 }

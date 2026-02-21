@@ -19,8 +19,9 @@ public class RollerBlockItem extends BlockItem {
         BlockPos clickedPos = ctx.getClickedPos();
         Level level = ctx.getLevel();
         BlockState blockStateBelow = level.getBlockState(clickedPos.below());
-        if (!Block.isFaceFull(blockStateBelow.getCollisionShape(level, clickedPos.below()), Direction.UP))
+        if (!Block.isFaceFull(blockStateBelow.getCollisionShape(level, clickedPos.below()), Direction.UP)) {
             return super.place(ctx);
+        }
         Direction clickedFace = ctx.getClickedFace();
         return super.place(BlockPlaceContext.at(ctx, clickedPos.relative(Direction.UP), clickedFace));
     }

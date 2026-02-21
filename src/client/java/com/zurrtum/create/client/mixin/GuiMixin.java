@@ -38,7 +38,11 @@ public class GuiMixin {
 
     @Inject(method = "renderCrosshair(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At("TAIL"))
     private void renderCrosshair(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        PlacementClient.onRenderCrosshairOverlay(minecraft, context, AnimationTickHolder.getPartialTicksUI(tickCounter));
+        PlacementClient.onRenderCrosshairOverlay(
+            minecraft,
+            context,
+            AnimationTickHolder.getPartialTicksUI(tickCounter)
+        );
     }
 
     @Inject(method = "renderItemHotbar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At("TAIL"))
@@ -53,7 +57,14 @@ public class GuiMixin {
     }
 
     @Inject(method = "renderAirBubbles(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;III)V", at = @At("TAIL"))
-    private void renderAirBubbles(GuiGraphics context, Player player, int heartCount, int top, int left, CallbackInfo ci) {
+    private void renderAirBubbles(
+        GuiGraphics context,
+        Player player,
+        int heartCount,
+        int top,
+        int left,
+        CallbackInfo ci
+    ) {
         RemainingAirOverlay.render(minecraft, context);
     }
 

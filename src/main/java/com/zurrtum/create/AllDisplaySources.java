@@ -3,14 +3,13 @@ package com.zurrtum.create;
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.redstone.displayLink.source.*;
-
-import java.util.function.Supplier;
-
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+
+import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -18,31 +17,68 @@ public class AllDisplaySources {
     public static final ItemNameDisplaySource ITEM_NAMES = register("item_names", ItemNameDisplaySource::new);
     public static final TimeOfDayDisplaySource TIME_OF_DAY = register("time_of_day", TimeOfDayDisplaySource::new);
     public static final StopWatchDisplaySource STOPWATCH = register("stopwatch", StopWatchDisplaySource::new);
-    public static final KineticSpeedDisplaySource KINETIC_SPEED = register("kinetic_speed", KineticSpeedDisplaySource::new);
-    public static final KineticStressDisplaySource KINETIC_STRESS = register("kinetic_stress", KineticStressDisplaySource::new);
+    public static final KineticSpeedDisplaySource KINETIC_SPEED = register(
+        "kinetic_speed",
+        KineticSpeedDisplaySource::new
+    );
+    public static final KineticStressDisplaySource KINETIC_STRESS = register(
+        "kinetic_stress",
+        KineticStressDisplaySource::new
+    );
     public static final BoilerDisplaySource BOILER = register("boiler", BoilerDisplaySource::new);
-    public static final CurrentFloorDisplaySource CURRENT_FLOOR = register("current_floor", CurrentFloorDisplaySource::new);
-    public static final StationSummaryDisplaySource STATION_SUMMARY = register("station_summary", StationSummaryDisplaySource::new);
+    public static final CurrentFloorDisplaySource CURRENT_FLOOR = register(
+        "current_floor",
+        CurrentFloorDisplaySource::new
+    );
+    public static final StationSummaryDisplaySource STATION_SUMMARY = register(
+        "station_summary",
+        StationSummaryDisplaySource::new
+    );
     public static final TrainStatusDisplaySource TRAIN_STATUS = register("train_status", TrainStatusDisplaySource::new);
-    public static final ObservedTrainNameSource OBSERVED_TRAIN_NAME = register("observed_train_name", ObservedTrainNameSource::new);
-    public static final AccumulatedItemCountDisplaySource ACCUMULATE_ITEMS = register("accumulate_items", AccumulatedItemCountDisplaySource::new);
-    public static final ItemThroughputDisplaySource ITEM_THROUGHPUT = register("item_throughput", ItemThroughputDisplaySource::new);
+    public static final ObservedTrainNameSource OBSERVED_TRAIN_NAME = register(
+        "observed_train_name",
+        ObservedTrainNameSource::new
+    );
+    public static final AccumulatedItemCountDisplaySource ACCUMULATE_ITEMS = register(
+        "accumulate_items",
+        AccumulatedItemCountDisplaySource::new
+    );
+    public static final ItemThroughputDisplaySource ITEM_THROUGHPUT = register(
+        "item_throughput",
+        ItemThroughputDisplaySource::new
+    );
     public static final ItemCountDisplaySource COUNT_ITEMS = register("count_items", ItemCountDisplaySource::new);
     public static final ItemListDisplaySource LIST_ITEMS = register("list_items", ItemListDisplaySource::new);
     public static final FluidAmountDisplaySource COUNT_FLUIDS = register("count_fluids", FluidAmountDisplaySource::new);
     public static final FluidListDisplaySource LIST_FLUIDS = register("list_fluids", FluidListDisplaySource::new);
-    public static final PackageAddressDisplaySource READ_PACKAGE_ADDRESS = register("read_package_address", PackageAddressDisplaySource::new);
+    public static final PackageAddressDisplaySource READ_PACKAGE_ADDRESS = register(
+        "read_package_address",
+        PackageAddressDisplaySource::new
+    );
     public static final FillLevelDisplaySource FILL_LEVEL = register("fill_level", FillLevelDisplaySource::new);
-    public static final FactoryGaugeDisplaySource GAUGE_STATUS = register("factory_gauge", FactoryGaugeDisplaySource::new);
+    public static final FactoryGaugeDisplaySource GAUGE_STATUS = register(
+        "factory_gauge",
+        FactoryGaugeDisplaySource::new
+    );
     public static final EntityNameDisplaySource ENTITY_NAME = register("entity_name", EntityNameDisplaySource::new);
     public static final DeathCounterDisplaySource DEATH_COUNT = register("death_count", DeathCounterDisplaySource::new);
     public static final ScoreboardDisplaySource SCOREBOARD = register("scoreboard", ScoreboardDisplaySource::new);
-    public static final EnchantPowerDisplaySource ENCHANT_POWER = register("enchant_power", EnchantPowerDisplaySource::new);
-    public static final RedstonePowerDisplaySource REDSTONE_POWER = register("redstone_power", RedstonePowerDisplaySource::new);
+    public static final EnchantPowerDisplaySource ENCHANT_POWER = register(
+        "enchant_power",
+        EnchantPowerDisplaySource::new
+    );
+    public static final RedstonePowerDisplaySource REDSTONE_POWER = register(
+        "redstone_power",
+        RedstonePowerDisplaySource::new
+    );
     public static final NixieTubeDisplaySource NIXIE_TUBE = register("nixie_tube", NixieTubeDisplaySource::new);
 
     private static <T extends DisplaySource> T register(String id, Supplier<T> factory) {
-        return Registry.register(CreateRegistries.DISPLAY_SOURCE, Identifier.fromNamespaceAndPath(MOD_ID, id), factory.get());
+        return Registry.register(
+            CreateRegistries.DISPLAY_SOURCE,
+            Identifier.fromNamespaceAndPath(MOD_ID, id),
+            factory.get()
+        );
     }
 
     public static void register(DisplaySource display, Block... blocks) {

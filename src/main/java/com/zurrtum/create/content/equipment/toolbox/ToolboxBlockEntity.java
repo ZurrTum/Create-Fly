@@ -57,8 +57,9 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
         inventory = new ToolboxInventory(this);
         colorProvider = ResetableLazy.of(() -> {
             BlockState blockState = getBlockState();
-            if (blockState != null && blockState.getBlock() instanceof ToolboxBlock)
+            if (blockState != null && blockState.getBlock() instanceof ToolboxBlock) {
                 return ((ToolboxBlock) blockState.getBlock()).getColor();
+            }
             return DyeColor.BROWN;
         });
         setLazyTickRate(10);
@@ -114,24 +115,30 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
             ItemStack referenceItem = inventory.filters.get(slot);
             boolean clear = referenceItem.isEmpty();
 
-            for (Iterator<Map.Entry<Player, Integer>> playerEntries = set.entrySet().iterator(); playerEntries.hasNext(); ) {
+            for (Iterator<Map.Entry<Player, Integer>> playerEntries = set.entrySet()
+                .iterator(); playerEntries.hasNext(); ) {
                 Map.Entry<Player, Integer> playerEntry = playerEntries.next();
 
                 Player player = playerEntry.getKey();
                 int hotbarSlot = playerEntry.getValue();
 
-                if (!clear && !ToolboxHandler.withinRange(player, this))
+                if (!clear && !ToolboxHandler.withinRange(player, this)) {
                     continue;
+                }
 
                 Inventory playerInv = player.getInventory();
                 ItemStack playerStack = playerInv.getItem(hotbarSlot);
 
-                if (clear || !playerStack.isEmpty() && !ToolboxInventory.canItemsShareCompartment(playerStack, referenceItem)) {
+                if (clear || !playerStack.isEmpty() && !ToolboxInventory.canItemsShareCompartment(
+                    playerStack,
+                    referenceItem
+                )) {
                     CompoundTag compound = AllSynchedDatas.TOOLBOX.get(player);
                     compound.remove(String.valueOf(hotbarSlot));
                     playerEntries.remove();
-                    if (player instanceof ServerPlayer)
+                    if (player instanceof ServerPlayer) {
                         ToolboxHandler.syncData(player, compound);
+                    }
                     continue;
                 }
 
@@ -179,12 +186,14 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                 }
             }
 
-            if (clear)
+            if (clear) {
                 toolboxSlots.remove();
+            }
         }
 
-        if (update)
+        if (update) {
             sendData();
+        }
 
     }
 
@@ -193,8 +202,9 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     }
 
     public void unequipTracked() {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         Set<ServerPlayer> affected = new HashSet<>();
 
@@ -207,22 +217,26 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                 int hotbarSlot = playerEntry.getValue();
 
                 ToolboxHandler.unequip(player, hotbarSlot, false);
-                if (player instanceof ServerPlayer serverPlayer)
+                if (player instanceof ServerPlayer serverPlayer) {
                     affected.add(serverPlayer);
+                }
             }
         }
 
-        for (ServerPlayer player : affected)
+        for (ServerPlayer player : affected) {
             ToolboxHandler.syncData(player, AllSynchedDatas.TOOLBOX.get(player));
+        }
         connectedPlayers.clear();
     }
 
     public void unequip(int slot, Player player, int hotbarSlot, boolean keepItems) {
-        if (!connectedPlayers.containsKey(slot))
+        if (!connectedPlayers.containsKey(slot)) {
             return;
+        }
         connectedPlayers.get(slot).remove(player);
-        if (keepItems)
+        if (keepItems) {
             return;
+        }
 
         Inventory playerInv = player.getInventory();
         ItemStack playerStack = playerInv.getItem(hotbarSlot);
@@ -264,7 +278,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     true
                 );
             }
-            if (openTracker.openCount == 0 && lid.getChaseTarget() == 1)
+            if (openTracker.openCount == 0 && lid.getChaseTarget() == 1) {
                 level.playLocalSound(
                     vec.x,
                     vec.y,
@@ -275,8 +289,10 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     level.random.nextFloat() * 0.1F + 1.1F,
                     true
                 );
+            }
 
-        } else if (openTracker.openCount == 0 && lid.getChaseTarget() == 0 && lid.getValue(0) > 1 / 16f && lid.getValue(1) < 1 / 16f)
+        } else if (openTracker.openCount == 0 && lid.getChaseTarget() == 0 && lid.getValue(0) > 1 / 16f && lid.getValue(
+            1) < 1 / 16f) {
             level.playLocalSound(
                 vec.x,
                 vec.y,
@@ -287,6 +303,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                 level.random.nextFloat() * 0.1F + 1.2F,
                 true
             );
+        }
     }
 
     @Override
@@ -299,14 +316,16 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
-        if (uniqueId == null)
+        if (uniqueId == null) {
             uniqueId = UUID.randomUUID();
+        }
 
         inventory.write(view.child("Inventory"));
         view.store("UniqueId", UUIDUtil.CODEC, uniqueId);
 
-        if (customName != null)
+        if (customName != null) {
             view.store("CustomName", ComponentSerialization.CODEC, customName);
+        }
         super.write(view, clientPacket);
     }
 
@@ -324,13 +343,15 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     }
 
     public void connectPlayer(int slot, Player player, int hotbarSlot) {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
         WeakHashMap<Player, Integer> map = connectedPlayers.computeIfAbsent(slot, WeakHashMap::new);
         Integer previous = map.get(player);
         if (previous != null) {
-            if (previous == hotbarSlot)
+            if (previous == hotbarSlot) {
                 return;
+            }
             ToolboxHandler.unequip(player, previous, false);
         }
         map.put(player, hotbarSlot);
@@ -342,8 +363,9 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
             for (int i = 0, size = filters.size(); i < size; i++) {
                 inventory.filters.set(i, filters.get(i));
             }
-            for (int i = 0, size = inv.getContainerSize(); i < size; i++)
+            for (int i = 0, size = inv.getContainerSize(); i < size; i++) {
                 inventory.setItem(i, inv.getItem(i));
+            }
         }
     }
 

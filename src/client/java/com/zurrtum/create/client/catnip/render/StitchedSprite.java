@@ -1,13 +1,13 @@
 package com.zurrtum.create.client.catnip.render;
 
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.Identifier;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.Identifier;
 
 public class StitchedSprite {
     private static final Map<Identifier, List<StitchedSprite>> ALL = new HashMap<>();

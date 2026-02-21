@@ -14,7 +14,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.Vector;
 
-public record ConfigureSequencedGearshiftPacket(BlockPos pos, Vector<Instruction> instructions) implements Packet<ServerGamePacketListener> {
+public record ConfigureSequencedGearshiftPacket(BlockPos pos,
+                                                Vector<Instruction> instructions) implements Packet<ServerGamePacketListener> {
     @SuppressWarnings("removal")
     public static final StreamCodec<RegistryFriendlyByteBuf, ConfigureSequencedGearshiftPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,

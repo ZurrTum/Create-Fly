@@ -3,16 +3,15 @@ package com.zurrtum.create.client.content.trains.schedule;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.zurrtum.create.catnip.data.IntAttached;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DestinationSuggestions extends CommandSuggestions {
 
@@ -44,28 +43,33 @@ public class DestinationSuggestions extends CommandSuggestions {
     }
 
     public void tick() {
-        if (suggestions == null)
+        if (suggestions == null) {
             textBox.setSuggestion("");
-        if (active == textBox.isFocused())
+        }
+        if (active == textBox.isFocused()) {
             return;
+        }
         active = textBox.isFocused();
         updateCommandInfo();
     }
 
     @Override
     public void updateCommandInfo() {
-        if (textBox.getValue().length() < textBox.getCursorPosition())
+        if (textBox.getValue().length() < textBox.getCursorPosition()) {
             return;
+        }
 
         String trimmed = textBox.getValue().substring(0, textBox.getCursorPosition());
 
-        if (!textBox.getHighlighted().isBlank())
+        if (!textBox.getHighlighted().isBlank()) {
             trimmed = trimmed.replace(textBox.getHighlighted(), "");
+        }
 
         final String value = trimmed;
 
-        if (value.equals(previous))
+        if (value.equals(previous)) {
             return;
+        }
         if (!active) {
             suggestions = null;
             return;
@@ -87,8 +91,9 @@ public class DestinationSuggestions extends CommandSuggestions {
         }
 
         int width = 0;
-        for (Suggestion suggestion : currentSuggestions)
+        for (Suggestion suggestion : currentSuggestions) {
             width = Math.max(width, font.width(suggestion.getText()));
+        }
         int x = Mth.clamp(textBox.getScreenX(0), 0, textBox.getScreenX(0) + textBox.getInnerWidth() - width);
         suggestions = new CommandSuggestions.SuggestionsList(x, 72 + yOffset, width, currentSuggestions, false);
     }

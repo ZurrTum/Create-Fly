@@ -1,16 +1,17 @@
 package com.zurrtum.create.content.logistics.box;
 
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.ItemStack;
-
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class PackageStyles {
-    public record PackageStyle(String namespace, String type, int width, int height, float riggingOffset, boolean rare) {
+    public record PackageStyle(String namespace, String type, int width, int height, float riggingOffset,
+                               boolean rare) {
         public PackageStyle(String type, int width, int height, float riggingOffset, boolean rare) {
             this(MOD_ID, type, width, height, riggingOffset, rare);
         }

@@ -10,10 +10,12 @@ import net.minecraft.world.phys.Vec3;
 public class CartAssemblerValueBoxTransform extends CenteredSideValueBoxTransform {
     public CartAssemblerValueBoxTransform() {
         super((state, d) -> {
-            if (d.getAxis().isVertical())
+            if (d.getAxis().isVertical()) {
                 return false;
-            if (!state.hasProperty(CartAssemblerBlock.RAIL_SHAPE))
+            }
+            if (!state.hasProperty(CartAssemblerBlock.RAIL_SHAPE)) {
                 return false;
+            }
             RailShape railShape = state.getValue(CartAssemblerBlock.RAIL_SHAPE);
             return (d.getAxis() == Direction.Axis.X) == (railShape == RailShape.NORTH_SOUTH);
         });

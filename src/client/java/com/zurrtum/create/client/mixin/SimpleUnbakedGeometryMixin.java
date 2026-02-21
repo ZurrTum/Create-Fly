@@ -33,7 +33,18 @@ public class SimpleUnbakedGeometryMixin {
         Operation<BakedQuad> original,
         @Local BlockElement element
     ) {
-        BakedQuad quad = original.call(partCache, from, to, face, icon, facing, modelState, elementRotation, shade, lightEmission);
+        BakedQuad quad = original.call(
+            partCache,
+            from,
+            to,
+            face,
+            icon,
+            facing,
+            modelState,
+            elementRotation,
+            shade,
+            lightEmission
+        );
         if (NormalsModelElement.calcNormals(element)) {
             Vector3f v1 = new Vector3f(quad.position3());
             Vector3fc t1 = quad.position1();

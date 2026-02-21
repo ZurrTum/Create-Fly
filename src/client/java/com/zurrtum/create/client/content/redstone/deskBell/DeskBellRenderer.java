@@ -60,7 +60,12 @@ public class DeskBellRenderer extends SmartBlockEntityRenderer<DeskBellBlockEnti
     }
 
     @Override
-    public void submit(DeskBellRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        DeskBellRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         if (state.layer != null) {
             queue.submitCustomGeometry(matrices, state.layer, state);
@@ -82,8 +87,10 @@ public class DeskBellRenderer extends SmartBlockEntityRenderer<DeskBellBlockEnti
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             plunger.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, plungerOffset, 0);
             plunger.light(lightCoords).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-            bell.center().rotateY(yRot).rotateX(xRot).translate(0, bellOffset, 0).rotateX(bellXRot).rotateZ(bellZRot).translate(0, -bellOffset, 0);
-            bell.scale(0.995f).uncenter().light(lightCoords).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+            bell.center().rotateY(yRot).rotateX(xRot).translate(0, bellOffset, 0).rotateX(bellXRot).rotateZ(bellZRot)
+                .translate(0, -bellOffset, 0);
+            bell.scale(0.995f).uncenter().light(lightCoords).overlay(OverlayTexture.NO_OVERLAY)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

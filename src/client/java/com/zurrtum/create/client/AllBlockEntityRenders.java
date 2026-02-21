@@ -122,14 +122,13 @@ import com.zurrtum.create.client.content.trains.track.TrackVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
-
-import java.util.function.Predicate;
-
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+
+import java.util.function.Predicate;
 
 public class AllBlockEntityRenders {
     public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void visual(
@@ -155,7 +154,8 @@ public class AllBlockEntityRenders {
         Predicate<P> skipVanillaRender
     ) {
         BlockEntityRenderers.register(type, rendererFactory);
-        SimpleBlockEntityVisualizer.builder(type).factory(visualizerFactory).skipVanillaRender(skipVanillaRender).apply();
+        SimpleBlockEntityVisualizer.builder(type).factory(visualizerFactory).skipVanillaRender(skipVanillaRender)
+            .apply();
     }
 
     public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void render(
@@ -166,9 +166,21 @@ public class AllBlockEntityRenders {
     }
 
     public static void register() {
-        visual(AllBlockEntityTypes.BRACKETED_KINETIC, BracketedKineticBlockEntityRenderer::new, BracketedKineticBlockEntityVisual::create);
-        visual(AllBlockEntityTypes.MOTOR, CreativeMotorRenderer::new, OrientedRotatingVisual.of(AllPartialModels.SHAFT_HALF));
-        normal(AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER, SpeedControllerRenderer::new, SingleAxisRotatingVisual::shaft);
+        visual(
+            AllBlockEntityTypes.BRACKETED_KINETIC,
+            BracketedKineticBlockEntityRenderer::new,
+            BracketedKineticBlockEntityVisual::create
+        );
+        visual(
+            AllBlockEntityTypes.MOTOR,
+            CreativeMotorRenderer::new,
+            OrientedRotatingVisual.of(AllPartialModels.SHAFT_HALF)
+        );
+        normal(
+            AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER,
+            SpeedControllerRenderer::new,
+            SingleAxisRotatingVisual::shaft
+        );
         visual(AllBlockEntityTypes.WATER_WHEEL, WaterWheelRenderer::standard, WaterWheelVisual::standard);
         visual(AllBlockEntityTypes.LARGE_WATER_WHEEL, WaterWheelRenderer::large, WaterWheelVisual::large);
         render(AllBlockEntityTypes.DEPOT, DepotRenderer::new);
@@ -185,17 +197,29 @@ public class AllBlockEntityRenders {
         normal(AllBlockEntityTypes.HAND_CRANK, HandCrankRenderer::new, HandCrankVisual::new);
         normal(AllBlockEntityTypes.VALVE_HANDLE, ValveHandleRenderer::new, ValveHandleVisual::new);
         normal(AllBlockEntityTypes.WINDMILL_BEARING, BearingRenderer::new, BearingVisual::new);
-        normal(AllBlockEntityTypes.MECHANICAL_PUMP, PumpRenderer::new, SingleAxisRotatingVisual.ofZ(AllPartialModels.MECHANICAL_PUMP_COG));
+        normal(
+            AllBlockEntityTypes.MECHANICAL_PUMP,
+            PumpRenderer::new,
+            SingleAxisRotatingVisual.ofZ(AllPartialModels.MECHANICAL_PUMP_COG)
+        );
         render(AllBlockEntityTypes.FLUID_TANK, FluidTankRenderer::new);
         render(AllBlockEntityTypes.CREATIVE_FLUID_TANK, FluidTankRenderer::new);
         visual(AllBlockEntityTypes.GLASS_FLUID_PIPE, TransparentStraightPipeRenderer::new, GlassPipeVisual::new);
         visual(AllBlockEntityTypes.STEAM_ENGINE, SteamEngineRenderer::new, SteamEngineVisual::new);
-        visual(AllBlockEntityTypes.POWERED_SHAFT, KineticBlockEntityRenderer::new, SingleAxisRotatingVisual.of(AllPartialModels.POWERED_SHAFT));
+        visual(
+            AllBlockEntityTypes.POWERED_SHAFT,
+            KineticBlockEntityRenderer::new,
+            SingleAxisRotatingVisual.of(AllPartialModels.POWERED_SHAFT)
+        );
         visual(AllBlockEntityTypes.HEATER, BlazeBurnerRenderer::new, BlazeBurnerVisual::new);
         visual(AllBlockEntityTypes.MECHANICAL_PRESS, MechanicalPressRenderer::new, PressVisual::new);
         normal(AllBlockEntityTypes.WEIGHTED_EJECTOR, EjectorRenderer::new, EjectorVisual::new);
         visual(AllBlockEntityTypes.ROPE_PULLEY, PulleyRenderer::new, RopePulleyVisual::new);
-        visual(AllBlockEntityTypes.MILLSTONE, MillstoneRenderer::new, SingleAxisRotatingVisual.of(AllPartialModels.MILLSTONE_COG));
+        visual(
+            AllBlockEntityTypes.MILLSTONE,
+            MillstoneRenderer::new,
+            SingleAxisRotatingVisual.of(AllPartialModels.MILLSTONE_COG)
+        );
         visual(AllBlockEntityTypes.ENCASED_FAN, EncasedFanRenderer::new, FanVisual::new);
         render(AllBlockEntityTypes.PECULIAR_BELL, BellRenderer::new);
         render(AllBlockEntityTypes.HAUNTED_BELL, BellRenderer::new);
@@ -213,7 +237,11 @@ public class AllBlockEntityRenders {
         normal(AllBlockEntityTypes.PORTABLE_STORAGE_INTERFACE, PortableStorageInterfaceRenderer::new, PSIVisual::new);
         normal(AllBlockEntityTypes.SPEEDOMETER, GaugeRenderer::speed, GaugeVisual.Speed::new);
         normal(AllBlockEntityTypes.STRESSOMETER, GaugeRenderer::stress, GaugeVisual.Stress::new);
-        normal(AllBlockEntityTypes.CUCKOO_CLOCK, CuckooClockRenderer::new, OrientedRotatingVisual.backHorizontal(AllPartialModels.SHAFT_HALF));
+        normal(
+            AllBlockEntityTypes.CUCKOO_CLOCK,
+            CuckooClockRenderer::new,
+            OrientedRotatingVisual.backHorizontal(AllPartialModels.SHAFT_HALF)
+        );
         normal(AllBlockEntityTypes.MECHANICAL_MIXER, MechanicalMixerRenderer::new, MixerVisual::new);
         normal(AllBlockEntityTypes.HOSE_PULLEY, HosePulleyRenderer::new, HosePulleyVisual::new);
         render(AllBlockEntityTypes.SPOUT, SpoutRenderer::new);
@@ -221,13 +249,25 @@ public class AllBlockEntityRenders {
         render(AllBlockEntityTypes.STEAM_WHISTLE, WhistleRenderer::new);
         normal(AllBlockEntityTypes.BACKTANK, BacktankRenderer::new, SingleAxisRotatingVisual::backtank);
         normal(AllBlockEntityTypes.DEPLOYER, DeployerRenderer::new, DeployerVisual::new);
-        visual(AllBlockEntityTypes.TURNTABLE, KineticBlockEntityRenderer::new, SingleAxisRotatingVisual.of(AllPartialModels.TURNTABLE));
+        visual(
+            AllBlockEntityTypes.TURNTABLE,
+            KineticBlockEntityRenderer::new,
+            SingleAxisRotatingVisual.of(AllPartialModels.TURNTABLE)
+        );
         visual(AllBlockEntityTypes.DRILL, DrillRenderer::new, OrientedRotatingVisual.of(AllPartialModels.DRILL_HEAD));
         visual(AllBlockEntityTypes.GANTRY_SHAFT, KineticBlockEntityRenderer::new, OrientedRotatingVisual::gantryShaft);
         normal(AllBlockEntityTypes.GANTRY_PINION, GantryCarriageRenderer::new, GantryCarriageVisual::new);
         normal(AllBlockEntityTypes.CLOCKWORK_BEARING, BearingRenderer::new, BearingVisual::new);
-        visual(AllBlockEntityTypes.CRUSHING_WHEEL, KineticBlockEntityRenderer::new, SingleAxisRotatingVisual.of(AllPartialModels.CRUSHING_WHEEL));
-        normal(AllBlockEntityTypes.FLAP_DISPLAY, FlapDisplayRenderer::new, SingleAxisRotatingVisual.of(AllPartialModels.SHAFTLESS_COGWHEEL));
+        visual(
+            AllBlockEntityTypes.CRUSHING_WHEEL,
+            KineticBlockEntityRenderer::new,
+            SingleAxisRotatingVisual.of(AllPartialModels.CRUSHING_WHEEL)
+        );
+        normal(
+            AllBlockEntityTypes.FLAP_DISPLAY,
+            FlapDisplayRenderer::new,
+            SingleAxisRotatingVisual.of(AllPartialModels.SHAFTLESS_COGWHEEL)
+        );
         render(AllBlockEntityTypes.DISPLAY_LINK, LinkBulbRenderer::new);
         render(AllBlockEntityTypes.NIXIE_TUBE, NixieTubeRenderer::new);
         normal(AllBlockEntityTypes.FLUID_VALVE, FluidValveRenderer::new, FluidValveVisual::new);

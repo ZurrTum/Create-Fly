@@ -25,10 +25,11 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
     @Override
     public void prepareComputerEvent(@NotNull ComputerEvent event) {
         if (event instanceof KineticsChangeEvent kce) {
-            if (kce.overStressed)
+            if (kce.overStressed) {
                 queueEvent("overstressed");
-            else
+            } else {
                 queueEvent("stress_change", kce.stress, kce.capacity);
+            }
         }
     }
 

@@ -29,7 +29,14 @@ public class ExperienceNuggetItem extends Item {
     public InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemInHand = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide()) {
-            pLevel.playSound(pPlayer, pPlayer.blockPosition(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, .5f, 1);
+            pLevel.playSound(
+                pPlayer,
+                pPlayer.blockPosition(),
+                SoundEvents.AMETHYST_BLOCK_BREAK,
+                SoundSource.PLAYERS,
+                .5f,
+                1
+            );
             return InteractionResult.CONSUME.heldItemTransformedTo(itemInHand);
         }
 
@@ -40,8 +47,9 @@ public class ExperienceNuggetItem extends Item {
 
         for (int i = 0; i < maxOrbs; i++) {
             int value = Math.min(valuePer, total - i * valuePer);
-            if (value == 0)
+            if (value == 0) {
                 continue;
+            }
 
             Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, pLevel.random, 1).normalize();
             Vec3 look = pPlayer.getLookAngle();
@@ -55,8 +63,9 @@ public class ExperienceNuggetItem extends Item {
         }
 
         itemInHand.shrink(amountUsed);
-        if (!itemInHand.isEmpty())
+        if (!itemInHand.isEmpty()) {
             return InteractionResult.SUCCESS.heldItemTransformedTo(itemInHand);
+        }
 
         pPlayer.setItemInHand(pUsedHand, ItemStack.EMPTY);
         return InteractionResult.CONSUME.heldItemTransformedTo(itemInHand);

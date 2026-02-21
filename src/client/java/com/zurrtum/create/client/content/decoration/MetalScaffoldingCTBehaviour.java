@@ -15,7 +15,11 @@ public class MetalScaffoldingCTBehaviour extends HorizontalCTBehaviour {
 
     protected CTSpriteShiftEntry insideShift;
 
-    public MetalScaffoldingCTBehaviour(CTSpriteShiftEntry outsideShift, CTSpriteShiftEntry insideShift, CTSpriteShiftEntry topShift) {
+    public MetalScaffoldingCTBehaviour(
+        CTSpriteShiftEntry outsideShift,
+        CTSpriteShiftEntry insideShift,
+        CTSpriteShiftEntry topShift
+    ) {
         super(outsideShift, topShift);
         this.insideShift = insideShift;
     }
@@ -26,21 +30,41 @@ public class MetalScaffoldingCTBehaviour extends HorizontalCTBehaviour {
     }
 
     @Override
-    protected boolean isBeingBlocked(BlockState state, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
+    protected boolean isBeingBlocked(
+        BlockState state,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
         return face.getAxis() == Axis.Y && super.isBeingBlocked(state, reader, pos, otherPos, face);
     }
 
     @Override
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
-        if (direction.getAxis() != Axis.Y && sprite == insideShift.getOriginal())
+        if (direction.getAxis() != Axis.Y && sprite == insideShift.getOriginal()) {
             return insideShift;
+        }
         return super.getShift(state, direction, sprite);
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
-        return super.connectsTo(state, other, reader, pos, otherPos, face) && state.getValue(MetalScaffoldingBlock.BOTTOM) && other.getValue(
-            MetalScaffoldingBlock.BOTTOM);
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
+        return super.connectsTo(
+            state,
+            other,
+            reader,
+            pos,
+            otherPos,
+            face
+        ) && state.getValue(MetalScaffoldingBlock.BOTTOM) && other.getValue(MetalScaffoldingBlock.BOTTOM);
     }
 
 }

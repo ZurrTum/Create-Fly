@@ -1,16 +1,15 @@
 package com.zurrtum.create.foundation.codec;
 
 import io.netty.buffer.ByteBuf;
-
-import java.util.Vector;
-import java.util.function.BiFunction;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+
+import java.util.Vector;
+import java.util.function.BiFunction;
 
 public interface CreateStreamCodecs {
     /**

@@ -51,12 +51,18 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
             SandPaperPolishingRecipe recipe = entry.value();
             ItemStack result = recipe.result();
             recipes.add(new RecipeHolder<>(
-                ResourceKey.create(Registries.RECIPE, entry.id().identifier().withSuffix("_using_deployer")), new DeployerApplicationRecipe(
-                List.of(new ProcessingOutput(result.getItemHolder(), result.getCount(), result.getComponentsPatch(), 1)),
-                true,
-                recipe.ingredient(),
-                ingredient
-            )
+                ResourceKey.create(Registries.RECIPE, entry.id().identifier().withSuffix("_using_deployer")),
+                new DeployerApplicationRecipe(
+                    List.of(new ProcessingOutput(
+                        result.getItemHolder(),
+                        result.getCount(),
+                        result.getComponentsPatch(),
+                        1
+                    )),
+                    true,
+                    recipe.ingredient(),
+                    ingredient
+                )
             ));
         }
         return recipes;
@@ -85,7 +91,11 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends ItemApplicationRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<? extends ItemApplicationRecipe> entry,
+        IFocusGroup focuses
+    ) {
         ItemApplicationRecipe recipe = entry.value();
         IRecipeSlotBuilder slot = builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         if (recipe.keepHeldItem()) {
@@ -113,6 +123,10 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
     ) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 62, 57);
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, entry.value().results().size() <= 2 ? 29 : 10);
-        graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(new Matrix3x2f(graphics.pose()), 75, -10));
+        graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(
+            new Matrix3x2f(graphics.pose()),
+            75,
+            -10
+        ));
     }
 }

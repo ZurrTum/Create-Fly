@@ -62,9 +62,19 @@ public class PressingCategory extends CreateCategory<RecipeHolder<PressingRecipe
     }
 
     @Override
-    public void draw(RecipeHolder<PressingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(
+        RecipeHolder<PressingRecipe> entry,
+        IRecipeSlotsView recipeSlotsView,
+        GuiGraphics graphics,
+        double mouseX,
+        double mouseY
+    ) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 61, 41);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 52, 54);
-        graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(new Matrix3x2f(graphics.pose()), 73, -16));
+        graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(
+            new Matrix3x2f(graphics.pose()),
+            73,
+            -16
+        ));
     }
 }

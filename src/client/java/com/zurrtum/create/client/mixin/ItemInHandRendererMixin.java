@@ -82,7 +82,19 @@ public class ItemInHandRendererMixin {
         )) {
             return;
         }
-        original.call(instance, player, tickProgress, pitch, hand, swingProgress, item, equipProgress, matrices, queue, light);
+        original.call(
+            instance,
+            player,
+            tickProgress,
+            pitch,
+            hand,
+            swingProgress,
+            item,
+            equipProgress,
+            matrices,
+            queue,
+            light
+        );
     }
 
     @WrapOperation(method = "renderMapHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/world/entity/HumanoidArm;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/ClientAsset$Texture;texturePath()Lnet/minecraft/resources/Identifier;"))

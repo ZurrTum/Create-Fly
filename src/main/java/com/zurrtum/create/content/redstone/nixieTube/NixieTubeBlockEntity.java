@@ -94,8 +94,9 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             return;
+        }
         signalState = null;
 
         if (AbstractComputerBehaviour.contains(this)) {
@@ -124,8 +125,9 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
 
     @Override
     public void initialize() {
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             updateDisplayedStrings();
+        }
     }
 
     //
@@ -154,10 +156,12 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     }
 
     public void displayCustomText(Component text, int nixiePositionInRow) {
-        if (text == null)
+        if (text == null) {
             return;
-        if (customText.filter(d -> d.equals(text)).isPresent())
+        }
+        if (customText.filter(d -> d.equals(text)).isPresent()) {
             return;
+        }
 
         customText = Optional.ofNullable(DynamicComponent.parseCustomText(level, worldPosition, text));
         nixieIndex = nixiePositionInRow;
@@ -170,11 +174,18 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     }
 
     public void updateDisplayedStrings() {
-        if (signalState != null || computerSignal != null)
+        if (signalState != null || computerSignal != null) {
             return;
+        }
         customText.map(Component::getString).ifPresentOrElse(
-            fullText -> displayedStrings = Couple.create(charOrEmpty(fullText, nixieIndex * 2), charOrEmpty(fullText, nixieIndex * 2 + 1)),
-            () -> displayedStrings = Couple.create(redstoneStrength < 10 ? "0" : "1", String.valueOf(redstoneStrength % 10))
+            fullText -> displayedStrings = Couple.create(
+                charOrEmpty(fullText, nixieIndex * 2),
+                charOrEmpty(fullText, nixieIndex * 2 + 1)
+            ),
+            () -> displayedStrings = Couple.create(
+                redstoneStrength < 10 ? "0" : "1",
+                String.valueOf(redstoneStrength % 10)
+            )
         );
     }
 
@@ -203,8 +214,9 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
             view.read("ComputerSignal", Codec.BYTE_BUFFER).ifPresentOrElse(
                 t -> {
                     byte[] encodedComputerSignal = t.array();
-                    if (computerSignal == null)
+                    if (computerSignal == null) {
                         computerSignal = new ComputerSignal();
+                    }
                     computerSignal.decode(encodedComputerSignal);
                 }, () -> computerSignal = null
             );

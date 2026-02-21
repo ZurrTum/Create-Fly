@@ -21,10 +21,9 @@ import java.util.Optional;
 
 import static com.zurrtum.create.compat.rei.IngredientHelper.*;
 
-public record MixingDisplay(
-    List<EntryIngredient> inputs, List<ProcessingOutput> results, List<EntryIngredient> fluidResults, HeatCondition heat,
-    Optional<Identifier> location
-) implements Display {
+public record MixingDisplay(List<EntryIngredient> inputs, List<ProcessingOutput> results,
+                            List<EntryIngredient> fluidResults, HeatCondition heat,
+                            Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<MixingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(MixingDisplay::inputs),
@@ -53,7 +52,10 @@ public record MixingDisplay(
 
     public MixingDisplay(Identifier id, MixingRecipe recipe) {
         this(
-            getEntryIngredients(getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredients())),
+            getEntryIngredients(
+                getSizedIngredientStream(recipe.ingredients()),
+                getFluidIngredientStream(recipe.fluidIngredients())
+            ),
             recipe.results(),
             getFluidIngredientList(recipe.fluidResults()),
             recipe.heat(),

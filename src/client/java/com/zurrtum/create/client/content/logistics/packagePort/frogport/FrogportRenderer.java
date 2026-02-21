@@ -72,8 +72,8 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         boolean animating = be.isAnimationInProgress();
         boolean depositing = be.currentlyDepositing;
         if (be.target != null) {
-            diff = be.target.getExactTargetLocation(be, world, state.blockPos).subtract(0, animating && depositing ? 0 : 0.75, 0)
-                .subtract(Vec3.atCenterOf(state.blockPos));
+            diff = be.target.getExactTargetLocation(be, world, state.blockPos)
+                .subtract(0, animating && depositing ? 0 : 0.75, 0).subtract(Vec3.atCenterOf(state.blockPos));
             float tonguePitch = (float) Mth.atan2(diff.y, diff.multiply(1, 0, 1).length() + (3 / 16f)) * Mth.RAD_TO_DEG;
             tongueLength = Math.max((float) diff.length(), 1);
             headPitch = Mth.clamp(tonguePitch * 2, 60, 100);
@@ -88,7 +88,10 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
             float scale, itemDistance;
             if (depositing) {
                 double modifier = Math.max(0, 1 - Math.pow((progress - 0.25) * 4 - 1, 4));
-                itemDistance = (float) Math.max(tongueLength * Math.min(1, (progress - 0.25) * 3), tongueLength * modifier);
+                itemDistance = (float) Math.max(
+                    tongueLength * Math.min(1, (progress - 0.25) * 3),
+                    tongueLength * modifier
+                );
                 tongueLength *= (float) Math.max(0, 1 - Math.pow((progress * 1.25 - 0.25) * 4 - 1, 4));
                 headPitchModifier = (float) Math.max(0, 1 - Math.pow((progress * 1.25) * 2 - 1, 4));
                 scale = 0.25f + progress * 3 / 4;
@@ -113,21 +116,32 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         } else {
             tongueLength = 0;
             float anticipation = be.anticipationProgress.getValue(tickProgress);
-            headPitchModifier = anticipation > 0 ? (float) Math.max(0, 1 - Math.pow((anticipation * 1.25) * 2 - 1, 4)) : 0;
+            headPitchModifier = anticipation > 0 ? (float) Math.max(
+                0,
+                1 - Math.pow((anticipation * 1.25) * 2 - 1, 4)
+            ) : 0;
         }
         headPitch *= headPitchModifier;
         float openProgress = be.manualOpenAnimationProgress.getValue(tickProgress);
         data.headPitch = Mth.DEG_TO_RAD * Math.max(headPitch, openProgress * 60);
         tongueLength = Math.max(tongueLength, openProgress * 0.25f);
         data.yRot = Mth.DEG_TO_RAD * be.getYaw();
-        data.head = CachedBuffers.partial(be.goggles ? AllPartialModels.FROGPORT_HEAD_GOGGLES : AllPartialModels.FROGPORT_HEAD, state.blockState);
+        data.head = CachedBuffers.partial(
+            be.goggles ? AllPartialModels.FROGPORT_HEAD_GOGGLES : AllPartialModels.FROGPORT_HEAD,
+            state.blockState
+        );
         data.tongue = CachedBuffers.partial(AllPartialModels.FROGPORT_TONGUE, state.blockState);
         data.tongueScale = tongueLength / (7 / 16f);
         data.light = state.lightCoords;
     }
 
     @Override
-    public void submit(FrogportRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        FrogportRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.name != null) {
             state.name.render(matrices, queue, cameraState);
         }
@@ -158,18 +172,21 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            body.center().rotateY(yRot).uncenter().light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-            head.center().rotateY(yRot).uncenter().translate(0.5f, 0.625f, 0.6875f).rotateX(headPitch).translate(-0.5f, -0.625f, -0.6875f)
-                .light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
-            tongue.center().rotateY(yRot).uncenter().translate(0.5f, 0.625f, 0.6875f).rotateX(tonguePitch).scale(1, 1, tongueScale)
-                .translate(-0.5f, -0.625f, -0.6875f).light(light).overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
+            body.center().rotateY(yRot).uncenter().light(light).overlay(OverlayTexture.NO_OVERLAY)
+                .renderInto(matricesEntry, vertexConsumer);
+            head.center().rotateY(yRot).uncenter().translate(0.5f, 0.625f, 0.6875f).rotateX(headPitch)
+                .translate(-0.5f, -0.625f, -0.6875f).light(light).overlay(OverlayTexture.NO_OVERLAY)
+                .renderInto(matricesEntry, vertexConsumer);
+            tongue.center().rotateY(yRot).uncenter().translate(0.5f, 0.625f, 0.6875f).rotateX(tonguePitch)
+                .scale(1, 1, tongueScale).translate(-0.5f, -0.625f, -0.6875f).light(light)
+                .overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
             if (box != null) {
-                box.translate(0, 0.1875f, 0).translate(boxOffset).center().scale(boxScale).uncenter().light(light).overlay(OverlayTexture.NO_OVERLAY)
-                    .renderInto(matricesEntry, vertexConsumer);
+                box.translate(0, 0.1875f, 0).translate(boxOffset).center().scale(boxScale).uncenter().light(light)
+                    .overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
             }
             if (rig != null) {
-                rig.translate(0, 0.1875f, 0).translate(boxOffset).center().scale(boxScale).uncenter().light(light).overlay(OverlayTexture.NO_OVERLAY)
-                    .renderInto(matricesEntry, vertexConsumer);
+                rig.translate(0, 0.1875f, 0).translate(boxOffset).center().scale(boxScale).uncenter().light(light)
+                    .overlay(OverlayTexture.NO_OVERLAY).renderInto(matricesEntry, vertexConsumer);
             }
         }
     }

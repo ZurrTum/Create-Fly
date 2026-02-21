@@ -21,9 +21,12 @@ public abstract class InstanceAssemblerComponent implements SourceComponent {
     // Each function receives a uint expression as the input.
     // For byte unpacking, the lowest 8 bits contain the value. For short unpacking, the lowest 16 bits contain the value.
     // In both cases, all other bits are 0.
-    private static final EnumMap<IntegerRepr, Function<GlslExpr, GlslExpr>> INT_UNPACKING_FUNCS = new EnumMap<>(IntegerRepr.class);
-    private static final EnumMap<UnsignedIntegerRepr, Function<GlslExpr, GlslExpr>> UINT_UNPACKING_FUNCS = new EnumMap<>(UnsignedIntegerRepr.class);
-    private static final EnumMap<FloatRepr, Function<GlslExpr, GlslExpr>> FLOAT_UNPACKING_FUNCS = new EnumMap<>(FloatRepr.class);
+    private static final EnumMap<IntegerRepr, Function<GlslExpr, GlslExpr>> INT_UNPACKING_FUNCS = new EnumMap<>(
+        IntegerRepr.class);
+    private static final EnumMap<UnsignedIntegerRepr, Function<GlslExpr, GlslExpr>> UINT_UNPACKING_FUNCS = new EnumMap<>(
+        UnsignedIntegerRepr.class);
+    private static final EnumMap<FloatRepr, Function<GlslExpr, GlslExpr>> FLOAT_UNPACKING_FUNCS = new EnumMap<>(
+        FloatRepr.class);
 
     static {
         INT_UNPACKING_FUNCS.put(IntegerRepr.BYTE, e -> signExtendByte(e).cast("int"));
@@ -35,17 +38,26 @@ public abstract class InstanceAssemblerComponent implements SourceComponent {
         UINT_UNPACKING_FUNCS.put(UnsignedIntegerRepr.UNSIGNED_INT, Function.identity());
 
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.BYTE, e -> signExtendByte(e).cast("int").cast("float"));
-        FLOAT_UNPACKING_FUNCS.put(FloatRepr.NORMALIZED_BYTE, e -> signExtendByte(e).cast("int").cast("float").div(127f).clamp(-1, 1));
+        FLOAT_UNPACKING_FUNCS.put(
+            FloatRepr.NORMALIZED_BYTE,
+            e -> signExtendByte(e).cast("int").cast("float").div(127f).clamp(-1, 1)
+        );
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.UNSIGNED_BYTE, e -> e.cast("float"));
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.NORMALIZED_UNSIGNED_BYTE, e -> e.cast("float").div(255f));
 
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.SHORT, e -> signExtendShort(e).cast("int").cast("float"));
-        FLOAT_UNPACKING_FUNCS.put(FloatRepr.NORMALIZED_SHORT, e -> signExtendShort(e).cast("int").cast("float").div(32767f).clamp(-1, 1));
+        FLOAT_UNPACKING_FUNCS.put(
+            FloatRepr.NORMALIZED_SHORT,
+            e -> signExtendShort(e).cast("int").cast("float").div(32767f).clamp(-1, 1)
+        );
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.UNSIGNED_SHORT, e -> e.cast("float"));
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.NORMALIZED_UNSIGNED_SHORT, e -> e.cast("float").div(65535f));
 
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.INT, e -> e.cast("int").cast("float"));
-        FLOAT_UNPACKING_FUNCS.put(FloatRepr.NORMALIZED_INT, e -> e.cast("int").cast("float").div(2147483647f).clamp(-1, 1));
+        FLOAT_UNPACKING_FUNCS.put(
+            FloatRepr.NORMALIZED_INT,
+            e -> e.cast("int").cast("float").div(2147483647f).clamp(-1, 1)
+        );
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.UNSIGNED_INT, e -> e.cast("float"));
         FLOAT_UNPACKING_FUNCS.put(FloatRepr.NORMALIZED_UNSIGNED_INT, e -> e.cast("float").div(4294967295f));
 
@@ -176,7 +188,13 @@ public abstract class InstanceAssemblerComponent implements SourceComponent {
         return unpackingFunc.apply(access(intOffset));
     }
 
-    private GlslExpr unpackVector(String outType, int size, int byteOffset, int byteSize, Function<GlslExpr, GlslExpr> unpackingFunc) {
+    private GlslExpr unpackVector(
+        String outType,
+        int size,
+        int byteOffset,
+        int byteSize,
+        Function<GlslExpr, GlslExpr> unpackingFunc
+    ) {
         int offset = byteOffset / byteSize;
 
         if (byteSize == Byte.BYTES) {
@@ -188,7 +206,12 @@ public abstract class InstanceAssemblerComponent implements SourceComponent {
         }
     }
 
-    private GlslExpr unpackByteBackedVector(String outType, int size, int byteOffset, Function<GlslExpr, GlslExpr> unpackingFunc) {
+    private GlslExpr unpackByteBackedVector(
+        String outType,
+        int size,
+        int byteOffset,
+        Function<GlslExpr, GlslExpr> unpackingFunc
+    ) {
         List<GlslExpr> args = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             args.add(unpackByteBackedScalar(byteOffset + i, unpackingFunc));
@@ -196,7 +219,12 @@ public abstract class InstanceAssemblerComponent implements SourceComponent {
         return GlslExpr.call(outType, args);
     }
 
-    private GlslExpr unpackShortBackedVector(String outType, int size, int shortOffset, Function<GlslExpr, GlslExpr> unpackingFunc) {
+    private GlslExpr unpackShortBackedVector(
+        String outType,
+        int size,
+        int shortOffset,
+        Function<GlslExpr, GlslExpr> unpackingFunc
+    ) {
         List<GlslExpr> args = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             args.add(unpackShortBackedScalar(shortOffset + i, unpackingFunc));
@@ -204,7 +232,12 @@ public abstract class InstanceAssemblerComponent implements SourceComponent {
         return GlslExpr.call(outType, args);
     }
 
-    private GlslExpr unpackIntBackedVector(String outType, int size, int intOffset, Function<GlslExpr, GlslExpr> unpackingFunc) {
+    private GlslExpr unpackIntBackedVector(
+        String outType,
+        int size,
+        int intOffset,
+        Function<GlslExpr, GlslExpr> unpackingFunc
+    ) {
         List<GlslExpr> args = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             args.add(unpackIntBackedScalar(intOffset + i, unpackingFunc));

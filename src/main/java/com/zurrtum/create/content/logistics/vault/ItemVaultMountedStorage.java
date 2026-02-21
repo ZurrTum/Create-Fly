@@ -16,8 +16,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import org.jetbrains.annotations.Nullable;
 
 public class ItemVaultMountedStorage extends WrapperMountedItemStorage<ItemStackHandler> {
-    public static final MapCodec<ItemVaultMountedStorage> CODEC = CreateCodecs.ITEM_STACK_HANDLER.xmap(
-        ItemVaultMountedStorage::new,
+    public static final MapCodec<ItemVaultMountedStorage> CODEC = CreateCodecs.ITEM_STACK_HANDLER.xmap(ItemVaultMountedStorage::new,
         storage -> storage.wrapped
     ).fieldOf("value");
 

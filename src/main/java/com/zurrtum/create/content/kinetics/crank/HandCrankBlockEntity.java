@@ -32,20 +32,23 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
     public void turn(boolean back) {
         boolean update = false;
 
-        if (getGeneratedSpeed() == 0 || back != backwards)
+        if (getGeneratedSpeed() == 0 || back != backwards) {
             update = true;
+        }
 
         inUse = 10;
         this.backwards = back;
-        if (update && !level.isClientSide())
+        if (update && !level.isClientSide()) {
             updateGeneratedRotation();
+        }
     }
 
     @Override
     public float getGeneratedSpeed() {
         Block block = getBlockState().getBlock();
-        if (!(block instanceof HandCrankBlock crank))
+        if (!(block instanceof HandCrankBlock crank)) {
             return 0;
+        }
         int speed = (inUse == 0 ? 0 : clockwise() ? -1 : 1) * crank.getRotationSpeed();
         return convertToDirection(speed, getBlockState().getValue(HandCrankBlock.FACING));
     }

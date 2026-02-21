@@ -77,7 +77,12 @@ public abstract class RecipeViewScreenMixin extends AbstractContainerScreen<Reci
     }
 
     @WrapOperation(method = "renderBg(Lnet/minecraft/client/gui/GuiGraphics;FII)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewMenu;guiOffsetTop(I)I"))
-    private int cacheIndex(RecipeViewMenu instance, int displayIndex, Operation<Integer> original, @Share("index") LocalIntRef ref) {
+    private int cacheIndex(
+        RecipeViewMenu instance,
+        int displayIndex,
+        Operation<Integer> original,
+        @Share("index") LocalIntRef ref
+    ) {
         ref.set(displayIndex);
         return original.call(instance, displayIndex);
     }

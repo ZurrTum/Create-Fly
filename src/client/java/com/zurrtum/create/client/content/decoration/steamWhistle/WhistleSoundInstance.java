@@ -53,14 +53,16 @@ public class WhistleSoundInstance extends AbstractTickableSoundInstance {
         if (active) {
             volume = Math.min(1, volume + .25f);
             keepAlive--;
-            if (keepAlive == 0)
+            if (keepAlive == 0) {
                 fadeOut();
+            }
             return;
 
         }
         volume = Math.max(0, volume - .25f);
-        if (volume == 0)
+        if (volume == 0) {
             stop();
+        }
     }
 
 }

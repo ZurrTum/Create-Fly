@@ -88,8 +88,12 @@ public class ValveHandleBlock extends HandCrankBlock {
         DyeColor color = AllItemTags.getDyeColor(heldItem);
 
         if (color != null && color != this.color) {
-            if (!level.isClientSide())
-                level.setBlockAndUpdate(pos, BlockHelper.copyProperties(state, getColorBlock(color).defaultBlockState()));
+            if (!level.isClientSide()) {
+                level.setBlockAndUpdate(
+                    pos,
+                    BlockHelper.copyProperties(state, getColorBlock(color).defaultBlockState())
+                );
+            }
             return InteractionResult.SUCCESS;
         }
 
@@ -102,7 +106,13 @@ public class ValveHandleBlock extends HandCrankBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        Player player,
+        BlockHitResult hit
+    ) {
         return super.useWithoutItem(state, world, pos, player, hit);
     }
 

@@ -4,13 +4,12 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.catnip.gui.element.AbstractRenderElement;
 import com.zurrtum.create.client.catnip.gui.element.RenderElement;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
+import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector4i;
 
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
-
-import net.minecraft.client.gui.GuiGraphics;
 
 public class ElementWidget extends AbstractSimiWidget {
 

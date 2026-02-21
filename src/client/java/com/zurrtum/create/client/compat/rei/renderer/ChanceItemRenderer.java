@@ -13,7 +13,14 @@ import org.jetbrains.annotations.Nullable;
 
 public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) implements EntryRenderer<ItemStack> {
     @Override
-    public void render(EntryStack<ItemStack> entry, GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
+    public void render(
+        EntryStack<ItemStack> entry,
+        GuiGraphics graphics,
+        Rectangle bounds,
+        int mouseX,
+        int mouseY,
+        float delta
+    ) {
         origin.render(entry, graphics, bounds, mouseX, mouseY, delta);
     }
 
@@ -23,8 +30,10 @@ public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) 
         if (tooltip != null) {
             tooltip.entries().add(
                 1,
-                Tooltip.entry(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100))
-                    .withStyle(ChatFormatting.GOLD))
+                Tooltip.entry(CreateLang.translateDirect(
+                    "recipe.processing.chance",
+                    chance < 0.01 ? "<1" : (int) (chance * 100)
+                ).withStyle(ChatFormatting.GOLD))
             );
         }
         return tooltip;

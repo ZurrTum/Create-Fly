@@ -11,13 +11,12 @@ import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import com.zurrtum.create.content.trains.bogey.BogeySize;
 import com.zurrtum.create.content.trains.bogey.BogeyStyle;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class BogeyBlockEntityVisual extends AbstractBlockEntityVisual<AbstractBogeyBlockEntity> implements SimpleDynamicVisual {
     private final PoseStack poseStack = new PoseStack();
@@ -43,8 +42,9 @@ public class BogeyBlockEntityVisual extends AbstractBlockEntityVisual<AbstractBo
         BlockPos visualPos = getVisualPosition();
         poseStack.translate(visualPos.getX(), visualPos.getY(), visualPos.getZ());
         poseStack.translate(.5f, .5f, .5f);
-        if (blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X)
+        if (blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
             poseStack.mulPose(Axis.YP.rotationDegrees(90));
+        }
         poseStack.translate(0, -1.5 - 1 / 128f, 0);
 
         bogey = AllBogeyStyleRenders.createVisual(lastStyle, bogeySize, visualizationContext, partialTick, false);
@@ -65,7 +65,13 @@ public class BogeyBlockEntityVisual extends AbstractBlockEntityVisual<AbstractBo
                 bogey = null;
             }
             lastStyle = style;
-            bogey = AllBogeyStyleRenders.createVisual(lastStyle, bogeySize, visualizationContext, context.partialTick(), false);
+            bogey = AllBogeyStyleRenders.createVisual(
+                lastStyle,
+                bogeySize,
+                visualizationContext,
+                context.partialTick(),
+                false
+            );
             updateLight(context.partialTick());
         }
 

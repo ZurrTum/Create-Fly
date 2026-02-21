@@ -1,13 +1,12 @@
 package com.zurrtum.create.content.trains.display;
 
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public class FlapDisplayLayout {
     List<FlapDisplaySection> sections;
@@ -18,7 +17,10 @@ public class FlapDisplayLayout {
     }
 
     public void loadDefault(int maxCharCount) {
-        configure("Default", Arrays.asList(new FlapDisplaySection(maxCharCount * FlapDisplaySection.MONOSPACE, "alphabet", false, false)));
+        configure(
+            "Default",
+            Arrays.asList(new FlapDisplaySection(maxCharCount * FlapDisplaySection.MONOSPACE, "alphabet", false, false))
+        );
     }
 
     public boolean isLayout(String key) {

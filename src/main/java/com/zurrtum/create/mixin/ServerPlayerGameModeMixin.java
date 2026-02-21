@@ -19,17 +19,6 @@ import com.zurrtum.create.content.redstone.link.controller.LinkedControllerItem;
 import com.zurrtum.create.foundation.block.BreakControlBlock;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionHandler;
 import com.zurrtum.create.infrastructure.click.ServerRightClickHandle;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Objects;
-import java.util.stream.Stream;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
@@ -46,6 +35,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Mixin(ServerPlayerGameMode.class)
 public class ServerPlayerGameModeMixin {
@@ -73,8 +72,8 @@ public class ServerPlayerGameModeMixin {
                 EdgeInteractionHandler::onBlockActivated,
                 LinkedControllerItem::onItemUseFirst,
                 CogwheelBlockItem::onItemUseFirst
-            ).map(handler -> handler.onRightClickBlock(world, player, stack, hand, hit, pos)).filter(Objects::nonNull).findFirst()
-            .ifPresent(cir::setReturnValue);
+            ).map(handler -> handler.onRightClickBlock(world, player, stack, hand, hit, pos)).filter(Objects::nonNull)
+            .findFirst().ifPresent(cir::setReturnValue);
     }
 
     @Inject(method = "handleBlockBreakAction(Lnet/minecraft/core/BlockPos;Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;Lnet/minecraft/core/Direction;II)V", at = @At("HEAD"), cancellable = true)
@@ -87,12 +86,10 @@ public class ServerPlayerGameModeMixin {
         CallbackInfo ci
     ) {
         ItemStack stack = player.getMainHandItem();
-        if (ZapperInteractionHandler.leftClickingBlocksWithTheZapperSelectsTheBlock(player, stack) || ClipboardValueSettingsHandler.leftClickToPaste(level,
+        if (ZapperInteractionHandler.leftClickingBlocksWithTheZapperSelectsTheBlock(
             player,
-            stack,
-            direction,
-            pos
-        )) {
+            stack
+        ) || ClipboardValueSettingsHandler.leftClickToPaste(level, player, stack, direction, pos)) {
             ci.cancel();
         } else if (action == ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
             CardboardSwordItem.cardboardSwordsMakeNoiseOnClick(player, pos);
@@ -116,11 +113,21 @@ public class ServerPlayerGameModeMixin {
                 stack
             ) || ExtendoGripItem.shouldInteraction(player, hand, stack));
         }
-        return FunnelItem.funnelItemAlwaysPlacesWhenUsed(stack) || ClickToLinkBlockItem.linkableItemAlwaysPlacesWhenUsed(world, pos, stack);
+        return FunnelItem.funnelItemAlwaysPlacesWhenUsed(stack) || ClickToLinkBlockItem.linkableItemAlwaysPlacesWhenUsed(world,
+            pos,
+            stack
+        );
     }
 
     @WrapOperation(method = "destroyBlock(Lnet/minecraft/core/BlockPos;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;mineBlock(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)V"))
-    private void postMine(ItemStack stack, Level world, BlockState state, BlockPos pos, Player miner, Operation<Void> original) {
+    private void postMine(
+        ItemStack stack,
+        Level world,
+        BlockState state,
+        BlockPos pos,
+        Player miner,
+        Operation<Void> original
+    ) {
         original.call(stack, world, state, pos, miner);
         if (!world.isClientSide() && state.getDestroySpeed(world, pos) != 0) {
             ExtendoGripItem.postMine(miner, stack);
@@ -128,7 +135,11 @@ public class ServerPlayerGameModeMixin {
     }
 
     @WrapOperation(method = "useItemOn(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", ordinal = 1))
-    private InteractionResult interactBlock(ItemStack stack, UseOnContext context, Operation<InteractionResult> original) {
+    private InteractionResult interactBlock(
+        ItemStack stack,
+        UseOnContext context,
+        Operation<InteractionResult> original
+    ) {
         InteractionResult result = original.call(stack, context);
         if (result.consumesAction() && stack.getItem() instanceof BlockItem) {
             ExtendoGripItem.postPlace(context.getPlayer());
@@ -145,7 +156,12 @@ public class ServerPlayerGameModeMixin {
         @Local(ordinal = 0) BlockState state,
         @Local Block block
     ) {
-        if (block instanceof BreakControlBlock controlBlock && !controlBlock.onDestroyedByPlayer(state, world, pos, player)) {
+        if (block instanceof BreakControlBlock controlBlock && !controlBlock.onDestroyedByPlayer(
+            state,
+            world,
+            pos,
+            player
+        )) {
             return false;
         }
         boolean remove = original.call(world, pos, move);

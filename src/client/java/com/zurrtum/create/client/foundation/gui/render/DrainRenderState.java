@@ -7,9 +7,8 @@ import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record DrainRenderState(
-    Matrix3x2f pose, Fluid fluid, DataComponentPatch components, int x0, int y0, ScreenRectangle bounds
-) implements PictureInPictureRenderState {
+public record DrainRenderState(Matrix3x2f pose, Fluid fluid, DataComponentPatch components, int x0, int y0,
+                               ScreenRectangle bounds) implements PictureInPictureRenderState {
     public DrainRenderState(Matrix3x2f pose, Fluid fluid, DataComponentPatch components, int x, int y) {
         this(pose, fluid, components, x, y, new ScreenRectangle(x, y, 26, 23).transformMaxBounds(pose));
     }

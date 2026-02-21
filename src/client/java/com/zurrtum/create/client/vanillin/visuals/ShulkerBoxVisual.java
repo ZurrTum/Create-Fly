@@ -9,11 +9,6 @@ import com.zurrtum.create.client.flywheel.lib.model.part.InstanceTree;
 import com.zurrtum.create.client.flywheel.lib.model.part.ModelTrees;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
-import org.joml.Matrix4f;
-
-import java.util.Set;
-import java.util.function.Consumer;
-
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.core.Direction;
@@ -21,10 +16,14 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import org.joml.Matrix4f;
+
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class ShulkerBoxVisual extends AbstractBlockEntityVisual<ShulkerBoxBlockEntity> implements SimpleDynamicVisual {
-    private static final Material MATERIAL = SimpleMaterial.builder().cutout(CutoutShaders.ONE_TENTH).texture(Sheets.SHULKER_SHEET).mipmap(false)
-        .backfaceCulling(false).build();
+    private static final Material MATERIAL = SimpleMaterial.builder().cutout(CutoutShaders.ONE_TENTH)
+        .texture(Sheets.SHULKER_SHEET).mipmap(false).backfaceCulling(false).build();
     private static final Set<String> PATHS_TO_PRUNE = Set.of("/head");
 
     private final InstanceTree instances;
@@ -45,7 +44,10 @@ public class ShulkerBoxVisual extends AbstractBlockEntityVisual<ShulkerBoxBlockE
             texture = Sheets.SHULKER_TEXTURE_LOCATION.get(color.getId());
         }
 
-        instances = InstanceTree.create(instancerProvider(), ModelTrees.of(ModelLayers.SHULKER, PATHS_TO_PRUNE, texture, MATERIAL));
+        instances = InstanceTree.create(
+            instancerProvider(),
+            ModelTrees.of(ModelLayers.SHULKER, PATHS_TO_PRUNE, texture, MATERIAL)
+        );
         lid = instances.childOrThrow("lid");
 
         initialPose = createInitialPose();
@@ -55,8 +57,8 @@ public class ShulkerBoxVisual extends AbstractBlockEntityVisual<ShulkerBoxBlockE
     private Matrix4f createInitialPose() {
         var visualPosition = getVisualPosition();
         var rotation = getDirection().getRotation();
-        return new Matrix4f().translate(visualPosition.getX(), visualPosition.getY(), visualPosition.getZ()).translate(0.5f, 0.5f, 0.5f)
-            .scale(0.9995f).rotate(rotation).scale(1, -1, -1).translate(0, -1, 0);
+        return new Matrix4f().translate(visualPosition.getX(), visualPosition.getY(), visualPosition.getZ())
+            .translate(0.5f, 0.5f, 0.5f).scale(0.9995f).rotate(rotation).scale(1, -1, -1).translate(0, -1, 0);
     }
 
     private Direction getDirection() {

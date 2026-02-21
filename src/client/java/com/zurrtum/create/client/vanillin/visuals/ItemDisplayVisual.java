@@ -31,11 +31,14 @@ public class ItemDisplayVisual extends AbstractEntityVisual<Display.ItemDisplay>
 
         if (itemRenderState == null) {
             currentStack = ItemStack.EMPTY;
-            instance = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.block(Blocks.AIR.defaultBlockState())).createInstance();
+            instance = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, Models.block(Blocks.AIR.defaultBlockState())).createInstance();
         } else {
             currentStack = itemRenderState.itemStack().copy();
-            instance = ctx.instancerProvider()
-                .instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, currentStack, itemRenderState.itemTransform())).createInstance();
+            instance = ctx.instancerProvider().instancer(
+                InstanceTypes.TRANSFORMED,
+                ItemModels.get(level, currentStack, itemRenderState.itemTransform())
+            ).createInstance();
         }
 
         shadowComponent = new ShadowComponent(ctx, entity);
@@ -60,7 +63,8 @@ public class ItemDisplayVisual extends AbstractEntityVisual<Display.ItemDisplay>
 
         if (!ItemStack.matches(itemStack, currentStack)) {
             currentStack = itemStack.copy();
-            visualizationContext.instancerProvider().instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, currentStack, object.itemTransform()))
+            visualizationContext.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, ItemModels.get(level, currentStack, object.itemTransform()))
                 .stealInstance(instance);
         }
 
@@ -77,8 +81,11 @@ public class ItemDisplayVisual extends AbstractEntityVisual<Display.ItemDisplay>
         Vec3 pos = entity.position();
         var renderOrigin = renderOrigin();
 
-        instance.setIdentityTransform()
-            .translate((float) (pos.x - renderOrigin.getX()), (float) (pos.y - renderOrigin.getY()), (float) (pos.z - renderOrigin.getZ()));
+        instance.setIdentityTransform().translate(
+            (float) (pos.x - renderOrigin.getX()),
+            (float) (pos.y - renderOrigin.getY()),
+            (float) (pos.z - renderOrigin.getZ())
+        );
 
         float partialTick = ctx.partialTick();
         Camera camera = ctx.camera();
@@ -91,13 +98,25 @@ public class ItemDisplayVisual extends AbstractEntityVisual<Display.ItemDisplay>
                 );
                 break;
             case HORIZONTAL:
-                instance.pose.rotateYXZ(-0.017453292F * entityYRot(entity, partialTick), ((float) Math.PI / 180F) * cameraXRot(camera), 0.0F);
+                instance.pose.rotateYXZ(
+                    -0.017453292F * entityYRot(entity, partialTick),
+                    ((float) Math.PI / 180F) * cameraXRot(camera),
+                    0.0F
+                );
                 break;
             case VERTICAL:
-                instance.pose.rotateYXZ(-0.017453292F * cameraYrot(camera), ((float) Math.PI / 180F) * entityXRot(entity, partialTick), 0.0F);
+                instance.pose.rotateYXZ(
+                    -0.017453292F * cameraYrot(camera),
+                    ((float) Math.PI / 180F) * entityXRot(entity, partialTick),
+                    0.0F
+                );
                 break;
             case CENTER:
-                instance.pose.rotateYXZ(-0.017453292F * cameraYrot(camera), ((float) Math.PI / 180F) * cameraXRot(camera), 0.0F);
+                instance.pose.rotateYXZ(
+                    -0.017453292F * cameraYrot(camera),
+                    ((float) Math.PI / 180F) * cameraXRot(camera),
+                    0.0F
+                );
                 break;
         }
 

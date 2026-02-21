@@ -63,7 +63,10 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
         Level world = be.getLevel();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        state.lightCoords = world != null ? LevelRenderer.getLightColor(
+            world,
+            state.blockPos
+        ) : LightTexture.FULL_BRIGHT;
         DepotBehaviour depotBehaviour = be.depotBehaviour;
         state.incoming = DepotRenderer.createIncomingStateList(depotBehaviour, itemModelManager, tickProgress, world);
         state.outputs = DepotRenderer.createOutputStateList(depotBehaviour, itemModelManager, world);
@@ -86,11 +89,18 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
             TrackBlockRenderer renderer = AllTrackRenders.get(track);
             if (renderer != null) {
                 state.block = renderer.getRenderState(
-                    world, new Vec3(
+                    world,
+                    new Vec3(
                         targetPosition.getX() - state.blockPos.getX(),
                         targetPosition.getY() - state.blockPos.getY(),
                         targetPosition.getZ() - state.blockPos.getZ()
-                    ), trackState, targetPosition, target.getTargetDirection(), target.getTargetBezier(), RenderedTrackOverlayType.STATION, 1
+                    ),
+                    trackState,
+                    targetPosition,
+                    target.getTargetDirection(),
+                    target.getTargetBezier(),
+                    RenderedTrackOverlayType.STATION,
+                    1
                 );
             }
             return;
@@ -112,7 +122,12 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
         );
     }
 
-    public void updateFlagState(PartialModel flag, StationBlockEntity be, StationRenderState state, float tickProgress) {
+    public void updateFlagState(
+        PartialModel flag,
+        StationBlockEntity be,
+        StationRenderState state,
+        float tickProgress
+    ) {
         if (be.resolveFlagAngle()) {
             state.layer = RenderTypes.cutoutMovingBlock();
             state.flag = CachedBuffers.partial(flag, be.getBlockState());
@@ -120,7 +135,10 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
             float progress = (float) (Math.pow(Math.min(value * 5, 1), 2));
             if (be.flag.getChaseTarget() > 0 && !be.flag.settled() && progress == 1) {
                 float wiggleProgress = (value - .2f) / .8f;
-                progress += (float) ((Math.sin(wiggleProgress * (2 * Mth.PI) * 4) / 8f) / Math.max(1, 8f * wiggleProgress));
+                progress += (float) ((Math.sin(wiggleProgress * (2 * Mth.PI) * 4) / 8f) / Math.max(
+                    1,
+                    8f * wiggleProgress
+                ));
             }
             float nudge = 1 / 512f;
             state.flagYRot = Mth.DEG_TO_RAD * be.flagYRot;
@@ -132,9 +150,22 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
     }
 
     @Override
-    public void submit(StationRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        StationRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.incoming != null || state.outputs != null) {
-            DepotRenderer.renderItemsOf(state.incoming, state.outputs, state.blockPos, cameraState.pos, queue, matrices, state.lightCoords);
+            DepotRenderer.renderItemsOf(
+                state.incoming,
+                state.outputs,
+                state.blockPos,
+                cameraState.pos,
+                queue,
+                matrices,
+                state.lightCoords
+            );
         }
         if (state.layer != null) {
             queue.submitCustomGeometry(matrices, state.layer, state);

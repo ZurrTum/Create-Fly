@@ -13,7 +13,8 @@ import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 
-public record TrainEditReturnPacket(UUID id, String name, Identifier iconType, int mapColor) implements Packet<ClientGamePacketListener> {
+public record TrainEditReturnPacket(UUID id, String name, Identifier iconType,
+                                    int mapColor) implements Packet<ClientGamePacketListener> {
     public static StreamCodec<RegistryFriendlyByteBuf, TrainEditReturnPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainEditReturnPacket::id,

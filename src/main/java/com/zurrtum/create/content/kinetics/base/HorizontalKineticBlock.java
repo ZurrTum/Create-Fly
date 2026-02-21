@@ -40,13 +40,14 @@ public abstract class HorizontalKineticBlock extends KineticBlock {
                     context.getClickedPos().relative(side),
                     blockState,
                     side.getOpposite()
-                ))
+                )) {
                     if (prefferedSide != null && prefferedSide.getAxis() != side.getAxis()) {
                         prefferedSide = null;
                         break;
                     } else {
                         prefferedSide = side;
                     }
+                }
             }
         }
         return prefferedSide;

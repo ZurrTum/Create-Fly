@@ -27,7 +27,11 @@ import java.util.function.BiFunction;
 @Mixin(SectionCompiler.class)
 public class SectionCompilerMixin {
     @Inject(method = "handleBlockEntity", at = @At("HEAD"), cancellable = true)
-    private <E extends BlockEntity> void flywheel$tryAddBlockEntity(SectionCompiler.Results data, E blockEntity, CallbackInfo ci) {
+    private <E extends BlockEntity> void flywheel$tryAddBlockEntity(
+        SectionCompiler.Results data,
+        E blockEntity,
+        CallbackInfo ci
+    ) {
         if (VisualizationHelper.tryAddBlockEntity(blockEntity)) {
             ci.cancel();
         }

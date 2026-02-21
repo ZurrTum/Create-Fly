@@ -34,7 +34,14 @@ public class SchematicExport {
      * @return a SchematicExportResult, or null if an error occurred.
      */
     @Nullable
-    public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, Level level, BlockPos first, BlockPos second) {
+    public static SchematicExportResult saveSchematic(
+        Path dir,
+        String fileName,
+        boolean overwrite,
+        Level level,
+        BlockPos first,
+        BlockPos second
+    ) {
         BoundingBox bb = BoundingBox.fromCorners(first, second);
         BlockPos origin = new BlockPos(bb.minX(), bb.minY(), bb.minZ());
         BlockPos bounds = new BlockPos(bb.getXSpan(), bb.getYSpan(), bb.getZSpan());
@@ -43,14 +50,21 @@ public class SchematicExport {
         structure.fillFromWorld(level, origin, bounds, true, List.of(Blocks.AIR));
         CompoundTag data = structure.save(new CompoundTag());
         SchematicAndQuillItem.replaceStructureVoidWithAir(data);
-        SchematicAndQuillItem.clampGlueBoxes(level, new AABB(Vec3.atLowerCornerOf(origin), Vec3.atLowerCornerOf(origin.offset(bounds))), data);
+        SchematicAndQuillItem.clampGlueBoxes(
+            level,
+            new AABB(Vec3.atLowerCornerOf(origin), Vec3.atLowerCornerOf(origin.offset(bounds))),
+            data
+        );
 
-        if (fileName.isEmpty())
+        if (fileName.isEmpty()) {
             fileName = Component.translatable("create.schematicAndQuill.fallbackName").getString();
-        if (!overwrite)
+        }
+        if (!overwrite) {
             fileName = FilesHelper.findFirstValidFilename(fileName, dir, "nbt");
-        if (!fileName.endsWith(".nbt"))
+        }
+        if (!fileName.endsWith(".nbt")) {
             fileName += ".nbt";
+        }
         Path file = dir.resolve(fileName).toAbsolutePath();
 
         try {
@@ -66,8 +80,7 @@ public class SchematicExport {
         }
     }
 
-    public record SchematicExportResult(
-        Path file, Path dir, String fileName, boolean overwritten, BlockPos origin, BlockPos bounds
-    ) {
+    public record SchematicExportResult(Path file, Path dir, String fileName, boolean overwritten, BlockPos origin,
+                                        BlockPos bounds) {
     }
 }

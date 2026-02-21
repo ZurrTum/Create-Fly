@@ -16,8 +16,9 @@ public class FakeTrackBlockEntity extends SyncedBlockEntity {
 
     public void randomTick() {
         keepAlive--;
-        if (keepAlive > 0)
+        if (keepAlive > 0) {
             return;
+        }
         level.removeBlock(worldPosition, false);
     }
 

@@ -57,9 +57,21 @@ public class AllCasings {
         make(AllBlocks.RAILWAY_CASING, AllSpriteShifts.RAILWAY_CASING_SIDE);
         make(AllBlocks.SHADOW_STEEL_CASING, AllSpriteShifts.SHADOW_STEEL_CASING);
         make(AllBlocks.REFINED_RADIANCE_CASING, AllSpriteShifts.REFINED_RADIANCE_CASING);
-        make(AllBlocks.GEARBOX, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() == s.getValue(GearboxBlock.AXIS));
-        make(AllBlocks.ANDESITE_ENCASED_SHAFT, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() != s.getValue(EncasedShaftBlock.AXIS));
-        make(AllBlocks.BRASS_ENCASED_SHAFT, AllSpriteShifts.BRASS_CASING, (s, f) -> f.getAxis() != s.getValue(EncasedShaftBlock.AXIS));
+        make(
+            AllBlocks.GEARBOX,
+            AllSpriteShifts.ANDESITE_CASING,
+            (s, f) -> f.getAxis() == s.getValue(GearboxBlock.AXIS)
+        );
+        make(
+            AllBlocks.ANDESITE_ENCASED_SHAFT,
+            AllSpriteShifts.ANDESITE_CASING,
+            (s, f) -> f.getAxis() != s.getValue(EncasedShaftBlock.AXIS)
+        );
+        make(
+            AllBlocks.BRASS_ENCASED_SHAFT,
+            AllSpriteShifts.BRASS_CASING,
+            (s, f) -> f.getAxis() != s.getValue(EncasedShaftBlock.AXIS)
+        );
         make(
             AllBlocks.ANDESITE_ENCASED_COGWHEEL,
             AllSpriteShifts.ANDESITE_CASING,
@@ -80,6 +92,10 @@ public class AllCasings {
             AllSpriteShifts.BRASS_CASING,
             (s, f) -> f.getAxis() == s.getValue(EncasedCogwheelBlock.AXIS) && !s.getValue(f.getAxisDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
         );
-        make(AllBlocks.ENCASED_FLUID_PIPE, AllSpriteShifts.COPPER_CASING, (s, f) -> !s.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f)));
+        make(
+            AllBlocks.ENCASED_FLUID_PIPE,
+            AllSpriteShifts.COPPER_CASING,
+            (s, f) -> !s.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f))
+        );
     }
 }

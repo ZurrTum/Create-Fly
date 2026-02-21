@@ -10,7 +10,10 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 public record ServerSpeedPacket(int speed) implements Packet<ClientGamePacketListener> {
-    public static final StreamCodec<ByteBuf, ServerSpeedPacket> CODEC = ByteBufCodecs.INT.map(ServerSpeedPacket::new, ServerSpeedPacket::speed);
+    public static final StreamCodec<ByteBuf, ServerSpeedPacket> CODEC = ByteBufCodecs.INT.map(
+        ServerSpeedPacket::new,
+        ServerSpeedPacket::speed
+    );
 
     @Override
     public void handle(ClientGamePacketListener listener) {

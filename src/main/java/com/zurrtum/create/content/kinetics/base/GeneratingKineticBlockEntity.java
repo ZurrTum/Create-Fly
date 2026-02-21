@@ -21,8 +21,9 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
 
     @Override
     public void removeSource() {
-        if (hasSource() && isSource())
+        if (hasSource() && isSource()) {
             reActivateSource = true;
+        }
         super.removeSource();
     }
 
@@ -30,10 +31,12 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
     public void setSource(BlockPos source) {
         super.setSource(source);
         BlockEntity blockEntity = level.getBlockEntity(source);
-        if (!(blockEntity instanceof KineticBlockEntity sourceBE))
+        if (!(blockEntity instanceof KineticBlockEntity sourceBE)) {
             return;
-        if (reActivateSource && Math.abs(sourceBE.getSpeed()) >= Math.abs(getGeneratedSpeed()))
+        }
+        if (reActivateSource && Math.abs(sourceBE.getSpeed()) >= Math.abs(getGeneratedSpeed())) {
             reActivateSource = false;
+        }
     }
 
     @Override
@@ -49,15 +52,17 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
         float speed = getGeneratedSpeed();
         float prevSpeed = this.speed;
 
-        if (level == null || level.isClientSide())
+        if (level == null || level.isClientSide()) {
             return;
+        }
 
         if (prevSpeed != speed) {
             if (!hasSource()) {
                 SpeedLevel levelBefore = SpeedLevel.of(this.speed);
                 SpeedLevel levelafter = SpeedLevel.of(speed);
-                if (levelBefore != levelafter)
+                if (levelBefore != levelafter) {
                     effects.queueRotationIndicators();
+                }
             }
 
             applyNewSpeed(prevSpeed, speed);
@@ -102,8 +107,9 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
 
             // Staying below Overpowered speed
             if (Math.abs(prevSpeed) >= Math.abs(speed)) {
-                if (Math.signum(prevSpeed) != Math.signum(speed))
+                if (Math.signum(prevSpeed) != Math.signum(speed)) {
                     level.destroyBlock(worldPosition, true);
+                }
                 return;
             }
 

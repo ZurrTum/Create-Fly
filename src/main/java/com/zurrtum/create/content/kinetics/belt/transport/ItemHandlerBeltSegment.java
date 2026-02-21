@@ -31,38 +31,45 @@ public class ItemHandlerBeltSegment implements ItemInventory {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot != 0)
+        if (slot != 0) {
             return ItemStack.EMPTY;
+        }
         TransportedItemStack stackAtOffset = beltInventory.getStackAtOffset(offset);
-        if (stackAtOffset == null)
+        if (stackAtOffset == null) {
             return ItemStack.EMPTY;
+        }
         return stackAtOffset.stack;
     }
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-        if (slot != 0)
+        if (slot != 0) {
             return ItemStack.EMPTY;
+        }
         TransportedItemStack transported = this.beltInventory.getStackAtOffset(offset);
-        if (transported == null)
+        if (transported == null) {
             return ItemStack.EMPTY;
+        }
 
         amount = Math.min(amount, transported.stack.getCount());
         ItemStack extracted = transported.stack.split(amount);
-        if (transported.stack.isEmpty())
+        if (transported.stack.isEmpty()) {
             beltInventory.toRemove.add(transported);
-        else
+        } else {
             setChanged();
+        }
         return extracted;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0)
+        if (slot != 0) {
             return ItemStack.EMPTY;
+        }
         TransportedItemStack transported = this.beltInventory.getStackAtOffset(offset);
-        if (transported == null)
+        if (transported == null) {
             return ItemStack.EMPTY;
+        }
         beltInventory.toRemove.add(transported);
         ItemStack stack = transported.stack;
         transported.stack = ItemStack.EMPTY;
@@ -76,8 +83,9 @@ public class ItemHandlerBeltSegment implements ItemInventory {
         }
         if (stack.isEmpty()) {
             TransportedItemStack transported = this.beltInventory.getStackAtOffset(offset);
-            if (transported == null || transported.stack.isEmpty())
+            if (transported == null || transported.stack.isEmpty()) {
                 return;
+            }
             beltInventory.toRemove.add(transported);
             transported.stack = stack;
         } else {

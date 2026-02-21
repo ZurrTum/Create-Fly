@@ -24,8 +24,9 @@ public class BasinMovementBehaviour extends MovementBehaviour {
     public void tick(MovementContext context) {
         if (context.temporaryData == null) {
             Vec3 facingVec = context.rotation.apply(UP);
-            if (Direction.getApproximateNearest(facingVec) == Direction.DOWN)
+            if (Direction.getApproximateNearest(facingVec) == Direction.DOWN) {
                 dump(context, facingVec);
+            }
         }
     }
 
@@ -34,8 +35,10 @@ public class BasinMovementBehaviour extends MovementBehaviour {
         return context.blockEntityData.getCompound("Inventory").map(nbt -> {
             RegistryOps<Tag> ops = context.world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
             List<ItemStack> result = new ArrayList<>();
-            nbt.getList("Input").ifPresent(list -> list.forEach(item -> ItemStack.CODEC.parse(ops, item).ifSuccess(result::add)));
-            nbt.getList("Output").ifPresent(list -> list.forEach(item -> ItemStack.CODEC.parse(ops, item).ifSuccess(result::add)));
+            nbt.getList("Input")
+                .ifPresent(list -> list.forEach(item -> ItemStack.CODEC.parse(ops, item).ifSuccess(result::add)));
+            nbt.getList("Output")
+                .ifPresent(list -> list.forEach(item -> ItemStack.CODEC.parse(ops, item).ifSuccess(result::add)));
             if (result.isEmpty()) {
                 return null;
             }
@@ -58,7 +61,10 @@ public class BasinMovementBehaviour extends MovementBehaviour {
         context.blockEntityData.remove("Inventory");
         // FIXME: Why are we setting client-side data here?
         if (context.contraption.entity.level().isClientSide()) {
-            BlockEntity blockEntity = AllClientHandle.INSTANCE.getBlockEntityClientSide(context.contraption, context.localPos);
+            BlockEntity blockEntity = AllClientHandle.INSTANCE.getBlockEntityClientSide(
+                context.contraption,
+                context.localPos
+            );
             if (blockEntity instanceof BasinBlockEntity basin) {
                 basin.itemCapability.clearContent();
             }

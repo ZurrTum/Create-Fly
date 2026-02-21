@@ -2,12 +2,11 @@ package com.zurrtum.create.client.ponder.foundation;
 
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import net.minecraft.resources.Identifier;
 
 public class PonderStoryBoardEntry implements StoryBoardEntry {
 
@@ -18,7 +17,12 @@ public class PonderStoryBoardEntry implements StoryBoardEntry {
     private final List<Identifier> tags;
     private final List<SceneOrderingEntry> orderingEntries;
 
-    public PonderStoryBoardEntry(PonderStoryBoard board, String namespace, Identifier schematicLocation, Identifier component) {
+    public PonderStoryBoardEntry(
+        PonderStoryBoard board,
+        String namespace,
+        Identifier schematicLocation,
+        Identifier component
+    ) {
         this.board = board;
         this.namespace = namespace;
         this.schematicLocation = schematicLocation;

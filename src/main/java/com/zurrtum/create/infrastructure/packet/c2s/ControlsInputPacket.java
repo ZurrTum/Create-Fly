@@ -15,9 +15,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import java.util.Collection;
 import java.util.List;
 
-public record ControlsInputPacket(
-    List<Integer> activatedButtons, boolean press, int contraptionEntityId, BlockPos controlsPos, boolean stopControlling
-) implements Packet<ServerGamePacketListener> {
+public record ControlsInputPacket(List<Integer> activatedButtons, boolean press, int contraptionEntityId,
+                                  BlockPos controlsPos,
+                                  boolean stopControlling) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, ControlsInputPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecBuilders.list(ByteBufCodecs.VAR_INT),
         ControlsInputPacket::activatedButtons,

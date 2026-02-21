@@ -38,15 +38,18 @@ public class PoweredLatchBlock extends ToggleLatchBlock {
         boolean shouldSide = isPoweredOnSides(worldIn, pos, state);
 
         TickPriority tickpriority = TickPriority.HIGH;
-        if (shouldPrioritize(worldIn, pos, state))
+        if (shouldPrioritize(worldIn, pos, state)) {
             tickpriority = TickPriority.EXTREMELY_HIGH;
-        else if (side || back)
+        } else if (side || back) {
             tickpriority = TickPriority.VERY_HIGH;
+        }
 
-        if (worldIn.getBlockTicks().willTickThisTick(pos, this))
+        if (worldIn.getBlockTicks().willTickThisTick(pos, this)) {
             return;
-        if (back != shouldBack || side != shouldSide)
+        }
+        if (back != shouldBack || side != shouldSide) {
             worldIn.scheduleTick(pos, this, getDelay(state), tickpriority);
+        }
     }
 
     protected boolean isPoweredOnSides(Level worldIn, BlockPos pos, BlockState state) {
@@ -57,11 +60,13 @@ public class PoweredLatchBlock extends ToggleLatchBlock {
         for (Direction d : new Direction[]{left, right}) {
             BlockPos blockpos = pos.relative(d);
             int i = worldIn.getSignal(blockpos, d);
-            if (i > 0)
+            if (i > 0) {
                 return true;
+            }
             BlockState blockstate = worldIn.getBlockState(blockpos);
-            if (blockstate.getBlock() == Blocks.REDSTONE_WIRE && blockstate.getValue(RedStoneWireBlock.POWER) > 0)
+            if (blockstate.getBlock() == Blocks.REDSTONE_WIRE && blockstate.getValue(RedStoneWireBlock.POWER) > 0) {
                 return true;
+            }
         }
         return false;
     }
@@ -76,28 +81,32 @@ public class PoweredLatchBlock extends ToggleLatchBlock {
 
         if (back != shouldBack) {
             state = state.setValue(POWERED, shouldBack);
-            if (shouldBack)
+            if (shouldBack) {
                 state = state.setValue(POWERING, true);
-            else if (side)
+            } else if (side) {
                 state = state.setValue(POWERING, false);
+            }
         }
 
         if (side != shouldSide) {
             state = state.setValue(POWERED_SIDE, shouldSide);
-            if (shouldSide)
+            if (shouldSide) {
                 state = state.setValue(POWERING, false);
-            else if (back)
+            } else if (back) {
                 state = state.setValue(POWERING, true);
+            }
         }
 
-        if (state != stateIn)
+        if (state != stateIn) {
             worldIn.setBlock(pos, state, Block.UPDATE_CLIENTS);
+        }
     }
 
     @Override
     protected InteractionResult activated(Level worldIn, BlockPos pos, BlockState state) {
-        if (state.getValue(POWERED) != state.getValue(POWERED_SIDE))
+        if (state.getValue(POWERED) != state.getValue(POWERED_SIDE)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (!worldIn.isClientSide()) {
             float f = !state.getValue(POWERING) ? 0.6F : 0.5F;
             worldIn.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, f);
@@ -108,8 +117,9 @@ public class PoweredLatchBlock extends ToggleLatchBlock {
 
     @Override
     public boolean canConnectRedstone(BlockState state, Direction side) {
-        if (side == null)
+        if (side == null) {
             return false;
+        }
         return side.getAxis().isHorizontal();
     }
 

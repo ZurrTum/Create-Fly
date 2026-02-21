@@ -21,11 +21,13 @@ public class HideAllInstruction extends TickingInstruction {
         scene.getElements().forEach(element -> {
             if (element instanceof AnimatedSceneElementBase animatedSceneElement) {
                 animatedSceneElement.setFade(1);
-                animatedSceneElement.setFadeVec(fadeOutTo == null ? null : Vec3.atLowerCornerOf(fadeOutTo.getUnitVec3i()).scale(.5f));
+                animatedSceneElement.setFadeVec(fadeOutTo == null ? null : Vec3.atLowerCornerOf(fadeOutTo.getUnitVec3i())
+                    .scale(.5f));
             } else if (element instanceof AnimatedOverlayElementBase animatedSceneElement) {
                 animatedSceneElement.setFade(1);
-            } else
+            } else {
                 element.setVisible(false);
+            }
         });
     }
 
@@ -37,16 +39,18 @@ public class HideAllInstruction extends TickingInstruction {
         scene.forEach(
             AnimatedSceneElementBase.class, ase -> {
                 ase.setFade(fade * fade);
-                if (remainingTicks == 0)
+                if (remainingTicks == 0) {
                     ase.setFade(0);
+                }
             }
         );
 
         scene.forEach(
             AnimatedOverlayElementBase.class, aoe -> {
                 aoe.setFade(fade * fade);
-                if (remainingTicks == 0)
+                if (remainingTicks == 0) {
                     aoe.setFade(0);
+                }
             }
         );
     }

@@ -37,7 +37,13 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     @Override
-    public boolean shouldRender(CarriageContraptionEntity entity, Frustum clippingHelper, double cameraX, double cameraY, double cameraZ) {
+    public boolean shouldRender(
+        CarriageContraptionEntity entity,
+        Frustum clippingHelper,
+        double cameraX,
+        double cameraY,
+        double cameraZ
+    ) {
         Carriage carriage = entity.getCarriage();
         if (carriage != null) {
             for (CarriageBogey bogey : carriage.bogeys) {
@@ -53,7 +59,11 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     @Override
-    public void extractRenderState(CarriageContraptionEntity entity, CarriageContraptionState state, float tickProgress) {
+    public void extractRenderState(
+        CarriageContraptionEntity entity,
+        CarriageContraptionState state,
+        float tickProgress
+    ) {
         super.extractRenderState(entity, state, tickProgress);
         Carriage carriage = entity.getCarriage();
         if (carriage == null) {
@@ -91,10 +101,22 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
             } else {
                 light = cameraLight = getBogeyLightCoords(level, entity.getLightProbePosition(tickProgress));
             }
-            state.firstBogey = CarriageBogeyRenderState.create(first, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, light, tickProgress);
+            state.firstBogey = CarriageBogeyRenderState.create(
+                first,
+                viewXRot,
+                viewYRot,
+                bogeySpacing,
+                firstYaw,
+                firstPitch,
+                light,
+                tickProgress
+            );
         }
         if (second != null) {
-            BlockPos bogeyPos = BlockPos.ZERO.relative(entity.getInitialOrientation().getCounterClockWise(), bogeySpacing);
+            BlockPos bogeyPos = BlockPos.ZERO.relative(
+                entity.getInitialOrientation().getCounterClockWise(),
+                bogeySpacing
+            );
             if (!state.contraption.isHiddenInPortal(bogeyPos)) {
                 Vec3 pos = second.getAnchorPosition();
                 int light;
@@ -125,7 +147,12 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     @Override
-    public void submit(CarriageContraptionState state, PoseStack ms, SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
+    public void submit(
+        CarriageContraptionState state,
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraRenderState
+    ) {
         super.submit(state, ms, queue, cameraRenderState);
         if (state.firstBogey != null) {
             state.firstBogey.render(ms, queue);
@@ -135,18 +162,29 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
         }
     }
 
-    public static void translateBogey(PoseStack ms, CarriageBogey bogey, int bogeySpacing, float viewYRot, float viewXRot, float yaw, float pitch) {
+    public static void translateBogey(
+        PoseStack ms,
+        CarriageBogey bogey,
+        int bogeySpacing,
+        float viewYRot,
+        float viewXRot,
+        float yaw,
+        float pitch
+    ) {
         boolean selfUpsideDown = bogey.isUpsideDown();
         boolean leadingUpsideDown = bogey.carriage.leadingBogey().isUpsideDown();
         TransformStack.of(ms).rotateYDegrees(viewYRot + 90).rotateXDegrees(-viewXRot).rotateYDegrees(180)
-            .translate(0, 0, bogey.isLeading ? 0 : -bogeySpacing).rotateYDegrees(-180).rotateXDegrees(viewXRot).rotateYDegrees(-viewYRot - 90)
-            .rotateYDegrees(yaw).rotateXDegrees(pitch).translate(0, .5f, 0).rotateZDegrees(selfUpsideDown ? 180 : 0)
-            .translateY(selfUpsideDown != leadingUpsideDown ? 2 : 0);
+            .translate(0, 0, bogey.isLeading ? 0 : -bogeySpacing).rotateYDegrees(-180).rotateXDegrees(viewXRot)
+            .rotateYDegrees(-viewYRot - 90).rotateYDegrees(yaw).rotateXDegrees(pitch).translate(0, .5f, 0)
+            .rotateZDegrees(selfUpsideDown ? 180 : 0).translateY(selfUpsideDown != leadingUpsideDown ? 2 : 0);
     }
 
     public static int getBogeyLightCoords(Level world, Vec3 pos) {
         BlockPos lightPos = BlockPos.containing(pos);
-        return LightTexture.pack(world.getBrightness(LightLayer.BLOCK, lightPos), world.getBrightness(LightLayer.SKY, lightPos));
+        return LightTexture.pack(
+            world.getBrightness(LightLayer.BLOCK, lightPos),
+            world.getBrightness(LightLayer.SKY, lightPos)
+        );
     }
 
     public static class CarriageContraptionState extends OrientedContraptionState {

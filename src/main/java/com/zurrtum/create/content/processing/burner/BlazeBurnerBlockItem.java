@@ -5,12 +5,6 @@ import com.zurrtum.create.AllEntityTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.math.VecHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -36,6 +30,11 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 public class BlazeBurnerBlockItem extends BlockItem {
 
     private final boolean capturedBlaze;
@@ -50,8 +49,9 @@ public class BlazeBurnerBlockItem extends BlockItem {
 
     @Override
     public void registerBlocks(Map<Block, Item> p_195946_1_, Item p_195946_2_) {
-        if (!hasCapturedBlaze())
+        if (!hasCapturedBlaze()) {
             return;
+        }
         super.registerBlocks(p_195946_1_, p_195946_2_);
     }
 
@@ -62,16 +62,18 @@ public class BlazeBurnerBlockItem extends BlockItem {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (hasCapturedBlaze())
+        if (hasCapturedBlaze()) {
             return super.useOn(context);
+        }
 
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockEntity be = world.getBlockEntity(pos);
         Player player = context.getPlayer();
 
-        if (!(be instanceof SpawnerBlockEntity mbe))
+        if (!(be instanceof SpawnerBlockEntity mbe)) {
             return super.useOn(context);
+        }
 
         BaseSpawner spawner = mbe.getSpawner();
 
@@ -82,16 +84,21 @@ public class BlazeBurnerBlockItem extends BlockItem {
             possibleSpawns.add(spawner.nextSpawnData);
         }
 
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(mbe.problemPath(), Create.LOGGER)) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            mbe.problemPath(),
+            Create.LOGGER
+        )) {
             for (SpawnData e : possibleSpawns) {
                 ValueInput readView = TagValueInput.create(logging, world.registryAccess(), e.entityToSpawn());
                 Optional<EntityType<?>> optionalEntity = EntityType.by(readView);
-                if (optionalEntity.isEmpty() || !optionalEntity.get().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE))
+                if (optionalEntity.isEmpty() || !optionalEntity.get().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE)) {
                     continue;
+                }
 
                 spawnCaptureEffects(world, VecHelper.getCenterOf(pos));
-                if (world.isClientSide() || player == null)
+                if (world.isClientSide() || player == null) {
                     return InteractionResult.SUCCESS;
+                }
 
                 giveBurnerItemTo(player, context.getItemInHand(), context.getHand());
                 return InteractionResult.SUCCESS;
@@ -102,16 +109,24 @@ public class BlazeBurnerBlockItem extends BlockItem {
     }
 
     @Override
-    public InteractionResult interactLivingEntity(ItemStack heldItem, Player player, LivingEntity entity, InteractionHand hand) {
-        if (hasCapturedBlaze())
+    public InteractionResult interactLivingEntity(
+        ItemStack heldItem,
+        Player player,
+        LivingEntity entity,
+        InteractionHand hand
+    ) {
+        if (hasCapturedBlaze()) {
             return InteractionResult.PASS;
-        if (!entity.getType().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE))
+        }
+        if (!entity.getType().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE)) {
             return InteractionResult.PASS;
+        }
 
         Level world = player.level();
         spawnCaptureEffects(world, entity.position());
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return InteractionResult.FAIL;
+        }
 
         giveBurnerItemTo(player, heldItem, hand);
         entity.discard();
@@ -120,8 +135,9 @@ public class BlazeBurnerBlockItem extends BlockItem {
 
     protected void giveBurnerItemTo(Player player, ItemStack heldItem, InteractionHand hand) {
         ItemStack filled = AllItems.BLAZE_BURNER.getDefaultInstance();
-        if (!player.isCreative())
+        if (!player.isCreative()) {
             heldItem.shrink(1);
+        }
         if (heldItem.isEmpty()) {
             player.setItemInHand(hand, filled);
             return;

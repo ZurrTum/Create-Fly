@@ -4,13 +4,6 @@ import com.google.common.base.Strings;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.catnip.lang.FontHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-
-import java.text.BreakIterator;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -18,22 +11,32 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
+import java.text.BreakIterator;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 public class TooltipHelper {
 
     public static final int MAX_WIDTH_PER_LINE = 200;
 
     public static MutableComponent holdShift(FontHelper.Palette palette, boolean highlighted) {
-        return CreateLang.translateDirect("tooltip.holdForDescription", CreateLang.translateDirect("tooltip.keyShift").withStyle(ChatFormatting.GRAY))
-            .withStyle(ChatFormatting.DARK_GRAY);
+        return CreateLang.translateDirect(
+            "tooltip.holdForDescription",
+            CreateLang.translateDirect("tooltip.keyShift").withStyle(ChatFormatting.GRAY)
+        ).withStyle(ChatFormatting.DARK_GRAY);
     }
 
     public static String makeProgressBar(int length, int filledLength) {
         String bar = " ";
         int emptySpaces = length - filledLength;
-        for (int i = 0; i < filledLength; i++)
+        for (int i = 0; i < filledLength; i++) {
             bar += "\u2588";
-        for (int i = 0; i < emptySpaces; i++)
+        }
+        for (int i = 0; i < emptySpaces; i++) {
             bar += "\u2592";
+        }
         return bar + " ";
     }
 
@@ -49,8 +52,9 @@ public class TooltipHelper {
         CreateLang.translate(hintKey + ".title").style(ChatFormatting.GOLD).forGoggles(tooltip);
         Component hint = CreateLang.translateDirect(hintKey);
         List<Component> cutComponent = cutTextComponent(hint, FontHelper.Palette.GRAY_AND_WHITE);
-        for (Component component : cutComponent)
+        for (Component component : cutComponent) {
             CreateLang.builder().add(component).forGoggles(tooltip);
+        }
     }
 
     public static List<Component> cutStringTextComponent(String s, FontHelper.Palette palette) {
@@ -69,7 +73,12 @@ public class TooltipHelper {
         return cutTextComponent(c, primaryStyle, highlightStyle, 0);
     }
 
-    public static List<Component> cutStringTextComponent(String c, Style primaryStyle, Style highlightStyle, int indent) {
+    public static List<Component> cutStringTextComponent(
+        String c,
+        Style primaryStyle,
+        Style highlightStyle,
+        int indent
+    ) {
         return cutTextComponent(Component.literal(c), primaryStyle, highlightStyle, indent);
     }
 

@@ -1,13 +1,6 @@
 package com.zurrtum.create.catnip.math;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import org.apache.commons.lang3.mutable.MutableObject;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
@@ -15,6 +8,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class VoxelShaper {
     private final Map<Direction, VoxelShape> shapes = new HashMap<>();
@@ -24,7 +23,12 @@ public class VoxelShaper {
     }
 
     public static VoxelShaper forHorizontalAxis(VoxelShape shape, Axis along) {
-        return forDirectionsWithRotation(shape, axisAsFace(along), Arrays.asList(Direction.SOUTH, Direction.EAST), new HorizontalRotationValues());
+        return forDirectionsWithRotation(
+            shape,
+            axisAsFace(along),
+            Arrays.asList(Direction.SOUTH, Direction.EAST),
+            new HorizontalRotationValues()
+        );
     }
 
     public static VoxelShaper forDirectional(VoxelShape shape, Direction facing) {
@@ -61,16 +65,23 @@ public class VoxelShaper {
         return voxelShaper;
     }
 
-    protected static VoxelShape rotate(VoxelShape shape, Direction from, Direction to, Function<Direction, Vec3> usingValues) {
-        if (from == to)
+    protected static VoxelShape rotate(
+        VoxelShape shape,
+        Direction from,
+        Direction to,
+        Function<Direction, Vec3> usingValues
+    ) {
+        if (from == to) {
             return shape;
+        }
 
         return rotatedCopy(shape, usingValues.apply(from).reverse().add(usingValues.apply(to)));
     }
 
     protected static VoxelShape rotatedCopy(VoxelShape shape, Vec3 rotation) {
-        if (rotation.equals(Vec3.ZERO))
+        if (rotation.equals(Vec3.ZERO)) {
             return shape;
+        }
 
         MutableObject<VoxelShape> result = new MutableObject<>(Shapes.empty());
         Vec3 center = new Vec3(8, 8, 8);

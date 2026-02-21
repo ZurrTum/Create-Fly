@@ -13,7 +13,8 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public record BlueprintAssignCompleteRecipePacket(List<ItemStack> input, ItemStack output) implements Packet<ServerGamePacketListener> {
+public record BlueprintAssignCompleteRecipePacket(List<ItemStack> input,
+                                                  ItemStack output) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintAssignCompleteRecipePacket> CODEC = StreamCodec.composite(
         ItemStack.OPTIONAL_STREAM_CODEC.apply(ByteBufCodecs.list()),
         BlueprintAssignCompleteRecipePacket::input,

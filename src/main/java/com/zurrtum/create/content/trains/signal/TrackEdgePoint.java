@@ -2,10 +2,10 @@ package com.zurrtum.create.content.trains.signal;
 
 import com.mojang.serialization.*;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.FriendlyByteBuf;
@@ -52,10 +52,18 @@ public abstract class TrackEdgePoint {
     public abstract void invalidate(LevelAccessor level);
 
     protected void invalidateAt(LevelAccessor level, BlockPos blockEntityPos) {
-        TrackTargetingBehaviour<?> behaviour = BlockEntityBehaviour.get(level, blockEntityPos, TrackTargetingBehaviour.TYPE);
-        if (behaviour == null)
+        TrackTargetingBehaviour<?> behaviour = BlockEntityBehaviour.get(
+            level,
+            blockEntityPos,
+            TrackTargetingBehaviour.TYPE
+        );
+        if (behaviour == null) {
             return;
-        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "TrackEdgePoint", Create.LOGGER)) {
+        }
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+            () -> "TrackEdgePoint",
+            Create.LOGGER
+        )) {
             TagValueOutput view = TagValueOutput.createWithContext(logging, level.registryAccess());
             DimensionPalette dimensions = new DimensionPalette();
             write(view, dimensions);
@@ -89,18 +97,23 @@ public abstract class TrackEdgePoint {
     }
 
     public void read(ValueInput view, boolean migration, DimensionPalette dimensions) {
-        if (migration)
+        if (migration) {
             return;
+        }
 
         id = view.read("Id", UUIDUtil.CODEC).orElseThrow();
         position = view.getDoubleOr("Position", 0);
         Iterator<ValueInput> edge = view.childrenListOrEmpty("Edge").iterator();
-        edgeLocation = Couple.create(TrackNodeLocation.read(edge.next(), dimensions), TrackNodeLocation.read(edge.next(), dimensions));
+        edgeLocation = Couple.create(
+            TrackNodeLocation.read(edge.next(), dimensions),
+            TrackNodeLocation.read(edge.next(), dimensions)
+        );
     }
 
     public <T> void decode(final DynamicOps<T> ops, T input, boolean migration, DimensionPalette dimensions) {
-        if (migration)
+        if (migration) {
             return;
+        }
 
         MapLike<T> map = ops.getMap(input).getOrThrow();
         id = UUIDUtil.CODEC.decode(ops, map.get("Id")).getOrThrow().getFirst();
@@ -152,9 +165,11 @@ public abstract class TrackEdgePoint {
     }
 
     protected void removeFromAllGraphs(MinecraftServer server) {
-        for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values())
-            if (trackGraph.removePoint(server, getType(), id) != null)
+        for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values()) {
+            if (trackGraph.removePoint(server, getType(), id) != null) {
                 return;
+            }
+        }
     }
 
 }

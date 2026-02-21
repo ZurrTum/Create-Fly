@@ -7,9 +7,9 @@ import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.LevelEvent;
@@ -17,12 +17,14 @@ import net.minecraft.world.level.block.LevelEvent;
 public class DropperMovementBehaviour extends MovementBehaviour {
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
+        }
 
         MountedItemStorage storage = context.getItemStorage();
-        if (storage == null)
+        if (storage == null) {
             return;
+        }
 
         int slot = getSlot(storage, context.world.random, context.contraption.getStorage().getAllItems());
         if (slot == -1) {
@@ -49,8 +51,9 @@ public class DropperMovementBehaviour extends MovementBehaviour {
         IntList filledSlots = new IntArrayList();
         for (int i = 0, size = storage.getContainerSize(); i < size; i++) {
             ItemStack stack = storage.getItem(i);
-            if (stack.isEmpty())
+            if (stack.isEmpty()) {
                 continue;
+            }
 
             if (stack.getCount() == 1 && stack.getMaxStackSize() != 1) {
                 storage.setItem(i, ItemStack.EMPTY);

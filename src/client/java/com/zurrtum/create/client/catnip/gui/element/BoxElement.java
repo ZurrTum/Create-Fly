@@ -8,8 +8,10 @@ import org.joml.Matrix3x2f;
 
 public class BoxElement extends AbstractRenderElement {
 
-    public static final Couple<Color> COLOR_VANILLA_BORDER = Couple.create(new Color(0x50_5000ff, true), new Color(0x50_28007f, true))
-        .map(Color::setImmutable);
+    public static final Couple<Color> COLOR_VANILLA_BORDER = Couple.create(
+        new Color(0x50_5000ff, true),
+        new Color(0x50_28007f, true)
+    ).map(Color::setImmutable);
     public static final Color COLOR_VANILLA_BACKGROUND = new Color(0xf0_100010, true).setImmutable();
     public static final Color COLOR_BACKGROUND_FLAT = new Color(0xff_000000, true).setImmutable();
     public static final Color COLOR_BACKGROUND_TRANSPARENT = new Color(0xdd_000000, true).setImmutable();
@@ -92,6 +94,16 @@ public class BoxElement extends AbstractRenderElement {
         Color c2 = borderTop.copy().scaleAlpha(alpha);
         Color c3 = borderBot.copy().scaleAlpha(alpha);
         Matrix3x2f model = new Matrix3x2f(graphics.pose());
-        graphics.guiRenderState.submitGuiElement(new BoxRenderState(model, x, y, width, height, borderOffset, c1, c2, c3));
+        graphics.guiRenderState.submitGuiElement(new BoxRenderState(
+            model,
+            x,
+            y,
+            width,
+            height,
+            borderOffset,
+            c1,
+            c2,
+            c3
+        ));
     }
 }

@@ -14,8 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class EntityLauncher {
-    public static final StreamCodec<RegistryFriendlyByteBuf, EntityLauncher> PACKET_CODEC = StreamCodec.ofMember(
-        EntityLauncher::write,
+    public static final StreamCodec<RegistryFriendlyByteBuf, EntityLauncher> PACKET_CODEC = StreamCodec.ofMember(EntityLauncher::write,
         EntityLauncher::new
     );
     public static final Codec<EntityLauncher> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -36,7 +35,13 @@ public class EntityLauncher {
         set(horizontalDistance, verticalDistance);
     }
 
-    private EntityLauncher(int horizontalDistance, int verticalDistance, double yMotion, double xMotion, double totalFlyingTicks) {
+    private EntityLauncher(
+        int horizontalDistance,
+        int verticalDistance,
+        double yMotion,
+        double xMotion,
+        double totalFlyingTicks
+    ) {
         this.horizontalDistance = horizontalDistance;
         this.verticalDistance = verticalDistance;
         this.yMotion = yMotion;
@@ -98,7 +103,11 @@ public class EntityLauncher {
         double progress = Mth.clamp(t / getTotalFlyingTicks(), 0, 1);
         double correctionStrength = Math.pow(progress, 3);
 
-        Vec3 vec = new Vec3(0, yt + (verticalDistance - yt) * correctionStrength * 0.5f, xt + (horizontalDistance - xt) * correctionStrength);
+        Vec3 vec = new Vec3(
+            0,
+            yt + (verticalDistance - yt) * correctionStrength * 0.5f,
+            xt + (horizontalDistance - xt) * correctionStrength
+        );
         return VecHelper.rotate(vec, 180 + AngleHelper.horizontalAngle(d), Axis.Y).add(start);
     }
 

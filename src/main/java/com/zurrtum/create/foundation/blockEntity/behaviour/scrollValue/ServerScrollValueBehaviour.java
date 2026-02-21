@@ -1,9 +1,9 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettingsHandleBehaviour;
 import net.minecraft.core.Direction;
@@ -35,8 +35,9 @@ public class ServerScrollValueBehaviour extends BlockEntityBehaviour<SmartBlockE
 
     public void setValue(int value) {
         value = Mth.clamp(value, min, max);
-        if (value == this.value)
+        if (value == this.value) {
             return;
+        }
         this.value = value;
         callback.accept(value);
         blockEntity.setChanged();
@@ -81,14 +82,16 @@ public class ServerScrollValueBehaviour extends BlockEntityBehaviour<SmartBlockE
 
     @Override
     public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
-        if (FakePlayerHandler.has(player))
+        if (FakePlayerHandler.has(player)) {
             blockEntity.getBlockState().useItemOn(player.getItemInHand(hand), getLevel(), player, hand, hitResult);
+        }
     }
 
     @Override
     public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlDown) {
-        if (valueSetting.equals(getValueSettings()))
+        if (valueSetting.equals(getValueSettings())) {
             return;
+        }
         setValue(valueSetting.value());
         playFeedbackSound(this);
     }

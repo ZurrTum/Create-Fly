@@ -75,7 +75,14 @@ public class FanHauntingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition position, GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(
+        RecipeViewScreen screen,
+        RecipePosition position,
+        GuiGraphics context,
+        int mouseX,
+        int mouseY,
+        float partialTicks
+    ) {
         int xOffsetAmount = 1 - Math.min(3, results.size());
         AllGuiTextures.JEI_SHADOW.render(context, 42, 23);
         AllGuiTextures.JEI_LIGHT.render(context, 61, 35);

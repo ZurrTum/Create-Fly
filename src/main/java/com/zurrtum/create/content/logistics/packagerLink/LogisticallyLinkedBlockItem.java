@@ -1,13 +1,7 @@
 package com.zurrtum.create.content.logistics.packagerLink;
 
-import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
-import java.util.function.Consumer;
-
+import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
@@ -28,6 +22,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class LogisticallyLinkedBlockItem extends BlockItem {
 
@@ -65,12 +64,15 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
         super.appendHoverText(stack, tooltipContext, displayComponent, textConsumer, type);
 
         TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
-        if (data == null || !data.contains("Freq"))
+        if (data == null || !data.contains("Freq")) {
             return;
+        }
 
-        textConsumer.accept(Component.translatable("create.logistically_linked.tooltip").withStyle(ChatFormatting.GOLD));
+        textConsumer.accept(Component.translatable("create.logistically_linked.tooltip")
+            .withStyle(ChatFormatting.GOLD));
 
-        textConsumer.accept(Component.translatable("create.logistically_linked.tooltip_clear").withStyle(ChatFormatting.GRAY));
+        textConsumer.accept(Component.translatable("create.logistically_linked.tooltip_clear")
+            .withStyle(ChatFormatting.GRAY));
     }
 
     @Override
@@ -78,7 +80,14 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
         ItemStack stack = player.getItemInHand(usedHand);
         if (isTuned(stack)) {
             if (world.isClientSide()) {
-                world.playSound(player, player.blockPosition(), SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.75f, 1.0f);
+                world.playSound(
+                    player,
+                    player.blockPosition(),
+                    SoundEvents.ITEM_FRAME_REMOVE_ITEM,
+                    SoundSource.BLOCKS,
+                    0.75f,
+                    1.0f
+                );
             } else {
                 player.displayClientMessage(Component.translatable("create.logistically_linked.cleared"), true);
                 stack.remove(DataComponents.BLOCK_ENTITY_DATA);
@@ -96,27 +105,32 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
         Level level = pContext.getLevel();
         Player player = pContext.getPlayer();
 
-        if (player == null)
+        if (player == null) {
             return InteractionResult.FAIL;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return super.useOn(pContext);
+        }
 
         LogisticallyLinkedBehaviour link = BlockEntityBehaviour.get(level, pos, LogisticallyLinkedBehaviour.TYPE);
         boolean tuned = isTuned(stack);
 
         if (link != null) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
-            if (!link.mayInteractMessage(player))
+            }
+            if (!link.mayInteractMessage(player)) {
                 return InteractionResult.SUCCESS;
+            }
 
             assignFrequency(stack, player, link.freqId);
             return InteractionResult.SUCCESS;
         }
 
         InteractionResult useOn = super.useOn(pContext);
-        if (level.isClientSide() || useOn == InteractionResult.FAIL)
+        if (level.isClientSide() || useOn == InteractionResult.FAIL) {
             return useOn;
+        }
 
         player.displayClientMessage(
             tuned ? Component.translatable("create.logistically_linked.connected") : Component.translatable(

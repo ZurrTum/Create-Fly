@@ -43,7 +43,10 @@ public class CardboardBlock extends Block {
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
-        return state.setValue(HORIZONTAL_AXIS, rot.rotate(Direction.get(AxisDirection.POSITIVE, state.getValue(HORIZONTAL_AXIS))).getAxis());
+        return state.setValue(
+            HORIZONTAL_AXIS,
+            rot.rotate(Direction.get(AxisDirection.POSITIVE, state.getValue(HORIZONTAL_AXIS))).getAxis()
+        );
     }
 
     @Override

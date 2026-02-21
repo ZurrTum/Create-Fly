@@ -9,15 +9,19 @@ import net.minecraft.client.Minecraft;
 
 public class GlobalRailwayManagerClient {
     public static void tickSignalOverlay(Minecraft mc) {
-        if (!isTrackGraphDebugActive())
-            for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values())
+        if (!isTrackGraphDebugActive()) {
+            for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values()) {
                 TrackGraphVisualizer.visualiseSignalEdgeGroups(mc, trackGraph);
+            }
+        }
     }
 
     public static void tick(Minecraft mc) {
-        if (isTrackGraphDebugActive())
-            for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values())
+        if (isTrackGraphDebugActive()) {
+            for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values()) {
                 TrackGraphVisualizer.debugViewGraph(mc, trackGraph, isTrackGraphDebugExtended());
+            }
+        }
     }
 
     private static boolean isTrackGraphDebugActive() {

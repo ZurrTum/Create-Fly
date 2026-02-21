@@ -11,7 +11,10 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record EjectorAwardPacket(BlockPos pos) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<ByteBuf, EjectorAwardPacket> CODEC = BlockPos.STREAM_CODEC.map(EjectorAwardPacket::new, EjectorAwardPacket::pos);
+    public static final StreamCodec<ByteBuf, EjectorAwardPacket> CODEC = BlockPos.STREAM_CODEC.map(
+        EjectorAwardPacket::new,
+        EjectorAwardPacket::pos
+    );
 
     @Override
     public void handle(ServerGamePacketListener listener) {

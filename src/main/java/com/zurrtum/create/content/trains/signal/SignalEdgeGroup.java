@@ -13,7 +13,10 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class SignalEdgeGroup {
-    private static final Codec<Map<UUID, UUID>> INTERSECTING_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, UUIDUtil.STRING_CODEC);
+    private static final Codec<Map<UUID, UUID>> INTERSECTING_CODEC = Codec.unboundedMap(
+        UUIDUtil.STRING_CODEC,
+        UUIDUtil.STRING_CODEC
+    );
     public static final Codec<SignalEdgeGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         UUIDUtil.STRING_CODEC.fieldOf("Id").forGetter(i -> i.id),
         EdgeGroupColor.CODEC.fieldOf("Color").forGetter(group -> group.color),
@@ -58,11 +61,14 @@ public class SignalEdgeGroup {
     }
 
     public boolean isOccupiedUnless(Train train) {
-        if (intersectingResolved.isEmpty())
+        if (intersectingResolved.isEmpty()) {
             walkIntersecting(intersectingResolved::add);
-        for (SignalEdgeGroup group : intersectingResolved)
-            if (group.isThisOccupiedUnless(train))
+        }
+        for (SignalEdgeGroup group : intersectingResolved) {
+            if (group.isThisOccupiedUnless(train)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -71,11 +77,14 @@ public class SignalEdgeGroup {
     }
 
     public boolean isOccupiedUnless(SignalBoundary boundary) {
-        if (intersectingResolved.isEmpty())
+        if (intersectingResolved.isEmpty()) {
             walkIntersecting(intersectingResolved::add);
-        for (SignalEdgeGroup group : intersectingResolved)
-            if (group.isThisOccupiedUnless(boundary))
+        }
+        for (SignalEdgeGroup group : intersectingResolved) {
+            if (group.isThisOccupiedUnless(boundary)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -94,8 +103,9 @@ public class SignalEdgeGroup {
 
         UUID removed = intersecting.remove(intersectionId);
         SignalEdgeGroup other = Create.RAILWAYS.signalEdgeGroups.get(removed);
-        if (other != null)
+        if (other != null) {
             other.intersecting.remove(intersectionId);
+        }
 
         resolveColor(server);
     }
@@ -109,16 +119,19 @@ public class SignalEdgeGroup {
     }
 
     public void resolveColor(MinecraftServer server) {
-        if (intersectingResolved.isEmpty())
+        if (intersectingResolved.isEmpty()) {
             walkIntersecting(intersectingResolved::add);
+        }
 
         MutableInt mask = new MutableInt(0);
-        intersectingResolved.forEach(group -> group.adjacent.stream().map(Create.RAILWAYS.signalEdgeGroups::get).filter(Objects::nonNull)
-            .filter(Predicates.not(intersectingResolved::contains)).forEach(adjacent -> mask.setValue(adjacent.color.strikeFrom(mask.getValue()))));
+        intersectingResolved.forEach(group -> group.adjacent.stream().map(Create.RAILWAYS.signalEdgeGroups::get)
+            .filter(Objects::nonNull).filter(Predicates.not(intersectingResolved::contains))
+            .forEach(adjacent -> mask.setValue(adjacent.color.strikeFrom(mask.getValue()))));
 
         EdgeGroupColor newColour = EdgeGroupColor.findNextAvailable(mask.getValue());
-        if (newColour == color)
+        if (newColour == color) {
             return;
+        }
 
         walkIntersecting(group -> Create.RAILWAYS.sync.edgeGroupCreated(server, group.id, group.color = newColour));
         Create.RAILWAYS.markTracksDirty();
@@ -129,13 +142,15 @@ public class SignalEdgeGroup {
     }
 
     private void walkIntersectingRec(Set<SignalEdgeGroup> visited, Consumer<SignalEdgeGroup> callback) {
-        if (!visited.add(this))
+        if (!visited.add(this)) {
             return;
+        }
         callback.accept(this);
         for (UUID uuid : intersecting.values()) {
             SignalEdgeGroup group = Create.RAILWAYS.signalEdgeGroups.get(uuid);
-            if (group != null)
+            if (group != null) {
                 group.walkIntersectingRec(visited, callback);
+            }
         }
     }
 }

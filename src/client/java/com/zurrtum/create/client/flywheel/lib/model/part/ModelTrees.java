@@ -6,16 +6,15 @@ import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.model.RetexturedMesh;
 import com.zurrtum.create.client.flywheel.lib.model.SingleMeshModel;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public final class ModelTrees {
     private static final RendererReloadCache<ModelTreeKey, ModelTree> CACHE = new RendererReloadCache<>(k -> {
@@ -41,7 +40,11 @@ public final class ModelTrees {
         return CACHE.get(new ModelTreeKey(layer, Collections.emptySet(), null, material));
     }
 
-    public static ModelTree of(ModelLayerLocation layer, net.minecraft.client.resources.model.Material texture, Material material) {
+    public static ModelTree of(
+        ModelLayerLocation layer,
+        net.minecraft.client.resources.model.Material texture,
+        Material material
+    ) {
         return CACHE.get(new ModelTreeKey(layer, Collections.emptySet(), texture, material));
     }
 
@@ -96,8 +99,7 @@ public final class ModelTrees {
         return new ModelTree(model, meshTree.initialPose(), children);
     }
 
-    private record ModelTreeKey(
-        ModelLayerLocation layer, Set<String> pathsToPrune, @Nullable net.minecraft.client.resources.model.Material texture, Material material
-    ) {
+    private record ModelTreeKey(ModelLayerLocation layer, Set<String> pathsToPrune,
+                                @Nullable net.minecraft.client.resources.model.Material texture, Material material) {
     }
 }

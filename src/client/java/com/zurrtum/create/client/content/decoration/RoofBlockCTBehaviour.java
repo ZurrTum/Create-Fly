@@ -29,9 +29,14 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public @Nullable CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
-        if (direction == Direction.UP)
+    public @Nullable CTSpriteShiftEntry getShift(
+        BlockState state,
+        Direction direction,
+        @Nullable TextureAtlasSprite sprite
+    ) {
+        if (direction == Direction.UP) {
             return shift;
+        }
         return null;
     }
 
@@ -41,10 +46,17 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public CTContext buildContext(BlockAndTintGetter reader, BlockPos pos, BlockState state, Direction face, ContextRequirement requirement) {
+    public CTContext buildContext(
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockState state,
+        Direction face,
+        ContextRequirement requirement
+    ) {
 
-        if (isUprightStair(state))
+        if (isUprightStair(state)) {
             return getStairMapping(state);
+        }
 
         return super.buildContext(reader, pos, state, face, requirement);
     }
@@ -61,17 +73,27 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
         Direction secondaryOffset
     ) {
 
-        if (connects(reader, pos, state, other) || connectsHigh(reader, pos, state, other, reader.getBlockState(otherPos.above())))
+        if (connects(reader, pos, state, other) || connectsHigh(
+            reader,
+            pos,
+            state,
+            other,
+            reader.getBlockState(otherPos.above())
+        )) {
             return true;
-        if (primaryOffset != null && secondaryOffset != null)
+        }
+        if (primaryOffset != null && secondaryOffset != null) {
             return false;
+        }
 
         for (boolean p : Iterate.trueAndFalse) {
             Direction offset = p ? primaryOffset : secondaryOffset;
-            if (offset == null)
+            if (offset == null) {
                 continue;
-            if (offset.getAxis().isVertical())
+            }
+            if (offset.getAxis().isVertical()) {
                 continue;
+            }
 
             if (connectsHigh(
                 reader,
@@ -85,8 +107,9 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
                 state,
                 reader.getBlockState(pos.relative(offset.getCounterClockWise())),
                 reader.getBlockState(pos.relative(offset.getCounterClockWise()).above())
-            ))
+            )) {
                 return true;
+            }
         }
 
         return false;
@@ -101,10 +124,12 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
         StairsShape shape = state.getValue(StairBlock.SHAPE);
         Direction facing = state.getValue(StairBlock.FACING);
 
-        if (shape == StairsShape.OUTER_LEFT)
+        if (shape == StairsShape.OUTER_LEFT) {
             facing = facing.getCounterClockWise();
-        if (shape == StairsShape.INNER_LEFT)
+        }
+        if (shape == StairsShape.INNER_LEFT) {
             facing = facing.getCounterClockWise();
+        }
 
         int type = shape == StairsShape.STRAIGHT ? 0 : (shape == StairsShape.INNER_LEFT || shape == StairsShape.INNER_RIGHT) ? 1 : 2;
         int rot = facing.get2DDataValue();
@@ -117,14 +142,23 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     protected boolean connects(BlockAndTintGetter reader, BlockPos pos, BlockState state, BlockState other) {
         double top = state.getCollisionShape(reader, pos).max(Axis.Y);
-        double topOther = other.getSoundType() != SoundType.COPPER ? 0 : other.getCollisionShape(reader, pos).max(Axis.Y);
+        double topOther = other.getSoundType() != SoundType.COPPER ? 0 : other.getCollisionShape(reader, pos)
+            .max(Axis.Y);
         return Mth.equal(top, topOther);
     }
 
-    protected boolean connectsHigh(BlockAndTintGetter reader, BlockPos pos, BlockState state, BlockState other, BlockState aboveOther) {
-        if (state.getBlock() instanceof SlabBlock && other.getBlock() instanceof SlabBlock)
-            if (state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM && other.getValue(SlabBlock.TYPE) != SlabType.BOTTOM)
+    protected boolean connectsHigh(
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockState state,
+        BlockState other,
+        BlockState aboveOther
+    ) {
+        if (state.getBlock() instanceof SlabBlock && other.getBlock() instanceof SlabBlock) {
+            if (state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM && other.getValue(SlabBlock.TYPE) != SlabType.BOTTOM) {
                 return true;
+            }
+        }
 
         if (state.getBlock() instanceof SlabBlock && state.getValue(SlabBlock.TYPE) == SlabType.BOTTOM) {
             double top = state.getCollisionShape(reader, pos).max(Axis.Y);

@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record FanWashingDisplay(EntryIngredient input, List<ProcessingOutput> outputs, Optional<Identifier> location) implements Display {
+public record FanWashingDisplay(EntryIngredient input, List<ProcessingOutput> outputs,
+                                Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanWashingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanWashingDisplay::input),

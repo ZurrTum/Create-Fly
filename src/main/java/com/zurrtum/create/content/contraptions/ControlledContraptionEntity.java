@@ -36,8 +36,15 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         super(type, world);
     }
 
-    public static ControlledContraptionEntity create(Level world, IControlContraption controller, Contraption contraption) {
-        ControlledContraptionEntity entity = new ControlledContraptionEntity(AllEntityTypes.CONTROLLED_CONTRAPTION, world);
+    public static ControlledContraptionEntity create(
+        Level world,
+        IControlContraption controller,
+        Contraption contraption
+    ) {
+        ControlledContraptionEntity entity = new ControlledContraptionEntity(
+            AllEntityTypes.CONTROLLED_CONTRAPTION,
+            world
+        );
         entity.controllerPos = controller.getBlockPosition();
         entity.setContraption(contraption);
         return entity;
@@ -46,24 +53,28 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     @Override
     public void setPos(double x, double y, double z) {
         super.setPos(x, y, z);
-        if (!level().isClientSide())
+        if (!level().isClientSide()) {
             return;
-        for (Entity entity : getPassengers())
+        }
+        for (Entity entity : getPassengers()) {
             positionRider(entity);
+        }
     }
 
     @Override
     public Vec3 getContactPointMotion(Vec3 globalContactPoint) {
-        if (contraption instanceof TranslatingContraption)
+        if (contraption instanceof TranslatingContraption) {
             return getDeltaMovement();
+        }
         return super.getContactPointMotion(globalContactPoint);
     }
 
     @Override
     protected void setContraption(Contraption contraption) {
         super.setContraption(contraption);
-        if (contraption instanceof BearingContraption)
+        if (contraption instanceof BearingContraption) {
             rotationAxis = ((BearingContraption) contraption).getFacing().getAxis();
+        }
     }
 
     @Override
@@ -78,20 +89,24 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     protected void writeAdditional(ValueOutput view, boolean spawnPacket) {
         super.writeAdditional(view, spawnPacket);
         view.store("ControllerRelative", BlockPos.CODEC, controllerPos.subtract(blockPosition()));
-        if (rotationAxis != null)
+        if (rotationAxis != null) {
             view.store("Axis", Axis.CODEC, rotationAxis);
+        }
         view.putFloat("Angle", angle);
     }
 
     @Override
     public ContraptionRotationState getRotationState() {
         ContraptionRotationState crs = new ContraptionRotationState();
-        if (rotationAxis == Axis.X)
+        if (rotationAxis == Axis.X) {
             crs.xRotation = angle;
-        if (rotationAxis == Axis.Y)
+        }
+        if (rotationAxis == Axis.Y) {
             crs.yRotation = angle;
-        if (rotationAxis == Axis.Z)
+        }
+        if (rotationAxis == Axis.Z) {
             crs.zRotation = angle;
+        }
         return crs;
     }
 
@@ -110,10 +125,12 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     public void setAngle(float angle) {
         this.angle = angle;
 
-        if (!level().isClientSide())
+        if (!level().isClientSide()) {
             return;
-        for (Entity entity : getPassengers())
+        }
+        for (Entity entity : getPassengers()) {
             positionRider(entity);
+        }
     }
 
     public float getAngle(float partialTicks) {
@@ -142,10 +159,12 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         prevAngle = angle;
         tickActors();
 
-        if (controllerPos == null)
+        if (controllerPos == null) {
             return;
-        if (!level().isLoaded(controllerPos))
+        }
+        if (!level().isLoaded(controllerPos)) {
             return;
+        }
         IControlContraption controller = getController();
         if (controller == null) {
             discard();
@@ -153,8 +172,9 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         }
         if (!controller.isAttachedTo(this)) {
             controller.attach(this);
-            if (level().isClientSide())
+            if (level().isClientSide()) {
                 setPos(getX(), getY(), getZ());
+            }
         }
     }
 
@@ -166,18 +186,23 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         Vec3 actorPosition,
         BlockPos gridPosition
     ) {
-        if (super.shouldActorTrigger(context, blockInfo, actor, actorPosition, gridPosition))
+        if (super.shouldActorTrigger(context, blockInfo, actor, actorPosition, gridPosition)) {
             return true;
+        }
 
         // Special activation timer for actors in the center of a bearing contraption
-        if (!(contraption instanceof BearingContraption bc))
+        if (!(contraption instanceof BearingContraption bc)) {
             return false;
+        }
         Direction facing = bc.getFacing();
         Vec3 activeAreaOffset = actor.getActiveAreaOffset(context);
-        if (!activeAreaOffset.multiply(VecHelper.axisAlingedPlaneOf(Vec3.atLowerCornerOf(facing.getUnitVec3i()))).equals(Vec3.ZERO))
+        if (!activeAreaOffset.multiply(VecHelper.axisAlingedPlaneOf(Vec3.atLowerCornerOf(facing.getUnitVec3i())))
+            .equals(Vec3.ZERO)) {
             return false;
-        if (!VecHelper.onSameAxis(blockInfo.pos(), BlockPos.ZERO, facing.getAxis()))
+        }
+        if (!VecHelper.onSameAxis(blockInfo.pos(), BlockPos.ZERO, facing.getAxis())) {
             return false;
+        }
         context.motion = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(angleDelta / 360.0);
         context.relativeMotion = context.motion;
         int timer = context.data.getIntOr("StationaryTimer", 0);
@@ -191,13 +216,16 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     }
 
     protected IControlContraption getController() {
-        if (controllerPos == null)
+        if (controllerPos == null) {
             return null;
-        if (!level().isLoaded(controllerPos))
+        }
+        if (!level().isLoaded(controllerPos)) {
             return null;
+        }
         BlockEntity be = level().getBlockEntity(controllerPos);
-        if (!(be instanceof IControlContraption))
+        if (!(be instanceof IControlContraption)) {
             return null;
+        }
         return (IControlContraption) be;
     }
 
@@ -213,8 +241,9 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     @Override
     protected void onContraptionStalled() {
         IControlContraption controller = getController();
-        if (controller != null)
+        if (controller != null) {
             controller.onStall();
+        }
         super.onContraptionStalled();
     }
 

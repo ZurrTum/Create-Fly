@@ -59,7 +59,12 @@ public class PlacardRenderer implements BlockEntityRenderer<PlacardBlockEntity, 
     }
 
     @Override
-    public void submit(PlacardRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        PlacardRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.mulPose(new Quaternionf().setAngleAxis(state.upAngle, 0, 1, 0));
         matrices.mulPose(new Quaternionf().setAngleAxis(state.eastAngle, 1, 0, 0));

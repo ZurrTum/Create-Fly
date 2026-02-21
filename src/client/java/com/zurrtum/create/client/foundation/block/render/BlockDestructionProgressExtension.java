@@ -1,10 +1,9 @@
 package com.zurrtum.create.client.foundation.block.render;
 
+import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
-
-import net.minecraft.core.BlockPos;
 
 public interface BlockDestructionProgressExtension {
     @Nullable Set<BlockPos> create$getExtraPositions();

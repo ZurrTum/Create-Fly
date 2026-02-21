@@ -5,12 +5,6 @@ import com.zurrtum.create.content.logistics.filter.FilterItemStack.ListFilterIte
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -19,6 +13,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ListFilterItem extends FilterItem {
     protected ListFilterItem(Properties properties) {
@@ -32,8 +31,8 @@ public class ListFilterItem extends FilterItem {
         ItemStackHandler filterItems = getFilterItemHandler(filter);
         boolean blacklist = filter.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false);
 
-        list.add((blacklist ? Component.translatable("create.gui.filter.deny_list") : Component.translatable("create.gui.filter.allow_list")).withStyle(
-            ChatFormatting.GOLD));
+        list.add((blacklist ? Component.translatable("create.gui.filter.deny_list") : Component.translatable(
+            "create.gui.filter.allow_list")).withStyle(ChatFormatting.GOLD));
         int count = 0;
         for (int i = 0, size = filterItems.getContainerSize(); i < size; i++) {
             if (count > 3) {
@@ -42,14 +41,16 @@ public class ListFilterItem extends FilterItem {
             }
 
             ItemStack filterStack = filterItems.getItem(i);
-            if (filterStack.isEmpty())
+            if (filterStack.isEmpty()) {
                 continue;
+            }
             list.add(Component.literal("- ").append(filterStack.getHoverName()).withStyle(ChatFormatting.GRAY));
             count++;
         }
 
-        if (count == 0)
+        if (count == 0) {
             return Collections.emptyList();
+        }
 
         return list;
     }
@@ -73,15 +74,19 @@ public class ListFilterItem extends FilterItem {
 
     public ItemStackHandler getFilterItemHandler(ItemStack stack) {
         ItemStackHandler newInv = new ItemStackHandler(18);
-        ItemContainerContents contents = stack.getOrDefault(AllDataComponents.FILTER_ITEMS, ItemContainerContents.EMPTY);
+        ItemContainerContents contents = stack.getOrDefault(
+            AllDataComponents.FILTER_ITEMS,
+            ItemContainerContents.EMPTY
+        );
         ItemHelper.fillItemStackHandler(contents, newInv);
         return newInv;
     }
 
     @Override
     public ItemStack[] getFilterItems(ItemStack stack) {
-        if (stack.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false))
+        if (stack.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false)) {
             return new ItemStack[0];
+        }
         return ItemHelper.getNonEmptyStacks(getFilterItemHandler(stack)).toArray(ItemStack[]::new);
     }
 }

@@ -30,8 +30,9 @@ public class ChainConveyorRidingHandler {
         chainPosition = position;
         ridingConnection = connection;
         catchingUp = 20;
-        if (mc.level.getBlockEntity(ridingChainConveyor) instanceof ChainConveyorBlockEntity clbe)
+        if (mc.level.getBlockEntity(ridingChainConveyor) instanceof ChainConveyorBlockEntity clbe) {
             flipped = clbe.getSpeed() < 0;
+        }
 
         Component component = Component.translatable("mount.onboard", mc.options.keyShift.getTranslatedKeyMessage());
         mc.gui.setOverlayMessage(component, false);
@@ -39,10 +40,12 @@ public class ChainConveyorRidingHandler {
     }
 
     public static void clientTick(Minecraft mc) {
-        if (ridingChainConveyor == null)
+        if (ridingChainConveyor == null) {
             return;
-        if (mc.isPaused())
+        }
+        if (mc.isPaused()) {
             return;
+        }
         if (!mc.player.isHolding(i -> i.is(AllItemTags.CHAIN_RIDEABLE))) {
             stopRiding(mc);
             return;
@@ -65,8 +68,9 @@ public class ChainConveyorRidingHandler {
         updateTargetPosition(mc, clbe);
 
         blockEntity = mc.level.getBlockEntity(ridingChainConveyor);
-        if (!(blockEntity instanceof ChainConveyorBlockEntity))
+        if (!(blockEntity instanceof ChainConveyorBlockEntity)) {
             return;
+        }
 
         clbe = (ChainConveyorBlockEntity) blockEntity;
         clbe.prepareStats();
@@ -75,13 +79,16 @@ public class ChainConveyorRidingHandler {
 
         if (ridingConnection != null) {
             ConnectionStats stats = clbe.connectionStats.get(ridingConnection);
-            targetPosition = stats.start().add((stats.end().subtract(stats.start())).normalize().scale(Math.min(stats.chainLength(), chainPosition)));
+            targetPosition = stats.start().add((stats.end().subtract(stats.start())).normalize()
+                .scale(Math.min(stats.chainLength(), chainPosition)));
         } else {
-            targetPosition = Vec3.atBottomCenterOf(ridingChainConveyor).add(VecHelper.rotate(new Vec3(0, 0.25, 1), chainPosition, Axis.Y));
+            targetPosition = Vec3.atBottomCenterOf(ridingChainConveyor)
+                .add(VecHelper.rotate(new Vec3(0, 0.25, 1), chainPosition, Axis.Y));
         }
 
-        if (catchingUp > 0)
+        if (catchingUp > 0) {
             catchingUp--;
+        }
 
         Vec3 diff = targetPosition.subtract(playerPosition);
         if (catchingUp == 0 && (diff.length() > 3 || diff.y < -1)) {
@@ -90,13 +97,15 @@ public class ChainConveyorRidingHandler {
         }
 
         mc.player.setDeltaMovement(mc.player.getDeltaMovement().scale(0.75).add(diff.scale(0.25)));
-        if (AnimationTickHolder.getTicks() % 10 == 0)
+        if (AnimationTickHolder.getTicks() % 10 == 0) {
             mc.getConnection().send(new ServerboundChainConveyorRidingPacket(ridingChainConveyor, false));
+        }
     }
 
     private static void stopRiding(Minecraft mc) {
-        if (ridingChainConveyor != null)
+        if (ridingChainConveyor != null) {
             mc.getConnection().send(new ServerboundChainConveyorRidingPacket(ridingChainConveyor, true));
+        }
         ridingChainConveyor = null;
         ridingConnection = null;
         mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_HIT, 0.75f, 0.35f));
@@ -122,11 +131,13 @@ public class ChainConveyorRidingHandler {
 
             chainPosition += serverSpeed * distancePerTick;
             chainPosition = Math.min(stats.chainLength(), chainPosition);
-            if (chainPosition < stats.chainLength())
+            if (chainPosition < stats.chainLength()) {
                 return;
+            }
 
             // transfer to other
-            if (mc.level.getBlockEntity(clbe.getBlockPos().offset(ridingConnection)) instanceof ChainConveyorBlockEntity clbe2) {
+            if (mc.level.getBlockEntity(clbe.getBlockPos()
+                .offset(ridingConnection)) instanceof ChainConveyorBlockEntity clbe2) {
                 chainPosition = clbe.wrapAngle(stats.tangentAngle() + 180 + 2 * 35 * (clbe.reversed ? -1 : 1));
                 ridingChainConveyor = clbe2.getBlockPos();
                 ridingConnection = null;
@@ -142,19 +153,23 @@ public class ChainConveyorRidingHandler {
         BlockPos nearestLooking = BlockPos.ZERO;
         double bestDiff = Double.MAX_VALUE;
         for (BlockPos connection : clbe.connections) {
-            double diff = Vec3.atLowerCornerOf(connection).normalize().distanceToSqr(mc.player.getLookAngle().normalize());
-            if (diff > bestDiff)
+            double diff = Vec3.atLowerCornerOf(connection).normalize()
+                .distanceToSqr(mc.player.getLookAngle().normalize());
+            if (diff > bestDiff) {
                 continue;
+            }
             nearestLooking = connection;
             bestDiff = diff;
         }
 
-        if (nearestLooking == BlockPos.ZERO)
+        if (nearestLooking == BlockPos.ZERO) {
             return;
+        }
 
         float offBranchAngle = clbe.connectionStats.get(nearestLooking).tangentAngle();
-        if (!clbe.loopThresholdCrossed(chainPosition, prevChainPosition, offBranchAngle))
+        if (!clbe.loopThresholdCrossed(chainPosition, prevChainPosition, offBranchAngle)) {
             return;
+        }
 
         chainPosition = 0;
         ridingConnection = nearestLooking;

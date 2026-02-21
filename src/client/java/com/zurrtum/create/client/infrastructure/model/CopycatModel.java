@@ -38,7 +38,13 @@ public abstract class CopycatModel extends WrapperBlockStateModel {
     }
 
     @Override
-    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(
+        BlockAndTintGetter world,
+        BlockPos pos,
+        BlockState state,
+        RandomSource random,
+        List<BlockModelPart> parts
+    ) {
         if (!(state.getBlock() instanceof CopycatBlock block)) {
             return;
         }
@@ -107,10 +113,12 @@ public abstract class CopycatModel extends WrapperBlockStateModel {
         OcclusionData occlusionData = new OcclusionData();
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
         for (Direction face : Iterate.directions) {
-            if (!copycatBlock.canFaceBeOccluded(state, face))
+            if (!copycatBlock.canFaceBeOccluded(state, face)) {
                 continue;
-            if (!Block.shouldRenderFace(material, world.getBlockState(mutablePos.setWithOffset(pos, face)), face))
+            }
+            if (!Block.shouldRenderFace(material, world.getBlockState(mutablePos.setWithOffset(pos, face)), face)) {
                 occlusionData.occlude(face);
+            }
         }
         return occlusionData;
     }

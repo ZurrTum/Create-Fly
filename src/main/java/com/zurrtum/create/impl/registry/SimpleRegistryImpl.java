@@ -1,13 +1,12 @@
 package com.zurrtum.create.impl.registry;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.StateHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.StateHolder;
 
 // methods are synchronized since registrations can happen during parallel mod loading
 public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<K, V> permits SimpleRegistryImpl.MultiImpl, SimpleRegistryImpl.SingleImpl {

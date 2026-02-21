@@ -1,13 +1,10 @@
 package com.zurrtum.create.content.decoration.slidingDoor;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,6 +13,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+
+import java.util.List;
 
 public class SlidingDoorBlockEntity extends SmartBlockEntity {
 
@@ -43,15 +42,17 @@ public class SlidingDoorBlockEntity extends SmartBlockEntity {
         animation.tickChaser();
 
         if (level.isClientSide()) {
-            if (bridgeTicks < 2 && open)
+            if (bridgeTicks < 2 && open) {
                 bridgeTicks++;
-            else if (bridgeTicks > 0 && !open && isVisible(getBlockState()))
+            } else if (bridgeTicks > 0 && !open && isVisible(getBlockState())) {
                 bridgeTicks--;
+            }
             return;
         }
 
-        if (!open && !wasSettled && animation.settled() && !isVisible(getBlockState()))
+        if (!open && !wasSettled && animation.settled() && !isVisible(getBlockState())) {
             showBlockModel();
+        }
     }
 
     @Override

@@ -44,13 +44,18 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
     private static final int DEPOSIT = -7;
     private static final int UNEQUIP = -5;
 
-    public RadialToolboxMenu(List<ToolboxBlockEntity> toolboxes, State state, @Nullable ToolboxBlockEntity selectedBox) {
+    public RadialToolboxMenu(
+        List<ToolboxBlockEntity> toolboxes,
+        State state,
+        @Nullable ToolboxBlockEntity selectedBox
+    ) {
         this.toolboxes = toolboxes;
         this.state = state;
         hoveredSlot = -1;
 
-        if (selectedBox != null)
+        if (selectedBox != null) {
             this.selectedBox = selectedBox;
+        }
     }
 
     public void prevSlot(int slot) {
@@ -67,13 +72,16 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
         float hoveredY = mouseY - window.getGuiScaledHeight() / 2;
 
         float distance = hoveredX * hoveredX + hoveredY * hoveredY;
-        if (distance > 25 && distance < 10000)
+        if (distance > 25 && distance < 10000) {
             hoveredSlot = (Mth.floor((AngleHelper.deg(Mth.atan2(hoveredY, hoveredX)) + 360 + 180 - 22.5f)) % 360) / 45;
+        }
         boolean renderCenterSlot = state == State.SELECT_ITEM_UNEQUIP;
-        if (scrollMode && distance > 150)
+        if (scrollMode && distance > 150) {
             scrollMode = false;
-        if (renderCenterSlot && distance <= 150)
+        }
+        if (renderCenterSlot && distance <= 150) {
             hoveredSlot = UNEQUIP;
+        }
 
         Matrix3x2fStack ms = graphics.pose();
         ms.pushMatrix();
@@ -83,8 +91,9 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
         if (state == State.DETACH) {
 
             tip = CreateLang.translateDirect("toolbox.outOfRange");
-            if (hoveredX > -20 && hoveredX < 20 && hoveredY > -80 && hoveredY < -20)
+            if (hoveredX > -20 && hoveredX < 20 && hoveredY > -80 && hoveredY < -20) {
                 hoveredSlot = UNEQUIP;
+            }
 
             ms.pushMatrix();
             AllGuiTextures.TOOLBELT_INACTIVE_SLOT.render(graphics, -12, -12);
@@ -103,8 +112,9 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
 
         } else {
 
-            if (hoveredX > 60 && hoveredX < 100 && hoveredY > -20 && hoveredY < 20)
+            if (hoveredX > 60 && hoveredX < 100 && hoveredY > -20 && hoveredY < 20) {
                 hoveredSlot = DEPOSIT;
+            }
 
             ms.pushMatrix();
             ms.translate(80 + (-5 * (1 - fade) * (1 - fade)), 0);
@@ -133,15 +143,20 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
                     if (!stackInSlot.isEmpty()) {
                         boolean empty = inv.getItem(slot * STACKS_PER_COMPARTMENT).isEmpty();
 
-                        (empty ? AllGuiTextures.TOOLBELT_INACTIVE_SLOT : AllGuiTextures.TOOLBELT_SLOT).render(graphics, 0, 0);
+                        (empty ? AllGuiTextures.TOOLBELT_INACTIVE_SLOT : AllGuiTextures.TOOLBELT_SLOT).render(
+                            graphics,
+                            0,
+                            0
+                        );
                         graphics.renderItem(stackInSlot, 3, 3);
 
                         if (slot == (scrollMode ? scrollSlot : hoveredSlot) && !empty) {
                             AllGuiTextures.TOOLBELT_SLOT_HIGHLIGHT.render(graphics, -1, -1);
                             tip = stackInSlot.getHoverName();
                         }
-                    } else
+                    } else {
                         AllGuiTextures.TOOLBELT_EMPTY_SLOT.render(graphics, 0, 0);
+                    }
 
                 } else if (state == State.SELECT_BOX) {
 
@@ -155,8 +170,9 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
                             AllGuiTextures.TOOLBELT_SLOT_HIGHLIGHT.render(graphics, -1, -1);
                             tip = toolboxBlockEntity.getDisplayName();
                         }
-                    } else
+                    } else {
                         AllGuiTextures.TOOLBELT_EMPTY_SLOT.render(graphics, 0, 0);
+                    }
 
                 }
 
@@ -169,8 +185,10 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
                 (scrollMode ? AllIcons.I_REFRESH : AllIcons.I_FLIP).render(graphics, -9, -9);
                 if (!scrollMode && UNEQUIP == hoveredSlot) {
                     AllGuiTextures.TOOLBELT_SLOT_HIGHLIGHT.render(graphics, -13, -13);
-                    tip = CreateLang.translateDirect("toolbox.unequip", minecraft.player.getMainHandItem().getHoverName())
-                        .withStyle(ChatFormatting.GOLD);
+                    tip = CreateLang.translateDirect(
+                        "toolbox.unequip",
+                        minecraft.player.getMainHandItem().getHoverName()
+                    ).withStyle(ChatFormatting.GOLD);
                 }
                 ms.popMatrix();
             }
@@ -179,8 +197,9 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
 
         if (tip != null) {
             int i1 = (int) (fade * 255.0F);
-            if (i1 > 255)
+            if (i1 > 255) {
                 i1 = 255;
+            }
 
             if (i1 > 8) {
                 ms.pushMatrix();
@@ -197,7 +216,10 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
 
     @Override
     public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        Color color = BACKGROUND_COLOR.scaleAlpha(Math.min(1, (ticksOpen + AnimationTickHolder.getPartialTicks()) / 20f));
+        Color color = BACKGROUND_COLOR.scaleAlpha(Math.min(
+            1,
+            (ticksOpen + AnimationTickHolder.getPartialTicks()) / 20f
+        ));
 
         pGuiGraphics.fillGradient(0, 0, this.width, this.height, color.getRGB(), color.getRGB());
     }
@@ -215,39 +237,50 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
         int selected = (scrollMode ? scrollSlot : hoveredSlot);
 
         if (selected == DEPOSIT) {
-            if (state == State.DETACH)
+            if (state == State.DETACH) {
                 return;
-            else if (state == State.SELECT_BOX)
+            } else if (state == State.SELECT_BOX) {
                 toolboxes.forEach(be -> minecraft.player.connection.send(new ToolboxDisposeAllPacket(be.getBlockPos())));
-            else
+            } else {
                 minecraft.player.connection.send(new ToolboxDisposeAllPacket(selectedBox.getBlockPos()));
+            }
             return;
         }
 
-        if (state == State.SELECT_BOX)
+        if (state == State.SELECT_BOX) {
             return;
+        }
 
         if (state == State.DETACH) {
-            if (selected == UNEQUIP)
-                minecraft.player.connection.send(new ToolboxEquipPacket(null, selected, minecraft.player.getInventory().getSelectedSlot()));
+            if (selected == UNEQUIP) {
+                minecraft.player.connection.send(new ToolboxEquipPacket(
+                    null,
+                    selected,
+                    minecraft.player.getInventory().getSelectedSlot()
+                ));
+            }
             return;
         }
 
-        if (selected == UNEQUIP)
+        if (selected == UNEQUIP) {
             minecraft.player.connection.send(new ToolboxEquipPacket(
                 selectedBox.getBlockPos(),
                 selected,
                 minecraft.player.getInventory().getSelectedSlot()
             ));
+        }
 
-        if (selected < 0)
+        if (selected < 0) {
             return;
+        }
         ToolboxInventory inv = selectedBox.inventory;
         ItemStack stackInSlot = inv.filters.get(selected);
-        if (stackInSlot.isEmpty())
+        if (stackInSlot.isEmpty()) {
             return;
-        if (inv.getItem(selected * STACKS_PER_COMPARTMENT).isEmpty())
+        }
+        if (inv.getItem(selected * STACKS_PER_COMPARTMENT).isEmpty()) {
             return;
+        }
 
         minecraft.player.connection.send(new ToolboxEquipPacket(
             selectedBox.getBlockPos(),
@@ -270,16 +303,20 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
                 if (state == State.SELECT_ITEM || state == State.SELECT_ITEM_UNEQUIP) {
                     ToolboxInventory inv = selectedBox.inventory;
                     ItemStack stackInSlot = inv.filters.get(scrollSlot);
-                    if (!stackInSlot.isEmpty() && !inv.getItem(scrollSlot * STACKS_PER_COMPARTMENT).isEmpty())
+                    if (!stackInSlot.isEmpty() && !inv.getItem(scrollSlot * STACKS_PER_COMPARTMENT).isEmpty()) {
                         break;
+                    }
                 }
 
-                if (state == State.SELECT_BOX)
-                    if (scrollSlot < toolboxes.size())
+                if (state == State.SELECT_BOX) {
+                    if (scrollSlot < toolboxes.size()) {
                         break;
+                    }
+                }
 
-                if (state == State.DETACH)
+                if (state == State.DETACH) {
                     break;
+                }
 
                 scrollSlot -= Mth.sign(pScrollY);
                 scrollSlot = (scrollSlot + 8) % 8;
@@ -352,13 +389,16 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
                 if (state == State.SELECT_ITEM || state == State.SELECT_ITEM_UNEQUIP) {
                     ToolboxInventory inv = selectedBox.inventory;
                     ItemStack stackInSlot = inv.filters.get(i);
-                    if (stackInSlot.isEmpty() || inv.getItem(i * STACKS_PER_COMPARTMENT).isEmpty())
+                    if (stackInSlot.isEmpty() || inv.getItem(i * STACKS_PER_COMPARTMENT).isEmpty()) {
                         return false;
+                    }
                 }
 
-                if (state == State.SELECT_BOX)
-                    if (i >= toolboxes.size())
+                if (state == State.SELECT_BOX) {
+                    if (i >= toolboxes.size()) {
                         return false;
+                    }
+                }
 
                 scrollMode = true;
                 scrollSlot = i;
@@ -381,10 +421,7 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
     }
 
     public enum State {
-        SELECT_BOX,
-        SELECT_ITEM,
-        SELECT_ITEM_UNEQUIP,
-        DETACH
+        SELECT_BOX, SELECT_ITEM, SELECT_ITEM_UNEQUIP, DETACH
     }
 
 }

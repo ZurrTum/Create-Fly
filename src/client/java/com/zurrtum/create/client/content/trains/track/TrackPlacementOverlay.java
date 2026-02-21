@@ -13,15 +13,19 @@ import net.minecraft.util.Mth;
 
 public class TrackPlacementOverlay {
     public static void render(Minecraft mc, GuiGraphics guiGraphics) {
-        if (TrackPlacement.hoveringPos == null)
+        if (TrackPlacement.hoveringPos == null) {
             return;
-        if (TrackPlacement.cached == null || TrackPlacement.cached.curve == null || !TrackPlacement.cached.valid)
+        }
+        if (TrackPlacement.cached == null || TrackPlacement.cached.curve == null || !TrackPlacement.cached.valid) {
             return;
-        if (TrackPlacementClient.extraTipWarmup < 4)
+        }
+        if (TrackPlacementClient.extraTipWarmup < 4) {
             return;
+        }
 
-        if (mc.gui.toolHighlightTimer > 0)
+        if (mc.gui.toolHighlightTimer > 0) {
             return;
+        }
 
         boolean active = mc.options.keySprint.isDown();
         MutableComponent text = CreateLang.translateDirect(

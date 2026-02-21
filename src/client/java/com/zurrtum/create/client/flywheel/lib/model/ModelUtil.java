@@ -30,18 +30,22 @@ public final class ModelUtil {
     private static final Map<RenderType, Material> ITEM_CHUNK_MATERIALS = new IdentityHashMap<>();
 
     static {
-        Material[] baseChunkMaterials = new Material[]{Materials.SOLID_BLOCK, Materials.CUTOUT_BLOCK, Materials.TRANSLUCENT_BLOCK, Materials.TRIPWIRE_BLOCK,};
+        Material[] baseChunkMaterials = new Material[]{
+            Materials.SOLID_BLOCK, Materials.CUTOUT_BLOCK, Materials.TRANSLUCENT_BLOCK, Materials.TRIPWIRE_BLOCK,
+        };
         for (int chunkLayerIdx = 0, size = baseChunkMaterials.length; chunkLayerIdx < size; chunkLayerIdx++) {
             int baseMaterialIdx = chunkLayerIdx * 4;
             Material baseChunkMaterial = baseChunkMaterials[chunkLayerIdx];
 
             // shaded: false, ambientOcclusion: false
-            CHUNK_MATERIALS[baseMaterialIdx] = SimpleMaterial.builderOf(baseChunkMaterial).cardinalLightingMode(CardinalLightingMode.OFF)
-                .ambientOcclusion(false).build();
+            CHUNK_MATERIALS[baseMaterialIdx] = SimpleMaterial.builderOf(baseChunkMaterial)
+                .cardinalLightingMode(CardinalLightingMode.OFF).ambientOcclusion(false).build();
             // shaded: false, ambientOcclusion: true
-            CHUNK_MATERIALS[baseMaterialIdx + 1] = SimpleMaterial.builderOf(baseChunkMaterial).cardinalLightingMode(CardinalLightingMode.OFF).build();
+            CHUNK_MATERIALS[baseMaterialIdx + 1] = SimpleMaterial.builderOf(baseChunkMaterial)
+                .cardinalLightingMode(CardinalLightingMode.OFF).build();
             // shaded: true, ambientOcclusion: false
-            CHUNK_MATERIALS[baseMaterialIdx + 2] = SimpleMaterial.builderOf(baseChunkMaterial).ambientOcclusion(false).build();
+            CHUNK_MATERIALS[baseMaterialIdx + 2] = SimpleMaterial.builderOf(baseChunkMaterial).ambientOcclusion(false)
+                .build();
             // shaded: true, ambientOcclusion: true
             CHUNK_MATERIALS[baseMaterialIdx + 3] = baseChunkMaterial;
         }

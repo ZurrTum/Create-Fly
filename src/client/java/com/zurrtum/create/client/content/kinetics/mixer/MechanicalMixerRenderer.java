@@ -67,7 +67,12 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
     }
 
     @Override
-    public void submit(MechanicalMixerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        MechanicalMixerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -84,9 +89,11 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            cogwheel.rotateCentered(angle, direction).color(color).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            cogwheel.rotateCentered(angle, direction).color(color).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
             pole.translate(0, headOffset, 0).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
-            head.rotateCentered(headAngle, Direction.UP).translate(0, headOffset, 0).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            head.rotateCentered(headAngle, Direction.UP).translate(0, headOffset, 0).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

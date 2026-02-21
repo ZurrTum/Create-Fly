@@ -2,8 +2,8 @@ package com.zurrtum.create.content.equipment.potatoCannon;
 
 import com.zurrtum.create.api.equipment.potatoCannon.PotatoCannonProjectileType;
 import com.zurrtum.create.api.registry.CreateRegistryKeys;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 import static com.zurrtum.create.Create.MOD_ID;
 

@@ -5,7 +5,8 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record CrafterRenderState(Matrix3x2f pose, int x0, int y0, ScreenRectangle bounds) implements PictureInPictureRenderState {
+public record CrafterRenderState(Matrix3x2f pose, int x0, int y0,
+                                 ScreenRectangle bounds) implements PictureInPictureRenderState {
     public CrafterRenderState(Matrix3x2f pose, int x, int y) {
         this(pose, x, y, new ScreenRectangle(x, y, 29, 29).transformMaxBounds(pose));
     }

@@ -58,7 +58,13 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     }
 
     @Override
-    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ToolboxBlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        ToolboxBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.inventory;
     }
 
@@ -100,27 +106,33 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
-        if (stack == null)
+        }
+        if (stack == null) {
             return;
+        }
         withBlockEntityDo(
             worldIn, pos, be -> {
                 be.readInventory(stack.get(AllDataComponents.TOOLBOX_INVENTORY));
-                if (stack.has(AllDataComponents.TOOLBOX_UUID))
+                if (stack.has(AllDataComponents.TOOLBOX_UUID)) {
                     be.setUniqueId(stack.get(AllDataComponents.TOOLBOX_UUID));
-                if (stack.has(DataComponents.CUSTOM_NAME))
+                }
+                if (stack.has(DataComponents.CUSTOM_NAME)) {
                     be.setCustomName(stack.getHoverName());
+                }
             }
         );
     }
 
     @Override
     public void attack(BlockState state, Level world, BlockPos pos, Player player) {
-        if (FakePlayerHandler.has(player))
+        if (FakePlayerHandler.has(player)) {
             return;
-        if (world.isClientSide())
+        }
+        if (world.isClientSide()) {
             return;
+        }
         withBlockEntityDo(world, pos, ToolboxBlockEntity::unequipTracked);
         if (world instanceof ServerLevel) {
             ItemStack cloneItemStack = getCloneItemStack(world, pos, state, true);
@@ -130,8 +142,9 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
                 }
             );
             world.destroyBlock(pos, false);
-            if (world.getBlockState(pos) != state)
+            if (world.getBlockState(pos) != state) {
                 player.getInventory().placeItemBackInInventory(cloneItemStack);
+            }
         }
     }
 
@@ -142,8 +155,10 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
 
         blockEntityOptional.map(tb -> item.set(AllDataComponents.TOOLBOX_INVENTORY, tb.inventory));
 
-        blockEntityOptional.map(ToolboxBlockEntity::getUniqueId).ifPresent(uid -> item.set(AllDataComponents.TOOLBOX_UUID, uid));
-        blockEntityOptional.map(ToolboxBlockEntity::getCustomName).ifPresent(name -> item.set(DataComponents.CUSTOM_NAME, name));
+        blockEntityOptional.map(ToolboxBlockEntity::getUniqueId)
+            .ifPresent(uid -> item.set(AllDataComponents.TOOLBOX_UUID, uid));
+        blockEntityOptional.map(ToolboxBlockEntity::getCustomName)
+            .ifPresent(name -> item.set(DataComponents.CUSTOM_NAME, name));
         return item;
     }
 
@@ -158,8 +173,9 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
         BlockState neighbourState,
         RandomSource random
     ) {
-        if (state.getValue(WATERLOGGED))
+        if (state.getValue(WATERLOGGED)) {
             tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+        }
         return state;
     }
 
@@ -178,22 +194,26 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null || player.isCrouching())
+        if (player == null || player.isCrouching()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         DyeColor color = AllItemTags.getDyeColor(stack);
         if (color != null && color != this.color) {
-            if (level.isClientSide())
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
+            }
             BlockState newState = BlockHelper.copyProperties(state, getColorBlock(color).defaultBlockState());
             level.setBlockAndUpdate(pos, newState);
             return InteractionResult.SUCCESS;
         }
 
-        if (FakePlayerHandler.has(player))
+        if (FakePlayerHandler.has(player)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         withBlockEntityDo(level, pos, toolbox -> toolbox.openHandledScreen((ServerPlayer) player));
         return InteractionResult.SUCCESS;

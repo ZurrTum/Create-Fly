@@ -53,7 +53,11 @@ public class BuiltInPackSourceMixin {
                     "c"
                 );
             }
-            DynamicPack dynamicPack = new DynamicPack("create:dynamic_data", Component.translatable("advancement.create.root"), PackType.SERVER_DATA);
+            DynamicPack dynamicPack = new DynamicPack(
+                "create:dynamic_data",
+                Component.translatable("advancement.create.root"),
+                PackType.SERVER_DATA
+            );
             RuntimeDataGenerator.insertIntoPack(dynamicPack);
             if (!dynamicPack.isEmpty()) {
                 addDataPack(consumer, false, dynamicPack);
@@ -63,7 +67,12 @@ public class BuiltInPackSourceMixin {
 
     @Unique
     private static PackLocationInfo createInfo(String id, String name, String version) {
-        return new PackLocationInfo(id, Component.nullToEmpty(name), PackSource.BUILT_IN, Optional.of(new KnownPack(id, "data", version)));
+        return new PackLocationInfo(
+            id,
+            Component.nullToEmpty(name),
+            PackSource.BUILT_IN,
+            Optional.of(new KnownPack(id, "data", version))
+        );
     }
 
     @Unique
@@ -77,9 +86,13 @@ public class BuiltInPackSourceMixin {
     ) {
         BuiltInMetadata metadataMap = BuiltInMetadata.of(
             PackMetadataSection.SERVER_TYPE,
-            new PackMetadataSection(title, SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA).minorRange())
+            new PackMetadataSection(
+                title,
+                SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA).minorRange()
+            )
         );
-        VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(metadataMap).exposeNamespace(namespace);
+        VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(metadataMap)
+            .exposeNamespace(namespace);
         for (Path path : paths) {
             builder.pushAssetPath(PackType.SERVER_DATA, path.resolve(directory));
         }

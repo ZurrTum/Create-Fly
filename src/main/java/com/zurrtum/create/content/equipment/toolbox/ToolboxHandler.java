@@ -3,12 +3,6 @@ package com.zurrtum.create.content.equipment.toolbox;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +13,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 public class ToolboxHandler {
 
@@ -35,31 +34,38 @@ public class ToolboxHandler {
     static int validationTimer = 20;
 
     public static void entityTick(Entity entity, Level world) {
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
-        if (!(world instanceof ServerLevel))
+        }
+        if (!(world instanceof ServerLevel)) {
             return;
-        if (!(entity instanceof ServerPlayer player))
+        }
+        if (!(entity instanceof ServerPlayer player)) {
             return;
-        if (entity.tickCount % validationTimer != 0)
+        }
+        if (entity.tickCount % validationTimer != 0) {
             return;
+        }
 
         CompoundTag compound = AllSynchedDatas.TOOLBOX.get(player);
-        if (compound.isEmpty())
+        if (compound.isEmpty()) {
             return;
+        }
 
         boolean sendData = false;
         for (int i = 0; i < 9; i++) {
             String key = String.valueOf(i);
-            if (!compound.contains(key))
+            if (!compound.contains(key)) {
                 continue;
+            }
 
             CompoundTag data = compound.getCompoundOrEmpty(key);
             BlockPos pos = data.read("Pos", BlockPos.CODEC).orElse(BlockPos.ZERO);
             int slot = data.getIntOr("Slot", 0);
 
-            if (!world.isLoaded(pos))
+            if (!world.isLoaded(pos)) {
                 continue;
+            }
             if (!(world.getBlockState(pos).getBlock() instanceof ToolboxBlock)) {
                 compound.remove(key);
                 sendData = true;
@@ -67,12 +73,14 @@ public class ToolboxHandler {
             }
 
             BlockEntity prevBlockEntity = world.getBlockEntity(pos);
-            if (prevBlockEntity instanceof ToolboxBlockEntity toolbox)
+            if (prevBlockEntity instanceof ToolboxBlockEntity toolbox) {
                 toolbox.connectPlayer(slot, player, i);
+            }
         }
 
-        if (sendData)
+        if (sendData) {
             syncData(player, compound);
+        }
     }
 
     public static void syncData(Player player, CompoundTag data) {
@@ -83,16 +91,17 @@ public class ToolboxHandler {
         Vec3 location = player.position();
         double maxRange = getMaxRange(player);
         return toolboxes.get(world).keySet().stream().filter(p -> distance(location, p) < maxRange * maxRange)
-            .sorted(Comparator.comparingDouble(p -> distance(location, p))).limit(maxAmount).map(toolboxes.get(world)::get)
-            .filter(ToolboxBlockEntity::isFullyInitialized).collect(Collectors.toList());
+            .sorted(Comparator.comparingDouble(p -> distance(location, p))).limit(maxAmount)
+            .map(toolboxes.get(world)::get).filter(ToolboxBlockEntity::isFullyInitialized).collect(Collectors.toList());
     }
 
     public static void unequip(Player player, int hotbarSlot, boolean keepItems) {
         CompoundTag compound = AllSynchedDatas.TOOLBOX.get(player);
         Level world = player.level();
         String key = String.valueOf(hotbarSlot);
-        if (!compound.contains(key))
+        if (!compound.contains(key)) {
             return;
+        }
 
         CompoundTag prevData = compound.getCompoundOrEmpty(key);
         BlockPos prevPos = prevData.read("Pos", BlockPos.CODEC).orElse(BlockPos.ZERO);
@@ -106,8 +115,9 @@ public class ToolboxHandler {
     }
 
     public static boolean withinRange(Player player, ToolboxBlockEntity box) {
-        if (player.level() != box.getLevel())
+        if (player.level() != box.getLevel()) {
             return false;
+        }
         double maxRange = getMaxRange(player);
         return distance(player.position(), box.getBlockPos()) < maxRange * maxRange;
     }

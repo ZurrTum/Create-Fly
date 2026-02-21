@@ -20,15 +20,25 @@ public class EncasedCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
-        if (isBeingBlocked(state, reader, pos, otherPos, face))
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
+        if (isBeingBlocked(state, reader, pos, otherPos, face)) {
             return false;
+        }
         Entry entry = AllCasings.get(state);
         Entry otherEntry = AllCasings.get(other);
-        if (entry == null || otherEntry == null)
+        if (entry == null || otherEntry == null) {
             return false;
-        if (!entry.isSideValid(state, face) || !otherEntry.isSideValid(other, face))
+        }
+        if (!entry.isSideValid(state, face) || !otherEntry.isSideValid(other, face)) {
             return false;
+        }
         return entry.getCasing() == otherEntry.getCasing();
     }
 

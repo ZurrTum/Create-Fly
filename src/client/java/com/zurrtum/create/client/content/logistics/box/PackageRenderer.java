@@ -88,7 +88,8 @@ public class PackageRenderer extends EntityRenderer<PackageEntity, PackageRender
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            model.translate(-.5, 0, -.5).rotateCentered(angle, Direction.UP).light(light).nudge(nudge).renderInto(matricesEntry, vertexConsumer);
+            model.translate(-.5, 0, -.5).rotateCentered(angle, Direction.UP).light(light).nudge(nudge)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

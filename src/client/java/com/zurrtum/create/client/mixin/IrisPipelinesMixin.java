@@ -22,7 +22,10 @@ public abstract class IrisPipelinesMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void add(CallbackInfo ci) {
-        IrisPipelines.copyPipeline(RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL, PonderRenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL);
+        IrisPipelines.copyPipeline(
+            RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL,
+            PonderRenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL
+        );
         IrisPipelines.copyPipeline(RenderPipelines.ENTITY_TRANSLUCENT, PonderRenderPipelines.ENTITY_TRANSLUCENT);
         IrisPipelines.copyPipeline(RenderPipelines.SOLID_BLOCK, AllRenderPipelines.ADDITIVE);
         IrisPipelines.copyPipeline(RenderPipelines.SOLID_BLOCK, AllRenderPipelines.ADDITIVE2);

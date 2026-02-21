@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue;
 
 import com.google.common.collect.ImmutableList;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.content.logistics.depot.EjectorSlot;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsBoard;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter;
@@ -10,7 +11,6 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBulkScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
@@ -122,7 +122,13 @@ public class ScrollValueBehaviour<B extends SmartBlockEntity, T extends ServerSc
 
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
-        return new ValueSettingsBoard(label, behaviour.getMax(), 10, ImmutableList.of(Component.literal("Value")), new ValueSettingsFormatter());
+        return new ValueSettingsBoard(
+            label,
+            behaviour.getMax(),
+            10,
+            ImmutableList.of(Component.literal("Value")),
+            new ValueSettingsFormatter()
+        );
     }
 
     @Override

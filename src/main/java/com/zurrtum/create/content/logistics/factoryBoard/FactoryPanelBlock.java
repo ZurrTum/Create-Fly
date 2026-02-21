@@ -84,10 +84,12 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState stateForPlacement = super.getStateForPlacement(pContext);
-        if (stateForPlacement == null)
+        if (stateForPlacement == null) {
             return null;
-        if (stateForPlacement.getValue(FACE) == AttachFace.FLOOR)
+        }
+        if (stateForPlacement.getValue(FACE) == AttachFace.FLOOR) {
             stateForPlacement = stateForPlacement.setValue(FACING, stateForPlacement.getValue(FACING).getOpposite());
+        }
 
         Level level = pContext.getLevel();
         BlockPos pos = pContext.getClickedPos();
@@ -107,8 +109,9 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
 
                     if (!pPlayer.isCreative()) {
                         panelItem.shrink(1);
-                        if (panelItem.isEmpty())
+                        if (panelItem.isEmpty()) {
                             pPlayer.setItemInHand(pContext.getHand(), ItemStack.EMPTY);
+                        }
                     }
                 }
             }
@@ -125,14 +128,16 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
         Player player = context.getPlayer();
         PanelSlot slot = getTargetedSlot(pos, state, context.getClickLocation());
 
-        if (!(world instanceof ServerLevel))
+        if (!(world instanceof ServerLevel)) {
             return InteractionResult.SUCCESS;
+        }
 
         return onBlockEntityUse(
             world, pos, be -> {
                 ServerFactoryPanelBehaviour behaviour = be.panels.get(slot);
-                if (behaviour == null || !behaviour.isActive())
+                if (behaviour == null || !behaviour.isActive()) {
                     return InteractionResult.SUCCESS;
+                }
 
                 //TODO
                 //                BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, world.getBlockState(pos), player);
@@ -140,15 +145,18 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
                 //                if (event.isCanceled())
                 //                    return ActionResult.SUCCESS;
 
-                if (!be.removePanel(slot))
+                if (!be.removePanel(slot)) {
                     return InteractionResult.SUCCESS;
+                }
 
-                if (!player.isCreative())
+                if (!player.isCreative()) {
                     player.getInventory().placeItemBackInInventory(AllItems.FACTORY_GAUGE.getDefaultInstance());
+                }
 
                 IWrenchable.playRemoveSound(world, pos);
-                if (be.activePanels() == 0)
+                if (be.activePanels() == 0) {
                     world.destroyBlock(pos, false);
+                }
 
                 return InteractionResult.SUCCESS;
             }
@@ -158,16 +166,22 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
     @Override
     public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
-        if (pPlacer == null)
+        if (pPlacer == null) {
             return;
+        }
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
         double range = pPlacer.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
         HitResult hitResult = pPlacer.pick(range, 1, false);
         Vec3 location = hitResult.getLocation();
-        if (location == null)
+        if (location == null) {
             return;
+        }
         PanelSlot initialSlot = getTargetedSlot(pPos, pState, location);
-        withBlockEntityDo(pLevel, pPos, fpbe -> fpbe.addPanel(initialSlot, LogisticallyLinkedBlockItem.networkFromStack(pStack)));
+        withBlockEntityDo(
+            pLevel,
+            pPos,
+            fpbe -> fpbe.addPanel(initialSlot, LogisticallyLinkedBlockItem.networkFromStack(pStack))
+        );
     }
 
     @Override
@@ -180,15 +194,19 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null)
+        if (player == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
-        if (!stack.is(AllItems.FACTORY_GAUGE))
+        }
+        if (!stack.is(AllItems.FACTORY_GAUGE)) {
             return InteractionResult.SUCCESS;
+        }
         Vec3 location = hitResult.getLocation();
-        if (location == null)
+        if (location == null) {
             return InteractionResult.SUCCESS;
+        }
 
         if (!FactoryPanelBlockItem.isTuned(stack)) {
             AllSoundEvents.DENY.playOnServer(level, pos);
@@ -199,15 +217,21 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
         PanelSlot newSlot = getTargetedSlot(pos, state, location);
         withBlockEntityDo(
             level, pos, fpbe -> {
-                if (!fpbe.addPanel(newSlot, LogisticallyLinkedBlockItem.networkFromStack(FactoryPanelBlockItem.fixCtrlCopiedStack(stack))))
+                if (!fpbe.addPanel(
+                    newSlot,
+                    LogisticallyLinkedBlockItem.networkFromStack(FactoryPanelBlockItem.fixCtrlCopiedStack(stack))
+                )) {
                     return;
+                }
                 player.displayClientMessage(Component.translatable("create.logistically_linked.connected"), true);
                 level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS);
-                if (player.isCreative())
+                if (player.isCreative()) {
                     return;
+                }
                 stack.shrink(1);
-                if (stack.isEmpty())
+                if (stack.isEmpty()) {
                     player.setItemInHand(hand, ItemStack.EMPTY);
+                }
             }
         );
         return InteractionResult.SUCCESS;
@@ -225,12 +249,15 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
         PanelSlot destroyedSlot = getTargetedSlot(pos, state, location);
         return InteractionResult.SUCCESS == onBlockEntityUse(
             level, pos, fpbe -> {
-                if (fpbe.activePanels() < 2)
+                if (fpbe.activePanels() < 2) {
                     return InteractionResult.FAIL;
-                if (!fpbe.removePanel(destroyedSlot))
+                }
+                if (!fpbe.removePanel(destroyedSlot)) {
                     return InteractionResult.FAIL;
-                if (!player.isCreative())
+                }
+                if (!player.isCreative()) {
                     popResource(level, pos, AllItems.FACTORY_GAUGE.getDefaultInstance());
+                }
                 return InteractionResult.SUCCESS;
             }
         );
@@ -253,31 +280,40 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
 
     @Override
     public boolean canBeReplaced(BlockState pState, BlockPlaceContext pUseContext) {
-        if (!pUseContext.getItemInHand().is(AllItems.FACTORY_GAUGE))
+        if (!pUseContext.getItemInHand().is(AllItems.FACTORY_GAUGE)) {
             return false;
+        }
         Vec3 location = pUseContext.getClickLocation();
 
         BlockPos pos = pUseContext.getClickedPos();
         PanelSlot slot = getTargetedSlot(pos, pState, location);
         FactoryPanelBlockEntity blockEntity = getBlockEntity(pUseContext.getLevel(), pos);
 
-        if (blockEntity == null)
+        if (blockEntity == null) {
             return false;
+        }
         return !blockEntity.panels.get(slot).isActive();
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        if (pContext instanceof EntityCollisionContext ecc && ecc.getEntity() == null)
+    public VoxelShape getCollisionShape(
+        BlockState pState,
+        BlockGetter pLevel,
+        BlockPos pPos,
+        CollisionContext pContext
+    ) {
+        if (pContext instanceof EntityCollisionContext ecc && ecc.getEntity() == null) {
             return getShape(pState, pLevel, pPos, pContext);
+        }
         return Shapes.empty();
     }
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         FactoryPanelBlockEntity blockEntity = getBlockEntity(pLevel, pPos);
-        if (blockEntity != null)
+        if (blockEntity != null) {
             return blockEntity.getShape();
+        }
         return AllShapes.FACTORY_PANEL_FALLBACK.get(getConnectedDirection(pState));
     }
 
@@ -319,8 +355,9 @@ public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock im
             vec = VecHelper.rotateCentered(vec, yRot, Axis.Y);
 
             double diff = vec.distanceToSqr(localClick);
-            if (diff > bestDistance)
+            if (diff > bestDistance) {
                 continue;
+            }
             bestDistance = diff;
             bestSlot = slot;
         }

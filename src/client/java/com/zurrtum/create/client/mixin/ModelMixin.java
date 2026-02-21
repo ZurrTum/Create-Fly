@@ -19,7 +19,14 @@ public abstract class ModelMixin {
     public abstract ModelPart root();
 
     @Inject(method = "renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V", at = @At("HEAD"), cancellable = true)
-    public void render(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color, CallbackInfo ci) {
+    public void render(
+        PoseStack matrices,
+        VertexConsumer vertices,
+        int light,
+        int overlay,
+        int color,
+        CallbackInfo ci
+    ) {
         if (vertices instanceof ItemMeshEmitter emitter) {
             emitter.emit(root(), matrices, null, null, light, overlay, color);
             ci.cancel();

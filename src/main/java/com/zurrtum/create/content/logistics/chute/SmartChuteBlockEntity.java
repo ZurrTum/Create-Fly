@@ -43,7 +43,8 @@ public class SmartChuteBlockEntity extends ChuteBlockEntity implements Clearable
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        behaviours.add(filtering = new ServerFilteringBehaviour(this).showCountWhen(this::isExtracting).withCallback($ -> invVersionTracker.reset()));
+        behaviours.add(filtering = new ServerFilteringBehaviour(this).showCountWhen(this::isExtracting)
+            .withCallback($ -> invVersionTracker.reset()));
         super.addBehaviours(behaviours);
     }
 

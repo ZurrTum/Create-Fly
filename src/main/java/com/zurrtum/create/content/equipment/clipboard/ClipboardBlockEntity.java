@@ -4,13 +4,9 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
-
-import java.util.List;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentMap;
@@ -18,6 +14,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
+import java.util.UUID;
 
 public class ClipboardBlockEntity extends SmartBlockEntity {
     private UUID lastEdit;
@@ -41,20 +40,24 @@ public class ClipboardBlockEntity extends SmartBlockEntity {
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             AllClientHandle.INSTANCE.advertiseToAddressHelper(this);
+        }
     }
 
     public void updateWrittenState() {
         BlockState blockState = getBlockState();
-        if (!blockState.is(AllBlocks.CLIPBOARD))
+        if (!blockState.is(AllBlocks.CLIPBOARD)) {
             return;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return;
+        }
         boolean isWritten = blockState.getValue(ClipboardBlock.WRITTEN);
         boolean shouldBeWritten = components().has(AllDataComponents.CLIPBOARD_CONTENT);
-        if (isWritten == shouldBeWritten)
+        if (isWritten == shouldBeWritten) {
             return;
+        }
         level.setBlockAndUpdate(worldPosition, blockState.setValue(ClipboardBlock.WRITTEN, shouldBeWritten));
     }
 
@@ -68,8 +71,9 @@ public class ClipboardBlockEntity extends SmartBlockEntity {
         if (clientPacket) {
             view.store("components", DataComponentMap.CODEC, components());
         }
-        if (lastEdit != null)
+        if (lastEdit != null) {
             view.store("LastEdit", UUIDUtil.CODEC, lastEdit);
+        }
     }
 
     @Override

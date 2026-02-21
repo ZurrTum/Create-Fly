@@ -2,22 +2,21 @@ package com.zurrtum.create.catnip.codecs.stream;
 
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.Array;
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.List;
+import java.util.Optional;
 
 public interface CatnipStreamCodecBuilders {
     static <T extends ByteBuf, S extends Enum<S>> StreamCodec<T, S> ofEnum(Class<S> clazz) {
@@ -32,7 +31,10 @@ public interface CatnipStreamCodecBuilders {
         };
     }
 
-    static <B extends ByteBuf, L, R> StreamCodec<B, Pair<L, R>> pair(StreamCodec<B, L> codecL, StreamCodec<B, R> codecR) {
+    static <B extends ByteBuf, L, R> StreamCodec<B, Pair<L, R>> pair(
+        StreamCodec<B, L> codecL,
+        StreamCodec<B, R> codecR
+    ) {
         return new StreamCodec<>() {
             @Override
             public @NotNull Pair<L, R> decode(B buffer) {
@@ -91,7 +93,10 @@ public interface CatnipStreamCodecBuilders {
         return base.apply(nonNullList());
     }
 
-    static <B extends FriendlyByteBuf, V> StreamCodec<B, NonNullList<V>> nonNullList(StreamCodec<B, V> base, int maxSize) {
+    static <B extends FriendlyByteBuf, V> StreamCodec<B, NonNullList<V>> nonNullList(
+        StreamCodec<B, V> base,
+        int maxSize
+    ) {
         return base.apply(nonNullList(maxSize));
     }
 

@@ -38,11 +38,14 @@ public abstract class MenuBase<T> extends AbstractContainerMenu {
     protected abstract void saveData(T contentHolder);
 
     protected void addPlayerSlots(int x, int y) {
-        for (int row = 0; row < 3; ++row)
-            for (int col = 0; col < 9; ++col)
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
                 this.addSlot(this.createPlayerSlot(playerInventory, col + row * 9 + 9, x + col * 18, y + row * 18));
-        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot)
+            }
+        }
+        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot) {
             this.addSlot(this.createPlayerSlot(playerInventory, hotbarSlot, x + hotbarSlot * 18, y + 58));
+        }
     }
 
     protected Slot createPlayerSlot(Inventory inventory, int index, int x, int y) {
@@ -57,10 +60,12 @@ public abstract class MenuBase<T> extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        if (contentHolder == null)
+        if (contentHolder == null) {
             return false;
-        if (contentHolder instanceof IInteractionChecker)
+        }
+        if (contentHolder instanceof IInteractionChecker) {
             return ((IInteractionChecker) contentHolder).canPlayerUse(player);
+        }
         return true;
     }
 

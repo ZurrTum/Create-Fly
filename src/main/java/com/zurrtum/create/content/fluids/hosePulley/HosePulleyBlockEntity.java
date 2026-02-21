@@ -3,21 +3,20 @@ package com.zurrtum.create.content.fluids.hosePulley;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.content.fluids.transfer.FluidDrainingBehaviour;
 import com.zurrtum.create.content.fluids.transfer.FluidFillingBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+
+import java.util.List;
 
 public class HosePulleyBlockEntity extends KineticBlockEntity {
 
@@ -33,7 +32,13 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
         super(AllBlockEntityTypes.HOSE_PULLEY, pos, state);
         offset = LerpedFloat.linear().startWithValue(0);
         isMoving = true;
-        handler = new HosePulleyFluidHandler(this, filler, drainer, () -> pos.below((int) Math.ceil(offset.getValue())), () -> !this.isMoving);
+        handler = new HosePulleyFluidHandler(
+            this,
+            filler,
+            drainer,
+            () -> pos.below((int) Math.ceil(offset.getValue())),
+            () -> !this.isMoving
+        );
     }
 
     @Override
@@ -71,8 +76,9 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
 
         if (isMoving) {
             float newOffset = offset.getValue() + getMovementSpeed();
-            if (newOffset < 0)
+            if (newOffset < 0) {
                 isMoving = false;
+            }
             if (!level.getBlockState(worldPosition.below((int) Math.ceil(newOffset))).canBeReplaced()) {
                 isMoving = false;
             }
@@ -102,8 +108,9 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
             newOffset = (int) newOffset;
             isMoving = false;
         }
-        if (getSpeed() == 0)
+        if (getSpeed() == 0) {
             isMoving = false;
+        }
 
         offset.setValue(newOffset);
         invalidateRenderBoundingBox();
@@ -112,10 +119,12 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
-        if (isMoving)
+        }
+        if (isMoving) {
             return;
+        }
 
         int ceil = (int) Math.ceil(offset.getValue() + getMovementSpeed());
         if (getMovementSpeed() > 0 && level.getBlockState(worldPosition.below(ceil)).canBeReplaced()) {
@@ -130,13 +139,15 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
 
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
-        if (clientPacket)
+        if (clientPacket) {
             offset.forceNextSync();
+        }
         offset.write(view.child("Offset"));
         handler.write(view);
         super.write(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             view.putBoolean("Infinite", infinite);
+        }
     }
 
     @Override
@@ -144,14 +155,16 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
         offset.read(view.childOrEmpty("Offset"), clientPacket);
         handler.read(view);
         super.read(view, clientPacket);
-        if (clientPacket)
+        if (clientPacket) {
             infinite = view.getBooleanOr("Infinite", false);
+        }
     }
 
     public float getMovementSpeed() {
         float movementSpeed = convertToLinear(getSpeed());
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             movementSpeed *= AllClientHandle.INSTANCE.getServerSpeed();
+        }
         return movementSpeed;
     }
 

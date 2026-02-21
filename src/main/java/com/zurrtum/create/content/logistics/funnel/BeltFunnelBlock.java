@@ -46,10 +46,8 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
     public static final EnumProperty<Shape> SHAPE = EnumProperty.create("shape", Shape.class);
 
     public enum Shape implements StringRepresentable {
-        RETRACTED(AllShapes.BELT_FUNNEL_RETRACTED),
-        EXTENDED(AllShapes.BELT_FUNNEL_EXTENDED),
-        PUSHING(AllShapes.BELT_FUNNEL_PERPENDICULAR),
-        PULLING(AllShapes.BELT_FUNNEL_PERPENDICULAR);
+        RETRACTED(AllShapes.BELT_FUNNEL_RETRACTED), EXTENDED(AllShapes.BELT_FUNNEL_EXTENDED), PUSHING(AllShapes.BELT_FUNNEL_PERPENDICULAR), PULLING(
+            AllShapes.BELT_FUNNEL_PERPENDICULAR);
 
         final VoxelShaper shaper;
 
@@ -98,15 +96,26 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+    public VoxelShape getShape(
+        BlockState state,
+        BlockGetter p_220053_2_,
+        BlockPos p_220053_3_,
+        CollisionContext p_220053_4_
+    ) {
         return state.getValue(SHAPE).shaper.get(state.getValue(HORIZONTAL_FACING));
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState p_220071_1_, BlockGetter p_220071_2_, BlockPos p_220071_3_, CollisionContext p_220071_4_) {
+    public VoxelShape getCollisionShape(
+        BlockState p_220071_1_,
+        BlockGetter p_220071_2_,
+        BlockPos p_220071_3_,
+        CollisionContext p_220071_4_
+    ) {
         if (p_220071_4_ instanceof EntityCollisionContext && ((EntityCollisionContext) p_220071_4_).getEntity() instanceof ItemEntity && (p_220071_1_.getValue(
-            SHAPE) == Shape.PULLING || p_220071_1_.getValue(SHAPE) == Shape.PUSHING))
+            SHAPE) == Shape.PULLING || p_220071_1_.getValue(SHAPE) == Shape.PUSHING)) {
             return AllShapes.FUNNEL_COLLISION.get(getFacing(p_220071_1_));
+        }
         return getShape(p_220071_1_, p_220071_2_, p_220071_3_, p_220071_4_);
     }
 
@@ -115,7 +124,8 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
         BlockState stateForPlacement = super.getStateForPlacement(ctx);
         BlockPos pos = ctx.getClickedPos();
         Level world = ctx.getLevel();
-        Direction facing = ctx.getClickedFace().getAxis().isHorizontal() ? ctx.getClickedFace() : ctx.getHorizontalDirection();
+        Direction facing = ctx.getClickedFace().getAxis()
+            .isHorizontal() ? ctx.getClickedFace() : ctx.getHorizontalDirection();
 
         BlockState state = stateForPlacement.setValue(HORIZONTAL_FACING, facing);
         boolean sneaking = ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown();
@@ -126,8 +136,9 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
         BlockPos posBelow = pos.below();
         BlockState stateBelow = world.getBlockState(posBelow);
         Shape perpendicularState = extracting ? Shape.PUSHING : Shape.PULLING;
-        if (!stateBelow.is(AllBlocks.BELT))
+        if (!stateBelow.is(AllBlocks.BELT)) {
             return perpendicularState;
+        }
         Direction movementFacing = stateBelow.getValue(BeltBlock.HORIZONTAL_FACING);
         return movementFacing.getAxis() != facing.getAxis() ? perpendicularState : Shape.RETRACTED;
     }
@@ -150,66 +161,87 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
         updateWater(world, tickView, state, pos);
         if (!isOnValidBelt(state, world, pos)) {
             BlockState parentState = ProperWaterloggedBlock.withWater(world, parent.defaultBlockState(), pos);
-            if (state.getValueOrElse(POWERED, false))
+            if (state.getValueOrElse(POWERED, false)) {
                 parentState = parentState.setValue(POWERED, true);
-            if (state.getValue(SHAPE) == Shape.PUSHING)
+            }
+            if (state.getValue(SHAPE) == Shape.PUSHING) {
                 parentState = parentState.setValue(FunnelBlock.EXTRACTING, true);
+            }
             return parentState.setValue(FunnelBlock.FACING, state.getValue(HORIZONTAL_FACING));
         }
-        Shape updatedShape = getShapeForPosition(world, pos, state.getValue(HORIZONTAL_FACING), state.getValue(SHAPE) == Shape.PUSHING);
+        Shape updatedShape = getShapeForPosition(
+            world,
+            pos,
+            state.getValue(HORIZONTAL_FACING),
+            state.getValue(SHAPE) == Shape.PUSHING
+        );
         Shape currentShape = state.getValue(SHAPE);
-        if (updatedShape == currentShape)
+        if (updatedShape == currentShape) {
             return state;
+        }
 
         // Don't revert wrenched states
-        if (updatedShape == Shape.PUSHING && currentShape == Shape.PULLING)
+        if (updatedShape == Shape.PUSHING && currentShape == Shape.PULLING) {
             return state;
-        if (updatedShape == Shape.RETRACTED && currentShape == Shape.EXTENDED)
+        }
+        if (updatedShape == Shape.RETRACTED && currentShape == Shape.EXTENDED) {
             return state;
+        }
 
         return state.setValue(SHAPE, updatedShape);
     }
 
     public static boolean isOnValidBelt(BlockState state, LevelReader world, BlockPos pos) {
         BlockState stateBelow = world.getBlockState(pos.below());
-        if ((stateBelow.getBlock() instanceof BeltBlock))
+        if ((stateBelow.getBlock() instanceof BeltBlock)) {
             return BeltBlock.canTransportObjects(stateBelow);
-        DirectBeltInputBehaviour directBeltInputBehaviour = BlockEntityBehaviour.get(world, pos.below(), DirectBeltInputBehaviour.TYPE);
-        if (directBeltInputBehaviour == null)
+        }
+        DirectBeltInputBehaviour directBeltInputBehaviour = BlockEntityBehaviour.get(
+            world,
+            pos.below(),
+            DirectBeltInputBehaviour.TYPE
+        );
+        if (directBeltInputBehaviour == null) {
             return false;
+        }
         return directBeltInputBehaviour.canSupportBeltFunnels();
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         Shape shape = state.getValue(SHAPE);
         Shape newShape = shape;
-        if (shape == Shape.PULLING)
+        if (shape == Shape.PULLING) {
             newShape = Shape.PUSHING;
-        else if (shape == Shape.PUSHING)
+        } else if (shape == Shape.PUSHING) {
             newShape = Shape.PULLING;
-        else if (shape == Shape.EXTENDED)
+        } else if (shape == Shape.EXTENDED) {
             newShape = Shape.RETRACTED;
-        else if (shape == Shape.RETRACTED) {
+        } else if (shape == Shape.RETRACTED) {
             BlockState belt = world.getBlockState(context.getClickedPos().below());
-            if (!(belt.getBlock() instanceof BeltBlock && belt.getValue(BeltBlock.SLOPE) != BeltSlope.HORIZONTAL))
+            if (!(belt.getBlock() instanceof BeltBlock && belt.getValue(BeltBlock.SLOPE) != BeltSlope.HORIZONTAL)) {
                 newShape = Shape.EXTENDED;
+            }
         }
 
-        if (newShape == shape)
+        if (newShape == shape) {
             return InteractionResult.SUCCESS;
+        }
 
         world.setBlockAndUpdate(context.getClickedPos(), state.setValue(SHAPE, newShape));
 
         if (newShape == Shape.EXTENDED) {
             Direction facing = state.getValue(HORIZONTAL_FACING);
             BlockState opposite = world.getBlockState(context.getClickedPos().relative(facing));
-            if (opposite.getBlock() instanceof BeltFunnelBlock && opposite.getValue(SHAPE) == Shape.EXTENDED && opposite.getValue(HORIZONTAL_FACING) == facing.getOpposite())
+            if (opposite.getBlock() instanceof BeltFunnelBlock && opposite.getValue(SHAPE) == Shape.EXTENDED && opposite.getValue(
+                HORIZONTAL_FACING) == facing.getOpposite()) {
                 AllAdvancements.FUNNEL_KISS.trigger((ServerPlayer) context.getPlayer());
+            }
         }
         return InteractionResult.SUCCESS;
     }

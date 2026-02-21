@@ -68,12 +68,14 @@ public class RegisteredObjectsHelper {
     @Nullable
     public static ItemLike getItemOrBlock(Identifier location) {
         Item item = getItem(location);
-        if (item != Items.AIR)
+        if (item != Items.AIR) {
             return item;
+        }
 
         Block block = getBlock(location);
-        if (block != Blocks.AIR)
+        if (block != Blocks.AIR) {
             return block;
+        }
 
         return null;
     }

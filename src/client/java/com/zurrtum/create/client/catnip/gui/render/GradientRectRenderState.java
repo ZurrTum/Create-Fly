@@ -10,11 +10,19 @@ import net.minecraft.client.renderer.RenderPipelines;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record GradientRectRenderState(
-    Matrix3x2f pose, float left, float top, float right, float bottom, int startRed, int startGreen, int startBlue, int startAlpha, int endRed,
-    int endGreen, int endBlue, int endAlpha, ScreenRectangle bounds
-) implements GuiElementRenderState {
-    public GradientRectRenderState(Matrix3x2f pose, float left, float top, float right, float bottom, Color startColor, Color endColor) {
+public record GradientRectRenderState(Matrix3x2f pose, float left, float top, float right, float bottom, int startRed,
+                                      int startGreen, int startBlue, int startAlpha, int endRed, int endGreen,
+                                      int endBlue, int endAlpha,
+                                      ScreenRectangle bounds) implements GuiElementRenderState {
+    public GradientRectRenderState(
+        Matrix3x2f pose,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        Color startColor,
+        Color endColor
+    ) {
         this(
             pose,
             left,
@@ -29,7 +37,8 @@ public record GradientRectRenderState(
             endColor.getGreen(),
             endColor.getBlue(),
             endColor.getAlpha(),
-            new ScreenRectangle((int) left, (int) top, (int) (right - left), (int) (bottom - top)).transformMaxBounds(pose)
+            new ScreenRectangle((int) left, (int) top, (int) (right - left), (int) (bottom - top)).transformMaxBounds(
+                pose)
         );
     }
 

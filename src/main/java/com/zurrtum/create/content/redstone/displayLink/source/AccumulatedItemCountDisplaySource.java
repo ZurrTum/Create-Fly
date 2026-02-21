@@ -14,8 +14,9 @@ public class AccumulatedItemCountDisplaySource extends NumericSingleLineDisplayS
     }
 
     public void itemReceived(DisplayLinkBlockEntity be, int amount) {
-        if (be.getBlockState().getValueOrElse(DisplayLinkBlock.POWERED, true))
+        if (be.getBlockState().getValueOrElse(DisplayLinkBlock.POWERED, true)) {
             return;
+        }
 
         int collected = be.getSourceConfig().getIntOr("Collected", 0);
         be.getSourceConfig().putInt("Collected", collected + amount);

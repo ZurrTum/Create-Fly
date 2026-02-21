@@ -15,9 +15,11 @@ public class MechanicalMixerAudioBehaviour extends KineticAudioBehaviour<Mechani
 
         // SoundEvents.BLOCK_STONE_BREAK
         boolean slow = Math.abs(blockEntity.getSpeed()) < 65;
-        if (slow && AnimationTickHolder.getTicks() % 2 == 0)
+        if (slow && AnimationTickHolder.getTicks() % 2 == 0) {
             return;
-        if (blockEntity.runningTicks == 20)
+        }
+        if (blockEntity.runningTicks == 20) {
             AllSoundEvents.MIXING.playAt(blockEntity.getLevel(), blockEntity.getBlockPos(), .75f, 1, true);
+        }
     }
 }

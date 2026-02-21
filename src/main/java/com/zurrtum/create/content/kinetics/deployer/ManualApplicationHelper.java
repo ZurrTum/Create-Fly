@@ -39,10 +39,12 @@ public class ManualApplicationHelper {
     ) {
         BlockState blockState = level.getBlockState(pos);
 
-        if (heldItem.isEmpty())
+        if (heldItem.isEmpty()) {
             return null;
-        if (blockState.isAir())
+        }
+        if (blockState.isAir()) {
             return null;
+        }
 
         ItemStack block = blockState.getBlock().asItem().getDefaultInstance();
         if (level.isClientSide()) {
@@ -70,7 +72,10 @@ public class ManualApplicationHelper {
         if (size != 0) {
             ItemStack stack = results.getFirst();
             if (stack.getItem() instanceof BlockItem blockItem) {
-                BlockState transformedBlock = BlockHelper.copyProperties(blockState, blockItem.getBlock().defaultBlockState());
+                BlockState transformedBlock = BlockHelper.copyProperties(
+                    blockState,
+                    blockItem.getBlock().defaultBlockState()
+                );
                 level.setBlock(pos, transformedBlock, Block.UPDATE_ALL);
                 awardAdvancements((ServerPlayer) player, transformedBlock);
             } else {
@@ -102,16 +107,17 @@ public class ManualApplicationHelper {
     private static void awardAdvancements(ServerPlayer player, BlockState placed) {
         CreateTrigger advancement;
 
-        if (placed.is(AllBlocks.ANDESITE_CASING))
+        if (placed.is(AllBlocks.ANDESITE_CASING)) {
             advancement = AllAdvancements.ANDESITE_CASING;
-        else if (placed.is(AllBlocks.BRASS_CASING))
+        } else if (placed.is(AllBlocks.BRASS_CASING)) {
             advancement = AllAdvancements.BRASS_CASING;
-        else if (placed.is(AllBlocks.COPPER_CASING))
+        } else if (placed.is(AllBlocks.COPPER_CASING)) {
             advancement = AllAdvancements.COPPER_CASING;
-        else if (placed.is(AllBlocks.RAILWAY_CASING))
+        } else if (placed.is(AllBlocks.RAILWAY_CASING)) {
             advancement = AllAdvancements.TRAIN_CASING;
-        else
+        } else {
             return;
+        }
 
         advancement.trigger(player);
     }

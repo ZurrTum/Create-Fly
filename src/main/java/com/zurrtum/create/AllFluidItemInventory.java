@@ -4,15 +4,14 @@ import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventoryWrapper;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 public class AllFluidItemInventory {
     public static Map<Item, Entry> ALL = new Reference2ObjectArrayMap<>();

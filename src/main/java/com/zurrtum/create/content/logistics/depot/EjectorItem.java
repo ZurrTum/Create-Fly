@@ -22,20 +22,34 @@ public class EjectorItem extends BlockItem {
     @Override
     public InteractionResult useOn(UseOnContext ctx) {
         Player player = ctx.getPlayer();
-        if (player != null && player.isShiftKeyDown())
+        if (player != null && player.isShiftKeyDown()) {
             return InteractionResult.SUCCESS;
+        }
         return super.useOn(ctx);
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, Player player, ItemStack p_195943_4_, BlockState p_195943_5_) {
-        if (!world.isClientSide() && player instanceof ServerPlayer sp)
+    protected boolean updateCustomBlockEntityTag(
+        BlockPos pos,
+        Level world,
+        Player player,
+        ItemStack p_195943_4_,
+        BlockState p_195943_5_
+    ) {
+        if (!world.isClientSide() && player instanceof ServerPlayer sp) {
             sp.connection.send(new EjectorPlacementRequestPacket(pos));
+        }
         return super.updateCustomBlockEntityTag(pos, world, player, p_195943_4_, p_195943_5_);
     }
 
     @Override
-    public boolean canDestroyBlock(ItemStack stack, BlockState state, Level world, BlockPos pos, LivingEntity p_195938_4_) {
+    public boolean canDestroyBlock(
+        ItemStack stack,
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        LivingEntity p_195938_4_
+    ) {
         return !p_195938_4_.isShiftKeyDown();
     }
 

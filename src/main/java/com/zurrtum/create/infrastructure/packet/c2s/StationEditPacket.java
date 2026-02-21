@@ -13,9 +13,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record StationEditPacket(
-    BlockPos pos, boolean dropSchedule, boolean assemblyMode, Boolean tryAssemble, DoorControl doorControl, String name
-) implements Packet<ServerGamePacketListener> {
+public record StationEditPacket(BlockPos pos, boolean dropSchedule, boolean assemblyMode, Boolean tryAssemble,
+                                DoorControl doorControl, String name) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, StationEditPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         StationEditPacket::pos,

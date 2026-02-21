@@ -71,7 +71,11 @@ public interface AutoMixingDisplay {
             )
         );
 
-        public ShapelessDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<Identifier> location) {
+        public ShapelessDisplay(
+            List<EntryIngredient> input,
+            List<EntryIngredient> output,
+            Optional<Identifier> location
+        ) {
             super(input, output, location);
         }
 
@@ -84,7 +88,10 @@ public interface AutoMixingDisplay {
         }
 
         @Override
-        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable AbstractContainerMenu menu, @Nullable Player player) {
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(
+            @Nullable AbstractContainerMenu menu,
+            @Nullable Player player
+        ) {
             return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
         }
 
@@ -105,7 +112,8 @@ public interface AutoMixingDisplay {
             RecordCodecBuilder.mapCodec(instance -> instance.group(
                 EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(Shapeless::getInputEntries),
                 EntryIngredient.codec().listOf().fieldOf("outputs").forGetter(Shapeless::getOutputEntries),
-                Codec.INT.xmap(RecipeDisplayId::new, RecipeDisplayId::index).optionalFieldOf("id").forGetter(Shapeless::recipeDisplayId)
+                Codec.INT.xmap(RecipeDisplayId::new, RecipeDisplayId::index).optionalFieldOf("id")
+                    .forGetter(Shapeless::recipeDisplayId)
             ).apply(instance, CraftingDisplayShapeless::new)), StreamCodec.composite(
                 EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
                 Shapeless::getInputEntries,
@@ -121,12 +129,19 @@ public interface AutoMixingDisplay {
             super(recipe, Optional.empty());
         }
 
-        public CraftingDisplayShapeless(List<EntryIngredient> inputs, List<EntryIngredient> outputs, Optional<RecipeDisplayId> id) {
+        public CraftingDisplayShapeless(
+            List<EntryIngredient> inputs,
+            List<EntryIngredient> outputs,
+            Optional<RecipeDisplayId> id
+        ) {
             super(inputs, outputs, id);
         }
 
         @Override
-        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable AbstractContainerMenu menu, @Nullable Player player) {
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(
+            @Nullable AbstractContainerMenu menu,
+            @Nullable Player player
+        ) {
             return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
         }
 

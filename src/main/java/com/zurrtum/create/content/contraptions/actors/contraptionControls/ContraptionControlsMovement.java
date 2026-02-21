@@ -27,30 +27,34 @@ public class ContraptionControlsMovement extends MovementBehaviour {
 
     @Override
     public void startMoving(MovementContext context) {
-        if (context.contraption instanceof ElevatorContraption && context.blockEntityData != null)
+        if (context.contraption instanceof ElevatorContraption && context.blockEntityData != null) {
             context.blockEntityData.remove("Filter");
+        }
     }
 
     @Override
     public void stopMoving(MovementContext context) {
         ItemStack filter = getFilter(context);
-        if (filter != null)
+        if (filter != null) {
             context.blockEntityData.putBoolean(
                 "Disabled",
                 context.contraption.isActorTypeDisabled(filter) || context.contraption.isActorTypeDisabled(ItemStack.EMPTY)
             );
+        }
     }
 
     public static boolean isSameFilter(ItemStack stack1, ItemStack stack2) {
-        if (stack1.isEmpty() && stack2.isEmpty())
+        if (stack1.isEmpty() && stack2.isEmpty()) {
             return true;
+        }
         return ItemStack.isSameItemSameComponents(stack1, stack2);
     }
 
     public static ItemStack getFilter(MovementContext ctx) {
         CompoundTag blockEntityData = ctx.blockEntityData;
-        if (blockEntityData == null)
+        if (blockEntityData == null) {
             return null;
+        }
         RegistryOps<Tag> ops = ctx.world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         return blockEntityData.read("Filter", ItemStack.OPTIONAL_CODEC, ops).orElse(ItemStack.EMPTY);
     }
@@ -61,15 +65,17 @@ public class ContraptionControlsMovement extends MovementBehaviour {
 
     @Override
     public void tick(MovementContext ctx) {
-        if (!ctx.world.isClientSide())
+        if (!ctx.world.isClientSide()) {
             return;
+        }
 
         Contraption contraption = ctx.contraption;
         BlockEntity blockEntity = AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos);
 
         if (!(contraption instanceof ElevatorContraption ec)) {
-            if (!(blockEntity instanceof ContraptionControlsBlockEntity cbe))
+            if (!(blockEntity instanceof ContraptionControlsBlockEntity cbe)) {
                 return;
+            }
             ItemStack filter = getFilter(ctx);
             int value = contraption.isActorTypeDisabled(filter) || contraption.isActorTypeDisabled(ItemStack.EMPTY) ? 4 * 45 : 0;
             cbe.indicator.setValue(value);
@@ -78,14 +84,16 @@ public class ContraptionControlsMovement extends MovementBehaviour {
             return;
         }
 
-        if (!(ctx.temporaryData instanceof ElevatorFloorSelection))
+        if (!(ctx.temporaryData instanceof ElevatorFloorSelection)) {
             ctx.temporaryData = new ElevatorFloorSelection();
+        }
 
         ElevatorFloorSelection efs = (ElevatorFloorSelection) ctx.temporaryData;
         tickFloorSelection(efs, ec);
 
-        if (!(blockEntity instanceof ContraptionControlsBlockEntity cbe))
+        if (!(blockEntity instanceof ContraptionControlsBlockEntity cbe)) {
             return;
+        }
 
         cbe.tickAnimations();
 
@@ -131,8 +139,9 @@ public class ContraptionControlsMovement extends MovementBehaviour {
         efs.currentLongName = entry.getSecond().getSecond();
         efs.targetYEqualsSelection = efs.currentTargetY == ec.clientYTarget;
 
-        if (ec.isTargetUnreachable(efs.currentTargetY))
+        if (ec.isTargetUnreachable(efs.currentTargetY)) {
             efs.currentLongName = Component.translatable("create.contraption.controls.floor_unreachable").getString();
+        }
     }
 
     public static class ElevatorFloorSelection {

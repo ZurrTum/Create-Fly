@@ -17,11 +17,13 @@ public class SignalPropagator {
     public static void onSignalRemoved(MinecraftServer server, TrackGraph graph, SignalBoundary signal) {
         signal.sidesToUpdate.map($ -> false);
         for (boolean front : Iterate.trueAndFalse) {
-            if (signal.sidesToUpdate.get(front))
+            if (signal.sidesToUpdate.get(front)) {
                 continue;
+            }
             UUID id = signal.groups.get(front);
-            if (Create.RAILWAYS.signalEdgeGroups.remove(id) != null)
+            if (Create.RAILWAYS.signalEdgeGroups.remove(id) != null) {
                 Create.RAILWAYS.sync.edgeGroupRemoved(server, id);
+            }
 
             walkSignals(
                 server, graph, signal, front, pair -> {
@@ -63,7 +65,12 @@ public class SignalPropagator {
         );
     }
 
-    public static void propagateSignalGroup(MinecraftServer server, TrackGraph graph, SignalBoundary signal, boolean front) {
+    public static void propagateSignalGroup(
+        MinecraftServer server,
+        TrackGraph graph,
+        SignalBoundary signal,
+        boolean front
+    ) {
         Map<UUID, SignalEdgeGroup> globalGroups = Create.RAILWAYS.signalEdgeGroups;
         TrackGraphSync sync = Create.RAILWAYS.sync;
 
@@ -78,18 +85,22 @@ public class SignalPropagator {
                 TrackNode node1 = pair.getFirst();
                 SignalBoundary boundary = pair.getSecond();
                 UUID currentGroup = boundary.getGroup(node1);
-                if (currentGroup != null)
-                    if (globalGroups.remove(currentGroup) != null)
+                if (currentGroup != null) {
+                    if (globalGroups.remove(currentGroup) != null) {
                         sync.edgeGroupRemoved(server, currentGroup);
+                    }
+                }
                 boundary.setGroupAndUpdate(node1, groupId);
                 sync.pointAdded(graph, boundary);
                 return true;
 
             }, signalData -> {
                 UUID singleSignalGroup = signalData.getSingleSignalGroup();
-                if (singleSignalGroup != null)
-                    if (globalGroups.remove(singleSignalGroup) != null)
+                if (singleSignalGroup != null) {
+                    if (globalGroups.remove(singleSignalGroup) != null) {
                         sync.edgeGroupRemoved(server, singleSignalGroup);
+                    }
+                }
                 signalData.setSingleSignalGroup(server, graph, groupId);
                 return true;
 
@@ -100,7 +111,12 @@ public class SignalPropagator {
         sync.edgeGroupCreated(server, groupId, group.color);
     }
 
-    public static Map<UUID, Boolean> collectChainedSignals(MinecraftServer server, TrackGraph graph, SignalBoundary signal, boolean front) {
+    public static Map<UUID, Boolean> collectChainedSignals(
+        MinecraftServer server,
+        TrackGraph graph,
+        SignalBoundary signal,
+        boolean front
+    ) {
         HashMap<UUID, Boolean> map = new HashMap<>();
         walkSignals(
             server, graph, signal, front, pair -> {
@@ -124,15 +140,19 @@ public class SignalPropagator {
 
         Couple<TrackNodeLocation> edgeLocation = signal.edgeLocation;
         Couple<TrackNode> startNodes = edgeLocation.map(graph::locateNode);
-        Couple<TrackEdge> startEdges = startNodes.mapWithParams((l1, l2) -> graph.getConnectionsFrom(l1).get(l2), startNodes.swap());
+        Couple<TrackEdge> startEdges = startNodes.mapWithParams(
+            (l1, l2) -> graph.getConnectionsFrom(l1).get(l2),
+            startNodes.swap()
+        );
 
         TrackNode node1 = startNodes.get(front);
         TrackNode node2 = startNodes.get(!front);
         TrackEdge startEdge = startEdges.get(front);
         TrackEdge oppositeEdge = startEdges.get(!front);
 
-        if (startEdge == null)
+        if (startEdge == null) {
             return;
+        }
 
         if (!forCollection) {
             notifyTrains(graph, startEdge, oppositeEdge);
@@ -141,10 +161,12 @@ public class SignalPropagator {
         }
 
         // Check for signal on the same edge
-        SignalBoundary immediateBoundary = startEdge.getEdgeData().next(EdgePointType.SIGNAL, signal.getLocationOn(startEdge));
+        SignalBoundary immediateBoundary = startEdge.getEdgeData()
+            .next(EdgePointType.SIGNAL, signal.getLocationOn(startEdge));
         if (immediateBoundary != null) {
-            if (boundaryCallback.test(Pair.of(node1, immediateBoundary)))
+            if (boundaryCallback.test(Pair.of(node1, immediateBoundary))) {
                 startEdge.getEdgeData().refreshIntersectingSignalGroups(server, graph);
+            }
             return;
         }
 
@@ -173,16 +195,19 @@ public class SignalPropagator {
                 TrackNode nextNode = entry.getKey();
                 TrackEdge edge = entry.getValue();
 
-                if (nextNode == prevNode)
+                if (nextNode == prevNode) {
                     continue;
+                }
 
                 // already checked this edge
-                if (!visited.add(edge))
+                if (!visited.add(edge)) {
                     continue;
+                }
 
                 // chain signal: check if reachable
-                if (forCollection && !graph.getConnectionsFrom(prevNode).get(currentNode).canTravelTo(edge))
+                if (forCollection && !graph.getConnectionsFrom(prevNode).get(currentNode).canTravelTo(edge)) {
                     continue;
+                }
 
                 TrackEdge oppositeEdge = graph.getConnectionsFrom(nextNode).get(currentNode);
                 visited.add(oppositeEdge);
@@ -202,8 +227,9 @@ public class SignalPropagator {
 
                     // other/own boundary found
                     SignalBoundary nextBoundary = signalData.next(EdgePointType.SIGNAL, 0);
-                    if (nextBoundary == null)
+                    if (nextBoundary == null) {
                         continue;
+                    }
                     if (boundaryCallback.test(Pair.of(currentNode, nextBoundary))) {
                         notifyTrains(graph, edge, oppositeEdge);
                         currentEdge.getEdgeData().refreshIntersectingSignalGroups(server, graph);
@@ -220,13 +246,16 @@ public class SignalPropagator {
     public static void notifyTrains(TrackGraph graph, TrackEdge... edges) {
         for (TrackEdge trackEdge : edges) {
             for (Train train : Create.RAILWAYS.trains.values()) {
-                if (train.graph != graph)
+                if (train.graph != graph) {
                     continue;
-                if (train.updateSignalBlocks)
+                }
+                if (train.updateSignalBlocks) {
                     continue;
+                }
                 train.forEachTravellingPoint(tp -> {
-                    if (tp.edge == trackEdge)
+                    if (tp.edge == trackEdge) {
                         train.updateSignalBlocks = true;
+                    }
                 });
             }
         }

@@ -18,10 +18,6 @@ import com.zurrtum.create.client.content.schematics.table.SchematicTableScreen;
 import com.zurrtum.create.client.content.trains.schedule.ScheduleScreen;
 import com.zurrtum.create.client.foundation.gui.menu.ScreenFactory;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
-
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
@@ -29,6 +25,9 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class AllMenuScreens {
     public static final Map<MenuType<?>, ScreenFactory<?, ?, ?>> ALL = new IdentityHashMap<>();

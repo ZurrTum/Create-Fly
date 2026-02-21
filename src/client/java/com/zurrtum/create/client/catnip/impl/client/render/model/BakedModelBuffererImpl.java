@@ -10,11 +10,6 @@ import com.zurrtum.create.client.infrastructure.model.CopycatModel;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import com.zurrtum.create.client.model.LayerBakedModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -29,10 +24,15 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.List;
 
 // Modified from https://github.com/Engine-Room/Flywheel/blob/2f67f54c8898d91a48126c3c753eefa6cd224f84/forge/src/lib/java/dev/engine_room/flywheel/lib/model/baked/BakedModelBufferer.java
 public final class BakedModelBuffererImpl {
-    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(
+        ThreadLocalObjects::new);
 
     private BakedModelBuffererImpl() {
     }
@@ -94,7 +94,17 @@ public final class BakedModelBuffererImpl {
                 render(universalEmitter, bufferSource, firstLayer, poseStack, blockRenderer, level, parts, state, pos);
             } else {
                 for (int i = 0; i < size; i++) {
-                    render(universalEmitter, bufferSource, renderLayers[i], poseStack, blockRenderer, level, List.of(parts.get(i)), state, pos);
+                    render(
+                        universalEmitter,
+                        bufferSource,
+                        renderLayers[i],
+                        poseStack,
+                        blockRenderer,
+                        level,
+                        List.of(parts.get(i)),
+                        state,
+                        pos
+                    );
                 }
             }
         }
@@ -115,7 +125,16 @@ public final class BakedModelBuffererImpl {
     ) {
         universalEmitter.prepare(bufferSource, layer);
         poseStack.pushPose();
-        blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, universalEmitter, false, OverlayTexture.NO_OVERLAY);
+        blockRenderer.tesselateBlock(
+            level,
+            parts,
+            state,
+            pos,
+            poseStack,
+            universalEmitter,
+            false,
+            OverlayTexture.NO_OVERLAY
+        );
         poseStack.popPose();
     }
 
@@ -185,7 +204,11 @@ public final class BakedModelBuffererImpl {
                     transformingWrapper.prepare(bufferSource.getBuffer(renderType, true), poseStack);
 
                     poseStack.pushPose();
-                    poseStack.translate(pos.getX() - (pos.getX() & 0xF), pos.getY() - (pos.getY() & 0xF), pos.getZ() - (pos.getZ() & 0xF));
+                    poseStack.translate(
+                        pos.getX() - (pos.getX() & 0xF),
+                        pos.getY() - (pos.getY() & 0xF),
+                        pos.getZ() - (pos.getZ() & 0xF)
+                    );
                     renderDispatcher.renderLiquid(pos, level, transformingWrapper, state, fluidState);
                     poseStack.popPose();
                 }
@@ -205,7 +228,16 @@ public final class BakedModelBuffererImpl {
                 } else {
                     model.collectParts(random, parts);
                 }
-                blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, universalEmitter, true, OverlayTexture.NO_OVERLAY);
+                blockRenderer.tesselateBlock(
+                    level,
+                    parts,
+                    state,
+                    pos,
+                    poseStack,
+                    universalEmitter,
+                    true,
+                    OverlayTexture.NO_OVERLAY
+                );
                 poseStack.popPose();
             }
         }

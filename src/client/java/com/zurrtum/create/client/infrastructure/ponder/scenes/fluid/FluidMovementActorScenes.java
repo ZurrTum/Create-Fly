@@ -48,12 +48,14 @@ public class FluidMovementActorScenes {
         BlockPos bearing = util.grid().at(5, 1, 2);
         scene.world().showSection(util.select().position(bearing), Direction.DOWN);
         scene.idle(5);
-        ElementLink<WorldSectionElement> contraption = scene.world().showIndependentSection(util.select().fromTo(5, 2, 2, 6, 4, 2), Direction.DOWN);
+        ElementLink<WorldSectionElement> contraption = scene.world()
+            .showIndependentSection(util.select().fromTo(5, 2, 2, 6, 4, 2), Direction.DOWN);
         scene.world().configureCenterOfRotation(contraption, util.vector().centerOf(bearing));
         scene.idle(10);
         scene.world().rotateBearing(bearing, 360, 70);
         scene.world().rotateSection(contraption, 0, 360, 0, 70);
-        scene.overlay().showText(60).pointAt(util.vector().topOf(bearing.above(2))).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
+        scene.overlay().showText(60).pointAt(util.vector().topOf(bearing.above(2))).colored(PonderPalette.RED)
+            .placeNearTarget().attachKeyFrame()
             .text("Fluid Tanks on moving contraptions cannot be accessed by any pipes");
 
         scene.idle(70);
@@ -62,14 +64,15 @@ public class FluidMovementActorScenes {
         scene.idle(13);
         scene.effects().superGlue(psi, Direction.EAST, true);
 
-        scene.overlay().showText(80).pointAt(util.vector().topOf(psi)).colored(PonderPalette.GREEN).placeNearTarget().attachKeyFrame()
+        scene.overlay().showText(80).pointAt(util.vector().topOf(psi)).colored(PonderPalette.GREEN).placeNearTarget()
+            .attachKeyFrame()
             .text("This component can interact with fluid tanks without the need to stop the contraption");
         scene.idle(90);
 
         BlockPos psi2 = psi.west(2);
         scene.world().showSection(util.select().position(psi2), Direction.DOWN);
-        scene.overlay().showOutlineWithText(util.select().position(psi.west()), 50).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
-            .text("Place a second one with a gap of 1 or 2 blocks inbetween");
+        scene.overlay().showOutlineWithText(util.select().position(psi.west()), 50).colored(PonderPalette.RED)
+            .placeNearTarget().attachKeyFrame().text("Place a second one with a gap of 1 or 2 blocks inbetween");
         scene.idle(55);
 
         scene.world().rotateBearing(bearing, 360, 60);
@@ -94,7 +97,8 @@ public class FluidMovementActorScenes {
         scene.overlay().showOutline(PonderPalette.GREEN, psi, util.select().fromTo(5, 3, 2, 6, 4, 2), 80);
         scene.idle(10);
 
-        scene.overlay().showOutlineWithText(util.select().position(psi2), 70).placeNearTarget().colored(PonderPalette.GREEN).attachKeyFrame()
+        scene.overlay().showOutlineWithText(util.select().position(psi2), 70).placeNearTarget()
+            .colored(PonderPalette.GREEN).attachKeyFrame()
             .text("While engaged, the stationary interface will represent ALL Tanks on the contraption");
         scene.idle(80);
 
@@ -107,13 +111,18 @@ public class FluidMovementActorScenes {
         scene.world().showSectionAndMerge(kinetics, Direction.NORTH, p);
         scene.idle(10);
 
-        scene.overlay().showText(70).placeNearTarget().pointAt(util.vector().topOf(pumpPos)).attachKeyFrame().text("Fluid can now be inserted...");
+        scene.overlay().showText(70).placeNearTarget().pointAt(util.vector().topOf(pumpPos)).attachKeyFrame()
+            .text("Fluid can now be inserted...");
         scene.idle(30);
 
         for (int i = 0; i < 16; i++) {
-            if (i == 8)
-                scene.overlay().showControls(util.vector().blockSurface(util.grid().at(5, 3, 2), Direction.WEST).add(0, 0.5, 0), Pointing.LEFT, 30)
-                    .withItem(bucket);
+            if (i == 8) {
+                scene.overlay().showControls(
+                    util.vector().blockSurface(util.grid().at(5, 3, 2), Direction.WEST).add(0, 0.5, 0),
+                    Pointing.LEFT,
+                    30
+                ).withItem(bucket);
+            }
 
             scene.world().modifyBlockEntity(st, type, be -> be.getTankInventory().extract(chocolate, 81000));
             scene.world().modifyBlockEntity(ct1, type, be -> be.getTankInventory().insert(chocolate));
@@ -127,7 +136,8 @@ public class FluidMovementActorScenes {
 
         scene.idle(50);
 
-        scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().topOf(pumpPos)).text("...or extracted from the contraption");
+        scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().topOf(pumpPos))
+            .text("...or extracted from the contraption");
         scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), true);
         scene.world().propagatePipeChange(pumpPos);
         scene.idle(30);
@@ -143,7 +153,8 @@ public class FluidMovementActorScenes {
             scene.idle(2);
         }
 
-        scene.world().modifyBlockEntity(util.grid().at(2, 2, 3), type, be -> be.getTankInventory().extract(chocolate, 648000));
+        scene.world()
+            .modifyBlockEntity(util.grid().at(2, 2, 3), type, be -> be.getTankInventory().extract(chocolate, 648000));
         scene.idle(50);
 
         scene.overlay().showText(120).placeNearTarget().attachKeyFrame().pointAt(util.vector().topOf(psi2))

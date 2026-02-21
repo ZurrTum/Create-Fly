@@ -45,12 +45,14 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
     public RedstoneRequesterScreen(RedstoneRequesterMenu container, Inventory inv, Component title) {
         super(container, inv, title);
 
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++) {
             amounts.add(1);
+        }
 
         List<BigItemStack> stacks = menu.contentHolder.encodedRequest.stacks();
-        for (int i = 0; i < stacks.size(); i++)
+        for (int i = 0; i < stacks.size(); i++) {
             amounts.set(i, Math.max(1, stacks.get(i).count));
+        }
     }
 
     public static RedstoneRequesterScreen create(
@@ -68,9 +70,11 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
     protected void containerTick() {
         super.containerTick();
         addressBox.tick();
-        for (int i = 0; i < amounts.size(); i++)
-            if (menu.ghostInventory.getItem(i).isEmpty())
+        for (int i = 0; i < amounts.size(); i++) {
+            if (menu.ghostInventory.getItem(i).isEmpty()) {
                 amounts.set(i, 1);
+            }
+        }
     }
 
     @Override
@@ -82,7 +86,15 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
         clearWidgets();
 
         if (addressBox == null) {
-            addressBox = new AddressEditBox(this, new NoShadowFontWrapper(font), leftPos + 55, topPos + 68, 110, 10, false);
+            addressBox = new AddressEditBox(
+                this,
+                new NoShadowFontWrapper(font),
+                leftPos + 55,
+                topPos + 68,
+                110,
+                10,
+                false
+            );
             addressBox.setValue(menu.contentHolder.encodedTargetAdress);
             addressBox.setTextColor(0xFF555555);
         }
@@ -142,44 +154,56 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
             int inputX = leftPos + 27 + i * 20;
             int inputY = topPos + 28;
             ItemStack itemStack = menu.ghostInventory.getItem(i);
-            if (itemStack.isEmpty())
+            if (itemStack.isEmpty()) {
                 continue;
+            }
             graphics.renderItemDecorations(font, itemStack, inputX, inputY, "" + amounts.get(i));
         }
 
         if (addressBox.isHovered() && !addressBox.isFocused()) {
-            if (addressBox.getValue().isBlank())
+            if (addressBox.getValue().isBlank()) {
                 graphics.setComponentTooltipForNextFrame(
                     font, List.of(
-                        CreateLang.translate("gui.redstone_requester.requester_address").color(ScrollInput.HEADER_RGB).component(),
-                        CreateLang.translate("gui.redstone_requester.requester_address_tip").style(ChatFormatting.GRAY).component(),
-                        CreateLang.translate("gui.redstone_requester.requester_address_tip_1").style(ChatFormatting.GRAY).component(),
-                        CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC).component()
+                        CreateLang.translate("gui.redstone_requester.requester_address").color(ScrollInput.HEADER_RGB)
+                            .component(),
+                        CreateLang.translate("gui.redstone_requester.requester_address_tip").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.redstone_requester.requester_address_tip_1")
+                            .style(ChatFormatting.GRAY).component(),
+                        CreateLang.translate("gui.schedule.lmb_edit").style(ChatFormatting.DARK_GRAY)
+                            .style(ChatFormatting.ITALIC).component()
                     ), mouseX, mouseY
                 );
-            else
+            } else {
                 graphics.setComponentTooltipForNextFrame(
                     font, List.of(
-                        CreateLang.translate("gui.redstone_requester.requester_address_given").color(ScrollInput.HEADER_RGB).component(),
+                        CreateLang.translate("gui.redstone_requester.requester_address_given")
+                            .color(ScrollInput.HEADER_RGB).component(),
                         CreateLang.text("'" + addressBox.getValue() + "'").style(ChatFormatting.GRAY).component()
                     ), mouseX, mouseY
                 );
+            }
         }
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (addressBox.mouseScrolled(mouseX, mouseY, scrollX, scrollY))
+        if (addressBox.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
             return true;
+        }
 
         for (int i = 0; i < amounts.size(); i++) {
             int inputX = leftPos + 27 + i * 20;
             int inputY = topPos + 28;
             if (mouseX >= inputX && mouseX < inputX + 16 && mouseY >= inputY && mouseY < inputY + 16) {
                 ItemStack itemStack = menu.ghostInventory.getItem(i);
-                if (itemStack.isEmpty())
+                if (itemStack.isEmpty()) {
                     return true;
-                amounts.set(i, Mth.clamp((int) (amounts.get(i) + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)), 1, 256));
+                }
+                amounts.set(
+                    i,
+                    Mth.clamp((int) (amounts.get(i) + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)), 1, 256)
+                );
                 return true;
             }
         }
@@ -195,15 +219,19 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
             return tooltip;
         }
         int slotIndex = hoveredSlot.getContainerSlot();
-        if (slotIndex >= amounts.size())
+        if (slotIndex >= amounts.size()) {
             return tooltip;
+        }
 
         return List.of(
-            CreateLang.translate("gui.factory_panel.send_item", CreateLang.itemName(pStack).add(CreateLang.text(" x" + amounts.get(slotIndex))))
-                .color(ScrollInput.HEADER_RGB).component(),
-            CreateLang.translate("gui.factory_panel.scroll_to_change_amount").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
-                .component(),
-            CreateLang.translate("gui.scrollInput.shiftScrollsFaster").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC).component()
+            CreateLang.translate(
+                "gui.factory_panel.send_item",
+                CreateLang.itemName(pStack).add(CreateLang.text(" x" + amounts.get(slotIndex)))
+            ).color(ScrollInput.HEADER_RGB).component(),
+            CreateLang.translate("gui.factory_panel.scroll_to_change_amount").style(ChatFormatting.DARK_GRAY)
+                .style(ChatFormatting.ITALIC).component(),
+            CreateLang.translate("gui.scrollInput.shiftScrollsFaster").style(ChatFormatting.DARK_GRAY)
+                .style(ChatFormatting.ITALIC).component()
         );
     }
 

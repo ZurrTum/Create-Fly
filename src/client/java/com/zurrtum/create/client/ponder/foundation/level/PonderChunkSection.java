@@ -15,7 +15,13 @@ public class PonderChunkSection extends LevelChunkSection {
     public final int zStart;
     public boolean empty;
 
-    public PonderChunkSection(PonderChunk owner, BlockPos.MutableBlockPos scratchPos, ChunkPos pos, int yBase, boolean hasBlock) {
+    public PonderChunkSection(
+        PonderChunk owner,
+        BlockPos.MutableBlockPos scratchPos,
+        ChunkPos pos,
+        int yBase,
+        boolean hasBlock
+    ) {
         super(owner.world.palettedContainerFactory());
         this.owner = owner;
         this.scratchPos = scratchPos;

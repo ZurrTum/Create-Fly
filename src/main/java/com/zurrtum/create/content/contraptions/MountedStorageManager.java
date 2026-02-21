@@ -130,7 +130,13 @@ public class MountedStorageManager {
         // interactablePositions intentionally not reset
     }
 
-    public void addBlock(Level level, BlockState state, BlockPos globalPos, BlockPos localPos, @Nullable BlockEntity be) {
+    public void addBlock(
+        Level level,
+        BlockState state,
+        BlockPos globalPos,
+        BlockPos localPos,
+        @Nullable BlockEntity be
+    ) {
         MountedItemStorageType<?> itemType = MountedItemStorageType.REGISTRY.get(state.getBlock());
         if (itemType != null) {
             MountedItemStorage storage = itemType.mount(level, state, globalPos, be);
@@ -248,7 +254,8 @@ public class MountedStorageManager {
                 addStorage(storage, pos);
             });
 
-            view.read("interactable_positions", CreateCodecs.BLOCK_POS_LIST_CODEC).ifPresent(list -> interactablePositions = new HashSet<>(list));
+            view.read("interactable_positions", CreateCodecs.BLOCK_POS_LIST_CODEC)
+                .ifPresent(list -> interactablePositions = new HashSet<>(list));
         } catch (Throwable t) {
             Create.LOGGER.error("Error deserializing mounted storage", t);
             // an exception will leave the manager in an invalid state, initialize must be called
@@ -258,7 +265,12 @@ public class MountedStorageManager {
         afterSync(clientPacket, contraption);
     }
 
-    public <T> void read(final DynamicOps<T> ops, MapLike<T> map, boolean clientPacket, @Nullable Contraption contraption) {
+    public <T> void read(
+        final DynamicOps<T> ops,
+        MapLike<T> map,
+        boolean clientPacket,
+        @Nullable Contraption contraption
+    ) {
         reset();
 
         try {
@@ -289,8 +301,9 @@ public class MountedStorageManager {
 
     private void afterSync(boolean clientPacket, @Nullable Contraption contraption) {
         // for client sync, run initial afterSync callbacks
-        if (!clientPacket || contraption == null)
+        if (!clientPacket || contraption == null) {
             return;
+        }
 
         getAllItemStorages().forEach((pos, storage) -> {
             if (storage instanceof SyncedMountedStorage synced) {
@@ -325,7 +338,8 @@ public class MountedStorageManager {
 
         if (clientPacket) {
             // let the client know of all non-synced ones too
-            List<BlockPos> list = Sets.union(this.getAllItemStorages().keySet(), getFluids().storages.keySet()).stream().toList();
+            List<BlockPos> list = Sets.union(this.getAllItemStorages().keySet(), getFluids().storages.keySet()).stream()
+                .toList();
             view.store("interactable_positions", CreateCodecs.BLOCK_POS_LIST_CODEC, list);
         }
     }
@@ -355,7 +369,8 @@ public class MountedStorageManager {
 
         if (clientPacket) {
             // let the client know of all non-synced ones too
-            List<BlockPos> list = Sets.union(this.getAllItemStorages().keySet(), getFluids().storages.keySet()).stream().toList();
+            List<BlockPos> list = Sets.union(this.getAllItemStorages().keySet(), getFluids().storages.keySet()).stream()
+                .toList();
             map.add("interactable_positions", list, CreateCodecs.BLOCK_POS_LIST_CODEC);
         }
     }
@@ -423,8 +438,9 @@ public class MountedStorageManager {
         }
 
         StructureBlockInfo info = contraption.getBlocks().get(localPos);
-        if (info == null)
+        if (info == null) {
             return false;
+        }
 
         MountedStorageManager storageManager = contraption.getStorage();
         MountedItemStorage storage = storageManager.getAllItemStorages().get(localPos);
@@ -438,14 +454,16 @@ public class MountedStorageManager {
 
     private void addStorage(MountedItemStorage storage, BlockPos pos) {
         this.itemsBuilder.put(pos, storage);
-        if (storage instanceof SyncedMountedStorage synced)
+        if (storage instanceof SyncedMountedStorage synced) {
             this.syncedItemsBuilder.put(pos, synced);
+        }
     }
 
     private void addStorage(MountedFluidStorage storage, BlockPos pos) {
         this.fluidsBuilder.put(pos, storage);
-        if (storage instanceof SyncedMountedStorage synced)
+        if (storage instanceof SyncedMountedStorage synced) {
             this.syncedFluidsBuilder.put(pos, synced);
+        }
     }
 
     private static <K, V> ImmutableMap<K, V> subMap(Map<K, V> map, Predicate<V> predicate) {

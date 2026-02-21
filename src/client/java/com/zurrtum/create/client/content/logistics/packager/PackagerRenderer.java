@@ -81,7 +81,12 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
     }
 
     @Override
-    public void submit(PackagerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        PackagerRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         if (state.layer != null) {
             queue.submitCustomGeometry(matrices, state.layer, state);
         }
@@ -122,7 +127,8 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             hatch.translate(hatchOffset).rotateYCentered(hatchYRot).rotateXCentered(hatchXRot).light(lightCoords)
                 .renderInto(matricesEntry, vertexConsumer);
-            tray.translate(trayOffset).rotateYCentered(trayYRot).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            tray.translate(trayOffset).rotateYCentered(trayYRot).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

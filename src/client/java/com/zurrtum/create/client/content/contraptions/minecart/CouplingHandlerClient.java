@@ -21,20 +21,23 @@ public class CouplingHandlerClient {
     static RandomSource r = RandomSource.create();
 
     public static void tick(Minecraft mc) {
-        if (selectedCart == null)
+        if (selectedCart == null) {
             return;
+        }
         spawnSelectionParticles(selectedCart.getBoundingBox(), false);
         LocalPlayer player = mc.player;
         ItemStack heldItemMainhand = player.getMainHandItem();
         ItemStack heldItemOffhand = player.getOffhandItem();
-        if (heldItemMainhand.is(AllItems.MINECART_COUPLING) || heldItemOffhand.is(AllItems.MINECART_COUPLING))
+        if (heldItemMainhand.is(AllItems.MINECART_COUPLING) || heldItemOffhand.is(AllItems.MINECART_COUPLING)) {
             return;
+        }
         selectedCart = null;
     }
 
     public static void onCartClicked(LocalPlayer player, AbstractMinecart entity) {
-        if (Minecraft.getInstance().player != player)
+        if (Minecraft.getInstance().player != player) {
             return;
+        }
         if (selectedCart == null || selectedCart == entity) {
             selectedCart = entity;
             spawnSelectionParticles(selectedCart.getBoundingBox(), true);

@@ -69,12 +69,14 @@ public class Label extends AbstractSimiWidget {
 
     @Override
     protected void doRender(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        if (text == null || text.getString().isEmpty())
+        if (text == null || text.getString().isEmpty()) {
             return;
+        }
 
         MutableComponent copy = text.plainCopy();
-        if (suffix != null && !suffix.isEmpty())
+        if (suffix != null && !suffix.isEmpty()) {
             copy.append(suffix);
+        }
 
         graphics.drawString(font, copy, getX(), getY(), color, hasShadow);
     }

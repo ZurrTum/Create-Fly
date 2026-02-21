@@ -110,7 +110,11 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SequencedAssemblyRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<SequencedAssemblyRecipe> entry,
+        IFocusGroup focuses
+    ) {
         SequencedAssemblyRecipe recipe = entry.value();
         ProcessingOutput chanceOutput = recipe.result();
         boolean randomOutput = chanceOutput.chance() != 1;
@@ -118,7 +122,11 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
         builder.addInputSlot(xOffset + 22, 91).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         addChanceSlot(builder, xOffset + 127, 91, chanceOutput);
         if (randomOutput) {
-            addJunkSlot(builder, xOffset + 146, 91).addRichTooltipCallback(new JunkChanceTooltip(1 - chanceOutput.chance()));
+            addJunkSlot(
+                builder,
+                xOffset + 146,
+                91
+            ).addRichTooltipCallback(new JunkChanceTooltip(1 - chanceOutput.chance()));
         }
         List<Recipe<?>> recipes = recipe.sequence();
         int size = recipes.size() / recipe.loops();
@@ -195,9 +203,18 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
         }
     }
 
-    private static <T extends Recipe<?>> void onRichTooltip(ITooltipBuilder tooltip, T recipe, IRecipeSlotsView recipeSlotsView, int i) {
+    private static <T extends Recipe<?>> void onRichTooltip(
+        ITooltipBuilder tooltip,
+        T recipe,
+        IRecipeSlotsView recipeSlotsView,
+        int i
+    ) {
         tooltip.add(SequenceTooltip.getStep(i));
-        tooltip.add(SequenceTooltip.getSequenceName(getRenderer(recipe), recipe, recipeSlotsView.findSlotByName(String.valueOf(i))));
+        tooltip.add(SequenceTooltip.getSequenceName(
+            getRenderer(recipe),
+            recipe,
+            recipeSlotsView.findSlotByName(String.valueOf(i))
+        ));
     }
 
     public static class SequencedRenderer<T extends Recipe<?>> {
@@ -218,7 +235,8 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
             if (id == null) {
                 name = CommonComponents.EMPTY;
             } else {
-                RegistryOps<JsonElement> ops = Minecraft.getInstance().level.registryAccess().createSerializationContext(JsonOps.INSTANCE);
+                RegistryOps<JsonElement> ops = Minecraft.getInstance().level.registryAccess()
+                    .createSerializationContext(JsonOps.INSTANCE);
                 name = Recipe.CODEC.encodeStart(ops, recipe).result().map(json -> AllAssemblyRecipeNames.get(ops, json))
                     .orElse(CommonComponents.EMPTY);
             }
@@ -240,7 +258,13 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
             matrices.translate(x, y);
             matrices.scale(scale, scale);
             matrices.translate(-x, -y);
-            graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(i, new Matrix3x2f(matrices), x - 3, y + 18, i));
+            graphics.guiRenderState.submitPicturesInPictureState(new PressRenderState(
+                i,
+                new Matrix3x2f(matrices),
+                x - 3,
+                y + 18,
+                i
+            ));
             matrices.popMatrix();
         }
 
@@ -259,18 +283,30 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
             matrices.translate(x, y);
             matrices.scale(scale, scale);
             matrices.translate(-x, -y);
-            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(i, new Matrix3x2f(matrices), x - 3, y + 18, i));
+            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(
+                i,
+                new Matrix3x2f(matrices),
+                x - 3,
+                y + 18,
+                i
+            ));
             matrices.popMatrix();
         }
 
         @Override
         public Component getSequenceName(DeployerApplicationRecipe recipe, Optional<IRecipeSlotView> slot) {
-            Component name = slot.flatMap(IRecipeSlotView::getDisplayedItemStack).map(ItemStack::getHoverName).orElse(CommonComponents.EMPTY);
+            Component name = slot.flatMap(IRecipeSlotView::getDisplayedItemStack).map(ItemStack::getHoverName)
+                .orElse(CommonComponents.EMPTY);
             return Component.translatable("create.recipe.assembly.deploying_item", name);
         }
 
         @Override
-        public IRecipeSlotBuilder addSlot(IRecipeLayoutBuilder builder, int x, int y, DeployerApplicationRecipe recipe) {
+        public IRecipeSlotBuilder addSlot(
+            IRecipeLayoutBuilder builder,
+            int x,
+            int y,
+            DeployerApplicationRecipe recipe
+        ) {
             return builder.addInputSlot(x, y).setBackground(EMPTY, 0, 0).add(recipe.ingredient());
         }
     }
@@ -308,14 +344,23 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
                 Fluid fluid = fluidVariant.getFluid();
                 if (fluid == AllFluids.POTION) {
                     DataComponentMap components = fluidVariant.getComponentMap();
-                    PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-                    BottleType bottleType = components.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
+                    PotionContents contents = components.getOrDefault(
+                        DataComponents.POTION_CONTENTS,
+                        PotionContents.EMPTY
+                    );
+                    BottleType bottleType = components.getOrDefault(
+                        AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
+                        BottleType.REGULAR
+                    );
                     ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(bottleType);
                     return contents.getName(itemFromBottleType.asItem().getDescriptionId() + ".effect.");
                 }
                 Block block = fluid.defaultFluidState().createLegacyBlock().getBlock();
                 if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
-                    return Component.translatable(Util.makeDescriptionId("block", BuiltInRegistries.FLUID.getKey(fluid)));
+                    return Component.translatable(Util.makeDescriptionId(
+                        "block",
+                        BuiltInRegistries.FLUID.getKey(fluid)
+                    ));
                 }
                 return block.getName();
             }).orElse(CommonComponents.EMPTY);
@@ -328,13 +373,18 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
         }
     }
 
-    public record SequenceTooltip<T extends Recipe<?>>(SequencedRenderer<T> renderer, T recipe, int i) implements IRecipeSlotRichTooltipCallback {
+    public record SequenceTooltip<T extends Recipe<?>>(SequencedRenderer<T> renderer, T recipe,
+                                                       int i) implements IRecipeSlotRichTooltipCallback {
         public static Component getStep(int i) {
             return CreateLang.translateDirect("recipe.assembly.step", i + 1);
         }
 
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        public static <T extends Recipe<?>> Component getSequenceName(SequencedRenderer<T> renderer, T recipe, Optional<IRecipeSlotView> slot) {
+        public static <T extends Recipe<?>> Component getSequenceName(
+            SequencedRenderer<T> renderer,
+            T recipe,
+            Optional<IRecipeSlotView> slot
+        ) {
             return renderer.getSequenceName(recipe, slot).copy().withStyle(ChatFormatting.DARK_GREEN);
         }
 
@@ -344,7 +394,10 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
             if (!lines.isEmpty()) {
                 lines.removeFirst();
             }
-            lines.addAll(0, List.of(Either.left(getStep(i)), Either.left(getSequenceName(renderer, recipe, Optional.of(slot)))));
+            lines.addAll(
+                0,
+                List.of(Either.left(getStep(i)), Either.left(getSequenceName(renderer, recipe, Optional.of(slot))))
+            );
         }
     }
 }

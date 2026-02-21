@@ -28,8 +28,8 @@ public class ChassisRangeDisplay {
         public Entry(ChassisBlockEntity be) {
             this.be = be;
             timer = DISPLAY_TIME;
-            Outliner.getInstance().showCluster(getOutlineKey(), createSelection(be)).colored(0xFFFFFF).disableLineNormals().lineWidth(1 / 16f)
-                .withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
+            Outliner.getInstance().showCluster(getOutlineKey(), createSelection(be)).colored(0xFFFFFF)
+                .disableLineNormals().lineWidth(1 / 16f).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
         }
 
         protected Object getOutlineKey() {
@@ -39,8 +39,9 @@ public class ChassisRangeDisplay {
         protected Set<BlockPos> createSelection(ChassisBlockEntity chassis) {
             Set<BlockPos> positions = new HashSet<>();
             List<BlockPos> includedBlockPositions = chassis.getIncludedBlockPositions(null, true);
-            if (includedBlockPositions == null)
+            if (includedBlockPositions == null) {
                 return Collections.emptySet();
+            }
             positions.addAll(includedBlockPositions);
             return positions;
         }
@@ -64,10 +65,12 @@ public class ChassisRangeDisplay {
         protected Set<BlockPos> createSelection(ChassisBlockEntity chassis) {
             Set<BlockPos> list = new HashSet<>();
             includedBEs = be.collectChassisGroup();
-            if (includedBEs == null)
+            if (includedBEs == null) {
                 return list;
-            for (ChassisBlockEntity chassisBlockEntity : includedBEs)
+            }
+            for (ChassisBlockEntity chassisBlockEntity : includedBEs) {
                 list.addAll(super.createSelection(chassisBlockEntity));
+            }
             return list;
         }
 
@@ -84,8 +87,9 @@ public class ChassisRangeDisplay {
         for (Iterator<BlockPos> iterator = entries.keySet().iterator(); iterator.hasNext(); ) {
             BlockPos pos = iterator.next();
             Entry entry = entries.get(pos);
-            if (tickEntry(world, entry, hasWrench))
+            if (tickEntry(world, entry, hasWrench)) {
                 iterator.remove();
+            }
             Outliner.getInstance().keep(entry.getOutlineKey());
         }
 
@@ -93,42 +97,49 @@ public class ChassisRangeDisplay {
             GroupEntry group = iterator.next();
             if (tickEntry(world, group, hasWrench)) {
                 iterator.remove();
-                if (group == lastHoveredGroup)
+                if (group == lastHoveredGroup) {
                     lastHoveredGroup = null;
+                }
             }
             Outliner.getInstance().keep(group.getOutlineKey());
         }
 
-        if (!hasWrench)
+        if (!hasWrench) {
             return;
+        }
 
         HitResult over = mc.hitResult;
-        if (!(over instanceof BlockHitResult ray))
+        if (!(over instanceof BlockHitResult ray)) {
             return;
+        }
         BlockPos pos = ray.getBlockPos();
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity == null || blockEntity.isRemoved())
+        if (blockEntity == null || blockEntity.isRemoved()) {
             return;
-        if (!(blockEntity instanceof ChassisBlockEntity chassisBlockEntity))
+        }
+        if (!(blockEntity instanceof ChassisBlockEntity chassisBlockEntity)) {
             return;
+        }
 
         boolean ctrl = AllKeys.hasControlDown();
 
         if (ctrl) {
             GroupEntry existingGroupForPos = getExistingGroupForPos(pos);
             if (existingGroupForPos != null) {
-                for (ChassisBlockEntity included : existingGroupForPos.includedBEs)
+                for (ChassisBlockEntity included : existingGroupForPos.includedBEs) {
                     entries.remove(included.getBlockPos());
+                }
                 existingGroupForPos.timer = DISPLAY_TIME;
                 return;
             }
         }
 
-        if (!entries.containsKey(pos) || ctrl)
+        if (!entries.containsKey(pos) || ctrl) {
             display(chassisBlockEntity);
-        else {
-            if (!ctrl)
+        } else {
+            if (!ctrl) {
                 entries.get(pos).timer = DISPLAY_TIME;
+            }
         }
     }
 
@@ -146,8 +157,9 @@ public class ChassisRangeDisplay {
         }
 
         entry.timer--;
-        if (entry.timer == 0)
+        if (entry.timer == 0) {
             return true;
+        }
         return false;
     }
 
@@ -157,8 +169,9 @@ public class ChassisRangeDisplay {
         if (AllKeys.hasControlDown()) {
             GroupEntry hoveredGroup = new GroupEntry(chassis);
 
-            for (ChassisBlockEntity included : hoveredGroup.includedBEs)
+            for (ChassisBlockEntity included : hoveredGroup.includedBEs) {
                 Outliner.getInstance().remove(Pair.of(included.getBlockPos(), 1));
+            }
 
             groupEntries.forEach(entry -> Outliner.getInstance().remove(entry.getOutlineKey()));
             groupEntries.clear();
@@ -170,8 +183,9 @@ public class ChassisRangeDisplay {
         // Display an individual chassis and kill any group selections that contained it
         BlockPos pos = chassis.getBlockPos();
         GroupEntry entry = getExistingGroupForPos(pos);
-        if (entry != null)
+        if (entry != null) {
             Outliner.getInstance().remove(entry.getOutlineKey());
+        }
 
         groupEntries.clear();
         entries.clear();
@@ -180,10 +194,13 @@ public class ChassisRangeDisplay {
     }
 
     private static GroupEntry getExistingGroupForPos(BlockPos pos) {
-        for (GroupEntry groupEntry : groupEntries)
-            for (ChassisBlockEntity chassis : groupEntry.includedBEs)
-                if (pos.equals(chassis.getBlockPos()))
+        for (GroupEntry groupEntry : groupEntries) {
+            for (ChassisBlockEntity chassis : groupEntry.includedBEs) {
+                if (pos.equals(chassis.getBlockPos())) {
                     return groupEntry;
+                }
+            }
+        }
         return null;
     }
 

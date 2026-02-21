@@ -13,9 +13,8 @@ import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record S2CHoldPacket(
-    PacketType<Packet<ClientGamePacketListener>> id, Consumer<AllClientHandle> callback
-) implements Packet<ClientGamePacketListener> {
+public record S2CHoldPacket(PacketType<Packet<ClientGamePacketListener>> id,
+                            Consumer<AllClientHandle> callback) implements Packet<ClientGamePacketListener> {
     public S2CHoldPacket(String id, Consumer<AllClientHandle> callback) {
         this(new PacketType<>(PacketFlow.CLIENTBOUND, Identifier.fromNamespaceAndPath(MOD_ID, id)), callback);
     }

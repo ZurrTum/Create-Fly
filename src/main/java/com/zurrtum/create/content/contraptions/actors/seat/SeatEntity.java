@@ -41,13 +41,20 @@ public class SeatEntity extends Entity {
 
     @Override
     protected void positionRider(Entity pEntity, Entity.MoveFunction pCallback) {
-        if (!this.hasPassenger(pEntity))
+        if (!this.hasPassenger(pEntity)) {
             return;
+        }
         double heightOffset = getPassengerRidingPosition(pEntity).y - pEntity.getVehicleAttachmentPoint(this).y;
 
-        pCallback.accept(pEntity, this.getX(), 1.0 / 16.0 + heightOffset + getCustomEntitySeatOffset(pEntity), this.getZ());
+        pCallback.accept(
+            pEntity,
+            this.getX(),
+            1.0 / 16.0 + heightOffset + getCustomEntitySeatOffset(pEntity),
+            this.getZ()
+        );
         if (pEntity instanceof Player player) {
-            float diff = player.getDimensions(player.getPose()).height() - player.getDimensions(Pose.CROUCHING).height();
+            float diff = player.getDimensions(player.getPose()).height() - player.getDimensions(Pose.CROUCHING)
+                .height();
             if (diff != 0) {
                 AABB boundingBox = pEntity.getBoundingBox();
                 pEntity.setBoundingBox(boundingBox.setMinY(boundingBox.minY + diff));
@@ -61,22 +68,30 @@ public class SeatEntity extends Entity {
     }
 
     public static double getCustomEntitySeatOffset(Entity entity) {
-        if (entity instanceof Slime)
+        if (entity instanceof Slime) {
             return 0.0f;
-        if (entity instanceof Parrot)
+        }
+        if (entity instanceof Parrot) {
             return 1 / 12f;
-        if (entity instanceof Skeleton)
+        }
+        if (entity instanceof Skeleton) {
             return 1 / 8f;
-        if (entity instanceof Cat)
+        }
+        if (entity instanceof Cat) {
             return 1 / 12f;
-        if (entity instanceof Wolf)
+        }
+        if (entity instanceof Wolf) {
             return 1 / 16f;
-        if (entity instanceof Frog)
+        }
+        if (entity instanceof Frog) {
             return 1.5 / 16f;
-        if (entity instanceof Spider)
+        }
+        if (entity instanceof Spider) {
             return 1 / 8.0;
-        if (entity instanceof PackageEntity)
+        }
+        if (entity instanceof PackageEntity) {
             return 3 / 32f;
+        }
         return 0;
     }
 
@@ -86,11 +101,13 @@ public class SeatEntity extends Entity {
 
     @Override
     public void tick() {
-        if (level().isClientSide())
+        if (level().isClientSide()) {
             return;
+        }
         boolean blockPresent = level().getBlockState(blockPosition()).getBlock() instanceof SeatBlock;
-        if (isVehicle() && blockPresent)
+        if (isVehicle() && blockPresent) {
             return;
+        }
         this.discard();
     }
 
@@ -109,8 +126,9 @@ public class SeatEntity extends Entity {
     @Override
     protected void removePassenger(Entity entity) {
         super.removePassenger(entity);
-        if (entity instanceof TamableAnimal ta)
+        if (entity instanceof TamableAnimal ta) {
             ta.setInSittingPose(false);
+        }
     }
 
     @Override

@@ -61,8 +61,10 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
                             return second.map(i -> null);
                         }
                         return DataResult.success(com.mojang.datafixers.util.Pair.of(
-                            new Couple<>(first.getOrThrow(), second.getOrThrow()),
-                            ops.empty()
+                            new Couple<>(
+                                first.getOrThrow(),
+                                second.getOrThrow()
+                            ), ops.empty()
                         ));
                     }, e -> e.map(i -> null)
                 );
@@ -81,13 +83,25 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
     public static <T> Codec<Couple<Optional<T>>> optionalCodec(Codec<T> codec) {
         return new Codec<>() {
             @Override
-            public <V> DataResult<com.mojang.datafixers.util.Pair<Couple<Optional<T>>, V>> decode(DynamicOps<V> ops, V input) {
+            public <V> DataResult<com.mojang.datafixers.util.Pair<Couple<Optional<T>>, V>> decode(
+                DynamicOps<V> ops,
+                V input
+            ) {
                 return ops.getMap(input).mapOrElse(
                     map -> {
-                        Optional<T> first = Optional.ofNullable(map.get("first")).flatMap(i -> codec.parse(ops, i).result());
-                        Optional<T> second = Optional.ofNullable(map.get("second")).flatMap(i -> codec.parse(ops, i).result());
-                        return DataResult.success(com.mojang.datafixers.util.Pair.of(new Couple<>(first, second), ops.empty()));
-                    }, e -> DataResult.success(com.mojang.datafixers.util.Pair.of(Couple.create(Optional::empty), ops.empty()))
+                        Optional<T> first = Optional.ofNullable(map.get("first"))
+                            .flatMap(i -> codec.parse(ops, i).result());
+                        Optional<T> second = Optional.ofNullable(map.get("second"))
+                            .flatMap(i -> codec.parse(ops, i).result());
+                        return DataResult.success(com.mojang.datafixers.util.Pair.of(
+                            new Couple<>(first, second),
+                            ops.empty()
+                        ));
+                    },
+                    e -> DataResult.success(com.mojang.datafixers.util.Pair.of(
+                        Couple.create(Optional::empty),
+                        ops.empty()
+                    ))
                 );
             }
 
@@ -110,10 +124,11 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
     }
 
     public void set(boolean first, T value) {
-        if (first)
+        if (first) {
             setFirst(value);
-        else
+        } else {
             setSecond(value);
+        }
     }
 
     @Override
@@ -126,7 +141,10 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
     }
 
     public <S> Couple<S> mapNotNull(Function<T, S> function) {
-        return Couple.create(first != null ? function.apply(first) : null, second != null ? function.apply(second) : null);
+        return Couple.create(
+            first != null ? function.apply(first) : null,
+            second != null ? function.apply(second) : null
+        );
     }
 
     public <S> Couple<S> mapWithContext(BiFunction<T, Boolean, S> function) {
@@ -138,7 +156,10 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
     }
 
     public <S, R> Couple<S> mapNotNullWithParam(BiFunction<T, R, S> function, R value) {
-        return Couple.create(first != null ? function.apply(first, value) : null, second != null ? function.apply(second, value) : null);
+        return Couple.create(
+            first != null ? function.apply(first, value) : null,
+            second != null ? function.apply(second, value) : null
+        );
     }
 
     public boolean both(Predicate<T> test) {
@@ -214,10 +235,12 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         @Override
         public T next() {
             state++;
-            if (state == 1)
+            if (state == 1) {
                 return couple.first;
-            if (state == 2)
+            }
+            if (state == 2) {
                 return couple.second;
+            }
             return null;
         }
 

@@ -11,7 +11,8 @@ public class AllItemTooltips {
     public static void register(Item item) {
         TooltipModifier.REGISTRY.register(
             item,
-            new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE).andThen(TooltipModifier.mapNull(KineticStats.create(item)))
+            new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE).andThen(TooltipModifier.mapNull(
+                KineticStats.create(item)))
         );
     }
 

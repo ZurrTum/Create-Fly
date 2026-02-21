@@ -7,10 +7,12 @@ import net.minecraft.world.item.ItemStack;
 
 public class ComponentProcessors {
     public static ItemStack withUnsafeComponentsDiscarded(ItemStack stack) {
-        if (stack.getComponentsPatch().isEmpty())
+        if (stack.getComponentsPatch().isEmpty()) {
             return stack;
+        }
         ItemStack copy = stack.copy();
-        stack.getComponents().stream().filter(ComponentProcessors::isUnsafeItemComponent).map(TypedDataComponent::type).forEach(copy::remove);
+        stack.getComponents().stream().filter(ComponentProcessors::isUnsafeItemComponent).map(TypedDataComponent::type)
+            .forEach(copy::remove);
         return copy;
     }
 
@@ -19,12 +21,15 @@ public class ComponentProcessors {
     }
 
     public static boolean isUnsafeItemComponent(DataComponentType<?> component) {
-        if (component.equals(DataComponents.ENCHANTMENTS))
+        if (component.equals(DataComponents.ENCHANTMENTS)) {
             return false;
-        if (component.equals(DataComponents.POTION_CONTENTS))
+        }
+        if (component.equals(DataComponents.POTION_CONTENTS)) {
             return false;
-        if (component.equals(DataComponents.DAMAGE))
+        }
+        if (component.equals(DataComponents.DAMAGE)) {
             return false;
+        }
         return !component.equals(DataComponents.CUSTOM_NAME);
     }
 }

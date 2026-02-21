@@ -15,15 +15,20 @@ public class FluidTankCTBehaviour extends HorizontalCTBehaviour {
 
     private CTSpriteShiftEntry innerShift;
 
-    public FluidTankCTBehaviour(CTSpriteShiftEntry layerShift, CTSpriteShiftEntry topShift, CTSpriteShiftEntry innerShift) {
+    public FluidTankCTBehaviour(
+        CTSpriteShiftEntry layerShift,
+        CTSpriteShiftEntry topShift,
+        CTSpriteShiftEntry innerShift
+    ) {
         super(layerShift, topShift);
         this.innerShift = innerShift;
     }
 
     @Override
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
-        if (sprite != null && direction.getAxis() == Axis.Y && innerShift.getOriginal() == sprite)
+        if (sprite != null && direction.getAxis() == Axis.Y && innerShift.getOriginal() == sprite) {
             return innerShift;
+        }
         return super.getShift(state, direction, sprite);
     }
 
@@ -32,7 +37,14 @@ public class FluidTankCTBehaviour extends HorizontalCTBehaviour {
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
+    public boolean connectsTo(
+        BlockState state,
+        BlockState other,
+        BlockAndTintGetter reader,
+        BlockPos pos,
+        BlockPos otherPos,
+        Direction face
+    ) {
         return state.getBlock() == other.getBlock() && ConnectivityHandler.isConnected(reader, pos, otherPos);
     }
 }

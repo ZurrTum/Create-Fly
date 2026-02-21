@@ -56,7 +56,11 @@ public class ManualApplicationCategory extends CreateCategory<RecipeHolder<Manua
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ManualApplicationRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(
+        IRecipeLayoutBuilder builder,
+        RecipeHolder<ManualApplicationRecipe> entry,
+        IFocusGroup focuses
+    ) {
         ManualApplicationRecipe recipe = entry.value();
         IRecipeSlotBuilder slot = builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         if (recipe.keepHeldItem()) {
@@ -87,7 +91,12 @@ public class ManualApplicationCategory extends CreateCategory<RecipeHolder<Manua
         recipeSlotsView.findSlotByName("target").flatMap(IRecipeSlotView::getDisplayedItemStack).ifPresent(stack -> {
             if (stack.getItem() instanceof BlockItem blockItem) {
                 BlockState block = blockItem.getBlock().defaultBlockState();
-                graphics.guiRenderState.submitPicturesInPictureState(new ManualBlockRenderState(new Matrix3x2f(graphics.pose()), block, 79, 34));
+                graphics.guiRenderState.submitPicturesInPictureState(new ManualBlockRenderState(
+                    new Matrix3x2f(graphics.pose()),
+                    block,
+                    79,
+                    34
+                ));
             }
         });
     }

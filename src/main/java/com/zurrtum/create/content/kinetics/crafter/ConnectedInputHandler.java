@@ -28,16 +28,20 @@ public class ConnectedInputHandler {
 
     public static boolean shouldConnect(Level world, BlockPos pos, Direction face, Direction direction) {
         BlockState refState = world.getBlockState(pos);
-        if (!refState.hasProperty(HORIZONTAL_FACING))
+        if (!refState.hasProperty(HORIZONTAL_FACING)) {
             return false;
+        }
         Direction refDirection = refState.getValue(HORIZONTAL_FACING);
-        if (direction.getAxis() == refDirection.getAxis())
+        if (direction.getAxis() == refDirection.getAxis()) {
             return false;
-        if (face == refDirection)
+        }
+        if (face == refDirection) {
             return false;
+        }
         BlockState neighbour = world.getBlockState(pos.relative(direction));
-        if (!neighbour.is(AllBlocks.MECHANICAL_CRAFTER))
+        if (!neighbour.is(AllBlocks.MECHANICAL_CRAFTER)) {
             return false;
+        }
         return refDirection == neighbour.getValue(HORIZONTAL_FACING);
     }
 
@@ -45,8 +49,9 @@ public class ConnectedInputHandler {
         MechanicalCrafterBlockEntity crafter1 = CrafterHelper.getCrafter(world, pos);
         MechanicalCrafterBlockEntity crafter2 = CrafterHelper.getCrafter(world, pos2);
 
-        if (crafter1 == null || crafter2 == null)
+        if (crafter1 == null || crafter2 == null) {
             return;
+        }
 
         BlockPos controllerPos1 = crafter1.getBlockPos().offset(crafter1.input.data.getFirst());
         BlockPos controllerPos2 = crafter2.getBlockPos().offset(crafter2.input.data.getFirst());
@@ -54,7 +59,8 @@ public class ConnectedInputHandler {
         if (controllerPos1.equals(controllerPos2)) {
             MechanicalCrafterBlockEntity controller = CrafterHelper.getCrafter(world, controllerPos1);
 
-            Set<BlockPos> positions = controller.input.data.stream().map(controllerPos1::offset).collect(Collectors.toSet());
+            Set<BlockPos> positions = controller.input.data.stream().map(controllerPos1::offset)
+                .collect(Collectors.toSet());
             List<BlockPos> frontier = new LinkedList<>();
             List<BlockPos> splitGroup = new ArrayList<>();
 
@@ -65,8 +71,9 @@ public class ConnectedInputHandler {
                 BlockPos current = frontier.removeFirst();
                 for (Direction direction : Iterate.directions) {
                     BlockPos next = current.relative(direction);
-                    if (!positions.remove(next))
+                    if (!positions.remove(next)) {
                         continue;
+                    }
                     splitGroup.add(next);
                     frontier.add(next);
                 }
@@ -82,12 +89,15 @@ public class ConnectedInputHandler {
             return;
         }
 
-        if (!crafter1.input.isController)
+        if (!crafter1.input.isController) {
             crafter1 = CrafterHelper.getCrafter(world, controllerPos1);
-        if (!crafter2.input.isController)
+        }
+        if (!crafter2.input.isController) {
             crafter2 = CrafterHelper.getCrafter(world, controllerPos2);
-        if (crafter1 == null || crafter2 == null)
+        }
+        if (crafter1 == null || crafter2 == null) {
             return;
+        }
 
         connectControllers(world, crafter1, crafter2);
 
@@ -99,7 +109,11 @@ public class ConnectedInputHandler {
         crafter2.connectivityChanged();
     }
 
-    public static void initAndAddAll(Level world, MechanicalCrafterBlockEntity crafter, Collection<BlockPos> positions) {
+    public static void initAndAddAll(
+        Level world,
+        MechanicalCrafterBlockEntity crafter,
+        Collection<BlockPos> positions
+    ) {
         crafter.input = new ConnectedInput();
         positions.forEach(splitPos -> {
             modifyAndUpdate(
@@ -111,7 +125,11 @@ public class ConnectedInputHandler {
         });
     }
 
-    public static void connectControllers(Level world, MechanicalCrafterBlockEntity crafter1, MechanicalCrafterBlockEntity crafter2) {
+    public static void connectControllers(
+        Level world,
+        MechanicalCrafterBlockEntity crafter1,
+        MechanicalCrafterBlockEntity crafter2
+    ) {
 
         crafter1.input.data.forEach(offset -> {
             BlockPos connectedPos = crafter1.getBlockPos().offset(offset);
@@ -122,8 +140,9 @@ public class ConnectedInputHandler {
         });
 
         crafter2.input.data.forEach(offset -> {
-            if (offset.equals(BlockPos.ZERO))
+            if (offset.equals(BlockPos.ZERO)) {
                 return;
+            }
             BlockPos connectedPos = crafter2.getBlockPos().offset(offset);
             modifyAndUpdate(
                 world, connectedPos, input -> {
@@ -139,8 +158,9 @@ public class ConnectedInputHandler {
 
     private static void modifyAndUpdate(Level world, BlockPos pos, Consumer<ConnectedInput> callback) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (!(blockEntity instanceof MechanicalCrafterBlockEntity crafter))
+        if (!(blockEntity instanceof MechanicalCrafterBlockEntity crafter)) {
             return;
+        }
 
         callback.accept(crafter.input);
         crafter.setChanged();
@@ -148,12 +168,13 @@ public class ConnectedInputHandler {
     }
 
     public static class ConnectedInput {
-        private static final Comparator<BlockPos> Y_COMPARATOR = Comparator.<BlockPos>comparingInt(BlockPos::getY).reversed();
-        private static final Comparator<BlockPos> NORTH_COMPARATOR = Y_COMPARATOR.thenComparing(Comparator.<BlockPos>comparingInt(BlockPos::getX)
-            .reversed());
+        private static final Comparator<BlockPos> Y_COMPARATOR = Comparator.<BlockPos>comparingInt(BlockPos::getY)
+            .reversed();
+        private static final Comparator<BlockPos> NORTH_COMPARATOR = Y_COMPARATOR.thenComparing(Comparator.<BlockPos>comparingInt(
+            BlockPos::getX).reversed());
         private static final Comparator<BlockPos> SOUTH_COMPARATOR = Y_COMPARATOR.thenComparingInt(BlockPos::getX);
-        private static final Comparator<BlockPos> EAST_COMPARATOR = Y_COMPARATOR.thenComparing(Comparator.<BlockPos>comparingInt(BlockPos::getZ)
-            .reversed());
+        private static final Comparator<BlockPos> EAST_COMPARATOR = Y_COMPARATOR.thenComparing(Comparator.<BlockPos>comparingInt(
+            BlockPos::getZ).reversed());
         private static final Comparator<BlockPos> WEST_COMPARATOR = Y_COMPARATOR.thenComparingInt(BlockPos::getZ);
 
         boolean isController;
@@ -178,8 +199,9 @@ public class ConnectedInputHandler {
             if (!isController) {
                 BlockPos controllerPos = pos.offset(data.getFirst());
                 ConnectedInput input = CrafterHelper.getInput(world, controllerPos);
-                if (input == this || input == null || !input.isController)
+                if (input == this || input == null || !input.isController) {
                     return new CrafterItemHandler[0];
+                }
                 return input.getInventories(world, controllerPos);
             }
 
@@ -191,8 +213,9 @@ public class ConnectedInputHandler {
                 default -> SOUTH_COMPARATOR;
             };
 
-            return data.stream().sorted(invOrdering).map(l -> CrafterHelper.getCrafter(world, pos.offset(l))).filter(Objects::nonNull)
-                .map(MechanicalCrafterBlockEntity::getInventory).toArray(CrafterItemHandler[]::new);
+            return data.stream().sorted(invOrdering).map(l -> CrafterHelper.getCrafter(world, pos.offset(l)))
+                .filter(Objects::nonNull).map(MechanicalCrafterBlockEntity::getInventory)
+                .toArray(CrafterItemHandler[]::new);
         }
 
         public void write(ValueOutput view) {

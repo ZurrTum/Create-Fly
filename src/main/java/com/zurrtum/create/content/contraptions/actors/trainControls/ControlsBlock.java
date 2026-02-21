@@ -32,7 +32,8 @@ public class ControlsBlock extends HorizontalDirectionalBlock implements IWrench
 
     public ControlsBlock(Properties p_54120_) {
         super(p_54120_);
-        registerDefaultState(defaultBlockState().setValue(OPEN, false).setValue(WATERLOGGED, false).setValue(VIRTUAL, false));
+        registerDefaultState(defaultBlockState().setValue(OPEN, false).setValue(WATERLOGGED, false)
+            .setValue(VIRTUAL, false));
     }
 
     @Override
@@ -67,8 +68,9 @@ public class ControlsBlock extends HorizontalDirectionalBlock implements IWrench
         Player player = pContext.getPlayer();
 
         state = state.setValue(FACING, horizontalDirection.getOpposite());
-        if (player != null && player.isShiftKeyDown())
+        if (player != null && player.isShiftKeyDown()) {
             state = state.setValue(FACING, horizontalDirection);
+        }
 
         return state;
     }
@@ -79,7 +81,12 @@ public class ControlsBlock extends HorizontalDirectionalBlock implements IWrench
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+    public VoxelShape getCollisionShape(
+        BlockState pState,
+        BlockGetter pLevel,
+        BlockPos pPos,
+        CollisionContext pContext
+    ) {
         return AllShapes.CONTROLS_COLLISION.get(pState.getValue(FACING));
     }
 

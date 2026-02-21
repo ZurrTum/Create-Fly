@@ -41,23 +41,31 @@ public class EdgeData {
         return singleSignalGroup;
     }
 
-    public void setSingleSignalGroup(@Nullable MinecraftServer server, @Nullable TrackGraph graph, UUID singleSignalGroup) {
-        if (graph != null && !Objects.equal(singleSignalGroup, this.singleSignalGroup))
+    public void setSingleSignalGroup(
+        @Nullable MinecraftServer server,
+        @Nullable TrackGraph graph,
+        UUID singleSignalGroup
+    ) {
+        if (graph != null && !Objects.equal(singleSignalGroup, this.singleSignalGroup)) {
             refreshIntersectingSignalGroups(server, graph);
+        }
         this.singleSignalGroup = singleSignalGroup;
     }
 
     public void refreshIntersectingSignalGroups(MinecraftServer server, TrackGraph graph) {
         Map<UUID, SignalEdgeGroup> groups = Create.RAILWAYS.signalEdgeGroups;
         for (TrackEdgeIntersection intersection : intersections) {
-            if (intersection.groupId == null)
+            if (intersection.groupId == null) {
                 continue;
+            }
             SignalEdgeGroup group = groups.get(intersection.groupId);
-            if (group != null)
+            if (group != null) {
                 group.removeIntersection(server, intersection.id);
+            }
         }
-        if (hasIntersections())
+        if (hasIntersections()) {
             graph.deferIntersectionUpdate(edge);
+        }
     }
 
     public boolean hasPoints() {
@@ -72,13 +80,22 @@ public class EdgeData {
         return intersections;
     }
 
-    public void addIntersection(TrackGraph graph, UUID id, double position, TrackNode target1, TrackNode target2, double targetPosition) {
+    public void addIntersection(
+        TrackGraph graph,
+        UUID id,
+        double position,
+        TrackNode target1,
+        TrackNode target2,
+        double targetPosition
+    ) {
         TrackNodeLocation loc1 = target1.getLocation();
         TrackNodeLocation loc2 = target2.getLocation();
 
-        for (TrackEdgeIntersection existing : intersections)
-            if (existing.isNear(position) && existing.targets(loc1, loc2))
+        for (TrackEdgeIntersection existing : intersections) {
+            if (existing.isNear(position) && existing.targets(loc1, loc2)) {
                 return;
+            }
+        }
 
         TrackEdgeIntersection intersection = new TrackEdgeIntersection();
         intersection.id = id;
@@ -93,24 +110,29 @@ public class EdgeData {
         refreshIntersectingSignalGroups(server, graph);
         for (Iterator<TrackEdgeIntersection> iterator = intersections.iterator(); iterator.hasNext(); ) {
             TrackEdgeIntersection existing = iterator.next();
-            if (existing.id.equals(id))
+            if (existing.id.equals(id)) {
                 iterator.remove();
+            }
         }
     }
 
     public UUID getGroupAtPosition(TrackGraph graph, double position) {
-        if (!hasSignalBoundaries())
+        if (!hasSignalBoundaries()) {
             return getEffectiveEdgeGroupId(graph);
+        }
         SignalBoundary firstSignal = next(EdgePointType.SIGNAL, 0);
-        if (firstSignal == null)
+        if (firstSignal == null) {
             return null;
+        }
         UUID currentGroup = firstSignal.getGroup(edge.node1);
 
         for (TrackEdgePoint trackEdgePoint : getPoints()) {
-            if (!(trackEdgePoint instanceof SignalBoundary sb))
+            if (!(trackEdgePoint instanceof SignalBoundary sb)) {
                 continue;
-            if (sb.getLocationOn(edge) >= position)
+            }
+            if (sb.getLocationOn(edge) >= position) {
                 return currentGroup;
+            }
             currentGroup = sb.getGroup(edge.node2);
         }
 
@@ -134,46 +156,55 @@ public class EdgeData {
     }
 
     public <T extends TrackEdgePoint> void addPoint(MinecraftServer server, TrackGraph graph, TrackEdgePoint point) {
-        if (point.getType() == EdgePointType.SIGNAL)
+        if (point.getType() == EdgePointType.SIGNAL) {
             setSingleSignalGroup(server, graph, null);
+        }
         double locationOn = point.getLocationOn(edge);
         int i = 0;
-        for (; i < points.size(); i++)
-            if (points.get(i).getLocationOn(edge) > locationOn)
+        for (; i < points.size(); i++) {
+            if (points.get(i).getLocationOn(edge) > locationOn) {
                 break;
+            }
+        }
         points.add(i, point);
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
     public <T extends TrackEdgePoint> T next(EdgePointType<T> type, double minPosition) {
-        for (TrackEdgePoint point : points)
-            if (point.getType() == type && point.getLocationOn(edge) > minPosition)
+        for (TrackEdgePoint point : points) {
+            if (point.getType() == type && point.getLocationOn(edge) > minPosition) {
                 return (T) point;
+            }
+        }
         return null;
     }
 
     @Nullable
     public TrackEdgePoint next(double minPosition) {
-        for (TrackEdgePoint point : points)
-            if (point.getLocationOn(edge) > minPosition)
+        for (TrackEdgePoint point : points) {
+            if (point.getLocationOn(edge) > minPosition) {
                 return point;
+            }
+        }
         return null;
     }
 
     @Nullable
     public <T extends TrackEdgePoint> T get(EdgePointType<T> type, double exactPosition) {
         T next = next(type, exactPosition - .5f);
-        if (next != null && Mth.equal(next.getLocationOn(edge), exactPosition))
+        if (next != null && Mth.equal(next.getLocationOn(edge), exactPosition)) {
             return next;
+        }
         return null;
     }
 
     public void write(ValueOutput view, DimensionPalette dimensions) {
-        if (singleSignalGroup == passiveGroup)
+        if (singleSignalGroup == passiveGroup) {
             view.putBoolean("PassiveGroup", true);
-        else if (singleSignalGroup != null)
+        } else if (singleSignalGroup != null) {
             view.store("SignalGroup", UUIDUtil.CODEC, singleSignalGroup);
+        }
 
         if (hasPoints()) {
             ValueOutput.ValueOutputList list = view.childrenList("Points");
@@ -191,12 +222,18 @@ public class EdgeData {
         }
     }
 
-    public static <T> DataResult<T> encode(final EdgeData input, final DynamicOps<T> ops, final T empty, DimensionPalette dimensions) {
+    public static <T> DataResult<T> encode(
+        final EdgeData input,
+        final DynamicOps<T> ops,
+        final T empty,
+        DimensionPalette dimensions
+    ) {
         RecordBuilder<T> builder = ops.mapBuilder();
-        if (input.singleSignalGroup == passiveGroup)
+        if (input.singleSignalGroup == passiveGroup) {
             builder.add("PassiveGroup", ops.createBoolean(true));
-        else if (input.singleSignalGroup != null)
+        } else if (input.singleSignalGroup != null) {
             builder.add("SignalGroup", input.singleSignalGroup, UUIDUtil.CODEC);
+        }
 
         if (input.hasPoints()) {
             ListBuilder<T> list = ops.listBuilder();
@@ -229,18 +266,29 @@ public class EdgeData {
         );
 
         view.childrenList("Points").ifPresent(list -> list.forEach(item -> item.read("Type", EdgePointType.CODEC)
-            .flatMap(type -> item.read("Id", UUIDUtil.CODEC).map(id -> graph.getPoint(type, id))).ifPresent(data.points::add)));
+            .flatMap(type -> item.read("Id", UUIDUtil.CODEC).map(id -> graph.getPoint(type, id)))
+            .ifPresent(data.points::add)));
         view.childrenList("Intersections")
-            .ifPresent(list -> list.forEach(item -> data.intersections.add(TrackEdgeIntersection.read(item, dimensions))));
+            .ifPresent(list -> list.forEach(item -> data.intersections.add(TrackEdgeIntersection.read(
+                item,
+                dimensions
+            ))));
         return data;
     }
 
-    public static <T> EdgeData decode(DynamicOps<T> ops, T input, TrackEdge edge, TrackGraph graph, DimensionPalette dimensions) {
+    public static <T> EdgeData decode(
+        DynamicOps<T> ops,
+        T input,
+        TrackEdge edge,
+        TrackGraph graph,
+        DimensionPalette dimensions
+    ) {
         EdgeData data = new EdgeData(edge);
         MapLike<T> map = ops.getMap(input).getOrThrow();
         UUIDUtil.CODEC.decode(ops, map.get("SignalGroup")).result().map(Pair::getFirst).ifPresentOrElse(
             id -> data.singleSignalGroup = id, () -> {
-                if (!Optional.ofNullable(map.get("PassiveGroup")).flatMap(value -> ops.getBooleanValue(value).result()).orElse(false)) {
+                if (!Optional.ofNullable(map.get("PassiveGroup")).flatMap(value -> ops.getBooleanValue(value).result())
+                    .orElse(false)) {
                     data.singleSignalGroup = null;
                 }
             }
@@ -248,8 +296,8 @@ public class EdgeData {
         ops.getList(map.get("Points")).ifSuccess(list -> list.accept(item -> {
             MapLike<T> point = ops.getMap(item).getOrThrow();
             EdgePointType.CODEC.decode(ops, point.get("Type")).result().map(Pair::getFirst)
-                .flatMap(type -> UUIDUtil.CODEC.decode(ops, point.get("Id")).result().map(Pair::getFirst).map(id -> graph.getPoint(type, id)))
-                .ifPresent(data.points::add);
+                .flatMap(type -> UUIDUtil.CODEC.decode(ops, point.get("Id")).result().map(Pair::getFirst)
+                    .map(id -> graph.getPoint(type, id))).ifPresent(data.points::add);
         }));
         ops.getList(map.get("Intersections")).ifSuccess(list -> list.accept(item -> {
             data.intersections.add(TrackEdgeIntersection.decode(ops, item, dimensions));

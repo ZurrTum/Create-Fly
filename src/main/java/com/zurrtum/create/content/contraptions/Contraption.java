@@ -108,7 +108,10 @@ import static com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlo
 
 public abstract class Contraption {
     public static final Codec<Map<UUID, Integer>> SEAT_MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT);
-    public static final Codec<Map<UUID, BlockFace>> SUB_CONTRAPTIONS_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, BlockFace.CODEC);
+    public static final Codec<Map<UUID, BlockFace>> SUB_CONTRAPTIONS_CODEC = Codec.unboundedMap(
+        UUIDUtil.STRING_CODEC,
+        BlockFace.CODEC
+    );
 
     public final CollisionList simplifiedEntityColliders = new CollisionList();
     public AbstractContraptionEntity entity;
@@ -176,8 +179,9 @@ public abstract class Contraption {
     }
 
     public ContraptionWorld getContraptionWorld() {
-        if (collisionLevel == null)
+        if (collisionLevel == null) {
             collisionLevel = new ContraptionWorld(entity.level(), this);
+        }
         return collisionLevel;
     }
 
@@ -195,7 +199,12 @@ public abstract class Contraption {
         return false;
     }
 
-    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction forcedDirection, Queue<BlockPos> frontier) throws AssemblyException {
+    protected boolean addToInitialFrontier(
+        Level world,
+        BlockPos pos,
+        Direction forcedDirection,
+        Queue<BlockPos> frontier
+    ) throws AssemblyException {
         return true;
     }
 
@@ -208,24 +217,33 @@ public abstract class Contraption {
         return contraption;
     }
 
-    public boolean searchMovedStructure(Level world, BlockPos pos, @Nullable Direction forcedDirection) throws AssemblyException {
+    public boolean searchMovedStructure(
+        Level world,
+        BlockPos pos,
+        @Nullable Direction forcedDirection
+    ) throws AssemblyException {
         initialPassengers.clear();
         Queue<BlockPos> frontier = new UniqueLinkedList<>();
         Set<BlockPos> visited = new HashSet<>();
         anchor = pos;
 
-        if (bounds == null)
+        if (bounds == null) {
             bounds = new AABB(BlockPos.ZERO);
+        }
 
-        if (!BlockMovementChecks.isBrittle(world.getBlockState(pos)))
+        if (!BlockMovementChecks.isBrittle(world.getBlockState(pos))) {
             frontier.add(pos);
-        if (!addToInitialFrontier(world, pos, forcedDirection, frontier))
+        }
+        if (!addToInitialFrontier(world, pos, forcedDirection, frontier)) {
             return false;
+        }
         for (int limit = 100000; limit > 0; limit--) {
-            if (frontier.isEmpty())
+            if (frontier.isEmpty()) {
                 return true;
-            if (!moveBlock(world, forcedDirection, frontier, visited))
+            }
+            if (!moveBlock(world, forcedDirection, frontier, visited)) {
                 return false;
+            }
         }
         throw AssemblyException.structureTooLarge();
     }
@@ -240,8 +258,9 @@ public abstract class Contraption {
             Level world = entity.level();
             BlockPos pos = blockFace.getPos();
             try {
-                if (!subContraption.assemble(world, pos))
+                if (!subContraption.assemble(world, pos)) {
                     continue;
+                }
             } catch (AssemblyException e) {
                 continue;
             }
@@ -258,23 +277,28 @@ public abstract class Contraption {
     }
 
     public void onEntityInitialize(Level world, AbstractContraptionEntity contraptionEntity) {
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
 
         for (OrientedContraptionEntity orientedCE : world.getEntitiesOfClass(
             OrientedContraptionEntity.class,
             contraptionEntity.getBoundingBox().inflate(1)
-        ))
-            if (stabilizedSubContraptions.containsKey(orientedCE.getUUID()))
+        )) {
+            if (stabilizedSubContraptions.containsKey(orientedCE.getUUID())) {
                 orientedCE.startRiding(contraptionEntity);
+            }
+        }
 
         for (BlockPos seatPos : getSeats()) {
             Entity passenger = initialPassengers.get(seatPos);
-            if (passenger == null)
+            if (passenger == null) {
                 continue;
+            }
             int seatIndex = getSeats().indexOf(seatPos);
-            if (seatIndex == -1)
+            if (seatIndex == -1) {
                 continue;
+            }
             contraptionEntity.addSittingPassenger(passenger, seatIndex);
         }
     }
@@ -301,106 +325,148 @@ public abstract class Contraption {
         Set<BlockPos> visited
     ) throws AssemblyException {
         BlockPos pos = frontier.poll();
-        if (pos == null)
+        if (pos == null) {
             return false;
+        }
         visited.add(pos);
 
-        if (world.isOutsideBuildHeight(pos))
+        if (world.isOutsideBuildHeight(pos)) {
             return true;
-        if (!world.isLoaded(pos))
+        }
+        if (!world.isLoaded(pos)) {
             throw AssemblyException.unloadedChunk(pos);
-        if (isAnchoringBlockAt(pos))
+        }
+        if (isAnchoringBlockAt(pos)) {
             return true;
+        }
         BlockState state = world.getBlockState(pos);
-        if (!BlockMovementChecks.isMovementNecessary(state, world, pos))
+        if (!BlockMovementChecks.isMovementNecessary(state, world, pos)) {
             return true;
-        if (!movementAllowed(state, world, pos))
+        }
+        if (!movementAllowed(state, world, pos)) {
             throw AssemblyException.unmovableBlock(pos, state);
-        if (state.getBlock() instanceof AbstractChassisBlock && !moveChassis(world, pos, forcedDirection, frontier, visited))
+        }
+        if (state.getBlock() instanceof AbstractChassisBlock && !moveChassis(
+            world,
+            pos,
+            forcedDirection,
+            frontier,
+            visited
+        )) {
             return false;
+        }
 
-        if (state.is(AllBlocks.BELT))
+        if (state.is(AllBlocks.BELT)) {
             moveBelt(pos, frontier, visited, state);
+        }
 
-        if (state.is(AllBlocks.WINDMILL_BEARING) && world.getBlockEntity(pos) instanceof WindmillBearingBlockEntity wbbe)
+        if (state.is(AllBlocks.WINDMILL_BEARING) && world.getBlockEntity(pos) instanceof WindmillBearingBlockEntity wbbe) {
             wbbe.disassembleForMovement();
+        }
 
-        if (state.is(AllBlocks.GANTRY_CARRIAGE))
+        if (state.is(AllBlocks.GANTRY_CARRIAGE)) {
             moveGantryPinion(world, pos, frontier, visited, state);
+        }
 
-        if (state.is(AllBlocks.GANTRY_SHAFT))
+        if (state.is(AllBlocks.GANTRY_SHAFT)) {
             moveGantryShaft(world, pos, frontier, visited, state);
+        }
 
         if (state.is(AllBlocks.STICKER) && state.getValue(StickerBlock.EXTENDED)) {
             Direction offset = state.getValue(StickerBlock.FACING);
             BlockPos attached = pos.relative(offset);
-            if (!visited.contains(attached) && !BlockMovementChecks.isNotSupportive(world.getBlockState(attached), offset.getOpposite()))
+            if (!visited.contains(attached) && !BlockMovementChecks.isNotSupportive(
+                world.getBlockState(attached),
+                offset.getOpposite()
+            )) {
                 frontier.add(attached);
+            }
         }
 
-        if (world.getBlockEntity(pos) instanceof ChainConveyorBlockEntity ccbe)
+        if (world.getBlockEntity(pos) instanceof ChainConveyorBlockEntity ccbe) {
             ccbe.notifyConnectedToValidate();
+        }
 
         // Double Chest halves stick together
         if (state.hasProperty(ChestBlock.TYPE) && state.hasProperty(ChestBlock.FACING) && state.getValue(ChestBlock.TYPE) != ChestType.SINGLE) {
             Direction offset = ChestBlock.getConnectedDirection(state);
             BlockPos attached = pos.relative(offset);
-            if (!visited.contains(attached))
+            if (!visited.contains(attached)) {
                 frontier.add(attached);
+            }
         }
 
         // Bogeys tend to have sticky sides
-        if (state.getBlock() instanceof AbstractBogeyBlock<?> bogey)
-            for (Direction d : bogey.getStickySurfaces(world, pos, state))
-                if (!visited.contains(pos.relative(d)))
+        if (state.getBlock() instanceof AbstractBogeyBlock<?> bogey) {
+            for (Direction d : bogey.getStickySurfaces(world, pos, state)) {
+                if (!visited.contains(pos.relative(d))) {
                     frontier.add(pos.relative(d));
+                }
+            }
+        }
 
         // Bearings potentially create stabilized sub-contraptions
-        if (state.is(AllBlocks.MECHANICAL_BEARING))
+        if (state.is(AllBlocks.MECHANICAL_BEARING)) {
             moveBearing(pos, frontier, visited, state);
+        }
 
         // WM Bearings attach their structure when moved
-        if (state.is(AllBlocks.WINDMILL_BEARING))
+        if (state.is(AllBlocks.WINDMILL_BEARING)) {
             moveWindmillBearing(pos, frontier, visited, state);
+        }
 
         // Seats transfer their passenger to the contraption
-        if (state.getBlock() instanceof SeatBlock)
+        if (state.getBlock() instanceof SeatBlock) {
             moveSeat(world, pos);
+        }
 
         // Pulleys drag their rope and their attached structure
-        if (state.getBlock() instanceof PulleyBlock)
+        if (state.getBlock() instanceof PulleyBlock) {
             movePulley(world, pos, frontier, visited);
+        }
 
         // Pistons drag their attaches poles and extension
-        if (state.getBlock() instanceof MechanicalPistonBlock)
-            if (!moveMechanicalPiston(world, pos, frontier, visited, state))
+        if (state.getBlock() instanceof MechanicalPistonBlock) {
+            if (!moveMechanicalPiston(world, pos, frontier, visited, state)) {
                 return false;
-        if (isExtensionPole(state))
+            }
+        }
+        if (isExtensionPole(state)) {
             movePistonPole(world, pos, frontier, visited, state);
-        if (isPistonHead(state))
+        }
+        if (isPistonHead(state)) {
             movePistonHead(world, pos, frontier, visited, state);
+        }
 
         // Cart assemblers attach themselves
         BlockPos posDown = pos.below();
         BlockState stateBelow = world.getBlockState(posDown);
-        if (!visited.contains(posDown) && stateBelow.is(AllBlocks.CART_ASSEMBLER))
+        if (!visited.contains(posDown) && stateBelow.is(AllBlocks.CART_ASSEMBLER)) {
             frontier.add(posDown);
+        }
 
         // Slime blocks and super glue drag adjacent blocks if possible
         for (Direction offset : Iterate.directions) {
             BlockPos offsetPos = pos.relative(offset);
             BlockState blockState = world.getBlockState(offsetPos);
-            if (isAnchoringBlockAt(offsetPos))
+            if (isAnchoringBlockAt(offsetPos)) {
                 continue;
+            }
             if (!movementAllowed(blockState, world, offsetPos)) {
-                if (offset == forcedDirection)
+                if (offset == forcedDirection) {
                     throw AssemblyException.unmovableBlock(pos, state);
+                }
                 continue;
             }
 
             boolean wasVisited = visited.contains(offsetPos);
             boolean faceHasGlue = SuperGlueEntity.isGlued(world, pos, offset, glueToRemove);
-            boolean blockAttachedTowardsFace = BlockMovementChecks.isBlockAttachedTowards(blockState, world, offsetPos, offset.getOpposite());
+            boolean blockAttachedTowardsFace = BlockMovementChecks.isBlockAttachedTowards(
+                blockState,
+                world,
+                offsetPos,
+                offset.getOpposite()
+            );
             boolean brittle = BlockMovementChecks.isBrittle(blockState);
             boolean canStick = !brittle && canStickTo(state, blockState);
             if (canStick) {
@@ -417,79 +483,121 @@ public abstract class Contraption {
 
             if (!wasVisited && (canStick || blockAttachedTowardsFace || faceHasGlue || (offset == forcedDirection && !BlockMovementChecks.isNotSupportive(state,
                 forcedDirection
-            ))))
+            )))) {
                 frontier.add(offsetPos);
+            }
         }
 
         addBlock(world, pos, capture(world, pos));
-        if (blocks.size() <= AllConfigs.server().kinetics.maxBlocksMoved.get())
+        if (blocks.size() <= AllConfigs.server().kinetics.maxBlocksMoved.get()) {
             return true;
-        else
+        } else {
             throw AssemblyException.structureTooLarge();
+        }
     }
 
-    protected void movePistonHead(Level world, BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
+    protected void movePistonHead(
+        Level world,
+        BlockPos pos,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited,
+        BlockState state
+    ) {
         Direction direction = state.getValue(MechanicalPistonHeadBlock.FACING);
         BlockPos offset = pos.relative(direction.getOpposite());
         if (!visited.contains(offset)) {
             BlockState blockState = world.getBlockState(offset);
-            if (isExtensionPole(blockState) && blockState.getValue(PistonExtensionPoleBlock.FACING).getAxis() == direction.getAxis())
+            if (isExtensionPole(blockState) && blockState.getValue(PistonExtensionPoleBlock.FACING)
+                .getAxis() == direction.getAxis()) {
                 frontier.add(offset);
+            }
             if (blockState.getBlock() instanceof MechanicalPistonBlock) {
                 Direction pistonFacing = blockState.getValue(MechanicalPistonBlock.FACING);
-                if (pistonFacing == direction && blockState.getValue(MechanicalPistonBlock.STATE) == PistonState.EXTENDED)
+                if (pistonFacing == direction && blockState.getValue(MechanicalPistonBlock.STATE) == PistonState.EXTENDED) {
                     frontier.add(offset);
+                }
             }
         }
         if (state.getValue(MechanicalPistonHeadBlock.TYPE) == PistonType.STICKY) {
             BlockPos attached = pos.relative(direction);
-            if (!visited.contains(attached))
+            if (!visited.contains(attached)) {
                 frontier.add(attached);
+            }
         }
     }
 
-    protected void movePistonPole(Level world, BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
+    protected void movePistonPole(
+        Level world,
+        BlockPos pos,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited,
+        BlockState state
+    ) {
         for (Direction d : Iterate.directionsInAxis(state.getValue(PistonExtensionPoleBlock.FACING).getAxis())) {
             BlockPos offset = pos.relative(d);
             if (!visited.contains(offset)) {
                 BlockState blockState = world.getBlockState(offset);
-                if (isExtensionPole(blockState) && blockState.getValue(PistonExtensionPoleBlock.FACING).getAxis() == d.getAxis())
+                if (isExtensionPole(blockState) && blockState.getValue(PistonExtensionPoleBlock.FACING)
+                    .getAxis() == d.getAxis()) {
                     frontier.add(offset);
-                if (isPistonHead(blockState) && blockState.getValue(MechanicalPistonHeadBlock.FACING).getAxis() == d.getAxis())
+                }
+                if (isPistonHead(blockState) && blockState.getValue(MechanicalPistonHeadBlock.FACING)
+                    .getAxis() == d.getAxis()) {
                     frontier.add(offset);
+                }
                 if (blockState.getBlock() instanceof MechanicalPistonBlock) {
                     Direction pistonFacing = blockState.getValue(MechanicalPistonBlock.FACING);
-                    if (pistonFacing == d || pistonFacing == d.getOpposite() && blockState.getValue(MechanicalPistonBlock.STATE) == PistonState.EXTENDED)
+                    if (pistonFacing == d || pistonFacing == d.getOpposite() && blockState.getValue(
+                        MechanicalPistonBlock.STATE) == PistonState.EXTENDED) {
                         frontier.add(offset);
+                    }
                 }
             }
         }
     }
 
-    protected void moveGantryPinion(Level world, BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
+    protected void moveGantryPinion(
+        Level world,
+        BlockPos pos,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited,
+        BlockState state
+    ) {
         BlockPos offset = pos.relative(state.getValue(GantryCarriageBlock.FACING));
-        if (!visited.contains(offset))
+        if (!visited.contains(offset)) {
             frontier.add(offset);
+        }
         Axis rotationAxis = ((IRotate) state.getBlock()).getRotationAxis(state);
         for (Direction d : Iterate.directionsInAxis(rotationAxis)) {
             offset = pos.relative(d);
             BlockState offsetState = world.getBlockState(offset);
-            if (offsetState.is(AllBlocks.GANTRY_SHAFT) && offsetState.getValue(GantryShaftBlock.FACING).getAxis() == d.getAxis())
-                if (!visited.contains(offset))
+            if (offsetState.is(AllBlocks.GANTRY_SHAFT) && offsetState.getValue(GantryShaftBlock.FACING)
+                .getAxis() == d.getAxis()) {
+                if (!visited.contains(offset)) {
                     frontier.add(offset);
+                }
+            }
         }
     }
 
-    protected void moveGantryShaft(Level world, BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
+    protected void moveGantryShaft(
+        Level world,
+        BlockPos pos,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited,
+        BlockState state
+    ) {
         for (Direction d : Iterate.directions) {
             BlockPos offset = pos.relative(d);
             if (!visited.contains(offset)) {
                 BlockState offsetState = world.getBlockState(offset);
                 Direction facing = state.getValue(GantryShaftBlock.FACING);
-                if (d.getAxis() == facing.getAxis() && offsetState.is(AllBlocks.GANTRY_SHAFT) && offsetState.getValue(GantryShaftBlock.FACING) == facing)
+                if (d.getAxis() == facing.getAxis() && offsetState.is(AllBlocks.GANTRY_SHAFT) && offsetState.getValue(
+                    GantryShaftBlock.FACING) == facing) {
                     frontier.add(offset);
-                else if (offsetState.is(AllBlocks.GANTRY_CARRIAGE) && offsetState.getValue(GantryCarriageBlock.FACING) == d)
+                } else if (offsetState.is(AllBlocks.GANTRY_CARRIAGE) && offsetState.getValue(GantryCarriageBlock.FACING) == d) {
                     frontier.add(offset);
+                }
             }
         }
     }
@@ -497,16 +605,18 @@ public abstract class Contraption {
     private void moveWindmillBearing(BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
         Direction facing = state.getValue(WindmillBearingBlock.FACING);
         BlockPos offset = pos.relative(facing);
-        if (!visited.contains(offset))
+        if (!visited.contains(offset)) {
             frontier.add(offset);
+        }
     }
 
     private void moveBearing(BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
         Direction facing = state.getValue(MechanicalBearingBlock.FACING);
         if (!canBeStabilized(facing, pos.subtract(anchor))) {
             BlockPos offset = pos.relative(facing);
-            if (!visited.contains(offset))
+            if (!visited.contains(offset)) {
                 frontier.add(offset);
+            }
             return;
         }
         pendingSubContraptions.add(new BlockFace(pos, facing));
@@ -515,10 +625,12 @@ public abstract class Contraption {
     private void moveBelt(BlockPos pos, Queue<BlockPos> frontier, Set<BlockPos> visited, BlockState state) {
         BlockPos nextPos = BeltBlock.nextSegmentPosition(state, pos, true);
         BlockPos prevPos = BeltBlock.nextSegmentPosition(state, pos, false);
-        if (nextPos != null && !visited.contains(nextPos))
+        if (nextPos != null && !visited.contains(nextPos)) {
             frontier.add(nextPos);
-        if (prevPos != null && !visited.contains(prevPos))
+        }
+        if (prevPos != null && !visited.contains(prevPos)) {
             frontier.add(prevPos);
+        }
     }
 
     private void moveSeat(Level world, BlockPos pos) {
@@ -528,8 +640,9 @@ public abstract class Contraption {
         if (!seatsEntities.isEmpty()) {
             SeatEntity seat = seatsEntities.getFirst();
             List<Entity> passengers = seat.getPassengers();
-            if (!passengers.isEmpty())
+            if (!passengers.isEmpty()) {
                 initialPassengers.put(local, passengers.getFirst());
+            }
         }
     }
 
@@ -538,13 +651,15 @@ public abstract class Contraption {
         BlockPos ropePos = pos;
         while (limit-- >= 0) {
             ropePos = ropePos.below();
-            if (!world.isLoaded(ropePos))
+            if (!world.isLoaded(ropePos)) {
                 break;
+            }
             BlockState ropeState = world.getBlockState(ropePos);
             Block block = ropeState.getBlock();
             if (!(block instanceof RopeBlock) && !(block instanceof MagnetBlock)) {
-                if (!visited.contains(ropePos))
+                if (!visited.contains(ropePos)) {
                     frontier.add(ropePos);
+                }
                 break;
             }
             addBlock(world, ropePos, capture(world, ropePos));
@@ -560,49 +675,67 @@ public abstract class Contraption {
     ) throws AssemblyException {
         Direction direction = state.getValue(MechanicalPistonBlock.FACING);
         PistonState pistonState = state.getValue(MechanicalPistonBlock.STATE);
-        if (pistonState == PistonState.MOVING)
+        if (pistonState == PistonState.MOVING) {
             return false;
+        }
 
         BlockPos offset = pos.relative(direction.getOpposite());
         if (!visited.contains(offset)) {
             BlockState poleState = world.getBlockState(offset);
-            if (poleState.is(AllBlocks.PISTON_EXTENSION_POLE) && poleState.getValue(PistonExtensionPoleBlock.FACING).getAxis() == direction.getAxis())
+            if (poleState.is(AllBlocks.PISTON_EXTENSION_POLE) && poleState.getValue(PistonExtensionPoleBlock.FACING)
+                .getAxis() == direction.getAxis()) {
                 frontier.add(offset);
+            }
         }
 
         if (pistonState == PistonState.EXTENDED || MechanicalPistonBlock.isStickyPiston(state)) {
             offset = pos.relative(direction);
-            if (!visited.contains(offset))
+            if (!visited.contains(offset)) {
                 frontier.add(offset);
+            }
         }
 
         return true;
     }
 
-    private boolean moveChassis(Level world, BlockPos pos, Direction movementDirection, Queue<BlockPos> frontier, Set<BlockPos> visited) {
+    private boolean moveChassis(
+        Level world,
+        BlockPos pos,
+        Direction movementDirection,
+        Queue<BlockPos> frontier,
+        Set<BlockPos> visited
+    ) {
         BlockEntity be = world.getBlockEntity(pos);
-        if (!(be instanceof ChassisBlockEntity chassis))
+        if (!(be instanceof ChassisBlockEntity chassis)) {
             return false;
+        }
         chassis.addAttachedChasses(frontier, visited);
         List<BlockPos> includedBlockPositions = chassis.getIncludedBlockPositions(movementDirection, false);
-        if (includedBlockPositions == null)
+        if (includedBlockPositions == null) {
             return false;
-        for (BlockPos blockPos : includedBlockPositions)
-            if (!visited.contains(blockPos))
+        }
+        for (BlockPos blockPos : includedBlockPositions) {
+            if (!visited.contains(blockPos)) {
                 frontier.add(blockPos);
+            }
+        }
         return true;
     }
 
     protected Pair<StructureBlockInfo, BlockEntity> capture(Level world, BlockPos pos) {
         BlockState blockstate = world.getBlockState(pos);
-        if (blockstate.is(AllBlocks.REDSTONE_CONTACT))
+        if (blockstate.is(AllBlocks.REDSTONE_CONTACT)) {
             blockstate = blockstate.setValue(RedstoneContactBlock.POWERED, true);
-        if (blockstate.is(AllBlocks.POWERED_SHAFT))
+        }
+        if (blockstate.is(AllBlocks.POWERED_SHAFT)) {
             blockstate = BlockHelper.copyProperties(blockstate, AllBlocks.SHAFT.defaultBlockState());
-        if (blockstate.getBlock() instanceof ControlsBlock && getType().is(AllContraptionTypeTags.OPENS_CONTROLS))
+        }
+        if (blockstate.getBlock() instanceof ControlsBlock && getType().is(AllContraptionTypeTags.OPENS_CONTROLS)) {
             blockstate = blockstate.setValue(ControlsBlock.OPEN, true);
-        if (blockstate.hasProperty(SlidingDoorBlock.VISIBLE))
+        }
+        if (blockstate.hasProperty(SlidingDoorBlock.VISIBLE)) {
             blockstate = blockstate.setValue(SlidingDoorBlock.VISIBLE, false);
+        }
         if (blockstate.getBlock() instanceof ButtonBlock) {
             blockstate = blockstate.setValue(ButtonBlock.POWERED, false);
             world.scheduleTick(pos, blockstate.getBlock(), -1);
@@ -613,11 +746,19 @@ public abstract class Contraption {
         }
         CompoundTag compoundnbt = getBlockEntityNBT(world, pos);
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof PoweredShaftBlockEntity)
+        if (blockEntity instanceof PoweredShaftBlockEntity) {
             blockEntity = new BracketedKineticBlockEntity(pos, blockstate);
+        }
         if (blockEntity instanceof FactoryPanelBlockEntity fpbe) {
-            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), LOGGER)) {
-                fpbe.writeSafe(new TagValueOutput(logging, world.registryAccess().createSerializationContext(NbtOps.INSTANCE), compoundnbt));
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                blockEntity.problemPath(),
+                LOGGER
+            )) {
+                fpbe.writeSafe(new TagValueOutput(
+                    logging,
+                    world.registryAccess().createSerializationContext(NbtOps.INSTANCE),
+                    compoundnbt
+                ));
             }
         }
 
@@ -630,8 +771,9 @@ public abstract class Contraption {
         BlockState state = captured.state();
         StructureBlockInfo structureBlockInfo = new StructureBlockInfo(localPos, state, captured.nbt());
 
-        if (blocks.put(localPos, structureBlockInfo) != null)
+        if (blocks.put(localPos, structureBlockInfo) != null) {
             return;
+        }
         bounds = bounds.minmax(new AABB(localPos));
 
         BlockEntity be = pair.getValue();
@@ -647,28 +789,33 @@ public abstract class Contraption {
 
         captureMultiblock(localPos, structureBlockInfo, be);
 
-        if (MovementBehaviour.REGISTRY.get(state) != null)
+        if (MovementBehaviour.REGISTRY.get(state) != null) {
             actors.add(MutablePair.of(structureBlockInfo, null));
+        }
 
         MovingInteractionBehaviour interactionBehaviour = MovingInteractionBehaviour.REGISTRY.get(state);
-        if (interactionBehaviour != null)
+        if (interactionBehaviour != null) {
             interactors.put(localPos, interactionBehaviour);
+        }
 
-        if (be instanceof CreativeCrateBlockEntity crateBlockEntity && crateBlockEntity.getBehaviour(ServerFilteringBehaviour.TYPE).getFilter()
-            .isEmpty())
+        if (be instanceof CreativeCrateBlockEntity crateBlockEntity && crateBlockEntity.getBehaviour(
+            ServerFilteringBehaviour.TYPE).getFilter().isEmpty()) {
             hasUniversalCreativeCrate = true;
+        }
     }
 
     protected void captureMultiblock(BlockPos localPos, StructureBlockInfo structureBlockInfo, BlockEntity be) {
-        if (!(be instanceof IMultiBlockEntityContainer multiBlockBE))
+        if (!(be instanceof IMultiBlockEntityContainer multiBlockBE)) {
             return;
+        }
 
         CompoundTag nbt = structureBlockInfo.nbt();
         BlockPos controllerPos = nbt.read("Controller", BlockPos.CODEC).map(this::toLocalPos).orElse(localPos);
         nbt.store("Controller", BlockPos.CODEC, controllerPos);
 
-        if (updateTags.containsKey(localPos))
+        if (updateTags.containsKey(localPos)) {
             updateTags.get(localPos).store("Controller", BlockPos.CODEC, controllerPos);
+        }
 
         if (multiBlockBE.isController() && multiBlockBE.getHeight() <= 1 && multiBlockBE.getWidth() <= 1) {
             nbt.store("LastKnownPos", BlockPos.CODEC, BlockPos.ZERO.below(Integer.MAX_VALUE - 1));
@@ -682,8 +829,9 @@ public abstract class Contraption {
     @Nullable
     protected CompoundTag getBlockEntityNBT(Level world, BlockPos pos) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity == null)
+        if (blockEntity == null) {
             return null;
+        }
         CompoundTag nbt = blockEntity.saveWithFullMetadata(world.registryAccess());
         nbt.remove("x");
         nbt.remove("y");
@@ -710,7 +858,8 @@ public abstract class Contraption {
         capturedMultiblocks.clear();
         view.childrenListOrEmpty("CapturedMultiblocks").forEach(c -> {
             BlockPos controllerPos = c.read("Controller", BlockPos.CODEC).orElseThrow();
-            c.read("Parts", CreateCodecs.BLOCK_POS_LIST_CODEC).orElseThrow().forEach(pos -> capturedMultiblocks.put(controllerPos, blocks.get(pos)));
+            c.read("Parts", CreateCodecs.BLOCK_POS_LIST_CODEC).orElseThrow()
+                .forEach(pos -> capturedMultiblocks.put(controllerPos, blocks.get(pos)));
         });
 
         storage.read(view, spawnData, this);
@@ -719,8 +868,9 @@ public abstract class Contraption {
         view.childrenListOrEmpty("Actors").forEach(c -> {
             c.read("Pos", BlockPos.CODEC).ifPresent(pos -> {
                 StructureBlockInfo info = blocks.get(pos);
-                if (info == null)
+                if (info == null) {
                     return;
+                }
                 MovementContext context = MovementContext.read(world, info, c, this);
                 actors.add(MutablePair.of(info, context));
             });
@@ -745,11 +895,13 @@ public abstract class Contraption {
         view.read("Interactors", CreateCodecs.BLOCK_POS_LIST_CODEC).ifPresentOrElse(
             list -> list.forEach(pos -> {
                 StructureBlockInfo structureBlockInfo = blocks.get(pos);
-                if (structureBlockInfo == null)
+                if (structureBlockInfo == null) {
                     return;
+                }
                 MovingInteractionBehaviour behaviour = MovingInteractionBehaviour.REGISTRY.get(structureBlockInfo.state());
-                if (behaviour != null)
+                if (behaviour != null) {
                     interactors.put(pos, behaviour);
+                }
             }), interactors::clear
         );
 
@@ -777,8 +929,9 @@ public abstract class Contraption {
         ValueOutput.ValueOutputList actors = view.childrenList("Actors");
         for (MutablePair<StructureBlockInfo, MovementContext> actor : getActors()) {
             MovementBehaviour behaviour = MovementBehaviour.REGISTRY.get(actor.left.state());
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             ValueOutput item = actors.addChild();
             item.store("Pos", BlockPos.CODEC, actor.left.pos());
             behaviour.writeExtraData(actor.right);
@@ -904,7 +1057,10 @@ public abstract class Contraption {
         );
     }
 
-    private static StructureBlockInfo legacyReadStructureBlockInfo(CompoundTag blockListEntry, HolderGetter<Block> holderGetter) {
+    private static StructureBlockInfo legacyReadStructureBlockInfo(
+        CompoundTag blockListEntry,
+        HolderGetter<Block> holderGetter
+    ) {
         return new StructureBlockInfo(
             NBTHelper.readBlockPos(blockListEntry, "Pos"),
             NbtUtils.readBlockState(holderGetter, blockListEntry.getCompoundOrEmpty("Block")),
@@ -919,34 +1075,44 @@ public abstract class Contraption {
         });
 
         List<BoundingBox> minimisedGlue = new ArrayList<>();
-        for (int i = 0; i < superglue.size(); i++)
+        for (int i = 0; i < superglue.size(); i++) {
             minimisedGlue.add(null);
+        }
 
         for (boolean brittles : Iterate.trueAndFalse) {
             for (Iterator<StructureBlockInfo> iterator = blocks.values().iterator(); iterator.hasNext(); ) {
                 StructureBlockInfo block = iterator.next();
-                if (brittles != BlockMovementChecks.isBrittle(block.state()))
+                if (brittles != BlockMovementChecks.isBrittle(block.state())) {
                     continue;
+                }
 
                 for (int i = 0; i < superglue.size(); i++) {
                     AABB aabb = superglue.get(i);
-                    if (aabb == null || !aabb.contains(block.pos().getX() + .5, block.pos().getY() + .5, block.pos().getZ() + .5))
+                    if (aabb == null || !aabb.contains(
+                        block.pos().getX() + .5,
+                        block.pos().getY() + .5,
+                        block.pos().getZ() + .5
+                    )) {
                         continue;
-                    if (minimisedGlue.get(i) == null)
+                    }
+                    if (minimisedGlue.get(i) == null) {
                         minimisedGlue.set(i, new BoundingBox(block.pos()));
-                    else
+                    } else {
                         minimisedGlue.set(i, BBHelper.encapsulate(minimisedGlue.get(i), block.pos()));
+                    }
                 }
 
                 BlockPos add = block.pos().offset(anchor).offset(offset);
-                if (customBlockRemoval(world, add, block.state()))
+                if (customBlockRemoval(world, add, block.state())) {
                     continue;
+                }
                 BlockState oldState = world.getBlockState(add);
                 Block blockIn = oldState.getBlock();
                 boolean blockMismatch = block.state().getBlock() != blockIn;
                 blockMismatch &= AllBlocks.POWERED_SHAFT != blockIn || !block.state().is(AllBlocks.SHAFT);
-                if (blockMismatch)
+                if (blockMismatch) {
                     iterator.remove();
+                }
                 world.removeBlockEntity(add);
                 int flags = Block.UPDATE_MOVE_BY_PISTON | Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_CLIENTS | Block.UPDATE_IMMEDIATE;
                 if (blockIn instanceof SimpleWaterloggedBlock && oldState.hasProperty(BlockStateProperties.WATERLOGGED) && oldState.getValue(
@@ -960,11 +1126,13 @@ public abstract class Contraption {
 
         superglue.clear();
         for (BoundingBox box : minimisedGlue) {
-            if (box == null)
+            if (box == null) {
                 continue;
+            }
             AABB bb = new AABB(box.minX(), box.minY(), box.minZ(), box.maxX() + 1, box.maxY() + 1, box.maxZ() + 1);
-            if (bb.getSize() > 1.01)
+            if (bb.getSize() > 1.01) {
                 superglue.add(bb);
+            }
         }
 
         for (StructureBlockInfo block : blocks.values()) {
@@ -987,14 +1155,22 @@ public abstract class Contraption {
                 });
             });
 
-            BlockHelper.markAndNotifyBlock(world, add, world.getChunkAt(add), block.state(), Blocks.AIR.defaultBlockState(), flags);
+            BlockHelper.markAndNotifyBlock(
+                world,
+                add,
+                world.getChunkAt(add),
+                block.state(),
+                Blocks.AIR.defaultBlockState(),
+                flags
+            );
             block.state().updateIndirectNeighbourShapes(world, add, flags & -2);
         }
     }
 
     public void addBlocksToWorld(Level world, StructureTransform transform) {
-        if (disassembled)
+        if (disassembled) {
             return;
+        }
         disassembled = true;
 
         boolean shouldDropBlocks = !AllConfigs.server().kinetics.noDropWhenContraptionReplaceBlocks.get();
@@ -1003,17 +1179,19 @@ public abstract class Contraption {
 
         for (boolean nonBrittles : Iterate.trueAndFalse) {
             for (StructureBlockInfo block : blocks.values()) {
-                if (nonBrittles == BlockMovementChecks.isBrittle(block.state()))
+                if (nonBrittles == BlockMovementChecks.isBrittle(block.state())) {
                     continue;
+                }
 
                 BlockPos targetPos = transform.apply(block.pos());
                 BlockState state = transform.apply(block.state());
 
-                if (customBlockPlacement(world, targetPos, state))
+                if (customBlockPlacement(world, targetPos, state)) {
                     continue;
+                }
 
-                if (nonBrittles)
-                    for (Direction face : Iterate.directions)
+                if (nonBrittles) {
+                    for (Direction face : Iterate.directions) {
                         state = state.updateShape(
                             world,
                             world,
@@ -1023,12 +1201,15 @@ public abstract class Contraption {
                             world.getBlockState(targetPos.relative(face)),
                             world.random
                         );
+                    }
+                }
 
                 BlockState blockState = world.getBlockState(targetPos);
                 if (blockState.getDestroySpeed(world, targetPos) == -1 || (state.getCollisionShape(world, targetPos)
                     .isEmpty() && !blockState.getCollisionShape(world, targetPos).isEmpty())) {
-                    if (targetPos.getY() == world.getMinY())
+                    if (targetPos.getY() == world.getMinY()) {
                         targetPos = targetPos.above();
+                    }
                     world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, targetPos, Block.getId(state));
                     if (shouldDropBlocks) {
                         Block.dropResources(state, world, targetPos, null);
@@ -1042,11 +1223,13 @@ public abstract class Contraption {
 
                 world.destroyBlock(targetPos, shouldDropBlocks);
 
-                if (state.is(AllBlocks.SHAFT))
+                if (state.is(AllBlocks.SHAFT)) {
                     state = ShaftBlock.pickCorrectShaftType(state, world, targetPos);
-                if (state.hasProperty(SlidingDoorBlock.VISIBLE))
+                }
+                if (state.hasProperty(SlidingDoorBlock.VISIBLE)) {
                     state = state.setValue(SlidingDoorBlock.VISIBLE, !state.getValue(SlidingDoorBlock.OPEN))
                         .setValue(SlidingDoorBlock.POWERED, false);
+                }
                 // Stop Sculk shriekers from getting "stuck" if moved mid-shriek.
                 if (state.is(Blocks.SCULK_SHRIEKER)) {
                     state = Blocks.SCULK_SHRIEKER.defaultBlockState();
@@ -1057,8 +1240,9 @@ public abstract class Contraption {
                 boolean verticalRotation = transform.rotationAxis == null || transform.rotationAxis.isHorizontal();
                 verticalRotation = verticalRotation && transform.rotation != Rotation.NONE;
                 if (verticalRotation) {
-                    if (state.getBlock() instanceof RopeBlock || state.getBlock() instanceof MagnetBlock || state.getBlock() instanceof DoorBlock)
+                    if (state.getBlock() instanceof RopeBlock || state.getBlock() instanceof MagnetBlock || state.getBlock() instanceof DoorBlock) {
                         world.destroyBlock(targetPos, shouldDropBlocks);
+                    }
                 }
 
                 BlockEntity blockEntity = world.getBlockEntity(targetPos);
@@ -1066,11 +1250,13 @@ public abstract class Contraption {
                 CompoundTag tag = block.nbt();
 
                 // Temporary fix: Calling load(CompoundTag tag) on a Sculk sensor causes it to not react to vibrations.
-                if (state.is(Blocks.SCULK_SENSOR) || state.is(Blocks.SCULK_SHRIEKER))
+                if (state.is(Blocks.SCULK_SENSOR) || state.is(Blocks.SCULK_SHRIEKER)) {
                     tag = null;
+                }
 
-                if (blockEntity != null)
+                if (blockEntity != null) {
                     tag = NBTProcessors.process(state, blockEntity, tag, false);
+                }
                 if (blockEntity != null && tag != null) {
                     tag.putInt("x", targetPos.getX());
                     tag.putInt("y", targetPos.getY());
@@ -1088,7 +1274,10 @@ public abstract class Contraption {
                         }
                     }
 
-                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), LOGGER)) {
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                        blockEntity.problemPath(),
+                        LOGGER
+                    )) {
                         blockEntity.loadWithComponents(TagValueInput.create(logging, world.registryAccess(), tag));
                     }
                 }
@@ -1102,8 +1291,9 @@ public abstract class Contraption {
         }
 
         for (StructureBlockInfo block : blocks.values()) {
-            if (!shouldUpdateAfterMovement(block))
+            if (!shouldUpdateAfterMovement(block)) {
                 continue;
+            }
             BlockPos targetPos = transform.apply(block.pos());
             BlockHelper.markAndNotifyBlock(
                 world,
@@ -1116,9 +1306,13 @@ public abstract class Contraption {
         }
 
         for (AABB box : superglue) {
-            box = new AABB(transform.apply(new Vec3(box.minX, box.minY, box.minZ)), transform.apply(new Vec3(box.maxX, box.maxY, box.maxZ)));
-            if (!world.isClientSide())
+            box = new AABB(
+                transform.apply(new Vec3(box.minX, box.minY, box.minZ)),
+                transform.apply(new Vec3(box.maxX, box.maxY, box.maxZ))
+            );
+            if (!world.isClientSide()) {
                 world.addFreshEntity(new SuperGlueEntity(world, box));
+            }
         }
     }
 
@@ -1134,8 +1328,9 @@ public abstract class Contraption {
             Collection<StructureBlockInfo> multiblockParts = capturedMultiblocks.get(controllerPos);
             Optional<BoundingBox> optionalBoundingBox = BoundingBox.encapsulatingPositions(multiblockParts.stream()
                 .map(info -> transform.apply(info.pos())).toList());
-            if (optionalBoundingBox.isEmpty())
+            if (optionalBoundingBox.isEmpty()) {
                 return;
+            }
 
             BoundingBox boundingBox = optionalBoundingBox.get();
             BlockPos newControllerPos = new BlockPos(boundingBox.minX(), boundingBox.minY(), boundingBox.minZ());
@@ -1143,33 +1338,45 @@ public abstract class Contraption {
 
             multiblockParts.forEach(info -> info.nbt().store("Controller", BlockPos.CODEC, newControllerPos));
 
-            if (controllerPos.equals(otherPos))
+            if (controllerPos.equals(otherPos)) {
                 return;
+            }
 
             // swap nbt data to the new controller position
             StructureBlockInfo prevControllerInfo = blocks.get(controllerPos);
             StructureBlockInfo newControllerInfo = blocks.get(otherPos);
-            if (prevControllerInfo == null || newControllerInfo == null)
+            if (prevControllerInfo == null || newControllerInfo == null) {
                 return;
+            }
 
-            blocks.put(otherPos, new StructureBlockInfo(newControllerInfo.pos(), newControllerInfo.state(), prevControllerInfo.nbt()));
-            blocks.put(controllerPos, new StructureBlockInfo(prevControllerInfo.pos(), prevControllerInfo.state(), newControllerInfo.nbt()));
+            blocks.put(
+                otherPos,
+                new StructureBlockInfo(newControllerInfo.pos(), newControllerInfo.state(), prevControllerInfo.nbt())
+            );
+            blocks.put(
+                controllerPos,
+                new StructureBlockInfo(prevControllerInfo.pos(), prevControllerInfo.state(), newControllerInfo.nbt())
+            );
         });
     }
 
     public void addPassengersToWorld(Level world, StructureTransform transform, List<Entity> seatedEntities) {
         for (Entity seatedEntity : seatedEntities) {
-            if (getSeatMapping().isEmpty())
+            if (getSeatMapping().isEmpty()) {
                 continue;
+            }
             Integer seatIndex = getSeatMapping().get(seatedEntity.getUUID());
-            if (seatIndex == null)
+            if (seatIndex == null) {
                 continue;
+            }
             BlockPos seatPos = getSeats().get(seatIndex);
             seatPos = transform.apply(seatPos);
-            if (!(world.getBlockState(seatPos).getBlock() instanceof SeatBlock))
+            if (!(world.getBlockState(seatPos).getBlock() instanceof SeatBlock)) {
                 continue;
-            if (SeatBlock.isSeatOccupied(world, seatPos))
+            }
+            if (SeatBlock.isSeatOccupied(world, seatPos)) {
                 continue;
+            }
             SeatBlock.sitDown(world, seatPos, seatedEntity);
         }
     }
@@ -1180,25 +1387,31 @@ public abstract class Contraption {
         for (MutablePair<StructureBlockInfo, MovementContext> pair : actors) {
             MovementContext context = new MovementContext(world, pair.left, this);
             MovementBehaviour behaviour = MovementBehaviour.REGISTRY.get(pair.left.state());
-            if (behaviour != null)
+            if (behaviour != null) {
                 behaviour.startMoving(context);
+            }
             pair.setRight(context);
-            if (behaviour instanceof ContraptionControlsMovement)
+            if (behaviour instanceof ContraptionControlsMovement) {
                 disableActorOnStart(context);
+            }
         }
 
-        for (ItemStack stack : disabledActors)
+        for (ItemStack stack : disabledActors) {
             setActorsActive(stack, false);
+        }
     }
 
     protected void disableActorOnStart(MovementContext context) {
-        if (!ContraptionControlsMovement.isDisabledInitially(context))
+        if (!ContraptionControlsMovement.isDisabledInitially(context)) {
             return;
+        }
         ItemStack filter = ContraptionControlsMovement.getFilter(context);
-        if (filter == null)
+        if (filter == null) {
             return;
-        if (isActorTypeDisabled(filter))
+        }
+        if (isActorTypeDisabled(filter)) {
             return;
+        }
         disabledActors.add(filter);
     }
 
@@ -1209,16 +1422,23 @@ public abstract class Contraption {
     public void setActorsActive(ItemStack referenceStack, boolean enable) {
         for (MutablePair<StructureBlockInfo, MovementContext> pair : actors) {
             MovementBehaviour behaviour = MovementBehaviour.REGISTRY.get(pair.left.state());
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             ItemStack behaviourStack = behaviour.canBeDisabledVia(pair.right);
-            if (behaviourStack == null)
+            if (behaviourStack == null) {
                 continue;
-            if (!referenceStack.isEmpty() && !ContraptionControlsMovement.isSameFilter(referenceStack, behaviourStack))
+            }
+            if (!referenceStack.isEmpty() && !ContraptionControlsMovement.isSameFilter(
+                referenceStack,
+                behaviourStack
+            )) {
                 continue;
+            }
             pair.right.disabled = !enable;
-            if (!enable)
+            if (!enable) {
                 behaviour.onDisabledByControls(pair.right);
+            }
         }
     }
 
@@ -1241,17 +1461,20 @@ public abstract class Contraption {
     public void forEachActor(Level world, BiConsumer<MovementBehaviour, MovementContext> callBack) {
         for (MutablePair<StructureBlockInfo, MovementContext> pair : actors) {
             MovementBehaviour behaviour = MovementBehaviour.REGISTRY.get(pair.getLeft().state());
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             callBack.accept(behaviour, pair.getRight());
         }
     }
 
     protected boolean shouldUpdateAfterMovement(StructureBlockInfo info) {
-        if (PoiTypes.forState(info.state()).isPresent())
+        if (PoiTypes.forState(info.state()).isPresent()) {
             return false;
-        if (info.state().getBlock() instanceof SlidingDoorBlock)
+        }
+        if (info.state().getBlock() instanceof SlidingDoorBlock) {
             return false;
+        }
         return true;
     }
 
@@ -1286,17 +1509,20 @@ public abstract class Contraption {
     }
 
     public BlockPos getSeatOf(UUID entityId) {
-        if (!getSeatMapping().containsKey(entityId))
+        if (!getSeatMapping().containsKey(entityId)) {
             return null;
+        }
         int seatIndex = getSeatMapping().get(entityId);
-        if (seatIndex >= getSeats().size())
+        if (seatIndex >= getSeats().size()) {
             return null;
+        }
         return getSeats().get(seatIndex);
     }
 
     public BlockPos getBearingPosOf(UUID subContraptionEntityId) {
-        if (stabilizedSubContraptions.containsKey(subContraptionEntityId))
+        if (stabilizedSubContraptions.containsKey(subContraptionEntityId)) {
             return stabilizedSubContraptions.get(subContraptionEntityId).getConnectedPos();
+        }
         return null;
     }
 
@@ -1322,9 +1548,11 @@ public abstract class Contraption {
 
     @Nullable
     public MutablePair<StructureBlockInfo, MovementContext> getActorAt(BlockPos localPos) {
-        for (MutablePair<StructureBlockInfo, MovementContext> pair : actors)
-            if (localPos.equals(pair.left.pos()))
+        for (MutablePair<StructureBlockInfo, MovementContext> pair : actors) {
+            if (localPos.equals(pair.left.pos())) {
                 return pair;
+            }
+        }
         return null;
     }
 
@@ -1341,9 +1569,11 @@ public abstract class Contraption {
         for (Map.Entry<BlockPos, StructureBlockInfo> entry : blocks.entrySet()) {
             StructureBlockInfo info = entry.getValue();
             BlockPos localPos = entry.getKey();
-            VoxelShape collisionShape = info.state().getCollisionShape(collisionLevel, localPos, CollisionContext.empty());
-            if (collisionShape.isEmpty())
+            VoxelShape collisionShape = info.state()
+                .getCollisionShape(collisionLevel, localPos, CollisionContext.empty());
+            if (collisionShape.isEmpty()) {
                 continue;
+            }
 
             populate.offsetX = localPos.getX();
             populate.offsetY = localPos.getY();
@@ -1379,8 +1609,9 @@ public abstract class Contraption {
 
             int distSq = a * a + b * b;
 
-            if (distSq > maxDistSq)
+            if (distSq > maxDistSq) {
                 maxDistSq = distSq;
+            }
         }
 
         return Math.sqrt(maxDistSq);
@@ -1405,8 +1636,9 @@ public abstract class Contraption {
     public boolean containsBlockBreakers() {
         for (MutablePair<StructureBlockInfo, MovementContext> pair : actors) {
             MovementBehaviour behaviour = MovementBehaviour.REGISTRY.get(pair.getLeft().state());
-            if (behaviour instanceof BlockBreakingMovementBehaviour || behaviour instanceof HarvesterMovementBehaviour)
+            if (behaviour instanceof BlockBreakingMovementBehaviour || behaviour instanceof HarvesterMovementBehaviour) {
                 return true;
+            }
         }
         return false;
     }

@@ -26,7 +26,11 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
     private final PartialModel halfRope;
     private final PartialModel halfMagnet;
 
-    public AbstractPulleyRenderer(BlockEntityRendererProvider.Context context, PartialModel halfRope, PartialModel halfMagnet) {
+    public AbstractPulleyRenderer(
+        BlockEntityRendererProvider.Context context,
+        PartialModel halfRope,
+        PartialModel halfMagnet
+    ) {
         super(context);
         this.halfRope = halfRope;
         this.halfMagnet = halfMagnet;
@@ -118,7 +122,11 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
 
     protected SuperByteBuffer getRotatedCoil(T be) {
         BlockState blockState = be.getBlockState();
-        return CachedBuffers.partialFacing(getCoil(), blockState, Direction.get(AxisDirection.POSITIVE, getShaftAxis(be)));
+        return CachedBuffers.partialFacing(
+            getCoil(),
+            blockState,
+            Direction.get(AxisDirection.POSITIVE, getShaftAxis(be))
+        );
     }
 
     public static float getCoilVScroll(SpriteShiftEntry coilShift, float offset, float speedModifier) {

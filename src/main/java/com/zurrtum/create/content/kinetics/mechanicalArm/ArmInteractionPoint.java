@@ -9,11 +9,6 @@ import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -27,22 +22,29 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
+import java.util.function.Supplier;
 
 public class ArmInteractionPoint {
     public static Codec<ArmInteractionPoint> getCodec(Level world, BlockPos anchor) {
         return RecordCodecBuilder.create(instance -> instance.group(
-            CreateRegistries.ARM_INTERACTION_POINT_TYPE.byNameCodec().fieldOf("Type").forGetter(ArmInteractionPoint::getType),
+            CreateRegistries.ARM_INTERACTION_POINT_TYPE.byNameCodec().fieldOf("Type")
+                .forGetter(ArmInteractionPoint::getType),
             BlockPos.CODEC.fieldOf("Pos").forGetter(point -> point.pos.subtract(anchor)),
             Mode.CODEC.fieldOf("Mode").forGetter(ArmInteractionPoint::getMode)
         ).apply(
             instance, (type, pos, mode) -> {
                 pos = pos.offset(anchor);
                 BlockState state = world.getBlockState(pos);
-                if (!type.canCreatePoint(world, pos, state))
+                if (!type.canCreatePoint(world, pos, state)) {
                     return null;
+                }
                 ArmInteractionPoint point = type.createPoint(world, pos, state);
-                if (point == null)
+                if (point == null) {
                     return null;
+                }
                 point.mode = mode;
                 return point;
             }
@@ -106,8 +108,14 @@ public class ArmInteractionPoint {
     }
 
     public ArmAngleTarget getTargetAngles(BlockPos armPos, boolean ceiling) {
-        if (cachedAngles == null)
-            cachedAngles = new ArmAngleTarget(armPos, getInteractionPositionVector(), getInteractionDirection(), ceiling);
+        if (cachedAngles == null) {
+            cachedAngles = new ArmAngleTarget(
+                armPos,
+                getInteractionPositionVector(),
+                getInteractionDirection(),
+                ceiling
+            );
+        }
 
         return cachedAngles;
     }
@@ -128,17 +136,24 @@ public class ArmInteractionPoint {
     protected Container getHandler(ArmBlockEntity armBlockEntity) {
         if (cachedHandler == null && level instanceof ServerLevel serverLevel) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be == null)
+            if (be == null) {
                 return null;
-            cachedHandler = ItemHelper.getInventoryCache(serverLevel, pos, Direction.UP, (blockEntity, direction) -> !armBlockEntity.isRemoved());
+            }
+            cachedHandler = ItemHelper.getInventoryCache(
+                serverLevel,
+                pos,
+                Direction.UP,
+                (blockEntity, direction) -> !armBlockEntity.isRemoved()
+            );
         }
         return cachedHandler.get();
     }
 
     public ItemStack insert(ArmBlockEntity armBlockEntity, ItemStack stack, boolean simulate) {
         Container handler = getHandler(armBlockEntity);
-        if (handler == null)
+        if (handler == null) {
             return stack;
+        }
         int insert;
         if (simulate) {
             insert = handler.countSpace(stack, Direction.UP);
@@ -157,8 +172,9 @@ public class ArmInteractionPoint {
 
     public ItemStack extract(ArmBlockEntity armBlockEntity, int slot, int amount, boolean simulate) {
         Container handler = getHandler(armBlockEntity);
-        if (handler == null)
+        if (handler == null) {
             return ItemStack.EMPTY;
+        }
         if (simulate) {
             return handler.count(stack -> true, amount, Direction.UP);
         }
@@ -171,8 +187,9 @@ public class ArmInteractionPoint {
 
     public int getSlotCount(ArmBlockEntity armBlockEntity) {
         Container handler = getHandler(armBlockEntity);
-        if (handler == null)
+        if (handler == null) {
             return 0;
+        }
         return handler.getContainerSize();
     }
 
@@ -186,8 +203,9 @@ public class ArmInteractionPoint {
 
     public final CompoundTag serialize(BlockPos anchor) {
         Identifier key = CreateRegistries.ARM_INTERACTION_POINT_TYPE.getKey(type);
-        if (key == null)
+        if (key == null) {
             throw new IllegalArgumentException("Could not get id for ArmInteractionPointType " + type + "!");
+        }
 
         CompoundTag nbt = new CompoundTag();
         nbt.putString("Type", key.toString());
@@ -199,18 +217,22 @@ public class ArmInteractionPoint {
     @Nullable
     public static ArmInteractionPoint deserialize(CompoundTag nbt, Level level, BlockPos anchor) {
         Identifier id = Identifier.tryParse(nbt.getStringOr("Type", ""));
-        if (id == null)
+        if (id == null) {
             return null;
+        }
         ArmInteractionPointType type = CreateRegistries.ARM_INTERACTION_POINT_TYPE.getValue(id);
-        if (type == null)
+        if (type == null) {
             return null;
+        }
         BlockPos pos = NBTHelper.readBlockPos(nbt, "Pos").offset(anchor);
         BlockState state = level.getBlockState(pos);
-        if (!type.canCreatePoint(level, pos, state))
+        if (!type.canCreatePoint(level, pos, state)) {
             return null;
+        }
         ArmInteractionPoint point = type.createPoint(level, pos, state);
-        if (point == null)
+        if (point == null) {
             return null;
+        }
         point.deserialize(nbt, anchor);
         return point;
     }
@@ -228,14 +250,14 @@ public class ArmInteractionPoint {
     @Nullable
     public static ArmInteractionPoint create(Level level, BlockPos pos, BlockState state) {
         ArmInteractionPointType type = ArmInteractionPointType.getPrimaryType(level, pos, state);
-        if (type == null)
+        if (type == null) {
             return null;
+        }
         return type.createPoint(level, pos, state);
     }
 
     public enum Mode implements StringRepresentable {
-        DEPOSIT("create.mechanical_arm.deposit_to", 0xDDC166),
-        TAKE("create.mechanical_arm.extract_from", 0x7FCDE0);
+        DEPOSIT("create.mechanical_arm.deposit_to", 0xDDC166), TAKE("create.mechanical_arm.extract_from", 0x7FCDE0);
 
         public static final Codec<Mode> CODEC = StringRepresentable.fromEnum(Mode::values);
         public static final StreamCodec<ByteBuf, Mode> PACKET_CODEC = CatnipStreamCodecBuilders.ofEnum(Mode.class);

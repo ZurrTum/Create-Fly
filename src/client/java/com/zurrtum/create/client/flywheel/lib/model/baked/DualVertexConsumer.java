@@ -13,7 +13,16 @@ public class DualVertexConsumer extends VertexMultiConsumer.Double {
     }
 
     @Override
-    public void putBulkData(PoseStack.Pose matrixEntry, BakedQuad quad, float red, float green, float blue, float f, int i, int j) {
+    public void putBulkData(
+        PoseStack.Pose matrixEntry,
+        BakedQuad quad,
+        float red,
+        float green,
+        float blue,
+        float f,
+        int i,
+        int j
+    ) {
         first.putBulkData(matrixEntry, quad, red, green, blue, f, i, j);
         second.putBulkData(matrixEntry, quad, red, green, blue, f, i, j);
     }

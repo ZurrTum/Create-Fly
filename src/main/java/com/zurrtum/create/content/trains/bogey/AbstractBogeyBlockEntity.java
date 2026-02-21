@@ -29,8 +29,9 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
     public abstract BogeyStyle getDefaultStyle();
 
     public CompoundTag getBogeyData() {
-        if (bogeyData == null || !bogeyData.contains(BOGEY_STYLE_KEY))
+        if (bogeyData == null || !bogeyData.contains(BOGEY_STYLE_KEY)) {
             bogeyData = createBogeyData();
+        }
         return bogeyData;
     }
 
@@ -61,8 +62,9 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
     @Override
     protected void saveAdditional(ValueOutput view) {
         CompoundTag data = this.getBogeyData();
-        if (data != null)
+        if (data != null) {
             view.store(BOGEY_DATA_KEY, CompoundTag.CODEC, data); // Now contains style
+        }
         super.saveAdditional(view);
     }
 
@@ -76,8 +78,9 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
         CompoundTag nbt = new CompoundTag();
         nbt.store(BOGEY_STYLE_KEY, Identifier.CODEC, getDefaultStyle().id);
         boolean upsideDown = false;
-        if (getBlockState().getBlock() instanceof AbstractBogeyBlock<?> bogeyBlock)
+        if (getBlockState().getBlock() instanceof AbstractBogeyBlock<?> bogeyBlock) {
             upsideDown = bogeyBlock.isUpsideDown(getBlockState());
+        }
         nbt.putBoolean(UPSIDE_DOWN_KEY, upsideDown);
         return nbt;
     }
@@ -96,8 +99,9 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
 
     public void animate(float distanceMoved) {
         BlockState blockState = getBlockState();
-        if (!(blockState.getBlock() instanceof AbstractBogeyBlock<?> type))
+        if (!(blockState.getBlock() instanceof AbstractBogeyBlock<?> type)) {
             return;
+        }
         double angleDiff = 360 * distanceMoved / (Math.PI * 2 * type.getWheelRadius());
         double newWheelAngle = (virtualAnimation.getValue() - angleDiff) % 360;
         virtualAnimation.setValue(newWheelAngle);
@@ -106,7 +110,8 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
     private void markUpdated() {
         setChanged();
         Level level = getLevel();
-        if (level != null)
+        if (level != null) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
     }
 }

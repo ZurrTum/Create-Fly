@@ -50,11 +50,20 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation wireOrientation, boolean isMoving) {
-        if (level.isClientSide())
+    public void neighborChanged(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Block block,
+        @Nullable Orientation wireOrientation,
+        boolean isMoving
+    ) {
+        if (level.isClientSide()) {
             return;
-        if (!level.getBlockTicks().willTickThisTick(pos, this))
+        }
+        if (!level.getBlockTicks().willTickThisTick(pos, this)) {
             level.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override
@@ -71,8 +80,9 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        if (state.getValue(VERTICAL))
+        if (state.getValue(VERTICAL)) {
             return face.getAxis().isVertical();
+        }
         return super.hasShaftTowards(world, pos, state, face);
     }
 
@@ -86,11 +96,18 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (stack.is(AllItems.WRENCH))
+        if (stack.is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (stack.getItem() instanceof BlockItem blockItem) {
-            if (blockItem.getBlock() instanceof KineticBlock && hasShaftTowards(level, pos, state, hitResult.getDirection()))
+            if (blockItem.getBlock() instanceof KineticBlock && hasShaftTowards(
+                level,
+                pos,
+                state,
+                hitResult.getDirection()
+            )) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
+            }
         }
 
         if (level.isClientSide()) {
@@ -102,8 +119,9 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Axis preferredAxis = RotatedPillarKineticBlock.getPreferredAxis(context);
-        if (preferredAxis != null && (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()))
+        if (preferredAxis != null && (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown())) {
             return withAxis(preferredAxis, context);
+        }
         return withAxis(context.getNearestLookingDirection().getAxis(), context);
     }
 
@@ -111,9 +129,11 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         BlockState newState = state;
 
-        if (context.getClickedFace().getAxis() != Axis.Y)
-            if (newState.getValue(HORIZONTAL_AXIS) != context.getClickedFace().getAxis())
+        if (context.getClickedFace().getAxis() != Axis.Y) {
+            if (newState.getValue(HORIZONTAL_AXIS) != context.getClickedFace().getAxis()) {
                 newState = newState.cycle(VERTICAL);
+            }
+        }
 
         return super.onWrenched(newState, context);
     }
@@ -125,15 +145,17 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
 
     private BlockState withAxis(Axis axis, BlockPlaceContext context) {
         BlockState state = defaultBlockState().setValue(VERTICAL, axis.isVertical());
-        if (axis.isVertical())
+        if (axis.isVertical()) {
             return state.setValue(HORIZONTAL_AXIS, context.getHorizontalDirection().getAxis());
+        }
         return state.setValue(HORIZONTAL_AXIS, axis);
     }
 
     @Override
     public Axis getRotationAxis(BlockState state) {
-        if (state.getValue(VERTICAL))
+        if (state.getValue(VERTICAL)) {
             return Axis.Y;
+        }
         return super.getRotationAxis(state);
     }
 

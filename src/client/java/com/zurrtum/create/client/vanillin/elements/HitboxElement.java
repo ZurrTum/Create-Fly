@@ -62,7 +62,8 @@ public final class HitboxElement implements Visual, SimpleDynamicVisual {
     }
 
     private TransformedInstance createInstance(Model model) {
-        TransformedInstance instance = context.instancerProvider().instancer(InstanceTypes.TRANSFORMED, model).createInstance();
+        TransformedInstance instance = context.instancerProvider().instancer(InstanceTypes.TRANSFORMED, model)
+            .createInstance();
         instance.light(LightTexture.FULL_BLOCK);
         instance.setChanged();
         return instance;
@@ -110,21 +111,29 @@ public final class HitboxElement implements Visual, SimpleDynamicVisual {
             var widthX = (float) (bb.maxX - bb.minX);
             var widthY = (float) (bb.maxY - bb.minY);
             var widthZ = (float) (bb.maxZ - bb.minZ);
-            recycler.get(BOX_MODEL).setIdentityTransform().translate(boxX, boxY, boxZ).scale(widthX, widthY, widthZ).setChanged();
+            recycler.get(BOX_MODEL).setIdentityTransform().translate(boxX, boxY, boxZ).scale(widthX, widthY, widthZ)
+                .setChanged();
 
             // TODO: multipart entities, but forge seems to have an
             //  injection for them so we'll need platform specific code.
 
             if (showEyeBox) {
-                recycler.get(BOX_MODEL).setIdentityTransform().translate(boxX, entityY + entity.getEyeHeight() - 0.01, boxZ)
-                    .scale(widthX, 0.02f, widthZ).color(255, 0, 0).setChanged();
+                recycler.get(BOX_MODEL).setIdentityTransform()
+                    .translate(boxX, entityY + entity.getEyeHeight() - 0.01, boxZ).scale(widthX, 0.02f, widthZ)
+                    .color(255, 0, 0).setChanged();
             }
 
             var viewVector = entity.getViewVector(partialTick);
 
             recycler.get(LINE_MODEL).setIdentityTransform().translate(entityX, entityY + entity.getEyeHeight(), entityZ)
-                .rotate(new Quaternionf().rotateTo(0, 1, 0, (float) viewVector.x, (float) viewVector.y, (float) viewVector.z)).color(0, 0, 255)
-                .setChanged();
+                .rotate(new Quaternionf().rotateTo(
+                    0,
+                    1,
+                    0,
+                    (float) viewVector.x,
+                    (float) viewVector.y,
+                    (float) viewVector.z
+                )).color(0, 0, 255).setChanged();
         }
 
         recycler.discardExtra();

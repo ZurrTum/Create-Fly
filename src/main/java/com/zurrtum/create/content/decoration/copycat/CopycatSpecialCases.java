@@ -14,8 +14,8 @@ public class CopycatSpecialCases {
     }
 
     public static boolean isTrapdoorMaterial(BlockState material) {
-        return material.getBlock() instanceof TrapDoorBlock && material.hasProperty(TrapDoorBlock.HALF) && material.hasProperty(TrapDoorBlock.OPEN) && material.hasProperty(
-            TrapDoorBlock.FACING);
+        return material.getBlock() instanceof TrapDoorBlock && material.hasProperty(TrapDoorBlock.HALF) && material.hasProperty(
+            TrapDoorBlock.OPEN) && material.hasProperty(TrapDoorBlock.FACING);
     }
 
 }

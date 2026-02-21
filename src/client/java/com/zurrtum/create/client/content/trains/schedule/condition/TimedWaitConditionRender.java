@@ -30,7 +30,8 @@ public abstract class TimedWaitConditionRender<T extends TimedWaitCondition> imp
         Identifier id = input.getId();
         return ImmutableList.of(
             Component.translatable(id.getNamespace() + ".schedule." + type + "." + id.getPath()),
-            CreateLang.translateDirect("schedule.condition.for_x_time", formatTime(input, false)).withStyle(ChatFormatting.DARK_AQUA)
+            CreateLang.translateDirect("schedule.condition.for_x_time", formatTime(input, false))
+                .withStyle(ChatFormatting.DARK_AQUA)
         );
     }
 
@@ -49,7 +50,12 @@ public abstract class TimedWaitConditionRender<T extends TimedWaitCondition> imp
     }
 
     public List<Component> getUnitOptions() {
-        return CreateLang.translatedOptions(null, getUnitKey(TimeUnit.TICKS), getUnitKey(TimeUnit.SECONDS), getUnitKey(TimeUnit.MINUTES));
+        return CreateLang.translatedOptions(
+            null,
+            getUnitKey(TimeUnit.TICKS),
+            getUnitKey(TimeUnit.SECONDS),
+            getUnitKey(TimeUnit.MINUTES)
+        );
     }
 
     public void initConfigurationWidgets(T input, ModularGuiLineBuilder builder) {

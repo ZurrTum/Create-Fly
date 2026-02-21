@@ -13,8 +13,9 @@ public abstract class ConfigBase {
     protected List<ConfigBase> children = new ArrayList<>();
 
     public void registerAll(final Builder builder) {
-        for (CValue<?> cValue : allValues)
+        for (CValue<?> cValue : allValues) {
             cValue.register(builder);
+        }
     }
 
     public abstract String getName();
@@ -62,8 +63,9 @@ public abstract class ConfigBase {
             config.getName(), builder -> {
             config.depth = depth;
             config.registerAll(builder);
-            if (config.depth > depth)
+            if (config.depth > depth) {
                 builder.pop(config.depth - depth);
+            }
             return null;
         }
         );
@@ -97,15 +99,17 @@ public abstract class ConfigBase {
         }
 
         public V get() {
-            if (value == null)
+            if (value == null) {
                 throw new AssertionError("Config " + getName() + " was accessed, but not registered before!");
+            }
 
             return value.get();
         }
 
         public void set(V value) {
-            if (this.value == null)
+            if (this.value == null) {
                 throw new AssertionError("Config " + getName() + " was accessed, but not registered before!");
+            }
 
             this.value.set(value);
             this.value.save();
@@ -132,8 +136,9 @@ public abstract class ConfigBase {
 
         @Override
         public void register(Builder builder) {
-            if (depth > groupDepth)
+            if (depth > groupDepth) {
                 builder.pop(depth - groupDepth);
+            }
             depth = groupDepth;
             addComments(builder, comment);
             builder.push(getName());

@@ -17,8 +17,9 @@ public class ControllerValueBoxTransform extends ValueBoxTransform.Sided {
 
     @Override
     protected boolean isSideActive(BlockState state, Direction direction) {
-        if (direction.getAxis().isVertical())
+        if (direction.getAxis().isVertical()) {
             return false;
+        }
         return state.getValue(SpeedControllerBlock.HORIZONTAL_AXIS) != direction.getAxis();
     }
 

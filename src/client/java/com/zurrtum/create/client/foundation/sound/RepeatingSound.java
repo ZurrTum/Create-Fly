@@ -15,7 +15,13 @@ public class RepeatingSound {
     private final SoundScape scape;
     private final float relativeVolume;
 
-    public RepeatingSound(SoundEvent event, SoundScape scape, float sharedPitch, float relativeVolume, int repeatDelay) {
+    public RepeatingSound(
+        SoundEvent event,
+        SoundScape scape,
+        float sharedPitch,
+        float relativeVolume,
+        int repeatDelay
+    ) {
         this.event = event;
         this.scape = scape;
         this.sharedPitch = sharedPitch;
@@ -24,13 +30,23 @@ public class RepeatingSound {
     }
 
     public void tick() {
-        if (AnimationTickHolder.getTicks() % repeatDelay != 0)
+        if (AnimationTickHolder.getTicks() % repeatDelay != 0) {
             return;
+        }
 
         ClientLevel world = Minecraft.getInstance().level;
         Vec3 meanPos = scape.getMeanPos();
 
-        world.playLocalSound(meanPos.x, meanPos.y, meanPos.z, event, SoundSource.AMBIENT, scape.getVolume() * relativeVolume, sharedPitch, true);
+        world.playLocalSound(
+            meanPos.x,
+            meanPos.y,
+            meanPos.z,
+            event,
+            SoundSource.AMBIENT,
+            scape.getVolume() * relativeVolume,
+            sharedPitch,
+            true
+        );
     }
 
 }

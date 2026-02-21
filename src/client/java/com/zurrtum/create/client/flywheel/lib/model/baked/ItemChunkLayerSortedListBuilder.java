@@ -2,14 +2,14 @@ package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.rendertype.RenderType;
-
 public class ItemChunkLayerSortedListBuilder<T> {
-    private static final ThreadLocal<ItemChunkLayerSortedListBuilder<?>> THREAD_LOCAL = ThreadLocal.withInitial(ItemChunkLayerSortedListBuilder::new);
+    private static final ThreadLocal<ItemChunkLayerSortedListBuilder<?>> THREAD_LOCAL = ThreadLocal.withInitial(
+        ItemChunkLayerSortedListBuilder::new);
 
     private final List<ObjectArrayList<T>> lists;
 

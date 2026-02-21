@@ -1,10 +1,9 @@
 package com.zurrtum.create.content.logistics.crate;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Supplier;
-
-import net.minecraft.world.item.ItemStack;
 
 public class BottomlessItemHandler implements ItemInventory {
     private final Supplier<ItemStack> suppliedItemStack;
@@ -21,8 +20,9 @@ public class BottomlessItemHandler implements ItemInventory {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot == 0)
+        if (slot == 0) {
             return stack;
+        }
         return ItemStack.EMPTY;
     }
 

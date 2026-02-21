@@ -27,8 +27,9 @@ public class RedstoneLinkCondition extends ScheduleWaitCondition {
     public boolean tickCompletion(Level level, Train train, CompoundTag context) {
         int lastChecked = context.contains("LastChecked") ? context.getIntOr("LastChecked", 0) : -1;
         int status = Create.REDSTONE_LINK_NETWORK_HANDLER.globalPowerVersion.get();
-        if (status == lastChecked)
+        if (status == lastChecked) {
             return false;
+        }
         context.putInt("LastChecked", status);
         return Create.REDSTONE_LINK_NETWORK_HANDLER.hasAnyLoadedPower(freq) != lowActivation();
     }

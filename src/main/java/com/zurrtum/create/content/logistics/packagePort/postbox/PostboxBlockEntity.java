@@ -36,8 +36,9 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     public void tick() {
         super.tick();
         if (!level.isClientSide() && !isVirtual()) {
-            if (sendParticles)
+            if (sendParticles) {
                 sendData();
+            }
             return;
         }
 
@@ -46,14 +47,16 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
             int target = (inventory.isEmpty() && !forceFlag) ? 0 : 1;
             if (target != currentTarget) {
                 flag.chase(target, 0.1f, Chaser.LINEAR);
-                if (target == 1)
+                if (target == 1) {
                     AllSoundEvents.CONTRAPTION_ASSEMBLE.playAt(level, worldPosition, 1, 2, true);
+                }
             }
         }
         boolean settled = flag.getValue() > .15f;
         flag.tickChaser();
-        if (currentTarget == 0 && settled != flag.getValue() > .15f)
+        if (currentTarget == 0 && settled != flag.getValue() > .15f) {
             AllSoundEvents.CONTRAPTION_DISASSEMBLE.playAt(level, worldPosition, 0.75f, 1.5f, true);
+        }
 
         if (sendParticles) {
             sendParticles = false;
@@ -65,11 +68,17 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     protected void onOpenChange(boolean open) {
         // cached getBlockState doesn't update if we're exploded in the meantime, refreshBlockState crashes validation
         BlockState state = level.getBlockState(worldPosition);
-        if (!(state.getBlock() instanceof PostboxBlock))
+        if (!(state.getBlock() instanceof PostboxBlock)) {
             return;
+        }
 
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(PostboxBlock.OPEN, open));
-        level.playSound(null, worldPosition, open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE, SoundSource.BLOCKS);
+        level.playSound(
+            null,
+            worldPosition,
+            open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE,
+            SoundSource.BLOCKS
+        );
     }
 
     public void spawnParticles() {
@@ -79,8 +88,9 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        if (clientPacket && sendParticles)
+        if (clientPacket && sendParticles) {
             view.putBoolean("Particles", true);
+        }
         sendParticles = false;
     }
 

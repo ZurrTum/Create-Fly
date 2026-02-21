@@ -3,11 +3,6 @@ package com.zurrtum.create.client.ponder.api.scene;
 import com.zurrtum.create.client.ponder.api.element.ElementLink;
 import com.zurrtum.create.client.ponder.api.element.EntityElement;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -19,6 +14,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public interface WorldInstructions {
     HolderLookup.Provider getHolderLookupProvider();
@@ -43,7 +42,13 @@ public interface WorldInstructions {
 
     ElementLink<WorldSectionElement> makeSectionIndependent(Selection selection);
 
-    void rotateSection(ElementLink<WorldSectionElement> link, double xRotation, double yRotation, double zRotation, int duration);
+    void rotateSection(
+        ElementLink<WorldSectionElement> link,
+        double xRotation,
+        double yRotation,
+        double zRotation,
+        int duration
+    );
 
     void configureCenterOfRotation(ElementLink<WorldSectionElement> link, Vec3 anchor);
 
@@ -81,5 +86,10 @@ public interface WorldInstructions {
 
     <T extends BlockEntity> void modifyBlockEntity(BlockPos position, Class<T> beType, Consumer<T> consumer);
 
-    void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> teType, Consumer<CompoundTag> consumer, boolean reDrawBlocks);
+    void modifyBlockEntityNBT(
+        Selection selection,
+        Class<? extends BlockEntity> teType,
+        Consumer<CompoundTag> consumer,
+        boolean reDrawBlocks
+    );
 }

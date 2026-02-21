@@ -13,24 +13,23 @@ import com.zurrtum.create.content.trains.bogey.BogeyStyle;
 import com.zurrtum.create.content.trains.graph.DimensionPalette;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Random;
-
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.Random;
 
 import static com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity.BOGEY_DATA_KEY;
 import static com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity.BOGEY_STYLE_KEY;
@@ -70,13 +69,20 @@ public class CarriageBogey {
         this(type, upsideDown, bogeyData, new TravellingPoint(), new TravellingPoint());
     }
 
-    public CarriageBogey(AbstractBogeyBlock<?> type, boolean upsideDown, CompoundTag bogeyData, TravellingPoint point, TravellingPoint point2) {
+    public CarriageBogey(
+        AbstractBogeyBlock<?> type,
+        boolean upsideDown,
+        CompoundTag bogeyData,
+        TravellingPoint point,
+        TravellingPoint point2
+    ) {
         this.type = type;
         this.upsideDown = type.canBeUpsideDown() && upsideDown;
         point.upsideDown = this.upsideDown;
         point2.upsideDown = this.upsideDown;
-        if (bogeyData == null || bogeyData.isEmpty())
+        if (bogeyData == null || bogeyData.isEmpty()) {
             bogeyData = this.createBogeyData(); // Prevent Crash When Updating
+        }
         bogeyData.putBoolean(UPSIDE_DOWN_KEY, upsideDown);
         this.bogeyData = bogeyData;
         points = Couple.create(point, point2);
@@ -90,14 +96,17 @@ public class CarriageBogey {
     public ResourceKey<Level> getDimension() {
         TravellingPoint leading = leading();
         TravellingPoint trailing = trailing();
-        if (leading.edge == null || trailing.edge == null)
+        if (leading.edge == null || trailing.edge == null) {
             return null;
-        if (leading.edge.isInterDimensional() || trailing.edge.isInterDimensional())
+        }
+        if (leading.edge.isInterDimensional() || trailing.edge.isInterDimensional()) {
             return null;
+        }
         ResourceKey<Level> dimension1 = leading.node1.getLocation().dimension;
         ResourceKey<Level> dimension2 = trailing.node1.getLocation().dimension;
-        if (dimension1.equals(dimension2))
+        if (dimension1.equals(dimension2)) {
             return dimension1;
+        }
         return null;
     }
 
@@ -125,8 +134,9 @@ public class CarriageBogey {
         double newWheelAngle = (wheelAngle.getValue() - angleDiff) % 360;
 
         for (boolean twice : Iterate.trueAndFalse) {
-            if (twice && !entity.firstPositionUpdate)
+            if (twice && !entity.firstPositionUpdate) {
                 continue;
+            }
             wheelAngle.setValue(newWheelAngle);
             pitch.setValue(xRot);
             yaw.setValue(-yRot);
@@ -146,11 +156,14 @@ public class CarriageBogey {
     }
 
     public double getStress() {
-        if (getDimension() == null)
+        if (getDimension() == null) {
             return 0;
-        if (carriage.train.derailed)
+        }
+        if (carriage.train.derailed) {
             return 0;
-        return type.getWheelPointSpacing() - leading().getPosition(carriage.train.graph).distanceTo(trailing().getPosition(carriage.train.graph));
+        }
+        return type.getWheelPointSpacing() - leading().getPosition(carriage.train.graph)
+            .distanceTo(trailing().getPosition(carriage.train.graph));
     }
 
     @Nullable
@@ -160,13 +173,22 @@ public class CarriageBogey {
 
     @Nullable
     public Vec3 getAnchorPosition(boolean flipUpsideDown) {
-        if (leading().edge == null)
+        if (leading().edge == null) {
             return null;
+        }
         return points.getFirst().getPosition(carriage.train.graph, flipUpsideDown)
             .add(points.getSecond().getPosition(carriage.train.graph, flipUpsideDown)).scale(.5);
     }
 
-    public void updateCouplingAnchor(Vec3 entityPos, float entityXRot, float entityYRot, int bogeySpacing, float yaw, float pitch, boolean leading) {
+    public void updateCouplingAnchor(
+        Vec3 entityPos,
+        float entityXRot,
+        float entityYRot,
+        int bogeySpacing,
+        float yaw,
+        float pitch,
+        boolean leading
+    ) {
         boolean selfUpsideDown = isUpsideDown();
         boolean leadingUpsideDown = carriage.leadingBogey().isUpsideDown();
         Vec3 thisOffset = type.getConnectorAnchorOffset(selfUpsideDown);
@@ -181,8 +203,9 @@ public class CarriageBogey {
         thisOffset = VecHelper.rotate(thisOffset, 180, Axis.Y);
         thisOffset = VecHelper.rotate(thisOffset, -entityXRot, Axis.X);
         thisOffset = VecHelper.rotate(thisOffset, entityYRot + 90, Axis.Y);
-        if (selfUpsideDown != leadingUpsideDown)
+        if (selfUpsideDown != leadingUpsideDown) {
             thisOffset = thisOffset.add(0, selfUpsideDown ? -2 : 2, 0);
+        }
 
         couplingAnchors.set(leading, entityPos.add(thisOffset));
     }
@@ -198,7 +221,12 @@ public class CarriageBogey {
         view.store(BOGEY_DATA_KEY, CompoundTag.CODEC, bogeyData);
     }
 
-    public static <T> DataResult<T> encode(final CarriageBogey input, final DynamicOps<T> ops, final T empty, DimensionPalette dimensions) {
+    public static <T> DataResult<T> encode(
+        final CarriageBogey input,
+        final DynamicOps<T> ops,
+        final T empty,
+        DimensionPalette dimensions
+    ) {
         RecordBuilder<T> map = ops.mapBuilder();
         map.add("Type", input.type, CreateCodecs.BLOCK_CODEC);
         ListBuilder<T> list = ops.listBuilder();
@@ -224,7 +252,8 @@ public class CarriageBogey {
 
     public static <T> CarriageBogey decode(DynamicOps<T> ops, T input, TrackGraph graph, DimensionPalette dimensions) {
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        AbstractBogeyBlock<?> type = (AbstractBogeyBlock<?>) CreateCodecs.BLOCK_CODEC.parse(ops, map.get("Type")).getOrThrow();
+        AbstractBogeyBlock<?> type = (AbstractBogeyBlock<?>) CreateCodecs.BLOCK_CODEC.parse(ops, map.get("Type"))
+            .getOrThrow();
         boolean upsideDown = ops.getBooleanValue(map.get("UpsideDown")).getOrThrow();
         Iterator<T> iterator = ops.getStream(map.get("Points")).getOrThrow().iterator();
         TravellingPoint point1 = TravellingPoint.decode(ops, iterator.next(), graph, dimensions);

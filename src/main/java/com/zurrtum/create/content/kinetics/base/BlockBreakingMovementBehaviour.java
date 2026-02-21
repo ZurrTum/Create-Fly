@@ -27,8 +27,9 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void startMoving(MovementContext context) {
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
+        }
         context.data.putInt("BreakerId", -BlockBreakingKineticBlockEntity.NEXT_BREAKER_ID.incrementAndGet());
     }
 
@@ -37,42 +38,54 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
         Level world = context.world;
         BlockState stateVisited = world.getBlockState(pos);
 
-        if (!stateVisited.isRedstoneConductor(world, pos))
+        if (!stateVisited.isRedstoneConductor(world, pos)) {
             damageEntities(context, pos, world);
-        if (world.isClientSide())
+        }
+        if (world.isClientSide()) {
             return;
+        }
 
-        if (!canBreak(world, pos, stateVisited))
+        if (!canBreak(world, pos, stateVisited)) {
             return;
+        }
         context.data.store("BreakingPos", BlockPos.CODEC, pos);
         context.stall = true;
     }
 
     public void damageEntities(MovementContext context, BlockPos pos, Level world) {
-        if (context.contraption.entity instanceof OrientedContraptionEntity oce && oce.nonDamageTicks > 0)
+        if (context.contraption.entity instanceof OrientedContraptionEntity oce && oce.nonDamageTicks > 0) {
             return;
+        }
         DamageSource damageSource = getDamageSource(world);
-        if (damageSource == null && !throwsEntities(world))
+        if (damageSource == null && !throwsEntities(world)) {
             return;
+        }
         Entities:
         for (Entity entity : world.getEntitiesOfClass(Entity.class, new AABB(pos))) {
-            if (entity instanceof ItemEntity)
+            if (entity instanceof ItemEntity) {
                 continue;
-            if (entity instanceof AbstractContraptionEntity)
+            }
+            if (entity instanceof AbstractContraptionEntity) {
                 continue;
-            if (entity.isPassengerOfSameVehicle(context.contraption.entity))
+            }
+            if (entity.isPassengerOfSameVehicle(context.contraption.entity)) {
                 continue;
-            if (entity instanceof AbstractMinecart)
-                for (Entity passenger : entity.getIndirectPassengers())
-                    if (passenger instanceof AbstractContraptionEntity && ((AbstractContraptionEntity) passenger).getContraption() == context.contraption)
+            }
+            if (entity instanceof AbstractMinecart) {
+                for (Entity passenger : entity.getIndirectPassengers()) {
+                    if (passenger instanceof AbstractContraptionEntity && ((AbstractContraptionEntity) passenger).getContraption() == context.contraption) {
                         continue Entities;
+                    }
+                }
+            }
 
             if (damageSource != null && !world.isClientSide()) {
                 float damage = (float) Mth.clamp(6 * Math.pow(context.relativeMotion.length(), 0.4) + 1, 2, 10);
                 entity.hurtServer((ServerLevel) world, damageSource, damage);
             }
-            if (throwsEntities(world) && (world.isClientSide() == (entity instanceof Player)))
+            if (throwsEntities(world) && (world.isClientSide() == (entity instanceof Player))) {
                 throwEntity(context, entity);
+            }
         }
     }
 
@@ -97,10 +110,12 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
     @Override
     public void cancelStall(MovementContext context) {
         CompoundTag data = context.data;
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
-        if (!data.contains("BreakingPos"))
+        }
+        if (!data.contains("BreakingPos")) {
             return;
+        }
 
         Level world = context.world;
         int id = data.getIntOr("BreakerId", 0);
@@ -124,8 +139,9 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
         tickBreaker(context);
 
         CompoundTag data = context.data;
-        if (!data.contains("WaitingTicks"))
+        if (!data.contains("WaitingTicks")) {
             return;
+        }
 
         int waitingTicks = data.getIntOr("WaitingTicks", 0);
         if (waitingTicks-- > 0) {
@@ -143,8 +159,9 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
     public void tickBreaker(MovementContext context) {
         CompoundTag data = context.data;
-        if (context.world.isClientSide())
+        if (context.world.isClientSide()) {
             return;
+        }
         if (!data.contains("BreakingPos")) {
             context.stall = false;
             return;
@@ -195,8 +212,9 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
             stateToBreak = world.getBlockState(breakingPos);
 
             context.stall = false;
-            if (shouldDestroyStartBlock(stateToBreak))
+            if (shouldDestroyStartBlock(stateToBreak)) {
                 destroyBlock(context, breakingPos);
+            }
             onBlockBroken(context, ogPos, stateToBreak);
             ticksUntilNextProgress = -1;
             data.remove("Progress");
@@ -217,10 +235,12 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
     protected float getBlockBreakingSpeed(MovementContext context) {
         float lowerLimit = 1 / 128f;
-        if (context.contraption instanceof MountedContraption)
+        if (context.contraption instanceof MountedContraption) {
             lowerLimit = 1f;
-        if (context.contraption instanceof CarriageContraption)
+        }
+        if (context.contraption instanceof CarriageContraption) {
             lowerLimit = 2f;
+        }
         return Mth.clamp(Math.abs(context.getAnimationSpeed()) / 500f, lowerLimit, 16f);
     }
 
@@ -235,8 +255,9 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
     protected void onBlockBroken(MovementContext context, BlockPos pos, BlockState brokenState) {
         // Check for falling blocks
-        if (!(brokenState.getBlock() instanceof FallingBlock))
+        if (!(brokenState.getBlock() instanceof FallingBlock)) {
             return;
+        }
 
         CompoundTag data = context.data;
         data.putInt("WaitingTicks", 10);

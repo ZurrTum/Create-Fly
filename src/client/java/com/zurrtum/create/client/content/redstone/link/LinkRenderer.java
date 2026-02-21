@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.redstone.link;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
@@ -10,7 +11,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxRender
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -35,15 +35,17 @@ import java.util.List;
 public class LinkRenderer {
     public static void tick(Minecraft mc) {
         HitResult target = mc.hitResult;
-        if (!(target instanceof BlockHitResult result))
+        if (!(target instanceof BlockHitResult result)) {
             return;
+        }
 
         ClientLevel world = mc.level;
         BlockPos pos = result.getBlockPos();
 
         LinkBehaviour behaviour = BlockEntityBehaviour.get(world, pos, LinkBehaviour.TYPE);
-        if (behaviour == null)
+        if (behaviour == null) {
             return;
+        }
 
         Component freq1 = CreateLang.translateDirect("logistics.firstFrequency");
         Component freq2 = CreateLang.translateDirect("logistics.secondFrequency");
@@ -57,13 +59,16 @@ public class LinkRenderer {
             ValueBox box = new ValueBox(label, bb, pos).passive(!hit);
             boolean empty = behaviour.getNetworkKey().get(first).getStack().isEmpty();
 
-            if (!empty)
+            if (!empty) {
                 box.wideOutline();
+            }
 
-            Outliner.getInstance().showOutline(Pair.of(first, pos), box.transform(transform)).highlightFace(result.getDirection());
+            Outliner.getInstance().showOutline(Pair.of(first, pos), box.transform(transform))
+                .highlightFace(result.getDirection());
 
-            if (!hit)
+            if (!hit) {
                 continue;
+            }
 
             List<MutableComponent> tip = new ArrayList<>();
             tip.add(label.copy());
@@ -73,7 +78,11 @@ public class LinkRenderer {
     }
 
     @Nullable
-    public static LinkRenderState getLinkRenderState(SmartBlockEntity be, ItemModelResolver itemModelManager, double distance) {
+    public static LinkRenderState getLinkRenderState(
+        SmartBlockEntity be,
+        ItemModelResolver itemModelManager,
+        double distance
+    ) {
         LinkBehaviour behaviour = be.getBehaviour(LinkBehaviour.TYPE);
         if (behaviour == null || behaviour.behaviour == null) {
             return null;
@@ -92,10 +101,8 @@ public class LinkRenderer {
         );
     }
 
-    public record LinkRenderState(
-        ValueBoxTransform firstSlot, ItemStackRenderState firstState, float firstOffset, ValueBoxTransform secondSlot,
-        ItemStackRenderState secondState, float secondOffset
-    ) {
+    public record LinkRenderState(ValueBoxTransform firstSlot, ItemStackRenderState firstState, float firstOffset,
+                                  ValueBoxTransform secondSlot, ItemStackRenderState secondState, float secondOffset) {
         public static LinkRenderState create(
             ValueBoxTransform firstSlot,
             ValueBoxTransform secondSlot,

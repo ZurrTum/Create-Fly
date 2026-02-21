@@ -59,11 +59,18 @@ public class AllFluidConfigs {
     }
 
     @SuppressWarnings("deprecation")
-    private static void config(FlowableFluid fluid, int fogColor, Supplier<Float> fogDistance, Function<DataComponentPatch, Integer> tint) {
+    private static void config(
+        FlowableFluid fluid,
+        int fogColor,
+        Supplier<Float> fogDistance,
+        Function<DataComponentPatch, Integer> tint
+    ) {
         Identifier id = BuiltInRegistries.FLUID.getKey(fluid).withPrefix("fluid/");
         FluidConfig config = new FluidConfig(
-            () -> Minecraft.getInstance().getAtlasManager().get(new Material(TextureAtlas.LOCATION_BLOCKS, id.withSuffix("_still"))),
-            () -> Minecraft.getInstance().getAtlasManager().get(new Material(TextureAtlas.LOCATION_BLOCKS, id.withSuffix("_flow"))),
+            () -> Minecraft.getInstance().getAtlasManager()
+                .get(new Material(TextureAtlas.LOCATION_BLOCKS, id.withSuffix("_still"))),
+            () -> Minecraft.getInstance().getAtlasManager()
+                .get(new Material(TextureAtlas.LOCATION_BLOCKS, id.withSuffix("_flow"))),
             tint,
             fogDistance,
             fogColor
@@ -97,9 +104,21 @@ public class AllFluidConfigs {
         Minecraft client = Minecraft.getInstance();
         FluidState state = fluid.defaultFluidState();
         config = new FluidConfig(
-            () -> handler.getFluidSprites(client.level, client.player != null ? client.player.blockPosition() : null, state)[0],
-            () -> handler.getFluidSprites(client.level, client.player != null ? client.player.blockPosition() : null, state)[1],
-            component -> handler.getFluidColor(client.level, client.player != null ? client.player.blockPosition() : null, state)
+            () -> handler.getFluidSprites(
+                client.level,
+                client.player != null ? client.player.blockPosition() : null,
+                state
+            )[0],
+            () -> handler.getFluidSprites(
+                client.level,
+                client.player != null ? client.player.blockPosition() : null,
+                state
+            )[1],
+            component -> handler.getFluidColor(
+                client.level,
+                client.player != null ? client.player.blockPosition() : null,
+                state
+            )
         );
         CACHE.put(fluid, config);
         return config;
@@ -119,7 +138,15 @@ public class AllFluidConfigs {
         );
         config(AllFluids.TEA);
         config(AllFluids.MILK);
-        config(AllFluids.HONEY, 0xEAAE2F, () -> 96.0f * (1f / 8f * AllConfigs.client().honeyTransparencyMultiplier.getF()));
-        config(AllFluids.CHOCOLATE, 0x622020, () -> 96.0f * (1f / 32f * AllConfigs.client().chocolateTransparencyMultiplier.getF()));
+        config(
+            AllFluids.HONEY,
+            0xEAAE2F,
+            () -> 96.0f * (1f / 8f * AllConfigs.client().honeyTransparencyMultiplier.getF())
+        );
+        config(
+            AllFluids.CHOCOLATE,
+            0x622020,
+            () -> 96.0f * (1f / 32f * AllConfigs.client().chocolateTransparencyMultiplier.getF())
+        );
     }
 }

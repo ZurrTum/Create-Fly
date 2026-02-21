@@ -2,16 +2,15 @@ package com.zurrtum.create.content.fluids;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllFluids;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class AllFlowCollision {
     public static final Map<FlowEntry, BlockState> Flow = new HashMap<>();
@@ -63,7 +62,11 @@ public class AllFlowCollision {
 
     public static class FlowEntry extends Entry {
         public FlowEntry(Fluid firstFluid, Fluid secondFluid) {
-            this(firstFluid, secondFluid, BuiltInRegistries.FLUID.getId(firstFluid) > BuiltInRegistries.FLUID.getId(secondFluid));
+            this(
+                firstFluid,
+                secondFluid,
+                BuiltInRegistries.FLUID.getId(firstFluid) > BuiltInRegistries.FLUID.getId(secondFluid)
+            );
         }
 
         private FlowEntry(Fluid firstFluid, Fluid secondFluid, boolean reverse) {

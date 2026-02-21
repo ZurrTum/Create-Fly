@@ -88,14 +88,19 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
         initGathererOptions();
 
-        confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            x + background.getWidth() - 33,
+            y + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(this::onClose);
         addRenderableWidget(confirmButton);
 
         renderedItem = new ElementWidget(
             x + background.getWidth() - 11,
             y + background.getHeight() - 55
-        ).showingElement(GuiGameElement.of(AllItems.DISPLAY_LINK.getDefaultInstance()).scale(4).rotate(50, 207, -14).padding(17));
+        ).showingElement(GuiGameElement.of(AllItems.DISPLAY_LINK.getDefaultInstance()).scale(4).rotate(50, 207, -14)
+            .padding(17));
         addRenderableWidget(renderedItem);
     }
 
@@ -103,8 +108,10 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
     public void tick() {
         super.tick();
         if (sourceState != null && sourceState.getBlock() != minecraft.level.getBlockState(blockEntity.getSourcePosition())
-            .getBlock() || targetState != null && targetState.getBlock() != minecraft.level.getBlockState(blockEntity.getTargetPosition()).getBlock())
+            .getBlock() || targetState != null && targetState.getBlock() != minecraft.level.getBlockState(blockEntity.getTargetPosition())
+            .getBlock()) {
             initGathererOptions();
+        }
     }
 
     private void initGathererOptions() {
@@ -157,9 +164,10 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
             addRenderableWidget(targetLineLabel);
         }
 
-        sourceWidget = new ElementWidget(x + 37, y + 26).showingElement(GuiGameElement.of(sourceIcon)).withCallback((mX, mY) -> {
-            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_SOURCES));
-        });
+        sourceWidget = new ElementWidget(x + 37, y + 26).showingElement(GuiGameElement.of(sourceIcon))
+            .withCallback((mX, mY) -> {
+                ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_SOURCES));
+            });
 
         sourceWidget.getToolTip().addAll(List.of(
             CreateLang.translateDirect("display_link.reading_from"),
@@ -170,9 +178,10 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
         addRenderableWidget(sourceWidget);
 
-        targetWidget = new ElementWidget(x + 37, y + 105).showingElement(GuiGameElement.of(targetIcon)).withCallback((mX, mY) -> {
-            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_TARGETS));
-        });
+        targetWidget = new ElementWidget(x + 37, y + 105).showingElement(GuiGameElement.of(targetIcon))
+            .withCallback((mX, mY) -> {
+                ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_TARGETS));
+            });
 
         targetWidget.getToolTip().addAll(List.of(
             CreateLang.translateDirect("display_link.writing_to"),
@@ -191,13 +200,14 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
             if (sources.size() > 1) {
                 List<Component> options = sources.stream().map(DisplaySource::getName).toList();
-                sourceTypeSelector = new SelectionScrollInput(x + 61, y + 26, 135, 16).forOptions(options).writingTo(sourceTypeLabel)
-                    .titled(CreateLang.translateDirect("display_link.information_type")).calling(this::initGathererSourceSubOptions)
-                    .setState(startIndex);
+                sourceTypeSelector = new SelectionScrollInput(x + 61, y + 26, 135, 16).forOptions(options)
+                    .writingTo(sourceTypeLabel).titled(CreateLang.translateDirect("display_link.information_type"))
+                    .calling(this::initGathererSourceSubOptions).setState(startIndex);
                 sourceTypeSelector.onChanged();
                 addRenderableWidget(sourceTypeSelector);
-            } else
+            } else {
                 initGathererSourceSubOptions(0);
+            }
 
             addRenderableWidget(sourceTypeLabel);
         }
@@ -207,9 +217,10 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
         DisplaySource source = sources.get(i);
         source.populateData(new DisplayLinkContext(blockEntity.getLevel(), blockEntity));
 
-        if (targetLineSelector != null)
-            targetLineSelector.titled(source instanceof SingleLineDisplaySource ? CreateLang.translateDirect("display_link.display_on") : CreateLang.translateDirect(
-                "display_link.display_on_multiline"));
+        if (targetLineSelector != null) {
+            targetLineSelector.titled(source instanceof SingleLineDisplaySource ? CreateLang.translateDirect(
+                "display_link.display_on") : CreateLang.translateDirect("display_link.display_on_multiline"));
+        }
 
         configWidgets.forEach(s -> {
             s.forEach(this::removeWidget);
@@ -220,10 +231,19 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
         if (render != null) {
             DisplayLinkContext context = new DisplayLinkContext(minecraft.level, blockEntity);
             configWidgets.forEachWithContext((s, first) -> {
-                render.initConfigurationWidgets(source, context, new ModularGuiLineBuilder(font, s, guiLeft + 60, guiTop + (first ? 51 : 72)), first);
+                render.initConfigurationWidgets(
+                    source,
+                    context,
+                    new ModularGuiLineBuilder(font, s, guiLeft + 60, guiTop + (first ? 51 : 72)),
+                    first
+                );
             });
         }
-        configWidgets.forEach(s -> s.loadValues(blockEntity.getSourceConfig(), this::addRenderableWidget, this::addRenderableOnly));
+        configWidgets.forEach(s -> s.loadValues(
+            blockEntity.getSourceConfig(),
+            this::addRenderableWidget,
+            this::addRenderableOnly
+        ));
     }
 
     @Override
@@ -256,12 +276,35 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
         background.render(graphics, x, y);
         MutableComponent header = CreateLang.translateDirect("display_link.title");
-        graphics.drawString(font, header, x + background.getWidth() / 2 - font.width(header) / 2, y + 4, 0xFF592424, false);
+        graphics.drawString(
+            font,
+            header,
+            x + background.getWidth() / 2 - font.width(header) / 2,
+            y + 4,
+            0xFF592424,
+            false
+        );
 
-        if (sources.isEmpty())
-            graphics.drawString(font, CreateLang.translateDirect("display_link.no_source"), x + 65, y + 30, 0xFFD3D3D3, true);
-        if (target == null)
-            graphics.drawString(font, CreateLang.translateDirect("display_link.no_target"), x + 65, y + 109, 0xFFD3D3D3, true);
+        if (sources.isEmpty()) {
+            graphics.drawString(
+                font,
+                CreateLang.translateDirect("display_link.no_source"),
+                x + 65,
+                y + 30,
+                0xFFD3D3D3,
+                true
+            );
+        }
+        if (target == null) {
+            graphics.drawString(
+                font,
+                CreateLang.translateDirect("display_link.no_target"),
+                x + 65,
+                y + 109,
+                0xFFD3D3D3,
+                true
+            );
+        }
 
         Matrix3x2fStack ms = graphics.pose();
         ms.pushMatrix();
@@ -274,7 +317,8 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
     @Override
     protected void removeWidget(GuiEventListener p_169412_) {
-        if (p_169412_ != null)
+        if (p_169412_ != null) {
             super.removeWidget(p_169412_);
+        }
     }
 }

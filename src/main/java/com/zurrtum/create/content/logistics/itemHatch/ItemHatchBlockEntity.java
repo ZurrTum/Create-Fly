@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.logistics.itemHatch;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Clearable;

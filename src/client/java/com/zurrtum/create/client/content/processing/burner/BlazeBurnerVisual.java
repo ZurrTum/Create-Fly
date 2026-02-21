@@ -21,13 +21,12 @@ import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBlockEntity> implements SimpleDynamicVisual, SimpleTickableVisual {
 
@@ -99,17 +98,21 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
                 PartialModel rodsModel = heatLevel == BlazeBurnerBlock.HeatLevel.SEETHING ? AllPartialModels.BLAZE_BURNER_SUPER_RODS : AllPartialModels.BLAZE_BURNER_RODS;
                 PartialModel rodsModel2 = heatLevel == BlazeBurnerBlock.HeatLevel.SEETHING ? AllPartialModels.BLAZE_BURNER_SUPER_RODS_2 : AllPartialModels.BLAZE_BURNER_RODS_2;
 
-                smallRods = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(rodsModel)).createInstance();
-                largeRods = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(rodsModel2)).createInstance();
+                smallRods = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(rodsModel))
+                    .createInstance();
+                largeRods = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(rodsModel2))
+                    .createInstance();
 
                 smallRods.light(LightTexture.FULL_BRIGHT);
                 largeRods.light(LightTexture.FULL_BRIGHT);
 
             } else if (!needsRods && hasRods) {
-                if (smallRods != null)
+                if (smallRods != null) {
                     smallRods.delete();
-                if (largeRods != null)
+                }
+                if (largeRods != null) {
                     largeRods.delete();
+                }
                 smallRods = null;
                 largeRods = null;
             }
@@ -157,17 +160,18 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
 
         float horizontalAngle = AngleHelper.rad(blockEntity.headAngle.getValue(partialTicks));
 
-        head.setIdentityTransform().translate(getVisualPosition()).translateY(headY).translate(Translate.CENTER).rotateY(horizontalAngle)
-            .translateBack(Translate.CENTER).setChanged();
+        head.setIdentityTransform().translate(getVisualPosition()).translateY(headY).translate(Translate.CENTER)
+            .rotateY(horizontalAngle).translateBack(Translate.CENTER).setChanged();
 
         if (goggles != null) {
-            goggles.setIdentityTransform().translate(getVisualPosition()).translateY(headY + 8 / 16f).translate(Translate.CENTER)
-                .rotateY(horizontalAngle).translateBack(Translate.CENTER).setChanged();
+            goggles.setIdentityTransform().translate(getVisualPosition()).translateY(headY + 8 / 16f)
+                .translate(Translate.CENTER).rotateY(horizontalAngle).translateBack(Translate.CENTER).setChanged();
         }
 
         if (hat != null) {
             hat.setIdentityTransform().translate(getVisualPosition()).translateY(headY).translateY(0.75f);
-            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f).light(LightTexture.FULL_BRIGHT);
+            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f)
+                .light(LightTexture.FULL_BRIGHT);
 
             hat.setChanged();
         }
@@ -175,18 +179,23 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
         if (smallRods != null) {
             float offset1 = Mth.sin((float) ((renderTick / 16f + Math.PI) % (2 * Math.PI))) / offsetMult;
 
-            smallRods.setIdentityTransform().translate(getVisualPosition()).translateY(offset1 + animation + .125f).setChanged();
+            smallRods.setIdentityTransform().translate(getVisualPosition()).translateY(offset1 + animation + .125f)
+                .setChanged();
         }
 
         if (largeRods != null) {
             float offset2 = Mth.sin((float) ((renderTick / 16f + Math.PI / 2) % (2 * Math.PI))) / offsetMult;
 
-            largeRods.setIdentityTransform().translate(getVisualPosition()).translateY(offset2 + animation - 3 / 16f).setChanged();
+            largeRods.setIdentityTransform().translate(getVisualPosition()).translateY(offset2 + animation - 3 / 16f)
+                .setChanged();
         }
     }
 
     private void setupFlameInstance() {
-        flame = instancerProvider().instancer(AllInstanceTypes.SCROLLING, Models.partial(AllPartialModels.BLAZE_BURNER_FLAME)).createInstance();
+        flame = instancerProvider().instancer(
+            AllInstanceTypes.SCROLLING,
+            Models.partial(AllPartialModels.BLAZE_BURNER_FLAME)
+        ).createInstance();
 
         flame.position(getVisualPosition()).light(LightTexture.FULL_BRIGHT);
 

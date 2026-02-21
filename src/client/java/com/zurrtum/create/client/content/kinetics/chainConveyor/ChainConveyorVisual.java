@@ -76,12 +76,15 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
         boxes.resetCount();
         rigging.resetCount();
 
-        for (ChainConveyorPackage box : blockEntity.getLoopingPackages())
+        for (ChainConveyorPackage box : blockEntity.getLoopingPackages()) {
             setupBoxVisual(blockEntity, box, partialTicks);
+        }
 
-        for (Map.Entry<BlockPos, List<ChainConveyorPackage>> entry : blockEntity.getTravellingPackages().entrySet())
-            for (ChainConveyorPackage box : entry.getValue())
+        for (Map.Entry<BlockPos, List<ChainConveyorPackage>> entry : blockEntity.getTravellingPackages().entrySet()) {
+            for (ChainConveyorPackage box : entry.getValue()) {
                 setupBoxVisual(blockEntity, box, partialTicks);
+            }
+        }
 
         boxes.discardExtra();
         rigging.discardExtra();
@@ -89,28 +92,39 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
 
 
     private void setupBoxVisual(ChainConveyorBlockEntity be, ChainConveyorPackage box, float partialTicks) {
-        if (box.worldPosition == null)
+        if (box.worldPosition == null) {
             return;
-        if (box.item == null || box.item.isEmpty())
+        }
+        if (box.item == null || box.item.isEmpty()) {
             return;
+        }
 
         ChainConveyorPackagePhysicsData physicsData = ChainConveyorClientBehaviour.physicsData(box, be.getLevel());
-        if (physicsData.prevPos == null)
+        if (physicsData.prevPos == null) {
             return;
+        }
 
         Vec3 position = physicsData.prevPos.lerp(physicsData.pos, partialTicks);
         Vec3 targetPosition = physicsData.prevTargetPos.lerp(physicsData.targetPos, partialTicks);
         float yaw = AngleHelper.angleLerp(partialTicks, physicsData.prevYaw, physicsData.yaw);
-        Vec3 offset = new Vec3(targetPosition.x - this.pos.getX(), targetPosition.y - this.pos.getY(), targetPosition.z - this.pos.getZ());
+        Vec3 offset = new Vec3(
+            targetPosition.x - this.pos.getX(),
+            targetPosition.y - this.pos.getY(),
+            targetPosition.z - this.pos.getZ()
+        );
 
         BlockPos containingPos = BlockPos.containing(position);
         Level level = be.getLevel();
-        int light = LightTexture.pack(level.getBrightness(LightLayer.BLOCK, containingPos), level.getBrightness(LightLayer.SKY, containingPos));
+        int light = LightTexture.pack(
+            level.getBrightness(LightLayer.BLOCK, containingPos),
+            level.getBrightness(LightLayer.SKY, containingPos)
+        );
 
         if (physicsData.modelKey == null) {
             Identifier key = BuiltInRegistries.ITEM.getKey(box.item.getItem());
-            if (key == BuiltInRegistries.ITEM.getDefaultKey())
+            if (key == BuiltInRegistries.ITEM.getDefaultKey()) {
                 return;
+            }
             physicsData.modelKey = key;
         }
 
@@ -133,8 +147,9 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
             buf.rotateZDegrees(zRot);
             buf.rotateXDegrees(xRot);
 
-            if (physicsData.flipped && buf == rigBuffer)
+            if (physicsData.flipped && buf == rigBuffer) {
                 buf.rotateYDegrees(180);
+            }
 
             buf.uncenter();
             buf.translate(0, -PackageItem.getHookDistance(box.item) + 7 / 16f, 0);
@@ -180,7 +195,8 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
             double yaw = Mth.RAD_TO_DEG * Mth.atan2(diff.x, diff.z);
 
             TransformedInstance guard = guardInstancer.createInstance();
-            guard.translate(getVisualPosition()).center().rotateYDegrees((float) yaw).uncenter().light(rotatingModel.light).setChanged();
+            guard.translate(getVisualPosition()).center().rotateYDegrees((float) yaw).uncenter()
+                .light(rotatingModel.light).setChanged();
 
             guards.add(guard);
         }

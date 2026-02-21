@@ -51,8 +51,9 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
-        if (entity == null)
+        if (entity == null) {
             entity = constructor.create(scene.getLevel(), 0, 0, 0);
+        }
 
         entity.tickCount++;
         entity.setOnGround(true);
@@ -66,11 +67,13 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
 
     @Override
     public void setPositionOffset(Vec3 position, boolean immediate) {
-        if (entity == null)
+        if (entity == null) {
             return;
+        }
         entity.setPosRaw(position.x, position.y, position.z);
-        if (!immediate)
+        if (!immediate) {
             return;
+        }
         entity.xo = position.x;
         entity.yo = position.y;
         entity.zo = position.z;
@@ -78,11 +81,13 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
 
     @Override
     public void setRotation(float angle, boolean immediate) {
-        if (entity == null)
+        if (entity == null) {
             return;
+        }
         rotation.setValue(angle);
-        if (!immediate)
+        if (!immediate) {
             return;
+        }
         rotation.startWithValue(angle);
     }
 
@@ -109,12 +114,17 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
         float fade,
         float pt
     ) {
-        if (entity == null)
+        if (entity == null) {
             entity = constructor.create(world, 0, 0, 0);
+        }
 
         poseStack.pushPose();
         poseStack.translate(location.x, location.y, location.z);
-        poseStack.translate(Mth.lerp(pt, entity.xo, entity.getX()), Mth.lerp(pt, entity.yo, entity.getY()), Mth.lerp(pt, entity.zo, entity.getZ()));
+        poseStack.translate(
+            Mth.lerp(pt, entity.xo, entity.getX()),
+            Mth.lerp(pt, entity.yo, entity.getY()),
+            Mth.lerp(pt, entity.zo, entity.getZ())
+        );
 
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation.getValue(pt)));
 

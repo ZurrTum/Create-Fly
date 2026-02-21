@@ -36,8 +36,16 @@ public interface ValueSettingsHandleBehaviour extends ClipboardCloneable {
     }
 
     default void playFeedbackSound(BlockEntityBehaviour<?> origin) {
-        origin.getLevel().playSound(null, origin.getPos(), SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.25f, 2f);
-        origin.getLevel().playSound(null, origin.getPos(), SoundEvents.NOTE_BLOCK_IRON_XYLOPHONE.value(), SoundSource.BLOCKS, 0.03f, 1.125f);
+        origin.getLevel()
+            .playSound(null, origin.getPos(), SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.25f, 2f);
+        origin.getLevel().playSound(
+            null,
+            origin.getPos(),
+            SoundEvents.NOTE_BLOCK_IRON_XYLOPHONE.value(),
+            SoundSource.BLOCKS,
+            0.03f,
+            1.125f
+        );
     }
 
     @Override
@@ -52,8 +60,9 @@ public interface ValueSettingsHandleBehaviour extends ClipboardCloneable {
 
     @Override
     default boolean writeToClipboard(ValueOutput view, Direction side) {
-        if (!acceptsValueSettings())
+        if (!acceptsValueSettings()) {
             return false;
+        }
         ValueSettings valueSettings = getValueSettings();
         view.putInt("Value", valueSettings.value());
         view.putInt("Row", valueSettings.row());
@@ -62,8 +71,9 @@ public interface ValueSettingsHandleBehaviour extends ClipboardCloneable {
 
     @Override
     default boolean readFromClipboard(ValueInput view, Player player, Direction side, boolean simulate) {
-        if (!acceptsValueSettings())
+        if (!acceptsValueSettings()) {
             return false;
+        }
         Optional<Integer> row = view.getInt("Row");
         if (row.isEmpty()) {
             return false;
@@ -72,8 +82,9 @@ public interface ValueSettingsHandleBehaviour extends ClipboardCloneable {
         if (value.isEmpty()) {
             return false;
         }
-        if (simulate)
+        if (simulate) {
             return true;
+        }
         setValueSettings(player, new ValueSettings(row.get(), value.get()), false);
         return true;
     }

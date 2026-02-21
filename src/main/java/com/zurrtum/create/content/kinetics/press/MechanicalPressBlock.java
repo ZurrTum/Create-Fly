@@ -27,8 +27,9 @@ public class MechanicalPressBlock extends HorizontalKineticBlock implements IBE<
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() instanceof Player)
+        if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() instanceof Player) {
             return AllShapes.CASING_14PX.get(Direction.DOWN);
+        }
 
         return AllShapes.MECHANICAL_PROCESSOR_SHAPE;
     }
@@ -41,8 +42,9 @@ public class MechanicalPressBlock extends HorizontalKineticBlock implements IBE<
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction prefferedSide = getPreferredHorizontalFacing(context);
-        if (prefferedSide != null)
+        if (prefferedSide != null) {
             return defaultBlockState().setValue(HORIZONTAL_FACING, prefferedSide);
+        }
         return super.getStateForPlacement(context);
     }
 

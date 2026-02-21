@@ -55,12 +55,29 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     ) {
         poseStack.pushPose();
         float currentFade = applyFade(poseStack, pt);
-        renderFirst(blockEntityRenderDispatcher, blockRenderManager, world, buffer, queue, camera, cameraRenderState, poseStack, currentFade, pt);
+        renderFirst(
+            blockEntityRenderDispatcher,
+            blockRenderManager,
+            world,
+            buffer,
+            queue,
+            camera,
+            cameraRenderState,
+            poseStack,
+            currentFade,
+            pt
+        );
         poseStack.popPose();
     }
 
     @Override
-    public final void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer type, PoseStack poseStack, float pt) {
+    public final void renderLayer(
+        PonderLevel world,
+        MultiBufferSource buffer,
+        ChunkSectionLayer type,
+        PoseStack poseStack,
+        float pt
+    ) {
         poseStack.pushPose();
         float currentFade = applyFade(poseStack, pt);
         renderLayer(world, buffer, type, poseStack, currentFade, pt);
@@ -81,7 +98,18 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     ) {
         poseStack.pushPose();
         float currentFade = applyFade(poseStack, pt);
-        renderLast(entityRenderManager, itemModelManager, world, buffer, queue, camera, cameraRenderState, poseStack, currentFade, pt);
+        renderLast(
+            entityRenderManager,
+            itemModelManager,
+            world,
+            buffer,
+            queue,
+            camera,
+            cameraRenderState,
+            poseStack,
+            currentFade,
+            pt
+        );
         poseStack.popPose();
     }
 
@@ -95,7 +123,14 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
         return currentFade;
     }
 
-    protected void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer type, PoseStack ms, float fade, float pt) {
+    protected void renderLayer(
+        PonderLevel world,
+        MultiBufferSource buffer,
+        ChunkSectionLayer type,
+        PoseStack ms,
+        float fade,
+        float pt
+    ) {
     }
 
     protected void renderFirst(

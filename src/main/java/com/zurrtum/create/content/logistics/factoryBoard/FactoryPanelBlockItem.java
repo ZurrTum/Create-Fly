@@ -5,11 +5,6 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponents;
@@ -26,6 +21,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
+
 public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
 
     public FactoryPanelBlockItem(Block pBlock, Properties pProperties) {
@@ -38,7 +37,8 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
 
         if (!isTuned(stack)) {
             AllSoundEvents.DENY.playOnServer(pContext.getLevel(), pContext.getClickedPos());
-            pContext.getPlayer().displayClientMessage(Component.translatable("create.factory_panel.tune_before_placing"), true);
+            pContext.getPlayer()
+                .displayClientMessage(Component.translatable("create.factory_panel.tune_before_placing"), true);
             return InteractionResult.FAIL;
         }
 
@@ -46,7 +46,13 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, Player player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(
+        BlockPos pos,
+        Level level,
+        Player player,
+        ItemStack stack,
+        BlockState state
+    ) {
         return super.updateCustomBlockEntityTag(pos, level, player, fixCtrlCopiedStack(stack), state);
     }
 
@@ -66,14 +72,20 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
             UUID frequency = UUID.randomUUID();
 
             for (PanelSlot slot : PanelSlot.values()) {
-                Optional<UUID> freq = bet.getCompound(slot.name().toLowerCase(Locale.ROOT)).flatMap(tag -> tag.read("Freq", UUIDUtil.CODEC));
-                if (freq.isPresent())
+                Optional<UUID> freq = bet.getCompound(slot.name().toLowerCase(Locale.ROOT))
+                    .flatMap(tag -> tag.read("Freq", UUIDUtil.CODEC));
+                if (freq.isPresent()) {
                     frequency = freq.get();
+                }
             }
 
             bet = new CompoundTag();
             bet.store("Freq", UUIDUtil.CODEC, frequency);
-            bet.store("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, ((IBE<?>) ((BlockItem) stack.getItem()).getBlock()).getBlockEntityType());
+            bet.store(
+                "id",
+                CreateCodecs.BLOCK_ENTITY_TYPE_CODEC,
+                ((IBE<?>) ((BlockItem) stack.getItem()).getBlock()).getBlockEntityType()
+            );
             stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(type, bet));
         }
 

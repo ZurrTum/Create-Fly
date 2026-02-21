@@ -37,6 +37,7 @@ public class DrillMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public boolean canBreak(Level world, BlockPos breakingPos, BlockState state) {
-        return super.canBreak(world, breakingPos, state) && !state.getCollisionShape(world, breakingPos).isEmpty() && !state.is(AllBlockTags.TRACKS);
+        return super.canBreak(world, breakingPos, state) && !state.getCollisionShape(world, breakingPos)
+            .isEmpty() && !state.is(AllBlockTags.TRACKS);
     }
 }

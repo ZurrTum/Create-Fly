@@ -12,8 +12,9 @@ public class ServerKineticScrollValueBehaviour extends ServerScrollValueBehaviou
     @Override
     public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlHeld) {
         int value = Math.max(1, valueSetting.value());
-        if (!valueSetting.equals(getValueSettings()))
+        if (!valueSetting.equals(getValueSettings())) {
             playFeedbackSound(this);
+        }
         setValue(valueSetting.row() == 0 ? -value : value);
     }
 

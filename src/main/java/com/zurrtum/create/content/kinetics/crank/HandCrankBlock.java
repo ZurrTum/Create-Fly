@@ -71,15 +71,18 @@ public class HandCrankBlock extends DirectionalKineticBlock implements IBE<HandC
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isSpectator())
+        if (player.isSpectator()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         withBlockEntityDo(level, pos, be -> be.turn(player.isShiftKeyDown()));
-        if (!stack.is(AllItems.EXTENDO_GRIP))
+        if (!stack.is(AllItems.EXTENDO_GRIP)) {
             player.causeFoodExhaustion(getRotationSpeed() * AllConfigs.server().kinetics.crankHungerMultiplier.getF());
+        }
 
-        if (player.getFoodData().getFoodLevel() == 0 && player instanceof ServerPlayer serverPlayer)
+        if (player.getFoodData().getFoodLevel() == 0 && player instanceof ServerPlayer serverPlayer) {
             AllAdvancements.HAND_CRANK.trigger(serverPlayer);
+        }
 
         return InteractionResult.SUCCESS;
     }
@@ -88,8 +91,9 @@ public class HandCrankBlock extends DirectionalKineticBlock implements IBE<HandC
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredFacing(context);
         BlockState defaultBlockState = withWater(defaultBlockState(), context);
-        if (preferred == null || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()))
+        if (preferred == null || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
             return defaultBlockState.setValue(FACING, context.getClickedFace());
+        }
         return defaultBlockState.setValue(FACING, preferred.getOpposite());
     }
 
@@ -102,9 +106,17 @@ public class HandCrankBlock extends DirectionalKineticBlock implements IBE<HandC
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClientSide())
+    public void neighborUpdate(
+        BlockState state,
+        Level worldIn,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos fromPos,
+        boolean isMoving
+    ) {
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         Direction blockFacing = state.getValue(FACING);
         if (fromPos.equals(pos.relative(blockFacing.getOpposite()))) {

@@ -1,13 +1,13 @@
 package com.zurrtum.create.catnip.levelWrappers;
 
-import java.util.HashMap;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+
+import java.util.HashMap;
+import java.util.function.Predicate;
 
 public class PlacementSimulationServerLevel extends WrappedServerLevel {
     public HashMap<BlockPos, BlockState> blocksAdded;
@@ -44,8 +44,9 @@ public class PlacementSimulationServerLevel extends WrappedServerLevel {
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        if (blocksAdded.containsKey(pos))
+        if (blocksAdded.containsKey(pos)) {
             return blocksAdded.get(pos);
+        }
         return Blocks.AIR.defaultBlockState();
     }
 

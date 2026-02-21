@@ -3,6 +3,10 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.filtering;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -11,11 +15,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
 
@@ -42,15 +41,20 @@ public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
 
     public void updateFilterPresence() {
         Set<Direction> valid = new HashSet<>();
-        for (Direction d : Iterate.directions)
-            if (validDirections.test(d))
+        for (Direction d : Iterate.directions) {
+            if (validDirections.test(d)) {
                 valid.add(d);
-        for (Direction d : Iterate.directions)
+            }
+        }
+        for (Direction d : Iterate.directions) {
             if (valid.contains(d)) {
-                if (!sidedFilters.containsKey(d))
+                if (!sidedFilters.containsKey(d)) {
                     sidedFilters.put(d, filterFactory.apply(d, new ServerFilteringBehaviour(blockEntity)));
-            } else if (sidedFilters.containsKey(d))
+                }
+            } else if (sidedFilters.containsKey(d)) {
                 removeFilter(d);
+            }
+        }
     }
 
     @Override
@@ -84,22 +88,25 @@ public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
 
     @Override
     public boolean setFilter(Direction side, ItemStack stack) {
-        if (!sidedFilters.containsKey(side))
+        if (!sidedFilters.containsKey(side)) {
             return true;
+        }
         sidedFilters.get(side).setFilter(stack);
         return true;
     }
 
     @Override
     public ItemStack getFilter(Direction side) {
-        if (!sidedFilters.containsKey(side))
+        if (!sidedFilters.containsKey(side)) {
             return ItemStack.EMPTY;
+        }
         return sidedFilters.get(side).getFilter();
     }
 
     public boolean test(Direction side, ItemStack stack) {
-        if (!sidedFilters.containsKey(side))
+        if (!sidedFilters.containsKey(side)) {
             return true;
+        }
         return sidedFilters.get(side).test(stack);
     }
 
@@ -111,12 +118,14 @@ public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
 
     @Override
     public ItemRequirement getRequiredItems() {
-        return sidedFilters.values().stream().reduce(ItemRequirement.NONE, (a, b) -> a.union(b.getRequiredItems()), ItemRequirement::union);
+        return sidedFilters.values().stream()
+            .reduce(ItemRequirement.NONE, (a, b) -> a.union(b.getRequiredItems()), ItemRequirement::union);
     }
 
     public void removeFilter(Direction side) {
-        if (!sidedFilters.containsKey(side))
+        if (!sidedFilters.containsKey(side)) {
             return;
+        }
         sidedFilters.remove(side).destroy();
         if (removeListener != null) {
             removeListener.accept(side);

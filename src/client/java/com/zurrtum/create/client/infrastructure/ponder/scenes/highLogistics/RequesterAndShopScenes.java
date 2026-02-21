@@ -49,7 +49,8 @@ public class RequesterAndShopScenes {
         scene.idle(15);
 
         ItemStack linkItem = AllItems.REDSTONE_REQUESTER.getDefaultInstance();
-        scene.overlay().showControls(util.vector().topOf(link.below(2)), Pointing.DOWN, 50).rightClick().withItem(linkItem);
+        scene.overlay().showControls(util.vector().topOf(link.below(2)), Pointing.DOWN, 50).rightClick()
+            .withItem(linkItem);
         scene.idle(5);
 
         AABB bb1 = new AABB(link.below(2));
@@ -59,8 +60,9 @@ public class RequesterAndShopScenes {
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1, 50);
         scene.idle(26);
 
-        scene.overlay().showText(100).text("Right-click a Stock link before placement to connect to its network").attachKeyFrame()
-            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().centerOf(link.below(2)));
+        scene.overlay().showText(100).text("Right-click a Stock link before placement to connect to its network")
+            .attachKeyFrame().colored(PonderPalette.BLUE).placeNearTarget()
+            .pointAt(util.vector().centerOf(link.below(2)));
 
         scene.idle(40);
 
@@ -91,15 +93,17 @@ public class RequesterAndShopScenes {
         scene.world().showSection(vault, Direction.WEST);
         scene.idle(30);
 
-        scene.overlay().showText(110).text("Just like Stock tickers, Redstone requesters can order items from the logistics network").attachKeyFrame()
-            .placeNearTarget().pointAt(util.vector().blockSurface(req, Direction.WEST));
+        scene.overlay().showText(110)
+            .text("Just like Stock tickers, Redstone requesters can order items from the logistics network")
+            .attachKeyFrame().placeNearTarget().pointAt(util.vector().blockSurface(req, Direction.WEST));
         scene.idle(120);
 
         scene.overlay().showControls(util.vector().topOf(req), Pointing.DOWN, 80).rightClick();
         scene.idle(10);
 
-        scene.overlay().showOutlineWithText(reqS, 80).text("Right-click the requester to open its configuration UI").attachKeyFrame()
-            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().blockSurface(req, Direction.WEST));
+        scene.overlay().showOutlineWithText(reqS, 80).text("Right-click the requester to open its configuration UI")
+            .attachKeyFrame().colored(PonderPalette.BLUE).placeNearTarget()
+            .pointAt(util.vector().blockSurface(req, Direction.WEST));
 
         scene.idle(90);
         scene.world().showSection(buttonAndRedstone, Direction.EAST);
@@ -125,7 +129,8 @@ public class RequesterAndShopScenes {
 
         scene.world().toggleRedstonePower(util.select().fromTo(1, 1, 1, 3, 1, 1));
 
-        scene.overlay().showText(120).text("The order set in the UI will be requested on every redstone pulse").attachKeyFrame().placeNearTarget()
+        scene.overlay().showText(120).text("The order set in the UI will be requested on every redstone pulse")
+            .attachKeyFrame().placeNearTarget()
             .pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.WEST));
         scene.idle(60);
 
@@ -155,15 +160,16 @@ public class RequesterAndShopScenes {
         scene.idle(20);
 
         Vec3 keeper = util.vector().blockSurface(util.grid().at(4, 1, 1), Direction.WEST).add(0, 0.5, 0);
-        scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 1, 1)), Pointing.DOWN, 50).rightClick().withItem(linkItem);
+        scene.overlay().showControls(util.vector().topOf(util.grid().at(4, 1, 1)), Pointing.DOWN, 50).rightClick()
+            .withItem(linkItem);
         scene.idle(10);
 
-        scene.overlay().showText(80).text("Alternatively, the requester can be fully configured before placement").attachKeyFrame()
-            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(keeper);
+        scene.overlay().showText(80).text("Alternatively, the requester can be fully configured before placement")
+            .attachKeyFrame().colored(PonderPalette.BLUE).placeNearTarget().pointAt(keeper);
         scene.idle(90);
 
-        scene.overlay().showText(100).text("Right-click a Stock keeper with it and set the desired order there").colored(PonderPalette.BLUE)
-            .placeNearTarget().pointAt(keeper);
+        scene.overlay().showText(100).text("Right-click a Stock keeper with it and set the desired order there")
+            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(keeper);
         scene.idle(90);
 
     }

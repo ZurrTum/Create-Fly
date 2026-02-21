@@ -10,9 +10,8 @@ import org.joml.Matrix3x2f;
 
 import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.TRIANGLE_FAN;
 
-public record ArrowRenderState(
-    Matrix3x2f pose, float r, float g, float b, float a, float length, ScreenRectangle bounds
-) implements GuiElementRenderState {
+public record ArrowRenderState(Matrix3x2f pose, float r, float g, float b, float a, float length,
+                               ScreenRectangle bounds) implements GuiElementRenderState {
     public ArrowRenderState(Matrix3x2f pose, int size, float r, float g, float b, float a, float length) {
         this(pose, r, g, b, a, length, new ScreenRectangle(0, 0, size, size).transformMaxBounds(pose));
     }

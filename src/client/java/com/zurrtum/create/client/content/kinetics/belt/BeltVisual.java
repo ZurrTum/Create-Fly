@@ -53,12 +53,16 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
             PartialModel beltPartial = BeltRenderer.getBeltPartial(diagonal, start, end, bottom);
             SpriteShiftEntry spriteShift = BeltRenderer.getSpriteShiftEntry(color, diagonal, bottom);
 
-            Instancer<ScrollInstance> beltModel = instancerProvider().instancer(AllInstanceTypes.SCROLLING, Models.partial(beltPartial));
+            Instancer<ScrollInstance> beltModel = instancerProvider().instancer(
+                AllInstanceTypes.SCROLLING,
+                Models.partial(beltPartial)
+            );
 
             belts[bottom ? 0 : 1] = setup(beltModel.createInstance(), bottom, spriteShift);
 
-            if (diagonal)
+            if (diagonal) {
                 break;
+            }
         }
 
         if (blockEntity.hasPulley()) {
@@ -91,8 +95,9 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
     public void updateLight(float partialTick) {
         relight(belts);
 
-        if (pulley != null)
+        if (pulley != null) {
             relight(pulley);
+        }
     }
 
     @Override
@@ -112,10 +117,12 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
             AllPartialModels.BELT_PULLEY, dir.getAxis(), (axis11, modelTransform1) -> {
                 var msr = TransformStack.of(modelTransform1);
                 msr.center();
-                if (axis11 == Direction.Axis.X)
+                if (axis11 == Direction.Axis.X) {
                     msr.rotateYDegrees(90);
-                if (axis11 == Direction.Axis.Y)
+                }
+                if (axis11 == Direction.Axis.Y) {
                     msr.rotateXDegrees(90);
+                }
                 msr.rotateXDegrees(90);
                 msr.uncenter();
             }
@@ -125,8 +132,9 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
     private Direction getOrientation() {
         Direction dir = blockState.getValue(BeltBlock.HORIZONTAL_FACING).getClockWise();
 
-        if (blockState.getValue(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS)
+        if (blockState.getValue(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS) {
             dir = Direction.UP;
+        }
 
         return dir;
     }
@@ -154,10 +162,15 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
         float rotY = facing.toYRot() + ((diagonal ^ alongX) && !downward ? 180 : 0) + (sideways && alongZ ? 180 : 0) + (vertical && alongX ? 90 : 0);
         float rotZ = (sideways ? 90 : 0) + (vertical && alongX ? 90 : 0);
 
-        Quaternionf q = new Quaternionf().rotationXYZ(rotX * Mth.DEG_TO_RAD, rotY * Mth.DEG_TO_RAD, rotZ * Mth.DEG_TO_RAD);
+        Quaternionf q = new Quaternionf().rotationXYZ(
+            rotX * Mth.DEG_TO_RAD,
+            rotY * Mth.DEG_TO_RAD,
+            rotZ * Mth.DEG_TO_RAD
+        );
 
-        key.setSpriteShift(spriteShift, 1f, (diagonal ? SCROLL_FACTOR_DIAGONAL : SCROLL_FACTOR_OTHERWISE)).position(getVisualPosition()).rotation(q)
-            .speed(0, speed * MAGIC_SCROLL_MULTIPLIER).offset(0, bottom ? SCROLL_OFFSET_BOTTOM : SCROLL_OFFSET_OTHERWISE)
+        key.setSpriteShift(spriteShift, 1f, (diagonal ? SCROLL_FACTOR_DIAGONAL : SCROLL_FACTOR_OTHERWISE))
+            .position(getVisualPosition()).rotation(q).speed(0, speed * MAGIC_SCROLL_MULTIPLIER)
+            .offset(0, bottom ? SCROLL_OFFSET_BOTTOM : SCROLL_OFFSET_OTHERWISE)
             .colorRgb(RotatingInstance.colorFromBE(blockEntity)).setChanged();
 
         return key;

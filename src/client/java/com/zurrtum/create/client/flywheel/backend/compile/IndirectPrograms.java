@@ -16,11 +16,10 @@ import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.backend.util.AtomicReferenceCounted;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import net.minecraft.resources.Identifier;
 
 public class IndirectPrograms extends AtomicReferenceCounted {
     private static final Identifier CULL_SHADER_API_IMPL = ResourceUtil.rl("internal/indirect/cull_api_impl.glsl");
@@ -86,17 +85,32 @@ public class IndirectPrograms extends AtomicReferenceCounted {
         return extensions.build();
     }
 
-    static void reload(ShaderSources sources, List<SourceComponent> vertexComponents, List<SourceComponent> fragmentComponents) {
+    static void reload(
+        ShaderSources sources,
+        List<SourceComponent> vertexComponents,
+        List<SourceComponent> fragmentComponents
+    ) {
         if (!GlCompat.SUPPORTS_INDIRECT) {
             return;
         }
 
-        var pipelineCompiler = PipelineCompiler.create(sources, Pipelines.INDIRECT, vertexComponents, fragmentComponents, EXTENSIONS);
+        var pipelineCompiler = PipelineCompiler.create(
+            sources,
+            Pipelines.INDIRECT,
+            vertexComponents,
+            fragmentComponents,
+            EXTENSIONS
+        );
         var cullingCompiler = createCullingCompiler(sources);
         var utilCompiler = createUtilCompiler(sources);
         var fullscreenCompiler = OitPrograms.createFullscreenCompiler(sources);
 
-        IndirectPrograms newInstance = new IndirectPrograms(pipelineCompiler, cullingCompiler, utilCompiler, fullscreenCompiler);
+        IndirectPrograms newInstance = new IndirectPrograms(
+            pipelineCompiler,
+            cullingCompiler,
+            utilCompiler,
+            fullscreenCompiler
+        );
 
         setInstance(newInstance);
     }
@@ -106,10 +120,12 @@ public class IndirectPrograms extends AtomicReferenceCounted {
      */
     private static CompilationHarness<InstanceType<?>> createCullingCompiler(ShaderSources sources) {
         return CULL.program().link(CULL.shader(GlCompat.MAX_GLSL_VERSION, ShaderType.COMPUTE)
-            .nameMapper(instanceType -> "culling/" + ResourceUtil.toDebugFileNameNoExtension(instanceType.cullShader()))
-            .requireExtensions(COMPUTE_EXTENSIONS).define("_FLW_SUBGROUP_SIZE", GlCompat.SUBGROUP_SIZE).withResource(CULL_SHADER_API_IMPL)
-            .withComponent(InstanceStructComponent::new).withResource(InstanceType::cullShader).withComponent(SsboInstanceComponent::new)
-            .withResource(CULL_SHADER_MAIN)).postLink((key, program) -> Uniforms.setUniformBlockBindings(program)).harness("culling", sources);
+                .nameMapper(instanceType -> "culling/" + ResourceUtil.toDebugFileNameNoExtension(instanceType.cullShader()))
+                .requireExtensions(COMPUTE_EXTENSIONS).define("_FLW_SUBGROUP_SIZE", GlCompat.SUBGROUP_SIZE)
+                .withResource(CULL_SHADER_API_IMPL).withComponent(InstanceStructComponent::new)
+                .withResource(InstanceType::cullShader).withComponent(SsboInstanceComponent::new)
+                .withResource(CULL_SHADER_MAIN)).postLink((key, program) -> Uniforms.setUniformBlockBindings(program))
+            .harness("culling", sources);
     }
 
     /**
@@ -117,8 +133,9 @@ public class IndirectPrograms extends AtomicReferenceCounted {
      */
     private static CompilationHarness<Identifier> createUtilCompiler(ShaderSources sources) {
         return UTIL.program().link(UTIL.shader(GlCompat.MAX_GLSL_VERSION, ShaderType.COMPUTE)
-            .nameMapper(Identifier -> "utilities/" + ResourceUtil.toDebugFileNameNoExtension(Identifier)).requireExtensions(COMPUTE_EXTENSIONS)
-            .define("_FLW_SUBGROUP_SIZE", GlCompat.SUBGROUP_SIZE).withResource(s -> s)).harness("utilities", sources);
+            .nameMapper(Identifier -> "utilities/" + ResourceUtil.toDebugFileNameNoExtension(Identifier))
+            .requireExtensions(COMPUTE_EXTENSIONS).define("_FLW_SUBGROUP_SIZE", GlCompat.SUBGROUP_SIZE)
+            .withResource(s -> s)).harness("utilities", sources);
     }
 
     static void setInstance(@Nullable IndirectPrograms newInstance) {
@@ -144,7 +161,12 @@ public class IndirectPrograms extends AtomicReferenceCounted {
         setInstance(null);
     }
 
-    public GlProgram getIndirectProgram(InstanceType<?> instanceType, ContextShader contextShader, Material material, PipelineCompiler.OitMode oit) {
+    public GlProgram getIndirectProgram(
+        InstanceType<?> instanceType,
+        ContextShader contextShader,
+        Material material,
+        PipelineCompiler.OitMode oit
+    ) {
         return pipeline.get(instanceType, contextShader, material, oit);
     }
 

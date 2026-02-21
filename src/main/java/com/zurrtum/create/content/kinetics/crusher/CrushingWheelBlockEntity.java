@@ -5,13 +5,12 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+
+import java.util.List;
 
 public class CrushingWheelBlockEntity extends KineticBlockEntity {
     public CrushingWheelBlockEntity(BlockPos pos, BlockState state) {
@@ -31,8 +30,14 @@ public class CrushingWheelBlockEntity extends KineticBlockEntity {
     }
 
     public void fixControllers() {
-        for (Direction d : Iterate.directions)
-            ((CrushingWheelBlock) getBlockState().getBlock()).updateControllers(getBlockState(), getLevel(), getBlockPos(), d);
+        for (Direction d : Iterate.directions) {
+            ((CrushingWheelBlock) getBlockState().getBlock()).updateControllers(
+                getBlockState(),
+                getLevel(),
+                getBlockPos(),
+                d
+            );
+        }
     }
 
     @Override

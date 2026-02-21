@@ -12,9 +12,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record ChainPackageInteractionPacket(
-    BlockPos pos, BlockPos selectedConnection, float chainPosition, boolean removingPackage
-) implements Packet<ServerGamePacketListener> {
+public record ChainPackageInteractionPacket(BlockPos pos, BlockPos selectedConnection, float chainPosition,
+                                            boolean removingPackage) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, ChainPackageInteractionPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         ChainPackageInteractionPacket::pos,

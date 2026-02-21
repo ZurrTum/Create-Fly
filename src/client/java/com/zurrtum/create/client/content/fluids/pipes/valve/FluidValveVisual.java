@@ -13,11 +13,10 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.fluids.pipes.valve.FluidValveBlock;
 import com.zurrtum.create.content.fluids.pipes.valve.FluidValveBlockEntity;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+
+import java.util.function.Consumer;
 
 public class FluidValveVisual extends ShaftVisual<FluidValveBlockEntity> implements SimpleDynamicVisual {
 
@@ -43,15 +42,19 @@ public class FluidValveVisual extends ShaftVisual<FluidValveBlockEntity> impleme
         pointerRotationOffset = twist ? 90 : 0;
         settled = false;
 
-        pointer = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.FLUID_VALVE_POINTER)).createInstance();
+        pointer = instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(AllPartialModels.FLUID_VALVE_POINTER)
+        ).createInstance();
 
         transformPointer(partialTick);
     }
 
     @Override
     public void beginFrame(DynamicVisual.Context ctx) {
-        if (blockEntity.pointer.settled() && settled)
+        if (blockEntity.pointer.settled() && settled) {
             return;
+        }
 
         transformPointer(ctx.partialTick());
     }
@@ -61,8 +64,9 @@ public class FluidValveVisual extends ShaftVisual<FluidValveBlockEntity> impleme
         float pointerRotation = Mth.lerpInt(value, 0, -90);
         settled = (value == 0 || value == 1) && blockEntity.pointer.settled();
 
-        pointer.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees((float) yRot).rotateXDegrees((float) xRot)
-            .rotateYDegrees(pointerRotationOffset + pointerRotation).uncenter().setChanged();
+        pointer.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees((float) yRot)
+            .rotateXDegrees((float) xRot).rotateYDegrees(pointerRotationOffset + pointerRotation).uncenter()
+            .setChanged();
     }
 
     @Override

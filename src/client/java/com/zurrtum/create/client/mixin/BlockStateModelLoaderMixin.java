@@ -27,7 +27,8 @@ public class BlockStateModelLoaderMixin {
         CallbackInfoReturnable<BlockStateModelLoader.LoadedModels> cir,
         @Local Map<BlockState, BlockStateModel.UnbakedRoot> models
     ) {
-        BiFunction<BlockState, BlockStateModel.UnbakedRoot, BlockStateModel.UnbakedRoot> factory = AllModels.ALL.get(stateDefinition.getOwner());
+        BiFunction<BlockState, BlockStateModel.UnbakedRoot, BlockStateModel.UnbakedRoot> factory = AllModels.ALL.get(
+            stateDefinition.getOwner());
         if (factory != null) {
             models.replaceAll(factory);
         }

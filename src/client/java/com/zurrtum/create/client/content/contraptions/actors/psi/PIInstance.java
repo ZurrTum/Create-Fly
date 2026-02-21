@@ -7,12 +7,11 @@ import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlock;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.function.Consumer;
 
 public class PIInstance {
     private final InstancerProvider instancerProvider;
@@ -38,14 +37,18 @@ public class PIInstance {
             InstanceTypes.TRANSFORMED,
             Models.partial(PortableStorageInterfaceRenderer.getMiddleForState(blockState, lit))
         ).createInstance();
-        top = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(PortableStorageInterfaceRenderer.getTopForState(blockState)))
-            .createInstance();
+        top = instancerProvider.instancer(
+            InstanceTypes.TRANSFORMED,
+            Models.partial(PortableStorageInterfaceRenderer.getTopForState(blockState))
+        ).createInstance();
     }
 
     public void beginFrame(float progress) {
-        middle.setIdentityTransform().translate(instancePos).center().rotateYDegrees(angleY).rotateXDegrees(angleX).uncenter();
+        middle.setIdentityTransform().translate(instancePos).center().rotateYDegrees(angleY).rotateXDegrees(angleX)
+            .uncenter();
 
-        top.setIdentityTransform().translate(instancePos).center().rotateYDegrees(angleY).rotateXDegrees(angleX).uncenter();
+        top.setIdentityTransform().translate(instancePos).center().rotateYDegrees(angleY).rotateXDegrees(angleX)
+            .uncenter();
 
         middle.translate(0, progress * 0.5f + 0.375f, 0);
         top.translate(0, progress, 0);

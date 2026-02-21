@@ -12,8 +12,8 @@ import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.transform.Translate;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -51,8 +51,9 @@ public class FlapStuffs {
         float intensity = segment == 3 ? 1.5f : segment + 1;
         float abs = Math.abs(flapness);
         float flapAngle = Mth.sin((float) ((1 - abs) * Math.PI * intensity)) * 30 * flapness;
-        if (flapness < 0)
+        if (flapness < 0) {
             flapAngle *= .5f;
+        }
         return flapAngle;
     }
 
@@ -83,8 +84,8 @@ public class FlapStuffs {
             for (int segment = 0; segment < FLAP_COUNT; segment++) {
                 var flap = flaps[segment];
 
-                flap.setTransform(commonTransform).rotateXDegrees(flapAngle(f, segment)).translateBack(pivot).translate(segment * SEGMENT_STEP, 0, 0)
-                    .setChanged();
+                flap.setTransform(commonTransform).rotateXDegrees(flapAngle(f, segment)).translateBack(pivot)
+                    .translate(segment * SEGMENT_STEP, 0, 0).setChanged();
             }
         }
 
@@ -107,9 +108,9 @@ public class FlapStuffs {
         }
     }
 
-    public record FlapsRenderState(
-        SuperByteBuffer model, Vec3 pivot, float zOffset, int light, float horizontalAngle, float[] angles, PoseStack.Pose[] entries
-    ) implements SubmitNodeCollector.CustomGeometryRenderer {
+    public record FlapsRenderState(SuperByteBuffer model, Vec3 pivot, float zOffset, int light, float horizontalAngle,
+                                   float[] angles,
+                                   PoseStack.Pose[] entries) implements SubmitNodeCollector.CustomGeometryRenderer {
         public void render(RenderType layer, PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
             matrices.translate(0.5f, 0.5f, 0.5f);

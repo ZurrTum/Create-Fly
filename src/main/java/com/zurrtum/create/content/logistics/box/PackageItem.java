@@ -102,7 +102,14 @@ public class PackageItem extends Item implements EntityItem {
         boolean isFinal,
         @Nullable PackageOrderWithCrafts orderContext
     ) {
-        PackageOrderData order = new PackageOrderData(orderId, linkIndex, isFinalLink, fragmentIndex, isFinal, orderContext);
+        PackageOrderData order = new PackageOrderData(
+            orderId,
+            linkIndex,
+            isFinalLink,
+            fragmentIndex,
+            isFinal,
+            orderContext
+        );
         box.set(AllDataComponents.PACKAGE_ORDER_DATA, order);
     }
 
@@ -144,7 +151,8 @@ public class PackageItem extends Item implements EntityItem {
 
     public static boolean isFinalLink(ItemStack box) {
         //noinspection DataFlowIssue
-        return box.has(AllDataComponents.PACKAGE_ORDER_DATA) && box.get(AllDataComponents.PACKAGE_ORDER_DATA).isFinalLink();
+        return box.has(AllDataComponents.PACKAGE_ORDER_DATA) && box.get(AllDataComponents.PACKAGE_ORDER_DATA)
+            .isFinalLink();
     }
 
     /**
@@ -173,13 +181,19 @@ public class PackageItem extends Item implements EntityItem {
     }
 
     public static boolean matchAddress(String boxAddress, String address) {
-        if (address.isBlank())
+        if (address.isBlank()) {
             return boxAddress.isBlank();
-        if (address.equals("*") || boxAddress.equals("*"))
+        }
+        if (address.equals("*") || boxAddress.equals("*")) {
             return true;
-        if (address.equals(boxAddress))
+        }
+        if (address.equals(boxAddress)) {
             return true;
-        return address.matches(Glob.toRegexPattern(boxAddress, "")) || boxAddress.matches(Glob.toRegexPattern(address, ""));
+        }
+        return address.matches(Glob.toRegexPattern(boxAddress, "")) || boxAddress.matches(Glob.toRegexPattern(
+            address,
+            ""
+        ));
     }
 
     public static String getAddress(ItemStack box) {
@@ -187,26 +201,32 @@ public class PackageItem extends Item implements EntityItem {
     }
 
     public static float getWidth(ItemStack box) {
-        if (box.getItem() instanceof PackageItem pi)
+        if (box.getItem() instanceof PackageItem pi) {
             return pi.style.width() / 16f;
+        }
         return 1;
     }
 
     public static float getHeight(ItemStack box) {
-        if (box.getItem() instanceof PackageItem pi)
+        if (box.getItem() instanceof PackageItem pi) {
             return pi.style.height() / 16f;
+        }
         return 1;
     }
 
     public static float getHookDistance(ItemStack box) {
-        if (box.getItem() instanceof PackageItem pi)
+        if (box.getItem() instanceof PackageItem pi) {
             return pi.style.riggingOffset() / 16f;
+        }
         return 1;
     }
 
     public static ItemStackHandler getContents(ItemStack box) {
         ItemStackHandler newInv = new ItemStackHandler(9);
-        ItemContainerContents contents = box.getOrDefault(AllDataComponents.PACKAGE_CONTENTS, ItemContainerContents.EMPTY);
+        ItemContainerContents contents = box.getOrDefault(
+            AllDataComponents.PACKAGE_CONTENTS,
+            ItemContainerContents.EMPTY
+        );
         ItemHelper.fillItemStackHandler(contents, newInv);
         return newInv;
     }
@@ -221,8 +241,10 @@ public class PackageItem extends Item implements EntityItem {
     ) {
         super.appendHoverText(stack, tooltipContext, displayComponent, textConsumer, type);
 
-        if (stack.has(AllDataComponents.PACKAGE_ADDRESS))
-            textConsumer.accept(Component.literal("→ " + stack.get(AllDataComponents.PACKAGE_ADDRESS)).withStyle(ChatFormatting.GOLD));
+        if (stack.has(AllDataComponents.PACKAGE_ADDRESS)) {
+            textConsumer.accept(Component.literal("→ " + stack.get(AllDataComponents.PACKAGE_ADDRESS))
+                .withStyle(ChatFormatting.GOLD));
+        }
 
         /*
          * Debug Fragmentation Data if (tag.contains("Fragment")) { CompoundTag
@@ -238,30 +260,38 @@ public class PackageItem extends Item implements EntityItem {
          */
 
         // From stack nbt
-        if (!stack.has(AllDataComponents.PACKAGE_CONTENTS))
+        if (!stack.has(AllDataComponents.PACKAGE_CONTENTS)) {
             return;
+        }
 
         int visibleNames = 0;
         int skippedNames = 0;
         ItemStackHandler contents = getContents(stack);
         for (int i = 0, size = contents.getContainerSize(); i < size; i++) {
             ItemStack itemstack = contents.getItem(i);
-            if (itemstack.isEmpty())
+            if (itemstack.isEmpty()) {
                 continue;
-            if (itemstack.getItem() instanceof SpawnEggItem)
+            }
+            if (itemstack.getItem() instanceof SpawnEggItem) {
                 continue;
+            }
             if (visibleNames > 2) {
                 skippedNames++;
                 continue;
             }
 
             visibleNames++;
-            textConsumer.accept(Component.translatable("item.container.item_count", itemstack.getHoverName(), itemstack.getCount())
-                .withStyle(ChatFormatting.GRAY));
+            textConsumer.accept(Component.translatable(
+                "item.container.item_count",
+                itemstack.getHoverName(),
+                itemstack.getCount()
+            ).withStyle(ChatFormatting.GRAY));
         }
 
-        if (skippedNames > 0)
-            textConsumer.accept(Component.translatable("item.container.more_items", skippedNames).withStyle(ChatFormatting.ITALIC));
+        if (skippedNames > 0) {
+            textConsumer.accept(Component.translatable("item.container.more_items", skippedNames)
+                .withStyle(ChatFormatting.ITALIC));
+        }
     }
 
     // Throwing stuff
@@ -286,8 +316,9 @@ public class PackageItem extends Item implements EntityItem {
         if (!worldIn.isClientSide()) {
             for (int i = 0, size = contents.getContainerSize(); i < size; i++) {
                 ItemStack itemstack = contents.getItem(i);
-                if (itemstack.isEmpty())
+                if (itemstack.isEmpty()) {
                     continue;
+                }
 
                 if (itemstack.getItem() instanceof SpawnEggItem sei && worldIn instanceof ServerLevel sl) {
                     EntityType<?> entitytype = sei.getType(itemstack);
@@ -295,13 +326,15 @@ public class PackageItem extends Item implements EntityItem {
                         sl,
                         itemstack,
                         null,
-                        BlockPos.containing(playerIn.position().add(playerIn.getLookAngle().multiply(1, 0, 1).normalize())),
+                        BlockPos.containing(playerIn.position()
+                            .add(playerIn.getLookAngle().multiply(1, 0, 1).normalize())),
                         EntitySpawnReason.SPAWN_ITEM_USE,
                         false,
                         false
                     );
-                    if (entity != null)
+                    if (entity != null) {
                         itemstack.shrink(1);
+                    }
                 }
 
                 playerIn.getInventory().placeItemBackInInventory(itemstack.copy());
@@ -315,7 +348,15 @@ public class PackageItem extends Item implements EntityItem {
             for (int i = 0; i < 10; i++) {
                 Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, worldIn.getRandom(), .125f);
                 Vec3 pos = position.add(0, 0.5, 0).add(playerIn.getLookAngle().scale(.5)).add(motion.scale(4));
-                worldIn.addParticle(new ItemParticleOption(ParticleTypes.ITEM, particle), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
+                worldIn.addParticle(
+                    new ItemParticleOption(ParticleTypes.ITEM, particle),
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    motion.x,
+                    motion.y,
+                    motion.z
+                );
             }
         }
 
@@ -332,15 +373,17 @@ public class PackageItem extends Item implements EntityItem {
         float h = style.height() / 16f;
         float r = style.width() / 2f / 16f;
 
-        if (context.getClickedFace() == Direction.DOWN)
+        if (context.getClickedFace() == Direction.DOWN) {
             point = point.subtract(0, h + .25f, 0);
-        else if (context.getClickedFace().getAxis().isHorizontal())
+        } else if (context.getClickedFace().getAxis().isHorizontal()) {
             point = point.add(Vec3.atLowerCornerOf(context.getClickedFace().getUnitVec3i()).scale(r));
+        }
 
         AABB scanBB = new AABB(point, point).inflate(r, 0, r).expandTowards(0, h, 0);
         Level world = context.getLevel();
-        if (!world.getEntities(AllEntityTypes.PACKAGE, scanBB, e -> true).isEmpty())
+        if (!world.getEntities(AllEntityTypes.PACKAGE, scanBB, e -> true).isEmpty()) {
             return super.useOn(context);
+        }
 
         PackageEntity packageEntity = new PackageEntity(world, point.x, point.y, point.z);
         ItemStack itemInHand = context.getItemInHand();
@@ -352,8 +395,9 @@ public class PackageItem extends Item implements EntityItem {
 
     @Override
     public InteractionResult use(Level world, Player player, InteractionHand hand) {
-        if (player.isShiftKeyDown())
+        if (player.isShiftKeyDown()) {
             return open(world, player, hand);
+        }
         ItemStack itemstack = player.getItemInHand(hand);
         player.startUsingItem(hand);
         return InteractionResult.SUCCESS.heldItemTransformedTo(itemstack);
@@ -361,25 +405,38 @@ public class PackageItem extends Item implements EntityItem {
 
     @Override
     public boolean releaseUsing(ItemStack stack, Level world, LivingEntity entity, int ticks) {
-        if (!(entity instanceof Player player))
+        if (!(entity instanceof Player player)) {
             return false;
+        }
         int i = this.getUseDuration(stack, entity) - ticks;
-        if (i < 0)
+        if (i < 0) {
             return false;
+        }
 
         float f = getPackageVelocity(i);
-        if (f < 0.1D)
+        if (f < 0.1D) {
             return false;
+        }
         if (world.isClientSide()) {
             stack.consume(1, player);
             return false;
         }
 
-        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.5F);
+        world.playSound(
+            null,
+            player.getX(),
+            player.getY(),
+            player.getZ(),
+            SoundEvents.SNOWBALL_THROW,
+            SoundSource.NEUTRAL,
+            0.5F,
+            0.5F
+        );
 
         ItemStack copy = stack.copy();
-        if (!player.getAbilities().instabuild)
+        if (!player.getAbilities().instabuild) {
             stack.shrink(1);
+        }
 
         Vec3 vec = new Vec3(entity.getX(), entity.getY() + entity.getBoundingBox().getYsize() / 2f, entity.getZ());
         Vec3 motion = entity.getLookAngle().scale(f * 2);
@@ -396,8 +453,9 @@ public class PackageItem extends Item implements EntityItem {
     public static float getPackageVelocity(int p_185059_0_) {
         float f = (float) p_185059_0_ / 20.0F;
         f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F)
+        if (f > 1.0F) {
             f = 1.0F;
+        }
         return f;
     }
 }

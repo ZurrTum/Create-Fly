@@ -15,9 +15,8 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public record MountedStorageSyncPacket(
-    int contraptionId, Map<BlockPos, MountedItemStorage> items, Map<BlockPos, MountedFluidStorage> fluids
-) implements Packet<ClientGamePacketListener> {
+public record MountedStorageSyncPacket(int contraptionId, Map<BlockPos, MountedItemStorage> items,
+                                       Map<BlockPos, MountedFluidStorage> fluids) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, MountedStorageSyncPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         MountedStorageSyncPacket::contraptionId,

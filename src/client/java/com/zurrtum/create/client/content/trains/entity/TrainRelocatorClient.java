@@ -51,25 +51,31 @@ public class TrainRelocatorClient {
     static List<Vec3> toVisualise = new ArrayList<>();
 
     public static boolean onClicked(Minecraft mc) {
-        if (relocatingTrain == null)
-            return false;
-
-        LocalPlayer player = mc.player;
-        if (player == null)
-            return false;
-        if (player.isSpectator())
-            return false;
-
-        if (!player.position().closerThan(relocatingOrigin, 24) || player.isShiftKeyDown()) {
-            relocatingTrain = null;
-            player.displayClientMessage(CreateLang.translateDirect("train.relocate.abort").withStyle(ChatFormatting.RED), true);
+        if (relocatingTrain == null) {
             return false;
         }
 
-        if (player.isPassenger())
+        LocalPlayer player = mc.player;
+        if (player == null) {
             return false;
-        if (mc.level == null)
+        }
+        if (player.isSpectator()) {
             return false;
+        }
+
+        if (!player.position().closerThan(relocatingOrigin, 24) || player.isShiftKeyDown()) {
+            relocatingTrain = null;
+            player.displayClientMessage(
+                CreateLang.translateDirect("train.relocate.abort").withStyle(ChatFormatting.RED), true);
+            return false;
+        }
+
+        if (player.isPassenger()) {
+            return false;
+        }
+        if (mc.level == null) {
+            return false;
+        }
         Train relocating = getRelocating();
         if (relocating != null) {
             Boolean relocate = relocateClient(mc, relocating, false);
@@ -86,8 +92,9 @@ public class TrainRelocatorClient {
     @Nullable
     public static Boolean relocateClient(Minecraft mc, Train relocating, boolean simulate) {
         HitResult hitResult = mc.hitResult;
-        if (!(hitResult instanceof BlockHitResult blockhit))
+        if (!(hitResult instanceof BlockHitResult blockhit)) {
             return null;
+        }
 
         BlockPos blockPos = blockhit.getBlockPos();
         BezierTrackPointLocation hoveredBezier = null;
@@ -100,8 +107,8 @@ public class TrainRelocatorClient {
                 Vec3 vec1 = toVisualise.get(i).add(offset);
                 Vec3 vec2 = toVisualise.get(i + 1).add(offset);
                 Outliner.getInstance().showLine(Pair.of(relocating, i), vec1.add(0, -.925f, 0), vec2.add(0, -.925f, 0))
-                    .colored(lastHoveredResult || i != toVisualise.size() - 2 ? 0x95CD41 : 0xEA5C2B).disableLineNormals()
-                    .lineWidth(i % 2 == 1 ? 1 / 6f : 1 / 4f);
+                    .colored(lastHoveredResult || i != toVisualise.size() - 2 ? 0x95CD41 : 0xEA5C2B)
+                    .disableLineNormals().lineWidth(i % 2 == 1 ? 1 / 6f : 1 / 4f);
             }
         }
 
@@ -112,23 +119,43 @@ public class TrainRelocatorClient {
         }
 
         if (simulate) {
-            if (lastHoveredPos != null && lastHoveredPos.equals(blockPos) && Objects.equals(lastHoveredBezierSegment, hoveredBezier))
+            if (lastHoveredPos != null && lastHoveredPos.equals(blockPos) && Objects.equals(
+                lastHoveredBezierSegment,
+                hoveredBezier
+            )) {
                 return lastHoveredResult;
+            }
             lastHoveredPos = blockPos;
             lastHoveredBezierSegment = hoveredBezier;
             toVisualise.clear();
         }
 
         BlockState blockState = mc.level.getBlockState(blockPos);
-        if (!(blockState.getBlock() instanceof ITrackBlock))
+        if (!(blockState.getBlock() instanceof ITrackBlock)) {
             return lastHoveredResult = null;
+        }
 
         Vec3 lookAngle = mc.player.getLookAngle();
         boolean direction = bezierSelection != null && lookAngle.dot(bezierSelection.direction()) < 0;
-        boolean result = TrainRelocator.relocate(relocating, mc.level, blockPos, hoveredBezier, direction, lookAngle, toVisualise);
+        boolean result = TrainRelocator.relocate(
+            relocating,
+            mc.level,
+            blockPos,
+            hoveredBezier,
+            direction,
+            lookAngle,
+            toVisualise
+        );
         if (!simulate && result) {
             relocating.carriages.forEach(c -> c.forEachPresentEntity(e -> e.nonDamageTicks = 10));
-            mc.player.connection.send(new TrainRelocationPacket(relocatingTrain, blockPos, lookAngle, relocatingEntityId, direction, hoveredBezier));
+            mc.player.connection.send(new TrainRelocationPacket(
+                relocatingTrain,
+                blockPos,
+                lookAngle,
+                relocatingEntityId,
+                direction,
+                hoveredBezier
+            ));
         }
 
         return lastHoveredResult = result;
@@ -137,13 +164,16 @@ public class TrainRelocatorClient {
     public static void clientTick(Minecraft mc) {
         LocalPlayer player = mc.player;
 
-        if (player == null)
+        if (player == null) {
             return;
-        if (player.isPassenger())
+        }
+        if (player.isPassenger()) {
             return;
+        }
         ClientLevel world = mc.level;
-        if (world == null)
+        if (world == null) {
             return;
+        }
 
         if (relocatingTrain != null) {
             Train relocating = getRelocating();
@@ -153,30 +183,41 @@ public class TrainRelocatorClient {
             }
 
             Entity entity = world.getEntity(relocatingEntityId);
-            if (entity instanceof AbstractContraptionEntity ce && Math.abs(ce.getPosition(0).subtract(ce.getPosition(1)).lengthSqr()) > 1 / 1024d) {
-                player.displayClientMessage(CreateLang.translateDirect("train.cannot_relocate_moving").withStyle(ChatFormatting.RED), true);
+            if (entity instanceof AbstractContraptionEntity ce && Math.abs(ce.getPosition(0).subtract(ce.getPosition(1))
+                .lengthSqr()) > 1 / 1024d) {
+                player.displayClientMessage(
+                    CreateLang.translateDirect("train.cannot_relocate_moving").withStyle(ChatFormatting.RED), true);
                 relocatingTrain = null;
                 return;
             }
 
             if (!player.getMainHandItem().is(AllItems.WRENCH)) {
-                player.displayClientMessage(CreateLang.translateDirect("train.relocate.abort").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                    CreateLang.translateDirect("train.relocate.abort").withStyle(ChatFormatting.RED), true);
                 relocatingTrain = null;
                 return;
             }
 
             if (!player.position().closerThan(relocatingOrigin, 24)) {
-                player.displayClientMessage(CreateLang.translateDirect("train.relocate.too_far").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                    CreateLang.translateDirect("train.relocate.too_far").withStyle(ChatFormatting.RED), true);
                 return;
             }
 
             Boolean success = relocateClient(mc, relocating, true);
-            if (success == null)
+            if (success == null) {
                 player.displayClientMessage(CreateLang.translateDirect("train.relocate", relocating.name), true);
-            else if (success)
-                player.displayClientMessage(CreateLang.translateDirect("train.relocate.valid").withStyle(ChatFormatting.GREEN), true);
-            else
-                player.displayClientMessage(CreateLang.translateDirect("train.relocate.invalid").withStyle(ChatFormatting.RED), true);
+            } else if (success) {
+                player.displayClientMessage(
+                    CreateLang.translateDirect("train.relocate.valid")
+                        .withStyle(ChatFormatting.GREEN), true
+                );
+            } else {
+                player.displayClientMessage(
+                    CreateLang.translateDirect("train.relocate.invalid")
+                        .withStyle(ChatFormatting.RED), true
+                );
+            }
             return;
         }
 
@@ -186,25 +227,31 @@ public class TrainRelocatorClient {
 
         CarriageContraptionEntity currentEntity = hoveredEntity.get();
         if (currentEntity != null) {
-            if (ContraptionHandlerClient.rayTraceContraption(origin, target, currentEntity) != null)
+            if (ContraptionHandlerClient.rayTraceContraption(origin, target, currentEntity) != null) {
                 return;
+            }
             hoveredEntity = new WeakReference<>(null);
         }
 
         AABB aabb = new AABB(origin, target);
-        List<CarriageContraptionEntity> intersectingContraptions = world.getEntitiesOfClass(CarriageContraptionEntity.class, aabb);
+        List<CarriageContraptionEntity> intersectingContraptions = world.getEntitiesOfClass(
+            CarriageContraptionEntity.class,
+            aabb
+        );
 
         for (CarriageContraptionEntity contraptionEntity : intersectingContraptions) {
-            if (ContraptionHandlerClient.rayTraceContraption(origin, target, contraptionEntity) == null)
+            if (ContraptionHandlerClient.rayTraceContraption(origin, target, contraptionEntity) == null) {
                 continue;
+            }
             hoveredEntity = new WeakReference<>(contraptionEntity);
         }
     }
 
     public static boolean carriageWrenched(Vec3 vec3, CarriageContraptionEntity entity) {
         Train train = getTrainFromEntity(entity);
-        if (train == null)
+        if (train == null) {
             return false;
+        }
         relocatingOrigin = vec3;
         relocatingTrain = train.id;
         relocatingEntityId = entity.getId();
@@ -225,11 +272,13 @@ public class TrainRelocatorClient {
     }
 
     private static Train getTrainFromEntity(CarriageContraptionEntity carriageContraptionEntity) {
-        if (carriageContraptionEntity == null)
+        if (carriageContraptionEntity == null) {
             return null;
+        }
         Carriage carriage = carriageContraptionEntity.getCarriage();
-        if (carriage == null)
+        if (carriage == null) {
             return null;
+        }
         return carriage.train;
     }
 

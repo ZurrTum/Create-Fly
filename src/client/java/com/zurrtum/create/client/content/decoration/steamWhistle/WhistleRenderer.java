@@ -53,7 +53,10 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
         Level world = be.getLevel();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        state.lightCoords = world != null ? LevelRenderer.getLightColor(
+            world,
+            state.blockPos
+        ) : LightTexture.FULL_BRIGHT;
         state.breakProgress = crumblingOverlay;
         state.layer = RenderTypes.solidMovingBlock();
         Direction direction = state.blockState.getValue(WhistleBlock.FACING);
@@ -73,7 +76,12 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
     }
 
     @Override
-    public void submit(WhistleRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        WhistleRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
@@ -85,7 +93,8 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            model.center().rotateY(yRot).uncenter().translate(0, offset, 0).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
+            model.center().rotateY(yRot).uncenter().translate(0, offset, 0).light(lightCoords)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

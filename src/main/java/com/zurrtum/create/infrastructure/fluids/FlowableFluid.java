@@ -113,7 +113,13 @@ public abstract class FlowableFluid extends WaterFluid {
     }
 
     @Override
-    protected void spreadTo(LevelAccessor world, BlockPos pos, BlockState state, Direction direction, FluidState fluidState) {
+    protected void spreadTo(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        Direction direction,
+        FluidState fluidState
+    ) {
         if (state.getBlock() instanceof LiquidBlockContainer fluidFillable) {
             fluidFillable.placeLiquid(world, pos, state, fluidState);
         } else if (state.getFluidState().isEmpty()) {
@@ -142,7 +148,13 @@ public abstract class FlowableFluid extends WaterFluid {
     }
 
     @Override
-    public boolean canBeReplacedWith(FluidState state, BlockGetter world, BlockPos pos, Fluid fluid, Direction direction) {
+    public boolean canBeReplacedWith(
+        FluidState state,
+        BlockGetter world,
+        BlockPos pos,
+        Fluid fluid,
+        Direction direction
+    ) {
         return false;
     }
 }

@@ -28,11 +28,19 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
     }
 
     @Override
-    public void submit(PoseStack ms, SubmitNodeCollector queue, int light, S renderState, float limbAngle, float limbDistance) {
+    public void submit(
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        int light,
+        S renderState,
+        float limbAngle,
+        float limbDistance
+    ) {
         HatState hatState = (HatState) renderState;
         PartialModel hat = hatState.create$getHat();
-        if (hat == null)
+        if (hat == null) {
             return;
+        }
 
         M entityModel = getParentModel();
         ms.pushPose();
@@ -59,7 +67,11 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
 
         if (!lastChild.isEmpty()) {
             ModelPart.Cube cube = lastChild.cubes.get(Mth.clamp(info.cubeIndex(), 0, lastChild.cubes.size() - 1));
-            ms.translate(info.offset().x() / 16.0F, (cube.minY - cube.maxY + info.offset().y()) / 16.0F, info.offset().z() / 16.0F);
+            ms.translate(
+                info.offset().x() / 16.0F,
+                (cube.minY - cube.maxY + info.offset().y()) / 16.0F,
+                info.offset().z() / 16.0F
+            );
             float max = Math.max(cube.maxX - cube.minX, cube.maxZ - cube.minZ) / 8.0F * info.scale();
             ms.scale(max, max, max);
         }

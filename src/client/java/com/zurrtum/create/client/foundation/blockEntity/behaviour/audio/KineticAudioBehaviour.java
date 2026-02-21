@@ -15,8 +15,9 @@ public class KineticAudioBehaviour<T extends KineticBlockEntity> extends AudioBe
     @Override
     public void tickAudio() {
         float componentSpeed = Math.abs(blockEntity.getSpeed());
-        if (componentSpeed == 0)
+        if (componentSpeed == 0) {
             return;
+        }
         float pitch = Mth.clamp((componentSpeed / 256f) + .45f, .85f, 1f);
 
         if (blockEntity.isNoisy()) {

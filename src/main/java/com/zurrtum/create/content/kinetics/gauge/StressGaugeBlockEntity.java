@@ -29,22 +29,24 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
     public void updateFromNetwork(float maxStress, float currentStress, int networkSize) {
         super.updateFromNetwork(maxStress, currentStress, networkSize);
 
-        if (!StressImpact.isEnabled())
+        if (!StressImpact.isEnabled()) {
             dialTarget = 0;
-        else if (isOverStressed())
+        } else if (isOverStressed()) {
             dialTarget = 1.125f;
-        else if (maxStress == 0)
+        } else if (maxStress == 0) {
             dialTarget = 0;
-        else
+        } else {
             dialTarget = currentStress / maxStress;
+        }
 
         if (dialTarget > 0) {
-            if (dialTarget < .5f)
+            if (dialTarget < .5f) {
                 color = Color.mixColors(0x00FF00, 0xFFFF00, dialTarget * 2);
-            else if (dialTarget < 1)
+            } else if (dialTarget < 1) {
                 color = Color.mixColors(0xFFFF00, 0xFF0000, (dialTarget) * 2 - 1);
-            else
+            } else {
                 color = 0xFF0000;
+            }
         }
 
         sendData();
@@ -66,8 +68,9 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket && worldPosition != null && worldPosition.equals(lastSent))
+        if (clientPacket && worldPosition != null && worldPosition.equals(lastSent)) {
             lastSent = null;
+        }
     }
 
     public float getNetworkStress() {
@@ -80,7 +83,8 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
 
     public void onObserved() {
         award(AllAdvancements.STRESSOMETER);
-        if (Mth.equal(dialTarget, 1))
+        if (Mth.equal(dialTarget, 1)) {
             award(AllAdvancements.STRESSOMETER_MAXED);
+        }
     }
 }

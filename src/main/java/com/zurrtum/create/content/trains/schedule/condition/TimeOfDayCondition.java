@@ -50,7 +50,8 @@ public class TimeOfDayCondition extends ScheduleWaitCondition {
             hr12,
             hr24,
             twoDigits(minute),
-            hour > 11 ? Component.translatable("create.generic.daytime.pm") : Component.translatable("create.generic.daytime.am")
+            hour > 11 ? Component.translatable("create.generic.daytime.pm") : Component.translatable(
+                "create.generic.daytime.am")
         );
     }
 
@@ -67,8 +68,9 @@ public class TimeOfDayCondition extends ScheduleWaitCondition {
         int targetTicks = (int) ((((targetHour + 18) % 24) * 1000 + Math.ceil(targetMinute / 60f * 1000)) % getRotation());
         int diff = targetTicks - dayTime;
 
-        if (diff < 0)
+        if (diff < 0) {
             diff += getRotation();
+        }
 
         int departureTime = (int) (timeOfDay + diff) % 24000;
         int departingHour = (departureTime / 1000 + 6) % 24;

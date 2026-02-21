@@ -25,22 +25,25 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class ExtendoGripItem extends Item {
     public static final AttributeModifier singleRangeAttributeModifier = new AttributeModifier(
-        Identifier.fromNamespaceAndPath(
-            MOD_ID,
+        Identifier.fromNamespaceAndPath(MOD_ID,
             "single_range_attribute_modifier"
-    ), 3, AttributeModifier.Operation.ADD_VALUE
+    ),
+        3,
+        AttributeModifier.Operation.ADD_VALUE
     );
     public static final AttributeModifier doubleRangeAttributeModifier = new AttributeModifier(
-        Identifier.fromNamespaceAndPath(
-            MOD_ID,
+        Identifier.fromNamespaceAndPath(MOD_ID,
             "double_range_attribute_modifier"
-    ), 2, AttributeModifier.Operation.ADD_VALUE
+    ),
+        2,
+        AttributeModifier.Operation.ADD_VALUE
     );
     public static final AttributeModifier attackKnockbackAttributeModifier = new AttributeModifier(
-        Identifier.fromNamespaceAndPath(
-            MOD_ID,
+        Identifier.fromNamespaceAndPath(MOD_ID,
             "attack_knockback_attribute_modifier"
-    ), 4, AttributeModifier.Operation.ADD_VALUE
+    ),
+        4,
+        AttributeModifier.Operation.ADD_VALUE
     );
     public static final ItemAttributeModifiers rangeModifier = ItemAttributeModifiers.builder()
         .add(Attributes.BLOCK_INTERACTION_RANGE, singleRangeAttributeModifier, EquipmentSlotGroup.HAND)
@@ -58,7 +61,8 @@ public class ExtendoGripItem extends Item {
     public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         ItemAttributeModifiers modifiers = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         if (slot == EquipmentSlot.MAINHAND) {
-            if (entity instanceof LivingEntity livingEntity && livingEntity.getItemBySlot(EquipmentSlot.OFFHAND).is(AllItems.EXTENDO_GRIP)) {
+            if (entity instanceof LivingEntity livingEntity && livingEntity.getItemBySlot(EquipmentSlot.OFFHAND)
+                .is(AllItems.EXTENDO_GRIP)) {
                 if (modifiers != doubleRangeModifier) {
                     stack.set(DataComponents.ATTRIBUTE_MODIFIERS, doubleRangeModifier);
                     livingEntity.lastEquipmentItems.get(slot).remove(DataComponents.ATTRIBUTE_MODIFIERS);
@@ -77,7 +81,11 @@ public class ExtendoGripItem extends Item {
         }
     }
 
-    private static void applyAttributeModifiers(ItemStack stack, ItemAttributeModifiers oldComponent, ItemAttributeModifiers newComponent) {
+    private static void applyAttributeModifiers(
+        ItemStack stack,
+        ItemAttributeModifiers oldComponent,
+        ItemAttributeModifiers newComponent
+    ) {
         if (oldComponent != newComponent) {
             stack.set(DataComponents.ATTRIBUTE_MODIFIERS, newComponent);
         }
@@ -143,7 +151,8 @@ public class ExtendoGripItem extends Item {
 
     public static boolean shouldInteraction(Player player, InteractionHand hand, ItemStack stack) {
         if (stack.isEmpty()) {
-            return player.getItemBySlot(hand == InteractionHand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND).is(AllItems.EXTENDO_GRIP);
+            return player.getItemBySlot(hand == InteractionHand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND)
+                .is(AllItems.EXTENDO_GRIP);
         }
         if (stack.is(AllItems.EXTENDO_GRIP)) {
             stack = player.getItemBySlot(hand == InteractionHand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND);

@@ -21,7 +21,14 @@ public final class ModelBuilderImpl {
                 builder.materialFunc
             );
         }
-        return BakedModelBufferer.bufferModel(builder.model, builder.pos, builder.level, blockState, builder.poseStack, builder.materialFunc);
+        return BakedModelBufferer.bufferModel(
+            builder.model,
+            builder.pos,
+            builder.level,
+            blockState,
+            builder.poseStack,
+            builder.materialFunc
+        );
     }
 
     public static SimpleModel buildBlockModelBuilder(BlockModelBuilder builder) {

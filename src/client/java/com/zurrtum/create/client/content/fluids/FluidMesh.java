@@ -17,13 +17,12 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 
 public class FluidMesh {
-    private static final RendererReloadCache<TextureAtlasSprite, Model> STREAM = new RendererReloadCache<>(sprite -> new SingleMeshModel(
-        new FluidStreamMesh(sprite), material(sprite)));
+    private static final RendererReloadCache<TextureAtlasSprite, Model> STREAM = new RendererReloadCache<>(sprite -> new SingleMeshModel(new FluidStreamMesh(sprite),
+        material(sprite)
+    ));
 
-    private static final RendererReloadCache<SurfaceKey, Model> SURFACE = new RendererReloadCache<>(sprite -> new SingleMeshModel(
-        new FluidSurfaceMesh(sprite.texture(),
-        sprite.width()
-    ), material(sprite.texture())
+    private static final RendererReloadCache<SurfaceKey, Model> SURFACE = new RendererReloadCache<>(sprite -> new SingleMeshModel(new FluidSurfaceMesh(sprite.texture(), sprite.width()),
+        material(sprite.texture())
     ));
     public static final float PIPE_RADIUS = 3f / 16f;
 
@@ -161,7 +160,16 @@ public class FluidMesh {
             }
         }
 
-        private static void putQuad(MutableVertexList vertexList, int i, Direction horizontal, float radius, float p0, float p1, float u0, float u1) {
+        private static void putQuad(
+            MutableVertexList vertexList,
+            int i,
+            Direction horizontal,
+            float radius,
+            float p0,
+            float p1,
+            float u0,
+            float u1
+        ) {
             float xStart;
             float xEnd;
             float zStart;

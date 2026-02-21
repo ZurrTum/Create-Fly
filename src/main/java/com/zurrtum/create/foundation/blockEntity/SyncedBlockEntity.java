@@ -1,7 +1,5 @@
 package com.zurrtum.create.foundation.blockEntity;
 
-import static com.zurrtum.create.Create.LOGGER;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
@@ -18,6 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import static com.zurrtum.create.Create.LOGGER;
 
 public abstract class SyncedBlockEntity extends BlockEntity {
     public SyncedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -57,8 +57,9 @@ public abstract class SyncedBlockEntity extends BlockEntity {
     }
 
     public void sendData() {
-        if (level instanceof ServerLevel serverLevel)
+        if (level instanceof ServerLevel serverLevel) {
             serverLevel.getChunkSource().blockChanged(getBlockPos());
+        }
     }
 
     public void notifyUpdate() {

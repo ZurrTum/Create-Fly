@@ -5,15 +5,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import io.netty.buffer.ByteBuf;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DimensionPalette implements Codec<ResourceKey<Level>> {
     public static final Codec<DimensionPalette> CODEC = ResourceKey.codec(Registries.DIMENSION).listOf()
@@ -45,8 +44,9 @@ public class DimensionPalette implements Codec<ResourceKey<Level>> {
     }
 
     public ResourceKey<Level> decode(int index) {
-        if (gatheredDims.size() <= index || index < 0)
+        if (gatheredDims.size() <= index || index < 0) {
             return Level.OVERWORLD;
+        }
         return gatheredDims.get(index);
     }
 

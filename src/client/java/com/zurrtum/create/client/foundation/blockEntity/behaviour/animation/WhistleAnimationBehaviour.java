@@ -15,7 +15,11 @@ public class WhistleAnimationBehaviour extends AnimationBehaviour<WhistleBlockEn
     public void tickAnimation() {
         FluidTankBlockEntity tank = blockEntity.getTank();
         boolean powered = blockEntity.isPowered() && (tank != null && tank.boiler.isActive() && (tank.boiler.passiveHeat || tank.boiler.activeHeat > 0) || blockEntity.isVirtual());
-        animation.chase(powered ? 1 : 0, powered ? .5f : .4f, powered ? LerpedFloat.Chaser.EXP : LerpedFloat.Chaser.LINEAR);
+        animation.chase(
+            powered ? 1 : 0,
+            powered ? .5f : .4f,
+            powered ? LerpedFloat.Chaser.EXP : LerpedFloat.Chaser.LINEAR
+        );
         animation.tickChaser();
     }
 }

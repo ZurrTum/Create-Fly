@@ -14,8 +14,9 @@ public class BlazeBurnerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void tick(MovementContext context) {
-        if (!context.world.isClientSide())
+        if (!context.world.isClientSide()) {
             return;
+        }
         AllClientHandle.INSTANCE.tickBlazeBurnerMovement(context);
     }
 

@@ -21,7 +21,8 @@ public class FluidFogModifier extends WaterFogEnvironment {
         FluidConfig config = AllFluidConfigs.ALL.get(world.getFluidState(cameraPos).getType());
         if (config != null) {
             float partialTicks = tickCounter.getGameTimeDeltaPartialTick(false);
-            data.environmentalStart = camera.attributeProbe().getValue(EnvironmentAttributes.WATER_FOG_START_DISTANCE, partialTicks);
+            data.environmentalStart = camera.attributeProbe()
+                .getValue(EnvironmentAttributes.WATER_FOG_START_DISTANCE, partialTicks);
             data.environmentalEnd = config.fogDistance().get();
             if (camera.entity() instanceof LocalPlayer player) {
                 data.environmentalEnd = data.environmentalEnd * Math.max(0.25F, player.getWaterVision());

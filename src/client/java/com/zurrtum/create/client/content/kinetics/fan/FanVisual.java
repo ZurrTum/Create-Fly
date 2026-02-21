@@ -8,12 +8,11 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
-
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+
+import java.util.function.Consumer;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
@@ -30,20 +29,27 @@ public class FanVisual extends KineticBlockEntityVisual<EncasedFanBlockEntity> {
         direction = blockState.getValue(FACING);
 
         opposite = direction.getOpposite();
-        shaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF)).createInstance();
-        fan = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.ENCASED_FAN_INNER)).createInstance();
+        shaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF))
+            .createInstance();
+        fan = instancerProvider().instancer(
+            AllInstanceTypes.ROTATING,
+            Models.partial(AllPartialModels.ENCASED_FAN_INNER)
+        ).createInstance();
 
         shaft.setup(blockEntity).setPosition(getVisualPosition()).rotateToFace(Direction.SOUTH, opposite).setChanged();
 
-        fan.setup(blockEntity, getFanSpeed()).setPosition(getVisualPosition()).rotateToFace(Direction.SOUTH, opposite).setChanged();
+        fan.setup(blockEntity, getFanSpeed()).setPosition(getVisualPosition()).rotateToFace(Direction.SOUTH, opposite)
+            .setChanged();
     }
 
     private float getFanSpeed() {
         float speed = blockEntity.getSpeed() * 5;
-        if (speed > 0)
+        if (speed > 0) {
             speed = Mth.clamp(speed, 80, 64 * 20);
-        if (speed < 0)
+        }
+        if (speed < 0) {
             speed = Mth.clamp(speed, -64 * 20, -80);
+        }
         return speed;
     }
 

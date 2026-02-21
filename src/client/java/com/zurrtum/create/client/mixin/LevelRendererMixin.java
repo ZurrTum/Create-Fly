@@ -136,7 +136,13 @@ public class LevelRendererMixin {
     }
 
     @Inject(method = "destroyBlockProgress(ILnet/minecraft/core/BlockPos;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/BlockDestructionProgress;updateTick(I)V"))
-    private void onDestroyBlockProgress(int entityId, BlockPos pos, int progress, CallbackInfo ci, @Local BlockDestructionProgress progressObj) {
+    private void onDestroyBlockProgress(
+        int entityId,
+        BlockPos pos,
+        int progress,
+        CallbackInfo ci,
+        @Local BlockDestructionProgress progressObj
+    ) {
         BlockState state = level.getBlockState(pos);
         MultiPosDestructionHandler handler = AllExtensions.MULTI_POS.get(state.getBlock());
         if (handler != null) {
@@ -178,8 +184,7 @@ public class LevelRendererMixin {
         @Local Vec3 cameraPos,
         @Local BlockOutlineRenderState state
     ) {
-        if (ChainConveyorInteractionHandler.hideVanillaBlockSelection() || ClipboardValueSettingsClientHandler.drawCustomBlockSelection(
-            minecraft,
+        if (ChainConveyorInteractionHandler.hideVanillaBlockSelection() || ClipboardValueSettingsClientHandler.drawCustomBlockSelection(minecraft,
             state.pos(),
             vertexConsumers,
             cameraPos,

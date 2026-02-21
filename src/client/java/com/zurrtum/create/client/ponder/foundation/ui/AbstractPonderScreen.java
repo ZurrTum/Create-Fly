@@ -35,7 +35,12 @@ public abstract class AbstractPonderScreen extends NavigatableSimiScreen {
         super.init();
 
         if (backTrack != null) {
-            backTrack.withCustomTheme(PonderButton.COLOR_IDLE, PonderButton.COLOR_HOVER, PonderButton.COLOR_CLICK, PonderButton.COLOR_DISABLED);
+            backTrack.withCustomTheme(
+                PonderButton.COLOR_IDLE,
+                PonderButton.COLOR_HOVER,
+                PonderButton.COLOR_CLICK,
+                PonderButton.COLOR_DISABLED
+            );
         }
 
     }

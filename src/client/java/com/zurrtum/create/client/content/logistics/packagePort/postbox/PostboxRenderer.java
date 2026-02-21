@@ -67,7 +67,12 @@ public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, 
     }
 
     @Override
-    public void submit(PostboxRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        PostboxRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         queue.submitCustomGeometry(matrices, state.layer, state);
         if (state.name != null) {
             state.name.render(matrices, queue, cameraState);
@@ -83,8 +88,9 @@ public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, 
 
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            flag.light(lightCoords).overlay(OverlayTexture.NO_OVERLAY).rotateYCentered(angle).translate(0, 0.625f, 0.125f).rotateX(xRot)
-                .translate(0, -0.625f, -0.125f).renderInto(matricesEntry, vertexConsumer);
+            flag.light(lightCoords).overlay(OverlayTexture.NO_OVERLAY).rotateYCentered(angle)
+                .translate(0, 0.625f, 0.125f).rotateX(xRot).translate(0, -0.625f, -0.125f)
+                .renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

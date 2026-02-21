@@ -11,9 +11,6 @@ import com.zurrtum.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.InteractionHand;
@@ -31,6 +28,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.function.Predicate;
+
 public class SpeedControllerBlock extends HorizontalAxisKineticBlock implements IBE<SpeedControllerBlockEntity>, NeighborUpdateListeningBlock {
 
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
@@ -42,15 +41,27 @@ public class SpeedControllerBlock extends HorizontalAxisKineticBlock implements 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState above = context.getLevel().getBlockState(context.getClickedPos().above());
-        if (ICogWheel.isLargeCog(above) && above.getValue(CogWheelBlock.AXIS).isHorizontal())
-            return defaultBlockState().setValue(HORIZONTAL_AXIS, above.getValue(CogWheelBlock.AXIS) == Axis.X ? Axis.Z : Axis.X);
+        if (ICogWheel.isLargeCog(above) && above.getValue(CogWheelBlock.AXIS).isHorizontal()) {
+            return defaultBlockState().setValue(
+                HORIZONTAL_AXIS,
+                above.getValue(CogWheelBlock.AXIS) == Axis.X ? Axis.Z : Axis.X
+            );
+        }
         return super.getStateForPlacement(context);
     }
 
     @Override
-    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos neighborPos, boolean isMoving) {
-        if (neighborPos.equals(pos.above()))
+    public void neighborUpdate(
+        BlockState state,
+        Level world,
+        BlockPos pos,
+        Block sourceBlock,
+        BlockPos neighborPos,
+        boolean isMoving
+    ) {
+        if (neighborPos.equals(pos.above())) {
             withBlockEntityDo(world, pos, SpeedControllerBlockEntity::updateBracket);
+        }
     }
 
     @Override
@@ -64,8 +75,10 @@ public class SpeedControllerBlock extends HorizontalAxisKineticBlock implements 
         BlockHitResult hitResult
     ) {
         IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
-        if (helper.matchesItem(stack))
-            return helper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        if (helper.matchesItem(stack)) {
+            return helper.getOffset(player, level, state, pos, hitResult)
+                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        }
 
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
@@ -87,15 +100,23 @@ public class SpeedControllerBlock extends HorizontalAxisKineticBlock implements 
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             BlockPos newPos = pos.above();
-            if (!world.getBlockState(newPos).canBeReplaced())
+            if (!world.getBlockState(newPos).canBeReplaced()) {
                 return PlacementOffset.fail();
+            }
 
             Axis newAxis = state.getValue(HORIZONTAL_AXIS) == Axis.X ? Axis.Z : Axis.X;
 
-            if (!CogWheelBlock.isValidCogwheelPosition(true, world, newPos, newAxis))
+            if (!CogWheelBlock.isValidCogwheelPosition(true, world, newPos, newAxis)) {
                 return PlacementOffset.fail();
+            }
 
             return PlacementOffset.success(newPos, s -> s.setValue(CogWheelBlock.AXIS, newAxis));
         }

@@ -11,10 +11,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -51,6 +47,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.LevelTickAccess;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
 public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<FlapDisplayBlockEntity>, IWrenchable, ICogWheel, SimpleWaterloggedBlock {
@@ -60,7 +59,8 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
 
     public FlapDisplayBlock(Properties p_49795_) {
         super(p_49795_);
-        registerDefaultState(defaultBlockState().setValue(UP, false).setValue(DOWN, false).setValue(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(UP, false).setValue(DOWN, false)
+            .setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -93,14 +93,19 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
         BlockState stateForPlacement = defaultBlockState();
         FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
 
-        if ((blockState.getBlock() != this) || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()))
+        if ((blockState.getBlock() != this) || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
             stateForPlacement = super.getStateForPlacement(context);
-        else {
+        } else {
             Direction otherFacing = blockState.getValue(HORIZONTAL_FACING);
             stateForPlacement = stateForPlacement.setValue(HORIZONTAL_FACING, otherFacing);
         }
 
-        return updateColumn(level, clickedPos, stateForPlacement.setValue(WATERLOGGED, ifluidstate.getType() == Fluids.WATER), true);
+        return updateColumn(
+            level,
+            clickedPos,
+            stateForPlacement.setValue(WATERLOGGED, ifluidstate.getType() == Fluids.WATER),
+            true
+        );
     }
 
     @Override
@@ -113,28 +118,35 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isShiftKeyDown())
+        if (player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
         IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
-        if (placementHelper.matchesItem(stack))
-            return placementHelper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        if (placementHelper.matchesItem(stack)) {
+            return placementHelper.getOffset(player, level, state, pos, hitResult)
+                .placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
+        }
 
         FlapDisplayBlockEntity flapBE = getBlockEntity(level, pos);
 
-        if (flapBE == null)
+        if (flapBE == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         flapBE = flapBE.getController();
-        if (flapBE == null)
+        if (flapBE == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
 
-        double yCoord = hitResult.getLocation().add(Vec3.atLowerCornerOf(hitResult.getDirection().getOpposite().getUnitVec3i()).scale(.125f)).y;
+        double yCoord = hitResult.getLocation()
+            .add(Vec3.atLowerCornerOf(hitResult.getDirection().getOpposite().getUnitVec3i()).scale(.125f)).y;
 
         int lineIndex = flapBE.getLineIndexAt(yCoord);
 
         if (stack.isEmpty()) {
-            if (!flapBE.isSpeedRequirementFulfilled())
+            if (!flapBE.isSpeedRequirementFulfilled()) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
+            }
             flapBE.applyTextManually(lineIndex, null);
             return InteractionResult.SUCCESS;
         }
@@ -147,15 +159,19 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
             return InteractionResult.SUCCESS;
         }
 
-        boolean display = stack.getItem() == Items.NAME_TAG && stack.has(DataComponents.CUSTOM_NAME) || stack.is(AllItems.CLIPBOARD);
+        boolean display = stack.getItem() == Items.NAME_TAG && stack.has(DataComponents.CUSTOM_NAME) || stack.is(
+            AllItems.CLIPBOARD);
         DyeColor dye = AllItemTags.getDyeColor(stack);
 
-        if (!display && dye == null)
+        if (!display && dye == null) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (dye == null && !flapBE.isSpeedRequirementFulfilled())
+        }
+        if (dye == null && !flapBE.isSpeedRequirementFulfilled()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide())
+        }
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
 
         Component customName = stack.get(DataComponents.CUSTOM_NAME);
 
@@ -217,8 +233,9 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
             for (Direction movement : Iterate.directionsInAxis(axis)) {
                 currentPos.set(pos);
                 for (int i = 0; i < 1000; i++) {
-                    if (!level.isLoaded(currentPos))
+                    if (!level.isLoaded(currentPos)) {
                         break;
+                    }
 
                     BlockState other1 = currentPos.equals(pos) ? state : level.getBlockState(currentPos);
                     BlockState other2 = level.getBlockState(currentPos.relative(connection));
@@ -226,10 +243,12 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
                     boolean col2 = canConnect(state, other2);
                     currentPos.move(movement);
 
-                    if (!col1 && !col2)
+                    if (!col1 && !col2) {
                         break;
-                    if (col1 && col2)
+                    }
+                    if (col1 && col2) {
                         continue;
+                    }
 
                     connect = false;
                     break Move;
@@ -243,21 +262,28 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
     @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
         super.onPlace(pState, pLevel, pPos, pOldState, pIsMoving);
-        if (pOldState.getBlock() == this)
+        if (pOldState.getBlock() == this) {
             return;
+        }
         LevelTickAccess<Block> blockTicks = pLevel.getBlockTicks();
-        if (!blockTicks.hasScheduledTick(pPos, this))
+        if (!blockTicks.hasScheduledTick(pPos, this)) {
             pLevel.scheduleTick(pPos, this, 1);
+        }
     }
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        if (pState.getBlock() != this)
+        if (pState.getBlock() != this) {
             return;
-        BlockPos belowPos = pPos.relative(Direction.fromAxisAndDirection(getConnectionAxis(pState), AxisDirection.NEGATIVE));
+        }
+        BlockPos belowPos = pPos.relative(Direction.fromAxisAndDirection(
+            getConnectionAxis(pState),
+            AxisDirection.NEGATIVE
+        ));
         BlockState belowState = pLevel.getBlockState(belowPos);
-        if (!canConnect(pState, belowState))
+        if (!canConnect(pState, belowState)) {
             KineticBlockEntity.switchToBlockState(pLevel, pPos, updateColumn(pLevel, pPos, pState, true));
+        }
         withBlockEntityDo(pLevel, pPos, FlapDisplayBlockEntity::updateControllerStatus);
     }
 
@@ -283,12 +309,15 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
         ScheduledTickAccess tickView,
         BlockPos pCurrentPos
     ) {
-        if (state.getValue(WATERLOGGED))
+        if (state.getValue(WATERLOGGED)) {
             tickView.scheduleTick(pCurrentPos, Fluids.WATER, Fluids.WATER.getTickDelay(pLevel));
-        if (!canConnect(state, pNeighborState))
+        }
+        if (!canConnect(state, pNeighborState)) {
             return setConnection(state, pDirection, false);
-        if (pDirection.getAxis() == getConnectionAxis(state))
+        }
+        if (pDirection.getAxis() == getConnectionAxis(state)) {
             return withPropertiesOf(pNeighborState).setValue(WATERLOGGED, state.getValue(WATERLOGGED));
+        }
         return setConnection(state, pDirection, getConnection(pNeighborState, pDirection.getOpposite()));
     }
 
@@ -312,21 +341,28 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
 
     public static BlockState setConnection(BlockState state, Direction side, boolean connect) {
         BooleanProperty property = side == Direction.DOWN ? DOWN : side == Direction.UP ? UP : null;
-        if (property != null)
+        if (property != null) {
             state = state.setValue(property, connect);
+        }
         return state;
     }
 
     @Override
     public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
         super.affectNeighborsAfterRemoval(pState, pLevel, pPos, pIsMoving);
-        if (pIsMoving)
+        if (pIsMoving) {
             return;
+        }
         for (Direction d : Iterate.directionsInAxis(getConnectionAxis(pState))) {
             BlockPos relative = pPos.relative(d);
             BlockState adjacent = pLevel.getBlockState(relative);
-            if (canConnect(pState, adjacent))
-                KineticBlockEntity.switchToBlockState(pLevel, relative, updateColumn(pLevel, relative, adjacent, false));
+            if (canConnect(pState, adjacent)) {
+                KineticBlockEntity.switchToBlockState(
+                    pLevel,
+                    relative,
+                    updateColumn(pLevel, relative, adjacent, false)
+                );
+            }
         }
     }
 
@@ -344,7 +380,13 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
         }
 
         @Override
-        public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos, BlockHitResult ray) {
+        public PlacementOffset getOffset(
+            Player player,
+            Level world,
+            BlockState state,
+            BlockPos pos,
+            BlockHitResult ray
+        ) {
             List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(
                 pos,
                 ray.getLocation(),

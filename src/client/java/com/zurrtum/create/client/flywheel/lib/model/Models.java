@@ -8,13 +8,12 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * A collection of methods for creating models from various sources.
@@ -26,8 +25,10 @@ public final class Models {
     private static final RendererReloadCache<BlockState, Model> BLOCK_STATE = new RendererReloadCache<>(it -> new BlockModelBuilder(SinglePosVirtualBlockGetter.createFullDark().blockState(it),
         List.of(BlockPos.ZERO)
     ).build());
-    private static final RendererReloadCache<PartialModel, Model> PARTIAL = new RendererReloadCache<>(it -> new BakedModelBuilder(it.get()).build());
-    private static final RendererReloadCache<TransformedPartial<?>, Model> TRANSFORMED_PARTIAL = new RendererReloadCache<>(TransformedPartial::create);
+    private static final RendererReloadCache<PartialModel, Model> PARTIAL = new RendererReloadCache<>(it -> new BakedModelBuilder(
+        it.get()).build());
+    private static final RendererReloadCache<TransformedPartial<?>, Model> TRANSFORMED_PARTIAL = new RendererReloadCache<>(
+        TransformedPartial::create);
 
     private Models() {
     }

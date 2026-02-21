@@ -149,8 +149,9 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
         for (Renderable widget : renderables) {
             if (widget instanceof AbstractSimiWidget simiWidget && simiWidget.isMouseOver(mouseX, mouseY)) {
                 List<Component> tooltip = simiWidget.getToolTip();
-                if (tooltip.isEmpty())
+                if (tooltip.isEmpty()) {
                     continue;
+                }
                 int ttx = simiWidget.lockedTooltipX == -1 ? mouseX : simiWidget.lockedTooltipX + simiWidget.getX();
                 int tty = simiWidget.lockedTooltipY == -1 ? mouseY : simiWidget.lockedTooltipY + simiWidget.getY();
                 graphics.setComponentTooltipForNextFrame(font, tooltip, ttx, tty);
@@ -169,23 +170,26 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (getFocused() instanceof EditBox && input.key() != GLFW.GLFW_KEY_ESCAPE)
+        if (getFocused() instanceof EditBox && input.key() != GLFW.GLFW_KEY_ESCAPE) {
             return getFocused().keyPressed(input);
+        }
         return super.keyPressed(input);
     }
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        if (getFocused() != null && !getFocused().isMouseOver(click.x(), click.y()))
+        if (getFocused() != null && !getFocused().isMouseOver(click.x(), click.y())) {
             setFocused(null);
+        }
         return super.mouseClicked(click, doubled);
     }
 
     @Override
     public GuiEventListener getFocused() {
         GuiEventListener focused = super.getFocused();
-        if (focused instanceof AbstractWidget && !focused.isFocused())
+        if (focused instanceof AbstractWidget && !focused.isFocused()) {
             focused = null;
+        }
         setFocused(focused);
         return focused;
     }
@@ -208,7 +212,13 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
     @Deprecated
     protected void debugExtraAreas(GuiGraphics graphics) {
         for (Rect2i area : getExtraAreas()) {
-            graphics.fill(area.getX() + area.getWidth(), area.getY() + area.getHeight(), area.getX(), area.getY(), 0xD3D3D3D3);
+            graphics.fill(
+                area.getX() + area.getWidth(),
+                area.getY() + area.getHeight(),
+                area.getX(),
+                area.getY(),
+                0xD3D3D3D3
+            );
         }
     }
 

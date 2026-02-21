@@ -9,10 +9,19 @@ import net.minecraft.client.renderer.RenderPipelines;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record TextureArrowRenderState(
-    Matrix3x2f pose, float alpha, float tx, float ty, float tw, float th, TextureSetup textureSetup, ScreenRectangle bounds
-) implements GuiElementRenderState {
-    public TextureArrowRenderState(Matrix3x2f pose, int size, float alpha, TextureSetup textureSetup, float tx, float ty, float tw, float th) {
+public record TextureArrowRenderState(Matrix3x2f pose, float alpha, float tx, float ty, float tw, float th,
+                                      TextureSetup textureSetup,
+                                      ScreenRectangle bounds) implements GuiElementRenderState {
+    public TextureArrowRenderState(
+        Matrix3x2f pose,
+        int size,
+        float alpha,
+        TextureSetup textureSetup,
+        float tx,
+        float ty,
+        float tw,
+        float th
+    ) {
         this(pose, alpha, tx, ty, tw, th, textureSetup, new ScreenRectangle(0, 0, size, size).transformMaxBounds(pose));
     }
 

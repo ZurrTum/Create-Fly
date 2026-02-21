@@ -13,7 +13,11 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(Leashable.class)
 public interface LeashableMixin {
     @WrapOperation(method = "angularFriction(Lnet/minecraft/world/entity/Entity;)F", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;getFriction()F"))
-    private static <E extends Entity & Leashable> float getSlipperiness(Block block, Operation<Float> original, @Local(argsOnly = true) E entity) {
+    private static <E extends Entity & Leashable> float getSlipperiness(
+        Block block,
+        Operation<Float> original,
+        @Local(argsOnly = true) E entity
+    ) {
         if (block instanceof SlipperinessControlBlock controlBlock) {
             return controlBlock.getSlipperiness(entity.level(), entity.getBlockPosBelowThatAffectsMyMovement());
         }

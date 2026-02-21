@@ -12,44 +12,49 @@ public enum AllCTTypes implements CTType {
         public int getTextureIndex(CTContext context) {
             return (context.right ? 1 : 0) + (context.left ? 2 : 0);
         }
-    },
-    HORIZONTAL_KRYPPERS(2, ContextRequirement.builder().horizontal().build()) {
+    }, HORIZONTAL_KRYPPERS(2, ContextRequirement.builder().horizontal().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             return !context.right && !context.left ? 0 : !context.right ? 3 : !context.left ? 2 : 1;
         }
-    },
-    VERTICAL(2, ContextRequirement.builder().vertical().build()) {
+    }, VERTICAL(2, ContextRequirement.builder().vertical().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             return (context.up ? 1 : 0) + (context.down ? 2 : 0);
         }
-    },
-    OMNIDIRECTIONAL(8, ContextRequirement.builder().all().build()) {
+    }, OMNIDIRECTIONAL(8, ContextRequirement.builder().all().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             CTContext c = context;
             int tileX = 0, tileY = 0;
             int borders = (!c.up ? 1 : 0) + (!c.down ? 1 : 0) + (!c.left ? 1 : 0) + (!c.right ? 1 : 0);
 
-            if (c.up)
+            if (c.up) {
                 tileX++;
-            if (c.down)
+            }
+            if (c.down) {
                 tileX += 2;
-            if (c.left)
+            }
+            if (c.left) {
                 tileY++;
-            if (c.right)
+            }
+            if (c.right) {
                 tileY += 2;
+            }
 
             if (borders == 0) {
-                if (c.topRight)
+                if (c.topRight) {
                     tileX++;
-                if (c.topLeft)
+                }
+                if (c.topLeft) {
                     tileX += 2;
-                if (c.bottomRight)
+                }
+                if (c.bottomRight) {
                     tileY += 2;
-                if (c.bottomLeft)
+                }
+                if (c.bottomLeft) {
                     tileY++;
+                }
             }
 
             if (borders == 1) {
@@ -80,14 +85,14 @@ public enum AllCTTypes implements CTType {
             }
 
             if (borders == 2) {
-                if ((c.up && c.left && c.topLeft) || (c.down && c.left && c.bottomLeft) || (c.up && c.right && c.topRight) || (c.down && c.right && c.bottomRight))
+                if ((c.up && c.left && c.topLeft) || (c.down && c.left && c.bottomLeft) || (c.up && c.right && c.topRight) || (c.down && c.right && c.bottomRight)) {
                     tileX += 3;
+                }
             }
 
             return tileX + 8 * tileY;
         }
-    },
-    ROOF(4, ContextRequirement.builder().all().build()) {
+    }, ROOF(4, ContextRequirement.builder().all().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             boolean upDrops = context.down && !context.up && (context.left || context.right);
@@ -96,51 +101,63 @@ public enum AllCTTypes implements CTType {
             boolean rightDrops = context.left && !context.right && (context.up || context.down);
 
             if (upDrops) {
-                if (leftDrops)
+                if (leftDrops) {
                     return context.bottomRight ? 0 : 5;
-                if (rightDrops)
+                }
+                if (rightDrops) {
                     return context.bottomLeft ? 2 : 5;
+                }
                 return 1;
             }
 
             if (downDrops) {
-                if (leftDrops)
+                if (leftDrops) {
                     return context.topRight ? 8 : 5;
-                if (rightDrops)
+                }
+                if (rightDrops) {
                     return context.topLeft ? 10 : 5;
+                }
                 return 9;
             }
 
-            if (leftDrops)
+            if (leftDrops) {
                 return 4;
-            if (rightDrops)
+            }
+            if (rightDrops) {
                 return 6;
+            }
 
-            if (!context.up || !context.down || !context.left || !context.right)
+            if (!context.up || !context.down || !context.left || !context.right) {
                 return 5;
+            }
 
             if (context.bottomLeft && context.topRight) {
-                if (context.topLeft && !context.bottomRight)
+                if (context.topLeft && !context.bottomRight) {
                     return 12;
-                if (context.bottomRight && !context.topLeft)
+                }
+                if (context.bottomRight && !context.topLeft) {
                     return 15;
-                if (!context.bottomRight && !context.topLeft)
+                }
+                if (!context.bottomRight && !context.topLeft) {
                     return 7;
+                }
             }
 
             if (context.bottomRight && context.topLeft) {
-                if (context.topRight && !context.bottomLeft)
+                if (context.topRight && !context.bottomLeft) {
                     return 13;
-                if (context.bottomLeft && !context.topRight)
+                }
+                if (context.bottomLeft && !context.topRight) {
                     return 14;
-                if (!context.bottomLeft && !context.topRight)
+                }
+                if (!context.bottomLeft && !context.topRight) {
                     return 11;
+                }
             }
 
             return 5;
         }
-    },
-    ROOF_STAIR(4, ContextRequirement.builder().axisAligned().build()) {
+    }, ROOF_STAIR(4, ContextRequirement.builder().axisAligned().build()) {
         private static final int[][] MAPPING = {{1, 6, 9, 4}, {14, 12, 13, 15}, {2, 10, 8, 0}, {5, 5, 5, 5}};
 
         @Override
@@ -149,14 +166,12 @@ public enum AllCTTypes implements CTType {
             int rot = (context.left ? 2 : 0) + (context.down ? 1 : 0);
             return MAPPING[type][rot];
         }
-    },
-    CROSS(4, ContextRequirement.builder().axisAligned().build()) {
+    }, CROSS(4, ContextRequirement.builder().axisAligned().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             return (context.up ? 1 : 0) + (context.down ? 2 : 0) + (context.left ? 4 : 0) + (context.right ? 8 : 0);
         }
-    },
-    RECTANGLE(4, ContextRequirement.builder().axisAligned().build()) {
+    }, RECTANGLE(4, ContextRequirement.builder().axisAligned().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             int x = context.left && context.right ? 2 : context.left ? 3 : context.right ? 1 : 0;

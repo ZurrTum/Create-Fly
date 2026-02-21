@@ -47,8 +47,9 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
 
     private final Map<VertexFormatElement, Integer> ELEMENT_OFFSETS = Util.make(
         new IdentityHashMap<>(), map -> {
-            for (var element : DefaultVertexFormat.BLOCK.getElements())
+            for (var element : DefaultVertexFormat.BLOCK.getElements()) {
                 map.put(element, DefaultVertexFormat.BLOCK.getOffset(element) / 4); // Int offset
+            }
         }
     );
     private static final int QUAD_DATA_SIZE = STRIDE * 4;

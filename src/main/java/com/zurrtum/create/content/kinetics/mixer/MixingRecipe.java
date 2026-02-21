@@ -28,10 +28,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-public record MixingRecipe(
-    int time, List<ProcessingOutput> results, List<FluidStack> fluidResults, HeatCondition heat, List<FluidIngredient> fluidIngredients,
-    List<SizedIngredient> ingredients
-) implements BasinRecipe, TimedRecipe {
+public record MixingRecipe(int time, List<ProcessingOutput> results, List<FluidStack> fluidResults, HeatCondition heat,
+                           List<FluidIngredient> fluidIngredients,
+                           List<SizedIngredient> ingredients) implements BasinRecipe, TimedRecipe {
     @Override
     public int getIngredientSize() {
         return fluidIngredients.size() + ingredients().size();
@@ -99,9 +98,11 @@ public record MixingRecipe(
         public static final MapCodec<MixingRecipe> CODEC = RecordCodecBuilder.mapCodec((Instance<MixingRecipe> instance) -> instance.group(
             Codec.INT.optionalFieldOf("processing_time", 100).forGetter(MixingRecipe::time),
             ProcessingOutput.CODEC.listOf(1, 4).optionalFieldOf("results", List.of()).forGetter(MixingRecipe::results),
-            FluidStack.CODEC.listOf(1, 2).optionalFieldOf("fluid_results", List.of()).forGetter(MixingRecipe::fluidResults),
+            FluidStack.CODEC.listOf(1, 2).optionalFieldOf("fluid_results", List.of())
+                .forGetter(MixingRecipe::fluidResults),
             HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(MixingRecipe::heat),
-            FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
+            FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of())
+                .forGetter(MixingRecipe::fluidIngredients),
             SizedIngredient.LIST_CODEC.optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
         ).apply(instance, MixingRecipe::new)).validate(recipe -> {
             if (recipe.results.isEmpty() && recipe.fluidResults.isEmpty()) {

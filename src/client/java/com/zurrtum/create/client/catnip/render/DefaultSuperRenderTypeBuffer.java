@@ -90,7 +90,10 @@ public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
                 put(map, CreateRenderTypes.additive());
             }
         );
-        private final BufferSource bufferSource = MultiBufferSource.immediateWithBuffers(fixedBuffers, new ByteBufferBuilder(256));
+        private final BufferSource bufferSource = MultiBufferSource.immediateWithBuffers(
+            fixedBuffers,
+            new ByteBufferBuilder(256)
+        );
 
         private static void put(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> map, RenderType type) {
             map.put(type, new ByteBufferBuilder(type.bufferSize()));

@@ -62,16 +62,23 @@ public record EnchantmentExtend(Codec<Enchantment> codec) implements Codec<Encha
     public <T> DataResult<Pair<Enchantment, T>> decode(DynamicOps<T> ops, T input) {
         DataResult<Pair<Enchantment, T>> result = codec.decode(ops, input);
         if (result instanceof Success<Pair<Enchantment, T>> success && ops instanceof RegistryOps<T> registryOps) {
-            return registryOps.getter(Registries.ITEM).flatMap(registry -> switch (success.value().getFirst().description()
-                .getContents() instanceof TranslatableContents text ? text.getKey() : null) {
-                case "enchantment.minecraft.knockback" -> apply(success, registry, AllItemTags.ENCHANTMENT_KNOCKBACK, true);
-                case "enchantment.minecraft.looting" -> apply(success, registry, AllItemTags.ENCHANTMENT_LOOTING, true);
-                case "enchantment.minecraft.mending" -> apply(success, registry, AllItemTags.ENCHANTMENT_DENY_MENDING, false);
-                case "enchantment.minecraft.unbreaking" -> apply(success, registry, AllItemTags.ENCHANTMENT_DENY_UNBREAKING, false);
-                case "enchantment.minecraft.infinity" -> apply(success, registry, AllItemTags.ENCHANTMENT_DENY_INFINITY, false);
-                case "enchantment.minecraft.aqua_affinity" -> apply(success, registry, AllItemTags.ENCHANTMENT_DENY_AQUA_AFFINITY, false);
-                case null, default -> Optional.empty();
-            }).orElse(success);
+            return registryOps.getter(Registries.ITEM)
+                .flatMap(registry -> switch (success.value().getFirst().description()
+                    .getContents() instanceof TranslatableContents text ? text.getKey() : null) {
+                    case "enchantment.minecraft.knockback" ->
+                        apply(success, registry, AllItemTags.ENCHANTMENT_KNOCKBACK, true);
+                    case "enchantment.minecraft.looting" ->
+                        apply(success, registry, AllItemTags.ENCHANTMENT_LOOTING, true);
+                    case "enchantment.minecraft.mending" ->
+                        apply(success, registry, AllItemTags.ENCHANTMENT_DENY_MENDING, false);
+                    case "enchantment.minecraft.unbreaking" ->
+                        apply(success, registry, AllItemTags.ENCHANTMENT_DENY_UNBREAKING, false);
+                    case "enchantment.minecraft.infinity" ->
+                        apply(success, registry, AllItemTags.ENCHANTMENT_DENY_INFINITY, false);
+                    case "enchantment.minecraft.aqua_affinity" ->
+                        apply(success, registry, AllItemTags.ENCHANTMENT_DENY_AQUA_AFFINITY, false);
+                    case null, default -> Optional.empty();
+                }).orElse(success);
         }
         return result;
     }

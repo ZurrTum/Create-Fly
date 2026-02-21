@@ -42,22 +42,30 @@ public class BracketedKineticBlockEntityVisual {
 
         protected final RotatingInstance additionalShaft;
 
-        private LargeCogVisual(VisualizationContext context, BracketedKineticBlockEntity blockEntity, float partialTick) {
+        private LargeCogVisual(
+            VisualizationContext context,
+            BracketedKineticBlockEntity blockEntity,
+            float partialTick
+        ) {
             super(context, blockEntity, partialTick, Models.partial(AllPartialModels.SHAFTLESS_LARGE_COGWHEEL));
 
             Direction.Axis axis = KineticBlockEntityRenderer.getRotationAxisOf(blockEntity);
 
-            additionalShaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
-                .createInstance();
+            additionalShaft = instancerProvider().instancer(
+                AllInstanceTypes.ROTATING,
+                Models.partial(AllPartialModels.COGWHEEL_SHAFT)
+            ).createInstance();
 
             additionalShaft.rotateToFace(axis).setup(blockEntity)
-                .setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(axis, pos)).setPosition(getVisualPosition()).setChanged();
+                .setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(axis, pos))
+                .setPosition(getVisualPosition()).setChanged();
         }
 
         @Override
         public void update(float pt) {
             super.update(pt);
-            additionalShaft.setup(blockEntity).setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(rotationAxis(), pos))
+            additionalShaft.setup(blockEntity)
+                .setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(rotationAxis(), pos))
                 .setChanged();
         }
 

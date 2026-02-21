@@ -16,9 +16,8 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 
-public record ContraptionInteractionPacket(
-    InteractionHand hand, int target, BlockPos localPos, Direction face
-) implements Packet<ServerGamePacketListener> {
+public record ContraptionInteractionPacket(InteractionHand hand, int target, BlockPos localPos,
+                                           Direction face) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ContraptionInteractionPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecBuilders.nullable(CatnipStreamCodecs.HAND),
         ContraptionInteractionPacket::hand,
@@ -31,7 +30,12 @@ public record ContraptionInteractionPacket(
         ContraptionInteractionPacket::new
     );
 
-    public ContraptionInteractionPacket(AbstractContraptionEntity target, InteractionHand hand, BlockPos localPos, Direction side) {
+    public ContraptionInteractionPacket(
+        AbstractContraptionEntity target,
+        InteractionHand hand,
+        BlockPos localPos,
+        Direction side
+    ) {
         this(hand, target.getId(), localPos, side);
     }
 

@@ -14,7 +14,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import java.util.function.Function;
 
 public class AllComputerPeripherals {
-    private static <T extends SmartBlockEntity> void registerPeripheral(BlockEntityType<T> type, Function<T, SyncedPeripheral<T>> factory) {
+    private static <T extends SmartBlockEntity> void registerPeripheral(
+        BlockEntityType<T> type,
+        Function<T, SyncedPeripheral<T>> factory
+    ) {
         BlockEntityBehaviour.add(type, ComputerBehaviour::new);
         PeripheralLookup.get().registerForBlockEntity(
             (blockEntity, direction) -> {

@@ -24,11 +24,13 @@ public class StabilizedContraption extends Contraption {
     @Override
     public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         BlockPos offset = pos.relative(facing);
-        if (!searchMovedStructure(world, offset, null))
+        if (!searchMovedStructure(world, offset, null)) {
             return false;
+        }
         startMoving(world);
-        if (blocks.isEmpty())
+        if (blocks.isEmpty()) {
             return false;
+        }
         return true;
     }
 

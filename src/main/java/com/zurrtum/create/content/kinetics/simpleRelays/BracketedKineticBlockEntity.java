@@ -1,16 +1,15 @@
 package com.zurrtum.create.content.kinetics.simpleRelays;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public class BracketedKineticBlockEntity extends SimpleKineticBlockEntity implements TransformableBlockEntity {
 
@@ -20,7 +19,10 @@ public class BracketedKineticBlockEntity extends SimpleKineticBlockEntity implem
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        behaviours.add(new BracketedBlockEntityBehaviour(this, state -> state.getBlock() instanceof AbstractSimpleShaftBlock));
+        behaviours.add(new BracketedBlockEntityBehaviour(
+            this,
+            state -> state.getBlock() instanceof AbstractSimpleShaftBlock
+        ));
         super.addBehaviours(behaviours);
     }
 

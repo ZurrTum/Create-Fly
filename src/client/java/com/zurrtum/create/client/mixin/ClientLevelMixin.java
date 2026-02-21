@@ -26,7 +26,8 @@ import static com.zurrtum.create.Create.REDSTONE_LINK_NETWORK_HANDLER;
 public class ClientLevelMixin {
     @Inject(method = "onBlockEntityAdded(Lnet/minecraft/world/level/block/entity/BlockEntity;)V", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"), cancellable = true)
     private void flywheel$decideNotToRenderEntity(BlockEntity entity, CallbackInfo ci) {
-        if (VisualizationManager.supportsVisualization(entity.getLevel()) && VisualizationHelper.skipVanillaRender(entity)) {
+        if (VisualizationManager.supportsVisualization(entity.getLevel()) && VisualizationHelper.skipVanillaRender(
+            entity)) {
             ci.cancel();
         }
     }

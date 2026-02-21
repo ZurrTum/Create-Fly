@@ -14,9 +14,8 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jetbrains.annotations.Nullable;
 
-public record ClipboardEditPacket(
-    int hotbarSlot, @Nullable ClipboardContent clipboardContent, @Nullable BlockPos targetedBlock
-) implements Packet<ServerGamePacketListener> {
+public record ClipboardEditPacket(int hotbarSlot, @Nullable ClipboardContent clipboardContent,
+                                  @Nullable BlockPos targetedBlock) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ClipboardEditPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT,
         ClipboardEditPacket::hotbarSlot,

@@ -58,12 +58,20 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
         setWindowOffset(1, 0);
         super.init();
 
-        resetButton = new IconButton(leftPos + background.getWidth() - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);
+        resetButton = new IconButton(
+            leftPos + background.getWidth() - 62,
+            topPos + background.getHeight() - 24,
+            AllIcons.I_TRASH
+        );
         resetButton.withCallback(() -> {
             menu.clearContents();
             minecraft.player.connection.send(AllPackets.CLEAR_CONTAINER);
         });
-        confirmButton = new IconButton(leftPos + background.getWidth() - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(
+            leftPos + background.getWidth() - 33,
+            topPos + background.getHeight() - 24,
+            AllIcons.I_CONFIRM
+        );
         confirmButton.withCallback(() -> {
             minecraft.player.closeContainer();
         });
@@ -71,9 +79,16 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
         addRenderableWidget(resetButton);
         addRenderableWidget(confirmButton);
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + background.getWidth() + 4, topPos + background.getHeight() - 44, 64, 56));
-        renderedItem = new ElementWidget(leftPos + background.getWidth() - 4, topPos + background.getHeight() - 56).showingElement(GuiGameElement.of(
-            menu.contentHolder).scale(5));
+        extraAreas = ImmutableList.of(new Rect2i(
+            leftPos + background.getWidth() + 4,
+            topPos + background.getHeight() - 44,
+            64,
+            56
+        ));
+        renderedItem = new ElementWidget(
+            leftPos + background.getWidth() - 4,
+            topPos + background.getHeight() - 56
+        ).showingElement(GuiGameElement.of(menu.contentHolder).scale(5));
         addRenderableWidget(renderedItem);
     }
 
@@ -95,8 +110,9 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
 
     @Override
     protected void containerTick() {
-        if (!ItemStack.matches(menu.player.getMainHandItem(), menu.contentHolder))
+        if (!ItemStack.matches(menu.player.getMainHandItem(), menu.contentHolder)) {
             minecraft.player.closeContainer();
+        }
 
         super.containerTick();
     }
@@ -109,15 +125,17 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
         }
 
         List<Component> list = new LinkedList<>();
-        if (hoveredSlot.hasItem())
+        if (hoveredSlot.hasItem()) {
             list = getTooltipFromContainerItem(hoveredSlot.getItem());
+        }
 
         graphics.setComponentTooltipForNextFrame(font, addToTooltip(list, hoveredSlot.getContainerSlot()), x, y);
     }
 
     private List<Component> addToTooltip(List<Component> list, int slot) {
-        if (slot < 0 || slot >= 12)
+        if (slot < 0 || slot >= 12) {
             return list;
+        }
         list.add(CreateLang.translateDirect(
             "linked_controller.frequency_slot_" + ((slot % 2) + 1),
             ControlsUtil.getControls().get(slot / 2).getTranslatedKeyMessage().getString()

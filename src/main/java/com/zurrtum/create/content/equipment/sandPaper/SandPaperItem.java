@@ -64,19 +64,23 @@ public class SandPaperItem extends Item {
         AABB bb = new AABB(hitVec, hitVec).inflate(1f);
         ItemEntity pickUp = null;
         for (ItemEntity itemEntity : worldIn.getEntitiesOfClass(ItemEntity.class, bb)) {
-            if (!itemEntity.isAlive())
+            if (!itemEntity.isAlive()) {
                 continue;
-            if (itemEntity.position().distanceTo(playerIn.position()) > 3)
+            }
+            if (itemEntity.position().distanceTo(playerIn.position()) > 3) {
                 continue;
+            }
             ItemStack stack = itemEntity.getItem();
-            if (!recipe.test(stack))
+            if (!recipe.test(stack)) {
                 continue;
+            }
             pickUp = itemEntity;
             break;
         }
 
-        if (pickUp == null)
+        if (pickUp == null) {
             return InteractionResult.FAIL;
+        }
 
         ItemStack item = pickUp.getItem().copy();
         ItemStack toPolish = item.split(1);
@@ -85,10 +89,11 @@ public class SandPaperItem extends Item {
 
         if (!worldIn.isClientSide()) {
             itemstack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(toPolish));
-            if (item.isEmpty())
+            if (item.isEmpty()) {
                 pickUp.discard();
-            else
+            } else {
                 pickUp.setItem(item);
+            }
         }
 
         return InteractionResult.SUCCESS.heldItemTransformedTo(itemstack);
@@ -99,23 +104,30 @@ public class SandPaperItem extends Item {
         RandomSource random = user.getRandom();
         if (stack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
             ItemStack polishing = stack.get(AllDataComponents.SAND_PAPER_POLISHING).item();
-            if (!polishing.isEmpty())
+            if (!polishing.isEmpty()) {
                 user.spawnItemParticles(polishing, 1);
+            }
         }
 
         // After 6 ticks play the sound every 7th
         if ((user.getTicksUsingItem() - 6) % 7 == 0) {
-            user.playSound(AllSoundEvents.SANDING_SHORT.getMainEvent(), 0.9F + 0.2F * random.nextFloat(), random.nextFloat() * 0.2F + 0.9F);
+            user.playSound(
+                AllSoundEvents.SANDING_SHORT.getMainEvent(),
+                0.9F + 0.2F * random.nextFloat(),
+                random.nextFloat() * 0.2F + 0.9F
+            );
         }
     }
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entityLiving) {
-        if (!(entityLiving instanceof Player player))
+        if (!(entityLiving instanceof Player player)) {
             return stack;
+        }
         SandPaperItemComponent component = stack.get(AllDataComponents.SAND_PAPER_POLISHING);
-        if (component == null)
+        if (component == null) {
             return stack;
+        }
         ItemStack toPolish = component.item();
 
         if (world.isClientSide()) {
@@ -124,17 +136,18 @@ public class SandPaperItem extends Item {
         }
 
         SingleRecipeInput input = new SingleRecipeInput(toPolish);
-        ((ServerLevel) world).recipeAccess().getRecipeFor(AllRecipeTypes.SANDPAPER_POLISHING, input, world).ifPresent(recipe -> {
-            ItemStack polished = recipe.value().assemble(input, world.registryAccess());
-            Inventory playerInv = player.getInventory();
-            if (!polished.isEmpty()) {
-                playerInv.placeItemBackInInventory(polished);
-            }
-            ItemStack recipeRemainder = toPolish.getItem().getCraftingRemainder();
-            if (!recipeRemainder.isEmpty()) {
-                playerInv.placeItemBackInInventory(recipeRemainder);
-            }
-        });
+        ((ServerLevel) world).recipeAccess().getRecipeFor(AllRecipeTypes.SANDPAPER_POLISHING, input, world)
+            .ifPresent(recipe -> {
+                ItemStack polished = recipe.value().assemble(input, world.registryAccess());
+                Inventory playerInv = player.getInventory();
+                if (!polished.isEmpty()) {
+                    playerInv.placeItemBackInInventory(polished);
+                }
+                ItemStack recipeRemainder = toPolish.getItem().getCraftingRemainder();
+                if (!recipeRemainder.isEmpty()) {
+                    playerInv.placeItemBackInInventory(recipeRemainder);
+                }
+            });
 
         stack.remove(AllDataComponents.SAND_PAPER_POLISHING);
         stack.hurtAndBreak(1, entityLiving, entityLiving.getUsedItemHand().asEquipmentSlot());
@@ -159,8 +172,9 @@ public class SandPaperItem extends Item {
 
     @Override
     public boolean releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-        if (!(entityLiving instanceof Player player))
+        if (!(entityLiving instanceof Player player)) {
             return false;
+        }
         if (stack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
             ItemStack toPolish = stack.get(AllDataComponents.SAND_PAPER_POLISHING).item();
             //noinspection DataFlowIssue - toPolish won't be null as we do call .has before calling .get
@@ -183,18 +197,26 @@ public class SandPaperItem extends Item {
             AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.random.nextFloat() * 0.5f - 1f) / 5f);
             level.levelEvent(player, LevelEvent.PARTICLES_SCRAPE, pos, 0); // Spawn particles
         } else {
-            newState = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(state.getBlock())).map(block -> block.withPropertiesOf(state));
+            newState = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(state.getBlock()))
+                .map(block -> block.withPropertiesOf(state));
 
             if (newState.isPresent()) {
-                AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.random.nextFloat() * 0.5f - 1f) / 5f);
+                AllSoundEvents.SANDING_LONG.play(
+                    level,
+                    player,
+                    pos,
+                    1,
+                    1 + (level.random.nextFloat() * 0.5f - 1f) / 5f
+                );
                 level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0); // Spawn particles
             }
         }
 
         if (newState.isPresent()) {
             level.setBlockAndUpdate(pos, newState.get());
-            if (player != null)
+            if (player != null) {
                 stack.hurtAndBreak(1, player, player.getUsedItemHand().asEquipmentSlot());
+            }
             return InteractionResult.SUCCESS;
         }
 

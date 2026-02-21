@@ -2,19 +2,23 @@ package com.zurrtum.create.infrastructure.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record ClipboardContent(
-    ClipboardType type, List<List<ClipboardEntry>> pages, boolean readOnly, int previouslyOpenedPage, Optional<CompoundTag> copiedValues
-) {
-    public static final ClipboardContent EMPTY = new ClipboardContent(ClipboardType.EMPTY, List.of(), false, 0, Optional.empty());
+import java.util.List;
+import java.util.Optional;
+
+public record ClipboardContent(ClipboardType type, List<List<ClipboardEntry>> pages, boolean readOnly,
+                               int previouslyOpenedPage, Optional<CompoundTag> copiedValues) {
+    public static final ClipboardContent EMPTY = new ClipboardContent(
+        ClipboardType.EMPTY,
+        List.of(),
+        false,
+        0,
+        Optional.empty()
+    );
 
     public static final Codec<List<List<ClipboardEntry>>> PAGES_CODEC = ClipboardEntry.CODEC.listOf().listOf();
     public static final StreamCodec<RegistryFriendlyByteBuf, List<List<ClipboardEntry>>> PAGES_STREAM_CODEC = ClipboardEntry.STREAM_CODEC.apply(
@@ -63,6 +67,12 @@ public record ClipboardContent(
     }
 
     public ClipboardContent setCopiedValues(CompoundTag copiedValues) {
-        return new ClipboardContent(this.type, this.pages, this.readOnly, this.previouslyOpenedPage, Optional.of(copiedValues));
+        return new ClipboardContent(
+            this.type,
+            this.pages,
+            this.readOnly,
+            this.previouslyOpenedPage,
+            Optional.of(copiedValues)
+        );
     }
 }

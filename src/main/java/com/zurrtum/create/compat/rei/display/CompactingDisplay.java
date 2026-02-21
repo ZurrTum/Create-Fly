@@ -23,9 +23,8 @@ import java.util.Optional;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredients;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getFluidIngredientStream;
 
-public record CompactingDisplay(
-    List<EntryIngredient> inputs, List<ProcessingOutput> outputs, HeatCondition heat, Optional<Identifier> location
-) implements Display {
+public record CompactingDisplay(List<EntryIngredient> inputs, List<ProcessingOutput> outputs, HeatCondition heat,
+                                Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<CompactingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(CompactingDisplay::inputs),
@@ -51,10 +50,10 @@ public record CompactingDisplay(
 
     public CompactingDisplay(Identifier id, CompactingRecipe recipe) {
         this(
-            getEntryIngredients(IngredientHelper.getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredients())),
-            recipe.results(),
-            recipe.heat(),
-            Optional.of(id)
+            getEntryIngredients(
+                IngredientHelper.getSizedIngredientStream(recipe.ingredients()),
+                getFluidIngredientStream(recipe.fluidIngredients())
+            ), recipe.results(), recipe.heat(), Optional.of(id)
         );
     }
 

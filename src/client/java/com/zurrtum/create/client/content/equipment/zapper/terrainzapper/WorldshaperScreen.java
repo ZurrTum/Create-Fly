@@ -127,7 +127,8 @@ public class WorldshaperScreen extends ZapperScreen {
             case SphereBrush b -> CreateLang.translateDirect("generic.radius");
             case CylinderBrush b ->
                 paramIndex == 0 ? CreateLang.translateDirect("generic.radius") : CreateLang.translateDirect(paramIndex == 1 ? "generic.height" : "generic.length");
-            default -> CreateLang.translateDirect(paramIndex == 0 ? "generic.width" : paramIndex == 1 ? "generic.height" : "generic.length");
+            default ->
+                CreateLang.translateDirect(paramIndex == 0 ? "generic.width" : paramIndex == 1 ? "generic.height" : "generic.length");
         };
     }
 
@@ -205,16 +206,19 @@ public class WorldshaperScreen extends ZapperScreen {
             addRenderableWidget(followDiagonalsIndicator);
             addRenderableWidget(acrossMaterials);
             addRenderableWidget(acrossMaterialsIndicator);
-            if (currentFollowDiagonals)
+            if (currentFollowDiagonals) {
                 followDiagonalsIndicator.state = State.ON;
-            if (currentAcrossMaterials)
+            }
+            if (currentAcrossMaterials) {
                 acrossMaterialsIndicator.state = State.ON;
+            }
         }
 
         // Tools
 
-        if (toolButtons != null)
+        if (toolButtons != null) {
             removeWidgets(toolButtons);
+        }
 
         TerrainTools[] toolValues = currentBrush.getSupportedTools();
         toolButtons = new ArrayList<>(toolValues.length);
@@ -231,9 +235,11 @@ public class WorldshaperScreen extends ZapperScreen {
         }
 
         int toolIndex = -1;
-        for (int i = 0; i < toolValues.length; i++)
-            if (currentTool == toolValues[i])
+        for (int i = 0; i < toolValues.length; i++) {
+            if (currentTool == toolValues[i]) {
                 toolIndex = i;
+            }
+        }
         if (toolIndex == -1) {
             currentTool = toolValues[0];
             toolIndex = 0;
@@ -244,8 +250,9 @@ public class WorldshaperScreen extends ZapperScreen {
 
         // Placement Options
 
-        if (placementButtons != null)
+        if (placementButtons != null) {
             removeWidgets(placementButtons);
+        }
 
         if (currentBrush.hasPlacementOptions()) {
             PlacementOptions[] placementValues = PlacementOptions.values();
@@ -273,12 +280,14 @@ public class WorldshaperScreen extends ZapperScreen {
         super.drawOnBackground(graphics, x, y);
 
         Brush currentBrush = this.currentBrush.get();
-        for (int index = 2; index >= currentBrush.amtParams; index--)
+        for (int index = 2; index >= currentBrush.amtParams; index--) {
             AllGuiTextures.TERRAINZAPPER_INACTIVE_PARAM.render(graphics, x + 56 + 20 * index, y + 40);
+        }
 
         graphics.drawString(font, toolSection, x + 7, y + 69, fontColor, false);
-        if (currentBrush.hasPlacementOptions())
+        if (currentBrush.hasPlacementOptions()) {
             graphics.drawString(font, placementSection, x + 136, y + 69, fontColor, false);
+        }
     }
 
     @Override

@@ -55,8 +55,9 @@ public abstract class ChainConveyorShape {
             to = counterTransform(to);
 
             Vec3 result = bounds.clip(from, to).orElse(null);
-            if (result == null)
+            if (result == null) {
                 return null;
+            }
 
             result = transform(result);
             return result;
@@ -80,7 +81,8 @@ public abstract class ChainConveyorShape {
 
         @Override
         public void drawOutline(BlockPos anchor, PoseStack ms, VertexConsumer vb) {
-            TransformStack.of(ms).translate(pivot).rotateYDegrees((float) yaw).rotateXDegrees((float) pitch).translateBack(pivot);
+            TransformStack.of(ms).translate(pivot).rotateYDegrees((float) yaw).rotateXDegrees((float) pitch)
+                .translateBack(pivot);
             TrackBlockOutline.renderShape(voxelShape, ms, vb, null);
         }
 

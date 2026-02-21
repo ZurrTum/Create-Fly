@@ -56,21 +56,25 @@ public class TrackPlacementClient {
         int restoreWarmup = extraTipWarmup;
         extraTipWarmup = 0;
 
-        if (hitResult == null)
+        if (hitResult == null) {
             return;
-        if (hitResult.getType() != Type.BLOCK)
+        }
+        if (hitResult.getType() != Type.BLOCK) {
             return;
+        }
 
         InteractionHand hand = InteractionHand.MAIN_HAND;
         if (!stack.is(AllItemTags.TRACKS)) {
             stack = player.getOffhandItem();
             hand = InteractionHand.OFF_HAND;
-            if (!stack.is(AllItemTags.TRACKS))
+            if (!stack.is(AllItemTags.TRACKS)) {
                 return;
+            }
         }
 
-        if (!stack.hasFoil())
+        if (!stack.hasFoil()) {
             return;
+        }
 
         TrackBlockItem blockItem = (TrackBlockItem) stack.getItem();
         Level level = player.level();
@@ -80,31 +84,41 @@ public class TrackPlacementClient {
         if (!(hitState.getBlock() instanceof TrackBlock) && !hitState.canBeReplaced()) {
             pos = pos.relative(bhr.getDirection());
             hitState = blockItem.getPlacementState(new UseOnContext(player, hand, bhr));
-            if (hitState == null)
+            if (hitState == null) {
                 return;
+            }
         }
 
-        if (!(hitState.getBlock() instanceof TrackBlock))
+        if (!(hitState.getBlock() instanceof TrackBlock)) {
             return;
+        }
 
         extraTipWarmup = restoreWarmup;
         boolean maxTurns = mc.options.keySprint.isDown();
         PlacementInfo info = TrackPlacement.tryConnect(level, player, pos, hitState, stack, false, maxTurns);
-        if (extraTipWarmup < 20)
+        if (extraTipWarmup < 20) {
             extraTipWarmup++;
-        if (!info.valid || !TrackPlacement.hoveringMaxed && (info.end1Extent == 0 || info.end2Extent == 0))
+        }
+        if (!info.valid || !TrackPlacement.hoveringMaxed && (info.end1Extent == 0 || info.end2Extent == 0)) {
             extraTipWarmup = 0;
+        }
 
-        if (!player.isCreative() && (info.valid || !info.hasRequiredTracks || !info.hasRequiredPavement))
+        if (!player.isCreative() && (info.valid || !info.hasRequiredTracks || !info.hasRequiredPavement)) {
             BlueprintOverlayRenderer.displayTrackRequirements(info, player.getOffhandItem());
+        }
 
-        if (info.valid)
-            player.displayClientMessage(CreateLang.translateDirect("track.valid_connection").withStyle(ChatFormatting.GREEN), true);
-        else if (info.message != null)
+        if (info.valid) {
+            player.displayClientMessage(
+                CreateLang.translateDirect("track.valid_connection")
+                    .withStyle(ChatFormatting.GREEN), true
+            );
+        } else if (info.message != null) {
             player.displayClientMessage(
                 CreateLang.translateDirect(info.message)
-                    .withStyle(info.message.equals("track.second_point") ? ChatFormatting.WHITE : ChatFormatting.RED), true
+                    .withStyle(info.message.equals("track.second_point") ? ChatFormatting.WHITE : ChatFormatting.RED),
+                true
             );
+        }
 
         if (bhr.getDirection() == Direction.UP) {
             Vec3 lookVec = player.getLookAngle();
@@ -118,17 +132,25 @@ public class TrackPlacementClient {
                 for (int xOffset = -2; xOffset <= 2; xOffset++) {
                     for (int zOffset = -2; zOffset <= 2; zOffset++) {
                         BlockPos offset = pos.offset(xOffset, 0, zOffset);
-                        PlacementInfo adjInfo = TrackPlacement.tryConnect(level, player, offset, hitState, stack, false, maxTurns);
+                        PlacementInfo adjInfo = TrackPlacement.tryConnect(
+                            level,
+                            player,
+                            offset,
+                            hitState,
+                            stack,
+                            false,
+                            maxTurns
+                        );
                         hints.get(adjInfo.valid).add(offset.below());
                     }
                 }
             }
 
             if (hints != null && !hints.either(Collection::isEmpty)) {
-                Outliner.getInstance().showCluster("track_valid", hints.getFirst()).withFaceTexture(AllSpecialTextures.THIN_CHECKERED)
-                    .colored(0x95CD41).lineWidth(0);
-                Outliner.getInstance().showCluster("track_invalid", hints.getSecond()).withFaceTexture(AllSpecialTextures.THIN_CHECKERED)
-                    .colored(0xEA5C2B).lineWidth(0);
+                Outliner.getInstance().showCluster("track_valid", hints.getFirst())
+                    .withFaceTexture(AllSpecialTextures.THIN_CHECKERED).colored(0x95CD41).lineWidth(0);
+                Outliner.getInstance().showCluster("track_invalid", hints.getSecond())
+                    .withFaceTexture(AllSpecialTextures.THIN_CHECKERED).colored(0xEA5C2B).lineWidth(0);
             }
         }
 
@@ -162,8 +184,9 @@ public class TrackPlacementClient {
         }
 
         BezierConnection bc = info.curve;
-        if (bc == null)
+        if (bc == null) {
             return;
+        }
 
         Vec3 previous1 = null;
         Vec3 previous2 = null;
@@ -189,10 +212,16 @@ public class TrackPlacementClient {
             if (previous1 != null) {
                 Vec3 middle1 = rail1.add(previous1).scale(0.5f);
                 Vec3 middle2 = rail2.add(previous2).scale(0.5f);
-                Outliner.getInstance().showLine(Pair.of(key, i * 2), VecHelper.lerp(s, middle1, previous1), VecHelper.lerp(s, middle1, rail1))
-                    .colored(railcolor).disableLineNormals().lineWidth(lw);
-                Outliner.getInstance().showLine(Pair.of(key, i * 2 + 1), VecHelper.lerp(s, middle2, previous2), VecHelper.lerp(s, middle2, rail2))
-                    .colored(railcolor).disableLineNormals().lineWidth(lw);
+                Outliner.getInstance().showLine(
+                    Pair.of(key, i * 2),
+                    VecHelper.lerp(s, middle1, previous1),
+                    VecHelper.lerp(s, middle1, rail1)
+                ).colored(railcolor).disableLineNormals().lineWidth(lw);
+                Outliner.getInstance().showLine(
+                    Pair.of(key, i * 2 + 1),
+                    VecHelper.lerp(s, middle2, previous2),
+                    VecHelper.lerp(s, middle2, rail2)
+                ).colored(railcolor).disableLineNormals().lineWidth(lw);
             }
 
             previous1 = rail1;
@@ -209,13 +238,15 @@ public class TrackPlacementClient {
 
     private static void line(int id, Vec3 v1, Vec3 o1, Vec3 ex) {
         int color = Color.mixColors(0xEA5C2B, 0x95CD41, animation.getValue());
-        Outliner.getInstance().showLine(Pair.of("start", id), v1.subtract(o1), v1.add(ex)).lineWidth(1 / 8f).disableLineNormals().colored(color);
+        Outliner.getInstance().showLine(Pair.of("start", id), v1.subtract(o1), v1.add(ex)).lineWidth(1 / 8f)
+            .disableLineNormals().colored(color);
     }
 
     public static InteractionResult sendExtenderPacket(LocalPlayer player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!stack.is(AllItemTags.TRACKS))
+        if (!stack.is(AllItemTags.TRACKS)) {
             return null;
+        }
         if (Minecraft.getInstance().options.keySprint.isDown()) {
             player.connection.send(new PlaceExtendedCurvePacket(hand == InteractionHand.MAIN_HAND, true));
             return InteractionResult.SUCCESS;

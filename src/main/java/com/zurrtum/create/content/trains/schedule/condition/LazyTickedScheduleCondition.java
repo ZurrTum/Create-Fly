@@ -18,8 +18,9 @@ public abstract class LazyTickedScheduleCondition extends ScheduleWaitCondition 
     public boolean tickCompletion(Level level, Train train, CompoundTag context) {
         int time = context.getIntOr("Time", 0);
         if (time % tickRate == 0) {
-            if (lazyTickCompletion(level, train, context))
+            if (lazyTickCompletion(level, train, context)) {
                 return true;
+            }
             time = 0;
         }
         context.putInt("Time", time + 1);

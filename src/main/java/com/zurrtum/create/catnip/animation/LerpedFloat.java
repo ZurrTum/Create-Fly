@@ -62,8 +62,9 @@ public class LerpedFloat {
     }
 
     public void updateChaseTarget(float target) {
-        if (angularChase)
+        if (angularChase) {
             target = value + AngleHelper.getShortestAngleDiff(value, target);
+        }
         this.chaseTarget = target;
     }
 
@@ -75,8 +76,9 @@ public class LerpedFloat {
 
     public void tickChaser() {
         previousValue = value;
-        if (chaseFunction == null)
+        if (chaseFunction == null) {
             return;
+        }
         if (Mth.equal((double) value, chaseTarget)) {
             value = chaseTarget;
             return;
@@ -102,7 +104,10 @@ public class LerpedFloat {
     }
 
     public boolean settled() {
-        return Mth.equal((double) previousValue, value) && (chaseFunction == null || Mth.equal((double) value, chaseTarget));
+        return Mth.equal((double) previousValue, value) && (chaseFunction == null || Mth.equal(
+            (double) value,
+            chaseTarget
+        ));
     }
 
     public float getChaseTarget() {
@@ -117,14 +122,16 @@ public class LerpedFloat {
         view.putFloat("Speed", chaseSpeed);
         view.putFloat("Target", chaseTarget);
         view.putFloat("Value", value);
-        if (forcedSync)
+        if (forcedSync) {
             view.putBoolean("Force", true);
+        }
         forcedSync = false;
     }
 
     public void read(ValueInput view, boolean clientPacket) {
-        if (!clientPacket || view.getBooleanOr("Force", false))
+        if (!clientPacket || view.getBooleanOr("Force", false)) {
             startWithValue(view.getFloatOr("Value", 0));
+        }
         readChaser(view);
     }
 

@@ -164,7 +164,11 @@ public class AllHandle extends AllClientHandle {
         AllClientHandle.INSTANCE = new AllHandle();
     }
 
-    protected void forceMainThread(ClientGamePacketListener listener, Minecraft mc, Packet<ClientGamePacketListener> packet) {
+    protected void forceMainThread(
+        ClientGamePacketListener listener,
+        Minecraft mc,
+        Packet<ClientGamePacketListener> packet
+    ) {
         if (listener instanceof ClientPacketListener) {
             PacketUtils.ensureRunningOnSameThread(packet, listener, mc.packetProcessor());
         }
@@ -185,10 +189,12 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         BlockPos mirror = packet.mirror();
-        if (mc.player.position().distanceTo(Vec3.atLowerCornerOf(mirror)) > 100)
+        if (mc.player.position().distanceTo(Vec3.atLowerCornerOf(mirror)) > 100) {
             return;
-        for (BlockPos to : packet.positions())
+        }
+        for (BlockPos to : packet.positions()) {
             SymmetryHandlerClient.drawEffect(mc, mirror, to);
+        }
     }
 
     @Override
@@ -203,8 +209,9 @@ public class AllHandle extends AllClientHandle {
     @Override
     public void onTrainEditReturn(TrainEditReturnPacket packet) {
         Train train = Create.RAILWAYS.trains.get(packet.id());
-        if (train == null)
+        if (train == null) {
             return;
+        }
         if (!packet.name().isBlank()) {
             train.name = Component.literal(packet.name());
         }
@@ -215,8 +222,9 @@ public class AllHandle extends AllClientHandle {
     @Override
     public void onTrainHUDControlUpdate(TrainHUDControlUpdatePacket packet) {
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
-        if (train == null)
+        if (train == null) {
             return;
+        }
 
         if (packet.throttle() != null) {
             train.throttle = packet.throttle();
@@ -229,13 +237,15 @@ public class AllHandle extends AllClientHandle {
     @Override
     public void onTrainHonkReturn(HonkReturnPacket packet) {
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
-        if (train == null)
+        if (train == null) {
             return;
+        }
 
-        if (packet.isHonk())
+        if (packet.isHonk()) {
             train.honkTicks = train.honkTicks == 0 ? 20 : 13;
-        else
+        } else {
             train.honkTicks = train.honkTicks > 5 ? 6 : 0;
+        }
     }
 
     @Override
@@ -243,10 +253,12 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         Entity entityByID = mc.level.getEntity(packet.entityId());
-        if (!(entityByID instanceof AbstractContraptionEntity ace))
+        if (!(entityByID instanceof AbstractContraptionEntity ace)) {
             return;
-        if (!(ace.getContraption() instanceof ElevatorContraption ec))
+        }
+        if (!(ace.getContraption() instanceof ElevatorContraption ec)) {
             return;
+        }
 
         ec.namesList = packet.floors();
         ec.syncControlDisplays();
@@ -262,10 +274,12 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         BlockEntity blockEntity = mc.level.getBlockEntity(packet.pos());
-        if (blockEntity instanceof PackagerLinkBlockEntity plbe)
+        if (blockEntity instanceof PackagerLinkBlockEntity plbe) {
             plbe.playEffect();
-        if (blockEntity instanceof StockTickerBlockEntity plbe)
+        }
+        if (blockEntity instanceof StockTickerBlockEntity plbe) {
             plbe.playEffect();
+        }
     }
 
     @Override
@@ -296,16 +310,19 @@ public class AllHandle extends AllClientHandle {
         T handler,
         Consumer<T> handleAdditional
     ) {
-        if (renderViewEntity == null)
+        if (renderViewEntity == null) {
             return;
-        if (renderViewEntity.position().distanceTo(location) > 100)
+        }
+        if (renderViewEntity.position().distanceTo(location) > 100) {
             return;
+        }
 
         handleAdditional.accept(handler);
-        if (self)
+        if (self) {
             handler.shoot(hand, location);
-        else
+        } else {
             handler.playSound(hand, location);
+        }
     }
 
     @Override
@@ -313,7 +330,12 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         onShootGadget(
-            mc.getCameraEntity(), packet.location(), packet.hand(), packet.self(), Create.ZAPPER_RENDER_HANDLER, handler -> {
+            mc.getCameraEntity(),
+            packet.location(),
+            packet.hand(),
+            packet.self(),
+            Create.ZAPPER_RENDER_HANDLER,
+            handler -> {
                 handler.addBeam(mc, new LaserBeam(packet.location(), packet.target()));
             }
         );
@@ -324,7 +346,12 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         onShootGadget(
-            mc.getCameraEntity(), packet.location(), packet.hand(), packet.self(), Create.POTATO_CANNON_RENDER_HANDLER, handler -> {
+            mc.getCameraEntity(),
+            packet.location(),
+            packet.hand(),
+            packet.self(),
+            Create.POTATO_CANNON_RENDER_HANDLER,
+            handler -> {
                 handler.beforeShoot(packet.pitch(), packet.location(), packet.motion(), packet.item());
             }
         );
@@ -371,8 +398,9 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         LocalPlayer player = mc.player;
-        if (!player.blockPosition().closerThan(packet.pos(), 100))
+        if (!player.blockPosition().closerThan(packet.pos(), 100)) {
             return;
+        }
         SuperGlueSelectionHandler.spawnParticles(player.level(), packet.pos(), packet.direction(), packet.fullBlock());
     }
 
@@ -380,13 +408,15 @@ public class AllHandle extends AllClientHandle {
     public void onContraptionSeatMapping(ContraptionSeatMappingPacket packet) {
         LocalPlayer player = Minecraft.getInstance().player;
         Entity entityByID = player.level().getEntity(packet.entityId());
-        if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
+        if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity)) {
             return;
+        }
 
         if (packet.dismountedId() == player.getId()) {
             Vec3 transformedVector = contraptionEntity.getPassengerPosition(player, 1);
-            if (transformedVector != null)
+            if (transformedVector != null) {
                 AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.set(player, Optional.of(transformedVector));
+            }
         }
 
         contraptionEntity.getContraption().setSeatMapping(packet.mapping());
@@ -398,8 +428,9 @@ public class AllHandle extends AllClientHandle {
         forceMainThread(listener, mc, packet);
         ClientLevel world = mc.level;
         Entity entity = world.getEntity(packet.entityId());
-        if (!(entity instanceof Player player))
+        if (!(entity instanceof Player player)) {
             return;
+        }
         AllSynchedDatas.LAST_OVERRIDE_LIMB_SWING_UPDATE.set(player, 0);
         AllSynchedDatas.OVERRIDE_LIMB_SWING.set(player, packet.limbSwing());
         Vec3 position = packet.position();
@@ -418,8 +449,9 @@ public class AllHandle extends AllClientHandle {
     @Override
     public void onMountedStorageSync(MountedStorageSyncPacket packet) {
         Entity entity = Minecraft.getInstance().level.getEntity(packet.contraptionId());
-        if (!(entity instanceof AbstractContraptionEntity contraption))
+        if (!(entity instanceof AbstractContraptionEntity contraption)) {
             return;
+        }
 
         contraption.getContraption().getStorage().handleSync(packet, contraption);
     }
@@ -441,7 +473,8 @@ public class AllHandle extends AllClientHandle {
             return;
         }
 
-        Outliner.getInstance().showAABB("highlightCommand", Shapes.block().bounds().move(packet.pos()), 200).lineWidth(1 / 32f).colored(0xEeEeEe)
+        Outliner.getInstance().showAABB("highlightCommand", Shapes.block().bounds().move(packet.pos()), 200)
+            .lineWidth(1 / 32f).colored(0xEeEeEe)
             // .colored(0x243B50)
             .withFaceTexture(AllSpecialTextures.SELECTION);
     }
@@ -466,7 +499,11 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void onSoulPulseEffect(SoulPulseEffectPacket packet) {
-        Create.SOUL_PULSE_EFFECT_HANDLER.addPulse(new SoulPulseEffect(packet.pos(), packet.distance(), packet.canOverlap()));
+        Create.SOUL_PULSE_EFFECT_HANDLER.addPulse(new SoulPulseEffect(
+            packet.pos(),
+            packet.distance(),
+            packet.canOverlap()
+        ));
     }
 
     @Override
@@ -482,8 +519,9 @@ public class AllHandle extends AllClientHandle {
 
             SignalEdgeGroup group = new SignalEdgeGroup(id);
             signalEdgeGroups.put(id, group);
-            if (i < packet.colors().size())
+            if (i < packet.colors().size()) {
                 group.color = packet.colors().get(i);
+            }
         }
     }
 
@@ -536,17 +574,20 @@ public class AllHandle extends AllClientHandle {
             }
             unusedIds.remove(uuid);
             TrackGraph trackGraph = manager.trackNetworks.get(uuid);
-            if (trackGraph.getChecksum() == entry.checksum())
+            if (trackGraph.getChecksum() == entry.checksum()) {
                 continue;
+            }
             LOGGER.warn("Track network: {} failed its checksum; Requesting refresh", uuid.toString().substring(0, 6));
             failedIds.add(entry.netId());
         }
 
         ClientPacketListener networkHandler = Minecraft.getInstance().player.connection;
-        for (Integer failed : failedIds)
+        for (Integer failed : failedIds) {
             networkHandler.send(new TrackGraphRequestPacket(failed));
-        for (UUID unused : unusedIds)
+        }
+        for (UUID unused : unusedIds) {
             manager.trackNetworks.remove(unused);
+        }
     }
 
     @Override
@@ -569,14 +610,16 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         Entity entityByID = mc.level.getEntity(packet.entityId());
-        if (!(entityByID instanceof AbstractContraptionEntity ace))
+        if (!(entityByID instanceof AbstractContraptionEntity ace)) {
             return;
+        }
 
         Contraption contraption = ace.getContraption();
         List<ItemStack> disabledActors = contraption.getDisabledActors();
         ItemStack filter = packet.filter();
-        if (filter.isEmpty())
+        if (filter.isEmpty()) {
             disabledActors.clear();
+        }
 
         if (!packet.enable()) {
             disabledActors.add(filter);
@@ -626,7 +669,15 @@ public class AllHandle extends AllClientHandle {
         ClientLevel world = mc.level;
         Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), .125f);
         Vec3 pos = packet.location().add(motion.scale(4));
-        world.addParticle(new ItemParticleOption(ParticleTypes.ITEM, packet.box()), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
+        world.addParticle(
+            new ItemParticleOption(ParticleTypes.ITEM, packet.box()),
+            pos.x,
+            pos.y,
+            pos.z,
+            motion.x,
+            motion.y,
+            motion.z
+        );
     }
 
     @Override
@@ -635,14 +686,16 @@ public class AllHandle extends AllClientHandle {
         forceMainThread(listener, mc, packet);
         ClientLevel world = mc.level;
         BlockState blockState = world.getBlockState(packet.fromPos().pos());
-        if (!blockState.is(AllBlocks.FACTORY_GAUGE))
+        if (!blockState.is(AllBlocks.FACTORY_GAUGE)) {
             return;
+        }
         ServerFactoryPanelBehaviour panelBehaviour = ServerFactoryPanelBehaviour.at(world, packet.toPos());
         if (panelBehaviour != null) {
             panelBehaviour.bulb.setValue(1);
             FactoryPanelConnection connection = panelBehaviour.targetedBy.get(packet.fromPos());
-            if (connection != null)
+            if (connection != null) {
                 connection.success = packet.success();
+            }
         }
     }
 
@@ -691,8 +744,9 @@ public class AllHandle extends AllClientHandle {
 
         for (int nodeId : packet.removedNodes) {
             TrackNode node = graph.getNode(nodeId);
-            if (node != null)
+            if (node != null) {
                 graph.removeNode(null, node.getLocation());
+            }
         }
 
         for (Map.Entry<Integer, Pair<TrackNodeLocation, Vec3>> entry : packet.addedNodes.entrySet()) {
@@ -705,21 +759,30 @@ public class AllHandle extends AllClientHandle {
             Couple<TrackNode> nodes = pair.getFirst().getFirst().map(graph::getNode);
             TrackNode node1 = nodes.getFirst();
             TrackNode node2 = nodes.getSecond();
-            if (node1 != null && node2 != null)
-                graph.putConnection(node1, node2, new TrackEdge(node1, node2, pair.getSecond(), pair.getFirst().getSecond()));
+            if (node1 != null && node2 != null) {
+                graph.putConnection(
+                    node1,
+                    node2,
+                    new TrackEdge(node1, node2, pair.getSecond(), pair.getFirst().getSecond())
+                );
+            }
         }
 
-        for (TrackEdgePoint edgePoint : packet.addedEdgePoints)
+        for (TrackEdgePoint edgePoint : packet.addedEdgePoints) {
             graph.edgePoints.put(edgePoint.getType(), edgePoint);
+        }
 
-        for (UUID uuid : packet.removedEdgePoints)
-            for (EdgePointType<?> type : EdgePointType.TYPES.values())
+        for (UUID uuid : packet.removedEdgePoints) {
+            for (EdgePointType<?> type : EdgePointType.TYPES.values()) {
                 graph.edgePoints.remove(type, uuid);
+            }
+        }
 
         handleEdgeData(packet.updatedEdgeData, graph);
 
-        if (!packet.splitSubGraphs.isEmpty())
+        if (!packet.splitSubGraphs.isEmpty()) {
             graph.findDisconnectedGraphs(null, packet.splitSubGraphs).forEach(manager::putGraph);
+        }
     }
 
     private void handleEdgeData(Map<Couple<Integer>, Pair<Integer, List<UUID>>> updatedEdgeData, TrackGraph graph) {
@@ -728,19 +791,22 @@ public class AllHandle extends AllClientHandle {
             int groupType = entry.getValue().getFirst();
 
             Couple<TrackNode> nodes = entry.getKey().map(graph::getNode);
-            if (nodes.either(Objects::isNull))
+            if (nodes.either(Objects::isNull)) {
                 continue;
+            }
             TrackEdge edge = graph.getConnectionsFrom(nodes.getFirst()).get(nodes.getSecond());
-            if (edge == null)
+            if (edge == null) {
                 continue;
+            }
 
             EdgeData edgeData = new EdgeData(edge);
-            if (groupType == TrackGraphSyncPacket.NULL_GROUP)
+            if (groupType == TrackGraphSyncPacket.NULL_GROUP) {
                 edgeData.setSingleSignalGroup(null, null, null);
-            else if (groupType == TrackGraphSyncPacket.PASSIVE_GROUP)
+            } else if (groupType == TrackGraphSyncPacket.PASSIVE_GROUP) {
                 edgeData.setSingleSignalGroup(null, null, EdgeData.passiveGroup);
-            else
+            } else {
                 edgeData.setSingleSignalGroup(null, null, idList.getFirst());
+            }
 
             List<TrackEdgePoint> points = edgeData.getPoints();
             edge.edgeData = edgeData;
@@ -749,8 +815,9 @@ public class AllHandle extends AllClientHandle {
                 UUID uuid = idList.get(i);
                 for (EdgePointType<?> type : EdgePointType.TYPES.values()) {
                     TrackEdgePoint point = graph.edgePoints.get(type, uuid);
-                    if (point == null)
+                    if (point == null) {
                         continue;
+                    }
                     points.add(point);
                     break;
                 }
@@ -769,7 +836,10 @@ public class AllHandle extends AllClientHandle {
         if (listener instanceof ClientPacketListener handler) {
             Minecraft mc = Minecraft.getInstance();
             PacketUtils.ensureRunningOnSameThread(packet, handler, mc.packetProcessor());
-            RegistryFriendlyByteBuf extraData = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(packet.data()), handler.registryAccess());
+            RegistryFriendlyByteBuf extraData = new RegistryFriendlyByteBuf(
+                Unpooled.wrappedBuffer(packet.data()),
+                handler.registryAccess()
+            );
             AllMenuScreens.open(mc, packet.menu(), packet.id(), packet.name(), extraData);
             extraData.release();
         }
@@ -784,9 +854,11 @@ public class AllHandle extends AllClientHandle {
     public void buildDebugInfo() {
         DebugInfoSection.builder("Graphics").put("Flywheel Version", DebugInformation.getVersionOfMod(Flywheel.MOD_ID))
             .put("Flywheel Backend", () -> Backend.REGISTRY.getIdOrThrow(BackendManager.currentBackend()).toString())
-            .put("OpenGL Renderer", GlStateManager._getString(GL11.GL_RENDERER)).put("OpenGL Version", GlStateManager._getString(GL11.GL_VERSION))
-            .put("Transparency", () -> Minecraft.getInstance().options.improvedTransparency().get() ? "shader" : "regular")
-            .buildTo(DebugInformation::registerClientInfo);
+            .put("OpenGL Renderer", GlStateManager._getString(GL11.GL_RENDERER))
+            .put("OpenGL Version", GlStateManager._getString(GL11.GL_VERSION)).put(
+                "Transparency",
+                () -> Minecraft.getInstance().options.improvedTransparency().get() ? "shader" : "regular"
+            ).buildTo(DebugInformation::registerClientInfo);
     }
 
     @Override
@@ -801,8 +873,9 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void addAirFlowParticle(Level world, BlockPos airCurrentPos, double x, double y, double z) {
-        if (world.random.nextFloat() < AllConfigs.client().fanParticleDensity.get())
+        if (world.random.nextFloat() < AllConfigs.client().fanParticleDensity.get()) {
             world.addParticle(new AirFlowParticleData(airCurrentPos), x, y, z, 0, 0, 0);
+        }
     }
 
     @Override
@@ -814,7 +887,8 @@ public class AllHandle extends AllClientHandle {
     public void showWaterBounds(Axis axis, BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         Vec3 contract = Vec3.atLowerCornerOf(Direction.get(AxisDirection.POSITIVE, axis).getUnitVec3i());
-        Outliner.getInstance().showAABB(Pair.of("waterwheel", pos), new AABB(pos).inflate(1).deflate(contract.x, contract.y, contract.z))
+        Outliner.getInstance()
+            .showAABB(Pair.of("waterwheel", pos), new AABB(pos).inflate(1).deflate(contract.x, contract.y, contract.z))
             .colored(0xFF_ff5d6c);
         CreateLang.translate("large_water_wheel.not_enough_space").color(0xFF_ff5d6c).sendStatus(context.getPlayer());
     }
@@ -841,21 +915,32 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void spawnPipeParticles(Level world, BlockPos pos, PipeConnection.Flow flow, boolean openEnd, Direction side, int amount) {
+    public void spawnPipeParticles(
+        Level world,
+        BlockPos pos,
+        PipeConnection.Flow flow,
+        boolean openEnd,
+        Direction side,
+        int amount
+    ) {
         Minecraft mc = Minecraft.getInstance();
-        if (world == mc.level)
-            if (isRenderEntityWithoutDistance(mc, pos))
+        if (world == mc.level) {
+            if (isRenderEntityWithoutDistance(mc, pos)) {
                 return;
-        if (openEnd)
+            }
+        }
+        if (openEnd) {
             spawnPouringLiquid(world, pos, flow, side, amount);
-        else if (world.random.nextFloat() < PipeConnection.IDLE_PARTICLE_SPAWN_CHANCE)
+        } else if (world.random.nextFloat() < PipeConnection.IDLE_PARTICLE_SPAWN_CHANCE) {
             spawnRimParticles(world, pos, flow.fluid, side, amount);
+        }
     }
 
     private static boolean isRenderEntityWithoutDistance(Minecraft mc, BlockPos pos) {
         Entity renderViewEntity = mc.getCameraEntity();
-        if (renderViewEntity == null)
+        if (renderViewEntity == null) {
             return true;
+        }
         Vec3 center = VecHelper.getCenterOf(pos);
         return renderViewEntity.position().distanceTo(center) > PipeConnection.MAX_PARTICLE_RENDER_DISTANCE;
     }
@@ -865,7 +950,13 @@ public class AllHandle extends AllClientHandle {
         FluidFX.spawnRimParticles(world, pos, side, amount, particle, PipeConnection.RIM_RADIUS);
     }
 
-    private static void spawnPouringLiquid(Level world, BlockPos pos, PipeConnection.Flow flow, Direction side, int amount) {
+    private static void spawnPouringLiquid(
+        Level world,
+        BlockPos pos,
+        PipeConnection.Flow flow,
+        Direction side,
+        int amount
+    ) {
         ParticleOptions particle = FluidFX.getFluidParticle(flow.fluid);
         Vec3 directionVec = Vec3.atLowerCornerOf(side.getUnitVec3i());
         FluidFX.spawnPouringLiquid(world, pos, amount, particle, PipeConnection.RIM_RADIUS, directionVec, flow.inbound);
@@ -875,20 +966,24 @@ public class AllHandle extends AllClientHandle {
     public void spawnSteamEngineParticles(SteamEngineBlockEntity be) {
         Float targetAngle = SteamEngineRenderer.getTargetAngle(be);
         PoweredShaftBlockEntity ste = be.target.get();
-        if (ste == null)
+        if (ste == null) {
             return;
-        if (!ste.isPoweredBy(be.getBlockPos()) || ste.engineEfficiency == 0)
+        }
+        if (!ste.isPoweredBy(be.getBlockPos()) || ste.engineEfficiency == 0) {
             return;
-        if (targetAngle == null)
+        }
+        if (targetAngle == null) {
             return;
+        }
 
         float angle = AngleHelper.deg(targetAngle);
         angle += (angle < 0) ? -180 + 75 : 360 - 75;
         angle %= 360;
 
         PoweredShaftBlockEntity shaft = be.getShaft();
-        if (shaft == null || shaft.getSpeed() == 0)
+        if (shaft == null || shaft.getSpeed() == 0) {
             return;
+        }
 
         if (angle >= 0 && !(be.prevAngle > 180 && angle < 180)) {
             be.prevAngle = angle;
@@ -911,9 +1006,8 @@ public class AllHandle extends AllClientHandle {
 
         Level world = be.getLevel();
         Vec3 offset = VecHelper.rotate(
-            new Vec3(0, 0, 1).add(VecHelper.offsetRandomly(Vec3.ZERO, world.random, 1).multiply(1, 1, 0).normalize().scale(.5f)),
-            AngleHelper.verticalAngle(facing),
-            Axis.X
+            new Vec3(0, 0, 1).add(VecHelper.offsetRandomly(Vec3.ZERO, world.random, 1)
+                .multiply(1, 1, 0).normalize().scale(.5f)), AngleHelper.verticalAngle(facing), Axis.X
         );
         offset = VecHelper.rotate(offset, AngleHelper.horizontalAngle(facing), Axis.Y);
         Vec3 v = offset.scale(.5f).add(Vec3.atCenterOf(be.getBlockPos()));
@@ -954,26 +1048,33 @@ public class AllHandle extends AllClientHandle {
     public void createBasinFluidParticles(Level world, BasinBlockEntity blockEntity) {
         RandomSource r = world.random;
 
-        if (!blockEntity.visualizedOutputFluids.isEmpty())
+        if (!blockEntity.visualizedOutputFluids.isEmpty()) {
             createBasinOutputFluidParticles(world, blockEntity, r);
+        }
 
-        if (!blockEntity.areFluidsMoving && r.nextFloat() > 1 / 8f)
+        if (!blockEntity.areFluidsMoving && r.nextFloat() > 1 / 8f) {
             return;
+        }
 
         int segments = 0;
         for (SmartFluidTankBehaviour behaviour : blockEntity.getTanks()) {
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
-            for (SmartFluidTankBehaviour.TankSegment tankSegment : behaviour.getTanks())
-                if (!tankSegment.isEmpty(0))
+            }
+            for (SmartFluidTankBehaviour.TankSegment tankSegment : behaviour.getTanks()) {
+                if (!tankSegment.isEmpty(0)) {
                     segments++;
+                }
+            }
         }
-        if (segments < 2)
+        if (segments < 2) {
             return;
+        }
 
         float totalUnits = blockEntity.getTotalFluidUnits(0);
-        if (totalUnits == 0)
+        if (totalUnits == 0) {
             return;
+        }
         float fluidLevel = Mth.clamp(totalUnits / 162000, 0, 1);
         float rim = 2 / 16f;
         float space = 12 / 16f;
@@ -986,11 +1087,13 @@ public class AllHandle extends AllClientHandle {
         }
 
         for (SmartFluidTankBehaviour behaviour : blockEntity.getTanks()) {
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             for (SmartFluidTankBehaviour.TankSegment tankSegment : behaviour.getTanks()) {
-                if (tankSegment.isEmpty(0))
+                if (tankSegment.isEmpty(0)) {
                     continue;
+                }
                 float x = pos.getX() + rim + space * r.nextFloat();
                 float z = pos.getZ() + rim + space * r.nextFloat();
                 FluidStack stack = tankSegment.getRenderedFluid();
@@ -1009,13 +1112,16 @@ public class AllHandle extends AllClientHandle {
 
     private static void createBasinOutputFluidParticles(Level world, BasinBlockEntity blockEntity, RandomSource r) {
         BlockState blockState = blockEntity.getBlockState();
-        if (!(blockState.getBlock() instanceof BasinBlock))
+        if (!(blockState.getBlock() instanceof BasinBlock)) {
             return;
+        }
         Direction direction = blockState.getValue(BasinBlock.FACING);
-        if (direction == Direction.DOWN)
+        if (direction == Direction.DOWN) {
             return;
+        }
         Vec3 directionVec = Vec3.atLowerCornerOf(direction.getUnitVec3i());
-        Vec3 outVec = VecHelper.getCenterOf(blockEntity.getBlockPos()).add(directionVec.scale(.65).subtract(0, 1 / 4f, 0));
+        Vec3 outVec = VecHelper.getCenterOf(blockEntity.getBlockPos())
+            .add(directionVec.scale(.65).subtract(0, 1 / 4f, 0));
         Vec3 outMotion = directionVec.scale(1 / 16f).add(0, -1 / 16f, 0);
 
         for (int i = 0; i < 2; i++) {
@@ -1028,7 +1134,12 @@ public class AllHandle extends AllClientHandle {
         }
     }
 
-    private static void createBasinMovingFluidParticles(Level world, BasinBlockEntity blockEntity, float surface, int segments) {
+    private static void createBasinMovingFluidParticles(
+        Level world,
+        BasinBlockEntity blockEntity,
+        float surface,
+        int segments
+    ) {
         Vec3 pointer = new Vec3(1, 0, 0).scale(1 / 16f);
         float interval = 360f / segments;
         Vec3 centerOf = VecHelper.getCenterOf(blockEntity.getBlockPos());
@@ -1036,11 +1147,13 @@ public class AllHandle extends AllClientHandle {
 
         int currentSegment = 0;
         for (SmartFluidTankBehaviour behaviour : blockEntity.getTanks()) {
-            if (behaviour == null)
+            if (behaviour == null) {
                 continue;
+            }
             for (SmartFluidTankBehaviour.TankSegment tankSegment : behaviour.getTanks()) {
-                if (tankSegment.isEmpty(0))
+                if (tankSegment.isEmpty(0)) {
                     continue;
+                }
                 float angle = interval * (1 + currentSegment) + intervalOffset;
                 Vec3 vec = centerOf.add(VecHelper.rotate(pointer, angle, Axis.Y));
                 FluidStack stack = tankSegment.getRenderedFluid();
@@ -1071,12 +1184,15 @@ public class AllHandle extends AllClientHandle {
     @Override
     public void updateClipboardScreen(UUID lastEdit, BlockPos pos, ClipboardContent content) {
         Minecraft mc = Minecraft.getInstance();
-        if (!(mc.screen instanceof ClipboardScreen cs))
+        if (!(mc.screen instanceof ClipboardScreen cs)) {
             return;
-        if (lastEdit != null && mc.player.getUUID().equals(lastEdit))
+        }
+        if (lastEdit != null && mc.player.getUUID().equals(lastEdit)) {
             return;
-        if (!pos.equals(cs.targetedBlock))
+        }
+        if (!pos.equals(cs.targetedBlock)) {
             return;
+        }
         cs.reopenWith(content);
     }
 
@@ -1171,14 +1287,16 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void openClipboardScreen(Player player, DataComponentMap components, BlockPos pos) {
-        if (Minecraft.getInstance().player == player)
+        if (Minecraft.getInstance().player == player) {
             ScreenOpener.open(new ClipboardScreen(player.getInventory().getSelectedSlot(), components, pos));
+        }
     }
 
     @Override
     public void openDisplayLinkScreen(DisplayLinkBlockEntity be, Player player) {
-        if (!(player instanceof LocalPlayer))
+        if (!(player instanceof LocalPlayer)) {
             return;
+        }
         if (be.targetOffset.equals(BlockPos.ZERO)) {
             player.displayClientMessage(CreateLang.translateDirect("display_link.invalid"), true);
             return;
@@ -1188,14 +1306,21 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void openThresholdSwitchScreen(ThresholdSwitchBlockEntity be, Player player) {
-        if (player instanceof LocalPlayer)
+        if (player instanceof LocalPlayer) {
             ScreenOpener.open(new ThresholdSwitchScreen(be));
+        }
     }
 
     @Override
     public void openElevatorContactScreen(ElevatorContactBlockEntity be, Player player) {
-        if (player instanceof LocalPlayer)
-            ScreenOpener.open(new ElevatorContactScreen(be.getBlockPos(), be.shortName, be.longName, be.doorControls.mode));
+        if (player instanceof LocalPlayer) {
+            ScreenOpener.open(new ElevatorContactScreen(
+                be.getBlockPos(),
+                be.shortName,
+                be.longName,
+                be.doorControls.mode
+            ));
+        }
     }
 
     @Override
@@ -1206,8 +1331,9 @@ public class AllHandle extends AllClientHandle {
         if (world.getBlockEntity(pos) instanceof StationBlockEntity be) {
             GlobalStation station = be.getStation();
             BlockState blockState = be.getBlockState();
-            if (station == null || blockState == null)
+            if (station == null || blockState == null) {
                 return;
+            }
             boolean assembling = blockState.getBlock() == AllBlocks.TRACK_STATION && blockState.getValue(StationBlock.ASSEMBLING);
             ScreenOpener.open(assembling ? new AssemblyScreen(be, station) : new StationScreen(be, station));
         }
@@ -1215,8 +1341,9 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void openFactoryPanelScreen(ServerFactoryPanelBehaviour behaviour, Player player) {
-        if (player instanceof LocalPlayer)
+        if (player instanceof LocalPlayer) {
             ScreenOpener.open(new FactoryPanelScreen(behaviour));
+        }
     }
 
     @Override

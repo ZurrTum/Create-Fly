@@ -30,12 +30,15 @@ public abstract class KineticBlock extends Block implements IRotate {
         if (blockEntity instanceof KineticBlockEntity kineticBlockEntity) {
             kineticBlockEntity.preventSpeedUpdate = 0;
 
-            if (oldState.getBlock() != state.getBlock())
+            if (oldState.getBlock() != state.getBlock()) {
                 return;
-            if (state.hasBlockEntity() != oldState.hasBlockEntity())
+            }
+            if (state.hasBlockEntity() != oldState.hasBlockEntity()) {
                 return;
-            if (!areStatesKineticallyEquivalent(oldState, state))
+            }
+            if (!areStatesKineticallyEquivalent(oldState, state)) {
                 return;
+            }
 
             kineticBlockEntity.preventSpeedUpdate = 2;
         }
@@ -47,22 +50,32 @@ public abstract class KineticBlock extends Block implements IRotate {
     }
 
     protected boolean areStatesKineticallyEquivalent(BlockState oldState, BlockState newState) {
-        if (oldState.getBlock() != newState.getBlock())
+        if (oldState.getBlock() != newState.getBlock()) {
             return false;
+        }
         return getRotationAxis(newState) == getRotationAxis(oldState);
     }
 
     @Override
-    public void updateIndirectNeighbourShapes(BlockState stateIn, LevelAccessor worldIn, BlockPos pos, int flags, int count) {
-        if (worldIn.isClientSide())
+    public void updateIndirectNeighbourShapes(
+        BlockState stateIn,
+        LevelAccessor worldIn,
+        BlockPos pos,
+        int flags,
+        int count
+    ) {
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        if (!(blockEntity instanceof KineticBlockEntity kbe))
+        if (!(blockEntity instanceof KineticBlockEntity kbe)) {
             return;
+        }
 
-        if (kbe.preventSpeedUpdate > 0)
+        if (kbe.preventSpeedUpdate > 0) {
             return;
+        }
 
         // Remove previous information when block is added
         kbe.warnOfMovement();
@@ -73,12 +86,14 @@ public abstract class KineticBlock extends Block implements IRotate {
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         AdvancementBehaviour.setPlacedBy(worldIn, pos, placer);
-        if (worldIn.isClientSide())
+        if (worldIn.isClientSide()) {
             return;
+        }
 
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        if (!(blockEntity instanceof KineticBlockEntity kbe))
+        if (!(blockEntity instanceof KineticBlockEntity kbe)) {
             return;
+        }
 
         kbe.effects.queueRotationIndicators();
     }

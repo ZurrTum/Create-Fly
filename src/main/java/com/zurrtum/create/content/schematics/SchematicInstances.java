@@ -6,10 +6,6 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
 import com.zurrtum.create.content.contraptions.StructureTransform;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.TimeUnit;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -19,6 +15,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.TimeUnit;
 
 public class SchematicInstances {
 
@@ -30,25 +29,30 @@ public class SchematicInstances {
         Cache<Integer, SchematicLevel> map = LOADED_SCHEMATICS.get(world);
         int hash = getHash(schematic);
         SchematicLevel ifPresent = map.getIfPresent(hash);
-        if (ifPresent != null)
+        if (ifPresent != null) {
             return ifPresent;
+        }
         SchematicLevel loadWorld = loadWorld(world, schematic);
-        if (loadWorld == null)
+        if (loadWorld == null) {
             return null;
+        }
         map.put(hash, loadWorld);
         return loadWorld;
     }
 
     private static SchematicLevel loadWorld(Level wrapped, ItemStack schematic) {
-        if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
+        if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE)) {
             return null;
-        if (!schematic.has(AllDataComponents.SCHEMATIC_DEPLOYED))
+        }
+        if (!schematic.has(AllDataComponents.SCHEMATIC_DEPLOYED)) {
             return null;
+        }
 
         StructureTemplate activeTemplate = SchematicItem.loadSchematic(wrapped, schematic);
 
-        if (activeTemplate.getSize().equals(Vec3i.ZERO))
+        if (activeTemplate.getSize().equals(Vec3i.ZERO)) {
             return null;
+        }
 
         BlockPos anchor = schematic.get(AllDataComponents.SCHEMATIC_ANCHOR);
         SchematicLevel world = new SchematicLevel(anchor, wrapped);
@@ -61,23 +65,27 @@ public class SchematicInstances {
             settings.getRotation(),
             settings.getMirror()
         );
-        for (BlockEntity be : world.getBlockEntities())
+        for (BlockEntity be : world.getBlockEntities()) {
             transform.apply(be);
+        }
 
         return world;
     }
 
     public static void clearHash(ItemStack schematic) {
-        if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
+        if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE)) {
             return;
+        }
         schematic.remove(AllDataComponents.SCHEMATIC_HASH);
     }
 
     public static int getHash(ItemStack schematic) {
-        if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE))
+        if (schematic == null || !schematic.has(AllDataComponents.SCHEMATIC_FILE)) {
             return -1;
-        if (!schematic.has(AllDataComponents.SCHEMATIC_HASH))
+        }
+        if (!schematic.has(AllDataComponents.SCHEMATIC_HASH)) {
             schematic.set(AllDataComponents.SCHEMATIC_HASH, schematic.getComponentsPatch().hashCode());
+        }
         return schematic.getOrDefault(AllDataComponents.SCHEMATIC_HASH, -1);
     }
 

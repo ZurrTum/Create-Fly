@@ -1,13 +1,12 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.simple;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.function.Supplier;
-
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.function.Supplier;
 
 public class DeferralBehaviour extends BlockEntityBehaviour {
 
@@ -41,8 +40,9 @@ public class DeferralBehaviour extends BlockEntityBehaviour {
     @Override
     public void tick() {
         super.tick();
-        if (needsUpdate && callback.get())
+        if (needsUpdate && callback.get()) {
             needsUpdate = false;
+        }
     }
 
     public void scheduleUpdate() {

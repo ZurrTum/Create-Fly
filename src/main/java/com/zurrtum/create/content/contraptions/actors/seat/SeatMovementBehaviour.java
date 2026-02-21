@@ -5,11 +5,6 @@ import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,6 +12,10 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SeatMovementBehaviour extends MovementBehaviour {
     @Override
@@ -31,11 +30,13 @@ public class SeatMovementBehaviour extends MovementBehaviour {
         super.visitNewPosition(context, pos);
 
         AbstractContraptionEntity contraptionEntity = context.contraption.entity;
-        if (contraptionEntity == null)
+        if (contraptionEntity == null) {
             return;
+        }
         int index = context.data.getIntOr("SeatIndex", 0);
-        if (index == -1)
+        if (index == -1) {
             return;
+        }
 
         Map<UUID, Integer> seatMapping = context.contraption.getSeatMapping();
         BlockState blockState = context.world.getBlockState(pos);
@@ -43,22 +44,27 @@ public class SeatMovementBehaviour extends MovementBehaviour {
         boolean solid = blockState.canOcclude() || slab;
 
         // Occupied
-        if (!seatMapping.containsValue(index))
+        if (!seatMapping.containsValue(index)) {
             return;
-        if (!solid)
+        }
+        if (!solid) {
             return;
+        }
         Entity toDismount = null;
         for (Map.Entry<UUID, Integer> entry : seatMapping.entrySet()) {
-            if (entry.getValue() != index)
+            if (entry.getValue() != index) {
                 continue;
+            }
             for (Entity entity : contraptionEntity.getPassengers()) {
-                if (!entry.getKey().equals(entity.getUUID()))
+                if (!entry.getKey().equals(entity.getUUID())) {
                     continue;
+                }
                 toDismount = entity;
             }
         }
-        if (toDismount == null)
+        if (toDismount == null) {
             return;
+        }
         toDismount.stopRiding();
         Vec3 position = VecHelper.getCenterOf(pos).add(0, slab ? .5f : 1f, 0);
         toDismount.teleportTo(position.x, position.y, position.z);

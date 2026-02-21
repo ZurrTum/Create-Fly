@@ -49,13 +49,19 @@ public class AssemblyScreen extends AbstractStationScreen {
         }
 
         iconTypes = TrainIconType.ALL.keySet().stream().toList();
-        iconTypeScroll = new ScrollInput(x + 4, y + 17, 162, 14).titled(CreateLang.translateDirect("station.icon_type"));
+        iconTypeScroll = new ScrollInput(
+            x + 4,
+            y + 17,
+            162,
+            14
+        ).titled(CreateLang.translateDirect("station.icon_type"));
         iconTypeScroll.withRange(0, iconTypes.size());
         iconTypeScroll.withStepFunction(ctx -> -iconTypeScroll.standardStep().apply(ctx));
         iconTypeScroll.calling(s -> {
             Train train = displayedTrain.get();
-            if (train != null)
+            if (train != null) {
                 train.icon = TrainIconType.byId(iconTypes.get(s));
+            }
         });
         iconTypeScroll.active = iconTypeScroll.visible = false;
         addRenderableWidget(iconTypeScroll);
@@ -71,7 +77,12 @@ public class AssemblyScreen extends AbstractStationScreen {
         quitAssembly.active = true;
         quitAssembly.setToolTip(CreateLang.translateDirect("station.cancel"));
         quitAssembly.withCallback(() -> {
-            minecraft.player.connection.send(StationEditPacket.configure(blockEntity.getBlockPos(), false, station.name, null));
+            minecraft.player.connection.send(StationEditPacket.configure(
+                blockEntity.getBlockPos(),
+                false,
+                station.name,
+                null
+            ));
             minecraft.setScreen(new StationScreen(blockEntity, station));
         });
 
@@ -89,10 +100,16 @@ public class AssemblyScreen extends AbstractStationScreen {
         toggleAssemblyButton.active = blockEntity.bogeyCount > 0 || train != null;
 
         if (train != null) {
-            minecraft.player.connection.send(StationEditPacket.configure(blockEntity.getBlockPos(), false, station.name, null));
+            minecraft.player.connection.send(StationEditPacket.configure(
+                blockEntity.getBlockPos(),
+                false,
+                station.name,
+                null
+            ));
             minecraft.setScreen(new StationScreen(blockEntity, station));
-            for (Carriage carriage : train.carriages)
+            for (Carriage carriage : train.carriages) {
                 carriage.updateConductors();
+            }
         }
     }
 
@@ -107,7 +124,12 @@ public class AssemblyScreen extends AbstractStationScreen {
                 minecraft.player.connection.send(StationEditPacket.tryAssemble(blockEntity.getBlockPos()));
             });
         } else {
-            minecraft.player.connection.send(StationEditPacket.configure(blockEntity.getBlockPos(), false, station.name, null));
+            minecraft.player.connection.send(StationEditPacket.configure(
+                blockEntity.getBlockPos(),
+                false,
+                station.name,
+                null
+            ));
             minecraft.setScreen(new StationScreen(blockEntity, station));
         }
     }
@@ -119,7 +141,14 @@ public class AssemblyScreen extends AbstractStationScreen {
         int y = guiTop;
 
         MutableComponent header = CreateLang.translateDirect("station.assembly_title");
-        graphics.drawString(font, header, x + background.getWidth() / 2 - font.width(header) / 2, y + 4, 0xFF0E2233, false);
+        graphics.drawString(
+            font,
+            header,
+            x + background.getWidth() / 2 - font.width(header) / 2,
+            y + 4,
+            0xFF0E2233,
+            false
+        );
 
         AssemblyException lastAssemblyException = blockEntity.lastException;
         if (lastAssemblyException != null) {
@@ -137,9 +166,25 @@ public class AssemblyScreen extends AbstractStationScreen {
                 );
                 offset += 10;
             }
-            graphics.drawWordWrap(font, lastAssemblyException.component, x + 30, y + 67 + offset, 134, 0xFF775B5B, false);
+            graphics.drawWordWrap(
+                font,
+                lastAssemblyException.component,
+                x + 30,
+                y + 67 + offset,
+                134,
+                0xFF775B5B,
+                false
+            );
             offset += font.split(lastAssemblyException.component, 134).size() * 9 + 5;
-            graphics.drawWordWrap(font, CreateLang.translateDirect("station.retry"), x + 30, y + 67 + offset, 134, 0xFF7A7A7A, false);
+            graphics.drawWordWrap(
+                font,
+                CreateLang.translateDirect("station.retry"),
+                x + 30,
+                y + 67 + offset,
+                134,
+                0xFF7A7A7A,
+                false
+            );
             return;
         }
 
@@ -151,9 +196,33 @@ public class AssemblyScreen extends AbstractStationScreen {
         );
         graphics.drawString(font, text, x + 97 - font.width(text) / 2, y + 47, 0xFF7A7A7A, false);
 
-        graphics.drawWordWrap(font, CreateLang.translateDirect("station.how_to"), x + 28, y + 62, 134, 0xFF7A7A7A, false);
-        graphics.drawWordWrap(font, CreateLang.translateDirect("station.how_to_1"), x + 28, y + 94, 134, 0xFF7A7A7A, false);
-        graphics.drawWordWrap(font, CreateLang.translateDirect("station.how_to_2"), x + 28, y + 117, 138, 0xFF7A7A7A, false);
+        graphics.drawWordWrap(
+            font,
+            CreateLang.translateDirect("station.how_to"),
+            x + 28,
+            y + 62,
+            134,
+            0xFF7A7A7A,
+            false
+        );
+        graphics.drawWordWrap(
+            font,
+            CreateLang.translateDirect("station.how_to_1"),
+            x + 28,
+            y + 94,
+            134,
+            0xFF7A7A7A,
+            false
+        );
+        graphics.drawWordWrap(
+            font,
+            CreateLang.translateDirect("station.how_to_2"),
+            x + 28,
+            y + 117,
+            138,
+            0xFF7A7A7A,
+            false
+        );
     }
 
     @Override

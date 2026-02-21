@@ -37,8 +37,9 @@ public class FluidRenderer {
         int luminosity = Math.max(blockLightIn, fluid.defaultFluidState().createLegacyBlock().getLightEmission());
         light = (light & 0xF00000) | luminosity << 4;
 
-        if (inbound)
+        if (inbound) {
             direction = direction.getOpposite();
+        }
 
         entry = entry.copy();
         entry.translate(0.5f, 0.5f, 0.5f);
@@ -51,12 +52,36 @@ public class FluidRenderer {
         float yMin = y - Mth.clamp(progress * .5f, 0, 1);
 
         for (int i = 0; i < 4; i++) {
-            renderFlowingTiledFace(Direction.SOUTH, hMin, yMin, radius, y, radius, builder, entry, light, color, flowTexture);
+            renderFlowingTiledFace(
+                Direction.SOUTH,
+                hMin,
+                yMin,
+                radius,
+                y,
+                radius,
+                builder,
+                entry,
+                light,
+                color,
+                flowTexture
+            );
             entry.rotate(Axis.YP.rotation(Mth.DEG_TO_RAD * 90));
         }
 
         if (progress != 1) {
-            FluidRenderHelper.renderStillTiledFace(Direction.DOWN, hMin, hMin, radius, radius, yMin, builder, entry, light, color, stillTexture);
+            FluidRenderHelper.renderStillTiledFace(
+                Direction.DOWN,
+                hMin,
+                hMin,
+                radius,
+                radius,
+                yMin,
+                builder,
+                entry,
+                light,
+                color,
+                stillTexture
+            );
         }
     }
 
@@ -73,6 +98,19 @@ public class FluidRenderer {
         int color,
         TextureAtlasSprite texture
     ) {
-        FluidRenderHelper.renderTiledFace(dir, left, down, right, up, depth, builder, entry, light, color, texture, 0.5f);
+        FluidRenderHelper.renderTiledFace(
+            dir,
+            left,
+            down,
+            right,
+            up,
+            depth,
+            builder,
+            entry,
+            light,
+            color,
+            texture,
+            0.5f
+        );
     }
 }

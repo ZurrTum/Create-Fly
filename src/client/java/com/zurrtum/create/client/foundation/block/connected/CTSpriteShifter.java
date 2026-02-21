@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.foundation.block.connected;
 
+import net.minecraft.resources.Identifier;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import net.minecraft.resources.Identifier;
 
 public class CTSpriteShifter {
 
@@ -11,8 +11,9 @@ public class CTSpriteShifter {
 
     public static CTSpriteShiftEntry getCT(CTType type, Identifier blockTexture, Identifier connectedTexture) {
         String key = blockTexture + "->" + connectedTexture + "+" + type.getId();
-        if (ENTRY_CACHE.containsKey(key))
+        if (ENTRY_CACHE.containsKey(key)) {
             return ENTRY_CACHE.get(key);
+        }
 
         CTSpriteShiftEntry entry = new CTSpriteShiftEntry(type);
         entry.set(blockTexture, connectedTexture);

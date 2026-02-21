@@ -105,7 +105,10 @@ public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmR
             data.base = CachedBuffers.partial(AllPartialModels.ARM_BASE, state.blockState);
             data.lower = CachedBuffers.partial(AllPartialModels.ARM_LOWER_BODY, state.blockState);
             data.upper = CachedBuffers.partial(AllPartialModels.ARM_UPPER_BODY, state.blockState);
-            data.claw = CachedBuffers.partial(goggles ? AllPartialModels.ARM_CLAW_BASE_GOGGLES : AllPartialModels.ARM_CLAW_BASE, state.blockState);
+            data.claw = CachedBuffers.partial(
+                goggles ? AllPartialModels.ARM_CLAW_BASE_GOGGLES : AllPartialModels.ARM_CLAW_BASE,
+                state.blockState
+            );
             data.clawUpper = CachedBuffers.partial(AllPartialModels.ARM_CLAW_GRIP_UPPER, state.blockState);
             data.clawLower = CachedBuffers.partial(AllPartialModels.ARM_CLAW_GRIP_LOWER, state.blockState);
             data.light = state.lightCoords;
@@ -120,7 +123,12 @@ public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmR
     }
 
     @Override
-    public void submit(ArmRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    public void submit(
+        ArmRenderState state,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
+        CameraRenderState cameraState
+    ) {
         super.submit(state, matrices, queue, cameraState);
         matrices.translate(0.5f, 0.5f, 0.5f);
         if (state.rotate != 0) {

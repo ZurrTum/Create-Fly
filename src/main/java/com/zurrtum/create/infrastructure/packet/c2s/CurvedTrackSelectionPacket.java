@@ -11,9 +11,8 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record CurvedTrackSelectionPacket(
-    BlockPos pos, BlockPos targetPos, boolean front, int segment, int slot
-) implements Packet<ServerGamePacketListener> {
+public record CurvedTrackSelectionPacket(BlockPos pos, BlockPos targetPos, boolean front, int segment,
+                                         int slot) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, CurvedTrackSelectionPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         CurvedTrackSelectionPacket::pos,

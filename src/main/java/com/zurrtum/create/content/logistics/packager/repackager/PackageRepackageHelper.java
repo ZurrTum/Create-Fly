@@ -9,14 +9,13 @@ import com.zurrtum.create.infrastructure.component.PackageOrderData;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts.CraftingEntry;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 
 public class PackageRepackageHelper {
 
@@ -32,14 +31,16 @@ public class PackageRepackageHelper {
 
     public int addPackageFragment(ItemStack box) {
         int collectedOrderId = PackageItem.getOrderId(box);
-        if (collectedOrderId == -1)
+        if (collectedOrderId == -1) {
             return -1;
+        }
 
         List<ItemStack> collectedOrder = collectedPackages.computeIfAbsent(collectedOrderId, $ -> Lists.newArrayList());
         collectedOrder.add(box);
 
-        if (!isOrderComplete(collectedOrderId))
+        if (!isOrderComplete(collectedOrderId)) {
             return -1;
+        }
 
         return collectedOrderId;
     }
@@ -54,13 +55,15 @@ public class PackageRepackageHelper {
             address = PackageItem.getAddress(box);
             if (box.has(AllDataComponents.PACKAGE_ORDER_DATA)) {
                 PackageOrderWithCrafts context = box.get(AllDataComponents.PACKAGE_ORDER_DATA).orderContext();
-                if (context != null && !context.isEmpty())
+                if (context != null && !context.isEmpty()) {
                     orderContext = context;
+                }
             }
 
             ItemStackHandler contents = PackageItem.getContents(box);
-            for (int slot = 0, size = contents.getContainerSize(); slot < size; slot++)
+            for (int slot = 0, size = contents.getContainerSize(); slot < size; slot++) {
                 summary.add(contents.getItem(slot));
+            }
         }
 
         List<BigItemStack> orderedStacks = new ArrayList<>();
@@ -68,9 +71,11 @@ public class PackageRepackageHelper {
             List<BigItemStack> packagesSplitByRecipe = repackBasedOnRecipes(summary, orderContext, address, r);
             exportingPackages.addAll(packagesSplitByRecipe);
 
-            if (packagesSplitByRecipe.isEmpty())
-                for (BigItemStack stack : orderContext.stacks())
+            if (packagesSplitByRecipe.isEmpty()) {
+                for (BigItemStack stack : orderContext.stacks()) {
                     orderedStacks.add(new BigItemStack(stack.stack, stack.count));
+                }
+            }
         }
 
         List<BigItemStack> allItems = summary.getStacks();
@@ -79,33 +84,39 @@ public class PackageRepackageHelper {
         Repack:
         while (true) {
             allItems.removeIf(e -> e.count == 0);
-            if (allItems.isEmpty())
+            if (allItems.isEmpty()) {
                 break;
+            }
 
             BigItemStack targetedEntry = null;
-            if (!orderedStacks.isEmpty())
+            if (!orderedStacks.isEmpty()) {
                 targetedEntry = orderedStacks.remove(0);
+            }
 
             ItemSearch:
             for (BigItemStack entry : allItems) {
                 int targetAmount = entry.count;
-                if (targetAmount == 0)
+                if (targetAmount == 0) {
                     continue;
+                }
                 if (targetedEntry != null) {
                     targetAmount = targetedEntry.count;
-                    if (!ItemStack.isSameItemSameComponents(entry.stack, targetedEntry.stack))
+                    if (!ItemStack.isSameItemSameComponents(entry.stack, targetedEntry.stack)) {
                         continue;
+                    }
                 }
 
                 while (targetAmount > 0) {
                     int removedAmount = Math.min(Math.min(targetAmount, entry.stack.getMaxStackSize()), entry.count);
-                    if (removedAmount == 0)
+                    if (removedAmount == 0) {
                         continue ItemSearch;
+                    }
 
                     ItemStack output = entry.stack.copyWithCount(removedAmount);
                     targetAmount -= removedAmount;
-                    if (targetedEntry != null)
+                    if (targetedEntry != null) {
                         targetedEntry.count = targetAmount;
+                    }
                     entry.count -= removedAmount;
                     outputSlots.add(output);
                 }
@@ -119,30 +130,34 @@ public class PackageRepackageHelper {
 
         for (ItemStack item : outputSlots) {
             target.setItem(currentSlot++, item);
-            if (currentSlot < PackageItem.SLOTS)
+            if (currentSlot < PackageItem.SLOTS) {
                 continue;
+            }
             exportingPackages.add(new BigItemStack(PackageItem.containing(target), 1));
             target = new ItemStackHandler(PackageItem.SLOTS);
             currentSlot = 0;
         }
 
-        for (int slot = 0, size = target.getContainerSize(); slot < size; slot++)
+        for (int slot = 0, size = target.getContainerSize(); slot < size; slot++) {
             if (!target.getItem(slot).isEmpty()) {
                 exportingPackages.add(new BigItemStack(PackageItem.containing(target), 1));
                 break;
             }
+        }
 
         if (!address.isBlank()) {
-            for (BigItemStack box : exportingPackages)
+            for (BigItemStack box : exportingPackages) {
                 PackageItem.addAddress(box.stack, address);
+            }
         }
 
         for (int i = 0; i < exportingPackages.size(); i++) {
             BigItemStack box = exportingPackages.get(i);
             boolean isfinal = i == exportingPackages.size() - 1;
             PackageOrderWithCrafts outboundOrderContext = isfinal && orderContext != null ? orderContext : null;
-            if (PackageItem.getOrderId(box.stack) == -1)
+            if (PackageItem.getOrderId(box.stack) == -1) {
                 PackageItem.setOrder(box.stack, orderId, 0, true, 0, true, outboundOrderContext);
+            }
         }
 
         return exportingPackages;
@@ -152,19 +167,23 @@ public class PackageRepackageHelper {
         boolean finalLinkReached = false;
         Links:
         for (int linkCounter = 0; linkCounter < 1000; linkCounter++) {
-            if (finalLinkReached)
+            if (finalLinkReached) {
                 break;
+            }
             Packages:
             for (int packageCounter = 0; packageCounter < 1000; packageCounter++) {
                 for (ItemStack box : collectedPackages.get(orderId)) {
                     PackageOrderData data = box.get(AllDataComponents.PACKAGE_ORDER_DATA);
-                    if (linkCounter != data.linkIndex())
+                    if (linkCounter != data.linkIndex()) {
                         continue;
-                    if (packageCounter != data.fragmentIndex())
+                    }
+                    if (packageCounter != data.fragmentIndex()) {
                         continue;
+                    }
                     finalLinkReached = data.isFinalLink();
-                    if (data.isFinal())
+                    if (data.isFinal()) {
                         continue Links;
+                    }
                     continue Packages;
                 }
                 return false;
@@ -173,9 +192,15 @@ public class PackageRepackageHelper {
         return true;
     }
 
-    protected List<BigItemStack> repackBasedOnRecipes(InventorySummary summary, PackageOrderWithCrafts order, String address, RandomSource r) {
-        if (order.orderedCrafts().isEmpty())
+    protected List<BigItemStack> repackBasedOnRecipes(
+        InventorySummary summary,
+        PackageOrderWithCrafts order,
+        String address,
+        RandomSource r
+    ) {
+        if (order.orderedCrafts().isEmpty()) {
             return List.of();
+        }
 
         List<BigItemStack> packages = new ArrayList<>();
         for (CraftingEntry craftingEntry : order.orderedCrafts()) {
@@ -183,10 +208,12 @@ public class PackageRepackageHelper {
             Crafts:
             for (int i = 0; i < craftingEntry.count(); i++) {
                 for (BigItemStack required : craftingEntry.pattern().stacks()) {
-                    if (required.stack.isEmpty())
+                    if (required.stack.isEmpty()) {
                         continue;
-                    if (summary.getCountOf(required.stack) <= 0)
+                    }
+                    if (summary.getCountOf(required.stack) <= 0) {
                         break Crafts;
+                    }
                     summary.add(required.stack, -1);
                 }
                 packagesToCreate++;
@@ -194,11 +221,23 @@ public class PackageRepackageHelper {
 
             ItemStackHandler target = new ItemStackHandler(PackageItem.SLOTS);
             List<BigItemStack> stacks = craftingEntry.pattern().stacks();
-            for (int currentSlot = 0, size = Math.min(stacks.size(), target.getContainerSize()); currentSlot < size; currentSlot++)
+            for (int currentSlot = 0, size = Math.min(
+                stacks.size(),
+                target.getContainerSize()
+            ); currentSlot < size; currentSlot++) {
                 target.setItem(currentSlot, stacks.get(currentSlot).stack.copyWithCount(1));
+            }
 
             ItemStack box = PackageItem.containing(target);
-            PackageItem.setOrder(box, r.nextInt(), 0, true, 0, true, PackageOrderWithCrafts.singleRecipe(craftingEntry.pattern().stacks()));
+            PackageItem.setOrder(
+                box,
+                r.nextInt(),
+                0,
+                true,
+                0,
+                true,
+                PackageOrderWithCrafts.singleRecipe(craftingEntry.pattern().stacks())
+            );
             packages.add(new BigItemStack(box, packagesToCreate));
         }
 

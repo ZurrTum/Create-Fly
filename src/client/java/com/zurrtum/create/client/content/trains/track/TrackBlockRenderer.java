@@ -22,7 +22,13 @@ public interface TrackBlockRenderer {
         RenderedTrackOverlayType type
     );
 
-    TrackBlockRenderState getAssemblyRenderState(StationBlockEntity be, Vec3 offset, Level world, BlockPos pos, BlockState state);
+    TrackBlockRenderState getAssemblyRenderState(
+        StationBlockEntity be,
+        Vec3 offset,
+        Level world,
+        BlockPos pos,
+        BlockState state
+    );
 
     TrackBlockRenderState getRenderState(
         Level world,

@@ -1,19 +1,17 @@
 package com.zurrtum.create.client;
 
-import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.InputQuirks;
 import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.zurrtum.create.Create.MOD_ID;
-
-import com.mojang.blaze3d.platform.InputConstants;
 
 public class AllKeys {
     public static final List<KeyMapping> ALL = new ArrayList<>();
@@ -43,10 +41,10 @@ public class AllKeys {
         ) || InputConstants.isKeyDown(
             Minecraft.getInstance().getWindow(),
             GLFW.GLFW_KEY_RIGHT_SUPER
-        ) : InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputConstants.isKeyDown(
+        ) : InputConstants.isKeyDown(
             Minecraft.getInstance().getWindow(),
-            GLFW.GLFW_KEY_RIGHT_CONTROL
-        );
+            GLFW.GLFW_KEY_LEFT_CONTROL
+        ) || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
     public static boolean hasShiftDown() {

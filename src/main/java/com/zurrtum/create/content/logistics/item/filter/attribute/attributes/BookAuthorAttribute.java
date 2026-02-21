@@ -6,24 +6,24 @@ import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public record BookAuthorAttribute(String author) implements ItemAttribute {
-    public static final MapCodec<BookAuthorAttribute> CODEC = Codec.STRING.xmap(BookAuthorAttribute::new, BookAuthorAttribute::author)
-        .fieldOf("value");
-
-    public static final StreamCodec<ByteBuf, BookAuthorAttribute> PACKET_CODEC = ByteBufCodecs.STRING_UTF8.map(
+    public static final MapCodec<BookAuthorAttribute> CODEC = Codec.STRING.xmap(
         BookAuthorAttribute::new,
+        BookAuthorAttribute::author
+    ).fieldOf("value");
+
+    public static final StreamCodec<ByteBuf, BookAuthorAttribute> PACKET_CODEC = ByteBufCodecs.STRING_UTF8.map(BookAuthorAttribute::new,
         BookAuthorAttribute::author
     );
 

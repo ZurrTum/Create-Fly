@@ -64,12 +64,15 @@ public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConn
         InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.mayBuild())
+        if (!player.mayBuild()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (player.isShiftKeyDown())
+        }
+        if (player.isShiftKeyDown()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (stack.is(AllItems.WRENCH))
+        }
+        if (stack.is(AllItems.WRENCH)) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         return activated(level, pos, state);
     }
 
@@ -83,8 +86,9 @@ public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConn
         boolean poweredPreviously = state.getValue(POWERED);
         super.tick(state, worldIn, pos, random);
         BlockState newState = worldIn.getBlockState(pos);
-        if (newState.getValue(POWERED) && !poweredPreviously)
+        if (newState.getValue(POWERED) && !poweredPreviously) {
             worldIn.setBlock(pos, newState.cycle(POWERING), Block.UPDATE_CLIENTS);
+        }
     }
 
     protected InteractionResult activated(Level worldIn, BlockPos pos, BlockState state) {
@@ -98,8 +102,9 @@ public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConn
 
     @Override
     public boolean canConnectRedstone(BlockState state, Direction side) {
-        if (side == null)
+        if (side == null) {
             return false;
+        }
         return side.getAxis() == state.getValue(FACING).getAxis();
     }
 

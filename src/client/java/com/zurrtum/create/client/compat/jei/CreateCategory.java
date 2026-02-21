@@ -75,7 +75,12 @@ public abstract class CreateCategory<T> implements IRecipeCategory<T> {
         return slot;
     }
 
-    public static IRecipeSlotBuilder addFluidSlot(IRecipeLayoutBuilder builder, int x, int y, FluidIngredient fluidIngredient) {
+    public static IRecipeSlotBuilder addFluidSlot(
+        IRecipeLayoutBuilder builder,
+        int x,
+        int y,
+        FluidIngredient fluidIngredient
+    ) {
         int amount = fluidIngredient.amount();
         IRecipeSlotBuilder slot = builder.addInputSlot(x, y).setFluidRenderer(amount, false, 16, 16);
         DataComponentPatch components = DataComponentPatch.EMPTY;

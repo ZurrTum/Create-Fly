@@ -6,17 +6,15 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.element.FadableScreenElement;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.input.MouseButtonEvent;
-
 public class BoxWidget extends ElementWidget {
 
-    public static final Function<BoxWidget, FadableScreenElement> gradientFactory = (box) -> (ms, w, h, alpha) -> UIRenderHelper.angledGradient(
-        ms,
+    public static final Function<BoxWidget, FadableScreenElement> gradientFactory = (box) -> (ms, w, h, alpha) -> UIRenderHelper.angledGradient(ms,
         90,
         w / 2,
         -2,
@@ -86,17 +84,21 @@ public class BoxWidget extends ElementWidget {
         @Nullable Couple<Color> colorClick,
         @Nullable Couple<Color> colorDisabled
     ) {
-        if (colorIdle != null)
+        if (colorIdle != null) {
             this.colorIdle = colorIdle;
+        }
 
-        if (colorHover != null)
+        if (colorHover != null) {
             this.colorHover = colorHover;
+        }
 
-        if (colorClick != null)
+        if (colorClick != null) {
             this.colorClick = colorClick;
+        }
 
-        if (colorDisabled != null)
+        if (colorDisabled != null) {
             this.colorDisabled = colorDisabled;
+        }
 
         updateGradientFromState();
         //noinspection unchecked
@@ -135,7 +137,10 @@ public class BoxWidget extends ElementWidget {
             gradientColor = gradientTarget;
         } else {
             float animationValue = 1 - Math.abs(colorAnimation.getValue(partialTicks));
-            gradientColor = previousGradient.mapWithParams((prev, target) -> prev.mixWith(target, animationValue), gradientTarget);
+            gradientColor = previousGradient.mapWithParams(
+                (prev, target) -> prev.mixWith(target, animationValue),
+                gradientTarget
+            );
         }
 
     }
@@ -143,12 +148,13 @@ public class BoxWidget extends ElementWidget {
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         float fadeValue = fade.getValue(partialTicks);
-        if (fadeValue < .1f)
+        if (fadeValue < .1f) {
             return;
+        }
 
         box.withAlpha(fadeValue);
-        box.withBackground(customBackground != null ? customBackground : BoxElement.COLOR_BACKGROUND_TRANSPARENT).gradientBorder(gradientColor)
-            .at(getX(), getY(), z).withBounds(width, height).render(graphics);
+        box.withBackground(customBackground != null ? customBackground : BoxElement.COLOR_BACKGROUND_TRANSPARENT)
+            .gradientBorder(gradientColor).at(getX(), getY(), z).withBounds(width, height).render(graphics);
 
         super.doRender(graphics, mouseX, mouseY, partialTicks);
 
@@ -157,8 +163,9 @@ public class BoxWidget extends ElementWidget {
 
     @Override
     public boolean isMouseOver(double mX, double mY) {
-        if (!active || !visible)
+        if (!active || !visible) {
             return false;
+        }
 
         float padX = 2 + paddingX;
         float padY = 2 + paddingY;
@@ -179,8 +186,9 @@ public class BoxWidget extends ElementWidget {
     }
 
     protected void startGradientAnimation(Couple<Color> target, double expSpeed) {
-        if (!animateColors)
+        if (!animateColors) {
             return;
+        }
 
         colorAnimation.startWithValue(1);
         colorAnimation.chase(0, expSpeed, LerpedFloat.Chaser.EXP);
@@ -195,11 +203,13 @@ public class BoxWidget extends ElementWidget {
     }
 
     protected Couple<Color> getColorForState() {
-        if (!active)
+        if (!active) {
             return getColorDisabled();
+        }
 
-        if (customBorder != null)
+        if (customBorder != null) {
             return isHovered ? customBorder.map(Color::darker) : customBorder;
+        }
 
         return isHovered ? getColorHover() : getColorIdle();
     }

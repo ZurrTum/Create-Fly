@@ -2,8 +2,8 @@ package com.zurrtum.create.client.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.zurrtum.create.content.equipment.armor.AllEquipmentAssetKeys;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

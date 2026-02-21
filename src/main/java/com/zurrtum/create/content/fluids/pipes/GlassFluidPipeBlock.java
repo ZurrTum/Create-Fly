@@ -29,7 +29,8 @@ public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPi
 
     public GlassFluidPipeBlock(Properties p_i48339_1_) {
         super(p_i48339_1_);
-        registerDefaultState(defaultBlockState().setValue(ALT, false).setValue(BlockStateProperties.WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(ALT, false)
+            .setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
     @Override
@@ -39,13 +40,17 @@ public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPi
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        if (tryRemoveBracket(context))
+        if (tryRemoveBracket(context)) {
             return InteractionResult.SUCCESS;
+        }
         BlockState newState;
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         FluidTransportBehaviour.cacheFlows(world, pos);
-        newState = toRegularPipe(world, pos, state).setValue(BlockStateProperties.WATERLOGGED, state.getValue(BlockStateProperties.WATERLOGGED));
+        newState = toRegularPipe(world, pos, state).setValue(
+            BlockStateProperties.WATERLOGGED,
+            state.getValue(BlockStateProperties.WATERLOGGED)
+        );
         world.setBlock(pos, newState, Block.UPDATE_ALL);
         FluidTransportBehaviour.loadFlows(world, pos);
         return InteractionResult.SUCCESS;
@@ -55,7 +60,10 @@ public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPi
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
         BlockState state = super.getStateForPlacement(context);
-        return state == null ? null : state.setValue(BlockStateProperties.WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
+        return state == null ? null : state.setValue(
+            BlockStateProperties.WATERLOGGED,
+            ifluidstate.getType() == Fluids.WATER
+        );
     }
 
     @Override

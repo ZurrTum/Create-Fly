@@ -11,8 +11,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record TrackGraphRequestPacket(int netId) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<ByteBuf, TrackGraphRequestPacket> CODEC = ByteBufCodecs.INT.map(
-        TrackGraphRequestPacket::new,
+    public static final StreamCodec<ByteBuf, TrackGraphRequestPacket> CODEC = ByteBufCodecs.INT.map(TrackGraphRequestPacket::new,
         TrackGraphRequestPacket::netId
     );
 

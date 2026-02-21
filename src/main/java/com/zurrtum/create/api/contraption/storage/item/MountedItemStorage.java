@@ -32,7 +32,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class MountedItemStorage implements ItemInventory {
-    public static final Codec<MountedItemStorage> CODEC = MountedItemStorageType.CODEC.dispatch(storage -> storage.type, type -> type.codec);
+    public static final Codec<MountedItemStorage> CODEC = MountedItemStorageType.CODEC.dispatch(
+        storage -> storage.type,
+        type -> type.codec
+    );
 
     @SuppressWarnings("deprecation")
     public static final StreamCodec<RegistryFriendlyByteBuf, MountedItemStorage> STREAM_CODEC = StreamCodec.ofMember(
@@ -113,7 +116,12 @@ public abstract class MountedItemStorage implements ItemInventory {
      * @return a MenuProvider that provides the menu players will see when opening this storage
      */
     @Nullable
-    protected MenuProvider createMenuProvider(Component name, Container handler, Predicate<Player> stillValid, Consumer<ContainerUser> onClose) {
+    protected MenuProvider createMenuProvider(
+        Component name,
+        Container handler,
+        Predicate<Player> stillValid,
+        Consumer<ContainerUser> onClose
+    ) {
         return MountedStorageMenus.createGeneric(name, handler, stillValid, onClose);
     }
 

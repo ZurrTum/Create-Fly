@@ -8,18 +8,17 @@ import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.level.LevelAccessor;
 
 public record ShoppingList(@Unmodifiable List<IntAttached<BlockPos>> purchases, UUID shopOwner, UUID shopNetwork) {
     public static final Codec<ShoppingList> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -47,9 +46,11 @@ public record ShoppingList(@Unmodifiable List<IntAttached<BlockPos>> purchases, 
     }
 
     public int getPurchases(BlockPos clothPos) {
-        for (IntAttached<BlockPos> entry : purchases)
-            if (clothPos.equals(entry.getValue()))
+        for (IntAttached<BlockPos> entry : purchases) {
+            if (clothPos.equals(entry.getValue())) {
                 return entry.getFirst();
+            }
+        }
         return 0;
     }
 
@@ -58,13 +59,16 @@ public record ShoppingList(@Unmodifiable List<IntAttached<BlockPos>> purchases, 
         InventorySummary output = new InventorySummary();
 
         for (IntAttached<BlockPos> entry : purchases) {
-            if (clothPosToIgnore != null && clothPosToIgnore.equals(entry.getValue()))
+            if (clothPosToIgnore != null && clothPosToIgnore.equals(entry.getValue())) {
                 continue;
-            if (!(level.getBlockEntity(entry.getValue()) instanceof TableClothBlockEntity dcbe))
+            }
+            if (!(level.getBlockEntity(entry.getValue()) instanceof TableClothBlockEntity dcbe)) {
                 continue;
+            }
             input.add(dcbe.getPaymentItem(), dcbe.getPaymentAmount() * entry.getFirst());
-            for (BigItemStack stackEntry : dcbe.requestData.encodedRequest().stacks())
+            for (BigItemStack stackEntry : dcbe.requestData.encodedRequest().stacks()) {
                 output.add(stackEntry.stack, stackEntry.count * entry.getFirst());
+            }
         }
 
         return Couple.create(output, input);

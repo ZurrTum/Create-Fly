@@ -2,19 +2,18 @@ package com.zurrtum.create.client.catnip.lang;
 
 import com.google.common.base.Strings;
 import com.zurrtum.create.catnip.data.Couple;
-
-import java.text.BreakIterator;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+
+import java.text.BreakIterator;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 public class FontHelper {
     public static final int MAX_WIDTH_PER_LINE = 200;
@@ -43,7 +42,12 @@ public class FontHelper {
         return cutTextComponent(c, primaryStyle, highlightStyle, 0);
     }
 
-    public static List<Component> cutStringTextComponent(String c, Style primaryStyle, Style highlightStyle, int indent) {
+    public static List<Component> cutStringTextComponent(
+        String c,
+        Style primaryStyle,
+        Style highlightStyle,
+        int indent
+    ) {
         return cutTextComponent(Component.literal(c), primaryStyle, highlightStyle, indent);
     }
 

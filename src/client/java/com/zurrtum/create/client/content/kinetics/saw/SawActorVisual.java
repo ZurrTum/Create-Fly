@@ -10,7 +10,11 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 public class SawActorVisual extends ActorVisual {
     private final RotatingInstance shaft;
 
-    public SawActorVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
+    public SawActorVisual(
+        VisualizationContext visualizationContext,
+        VirtualRenderWorld simulationWorld,
+        MovementContext movementContext
+    ) {
         super(visualizationContext, simulationWorld, movementContext);
 
         var state = movementContext.state;
@@ -18,8 +22,8 @@ public class SawActorVisual extends ActorVisual {
         shaft = SawVisual.shaft(instancerProvider, state);
 
         var axis = KineticBlockEntityVisual.rotationAxis(state);
-        shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(state, axis, localPos)).setPosition(localPos)
-            .light(localBlockLight(), 0).setChanged();
+        shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(state, axis, localPos))
+            .setPosition(localPos).light(localBlockLight(), 0).setChanged();
     }
 
     @Override

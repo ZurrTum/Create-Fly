@@ -35,7 +35,10 @@ public class PotionTooltip implements IRecipeSlotRichTooltipCallback {
             if (variant.isOf(AllFluids.POTION)) {
                 DataComponentMap components = variant.getComponentMap();
                 PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-                BottleType bottleType = components.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
+                BottleType bottleType = components.getOrDefault(
+                    AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
+                    BottleType.REGULAR
+                );
                 ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(bottleType);
                 Component name = contents.getName(itemFromBottleType.asItem().getDescriptionId() + ".effect.");
                 List<Either<FormattedText, TooltipComponent>> list = new ArrayList<>();
@@ -43,7 +46,8 @@ public class PotionTooltip implements IRecipeSlotRichTooltipCallback {
                 Float scale = components.get(DataComponents.POTION_DURATION_SCALE);
                 if (scale == null) {
                     if (bottleType == BottleType.LINGERING) {
-                        scale = Items.LINGERING_POTION.components().getOrDefault(DataComponents.POTION_DURATION_SCALE, 1f);
+                        scale = Items.LINGERING_POTION.components()
+                            .getOrDefault(DataComponents.POTION_DURATION_SCALE, 1f);
                     } else {
                         scale = 1f;
                     }

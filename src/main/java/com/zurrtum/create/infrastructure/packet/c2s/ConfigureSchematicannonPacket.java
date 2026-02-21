@@ -32,15 +32,7 @@ public record ConfigureSchematicannonPacket(Option option, boolean set) implemen
     }
 
     public enum Option {
-        DONT_REPLACE,
-        REPLACE_SOLID,
-        REPLACE_ANY,
-        REPLACE_EMPTY,
-        SKIP_MISSING,
-        SKIP_BLOCK_ENTITIES,
-        PLAY,
-        PAUSE,
-        STOP;
+        DONT_REPLACE, REPLACE_SOLID, REPLACE_ANY, REPLACE_EMPTY, SKIP_MISSING, SKIP_BLOCK_ENTITIES, PLAY, PAUSE, STOP;
 
         public static final StreamCodec<ByteBuf, Option> CODEC = CatnipStreamCodecBuilders.ofEnum(Option.class);
     }

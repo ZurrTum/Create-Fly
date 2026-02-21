@@ -21,21 +21,24 @@ public class NBTHelper {
     // Backwards compatible with 1.20
     public static BlockPos readBlockPos(CompoundTag nbt, String key) {
         BlockPos pos = nbt.read(key, BlockPos.CODEC).orElse(null);
-        if (pos != null)
+        if (pos != null) {
             return pos;
+        }
         CompoundTag oldTag = nbt.getCompoundOrEmpty(key);
         return new BlockPos(oldTag.getIntOr("X", 0), oldTag.getIntOr("Y", 0), oldTag.getIntOr("Z", 0));
     }
 
     public static <T extends Enum<?>> T readEnum(CompoundTag nbt, String key, Class<T> enumClass) {
         T[] enumConstants = enumClass.getEnumConstants();
-        if (enumConstants == null)
+        if (enumConstants == null) {
             throw new IllegalArgumentException("Non-Enum class passed to readEnum: " + enumClass.getName());
+        }
         if (nbt.contains(key)) {
             String name = nbt.getStringOr(key, "");
             for (T t : enumConstants) {
-                if (t.name().equals(name))
+                if (t.name().equals(name)) {
                     return t;
+                }
             }
         }
         return enumConstants[0];
@@ -49,8 +52,9 @@ public class NBTHelper {
         ListTag listNBT = new ListTag();
         list.forEach(t -> {
             CompoundTag apply = serializer.apply(t);
-            if (apply == null)
+            if (apply == null) {
                 return;
+            }
             listNBT.add(apply);
         });
         return listNBT;
@@ -79,8 +83,9 @@ public class NBTHelper {
 
     @Nullable
     public static AABB readAABB(ListTag bbTag) {
-        if (bbTag.isEmpty())
+        if (bbTag.isEmpty()) {
             return null;
+        }
         return new AABB(
             bbTag.getFloatOr(0, 0),
             bbTag.getFloatOr(1, 0),
@@ -105,8 +110,9 @@ public class NBTHelper {
 
     public static Tag getINBT(CompoundTag nbt, String id) {
         Tag inbt = nbt.get(id);
-        if (inbt != null)
+        if (inbt != null) {
             return inbt;
+        }
         return new CompoundTag();
     }
 

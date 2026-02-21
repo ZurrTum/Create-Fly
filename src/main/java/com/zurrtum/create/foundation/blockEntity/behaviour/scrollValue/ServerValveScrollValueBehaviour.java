@@ -17,8 +17,9 @@ public class ServerValveScrollValueBehaviour extends ServerScrollValueBehaviour 
     @Override
     public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlHeld) {
         int value = Math.max(1, valueSetting.value());
-        if (!valueSetting.equals(getValueSettings()))
+        if (!valueSetting.equals(getValueSettings())) {
             playFeedbackSound(this);
+        }
         setValue(valueSetting.row() == 0 ? -value : value);
     }
 
@@ -29,10 +30,12 @@ public class ServerValveScrollValueBehaviour extends ServerScrollValueBehaviour 
 
     @Override
     public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
-        if (getLevel().isClientSide())
+        if (getLevel().isClientSide()) {
             return;
+        }
         BlockState blockState = blockEntity.getBlockState();
-        if (blockState.getBlock() instanceof ValveHandleBlock vhb)
+        if (blockState.getBlock() instanceof ValveHandleBlock vhb) {
             vhb.clicked(getLevel(), getPos(), blockState, player, hand);
+        }
     }
 }

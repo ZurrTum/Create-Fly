@@ -30,7 +30,12 @@ public class AvatarRendererMixin<AvatarlikeEntity extends Avatar & ClientAvatarE
     }
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V", at = @At("TAIL"))
-    private void updateRenderState(AvatarlikeEntity player, AvatarRenderState state, float tickProgress, CallbackInfo ci) {
+    private void updateRenderState(
+        AvatarlikeEntity player,
+        AvatarRenderState state,
+        float tickProgress,
+        CallbackInfo ci
+    ) {
         ((CardboardRenderState) state).create$update(player, tickProgress);
         SkyhookRenderState skyhookRenderState = (SkyhookRenderState) state;
         skyhookRenderState.create$setUuid(player.getUUID());

@@ -71,16 +71,19 @@ public class ValueBox extends ChasingAABBOutline {
     @Override
     public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         boolean hasTransform = transform != null;
-        if (transform instanceof Sided && params.getHighlightedFace() != null)
+        if (transform instanceof Sided && params.getHighlightedFace() != null) {
             ((Sided) transform).fromSide(params.getHighlightedFace());
+        }
 
-        if (hasTransform && !transform.shouldRender(blockState))
+        if (hasTransform && !transform.shouldRender(blockState)) {
             return;
+        }
 
         ms.pushPose();
         ms.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
-        if (hasTransform)
+        if (hasTransform) {
             transform.transform(blockState, ms);
+        }
 
         if (!isPassive) {
             ms.pushPose();
@@ -116,15 +119,17 @@ public class ValueBox extends ChasingAABBOutline {
 
         @Override
         public AllIcons getOutline() {
-            if (!stack.isEmpty())
+            if (!stack.isEmpty()) {
                 return AllIcons.VALUE_BOX_HOVER_6PX;
+            }
             return super.getOutline();
         }
 
         @Override
         public void renderContents(Minecraft mc, PoseStack ms, MultiBufferSource buffer) {
-            if (count == null)
+            if (count == null) {
                 return;
+            }
 
             Font font = mc.font;
             ms.translate(17.5, -5, 7);
@@ -148,8 +153,9 @@ public class ValueBox extends ChasingAABBOutline {
                 ms.translate(-7, 10, blockItem ? 10 + 1 / 4f : 0);
             }
 
-            if (count.getString().equals("*"))
+            if (count.getString().equals("*")) {
                 ms.translate(-1, 3, 0);
+            }
 
             ms.scale(scale, scale, scale);
             drawString8x(ms, buffer, count, 0, 0, isFilter ? 0xFFFFFFFF : 0xFFEDEDED);
@@ -180,18 +186,20 @@ public class ValueBox extends ChasingAABBOutline {
             int stringWidth = font.width(text);
             float numberScale = (float) font.lineHeight / stringWidth;
             boolean singleDigit = stringWidth < 10;
-            if (singleDigit)
+            if (singleDigit) {
                 numberScale = numberScale / 2;
+            }
             float verticalMargin = (stringWidth - font.lineHeight) / 2f;
 
             ms.scale(numberScale, numberScale, numberScale);
             ms.translate(singleDigit ? stringWidth / 2 : 0, singleDigit ? -verticalMargin : verticalMargin, 0);
 
             int overrideColor = transform.getOverrideColor();
-            if (overrideColor == -1)
+            if (overrideColor == -1) {
                 drawString8x(ms, buffer, text, 0, 0, 0xFFEDEDED);
-            else
+            } else {
                 drawString(ms, buffer, text, 0, 0, overrideColor);
+            }
         }
 
     }
@@ -216,7 +224,14 @@ public class ValueBox extends ChasingAABBOutline {
 
     }
 
-    private static void drawString(PoseStack ms, MultiBufferSource buffer, Component text, float x, float y, int color) {
+    private static void drawString(
+        PoseStack ms,
+        MultiBufferSource buffer,
+        Component text,
+        float x,
+        float y,
+        int color
+    ) {
         Minecraft.getInstance().font.drawInBatch(
             text,
             x,
@@ -231,7 +246,14 @@ public class ValueBox extends ChasingAABBOutline {
         );
     }
 
-    private static void drawString8x(PoseStack ms, MultiBufferSource buffer, Component text, float x, float y, int color) {
+    private static void drawString8x(
+        PoseStack ms,
+        MultiBufferSource buffer,
+        Component text,
+        float x,
+        float y,
+        int color
+    ) {
         Minecraft.getInstance().font.drawInBatch8xOutline(
             text.getVisualOrderText(),
             x,

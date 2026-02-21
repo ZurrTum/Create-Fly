@@ -30,7 +30,8 @@ public class TrackObserverVisual extends AbstractBlockEntityVisual<TrackObserver
     public TrackObserverVisual(VisualizationContext ctx, TrackObserverBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);
 
-        overlay = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.TRACK_OBSERVER_OVERLAY))
+        overlay = ctx.instancerProvider()
+            .instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.TRACK_OBSERVER_OVERLAY))
             .createInstance();
 
         setupVisual();
@@ -76,7 +77,15 @@ public class TrackObserverVisual extends AbstractBlockEntityVisual<TrackObserver
             TrackBlockRenderer renderer = AllTrackRenders.get(trackBlock);
             if (renderer != null) {
                 RenderedTrackOverlayType type = RenderedTrackOverlayType.OBSERVER;
-                renderer.prepareTrackOverlay(overlay, level, targetPosition, trackState, target.getTargetBezier(), target.getTargetDirection(), type);
+                renderer.prepareTrackOverlay(
+                    overlay,
+                    level,
+                    targetPosition,
+                    trackState,
+                    target.getTargetBezier(),
+                    target.getTargetDirection(),
+                    type
+                );
             }
 
             overlay.setChanged();

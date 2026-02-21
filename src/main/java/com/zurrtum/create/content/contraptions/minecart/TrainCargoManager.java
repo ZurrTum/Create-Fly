@@ -7,12 +7,11 @@ import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapp
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageWrapper;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.MountedStorageManager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 public class TrainCargoManager extends MountedStorageManager {
 
@@ -54,7 +53,12 @@ public class TrainCargoManager extends MountedStorageManager {
     }
 
     @Override
-    public <T> void read(final DynamicOps<T> ops, MapLike<T> map, boolean clientPacket, @Nullable Contraption contraption) {
+    public <T> void read(
+        final DynamicOps<T> ops,
+        MapLike<T> map,
+        boolean clientPacket,
+        @Nullable Contraption contraption
+    ) {
         super.read(ops, map, clientPacket, contraption);
         ticksSinceLastExchange = ops.getNumberValue(map.get("TicksSinceLastExchange"), 0).intValue();
     }

@@ -3,12 +3,11 @@ package com.zurrtum.create.content.contraptions.actors.trainControls;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
+
+import java.util.*;
 
 public class ControlsServerHandler {
 
@@ -31,8 +30,9 @@ public class ControlsServerHandler {
             for (Iterator<ManuallyPressedKey> entryIterator = list.iterator(); entryIterator.hasNext(); ) {
                 ManuallyPressedKey pressedKey = entryIterator.next();
                 pressedKey.decrement();
-                if (!pressedKey.isAlive())
+                if (!pressedKey.isAlive()) {
                     entryIterator.remove(); // key released
+                }
             }
 
             Player player = world.getPlayerByUUID(entry.getKey());
@@ -42,12 +42,17 @@ public class ControlsServerHandler {
                 continue;
             }
 
-            if (!ctx.entity.control(ctx.controlsLocalPos, list.stream().map(ManuallyPressedKey::getSecond).toList(), player)) {
+            if (!ctx.entity.control(
+                ctx.controlsLocalPos,
+                list.stream().map(ManuallyPressedKey::getSecond).toList(),
+                player
+            )) {
                 ctx.entity.stopControlling(ctx.controlsLocalPos);
             }
 
-            if (list.isEmpty())
+            if (list.isEmpty()) {
                 iterator.remove();
+            }
         }
     }
 
@@ -61,8 +66,9 @@ public class ControlsServerHandler {
     ) {
         Map<UUID, ControlsContext> map = receivedInputs.get(world);
 
-        if (map.containsKey(uniqueID) && map.get(uniqueID).entity != entity)
+        if (map.containsKey(uniqueID) && map.get(uniqueID).entity != entity) {
             map.remove(uniqueID);
+        }
 
         ControlsContext ctx = map.computeIfAbsent(uniqueID, $ -> new ControlsContext(entity, controlsPos));
         Collection<ManuallyPressedKey> list = ctx.keys;
@@ -72,16 +78,18 @@ public class ControlsServerHandler {
             for (ManuallyPressedKey entry : list) {
                 Integer inputType = entry.getSecond();
                 if (inputType.equals(activated)) {
-                    if (!pressed)
+                    if (!pressed) {
                         entry.setFirst(0);
-                    else
+                    } else {
                         entry.keepAlive();
+                    }
                     continue WithNext;
                 }
             }
 
-            if (!pressed)
+            if (!pressed) {
                 continue;
+            }
 
             list.add(new ManuallyPressedKey(activated)); // key newly pressed
         }

@@ -9,16 +9,15 @@ import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
 import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class DeliverPackagesInstruction extends ScheduleInstruction {
     public DeliverPackagesInstruction(Identifier id) {
@@ -46,19 +45,23 @@ public class DeliverPackagesInstruction extends ScheduleInstruction {
 
         for (Carriage carriage : train.carriages) {
             Container carriageInventory = carriage.storage.getAllItems();
-            if (carriageInventory == null)
+            if (carriageInventory == null) {
                 continue;
+            }
 
             // Export to station
             for (ItemStack stack : carriageInventory) {
-                if (!PackageItem.isPackage(stack))
+                if (!PackageItem.isPackage(stack)) {
                     continue;
-                if (firstPackage == null)
+                }
+                if (firstPackage == null) {
                     firstPackage = PackageItem.getAddress(stack);
+                }
                 for (GlobalStation globalStation : train.graph.getPoints(EdgePointType.STATION)) {
                     for (Map.Entry<BlockPos, GlobalPackagePort> port : globalStation.connectedPorts.entrySet()) {
-                        if (!PackageItem.matchAddress(stack, port.getValue().address))
+                        if (!PackageItem.matchAddress(stack, port.getValue().address)) {
                             continue;
+                        }
                         anyMatch = true;
                         validStations.add(globalStation);
                         break;
@@ -80,8 +83,9 @@ public class DeliverPackagesInstruction extends ScheduleInstruction {
 
         DiscoveredPath best = train.navigation.findPathTo(validStations, Double.MAX_VALUE);
         if (best == null) {
-            if (anyMatch)
+            if (anyMatch) {
                 train.status.failedNavigation();
+            }
             runtime.startCooldown();
             return null;
         }

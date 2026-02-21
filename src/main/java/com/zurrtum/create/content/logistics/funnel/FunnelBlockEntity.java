@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.funnel;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.BlockFace;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock.Shape;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
@@ -52,12 +52,7 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
     public LerpedFloat flap;
 
     enum Mode {
-        INVALID,
-        PAUSED,
-        COLLECT,
-        PUSHING_TO_BELT,
-        TAKING_FROM_BELT,
-        EXTRACT
+        INVALID, PAUSED, COLLECT, PUSHING_TO_BELT, TAKING_FROM_BELT, EXTRACT
     }
 
     public FunnelBlockEntity(BlockPos pos, BlockState state) {
@@ -68,24 +63,30 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     Mode determineCurrentMode() {
         BlockState state = getBlockState();
-        if (!FunnelBlock.isFunnel(state))
-            return Mode.INVALID;
-        if (state.getValueOrElse(BlockStateProperties.POWERED, false))
-            return Mode.PAUSED;
-        if (state.getBlock() instanceof BeltFunnelBlock) {
-            Shape shape = state.getValue(BeltFunnelBlock.SHAPE);
-            if (shape == Shape.PULLING)
-                return Mode.TAKING_FROM_BELT;
-            if (shape == Shape.PUSHING)
-                return Mode.PUSHING_TO_BELT;
-
-            BeltBlockEntity belt = BeltHelper.getSegmentBE(level, worldPosition.below());
-            if (belt != null)
-                return belt.getMovementFacing() == state.getValue(BeltFunnelBlock.HORIZONTAL_FACING) ? Mode.PUSHING_TO_BELT : Mode.TAKING_FROM_BELT;
+        if (!FunnelBlock.isFunnel(state)) {
             return Mode.INVALID;
         }
-        if (state.getBlock() instanceof FunnelBlock)
+        if (state.getValueOrElse(BlockStateProperties.POWERED, false)) {
+            return Mode.PAUSED;
+        }
+        if (state.getBlock() instanceof BeltFunnelBlock) {
+            Shape shape = state.getValue(BeltFunnelBlock.SHAPE);
+            if (shape == Shape.PULLING) {
+                return Mode.TAKING_FROM_BELT;
+            }
+            if (shape == Shape.PUSHING) {
+                return Mode.PUSHING_TO_BELT;
+            }
+
+            BeltBlockEntity belt = BeltHelper.getSegmentBE(level, worldPosition.below());
+            if (belt != null) {
+                return belt.getMovementFacing() == state.getValue(BeltFunnelBlock.HORIZONTAL_FACING) ? Mode.PUSHING_TO_BELT : Mode.TAKING_FROM_BELT;
+            }
+            return Mode.INVALID;
+        }
+        if (state.getBlock() instanceof FunnelBlock) {
             return state.getValue(FunnelBlock.EXTRACTING) ? Mode.EXTRACT : Mode.COLLECT;
+        }
 
         return Mode.INVALID;
     }
@@ -95,42 +96,50 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
         super.tick();
         flap.tickChaser();
         Mode mode = determineCurrentMode();
-        if (level.isClientSide())
+        if (level.isClientSide()) {
             return;
+        }
 
         // Redstone resets the extraction cooldown
-        if (mode == Mode.PAUSED)
+        if (mode == Mode.PAUSED) {
             extractionCooldown = 0;
-        if (mode == Mode.TAKING_FROM_BELT)
+        }
+        if (mode == Mode.TAKING_FROM_BELT) {
             return;
+        }
 
         if (extractionCooldown > 0) {
             extractionCooldown--;
             return;
         }
 
-        if (mode == Mode.PUSHING_TO_BELT)
+        if (mode == Mode.PUSHING_TO_BELT) {
             activateExtractingBeltFunnel();
-        if (mode == Mode.EXTRACT)
+        }
+        if (mode == Mode.EXTRACT) {
             activateExtractor();
+        }
     }
 
     private void activateExtractor() {
-        if (invVersionTracker.stillWaiting(invManipulation))
+        if (invVersionTracker.stillWaiting(invManipulation)) {
             return;
+        }
 
         BlockState blockState = getBlockState();
         Direction facing = AbstractFunnelBlock.getFunnelFacing(blockState);
 
-        if (facing == null)
+        if (facing == null) {
             return;
+        }
 
         // Check if last item is still blocking the extractor
         Entity lastEntity = lastObserved != null ? lastObserved.get() : null;
         if (lastEntity != null && lastEntity.isAlive()) {
             AABB area = getEntityOverflowScanningArea();
-            if (lastEntity.getBoundingBox().intersects(area))
+            if (lastEntity.getBoundingBox().intersects(area)) {
                 return;
+            }
             lastObserved = null;
         }
 
@@ -153,8 +162,9 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
         // Extract
         stack = invManipulation.extract(mode, amountToExtract);
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
             return;
+        }
 
         flap(false);
         onTransfer(stack);
@@ -164,12 +174,14 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
         boolean up = facing == Direction.UP;
 
         outputPos = outputPos.add(Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(vertical ? up ? .15f : .5f : .25f));
-        if (!vertical)
+        if (!vertical) {
             outputPos = outputPos.subtract(0, .45f, 0);
+        }
 
         Vec3 motion = Vec3.ZERO;
-        if (up)
+        if (up) {
             motion = new Vec3(0, 4 / 16f, 0);
+        }
 
         ItemEntity item = new ItemEntity(level, outputPos.x, outputPos.y, outputPos.z, stack.copy());
         item.setDefaultPickUpDelay();
@@ -185,25 +197,34 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
     private AABB getEntityOverflowScanningArea() {
         Direction facing = AbstractFunnelBlock.getFunnelFacing(getBlockState());
         AABB bb = coreBB.move(worldPosition);
-        if (facing == null || facing == Direction.UP)
+        if (facing == null || facing == Direction.UP) {
             return bb;
+        }
         return bb.expandTowards(0, -1, 0);
     }
 
     private void activateExtractingBeltFunnel() {
-        if (invVersionTracker.stillWaiting(invManipulation))
+        if (invVersionTracker.stillWaiting(invManipulation)) {
             return;
+        }
 
         BlockState blockState = getBlockState();
         Direction facing = blockState.getValue(BeltFunnelBlock.HORIZONTAL_FACING);
-        DirectBeltInputBehaviour inputBehaviour = BlockEntityBehaviour.get(level, worldPosition.below(), DirectBeltInputBehaviour.TYPE);
+        DirectBeltInputBehaviour inputBehaviour = BlockEntityBehaviour.get(
+            level,
+            worldPosition.below(),
+            DirectBeltInputBehaviour.TYPE
+        );
 
-        if (inputBehaviour == null)
+        if (inputBehaviour == null) {
             return;
-        if (!inputBehaviour.canInsertFromSide(facing))
+        }
+        if (!inputBehaviour.canInsertFromSide(facing)) {
             return;
-        if (inputBehaviour.isOccupied(facing))
+        }
+        if (inputBehaviour.isOccupied(facing)) {
             return;
+        }
 
         int amountToExtract = getAmountToExtract();
         ExtractionCountMode mode = getModeToExtract();
@@ -211,15 +232,17 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
         ItemStack stack = invManipulation.extract(
             mode, amountToExtract, s -> {
                 ItemStack handleInsertion = inputBehaviour.handleInsertion(s, facing, true);
-                if (handleInsertion.isEmpty())
+                if (handleInsertion.isEmpty()) {
                     return true;
+                }
                 deniedByInsertion.setTrue();
                 return false;
             }
         );
         if (stack.isEmpty()) {
-            if (deniedByInsertion.isFalse())
+            if (deniedByInsertion.isFalse()) {
                 invVersionTracker.awaitNewVersion(invManipulation.getInventory());
+            }
             return;
         }
         flap(false);
@@ -229,17 +252,20 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public int getAmountToExtract() {
-        if (!supportsAmountOnFilter())
+        if (!supportsAmountOnFilter()) {
             return 64;
+        }
         int amountToExtract = invManipulation.getAmountFromFilter();
-        if (!filtering.isActive())
+        if (!filtering.isActive()) {
             amountToExtract = 1;
+        }
         return amountToExtract;
     }
 
     public ExtractionCountMode getModeToExtract() {
-        if (!supportsAmountOnFilter() || !filtering.isActive())
+        if (!supportsAmountOnFilter() || !filtering.isActive()) {
             return ExtractionCountMode.UPTO;
+        }
         return invManipulation.getModeFromFilter();
     }
 
@@ -249,7 +275,10 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        invManipulation = new InvManipulationBehaviour(this, (w, p, s) -> new BlockFace(p, AbstractFunnelBlock.getFunnelFacing(s).getOpposite()));
+        invManipulation = new InvManipulationBehaviour(
+            this,
+            (w, p, s) -> new BlockFace(p, AbstractFunnelBlock.getFunnelFacing(s).getOpposite())
+        );
         behaviours.add(invManipulation);
 
         behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
@@ -274,10 +303,11 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
         boolean beltFunnelsupportsAmount = false;
         if (blockState.getBlock() instanceof BeltFunnelBlock) {
             Shape shape = blockState.getValue(BeltFunnelBlock.SHAPE);
-            if (shape == Shape.PUSHING)
+            if (shape == Shape.PUSHING) {
                 beltFunnelsupportsAmount = true;
-            else
+            } else {
                 beltFunnelsupportsAmount = BeltHelper.getSegmentBE(level, worldPosition.below()) != null;
+            }
         }
         boolean extractor = blockState.getBlock() instanceof FunnelBlock && blockState.getValue(FunnelBlock.EXTRACTING);
         return beltFunnelsupportsAmount || extractor;
@@ -285,12 +315,15 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     private boolean supportsDirectBeltInput(Direction side) {
         BlockState blockState = getBlockState();
-        if (blockState == null)
+        if (blockState == null) {
             return false;
-        if (!(blockState.getBlock() instanceof FunnelBlock))
+        }
+        if (!(blockState.getBlock() instanceof FunnelBlock)) {
             return false;
-        if (blockState.getValue(FunnelBlock.EXTRACTING))
+        }
+        if (blockState.getValue(FunnelBlock.EXTRACTING)) {
             return false;
+        }
         return FunnelBlock.getFunnelFacing(blockState) == Direction.UP;
     }
 
@@ -301,21 +334,28 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     private ItemStack handleDirectBeltInput(TransportedItemStack stack, Direction side, boolean simulate) {
         ItemStack inserted = stack.stack;
-        if (!filtering.test(inserted))
+        if (!filtering.test(inserted)) {
             return inserted;
-        if (determineCurrentMode() == Mode.PAUSED)
+        }
+        if (determineCurrentMode() == Mode.PAUSED) {
             return inserted;
-        if (simulate)
+        }
+        if (simulate) {
             invManipulation.simulate();
-        if (!simulate)
+        }
+        if (!simulate) {
             onTransfer(inserted);
+        }
         return invManipulation.insert(inserted);
     }
 
     public void flap(boolean inward) {
         if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
             FunnelFlapPacket packet = new FunnelFlapPacket(this, inward);
-            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(
+                new ChunkPos(worldPosition),
+                false
+            )) {
                 player.connection.send(packet);
             }
         } else {
@@ -331,8 +371,9 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     public float getFlapOffset() {
         BlockState blockState = getBlockState();
-        if (!(blockState.getBlock() instanceof BeltFunnelBlock))
+        if (!(blockState.getBlock() instanceof BeltFunnelBlock)) {
             return -1 / 16f;
+        }
         return switch (blockState.getValue(BeltFunnelBlock.SHAPE)) {
             case EXTENDED -> 8 / 16f;
             case PULLING, PUSHING -> -2 / 16f;
@@ -351,8 +392,9 @@ public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
         super.read(view, clientPacket);
         extractionCooldown = view.getIntOr("TransferCooldown", 0);
 
-        if (clientPacket)
+        if (clientPacket) {
             AllClientHandle.INSTANCE.queueUpdate(this);
+        }
     }
 
     @Override

@@ -80,8 +80,8 @@ public class CreativeModeTabsMixin {
                 return e1.key().identifier().compareTo(e2.key().identifier());
             }
         };
-        final List<Holder.Reference<CreativeModeTab>> sortedItemGroups = BuiltInRegistries.CREATIVE_MODE_TAB.listElements().sorted(entryComparator)
-            .toList();
+        final List<Holder.Reference<CreativeModeTab>> sortedItemGroups = BuiltInRegistries.CREATIVE_MODE_TAB.listElements()
+            .sorted(entryComparator).toList();
 
         for (Holder.Reference<CreativeModeTab> reference : sortedItemGroups) {
             final CreativeModeTab itemGroup = reference.value();
@@ -111,12 +111,15 @@ public class CreativeModeTabsMixin {
             final CreativeModeTab itemGroup = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(registryKey);
             final FabricItemGroupImpl fabricItemGroup = (FabricItemGroupImpl) itemGroup;
             final String displayName = itemGroup.getDisplayName().getString();
-            final var position = new ItemGroupPosition(itemGroup.row(), itemGroup.column(), fabricItemGroup.fabric_getPage());
+            final var position = new ItemGroupPosition(
+                itemGroup.row(),
+                itemGroup.column(),
+                fabricItemGroup.fabric_getPage()
+            );
             final String existingName = map.put(position, displayName);
 
             if (existingName != null) {
-                throw new IllegalArgumentException("Duplicate position: (%s) for item groups %s vs %s".formatted(
-                    position,
+                throw new IllegalArgumentException("Duplicate position: (%s) for item groups %s vs %s".formatted(position,
                     displayName,
                     existingName
                 ));

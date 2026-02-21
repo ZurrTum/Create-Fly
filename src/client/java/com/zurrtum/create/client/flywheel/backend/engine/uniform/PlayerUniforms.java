@@ -80,7 +80,11 @@ public final class PlayerUniforms extends UniformWriter {
         int skyBrightness = level.getBrightness(LightLayer.SKY, player.blockPosition());
         int maxBrightness = 15;
 
-        return writeVec2(ptr, (float) blockBrightness / (float) maxBrightness, (float) skyBrightness / (float) maxBrightness);
+        return writeVec2(
+            ptr,
+            (float) blockBrightness / (float) maxBrightness,
+            (float) skyBrightness / (float) maxBrightness
+        );
     }
 
     private static long writeHeldLight(long ptr, LocalPlayer player) {
@@ -90,7 +94,11 @@ public final class PlayerUniforms extends UniformWriter {
             Item handItem = player.getItemInHand(hand).getItem();
             if (handItem instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
-                int blockLight = FlwBackendXplat.INSTANCE.getLightEmission(block.defaultBlockState(), player.level(), player.blockPosition());
+                int blockLight = FlwBackendXplat.INSTANCE.getLightEmission(
+                    block.defaultBlockState(),
+                    player.level(),
+                    player.blockPosition()
+                );
                 if (heldLight < blockLight) {
                     heldLight = blockLight;
                 }

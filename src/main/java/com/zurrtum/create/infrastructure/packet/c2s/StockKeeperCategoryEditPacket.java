@@ -13,7 +13,8 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public record StockKeeperCategoryEditPacket(BlockPos pos, List<ItemStack> schedule) implements Packet<ServerGamePacketListener> {
+public record StockKeeperCategoryEditPacket(BlockPos pos,
+                                            List<ItemStack> schedule) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, StockKeeperCategoryEditPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         StockKeeperCategoryEditPacket::pos,

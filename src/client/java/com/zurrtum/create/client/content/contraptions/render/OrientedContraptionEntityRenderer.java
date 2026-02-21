@@ -27,9 +27,11 @@ public class OrientedContraptionEntityRenderer<C extends OrientedContraptionEnti
 
     @Override
     public boolean shouldRender(C entity, Frustum frustum, double cameraX, double cameraY, double cameraZ) {
-        if (!super.shouldRender(entity, frustum, cameraX, cameraY, cameraZ))
+        if (!super.shouldRender(entity, frustum, cameraX, cameraY, cameraZ)) {
             return false;
-        return entity.getVehicle() != null || !entity.getContraption().getType().is(AllContraptionTypeTags.REQUIRES_VEHICLE_FOR_RENDER);
+        }
+        return entity.getVehicle() != null || !entity.getContraption().getType()
+            .is(AllContraptionTypeTags.REQUIRES_VEHICLE_FOR_RENDER);
     }
 
     @Override
@@ -46,8 +48,16 @@ public class OrientedContraptionEntityRenderer<C extends OrientedContraptionEnti
         }
         state.seed = entity.getId();
         boolean done = tickProgress == 1.0F;
-        state.angleYaw = Mth.DEG_TO_RAD * (done ? -entity.yaw : -AngleHelper.angleLerp(tickProgress, entity.prevYaw, entity.yaw));
-        state.anglePitch = Mth.DEG_TO_RAD * (done ? entity.pitch : AngleHelper.angleLerp(tickProgress, entity.prevPitch, entity.pitch));
+        state.angleYaw = Mth.DEG_TO_RAD * (done ? -entity.yaw : -AngleHelper.angleLerp(
+            tickProgress,
+            entity.prevYaw,
+            entity.yaw
+        ));
+        state.anglePitch = Mth.DEG_TO_RAD * (done ? entity.pitch : AngleHelper.angleLerp(
+            tickProgress,
+            entity.prevPitch,
+            entity.pitch
+        ));
         state.angleInitialYaw = Mth.DEG_TO_RAD * entity.getInitialYaw();
         super.extractRenderState(entity, state, tickProgress);
     }
@@ -58,8 +68,8 @@ public class OrientedContraptionEntityRenderer<C extends OrientedContraptionEnti
         if (state.offset != null) {
             matrixStack.translate(state.offset);
         }
-        TransformStack.of(matrixStack).nudge(state.seed).center().rotateY(state.angleYaw).rotateZ(state.anglePitch).rotateY(state.angleInitialYaw)
-            .uncenter();
+        TransformStack.of(matrixStack).nudge(state.seed).center().rotateY(state.angleYaw).rotateZ(state.anglePitch)
+            .rotateY(state.angleInitialYaw).uncenter();
     }
 
     public static class OrientedContraptionState extends AbstractContraptionState {

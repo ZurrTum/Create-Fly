@@ -52,70 +52,89 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
     }
 
     private void updateTargetRotation() {
-        if (hasNetwork())
+        if (hasNetwork()) {
             getOrCreateNetwork().remove(this);
+        }
         RotationPropagator.handleRemoved(level, worldPosition, this);
         removeSource();
         attachKinetics();
 
-        if (isCogwheelPresent() && getSpeed() != 0)
+        if (isCogwheelPresent() && getSpeed() != 0) {
             award(AllAdvancements.SPEED_CONTROLLER);
+        }
     }
 
-    public static float getConveyedSpeed(KineticBlockEntity cogWheel, KineticBlockEntity speedControllerIn, boolean targetingController) {
-        if (!(speedControllerIn instanceof SpeedControllerBlockEntity))
+    public static float getConveyedSpeed(
+        KineticBlockEntity cogWheel,
+        KineticBlockEntity speedControllerIn,
+        boolean targetingController
+    ) {
+        if (!(speedControllerIn instanceof SpeedControllerBlockEntity)) {
             return 0;
+        }
 
         float speed = speedControllerIn.getTheoreticalSpeed();
         float wheelSpeed = cogWheel.getTheoreticalSpeed();
         float desiredOutputSpeed = getDesiredOutputSpeed(cogWheel, speedControllerIn, targetingController);
 
         float compareSpeed = targetingController ? speed : wheelSpeed;
-        if (desiredOutputSpeed >= 0 && compareSpeed >= 0)
+        if (desiredOutputSpeed >= 0 && compareSpeed >= 0) {
             return Math.max(desiredOutputSpeed, compareSpeed);
-        if (desiredOutputSpeed < 0 && compareSpeed < 0)
+        }
+        if (desiredOutputSpeed < 0 && compareSpeed < 0) {
             return Math.min(desiredOutputSpeed, compareSpeed);
+        }
 
         return desiredOutputSpeed;
     }
 
-    public static float getDesiredOutputSpeed(KineticBlockEntity cogWheel, KineticBlockEntity speedControllerIn, boolean targetingController) {
+    public static float getDesiredOutputSpeed(
+        KineticBlockEntity cogWheel,
+        KineticBlockEntity speedControllerIn,
+        boolean targetingController
+    ) {
         SpeedControllerBlockEntity speedController = (SpeedControllerBlockEntity) speedControllerIn;
         float targetSpeed = speedController.targetSpeed.getValue();
         float speed = speedControllerIn.getTheoreticalSpeed();
         float wheelSpeed = cogWheel.getTheoreticalSpeed();
 
-        if (targetSpeed == 0)
+        if (targetSpeed == 0) {
             return 0;
-        if (targetingController && wheelSpeed == 0)
+        }
+        if (targetingController && wheelSpeed == 0) {
             return 0;
+        }
         if (!speedController.hasSource()) {
-            if (targetingController)
+            if (targetingController) {
                 return targetSpeed;
+            }
             return 0;
         }
 
         boolean wheelPowersController = speedController.source.equals(cogWheel.getBlockPos());
 
         if (wheelPowersController) {
-            if (targetingController)
+            if (targetingController) {
                 return targetSpeed;
+            }
             return wheelSpeed;
         }
 
-        if (targetingController)
+        if (targetingController) {
             return speed;
+        }
         return targetSpeed;
     }
 
     public void updateBracket() {
-        if (level != null && level.isClientSide())
+        if (level != null && level.isClientSide()) {
             hasBracket = isCogwheelPresent();
+        }
     }
 
     private boolean isCogwheelPresent() {
         BlockState stateAbove = level.getBlockState(worldPosition.above());
-        return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.getValue(CogWheelBlock.AXIS)
-            .isHorizontal();
+        return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.getValue(
+            CogWheelBlock.AXIS).isHorizontal();
     }
 }

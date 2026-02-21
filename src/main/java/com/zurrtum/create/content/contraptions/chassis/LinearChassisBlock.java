@@ -36,8 +36,9 @@ public class LinearChassisBlock extends AbstractChassisBlock {
         BlockState blockState = context.getLevel().getBlockState(placedOnPos);
 
         if (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()) {
-            if (isChassis(blockState))
+            if (isChassis(blockState)) {
                 return defaultBlockState().setValue(AXIS, blockState.getValue(AXIS));
+            }
             return defaultBlockState().setValue(AXIS, context.getNearestLookingDirection().getAxis());
         }
         return super.getStateForPlacement(context);
@@ -55,15 +56,17 @@ public class LinearChassisBlock extends AbstractChassisBlock {
         RandomSource random
     ) {
         BooleanProperty property = getGlueableSide(state, side);
-        if (property == null || !sameKind(state, other) || state.getValue(AXIS) != other.getValue(AXIS))
+        if (property == null || !sameKind(state, other) || state.getValue(AXIS) != other.getValue(AXIS)) {
             return state;
+        }
         return state.setValue(property, false);
     }
 
     @Override
     public BooleanProperty getGlueableSide(BlockState state, Direction face) {
-        if (face.getAxis() != state.getValue(AXIS))
+        if (face.getAxis() != state.getValue(AXIS)) {
             return null;
+        }
         return face.getAxisDirection() == AxisDirection.POSITIVE ? STICKY_TOP : STICKY_BOTTOM;
     }
 

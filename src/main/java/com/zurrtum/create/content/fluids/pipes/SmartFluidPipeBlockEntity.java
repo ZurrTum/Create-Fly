@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.fluids.pipes;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.fluids.FluidPropagator;
 import com.zurrtum.create.content.fluids.pipes.StraightPipeBlockEntity.StraightPipeFluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
@@ -41,8 +41,9 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity implements Clear
     }
 
     private void onFilterChanged(ItemStack newFilter) {
-        if (!level.isClientSide())
+        if (!level.isClientSide()) {
             FluidPropagator.propagateChangedPipe(level, worldPosition, getBlockState());
+        }
     }
 
     class SmartPipeBehaviour extends StraightPipeFluidTransportBehaviour {
@@ -52,8 +53,9 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity implements Clear
 
         @Override
         public boolean canPullFluidFrom(FluidStack fluid, BlockState state, Direction direction) {
-            if (fluid.isEmpty() || filter != null && filter.test(fluid))
+            if (fluid.isEmpty() || filter != null && filter.test(fluid)) {
                 return super.canPullFluidFrom(fluid, state, direction);
+            }
             return false;
         }
 

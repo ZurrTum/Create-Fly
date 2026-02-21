@@ -22,7 +22,11 @@ public class AllComputerDisplaySource {
     );
 
     private static ComputerDisplaySource registerDisplay() {
-        return Registry.register(CreateRegistries.DISPLAY_SOURCE, Identifier.fromNamespaceAndPath(MOD_ID, "computer"), new ComputerDisplaySource());
+        return Registry.register(
+            CreateRegistries.DISPLAY_SOURCE,
+            Identifier.fromNamespaceAndPath(MOD_ID, "computer"),
+            new ComputerDisplaySource()
+        );
     }
 
     public static void register() {

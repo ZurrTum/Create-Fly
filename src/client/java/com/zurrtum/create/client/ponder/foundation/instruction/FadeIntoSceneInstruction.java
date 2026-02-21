@@ -26,8 +26,9 @@ public abstract class FadeIntoSceneInstruction<T extends AnimatedSceneElement> e
         element.setVisible(true);
         element.setFade(0);
         element.setFadeVec(fadeInFrom == null ? Vec3.ZERO : Vec3.atLowerCornerOf(fadeInFrom.getUnitVec3i()).scale(.5f));
-        if (elementLink != null)
+        if (elementLink != null) {
             scene.linkElement(element, elementLink);
+        }
     }
 
     @Override
@@ -36,8 +37,9 @@ public abstract class FadeIntoSceneInstruction<T extends AnimatedSceneElement> e
         float fade = totalTicks == 0 ? 1 : (remainingTicks / (float) totalTicks);
         element.setFade(1 - fade * fade);
         if (remainingTicks == 0) {
-            if (totalTicks == 0)
+            if (totalTicks == 0) {
                 element.setFade(1);
+            }
             element.setFade(1);
         }
     }

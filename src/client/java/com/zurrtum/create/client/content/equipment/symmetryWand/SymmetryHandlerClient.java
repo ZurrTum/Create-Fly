@@ -41,13 +41,16 @@ public class SymmetryHandlerClient {
         Inventory inventory = player.getInventory();
         for (int i = 0, size = Inventory.getSelectionSize(); i < size; i++) {
             ItemStack stackInSlot = inventory.getItem(i);
-            if (!stackInSlot.is(AllItems.WAND_OF_SYMMETRY))
+            if (!stackInSlot.is(AllItems.WAND_OF_SYMMETRY)) {
                 continue;
-            if (!SymmetryWandItem.isEnabled(stackInSlot))
+            }
+            if (!SymmetryWandItem.isEnabled(stackInSlot)) {
                 continue;
+            }
             SymmetryMirror mirror = SymmetryWandItem.getMirror(stackInSlot);
-            if (mirror instanceof EmptyMirror)
+            if (mirror instanceof EmptyMirror) {
                 continue;
+            }
 
             BlockPos pos = BlockPos.containing(mirror.getPosition());
 
@@ -61,8 +64,16 @@ public class SymmetryHandlerClient {
             SimpleModelWrapper model = getModel(mirror).get();
             VertexConsumer builder = buffer.getBuffer(RenderTypes.solidMovingBlock());
 
-            mc.getBlockRenderer().getModelRenderer()
-                .tesselateBlock(mc.level, List.of(model), Blocks.AIR.defaultBlockState(), pos, ms, builder, true, OverlayTexture.NO_OVERLAY);
+            mc.getBlockRenderer().getModelRenderer().tesselateBlock(
+                mc.level,
+                List.of(model),
+                Blocks.AIR.defaultBlockState(),
+                pos,
+                ms,
+                builder,
+                true,
+                OverlayTexture.NO_OVERLAY
+            );
 
             ms.popPose();
         }
@@ -92,10 +103,12 @@ public class SymmetryHandlerClient {
 
     public static void onClientTick(Minecraft mc) {
         ClientLevel world = mc.level;
-        if (world == null)
+        if (world == null) {
             return;
-        if (mc.isPaused())
+        }
+        if (mc.isPaused()) {
             return;
+        }
 
         LocalPlayer player = mc.player;
         tickCounter++;
@@ -106,8 +119,9 @@ public class SymmetryHandlerClient {
                 ItemStack stackInSlot = inventory.getItem(i);
                 if (stackInSlot.is(AllItems.WAND_OF_SYMMETRY) && SymmetryWandItem.isEnabled(stackInSlot)) {
                     SymmetryMirror mirror = SymmetryWandItem.getMirror(stackInSlot);
-                    if (mirror instanceof EmptyMirror)
+                    if (mirror instanceof EmptyMirror) {
                         continue;
+                    }
 
                     RandomSource random = mc.level.random;
                     double offsetX = (random.nextDouble() - 0.5) * 0.3;

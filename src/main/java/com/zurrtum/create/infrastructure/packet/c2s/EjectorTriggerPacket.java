@@ -11,8 +11,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record EjectorTriggerPacket(BlockPos pos) implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<ByteBuf, EjectorTriggerPacket> CODEC = BlockPos.STREAM_CODEC.map(
-        EjectorTriggerPacket::new,
+    public static final StreamCodec<ByteBuf, EjectorTriggerPacket> CODEC = BlockPos.STREAM_CODEC.map(EjectorTriggerPacket::new,
         EjectorTriggerPacket::pos
     );
 

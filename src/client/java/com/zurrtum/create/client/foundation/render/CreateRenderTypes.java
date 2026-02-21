@@ -23,44 +23,45 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class CreateRenderTypes {
     private static final RenderType TRANSLUCENT = RenderType.create(
         createLayerName("translucent"),
-        RenderSetup.builder(RenderPipelines.TRANSLUCENT_MOVING_BLOCK).bufferSize(256).affectsCrumbling().sortOnUpload().useLightmap()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS, RenderTypes.MOVING_BLOCK_SAMPLER).setOutline(OutlineProperty.AFFECTS_OUTLINE)
-            .createRenderSetup()
+        RenderSetup.builder(RenderPipelines.TRANSLUCENT_MOVING_BLOCK).bufferSize(256).affectsCrumbling().sortOnUpload()
+            .useLightmap().withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS, RenderTypes.MOVING_BLOCK_SAMPLER)
+            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
 
     private static final RenderType ADDITIVE = RenderType.create(
         createLayerName("additive"),
         RenderSetup.builder(AllRenderPipelines.ADDITIVE).bufferSize(256).affectsCrumbling().sortOnUpload()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE)
-            .createRenderSetup()
+            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
+            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
 
     private static final RenderType ADDITIVE2 = RenderType.create(
         createLayerName("additive2"),
         RenderSetup.builder(AllRenderPipelines.ADDITIVE2).bufferSize(256).affectsCrumbling().sortOnUpload()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE)
-            .createRenderSetup()
+            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
+            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
 
     private static final RenderType ITEM_GLOWING_SOLID = RenderType.create(
         createLayerName("item_glowing_solid"),
-        RenderSetup.builder(AllRenderPipelines.GLOWING).bufferSize(256).affectsCrumbling().withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
-            .useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
+        RenderSetup.builder(AllRenderPipelines.GLOWING).bufferSize(256).affectsCrumbling()
+            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
+            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
 
     private static final RenderType ITEM_GLOWING_TRANSLUCENT = RenderType.create(
         createLayerName("item_glowing_translucent"),
         RenderSetup.builder(AllRenderPipelines.GLOWING_TRANSLUCENT).bufferSize(256).affectsCrumbling().sortOnUpload()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE)
-            .createRenderSetup()
+            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
+            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
 
     public static final Supplier<GpuSampler> CHAIN_SAMPLER = () -> RenderSystem.getSamplerCache()
         .getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.LINEAR, FilterMode.NEAREST, true);
     private static final Function<Identifier, RenderType> CHAIN = Util.memoize((texture) -> RenderType.create(
         "chain_conveyor_chain",
-        RenderSetup.builder(RenderPipelines.CUTOUT_BLOCK).sortOnUpload().withTexture("Sampler0", texture, CHAIN_SAMPLER).useLightmap().useOverlay()
-            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
+        RenderSetup.builder(RenderPipelines.CUTOUT_BLOCK).sortOnUpload().withTexture("Sampler0", texture, CHAIN_SAMPLER)
+            .useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     ));
 
     public static RenderType translucent() {
@@ -83,7 +84,8 @@ public class CreateRenderTypes {
             RenderSetup.builder(RenderPipelines.TEXT).bufferSize(256).sortOnUpload().useLightmap().withTexture(
                 "Sampler0",
                 locationIn,
-                () -> RenderSystem.getSamplerCache().getClampToEdge(linearFiltering ? FilterMode.LINEAR : FilterMode.NEAREST)
+                () -> RenderSystem.getSamplerCache()
+                    .getClampToEdge(linearFiltering ? FilterMode.LINEAR : FilterMode.NEAREST)
             ).createRenderSetup()
         );
     }

@@ -63,14 +63,16 @@ public class SuperGlueSelectionHandler {
         ItemStack stack = player.getMainHandItem();
 
         if (!isGlue(stack)) {
-            if (firstPos != null)
+            if (firstPos != null) {
                 discard(player);
+            }
             return;
         }
 
         if (clusterCooldown > 0) {
-            if (clusterCooldown == 25)
+            if (clusterCooldown == 25) {
                 player.displayClientMessage(CommonComponents.EMPTY, true);
+            }
             Outliner.getInstance().keep(clusterOutlineSlot);
             clusterCooldown--;
         }
@@ -88,12 +90,14 @@ public class SuperGlueSelectionHandler {
             double bestDistance = Double.MAX_VALUE;
             for (SuperGlueEntity glueEntity : glueNearby) {
                 Optional<Vec3> clip = glueEntity.getBoundingBox().clip(traceOrigin, traceTarget);
-                if (clip.isEmpty())
+                if (clip.isEmpty()) {
                     continue;
+                }
                 Vec3 vec3 = clip.get();
                 double distanceToSqr = vec3.distanceToSqr(traceOrigin);
-                if (distanceToSqr > bestDistance)
+                if (distanceToSqr > bestDistance) {
                     continue;
+                }
                 selected = glueEntity;
                 soundSourceForRemoval = BlockPos.containing(vec3);
                 bestDistance = distanceToSqr;
@@ -102,14 +106,16 @@ public class SuperGlueSelectionHandler {
             for (SuperGlueEntity glueEntity : glueNearby) {
                 boolean h = clusterCooldown == 0 && glueEntity == selected;
                 AllSpecialTextures faceTex = h ? AllSpecialTextures.GLUE : null;
-                Outliner.getInstance().showAABB(glueEntity, glueEntity.getBoundingBox()).colored(h ? HIGHLIGHT : PASSIVE)
-                    .withFaceTextures(faceTex, faceTex).disableLineNormals().lineWidth(h ? 1 / 16f : 1 / 64f);
+                Outliner.getInstance().showAABB(glueEntity, glueEntity.getBoundingBox())
+                    .colored(h ? HIGHLIGHT : PASSIVE).withFaceTextures(faceTex, faceTex).disableLineNormals()
+                    .lineWidth(h ? 1 / 16f : 1 / 64f);
             }
         }
 
         HitResult hitResult = mc.hitResult;
-        if (hitResult != null && hitResult.getType() == Type.BLOCK)
+        if (hitResult != null && hitResult.getType() == Type.BLOCK) {
             hovered = ((BlockHitResult) hitResult).getBlockPos();
+        }
 
         if (hovered == null) {
             hoveredPos = null;
@@ -122,8 +128,9 @@ public class SuperGlueSelectionHandler {
         }
 
         boolean cancel = player.isShiftKeyDown();
-        if (cancel && firstPos == null)
+        if (cancel && firstPos == null) {
             return;
+        }
 
         AABB currentSelectionBox = getCurrentSelectionBox();
 
@@ -149,11 +156,15 @@ public class SuperGlueSelectionHandler {
 
                 CreateLang.translate(key).color(color).sendStatus(player);
 
-                if (currentSelectionBox != null)
-                    Outliner.getInstance().showAABB(bbOutlineSlot, currentSelectionBox).colored(canReach && canAfford && !cancel ? HIGHLIGHT : FAIL)
-                        .withFaceTextures(AllSpecialTextures.GLUE, AllSpecialTextures.GLUE).disableLineNormals().lineWidth(1 / 16f);
+                if (currentSelectionBox != null) {
+                    Outliner.getInstance().showAABB(bbOutlineSlot, currentSelectionBox)
+                        .colored(canReach && canAfford && !cancel ? HIGHLIGHT : FAIL)
+                        .withFaceTextures(AllSpecialTextures.GLUE, AllSpecialTextures.GLUE).disableLineNormals()
+                        .lineWidth(1 / 16f);
+                }
 
-                Outliner.getInstance().showCluster(clusterOutlineSlot, currentCluster).colored(0x4D9162).disableLineNormals().lineWidth(1 / 64f);
+                Outliner.getInstance().showCluster(clusterOutlineSlot, currentCluster).colored(0x4D9162)
+                    .disableLineNormals().lineWidth(1 / 64f);
             }
 
             return;
@@ -181,14 +192,17 @@ public class SuperGlueSelectionHandler {
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
 
-        if (!isGlue(player.getMainHandItem()))
+        if (!isGlue(player.getMainHandItem())) {
             return false;
-        if (!player.mayBuild())
+        }
+        if (!player.mayBuild()) {
             return false;
+        }
 
         if (attack) {
-            if (selected == null)
+            if (selected == null) {
                 return false;
+            }
             player.connection.send(new SuperGlueRemovalPacket(selected.getId(), soundSourceForRemoval));
             selected = null;
             clusterCooldown = 0;
@@ -203,32 +217,37 @@ public class SuperGlueSelectionHandler {
             return false;
         }
 
-        if (hoveredPos == null)
+        if (hoveredPos == null) {
             return false;
+        }
 
         Direction face = null;
         if (mc.hitResult instanceof BlockHitResult bhr) {
             face = bhr.getDirection();
             BlockState blockState = level.getBlockState(hoveredPos);
-            if (blockState.getBlock() instanceof AbstractChassisBlock cb)
-                if (cb.getGlueableSide(blockState, bhr.getDirection()) != null)
+            if (blockState.getBlock() instanceof AbstractChassisBlock cb) {
+                if (cb.getGlueableSide(blockState, bhr.getDirection()) != null) {
                     return false;
+                }
+            }
         }
 
         if (firstPos != null && currentCluster != null) {
             boolean canReach = currentCluster.contains(hoveredPos);
             boolean canAfford = SuperGlueSelectionHelper.collectGlueFromInventory(player, glueRequired, true);
 
-            if (!canReach || !canAfford)
+            if (!canReach || !canAfford) {
                 return true;
+            }
 
             confirm(player);
             return true;
         }
 
         firstPos = hoveredPos;
-        if (face != null)
+        if (face != null) {
             spawnParticles(level, firstPos, face, true);
+        }
         CreateLang.translate("super_glue.first_pos").sendStatus(player);
         AllSoundEvents.SLIME_ADDED.playAt(level, firstPos, 0.5F, 0.85F, false);
         level.playSound(player, firstPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.75f, 1);
@@ -247,9 +266,11 @@ public class SuperGlueSelectionHandler {
         AllSoundEvents.SLIME_ADDED.playAt(player.level(), hoveredPos, 0.5F, 0.95F, false);
         player.level().playSound(player, hoveredPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.75f, 1);
 
-        if (currentCluster != null)
+        if (currentCluster != null) {
             Outliner.getInstance().showCluster(clusterOutlineSlot, currentCluster).colored(0xB5F2C6)
-                .withFaceTextures(AllSpecialTextures.GLUE, AllSpecialTextures.HIGHLIGHT_CHECKERED).disableLineNormals().lineWidth(1 / 24f);
+                .withFaceTextures(AllSpecialTextures.GLUE, AllSpecialTextures.HIGHLIGHT_CHECKERED).disableLineNormals()
+                .lineWidth(1 / 24f);
+        }
 
         discard(player);
         CreateLang.translate("super_glue.success").sendStatus(player);
@@ -268,8 +289,13 @@ public class SuperGlueSelectionHandler {
         for (int i = fullBlock ? 40 : 15; i > 0; i--) {
             Vec3 offset = VecHelper.rotate(plane, 360 * world.random.nextFloat(), direction.getAxis());
             Vec3 motion = offset.normalize().scale(1 / 16f);
-            if (fullBlock)
-                offset = new Vec3(Mth.clamp(offset.x, -.5, .5), Mth.clamp(offset.y, -.5, .5), Mth.clamp(offset.z, -.5, .5));
+            if (fullBlock) {
+                offset = new Vec3(
+                    Mth.clamp(offset.x, -.5, .5),
+                    Mth.clamp(offset.y, -.5, .5),
+                    Mth.clamp(offset.z, -.5, .5)
+                );
+            }
             Vec3 particlePos = facePos.add(offset);
             world.addParticle(
                 new ItemParticleOption(ParticleTypes.ITEM, stack),

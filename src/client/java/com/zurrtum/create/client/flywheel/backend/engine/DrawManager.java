@@ -43,7 +43,12 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
      */
     protected final Function<InstancerKey<?>, N> createAndDeferInit = this::createAndDeferInit;
 
-    public <I extends Instance> AbstractInstancer<I> getInstancer(Environment environment, InstanceType<I> type, Model model, int bias) {
+    public <I extends Instance> AbstractInstancer<I> getInstancer(
+        Environment environment,
+        InstanceType<I> type,
+        Model model,
+        int bias
+    ) {
         return getInstancer(new InstancerKey<>(environment, type, model, bias));
     }
 
@@ -112,7 +117,8 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
                 if (!MaterialRenderState.materialIsAllNonNull(mesh.material())) {
                     if (MODEL_WARNINGS) {
                         StringBuilder builder = new StringBuilder();
-                        builder.append("ConfiguredMesh at index ").append(i).append(" has null components in its material! Stack trace:");
+                        builder.append("ConfiguredMesh at index ").append(i)
+                            .append(" has null components in its material! Stack trace:");
                         StackWalker.getInstance().forEach((f) -> builder.append("\n\t").append(f.toString()));
                         FlwBackend.LOGGER.warn(builder.toString());
                     }
@@ -131,8 +137,7 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
         @Nullable I apply(InstanceHandleImpl.State<?> state);
     }
 
-    protected static <I extends AbstractInstancer<?>> Map<GroupKey<?>, Int2ObjectMap<List<Pair<I, InstanceHandleImpl<?>>>>> doCrumblingSort(
-        List<Engine.CrumblingBlock> crumblingBlocks,
+    protected static <I extends AbstractInstancer<?>> Map<GroupKey<?>, Int2ObjectMap<List<Pair<I, InstanceHandleImpl<?>>>>> doCrumblingSort(List<Engine.CrumblingBlock> crumblingBlocks,
         State2Instancer<I> cast
     ) {
         Map<GroupKey<?>, Int2ObjectMap<List<Pair<I, InstanceHandleImpl<?>>>>> byType = new HashMap<>();
@@ -157,8 +162,10 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
                     continue;
                 }
 
-                byType.computeIfAbsent(new GroupKey<>(instancer.type, instancer.environment), $ -> new Int2ObjectArrayMap<>())
-                    .computeIfAbsent(progress, $ -> new ArrayList<>()).add(Pair.of(instancer, impl));
+                byType.computeIfAbsent(
+                    new GroupKey<>(instancer.type, instancer.environment),
+                    $ -> new Int2ObjectArrayMap<>()
+                ).computeIfAbsent(progress, $ -> new ArrayList<>()).add(Pair.of(instancer, impl));
             }
         }
         return byType;

@@ -17,7 +17,14 @@ public class CustomRotationParticle extends SimpleAnimatedParticle {
     protected boolean mirror;
     protected int loopLength;
 
-    public CustomRotationParticle(ClientLevel worldIn, double x, double y, double z, SpriteSet spriteSet, float yAccel) {
+    public CustomRotationParticle(
+        ClientLevel worldIn,
+        double x,
+        double y,
+        double z,
+        SpriteSet spriteSet,
+        float yAccel
+    ) {
         super(worldIn, x, y, z, spriteSet, yAccel);
     }
 

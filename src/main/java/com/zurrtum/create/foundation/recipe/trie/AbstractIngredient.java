@@ -15,10 +15,12 @@ public class AbstractIngredient {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractIngredient that))
+        if (!(obj instanceof AbstractIngredient that)) {
             return false;
-        if (this == that)
+        }
+        if (this == that) {
             return true;
+        }
 
         return this.hashCode == that.hashCode && this.variants.equals(that.variants);
     }

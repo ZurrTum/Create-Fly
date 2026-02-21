@@ -41,7 +41,8 @@ public class IngredientTextContent implements ComponentContents {
             if (entry.isSuccess()) {
                 return entry.map(pair -> pair.mapFirst(value -> new Ingredient(HolderSet.direct(value))));
             }
-            return ENTRY_CODEC.decode(ops, input).map(pair -> pair.mapFirst(value -> new Ingredient(HolderSet.direct(value))));
+            return ENTRY_CODEC.decode(ops, input)
+                .map(pair -> pair.mapFirst(value -> new Ingredient(HolderSet.direct(value))));
         }
 
         @Override

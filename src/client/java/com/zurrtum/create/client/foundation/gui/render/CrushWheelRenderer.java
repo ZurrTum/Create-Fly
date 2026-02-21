@@ -20,7 +20,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import java.util.List;
 
 public class CrushWheelRenderer extends PictureInPictureRenderer<CrushWheelRenderState> {
-    private final BlockState blockState = AllBlocks.CRUSHING_WHEEL.defaultBlockState().setValue(BlockStateProperties.AXIS, Axis.X);
+    private final BlockState blockState = AllBlocks.CRUSHING_WHEEL.defaultBlockState()
+        .setValue(BlockStateProperties.AXIS, Axis.X);
 
     public CrushWheelRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);

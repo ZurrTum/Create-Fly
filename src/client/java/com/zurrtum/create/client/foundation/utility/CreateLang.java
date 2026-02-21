@@ -4,14 +4,13 @@ import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.catnip.lang.LangBuilder;
 import com.zurrtum.create.client.catnip.lang.LangNumberFormat;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -27,8 +26,9 @@ public class CreateLang extends Lang {
 
     public static List<Component> translatedOptions(String prefix, String... keys) {
         List<Component> result = new ArrayList<>(keys.length);
-        for (String key : keys)
+        for (String key : keys) {
             result.add(translate((prefix != null ? prefix + "." : "") + key).component());
+        }
         return result;
     }
 

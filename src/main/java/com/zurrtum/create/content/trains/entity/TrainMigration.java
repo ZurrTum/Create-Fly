@@ -4,14 +4,13 @@ import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.trains.graph.*;
-
-import java.util.Iterator;
-import java.util.Map;
-
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public class TrainMigration {
 
@@ -45,39 +44,49 @@ public class TrainMigration {
             }
         }
 
-        if (curve)
+        if (curve) {
             return null;
+        }
 
-        Vec3 prevDirection = locations.getSecond().getLocation().subtract(locations.getFirst().getLocation()).normalize();
+        Vec3 prevDirection = locations.getSecond().getLocation().subtract(locations.getFirst().getLocation())
+            .normalize();
 
         for (TrackNodeLocation loc : graph.getNodes()) {
             Vec3 nodeVec = loc.getLocation();
-            if (nodeVec.distanceToSqr(fallback) > 32 * 32)
+            if (nodeVec.distanceToSqr(fallback) > 32 * 32) {
                 continue;
+            }
 
             TrackNode newNode1 = graph.locateNode(loc);
             for (Map.Entry<TrackNode, TrackEdge> entry : graph.getConnectionsFrom(newNode1).entrySet()) {
                 TrackEdge edge = entry.getValue();
-                if (edge.isTurn())
+                if (edge.isTurn()) {
                     continue;
+                }
                 TrackNode newNode2 = entry.getKey();
                 float radius = 1 / 64f;
                 Vec3 direction = edge.getDirection(true);
-                if (!Mth.equal(direction.dot(prevDirection), 1))
+                if (!Mth.equal(direction.dot(prevDirection), 1)) {
                     continue;
+                }
                 Vec3 intersectSphere = VecHelper.intersectSphere(nodeVec, direction, fallback, radius);
-                if (intersectSphere == null)
+                if (intersectSphere == null) {
                     continue;
-                if (!Mth.equal(direction.dot(intersectSphere.subtract(nodeVec).normalize()), 1))
+                }
+                if (!Mth.equal(direction.dot(intersectSphere.subtract(nodeVec).normalize()), 1)) {
                     continue;
+                }
                 double edgeLength = edge.getLength();
                 double position = intersectSphere.distanceTo(nodeVec) - radius;
-                if (Double.isNaN(position))
+                if (Double.isNaN(position)) {
                     continue;
-                if (position < 0)
+                }
+                if (position < 0) {
                     continue;
-                if (position > edgeLength)
+                }
+                if (position > edgeLength) {
                     continue;
+                }
 
                 TrackGraphLocation graphLocation = new TrackGraphLocation();
                 graphLocation.graph = graph;
@@ -99,7 +108,12 @@ public class TrainMigration {
         locations.getSecond().write(list.addChild(), dimensions);
     }
 
-    public static <T> DataResult<T> encode(final TrainMigration input, final DynamicOps<T> ops, final T empty, DimensionPalette dimensions) {
+    public static <T> DataResult<T> encode(
+        final TrainMigration input,
+        final DynamicOps<T> ops,
+        final T empty,
+        DimensionPalette dimensions
+    ) {
         RecordBuilder<T> map = ops.mapBuilder();
         map.add("Curve", ops.createBoolean(input.curve));
         map.add("Fallback", input.fallback, Vec3.CODEC);

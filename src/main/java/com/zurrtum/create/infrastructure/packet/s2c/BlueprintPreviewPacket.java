@@ -17,9 +17,8 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public record BlueprintPreviewPacket(
-    List<ItemStack> available, List<ItemStack> missing, ItemStack result
-) implements Packet<ClientGamePacketListener> {
+public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> missing,
+                                     ItemStack result) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintPreviewPacket> CODEC = StreamCodec.composite(
         ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
         BlueprintPreviewPacket::available,
@@ -29,7 +28,11 @@ public record BlueprintPreviewPacket(
         BlueprintPreviewPacket::result,
         BlueprintPreviewPacket::new
     );
-    public static final BlueprintPreviewPacket EMPTY = new BlueprintPreviewPacket(List.of(), List.of(), ItemStack.EMPTY);
+    public static final BlueprintPreviewPacket EMPTY = new BlueprintPreviewPacket(
+        List.of(),
+        List.of(),
+        ItemStack.EMPTY
+    );
 
     public static Object2IntLinkedOpenCustomHashMap<ItemStack> createMap() {
         return new Object2IntLinkedOpenCustomHashMap<>(BaseInventory.ITEM_STACK_HASH_STRATEGY);
@@ -47,7 +50,11 @@ public record BlueprintPreviewPacket(
         this(toList(available), toList(missing), result);
     }
 
-    public BlueprintPreviewPacket(Object2IntLinkedOpenCustomHashMap<ItemStack> available, List<ItemStack> missing, ItemStack result) {
+    public BlueprintPreviewPacket(
+        Object2IntLinkedOpenCustomHashMap<ItemStack> available,
+        List<ItemStack> missing,
+        ItemStack result
+    ) {
         this(toList(available), missing, result);
     }
 

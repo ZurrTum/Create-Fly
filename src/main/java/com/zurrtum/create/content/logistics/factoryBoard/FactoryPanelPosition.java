@@ -8,8 +8,8 @@ import net.minecraft.network.codec.StreamCodec;
 
 public record FactoryPanelPosition(BlockPos pos, PanelSlot slot) {
     public static final Codec<FactoryPanelPosition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        BlockPos.CODEC.fieldOf("pos")
-            .forGetter(FactoryPanelPosition::pos), PanelSlot.CODEC.fieldOf("slot").forGetter(FactoryPanelPosition::slot)
+        BlockPos.CODEC.fieldOf("pos").forGetter(FactoryPanelPosition::pos),
+        PanelSlot.CODEC.fieldOf("slot").forGetter(FactoryPanelPosition::slot)
     ).apply(instance, FactoryPanelPosition::new));
 
     public static final StreamCodec<ByteBuf, FactoryPanelPosition> PACKET_CODEC = StreamCodec.composite(

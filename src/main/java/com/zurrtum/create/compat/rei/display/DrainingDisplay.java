@@ -29,9 +29,8 @@ import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record DrainingDisplay(
-    EntryIngredient input, EntryIngredient output, EntryIngredient result, Optional<Identifier> location
-) implements Display {
+public record DrainingDisplay(EntryIngredient input, EntryIngredient output, EntryIngredient result,
+                              Optional<Identifier> location) implements Display {
     public static final Identifier POTIONS = Identifier.fromNamespaceAndPath(MOD_ID, "potions");
     public static final DisplaySerializer<DrainingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(

@@ -30,8 +30,9 @@ public class CreativeMotorBlock extends DirectionalKineticBlock implements IBE<C
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredFacing(context);
-        if ((context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) || preferred == null)
+        if ((context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) || preferred == null) {
             return super.getStateForPlacement(context);
+        }
         return defaultBlockState().setValue(FACING, preferred);
     }
 

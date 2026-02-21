@@ -59,8 +59,9 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
         boolean maxTransfer,
         boolean doTransfer
     ) {
-        if (!doTransfer)
+        if (!doTransfer) {
             return null;
+        }
 
         List<IRecipeSlotView> inputViews = new ArrayList<>();
         List<IRecipeSlotView> outputViews = new ArrayList<>();
@@ -81,7 +82,8 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
             }
         }
         if (output == null) {
-            return new RecipeTransferErrorMissingSlots(Component.translatable("jei.tooltip.error.recipe.transfer.missing"), outputViews);
+            return new RecipeTransferErrorMissingSlots(
+                Component.translatable("jei.tooltip.error.recipe.transfer.missing"), outputViews);
         }
         List<TagKey<Item>> cache = new ArrayList<>();
         List<ItemStack> input = new ArrayList<>();
@@ -99,7 +101,10 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
             TagKey<Item> tag = findTag(ingredient, cache);
             if (tag != null) {
                 ItemStack filterItem = AllItems.ATTRIBUTE_FILTER.getDefaultInstance();
-                filterItem.set(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE, AttributeFilterWhitelistMode.WHITELIST_DISJ);
+                filterItem.set(
+                    AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE,
+                    AttributeFilterWhitelistMode.WHITELIST_DISJ
+                );
                 filterItem.set(
                     AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES,
                     List.of(new ItemAttributeEntry(new InTagAttribute(tag), false))
@@ -125,8 +130,8 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
             }
         }
         int size = list.size();
-        return BuiltInRegistries.ITEM.getTags().filter(set -> set.size() == size).map(HolderSet.Named::key).filter(t -> matchTag(list, t)).findFirst()
-            .map(tag -> {
+        return BuiltInRegistries.ITEM.getTags().filter(set -> set.size() == size).map(HolderSet.Named::key)
+            .filter(t -> matchTag(list, t)).findFirst().map(tag -> {
                 cache.add(tag);
                 return tag;
             }).orElse(null);

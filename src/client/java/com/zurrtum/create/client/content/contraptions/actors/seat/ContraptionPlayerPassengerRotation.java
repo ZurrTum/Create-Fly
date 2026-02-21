@@ -24,20 +24,23 @@ public class ContraptionPlayerPassengerRotation {
 
     public static void frame(Minecraft client) {
         Player player = client.player;
-        if (!active)
+        if (!active) {
             return;
+        }
         if (player == null || !player.isPassenger()) {
             prevId = 0;
             return;
         }
 
         Entity vehicle = player.getVehicle();
-        if (!(vehicle instanceof AbstractContraptionEntity contraptionEntity))
+        if (!(vehicle instanceof AbstractContraptionEntity contraptionEntity)) {
             return;
+        }
 
         ContraptionRotationState rotationState = contraptionEntity.getRotationState();
 
-        float yaw = AngleHelper.wrapAngle180((contraptionEntity instanceof CarriageContraptionEntity cce) ? cce.getViewYRot(AnimationTickHolder.getPartialTicks()) : rotationState.yRotation);
+        float yaw = AngleHelper.wrapAngle180((contraptionEntity instanceof CarriageContraptionEntity cce) ? cce.getViewYRot(
+            AnimationTickHolder.getPartialTicks()) : rotationState.yRotation);
 
         float pitch = (contraptionEntity instanceof CarriageContraptionEntity cce) ? cce.getViewXRot(AnimationTickHolder.getPartialTicks()) : 0;
 
@@ -55,10 +58,11 @@ public class ContraptionPlayerPassengerRotation {
 
         float playerYaw = player.getYRot();
         float yawRelativeToTrain = Mth.abs(AngleHelper.getShortestAngleDiff(playerYaw, -yaw - 90));
-        if (yawRelativeToTrain > 120)
+        if (yawRelativeToTrain > 120) {
             pitchDiff *= -1;
-        else if (yawRelativeToTrain > 60)
+        } else if (yawRelativeToTrain > 60) {
             pitchDiff *= 0;
+        }
 
         player.setYRot(playerYaw + yawDiff);
         player.setXRot(player.getXRot() + pitchDiff);

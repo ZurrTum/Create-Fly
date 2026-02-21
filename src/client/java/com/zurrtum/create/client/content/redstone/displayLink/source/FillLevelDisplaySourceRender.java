@@ -7,15 +7,24 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 
 public class FillLevelDisplaySourceRender extends SingleLineDisplaySourceRender {
     @Override
-    public void initConfigurationWidgets(DisplaySource source, DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
+    public void initConfigurationWidgets(
+        DisplaySource source,
+        DisplayLinkContext context,
+        ModularGuiLineBuilder builder,
+        boolean isFirstLine
+    ) {
         super.initConfigurationWidgets(source, context, builder, isFirstLine);
-        if (isFirstLine)
+        if (isFirstLine) {
             return;
+        }
         builder.addSelectionScrollInput(
             0,
             120,
-            (si, l) -> si.forOptions(CreateLang.translatedOptions("display_source.fill_level", "percent", "progress_bar"))
-                .titled(CreateLang.translateDirect("display_source.fill_level.display")),
+            (si, l) -> si.forOptions(CreateLang.translatedOptions(
+                "display_source.fill_level",
+                "percent",
+                "progress_bar"
+            )).titled(CreateLang.translateDirect("display_source.fill_level.display")),
             "Mode"
         );
     }

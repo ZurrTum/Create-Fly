@@ -14,8 +14,9 @@ public class PulseExtenderBlockEntity extends BrassDiodeBlockEntity {
 
     @Override
     protected void updateState(boolean powered, boolean powering, boolean atMax, boolean atMin) {
-        if (atMin && !powered)
+        if (atMin && !powered) {
             return;
+        }
         if (atMin || powered) {
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(POWERING, true));
             state = maxState.getValue();

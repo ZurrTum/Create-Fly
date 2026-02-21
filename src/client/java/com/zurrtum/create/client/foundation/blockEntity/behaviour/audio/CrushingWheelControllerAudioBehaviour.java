@@ -12,11 +12,13 @@ public class CrushingWheelControllerAudioBehaviour extends AudioBehaviour<Crushi
 
     @Override
     public void tickAudio() {
-        if (!blockEntity.isOccupied() || blockEntity.crushingspeed == 0)
+        if (!blockEntity.isOccupied() || blockEntity.crushingspeed == 0) {
             return;
+        }
         float pitch = Mth.clamp((blockEntity.crushingspeed / 256f) + .45f, .85f, 1f);
-        if (blockEntity.entityUUID == null && blockEntity.inventory.getItem(0).isEmpty())
+        if (blockEntity.entityUUID == null && blockEntity.inventory.getItem(0).isEmpty()) {
             return;
+        }
         SoundScapes.play(AmbienceGroup.CRUSHING, blockEntity.getBlockPos(), pitch);
     }
 }
