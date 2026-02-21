@@ -160,6 +160,9 @@ public class SchematicHandler {
             schematic.placeInWorld(w, pos, pos, placementSettings, w.getRandom(), Block.UPDATE_CLIENTS);
             for (BlockEntity blockEntity : w.getBlockEntities()) {
                 blockEntity.setLevel(w);
+                if (blockEntity instanceof SmartBlockEntity smartBlockEntity) {
+                    smartBlockEntity.tick();
+                }
             }
             fixControllerBlockEntities(w);
         } catch (Exception e) {
@@ -179,6 +182,9 @@ public class SchematicHandler {
         );
         for (BlockEntity be : wMirroredFB.getRenderedBlockEntities()) {
             transform.apply(be);
+            if (be instanceof SmartBlockEntity smartBlockEntity) {
+                smartBlockEntity.tick();
+            }
         }
         fixControllerBlockEntities(wMirroredFB);
 
@@ -193,6 +199,9 @@ public class SchematicHandler {
         );
         for (BlockEntity be : wMirroredLR.getRenderedBlockEntities()) {
             transform.apply(be);
+            if (be instanceof SmartBlockEntity smartBlockEntity) {
+                smartBlockEntity.tick();
+            }
         }
         fixControllerBlockEntities(wMirroredLR);
 
