@@ -22,6 +22,7 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiItemRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.catnip.lang.ClientFontHelper;
+import com.zurrtum.create.client.foundation.sound.SoundScapes;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry.SceneOrderingEntry;
@@ -87,6 +88,7 @@ public class PonderUI extends AbstractPonderScreen {
         new Color(0x70_692400, true)
     ).map(Color::setImmutable);
 
+    private final SoundScapes soundScapes;
     private final List<PonderScene> scenes;
     private final List<PonderTag> tags;
     private List<PonderButton> tagButtons = new ArrayList<>();
@@ -139,6 +141,7 @@ public class PonderUI extends AbstractPonderScreen {
     }
 
     protected PonderUI(List<PonderScene> scenes) {
+        soundScapes = new SoundScapes(true);
         Identifier location = scenes.get(0).getLocation();
         stack = new ItemStack(RegisteredObjectsHelper.getItemOrBlock(location));
         itemRender = GuiGameElement.of(stack).scale(2).at(-35, 1);
@@ -313,6 +316,7 @@ public class PonderUI extends AbstractPonderScreen {
     @Override
     protected void init() {
         super.init();
+        SoundScapes.setInstance(soundScapes);
 
         tagButtons = new ArrayList<>();
         tagFades = new ArrayList<>();
@@ -441,14 +445,14 @@ public class PonderUI extends AbstractPonderScreen {
             if (!identifyMode) {
                 ponderTicks++;
                 if (skipCooling == 0) {
-                    activeScene.tick();
+                    activeScene.tick(minecraft, true);
                 }
             }
 
             if (!identifyMode) {
                 float lazyIndexValue = lazyIndex.getValue();
                 if (Math.abs(lazyIndexValue - index) > 1 / 512f) {
-                    scenes.get(lazyIndexValue < index ? index - 1 : index + 1).tick();
+                    scenes.get(lazyIndexValue < index ? index - 1 : index + 1).tick(minecraft, false);
                 }
             }
             extendedTickTimer = extendedTickLength;
@@ -488,7 +492,7 @@ public class PonderUI extends AbstractPonderScreen {
             replay();
         }
 
-        getActiveScene().seekToTime(time);
+        getActiveScene().seekToTime(minecraft, time);
         if (time != 0) {
             coolDownAfterSkip();
         }
@@ -622,7 +626,6 @@ public class PonderUI extends AbstractPonderScreen {
 
         Matrix3x2fStack ms = graphics.pose();
 
-        Minecraft mc = Minecraft.getInstance();
         if (identifyMode) {
             if (noWidgetsHovered && mouseY < height - 80) {
                 if (hoveredTooltipItem.isEmpty()) {
@@ -702,7 +705,6 @@ public class PonderUI extends AbstractPonderScreen {
         // Tags
         List<PonderTag> sceneTags = activeScene.getTags();
         boolean highlightAll = sceneTags.stream().anyMatch(tag -> tag.getId() == PonderTag.Highlight.ALL);
-        double s = mc.getWindow().getGuiScale();
         IntStream.range(0, tagButtons.size()).forEach(i -> {
             ms.pushMatrix();
             PonderTag tag = this.tags.get(i);
@@ -728,8 +730,6 @@ public class PonderUI extends AbstractPonderScreen {
 
             float fadedWidth = 200 * chase.getValue(partialTicks);
             UIRenderHelper.streak(graphics, 0, 0, 12, 26, (int) fadedWidth);
-
-            //            graphics.enableScissor(x, 0, (int) fadedWidth, height);
 
             graphics.enableScissor(0, 8, (int) fadedWidth, 8 + height);
             String tagName = tag.getTitle();
@@ -1133,6 +1133,8 @@ public class PonderUI extends AbstractPonderScreen {
     @Override
     public void removed() {
         super.removed();
+        SoundScapes.setInstance(null);
+        minecraft.getSoundManager().tick(false);
         hoveredTooltipItem = ItemStack.EMPTY;
         itemRender.clear();
         for (PonderTag tag : tags) {

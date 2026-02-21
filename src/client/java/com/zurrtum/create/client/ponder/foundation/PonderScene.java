@@ -37,6 +37,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.BlockHitResult;
@@ -84,7 +85,7 @@ public class PonderScene {
     //	private String defaultTitle;
 
     private final WorldSectionElement baseWorldSection;
-    private final Entity renderViewEntity;
+    private final SceneCameraEntity renderViewEntity;
     private Vec3 pointOfInterest;
     @Nullable
     private Vec3 chasingPointOfInterest;
@@ -140,11 +141,7 @@ public class PonderScene {
         scaleFactor = 1;
         yOffset = 0;
 
-        if (world != null) {
-            renderViewEntity = new ArmorStand(world, 0, 0, 0);
-        } else {
-            renderViewEntity = null;
-        }
+        renderViewEntity = SceneCameraEntity.create(world);
 
         setPointOfInterest(new Vec3(0, 4, 0));
     }
@@ -254,15 +251,13 @@ public class PonderScene {
         float pt
     ) {
         ms.pushPose();
-        Entity prevRVE = mc.getCameraEntity();
-
         camera.set(transform.xRotation.getValue(pt) + 90, transform.yRotation.getValue(pt) + 180);
         cameraRenderState.initialized = true;
         cameraRenderState.pos = camera.position();
         cameraRenderState.blockPos = camera.blockPosition();
         cameraRenderState.entityPos = renderViewEntity.getPosition(pt);
         cameraRenderState.orientation.set(camera.rotation());
-        mc.setCameraEntity(renderViewEntity);
+        renderViewEntity.swap(mc);
         BlockEntityRenderDispatcher blockEntityRenderManager = mc.getBlockEntityRenderDispatcher();
         BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
         EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
@@ -281,7 +276,7 @@ public class PonderScene {
                 pt
             )
         );
-        mc.setCameraEntity(prevRVE);
+        renderViewEntity.swap(mc);
 
         for (ChunkSectionLayer type : ChunkSectionLayer.values()) {
             forEachVisible(PonderSceneElement.class, e -> e.renderLayer(world, buffer, type, ms, pt));
@@ -330,7 +325,8 @@ public class PonderScene {
         return pointOfInterest;
     }
 
-    public void tick() {
+    public void tick(Minecraft mc, boolean sound) {
+        renderViewEntity.swap(mc);
         if (chasingPointOfInterest != null) {
             pointOfInterest = VecHelper.lerp(.25f, pointOfInterest, chasingPointOfInterest);
         }
@@ -362,6 +358,10 @@ public class PonderScene {
         if (activeSchedule.isEmpty()) {
             finished = true;
         }
+        if (sound) {
+            mc.getSoundManager().tick(false);
+        }
+        renderViewEntity.swap(mc);
     }
 
     public void clear() {
@@ -370,14 +370,14 @@ public class PonderScene {
         }
     }
 
-    public void seekToTime(int time) {
+    public void seekToTime(Minecraft mc, int time) {
         if (time < currentTime) {
             throw new IllegalStateException("Cannot seek backwards. Rewind first.");
         }
 
         while (currentTime < time && !finished) {
             forEach(e -> e.whileSkipping(this));
-            tick();
+            tick(mc, false);
         }
 
         forEach(WorldSectionElement.class, WorldSectionElement::queueRedraw);
@@ -633,9 +633,7 @@ public class PonderScene {
 
         public void updateSceneRVE(float pt) {
             Vec3 v = screenToScene(width / 2, height / 2, 500, pt);
-            if (renderViewEntity != null) {
-                renderViewEntity.setPosRaw(v.x, v.y, v.z);
-            }
+            renderViewEntity.setPosRaw(v);
         }
 
         public Vec3 screenToScene(double x, double y, int depth, float pt) {
@@ -680,11 +678,52 @@ public class PonderScene {
     }
 
     public static class SceneCamera extends Camera {
-
         public void set(float xRotation, float yRotation) {
             setRotation(yRotation, xRotation);
         }
+    }
 
+    public static class SceneCameraEntity {
+        public void swap(Minecraft mc) {
+        }
+
+        public void setPosRaw(Vec3 v) {
+        }
+
+        public Vec3 getPosition(float pt) {
+            return Vec3.ZERO;
+        }
+
+        public static SceneCameraEntity create(@Nullable Level level) {
+            return level == null ? new SceneCameraEntity() : new SceneCameraEntityImpl(level);
+        }
+
+        private static class SceneCameraEntityImpl extends SceneCameraEntity {
+            private final Entity entity;
+            private @Nullable Entity cameraEntity;
+
+            public SceneCameraEntityImpl(Level level) {
+                entity = new ArmorStand(level, 0, 0, 0);
+                cameraEntity = entity;
+            }
+
+            @Override
+            public void swap(Minecraft mc) {
+                Entity entity = mc.getCameraEntity();
+                mc.setCameraEntity(cameraEntity);
+                cameraEntity = entity;
+            }
+
+            @Override
+            public void setPosRaw(Vec3 v) {
+                entity.setPosRaw(v.x, v.y, v.z);
+            }
+
+            @Override
+            public Vec3 getPosition(float pt) {
+                return entity.getPosition(pt);
+            }
+        }
     }
 
 }
