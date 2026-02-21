@@ -47,8 +47,10 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
         0,
         0
     );
-    public static final AdditionalStackModifier NOT_CONSUMED = (stack, tooltip) -> tooltip.add(CreateLang.translateDirect(
-        "recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD));
+    public static final AdditionalStackModifier NOT_CONSUMED = (stack, tooltip) -> tooltip.add(
+        1,
+        CreateLang.translateDirect("recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD)
+    );
 
     public void placeSlots(SlotDefinition slotDefinition) {
         for (int i = placeViewSlots(slotDefinition), size = getViewType().getSlotCount(); i < size; i++) {
@@ -77,7 +79,7 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
             chance < 0.01 ? "<1" : (int) (chance * 100)
         ).withStyle(ChatFormatting.GOLD);
         slotFillContext.bindOptionalSlot(i, content, CHANCE_SLOT);
-        slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(text));
+        slotFillContext.addAdditionalStackModifier(i, (stack, tooltip) -> tooltip.add(1, text));
     }
 
     @Override

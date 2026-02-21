@@ -63,6 +63,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -103,8 +104,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private static final AllGuiTextures FOOTER = AllGuiTextures.STOCK_KEEPER_REQUEST_FOOTER;
     private static Consumer<String> searchConsumer;
     private static Function<Boolean, @Nullable String> searchSupplier;
-    private static final boolean hasSearchSync = FabricLoader.getInstance()
-        .isModLoaded("jei") || FabricLoader.getInstance().isModLoaded("roughlyenoughitems");
+    private static final boolean hasSearchSync = Util.make(() -> {
+        FabricLoader loader = FabricLoader.getInstance();
+        return loader.isModLoaded("jei") || loader.isModLoaded("roughlyenoughitems") || loader.isModLoaded("eiv");
+    });
 
     StockTickerBlockEntity blockEntity;
     public LerpedFloat itemScroll = LerpedFloat.linear().startWithValue(0);

@@ -19,12 +19,12 @@ public class FanWashingCategory extends CreateCategory {
 
     @Override
     public int getDisplayHeight() {
-        return 61;
+        return 72;
     }
 
     @Override
     public int getSlotCount() {
-        return 3;
+        return 13;
     }
 
     @Override

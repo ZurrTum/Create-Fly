@@ -26,10 +26,11 @@ public class CrushingDisplay extends CreateDisplay {
 
     public CrushingDisplay(RecipeHolder<? extends CreateSingleStackRollableRecipe> entry) {
         CreateSingleStackRollableRecipe recipe = entry.value();
-        int size = recipe.results().size();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
         results = new ArrayList<>(size);
         chances = new ArrayList<>(size);
-        for (ProcessingOutput output : recipe.results()) {
+        for (ProcessingOutput output : outputs) {
             results.add(output.create());
             chances.add(output.chance());
         }

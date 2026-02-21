@@ -25,11 +25,12 @@ public class FanWashingDisplay extends CreateDisplay {
 
     public FanWashingDisplay(RecipeHolder<SplashingRecipe> entry) {
         SplashingRecipe recipe = entry.value();
-        int size = recipe.results().size();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
         results = new ArrayList<>(size);
         chances = new ArrayList<>(size);
-        for (ProcessingOutput output : recipe.results()) {
-            results.add(output.stack());
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
             chances.add(output.chance());
         }
         ingredient = getItemStacks(recipe.ingredient());

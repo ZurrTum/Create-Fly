@@ -16,11 +16,13 @@ import org.joml.Matrix3x2f;
 import java.util.List;
 
 public class PressingView extends CreateView {
-    private final SlotContent result;
+    private final List<SlotContent> results;
+    private final List<Float> chances;
     private final SlotContent ingredient;
 
     public PressingView(PressingDisplay display) {
-        result = SlotContent.of(display.result);
+        results = display.results.stream().map(SlotContent::of).toList();
+        chances = display.chances;
         ingredient = SlotContent.of(display.ingredient);
     }
 
@@ -36,19 +38,32 @@ public class PressingView extends CreateView {
 
     @Override
     public List<SlotContent> getResults() {
-        return List.of(result);
+        return results;
     }
 
     @Override
-    public void placeSlots(SlotDefinition slotDefinition) {
-        slotDefinition.addItemSlot(0, 27, 55);
-        slotDefinition.addItemSlot(1, 131, 55);
+    public int placeViewSlots(SlotDefinition slotDefinition) {
+        int i = 0;
+        for (int size = results.size(); i < size; i++) {
+            slotDefinition.addItemSlot(i, 131 + 19 * i, 55);
+        }
+        slotDefinition.addItemSlot(i++, 27, 55);
+        return i;
     }
 
     @Override
-    public void bindSlots(RecipeViewMenu.SlotFillContext slotFillContext) {
-        slotFillContext.bindOptionalSlot(0, ingredient, SLOT);
-        slotFillContext.bindOptionalSlot(1, result, SLOT);
+    public int bindViewSlots(RecipeViewMenu.SlotFillContext slotFillContext) {
+        int i = 0;
+        for (int size = results.size(); i < size; i++) {
+            float chance = chances.get(i);
+            if (chance == 1) {
+                slotFillContext.bindOptionalSlot(i, results.get(i), SLOT);
+            } else {
+                bindChanceSlot(slotFillContext, i, results.get(i), chance);
+            }
+        }
+        slotFillContext.bindOptionalSlot(i++, ingredient, SLOT);
+        return i;
     }
 
     @Override
