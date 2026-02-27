@@ -102,7 +102,7 @@ public class TrainMigration {
         RecordBuilder<T> map = ops.mapBuilder();
         map.add("Curve", ops.createBoolean(input.curve));
         map.add("Fallback", input.fallback, Vec3d.CODEC);
-        map.add("Curve", ops.createDouble(input.positionOnOldEdge));
+        map.add("Position", ops.createDouble(input.positionOnOldEdge));
         ListBuilder<T> list = ops.listBuilder();
         list.add(TrackNodeLocation.encode(input.locations.getFirst(), ops, empty, dimensions));
         list.add(TrackNodeLocation.encode(input.locations.getSecond(), ops, empty, dimensions));
