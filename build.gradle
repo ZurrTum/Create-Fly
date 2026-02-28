@@ -15,7 +15,7 @@ repositories {
         }
     }
     maven {
-        url "https://oss.zurrtum.com"
+        url "https://maven.squiddev.cc"
         content {
             includeGroup("cc.tweaked")
         }
