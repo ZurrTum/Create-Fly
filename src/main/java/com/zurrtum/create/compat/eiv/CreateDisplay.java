@@ -68,25 +68,33 @@ public abstract class CreateDisplay implements IEivServerRecipe {
         return getItemStacks(ingredient, 1, context);
     }
 
+    public static ItemStack getFirstStack(Ingredient ingredient) {
+        MinecraftServer server = ServerRecipeManager.INSTANCE.getServer();
+        ContextMap context = new ContextMap.Builder().withParameter(SlotDisplayContext.FUEL_VALUES, server.fuelValues())
+            .withParameter(SlotDisplayContext.REGISTRIES, server.registryAccess()).create(SlotDisplayContext.CONTEXT);
+        return ingredient.display().resolveForFirstStack(context);
+    }
+
     private static List<ItemStack> getItemStacks(Ingredient ingredient, int count, ContextMap context) {
         List<ItemStack> stacks = ingredient.display().resolveForStacks(context);
         Optional<TagKey<Item>> value = ingredient.values.unwrap().left();
         if (value.isPresent()) {
             String tag = value.get().location().toString();
             if (count == 1) {
-                for (ItemStack stack : stacks) {
+                stacks = stacks.stream().map(stack -> {
+                    stack = stack.copy();
                     setEivRecipeTag(stack, tag);
-                }
+                    return stack;
+                }).toList();
             } else {
-                for (ItemStack stack : stacks) {
+                stacks = stacks.stream().map(stack -> {
+                    stack = stack.copyWithCount(count);
                     setEivRecipeTag(stack, tag);
-                    stack.setCount(count);
-                }
+                    return stack;
+                }).toList();
             }
         } else if (count != 1) {
-            for (ItemStack stack : stacks) {
-                stack.setCount(count);
-            }
+            stacks = stacks.stream().map(stack -> stack.copyWithCount(count)).toList();
         }
         return stacks;
     }

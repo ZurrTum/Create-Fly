@@ -15,7 +15,6 @@ import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
@@ -131,26 +130,25 @@ public class EivCommonPlugin implements IExtendedItemViewIntegration {
             .forEach(recipes::add);
         preparedRecipes.byType(AllRecipeTypes.FILLING).stream().map(SpoutFillingDisplay::new).forEach(recipes::add);
         SpoutFillingDisplay.registerGenericItem(recipes);
-        RegistryAccess registryManager = ServerRecipeManager.INSTANCE.getServer().registryAccess();
         Collection<RecipeHolder<SmokingRecipe>> smokingRecipes = preparedRecipes.byType(RecipeType.SMOKING);
         Collection<RecipeHolder<SmeltingRecipe>> smeltingRecipes = preparedRecipes.byType(RecipeType.SMELTING);
-        smeltingRecipes.stream().map(entry -> FanBlastingDisplay.of(entry, registryManager, null, smokingRecipes))
+        smeltingRecipes.stream().map(entry -> FanBlastingDisplay.of(entry, null, smokingRecipes))
             .filter(Objects::nonNull).forEach(recipes::add);
         preparedRecipes.byType(RecipeType.BLASTING).stream()
-            .map(entry -> FanBlastingDisplay.of(entry, registryManager, smeltingRecipes, smokingRecipes))
-            .filter(Objects::nonNull).forEach(recipes::add);
+            .map(entry -> FanBlastingDisplay.of(entry, smeltingRecipes, smokingRecipes)).filter(Objects::nonNull)
+            .forEach(recipes::add);
         preparedRecipes.byType(AllRecipeTypes.HAUNTING).stream().map(FanHauntingDisplay::new).forEach(recipes::add);
         preparedRecipes.byType(RecipeType.SMOKING).stream().map(FanSmokingDisplay::new).forEach(recipes::add);
         preparedRecipes.byType(AllRecipeTypes.SPLASHING).stream().map(FanWashingDisplay::new).forEach(recipes::add);
         preparedRecipes.byType(AllRecipeTypes.POTION).stream().map(PotionDisplay::new).forEach(recipes::add);
         MysteriousItemConversionDisplay.register(recipes);
         BlockCuttingDisplay.register(recipes, preparedRecipes);
-        registerToolboxRecipes(recipes, registryManager);
+        registerToolboxRecipes(recipes);
     }
 
-    public static void registerToolboxRecipes(List<IEivServerRecipe> recipes, RegistryAccess registryManager) {
-        HolderSet.Named<Item> entries = registryManager.lookupOrThrow(Registries.ITEM)
-            .getOrThrow(AllItemTags.TOOLBOXES);
+    public static void registerToolboxRecipes(List<IEivServerRecipe> recipes) {
+        HolderSet.Named<Item> entries = ServerRecipeManager.INSTANCE.getServer().registryAccess()
+            .lookupOrThrow(Registries.ITEM).getOrThrow(AllItemTags.TOOLBOXES);
         Ingredient ingredient = Ingredient.of(entries);
         for (DyeColor color : DyeColor.values()) {
             recipes.add(new ShapelessServerRecipe(

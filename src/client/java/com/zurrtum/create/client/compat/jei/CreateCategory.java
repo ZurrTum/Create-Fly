@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.compat.jei;
 
+import com.google.common.base.Suppliers;
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.client.compat.jei.renderer.JunkSlotRenderer;
 import com.zurrtum.create.client.compat.jei.renderer.SlotRenderer;
@@ -15,15 +16,20 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.core.HolderSet;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.world.item.Item;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public abstract class CreateCategory<T> implements IRecipeCategory<T> {
     public static final SlotRenderer EMPTY = new SlotRenderer(null, 18, 18);
@@ -32,33 +38,51 @@ public abstract class CreateCategory<T> implements IRecipeCategory<T> {
     public static final PotionTooltip POTION = new PotionTooltip();
     public static final KeepHeldTooltip KEEP_HELD = new KeepHeldTooltip();
 
-    public static List<ItemStack> getStacks(SizedIngredient ingredient) {
-        int count = ingredient.getCount();
-        return ingredient.getIngredient().values.stream().map(entry -> new ItemStack(entry, count)).toList();
+    public static ContextMap createIngredientContext() {
+        return SlotDisplayContext.fromLevel(Objects.requireNonNull(Minecraft.getInstance().level));
     }
 
-    public static List<ItemStack> getStacks(Ingredient ingredient) {
-        return ingredient.values.stream().map(ItemStack::new).toList();
+    public static List<ItemStack> getStacks(SizedIngredient sizedIngredient, Supplier<ContextMap> context) {
+        int count = sizedIngredient.getCount();
+        Ingredient ingredient = sizedIngredient.getIngredient();
+        if (count == 1) {
+            return getStacks(ingredient, context);
+        }
+        CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
+        if (customIngredient == null) {
+            return ingredient.values.stream().map(entry -> new ItemStack(entry, count)).toList();
+        }
+        return customIngredient.toDisplay().resolveForStacks(context.get()).stream()
+            .map(stack -> stack.copyWithCount(stack.getCount() * count)).toList();
+    }
+
+    public static List<ItemStack> getStacks(Ingredient ingredient, Supplier<ContextMap> context) {
+        CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
+        if (customIngredient == null) {
+            return ingredient.values.stream().map(ItemStack::new).toList();
+        }
+        return customIngredient.toDisplay().resolveForStacks(context.get());
     }
 
     public static List<List<ItemStack>> condenseIngredients(List<Ingredient> ingredients) {
         List<ItemStack> cache = new ArrayList<>();
         List<List<ItemStack>> result = new ArrayList<>();
+        Supplier<ContextMap> context = Suppliers.memoize(CreateCategory::createIngredientContext);
         Find:
         for (Ingredient ingredient : ingredients) {
-            HolderSet<Item> entries = ingredient.values;
-            if (entries.size() != 1) {
-                result.add(getStacks(ingredient));
+            List<ItemStack> stacks = getStacks(ingredient, context);
+            if (stacks.size() != 1) {
+                result.add(stacks);
                 continue;
             }
-            Item item = entries.get(0).value();
+            ItemStack stack = stacks.getFirst();
             for (ItemStack target : cache) {
-                if (target.is(item)) {
+                if (ItemStack.isSameItemSameComponents(target, stack)) {
                     target.grow(1);
                     continue Find;
                 }
             }
-            ItemStack stack = item.getDefaultInstance();
+            stack = stack.copy();
             cache.add(stack);
             result.add(List.of(stack));
         }

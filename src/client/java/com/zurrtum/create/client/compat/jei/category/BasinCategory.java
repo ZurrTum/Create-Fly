@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.compat.jei.category;
 
+import com.google.common.base.Suppliers;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.jei.CreateCategory;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
@@ -15,10 +16,12 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class BasinCategory<T extends BasinRecipe> extends CreateCategory<RecipeHolder<T>> {
     @Override
@@ -33,9 +36,10 @@ public abstract class BasinCategory<T extends BasinRecipe> extends CreateCategor
         int xOffset = size < 3 ? 12 + (3 - size) * 19 / 2 : 12;
         int yOffset = size <= 9 ? 51 : 60;
         int i = 0;
+        Supplier<ContextMap> context = Suppliers.memoize(CreateCategory::createIngredientContext);
         for (SizedIngredient ingredient : ingredients) {
             builder.addInputSlot(xOffset + (i % 3) * 19, yOffset - (i / 3) * 19).setBackground(SLOT, -1, -1)
-                .addItemStacks(getStacks(ingredient));
+                .addItemStacks(getStacks(ingredient, context));
             i++;
         }
         for (FluidIngredient fluidIngredient : fluidIngredients) {

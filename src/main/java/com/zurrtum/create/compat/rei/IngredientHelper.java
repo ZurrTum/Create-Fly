@@ -1,10 +1,11 @@
 package com.zurrtum.create.compat.rei;
 
-import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.google.common.base.Suppliers;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.utils.GameInstance;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.EntryDefinition;
@@ -12,15 +13,17 @@ import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
-import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public interface IngredientHelper {
@@ -65,14 +68,9 @@ public interface IngredientHelper {
 
     static Stream<EntryIngredient> getSizedIngredientStream(List<SizedIngredient> ingredients) {
         Stream.Builder<EntryIngredient> results = Stream.builder();
-        EntryDefinition<ItemStack> definition = VanillaEntryTypes.ITEM.getDefinition();
-        int size = ingredients.size();
-        for (SizedIngredient ingredient : ingredients) {
-            EntryIngredient.Builder builder = EntryIngredient.builder(size);
-            ingredient.getIngredient().values.forEach(stack -> {
-                builder.add(EntryStack.of(definition, new ItemStack(stack, ingredient.getCount())));
-            });
-            results.add(builder.build());
+        Supplier<ContextMap> context = Suppliers.memoize(IngredientHelper::createIngredientContext);
+        for (SizedIngredient sizedIngredient : ingredients) {
+            results.add(getInputEntryIngredient(sizedIngredient, context));
         }
         return results.build();
     }
@@ -81,27 +79,38 @@ public interface IngredientHelper {
         return Stream.concat(first, second).toList();
     }
 
-    static EntryIngredient getInputEntryIngredient(Ingredient ingredient) {
+    static ContextMap createIngredientContext() {
+        MinecraftServer server = GameInstance.getServer();
+        return new ContextMap.Builder().withParameter(SlotDisplayContext.FUEL_VALUES, server.fuelValues())
+            .withParameter(SlotDisplayContext.REGISTRIES, server.registryAccess()).create(SlotDisplayContext.CONTEXT);
+    }
+
+    static EntryIngredient getInputEntryIngredient(SizedIngredient sizedIngredient, Supplier<ContextMap> context) {
+        int count = sizedIngredient.getCount();
+        Ingredient ingredient = sizedIngredient.getIngredient();
+        if (count == 1) {
+            return getInputEntryIngredient(ingredient, context);
+        }
         CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
-        if (customIngredient instanceof ComponentsIngredient) {
-            EntryDefinition<ItemStack> definition = VanillaEntryTypes.ITEM.getDefinition();
-            List<SlotDisplay> contents = ((SlotDisplay.Composite) customIngredient.toDisplay()).contents();
-            EntryIngredient.Builder builder = EntryIngredient.builder(contents.size());
-            for (SlotDisplay content : contents) {
-                SlotDisplay.ItemStackSlotDisplay display = (SlotDisplay.ItemStackSlotDisplay) content;
-                builder.add(EntryStack.of(definition, display.stack()));
-            }
-            return builder.build();
+        List<ItemStack> stacks;
+        if (customIngredient == null) {
+            stacks = ingredient.values.stream().map(entry -> new ItemStack(entry, count)).toList();
         } else {
+            stacks = customIngredient.toDisplay().resolveForStacks(context.get()).stream()
+                .map(stack -> stack.copyWithCount(stack.getCount() * count)).toList();
+        }
+        return EntryIngredients.ofItemStacks(stacks);
+    }
+
+    static EntryIngredient getInputEntryIngredient(Ingredient ingredient, Supplier<ContextMap> context) {
+        CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
+        if (customIngredient == null) {
             return EntryIngredients.ofIngredient(ingredient);
         }
+        return EntryIngredients.ofItemStacks(customIngredient.toDisplay().resolveForStacks(context.get()));
     }
 
-    static List<EntryIngredient> getOutputEntryIngredients(List<ProcessingOutput> outputs) {
-        return outputs.stream().map(output -> EntryIngredients.of(output.create())).toList();
-    }
-
-    static List<Float> getOutputChances(List<ProcessingOutput> outputs) {
-        return outputs.stream().map(ProcessingOutput::chance).toList();
+    static EntryIngredient getInputEntryIngredient(Ingredient ingredient) {
+        return getInputEntryIngredient(ingredient, IngredientHelper::createIngredientContext);
     }
 }

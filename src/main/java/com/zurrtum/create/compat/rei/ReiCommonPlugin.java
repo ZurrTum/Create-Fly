@@ -2,7 +2,6 @@ package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.Create;
 import com.zurrtum.create.compat.rei.display.*;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.fluids.transfer.EmptyingRecipe;
@@ -20,6 +19,7 @@ import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
+import dev.architectury.utils.GameInstance;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
 import me.shedaniel.rei.api.common.entry.comparison.FluidComparatorRegistry;
@@ -120,7 +120,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(SmokingRecipe.class).fill(FanSmokingDisplay::of);
         registry.beginRecipeFiller(SplashingRecipe.class).fill(FanWashingDisplay::new);
         registry.beginRecipeFiller(PotionRecipe.class).fill(PotionDisplay::new);
-        if (Create.SERVER != null) {
+        if (GameInstance.getServer() != null) {
             BlockCuttingDisplay.register(registry);
         }
     }

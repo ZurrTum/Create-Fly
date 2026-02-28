@@ -8,6 +8,7 @@ import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.core.HolderSet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -39,6 +40,9 @@ public class BlockCuttingDisplay extends CreateDisplay {
             }
 
             public int hashCode(Ingredient ingredient) {
+                if (((FabricIngredient) ingredient).getCustomIngredient() != null) {
+                    return ingredient.hashCode();
+                }
                 if (ingredient.values instanceof HolderSet.Direct<Item> direct) {
                     return direct.hashCode();
                 }

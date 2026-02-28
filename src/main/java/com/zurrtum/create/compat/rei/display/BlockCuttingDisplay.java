@@ -2,9 +2,9 @@ package com.zurrtum.create.compat.rei.display;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
+import dev.architectury.utils.GameInstance;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
@@ -15,6 +15,7 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -57,6 +58,9 @@ public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> o
                 }
 
                 public int hashCode(Ingredient ingredient) {
+                    if (((FabricIngredient) ingredient).getCustomIngredient() != null) {
+                        return ingredient.hashCode();
+                    }
                     if (ingredient.values instanceof HolderSet.Direct<Item> direct) {
                         return direct.hashCode();
                     }
@@ -66,7 +70,8 @@ public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> o
                     return ingredient.hashCode();
                 }
             });
-        for (RecipeHolder<StonecutterRecipe> entry : Create.SERVER.getRecipeManager().recipes.byType(RecipeType.STONECUTTING)) {
+        for (RecipeHolder<StonecutterRecipe> entry : GameInstance.getServer().getRecipeManager().recipes.byType(
+            RecipeType.STONECUTTING)) {
             if (AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
                 continue;
             }
