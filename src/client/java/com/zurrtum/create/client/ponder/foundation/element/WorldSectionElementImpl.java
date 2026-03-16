@@ -11,11 +11,8 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.client.render.model.BakedModelBufferer;
 import com.zurrtum.create.client.catnip.client.render.model.ShadeSeparatedResultConsumer;
 import com.zurrtum.create.client.catnip.outliner.AABBOutline;
-import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.catnip.render.SuperByteBufferBuilder;
-import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
+import com.zurrtum.create.client.catnip.render.*;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache.Compartment;
-import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
 import com.zurrtum.create.client.compat.sodium.SodiumCompat;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.ponder.Ponder;
@@ -531,6 +528,11 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             }
 
             add(data, shaded);
+        }
+
+        @Override
+        public SuperByteBuffer build() {
+            return new ShadeSeparatingSuperByteBuffer(mesh.toImmutable(), shadeSwapVertices.toIntArray(), true);
         }
     }
 
