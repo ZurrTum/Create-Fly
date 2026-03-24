@@ -51,7 +51,7 @@ public class GenericItemEmptying {
                     stack.shrink(1);
                 }
                 EmptyingRecipe emptyingRecipe = recipe.get().value();
-                return Pair.of(emptyingRecipe.fluidResult(), emptyingRecipe.result());
+                return Pair.of(emptyingRecipe.fluidResult(), emptyingRecipe.result().copy());
             }
         } else {
             //TODO
