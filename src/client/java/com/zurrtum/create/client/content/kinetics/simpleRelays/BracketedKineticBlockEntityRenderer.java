@@ -41,6 +41,9 @@ public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRende
     ) {
         state.large = be.getBlockState().is(AllBlocks.LARGE_COGWHEEL);
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        if (state.support) {
+            return;
+        }
         if (state.large) {
             state.shaft = CachedBuffers.partialFacingVertical(
                 AllPartialModels.COGWHEEL_SHAFT,
