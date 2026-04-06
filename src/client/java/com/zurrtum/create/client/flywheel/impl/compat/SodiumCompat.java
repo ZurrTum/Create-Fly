@@ -29,34 +29,21 @@ public final class SodiumCompat {
             return null;
         }
 
-        //        if (oldVisualizer == null && newVisualizer != null) {
-        //            if (predicate != null) {
-        //                throw new IllegalArgumentException("Sodium predicate must be null when old visualizer is null");
-        //            }
-        //
-        //            return Internals.addPredicate(type);
-        //        } else if (oldVisualizer != null && newVisualizer == null) {
-        //            if (predicate == null) {
-        //                throw new IllegalArgumentException("Sodium predicate must not be null when old visualizer is not null");
-        //            }
-        //
-        //            Internals.removePredicate(type, predicate);
-        //            return null;
-        //        }
-        //
-        //        return predicate;
-        return null;
-    }
+        if (oldVisualizer == null && newVisualizer != null) {
+            if (predicate != null) {
+                throw new IllegalArgumentException("Sodium predicate must be null when old visualizer is null");
+            }
 
-    //    private static final class Internals {
-    //        static <T extends BlockEntity> Object addPredicate(BlockEntityType<T> type) {
-    //            BlockEntityRenderPredicate<T> predicate = (getter, pos, be) -> !VisualizationHelper.tryAddBlockEntity(be);
-    //            BlockEntityRenderHandler.instance().addRenderPredicate(type, predicate);
-    //            return predicate;
-    //        }
-    //
-    //        static <T extends BlockEntity> void removePredicate(BlockEntityType<T> type, Object predicate) {
-    //            BlockEntityRenderHandler.instance().removeRenderPredicate(type, (BlockEntityRenderPredicate<T>) predicate);
-    //        }
-    //    }
+            return SodiumCompatInternals.addPredicate(type);
+        } else if (oldVisualizer != null && newVisualizer == null) {
+            if (predicate == null) {
+                throw new IllegalArgumentException("Sodium predicate must not be null when old visualizer is not null");
+            }
+
+            SodiumCompatInternals.removePredicate(type, predicate);
+            return null;
+        }
+
+        return predicate;
+    }
 }
