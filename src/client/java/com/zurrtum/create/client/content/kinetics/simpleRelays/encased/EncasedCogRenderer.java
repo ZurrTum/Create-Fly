@@ -48,6 +48,9 @@ public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKinetic
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        if (state.support) {
+            return;
+        }
         state.shaftAngle = large ? BracketedKineticBlockEntityRenderer.getAngleForLargeCogShaft(
             be,
             state.axis

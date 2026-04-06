@@ -35,6 +35,9 @@ public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEn
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        if (state.support) {
+            return;
+        }
         BlockState blockState = be.getBlockState();
         state.wheel = CachedBuffers.partialFacingVertical(AllPartialModels.FLYWHEEL, blockState, state.direction);
         float speed = be.visualSpeed.getValue(tickProgress) * 3 / 10f;
