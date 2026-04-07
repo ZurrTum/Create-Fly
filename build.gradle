@@ -79,9 +79,7 @@ sourceSets {
             exclude 'com/zurrtum/create/client/compat/eiv/**'
             exclude 'com/zurrtum/create/client/compat/sodium/**'
             exclude 'com/zurrtum/create/client/compat/trinkets/**'
-            exclude 'com/zurrtum/create/client/flywheel/impl/compat/SodiumCompat.java'
-            exclude 'com/zurrtum/create/client/flywheel/impl/compat/SodiumCompatInternals.java'
-            exclude 'com/zurrtum/create/client/mixin/BlockEntityTypeMixin.java'
+
             exclude 'com/zurrtum/create/client/mixin/FabricModelAccessMixin.java'
             exclude 'com/zurrtum/create/client/mixin/IrisPipelinesMixin.java'
             exclude 'com/zurrtum/create/client/mixin/HoldMyItemsMixin.java'
