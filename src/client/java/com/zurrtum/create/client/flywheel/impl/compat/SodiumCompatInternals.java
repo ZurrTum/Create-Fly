@@ -31,8 +31,8 @@ final class SodiumCompatInternals {
             handler = handlerClass.getMethod("instance").invoke(null);
             addPredicate = handlerClass.getMethod("addRenderPredicate", BlockEntityType.class, predicateClass);
             removePredicate = handlerClass.getMethod("removeRenderPredicate", BlockEntityType.class, predicateClass);
-        } catch (ReflectiveOperationException e) {
-            // Sodium API structure has changed; Sodium integration will be unavailable
+        } catch (ReflectiveOperationException | LinkageError e) {
+            // Sodium API structure has changed or classes could not be linked; Sodium integration will be unavailable
             FlwImpl.LOGGER.debug("Could not initialize Sodium block entity render integration", e);
         }
         PREDICATE_CLASS = predicateClass;
