@@ -36,10 +36,6 @@ public final class SodiumCompat {
 
             return SodiumCompatInternals.addPredicate(type);
         } else if (oldVisualizer != null && newVisualizer == null) {
-            if (predicate == null) {
-                throw new IllegalArgumentException("Sodium predicate must not be null when old visualizer is not null");
-            }
-
             SodiumCompatInternals.removePredicate(type, predicate);
             return null;
         }
