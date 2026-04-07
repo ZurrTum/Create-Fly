@@ -83,7 +83,8 @@ final class SodiumCompatInternals {
         }
         try {
             REMOVE_PREDICATE.invoke(HANDLER, type, predicate);
-        } catch (ReflectiveOperationException ignored) {
+        } catch (ReflectiveOperationException e) {
+            FlwImpl.LOGGER.debug("Could not unregister Sodium block entity render predicate for {}", type, e);
         }
     }
 }
