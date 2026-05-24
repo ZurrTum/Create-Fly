@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -90,5 +92,15 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        if (!mixinClassName.endsWith(".EditBoxFinalMethodMixin")) {
+            return;
+        }
+
+        for (MethodNode method : targetClass.methods) {
+            if (method.name.equals("onValueChange") && method.desc.equals("(Ljava/lang/String;)V")) {
+                method.access &= ~Opcodes.ACC_FINAL;
+                return;
+            }
+        }
     }
 }

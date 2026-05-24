@@ -23,6 +23,7 @@
     "EntityFluidInteractionMixin",
     "EntityMixin",
     "EntityTypeMixin",
+    "EditBoxFinalMethodMixin",
     "FeatureRenderDispatcherMixin",
     "FluidStateModelSetMixin",
     "FlywheelLevelRendererMixin",
