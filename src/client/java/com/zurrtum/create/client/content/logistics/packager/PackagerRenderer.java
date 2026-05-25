@@ -64,7 +64,7 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
             state.blockPos = be.getBlockPos();
             state.blockEntityType = be.getType();
             state.lightCoords = SmartBlockEntityRenderer.getLightCoords(level, state.blockPos);
-            Direction facing = state.blockState.getValue(PackagerBlock.FACING).getOpposite();
+            Direction facing = be.getBlockState().getValue(PackagerBlock.FACING).getOpposite();
             state.trayOffset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(be.getTrayOffset(tickProgress));
             state.trayYRot = getYRotateAngle(facing.toYRot());
             ItemStackRenderState item = state.item = new ItemStackRenderState();
