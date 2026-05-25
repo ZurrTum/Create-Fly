@@ -64,10 +64,16 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
         float itemPosition = be.itemPosition.getValue(tickProgress);
-        if (itemPosition > 0.5f && state.blockState.getValue(ChuteBlock.SHAPE) != Shape.WINDOW) {
+        BlockState blockState = be.getBlockState();
+        if (itemPosition > 0.5f && blockState.getValue(ChuteBlock.SHAPE) != Shape.WINDOW) {
             return;
         }
-        Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
+        Level level = be.getLevel();
+        state.blockPos = be.getBlockPos();
+        state.blockState = blockState;
+        state.blockEntityType = be.getType();
+        state.lightCoords = SmartBlockEntityRenderer.getLightCoords(level, state.blockPos);
+        state.breakProgress = crumblingOverlay;
         state.item = ChuteItemRenderState.create(itemModelManager, be.getItem(), itemPosition, level);
     }
 
