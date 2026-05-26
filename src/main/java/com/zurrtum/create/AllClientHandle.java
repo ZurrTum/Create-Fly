@@ -123,7 +123,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onFluidSplash(FluidSplashPacket packet) {
+    public void onFluidSplash(ClientGamePacketListener listener, FluidSplashPacket packet) {
         warn();
     }
 

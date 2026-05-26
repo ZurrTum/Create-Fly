@@ -23,7 +23,7 @@ public record FluidSplashPacket(BlockPos pos, Fluid fluid) implements Packet<Cli
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onFluidSplash(this);
+        AllClientHandle.INSTANCE.onFluidSplash(listener, this);
     }
 
     @Override

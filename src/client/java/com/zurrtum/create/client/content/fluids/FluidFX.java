@@ -5,7 +5,6 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -19,16 +18,13 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 
 public class FluidFX {
-
-    static RandomSource r = RandomSource.create();
-
-    public static void splash(BlockPos pos, Fluid fluid) {
+    public static void splash(Level level, BlockPos pos, Fluid fluid) {
         if (fluid == Fluids.EMPTY) {
             return;
         }
 
         FluidState defaultState = fluid.defaultFluidState();
-        if (defaultState == null || defaultState.isEmpty()) {
+        if (defaultState.isEmpty()) {
             return;
         }
 
@@ -38,9 +34,10 @@ public class FluidFX {
         );
         Vec3 center = VecHelper.getCenterOf(pos);
 
+        RandomSource random = level.getRandom();
         for (int i = 0; i < 20; i++) {
-            Vec3 v = VecHelper.offsetRandomly(Vec3.ZERO, r, .25f);
-            particle(blockParticleData, center.add(v), v);
+            Vec3 v = VecHelper.offsetRandomly(Vec3.ZERO, random, .25f);
+            particle(level, blockParticleData, center.add(v), v);
         }
 
     }
@@ -75,11 +72,12 @@ public class FluidFX {
         ParticleOptions particle,
         float rimRadius
     ) {
+        RandomSource random = world.getRandom();
         Vec3 directionVec = Vec3.atLowerCornerOf(side.getUnitVec3i());
         for (int i = 0; i < amount; i++) {
-            Vec3 vec = VecHelper.offsetRandomly(Vec3.ZERO, r, 1).normalize();
+            Vec3 vec = VecHelper.offsetRandomly(Vec3.ZERO, random, 1).normalize();
             vec = VecHelper.clampComponentWise(vec, rimRadius).multiply(VecHelper.axisAlingedPlaneOf(directionVec))
-                .add(directionVec.scale(.45 + r.nextFloat() / 16f));
+                .add(directionVec.scale(.45 + random.nextFloat() / 16f));
             Vec3 m = vec.scale(.05f);
             vec = vec.add(VecHelper.getCenterOf(pos));
 
@@ -96,10 +94,11 @@ public class FluidFX {
         Vec3 directionVec,
         boolean inbound
     ) {
+        RandomSource random = world.getRandom();
         for (int i = 0; i < amount; i++) {
-            Vec3 vec = VecHelper.offsetRandomly(Vec3.ZERO, r, rimRadius * .75f);
+            Vec3 vec = VecHelper.offsetRandomly(Vec3.ZERO, random, rimRadius * .75f);
             vec = vec.multiply(VecHelper.axisAlingedPlaneOf(directionVec))
-                .add(directionVec.scale(.5 + r.nextFloat() / 4f));
+                .add(directionVec.scale(.5 + random.nextFloat() / 4f));
             Vec3 m = vec.scale(1 / 4f);
             Vec3 centerOf = VecHelper.getCenterOf(pos);
             vec = vec.add(centerOf);
@@ -111,12 +110,7 @@ public class FluidFX {
         }
     }
 
-    private static void particle(ParticleOptions data, Vec3 pos, Vec3 motion) {
-        world().addParticle(data, pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
+    private static void particle(Level level, ParticleOptions data, Vec3 pos, Vec3 motion) {
+        level.addParticle(data, pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
     }
-
-    private static Level world() {
-        return Minecraft.getInstance().level;
-    }
-
 }

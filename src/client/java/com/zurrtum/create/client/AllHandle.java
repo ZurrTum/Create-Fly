@@ -439,12 +439,14 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onFluidSplash(FluidSplashPacket packet) {
+    public void onFluidSplash(ClientGamePacketListener listener, FluidSplashPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         BlockPos pos = packet.pos();
-        if (Minecraft.getInstance().player.position().distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ())) > 100) {
+        if (mc.player.position().distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ())) > 100) {
             return;
         }
-        FluidFX.splash(pos, packet.fluid());
+        FluidFX.splash(mc.level, pos, packet.fluid());
     }
 
     @Override
