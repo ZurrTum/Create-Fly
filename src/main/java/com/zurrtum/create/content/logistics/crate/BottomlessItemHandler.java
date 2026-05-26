@@ -28,16 +28,23 @@ public class BottomlessItemHandler implements ItemInventory {
 
     @Override
     public void setItem(int slot, ItemStack stack) {
+        if (slot == 0 && stack == ItemStack.EMPTY) {
+            stack = suppliedItemStack.get();
+            if (stack != ItemStack.EMPTY) {
+                this.stack = stack.copy();
+            }
+        }
     }
 
     @Override
     public void setChanged() {
         ItemStack stack = suppliedItemStack.get();
-        int max = stack.getMaxStackSize();
-        if (stack == ItemStack.EMPTY || this.stack.is(stack.getItem())) {
-            this.stack.setCount(max);
+        if (stack == ItemStack.EMPTY) {
+            this.stack = ItemStack.EMPTY;
+        } else if (ItemStack.isSameItemSameComponents(this.stack, stack)) {
+            this.stack.setCount(stack.getMaxStackSize());
         } else {
-            this.stack = stack.copyWithCount(max);
+            this.stack = stack.copyWithCount(stack.getMaxStackSize());
         }
     }
 }

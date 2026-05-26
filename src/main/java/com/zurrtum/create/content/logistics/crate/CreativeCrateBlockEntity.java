@@ -7,10 +7,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
 public class CreativeCrateBlockEntity extends CrateBlockEntity implements Clearable {
+    @UnknownNullability
     ServerFilteringBehaviour filtering;
     public BottomlessItemHandler inv;
 
@@ -22,6 +25,12 @@ public class CreativeCrateBlockEntity extends CrateBlockEntity implements Cleara
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(filtering = new ServerFilteringBehaviour(this));
+    }
+
+    @Override
+    protected void read(ValueInput view, boolean clientPacket) {
+        super.read(view, clientPacket);
+        inv.setChanged();
     }
 
     @Override
