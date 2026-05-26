@@ -581,31 +581,34 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
                 }
                 packages.add(createBox(extract == stack.getCount() ? stack : stack.copyWithCount(extract)));
             }
-            int end = packages.size() - 1;
-            for (int i = 0; i < end; i++) {
-                stack = packages.get(i);
+            int size = packages.size();
+            if (size != 0) {
+                int end = size - 1;
+                for (int i = 0; i < end; i++) {
+                    stack = packages.get(i);
+                    PackageItem.setOrder(
+                        stack,
+                        fixedOrderId,
+                        linkIndexInOrder,
+                        finalLinkInOrder,
+                        packageIndexAtLink++,
+                        false,
+                        orderContext
+                    );
+                    queuePackage(stack, fixedAddress);
+                }
+                stack = packages.get(end);
                 PackageItem.setOrder(
                     stack,
                     fixedOrderId,
                     linkIndexInOrder,
                     finalLinkInOrder,
-                    packageIndexAtLink++,
-                    false,
+                    packageIndexAtLink,
+                    true,
                     orderContext
                 );
                 queuePackage(stack, fixedAddress);
             }
-            stack = packages.get(end);
-            PackageItem.setOrder(
-                stack,
-                fixedOrderId,
-                linkIndexInOrder,
-                finalLinkInOrder,
-                packageIndexAtLink,
-                true,
-                orderContext
-            );
-            queuePackage(stack, fixedAddress);
             if (nextRequest == null) {
                 break;
             }
