@@ -255,6 +255,7 @@ extendable method net/minecraft/client/gui/screens/Screen init (II)V
 extendable method net/minecraft/network/protocol/game/ClientboundAddEntityPacket write (Lnet/minecraft/network/RegistryFriendlyByteBuf;)V
 extendable method net/minecraft/world/entity/Entity isLocalInstanceAuthoritative ()Z
 extendable method net/minecraft/world/entity/Entity moveOrInterpolateTo (Lnet/minecraft/world/phys/Vec3;FF)V
+extendable method net/minecraft/client/gui/components/EditBox onValueChange (Ljava/lang/String;)V
 mutable field net/minecraft/client/KeyMapping defaultKey Lcom/mojang/blaze3d/platform/InputConstants$Key;
 mutable field net/minecraft/client/particle/QuadParticleGroup particleTypeRenderState Lnet/minecraft/client/renderer/state/level/QuadParticleRenderState;
 mutable field net/minecraft/world/entity/item/ItemEntity bobOffs F
