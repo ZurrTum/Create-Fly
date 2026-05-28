@@ -13,7 +13,7 @@ repositories {
         }
     }
     maven {
-        url "https://oss.zurrtum.com"
+        url "https://maven.squiddev.cc"
         content {
             includeGroup("cc.tweaked")
         }
@@ -60,14 +60,9 @@ loom {
 sourceSets {
     main {
         java {
-            exclude 'com/zurrtum/create/compat/computercraft/implementation/**'
-            exclude 'com/zurrtum/create/compat/computercraft/AllComputerDisplaySource.java'
-            exclude 'com/zurrtum/create/compat/computercraft/AllComputerPeripherals.java'
-            exclude 'com/zurrtum/create/compat/CompatMod.java'
             exclude 'com/zurrtum/create/compat/rei/**'
             exclude 'com/zurrtum/create/compat/eiv/**'
             exclude 'com/zurrtum/create/compat/trinkets/**'
-            exclude 'com/zurrtum/create/mixin/CreateIntegrationMixin.java'
             exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
             exclude 'com/zurrtum/create/mixin/JustEnoughItemsMixin.java'
         }
@@ -111,6 +106,7 @@ dependencies {
         compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-resource-loader-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-block-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-registry-sync-v0", project.fabric_version)
         clientCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
         clientCompileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
     } else {
@@ -122,7 +118,7 @@ dependencies {
 //    }
 //    modCompileOnly "maven.modrinth:jei:${project.jei_version}"
 //    modCompileOnly "maven.modrinth:eiv:${project.eiv_version}"
-//    modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
+    compileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
 //    modCompileOnly "maven.modrinth:trinkets-canary:${project.trinkets_version}"
 //    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
     clientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"

@@ -18,9 +18,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
         mixins = new ArrayList<>();
         FabricLoader loader = FabricLoader.getInstance();
         Create.Lazy = loader.isModLoaded("fabric-api");
-        //        if (FabricLoader.getInstance().isModLoaded("computercraft")) {
-        //            mixins.add("CreateIntegrationMixin");
-        //        }
         //        if (FabricLoader.getInstance().isModLoaded("architectury")) {
         //            mixins.add("ArchitecturyMixin");
         //        }
