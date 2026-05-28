@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -27,7 +28,7 @@ public interface IPlacementHelper {
     /**
      * used as an identifier in SuperGlueHandler to skip blocks placed by helpers
      */
-    BlockState ID = new BlockState(Blocks.AIR, null, null);
+    BlockState ID = new BlockState(Blocks.AIR, new Property[0], new Comparable[0]);
 
     /**
      * @return a predicate that gets tested with the items held in the players hands<br>
