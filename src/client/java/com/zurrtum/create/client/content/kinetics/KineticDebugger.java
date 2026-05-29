@@ -63,7 +63,11 @@ public class KineticDebugger {
     }
 
     public static boolean isF3DebugModeActive() {
-        return Minecraft.getInstance().getDebugOverlay().showDebugScreen();
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.debugEntries.isOverlayVisible()) {
+            return !mc.options.hideGui || mc.screen != null;
+        }
+        return false;
     }
 
     @Nullable
