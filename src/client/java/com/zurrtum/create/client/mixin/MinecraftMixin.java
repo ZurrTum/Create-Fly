@@ -70,6 +70,7 @@ import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
+import com.zurrtum.create.content.equipment.zapper.ZapperItem;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
 import com.zurrtum.create.content.redstone.link.controller.LinkedControllerItem;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
@@ -84,6 +85,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -271,8 +273,10 @@ public abstract class MinecraftMixin {
     }
 
     @Inject(method = "startAttack()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
-    private void missingAttack(CallbackInfoReturnable<Boolean> cir) {
-        player.connection.send(AllPackets.LEFT_CLICK);
+    private void missingAttack(CallbackInfoReturnable<Boolean> cir, @Local ItemStack heldItem) {
+        if (heldItem.getItem() instanceof ZapperItem) {
+            player.connection.send(AllPackets.LEFT_CLICK);
+        }
     }
 
     @Inject(method = "setLevel(Lnet/minecraft/client/multiplayer/ClientLevel;)V", at = @At("HEAD"))
