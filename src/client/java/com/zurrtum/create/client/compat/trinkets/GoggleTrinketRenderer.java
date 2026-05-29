@@ -3,10 +3,9 @@ package com.zurrtum.create.client.compat.trinkets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllItems;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.TrinketInventory;
-import dev.emi.trinkets.api.client.TrinketRenderer;
-import dev.emi.trinkets.api.client.TrinketRendererRegistry;
+import eu.pb4.trinkets.api.TrinketSlotAccess;
+import eu.pb4.trinkets.api.client.TrinketRenderer;
+import eu.pb4.trinkets.api.client.TrinketRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.player.PlayerModel;
@@ -24,16 +23,16 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
     }
 
     @Override
-    public void render(
+    public void submit(
         ItemStack stack,
-        SlotReference slotReference,
+        TrinketSlotAccess slotReference,
         EntityModel<? extends LivingEntityRenderState> contextModel,
         PoseStack matrices,
         SubmitNodeCollector queue,
         int light,
         LivingEntityRenderState state,
-        float headYaw,
-        float headPitch
+        float limbAngle,
+        float limbDistance
     ) {
         if (stack.is(AllItems.GOGGLES) && contextModel instanceof PlayerModel entityModel) {
             matrices.pushPose();
@@ -42,7 +41,7 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
             matrices.translate(0.0F, -0.25F, 0.0F);
             matrices.mulPose(Axis.YP.rotationDegrees(180.0F));
             matrices.scale(0.625F, -0.625F, -0.625F);
-            if (headOccupied((AvatarRenderState) state, slotReference)) {
+            if (!((AvatarRenderState) state).headEquipment.isEmpty()) {
                 matrices.mulPose(Axis.ZP.rotationDegrees(180.0F));
                 matrices.translate(0.0F, -0.25F, 0.0F);
             }
@@ -53,13 +52,5 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
             item.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
             matrices.popPose();
         }
-    }
-
-    public static boolean headOccupied(AvatarRenderState state, SlotReference slotReference) {
-        if (!state.headEquipment.isEmpty()) {
-            return true;
-        }
-        TrinketInventory inv = slotReference.inventory().getComponent().getInventory().get("head").get("hat");
-        return inv != null && !inv.isEmpty();
     }
 }
