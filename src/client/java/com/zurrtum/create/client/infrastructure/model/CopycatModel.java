@@ -79,11 +79,10 @@ public abstract class CopycatModel extends WrapperBlockStateModel {
 
     @Override
     public Material.Baked particleMaterialWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state) {
-        CopycatBlockEntity copycat = (CopycatBlockEntity) world.getBlockEntity(pos);
-        if (copycat == null) {
-            return model.particleMaterial();
+        if (world.getBlockEntity(pos) instanceof CopycatBlockEntity copycat) {
+            return getModelOf(copycat.getMaterial()).particleMaterial();
         }
-        return getModelOf(copycat.getMaterial()).particleMaterial();
+        return model.particleMaterial();
     }
 
     protected void addModelParts(
