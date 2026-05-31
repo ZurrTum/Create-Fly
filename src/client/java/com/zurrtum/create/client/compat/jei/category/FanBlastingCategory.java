@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.compat.jei.category;
 
+import com.google.common.base.Suppliers;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.client.compat.jei.CreateCategory;
@@ -13,33 +14,38 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.material.Fluids;
 import org.joml.Matrix3x2f;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class FanBlastingCategory extends CreateCategory<RecipeHolder<? extends SingleItemRecipe>> {
     public static List<RecipeHolder<? extends SingleItemRecipe>> getRecipes(RecipeMap preparedRecipes) {
         List<RecipeHolder<? extends SingleItemRecipe>> recipes = new ArrayList<>();
         Collection<RecipeHolder<BlastingRecipe>> blastingRecipes = preparedRecipes.byType(RecipeType.BLASTING);
         Collection<RecipeHolder<SmokingRecipe>> smokingRecipes = preparedRecipes.byType(RecipeType.SMOKING);
-        ClientLevel world = Minecraft.getInstance().level;
+        ClientLevel level = Minecraft.getInstance().level;
+        Supplier<ContextMap> context = Suppliers.memoize(() -> SlotDisplayContext.fromLevel(level));
         for (RecipeHolder<BlastingRecipe> entry : blastingRecipes) {
-            addRecipe(recipes, entry, world, null, smokingRecipes);
+            addRecipe(recipes, entry, level, null, smokingRecipes, context);
         }
         for (RecipeHolder<SmeltingRecipe> entry : preparedRecipes.byType(RecipeType.SMELTING)) {
-            addRecipe(recipes, entry, world, blastingRecipes, smokingRecipes);
+            addRecipe(recipes, entry, level, blastingRecipes, smokingRecipes, context);
         }
         return recipes;
     }
@@ -47,30 +53,37 @@ public class FanBlastingCategory extends CreateCategory<RecipeHolder<? extends S
     private static void addRecipe(
         List<RecipeHolder<? extends SingleItemRecipe>> list,
         RecipeHolder<? extends SingleItemRecipe> entry,
-        ClientLevel world,
-        @Nullable Collection<RecipeHolder<BlastingRecipe>> blastingRecipes,
-        Collection<RecipeHolder<SmokingRecipe>> smokingRecipes
+        ClientLevel level,
+        Collection<RecipeHolder<BlastingRecipe>> blastingRecipes,
+        Collection<RecipeHolder<SmokingRecipe>> smokingRecipes,
+        Supplier<ContextMap> context
     ) {
         if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {
             return;
         }
         SingleItemRecipe recipe = entry.value();
         Ingredient ingredient = recipe.input();
-        Optional<ItemStack> firstInput = ingredient.values.stream().findFirst()
-            .map(item -> item.value().getDefaultInstance());
+        CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
+        ItemStack firstInput;
+        if (customIngredient == null) {
+            firstInput = ingredient.values.stream().findFirst().map(item -> item.value().getDefaultInstance())
+                .orElse(ItemStack.EMPTY);
+        } else {
+            firstInput = customIngredient.display().resolveForFirstStack(context.get());
+        }
         if (firstInput.isEmpty()) {
             return;
         }
-        SingleRecipeInput input = new SingleRecipeInput(firstInput.get());
+        SingleRecipeInput input = new SingleRecipeInput(firstInput);
         if (blastingRecipes != null) {
             Optional<RecipeHolder<BlastingRecipe>> blastingRecipe = blastingRecipes.stream()
-                .filter(e -> e.value().matches(input, world)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+                .filter(e -> e.value().matches(input, level)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             if (blastingRecipe.isPresent()) {
                 return;
             }
         }
         Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = smokingRecipes.stream()
-            .filter(e -> e.value().matches(input, world)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+            .filter(e -> e.value().matches(input, level)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
         if (smokingRecipe.isPresent()) {
             return;
         }

@@ -21,9 +21,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
         //        if (FabricLoader.getInstance().isModLoaded("architectury")) {
         //            mixins.add("ArchitecturyMixin");
         //        }
-        //        if (FabricLoader.getInstance().isModLoaded("jei")) {
-        //            mixins.add("JustEnoughItemsMixin");
-        //        }
         if (Create.Lazy) {
             mixins.add("RegistriesMixin");
         } else {

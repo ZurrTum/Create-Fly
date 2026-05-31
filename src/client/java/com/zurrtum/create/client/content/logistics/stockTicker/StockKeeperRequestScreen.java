@@ -6,6 +6,7 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
+import com.zurrtum.create.catnip.config.ConfigBase.ConfigEnum;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
@@ -60,6 +61,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -69,14 +71,14 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
-import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockKeeperRequestMenu> {
@@ -98,7 +100,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private static final AllGuiTextures HEADER = AllGuiTextures.STOCK_KEEPER_REQUEST_HEADER;
     private static final AllGuiTextures BODY = AllGuiTextures.STOCK_KEEPER_REQUEST_BODY;
     private static final AllGuiTextures FOOTER = AllGuiTextures.STOCK_KEEPER_REQUEST_FOOTER;
-    private static @Nullable Consumer<String> searchConsumer;
+    private static @Nullable StockSearchSync searchSync;
 
     StockTickerBlockEntity blockEntity;
     public LerpedFloat itemScroll = LerpedFloat.linear().startWithValue(0);
@@ -112,9 +114,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     int itemsY;
     int orderY;
     int lockX;
-    int lockY;
+    int besideSearchButtonY;
 
-    public EditBox searchBox;
+    int searchSyncX;
+    String previousSearchText = "";
+
+    public @UnknownNullability EditBox searchBox;
     public @Nullable AddressEditBox addressBox;
 
     int emptyTicks = 0;
@@ -236,8 +241,9 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         itemsX = leftPos + (imageWidth - cols * colWidth) / 2 + 1;
         itemsY = topPos + 33;
         orderY = topPos + imageHeight - 72;
+        searchSyncX = leftPos + 25;
         lockX = leftPos + 186;
-        lockY = topPos + 18;
+        besideSearchButtonY = topPos + 18;
 
         MutableComponent searchLabel = CreateLang.translateDirect("gui.stock_keeper.search_items");
         searchBox = new EditBox(new NoShadowFontWrapper(font), leftPos + 71, topPos + 22, 100, 9, searchLabel);
@@ -245,6 +251,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         searchBox.setBordered(false);
         searchBox.setTextColor(0xFF4A2D31);
         addWidget(searchBox);
+
+        refreshSearchNextTick = true;
+        moveToTopNextTick = true;
+        syncSearch(true);
 
         boolean initial = addressBox == null;
         String previouslyUsedAddress = initial ? blockEntity.previouslyUsedAddress : addressBox.getValue();
@@ -283,7 +293,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (initial) {
             playUiSound(SoundEvents.WOOD_HIT, 0.5f, 1.5f);
             playUiSound(SoundEvents.BOOK_PAGE_TURN, 1, 1);
-            syncSearch();
+            syncSearch(false);
         }
     }
 
@@ -468,6 +478,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             revalidateOrders();
         }
 
+        if (shouldSyncSearch()) {
+            refreshSearchNextTick = true;
+            moveToTopNextTick = true;
+            syncSearch(true);
+        }
+
         if (refreshSearchNextTick) {
             refreshSearchNextTick = false;
             refreshSearchResults(moveToTopNextTick);
@@ -616,8 +632,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         MutableComponent headerTitle = CreateLang.translate("gui.stock_keeper.title").component();
         graphics.text(font, headerTitle, x + imageWidth / 2 - font.width(headerTitle) / 2, y + 4, 0xFF714A40, false);
-        MutableComponent component = CreateLang.translate(encodeRequester ? "gui.stock_keeper.configure" : "gui.stock_keeper.send")
-            .component();
+        MutableComponent component = CreateLang.translate(
+            encodeRequester ? "gui.stock_keeper.configure" : "gui.stock_keeper.send").component();
 
         if (justSent) {
             float alpha = Mth.clamp((successTicks + partialTicks - 5f) / 5f, 0f, 1f);
@@ -747,10 +763,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             }
 
             if (!categories.isEmpty()) {
-                (categoryEntry.hidden ? AllGuiTextures.STOCK_KEEPER_CATEGORY_HIDDEN : AllGuiTextures.STOCK_KEEPER_CATEGORY_SHOWN).render(graphics,
-                    itemsX,
-                    itemsY + categoryY + 6
-                );
+                (categoryEntry.hidden ? AllGuiTextures.STOCK_KEEPER_CATEGORY_HIDDEN :
+                    AllGuiTextures.STOCK_KEEPER_CATEGORY_SHOWN).render(graphics, itemsX, itemsY + categoryY + 6);
                 graphics.text(font, categoryEntry.name, itemsX + 10, itemsY + categoryY + 8, 0xFF4A2D31, false);
                 graphics.text(font, categoryEntry.name, itemsX + 9, itemsY + categoryY + 7, 0xFFF8F8EC, false);
                 if (categoryEntry.hidden) {
@@ -779,12 +793,18 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             }
         }
 
+        if (searchSync != null) {
+            AllConfigs.client().syncRecipeViewerSearch.get().buttonTexture.render(
+                graphics,
+                searchSyncX,
+                besideSearchButtonY
+            );
+        }
+
         // Render lock option
         if (isAdmin) {
-            (isLocked ? AllGuiTextures.STOCK_KEEPER_REQUEST_LOCKED : AllGuiTextures.STOCK_KEEPER_REQUEST_UNLOCKED).render(graphics,
-                lockX,
-                lockY
-            );
+            (isLocked ? AllGuiTextures.STOCK_KEEPER_REQUEST_LOCKED :
+                AllGuiTextures.STOCK_KEEPER_REQUEST_UNLOCKED).render(graphics, lockX, besideSearchButtonY);
         }
 
         ms.popMatrix();
@@ -861,8 +881,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             int slot = hoveredSlot.getSecond();
             boolean recipeHovered = hoveredSlot.getFirst() == -2;
             boolean orderHovered = hoveredSlot.getFirst() == -1;
-            BigItemStack entry = recipeHovered ? recipesToOrder.get(slot) : orderHovered ? itemsToOrder.get(slot) : displayedItems.get(
-                hoveredSlot.getFirst()).get(slot);
+            BigItemStack entry = recipeHovered ? recipesToOrder.get(slot) :
+                orderHovered ? itemsToOrder.get(slot) : displayedItems.get(hoveredSlot.getFirst()).get(slot);
 
             if (recipeHovered) {
                 ArrayList<Component> lines = new ArrayList<>(entry.stack.getTooltipLines(
@@ -880,17 +900,37 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         }
 
         // Render tooltip of lock option
-        if (currentScroll < 1 && isAdmin && mouseX > lockX && mouseX <= lockX + 15 && mouseY > lockY && mouseY <= lockY + 15) {
-            graphics.setComponentTooltipForNextFrame(
-                font, List.of(
-                    CreateLang.translate(isLocked ? "gui.stock_keeper.network_locked" : "gui.stock_keeper.network_open")
-                        .component(),
-                    CreateLang.translate("gui.stock_keeper.network_lock_tip").style(ChatFormatting.GRAY).component(),
-                    CreateLang.translate("gui.stock_keeper.network_lock_tip_1").style(ChatFormatting.GRAY).component(),
-                    CreateLang.translate("gui.stock_keeper.network_lock_tip_2").style(ChatFormatting.DARK_GRAY)
-                        .style(ChatFormatting.ITALIC).component()
-                ), mouseX, mouseY
-            );
+
+        if (currentScroll < 1 && mouseY > besideSearchButtonY && mouseY <= besideSearchButtonY + 15) {
+            // Render tooltip of jei sync mode option
+            if (searchSync != null && mouseX > searchSyncX && mouseX <= searchSyncX + 15) {
+                SearchSyncMode mode = AllConfigs.client().syncRecipeViewerSearch.get();
+                String langKey = "gui.stock_keeper.jei_sync." + mode.getSerializedName();
+                graphics.setComponentTooltipForNextFrame(
+                    font, List.of(
+                        CreateLang.translate(langKey).component(),
+                        CreateLang.translate(langKey + ".description").style(ChatFormatting.GRAY).component(),
+                        CreateLang.translate("gui.stock_keeper.click_to_cycle").style(ChatFormatting.DARK_GRAY)
+                            .style(ChatFormatting.ITALIC).component()
+                    ), mouseX, mouseY
+                );
+            }
+
+            // Render tooltip of lock option
+            if (isAdmin && mouseX > lockX && mouseX <= lockX + 15) {
+                graphics.setComponentTooltipForNextFrame(
+                    font, List.of(
+                        CreateLang.translate(
+                            isLocked ? "gui.stock_keeper.network_locked" : "gui.stock_keeper.network_open").component(),
+                        CreateLang.translate("gui.stock_keeper.network_lock_tip").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.stock_keeper.network_lock_tip_1").style(ChatFormatting.GRAY)
+                            .component(),
+                        CreateLang.translate("gui.stock_keeper.network_lock_tip_2").style(ChatFormatting.DARK_GRAY)
+                            .style(ChatFormatting.ITALIC).component()
+                    ), mouseX, mouseY
+                );
+            }
         }
 
         // Render tooltip of address input
@@ -958,7 +998,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     }
 
     private void drawItemCount(GuiGraphicsExtractor graphics, int customCount) {
-        String text = customCount >= 1000000 ? (customCount / 1000000) + "m" : customCount >= 10000 ? (customCount / 1000) + "k" : customCount >= 1000 ? ((customCount * 10) / 1000) / 10f + "k" : customCount >= 100 ? customCount + "" : " " + customCount;
+        String text = customCount >= 1000000 ? (customCount / 1000000) + "m" :
+            customCount >= 10000 ? (customCount / 1000) + "k" :
+                customCount >= 1000 ? ((customCount * 10) / 1000) / 10f + "k" :
+                    customCount >= 100 ? customCount + "" : " " + customCount;
 
         if (customCount >= BigItemStack.INF) {
             text = "+";
@@ -1077,7 +1120,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 continue;
             }
 
-            int row = Mth.floor((localY - (categories.isEmpty() ? 4 : rowHeight) - entry.y) / (float) rowHeight + itemScroll.getChaseTarget());
+            int row = Mth.floor((localY - (categories.isEmpty() ? 4 :
+                rowHeight) - entry.y) / (float) rowHeight + itemScroll.getChaseTarget());
 
             int col = (x - itemsX) / colWidth;
             int slot = row * cols + col;
@@ -1181,8 +1225,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             return CreateLang.translate("gui.stock_keeper.inventories_empty").component();
         }
         if (isSchematicListMode()) {
-            return CreateLang.translate(itemsToOrder.isEmpty() ? "gui.stock_keeper.schematic_list.no_results" : "gui.stock_keeper.schematic_list.requesting")
-                .component();
+            return CreateLang.translate(itemsToOrder.isEmpty() ? "gui.stock_keeper.schematic_list.no_results" :
+                "gui.stock_keeper.schematic_list.requesting").component();
         }
         return CreateLang.translate("gui.stock_keeper.no_search_results").component();
     }
@@ -1201,7 +1245,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
             searchBox.setFocused(true);
-            syncSearch();
+            syncSearch(false);
             return true;
         }
 
@@ -1231,12 +1275,26 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         Couple<Integer> hoveredSlot = getHoveredSlot((int) pMouseX, (int) pMouseY);
 
-        // Lock
-        if (isAdmin && itemScroll.getChaseTarget() == 0 && lmb && pMouseX > lockX && pMouseX <= lockX + 15 && pMouseY > lockY && pMouseY <= lockY + 15) {
-            isLocked = !isLocked;
-            minecraft.player.connection.send(new StockKeeperLockPacket(blockEntity.getBlockPos(), isLocked));
-            playUiSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            return true;
+        if (itemScroll.getChaseTarget() == 0 && lmb && pMouseY > besideSearchButtonY && pMouseY <= besideSearchButtonY + 15) {
+            // Search Sync Mode
+            if (pMouseX > searchSyncX && pMouseX <= searchSyncX + 15) {
+                SearchSyncMode.cycleConfig();
+
+                refreshSearchNextTick = true;
+                moveToTopNextTick = true;
+                syncSearch(false);
+
+                playUiSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
+                return true;
+            }
+
+            // Lock
+            if (isAdmin && pMouseX > lockX && pMouseX <= lockX + 15) {
+                isLocked = !isLocked;
+                minecraft.player.connection.send(new StockKeeperLockPacket(blockEntity.getBlockPos(), isLocked));
+                playUiSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
+                return true;
+            }
         }
 
         // Confirm
@@ -1283,8 +1341,9 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         // Items
         boolean orderClicked = hoveredSlot.getFirst() == -1;
         boolean recipeClicked = hoveredSlot.getFirst() == -2;
-        BigItemStack entry = recipeClicked ? recipesToOrder.get(hoveredSlot.getSecond()) : orderClicked ? itemsToOrder.get(
-            hoveredSlot.getSecond()) : displayedItems.get(hoveredSlot.getFirst()).get(hoveredSlot.getSecond());
+        BigItemStack entry = recipeClicked ? recipesToOrder.get(hoveredSlot.getSecond()) :
+            orderClicked ? itemsToOrder.get(hoveredSlot.getSecond()) :
+                displayedItems.get(hoveredSlot.getFirst()).get(hoveredSlot.getSecond());
 
         ItemStack itemStack = entry.stack;
         int transfer = click.hasShiftDown() ? itemStack.getMaxStackSize() : click.hasControlDown() ? 10 : 1;
@@ -1358,8 +1417,9 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         boolean orderClicked = hoveredSlot.getFirst() == -1;
         boolean recipeClicked = hoveredSlot.getFirst() == -2;
-        BigItemStack entry = recipeClicked ? recipesToOrder.get(hoveredSlot.getSecond()) : orderClicked ? itemsToOrder.get(
-            hoveredSlot.getSecond()) : displayedItems.get(hoveredSlot.getFirst()).get(hoveredSlot.getSecond());
+        BigItemStack entry = recipeClicked ? recipesToOrder.get(hoveredSlot.getSecond()) :
+            orderClicked ? itemsToOrder.get(hoveredSlot.getSecond()) :
+                displayedItems.get(hoveredSlot.getFirst()).get(hoveredSlot.getSecond());
 
         boolean remove = scrollY < 0;
         int transfer = Mth.ceil(Math.abs(scrollY)) * (mc.hasControlDown() ? 10 : 1);
@@ -1480,7 +1540,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (!Objects.equals(s, searchBox.getValue())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
-            syncSearch();
+            syncSearch(false);
         }
         return true;
     }
@@ -1517,7 +1577,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (!Objects.equals(s, searchBox.getValue())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
-            syncSearch();
+            syncSearch(false);
         }
         return true;
     }
@@ -1931,14 +1991,68 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         return resolvedIngredients;
     }
 
-    public static void setSearchConsumer(Consumer<String> consumer) {
-        searchConsumer = consumer;
+    public static void setSearchSync(StockSearchSync searchSync) {
+        StockKeeperRequestScreen.searchSync = searchSync;
     }
 
-    private void syncSearch() {
-        if (searchConsumer != null && AllConfigs.client().syncJeiSearch.get()) {
-            searchConsumer.accept(searchBox.getValue());
+    private boolean shouldSyncSearch() {
+        if (searchSync == null) {
+            return false;
+        }
+        String text = searchSync.get(false);
+        return text != null && !previousSearchText.equals(text);
+    }
+
+    private void syncSearch(boolean fromJei) {
+        if (searchSync == null) {
+            return;
+        }
+
+        SearchSyncMode mode = AllConfigs.client().syncRecipeViewerSearch.get();
+        if (mode == SearchSyncMode.NONE) {
+            return;
+        }
+
+        if (mode.isBothOr(SearchSyncMode.SYNC_FROM_JEI) && fromJei) {
+            String text = searchSync.get(true);
+            if (text != null) {
+                searchBox.setValue(previousSearchText = text);
+            }
+        } else if (mode.isBothOr(SearchSyncMode.SYNC_FROM_STOCK_KEEPER) && !fromJei) {
+            searchSync.set(searchBox.getValue());
         }
     }
 
+    public enum SearchSyncMode implements StringRepresentable {
+        // Typing anything in JEI or the StockKeeper UI will sync it to both
+        SYNC_BOTH(AllGuiTextures.STOCK_KEEPER_SEARCH_SYNC_BOTH), // Typing in JEI will sync it to the stockkeeper, but not vice versa
+        SYNC_FROM_JEI(AllGuiTextures.STOCK_KEEPER_SEARCH_SYNC_FROM_JEI), // Typing in the stockkeeper will sync it to JEI, but not vice versa
+        SYNC_FROM_STOCK_KEEPER(AllGuiTextures.STOCK_KEEPER_SEARCH_SYNC_FROM_STOCK_KEEPER), // Do nothing, both search boxes work separately
+        NONE(AllGuiTextures.STOCK_KEEPER_SEARCH_SYNC_DISABLED);
+
+        public final AllGuiTextures buttonTexture;
+
+        SearchSyncMode(AllGuiTextures buttonTexture) {
+            this.buttonTexture = buttonTexture;
+        }
+
+        public boolean isBothOr(SearchSyncMode mode) {
+            return this == SearchSyncMode.SYNC_BOTH || this == mode;
+        }
+
+        public SearchSyncMode next() {
+            SearchSyncMode[] vals = values();
+            return vals[(this.ordinal() + 1) % vals.length];
+        }
+
+        public static void cycleConfig() {
+            ConfigEnum<SearchSyncMode> modeConfig = AllConfigs.client().syncRecipeViewerSearch;
+            modeConfig.set(modeConfig.get().next());
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
 }

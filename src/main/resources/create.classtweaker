@@ -265,3 +265,6 @@ mutable field net/minecraft/world/item/CreativeModeTab row Lnet/minecraft/world/
 mutable field net/minecraft/world/level/biome/BiomeGenerationSettings features Ljava/util/List;
 transitive-inject-interface net/minecraft/world/Container com/zurrtum/create/infrastructure/items/ContainerExtension
 transitive-inject-interface net/minecraft/world/WorldlyContainer com/zurrtum/create/infrastructure/items/WorldlyContainerExtension
+accessible field net/minecraft/world/item/crafting/ShapedRecipe result Lnet/minecraft/world/item/ItemStackTemplate;
+accessible field net/minecraft/world/item/crafting/ShapelessRecipe result Lnet/minecraft/world/item/ItemStackTemplate;
+accessible method net/minecraft/world/item/crafting/SingleItemRecipe result ()Lnet/minecraft/world/item/ItemStackTemplate;

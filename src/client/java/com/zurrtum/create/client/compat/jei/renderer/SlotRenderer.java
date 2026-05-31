@@ -6,8 +6,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jspecify.annotations.Nullable;
 
 public class SlotRenderer implements IDrawable {
-    @Nullable
-    private final AllGuiTextures texture;
+    private final @Nullable AllGuiTextures texture;
     private final int width;
     private final int height;
 

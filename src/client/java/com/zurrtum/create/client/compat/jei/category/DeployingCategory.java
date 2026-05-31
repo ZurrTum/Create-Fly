@@ -12,7 +12,9 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -25,6 +27,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
@@ -45,9 +48,20 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
         Ingredient ingredient = Ingredient.of(HolderSet.direct(sandpaperList));
         for (RecipeHolder<SandPaperPolishingRecipe> entry : preparedRecipes.byType(AllRecipeTypes.SANDPAPER_POLISHING)) {
             SandPaperPolishingRecipe recipe = entry.value();
+            ItemStackTemplate result = recipe.result();
             recipes.add(new RecipeHolder<>(
                 ResourceKey.create(Registries.RECIPE, entry.id().identifier().withSuffix("_using_deployer")),
-                new DeployerApplicationRecipe(recipe.result(), true, recipe.ingredient(), ingredient)
+                new DeployerApplicationRecipe(
+                    List.of(new ProcessingOutput(
+                        result.item(),
+                        result.count(),
+                        result.components(),
+                        1
+                    )),
+                    true,
+                    recipe.ingredient(),
+                    ingredient
+                )
             ));
         }
         return recipes;
@@ -80,9 +94,20 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
         IFocusGroup focuses
     ) {
         ItemApplicationRecipe recipe = entry.value();
-        builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
+        IRecipeSlotBuilder slot = builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
+        if (recipe.keepHeldItem()) {
+            slot.addRichTooltipCallback(KEEP_HELD);
+        }
         builder.addInputSlot(27, 51).setBackground(SLOT, -1, -1).add(recipe.target());
-        builder.addOutputSlot(132, 51).setBackground(SLOT, -1, -1).add(recipe.result());
+        List<ProcessingOutput> results = recipe.results();
+        int size = results.size();
+        if (size == 1) {
+            addChanceSlot(builder, 132, 51, results.getFirst());
+        } else {
+            for (int i = 0; i < size; i++) {
+                addChanceSlot(builder, i % 2 == 0 ? 132 : 151, 51 + (i / 2) * -19, results.get(i));
+            }
+        }
     }
 
     @Override
@@ -94,7 +119,7 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
         double mouseY
     ) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 62, 57);
-        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, 29);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, entry.value().results().size() <= 2 ? 29 : 10);
         graphics.guiRenderState.addPicturesInPictureState(new DeployerRenderState(
             new Matrix3x2f(graphics.pose()),
             75,

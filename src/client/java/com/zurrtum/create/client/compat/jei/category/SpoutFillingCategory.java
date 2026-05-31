@@ -35,6 +35,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -62,7 +63,7 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
         List<RecipeHolder<FillingRecipe>> recipes = new ArrayList<>(preparedRecipes.byType(AllRecipeTypes.FILLING));
         List<FluidStack> fluids = fluidStream.map(ingredient -> {
             FluidVariant variant = ingredient.getFluidVariant();
-            return new FluidStack(variant.getFluid(), ingredient.getAmount(), variant.getComponents());
+            return new FluidStack(variant.getFluid(), ingredient.getAmount(), variant.getComponentsPatch());
         }).toList();
         MutableInt i = new MutableInt();
         itemStream.forEach(stack -> {
@@ -74,7 +75,7 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
                         Registries.RECIPE,
                         Identifier.fromNamespaceAndPath(MOD_ID, "filling_potions_" + i.getAndIncrement())
                     ), new FillingRecipe(
-                    stack,
+                    ItemStackTemplate.fromNonEmptyStack(stack),
                     Ingredient.of(Items.GLASS_BOTTLE),
                     PotionFluidHandler.getFluidIngredientFromPotion(potion, bottleType, BottleFluidInventory.CAPACITY)
                 )
@@ -108,14 +109,16 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
                                 MOD_ID,
                                 "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                             );
-                            Ingredient ingredient = stack.getComponentsPatch()
-                                .isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(stack);
+                            Ingredient ingredient =
+                                stack.getComponentsPatch().isEmpty() ? Ingredient.of(stack.getItem()) :
+                                    DefaultCustomIngredients.components(stack);
                             recipes.add(new RecipeHolder<>(
-                                ResourceKey.create(Registries.RECIPE, id), new FillingRecipe(
-                                result,
-                                ingredient,
-                                new FluidStackIngredient(fluid.getFluid(), fluid.getComponentChanges(), insert)
-                            )
+                                ResourceKey.create(Registries.RECIPE, id),
+                                new FillingRecipe(
+                                    ItemStackTemplate.fromNonEmptyStack(result),
+                                    ingredient,
+                                    new FluidStackIngredient(fluid.getFluid(), fluid.getComponentChanges(), insert)
+                                )
                             ));
                         }
                     }

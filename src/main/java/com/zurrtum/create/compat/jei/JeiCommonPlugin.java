@@ -1,17 +1,10 @@
-package com.zurrtum.create.mixin;
+package com.zurrtum.create.compat.jei;
 
 import com.zurrtum.create.AllRecipeSerializers;
-import mezz.jei.fabric.JustEnoughItems;
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(JustEnoughItems.class)
-public class JustEnoughItemsMixin {
-    @Inject(method = "onInitialize()V", at = @At("TAIL"))
-    private void syncRecipe(CallbackInfo ci) {
+public class JeiCommonPlugin {
+    public static void register() {
         RecipeSynchronization.synchronizeRecipeSerializer(AllRecipeSerializers.COMPACTING);
         RecipeSynchronization.synchronizeRecipeSerializer(AllRecipeSerializers.PRESSING);
         RecipeSynchronization.synchronizeRecipeSerializer(AllRecipeSerializers.MIXING);

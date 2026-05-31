@@ -9,16 +9,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
-public record ChanceTooltip(Either<FormattedText, TooltipComponent> chance) implements IRecipeSlotRichTooltipCallback {
-    public ChanceTooltip(float chance) {
-        this(Either.left(CreateLang.translateDirect(
-            "recipe.processing.chance",
-            chance < 0.01 ? "<1" : (int) (chance * 100)
-        ).withStyle(ChatFormatting.GOLD)));
-    }
+public class KeepHeldTooltip implements IRecipeSlotRichTooltipCallback {
+    private static final Either<FormattedText, TooltipComponent> KEEP_HELD = Either.left(CreateLang.translateDirect(
+        "recipe.deploying.not_consumed").withStyle(ChatFormatting.GOLD));
 
     @Override
-    public void onRichTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip) {
-        tooltip.getLines().add(1, chance);
+    public void onRichTooltip(IRecipeSlotView iRecipeSlotView, ITooltipBuilder tooltip) {
+        tooltip.getLines().add(1, KEEP_HELD);
     }
 }

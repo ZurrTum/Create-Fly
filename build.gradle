@@ -13,17 +13,16 @@ repositories {
         }
     }
     maven {
-        url "https://maven.squiddev.cc"
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
         content {
-            includeGroup("cc.tweaked")
+            includeGroup "mezz.jei"
         }
     }
     maven {
-        name = 'Ladysnake Mods'
-        url = 'https://maven.ladysnake.org/releases'
+        url "https://maven.squiddev.cc"
         content {
-            includeGroup "dev.onyxstudios.cardinal-components-api"
-            includeGroup "org.ladysnake.cardinal-components-api"
+            includeGroup("cc.tweaked")
         }
     }
     maven {
@@ -70,12 +69,10 @@ sourceSets {
             exclude 'com/zurrtum/create/compat/rei/**'
             exclude 'com/zurrtum/create/compat/eiv/**'
             exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
-            exclude 'com/zurrtum/create/mixin/JustEnoughItemsMixin.java'
         }
     }
     client {
         java {
-            exclude 'com/zurrtum/create/client/compat/jei/**'
             exclude 'com/zurrtum/create/client/compat/rei/**'
             exclude 'com/zurrtum/create/client/compat/eiv/**'
             exclude 'com/zurrtum/create/client/mixin/CraftingViewRecipeAccessor.java'
@@ -121,7 +118,7 @@ dependencies {
 //    if (project.compile_only_rei.equals("false")) {
 //        modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 //    }
-//    modCompileOnly "maven.modrinth:jei:${project.jei_version}"
+    compileOnly "mezz.jei:jei-${project.jei_version}"
 //    modCompileOnly "maven.modrinth:eiv:${project.eiv_version}"
     compileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
     compileOnly "eu.pb4:trinkets:${project.trinkets_version}"

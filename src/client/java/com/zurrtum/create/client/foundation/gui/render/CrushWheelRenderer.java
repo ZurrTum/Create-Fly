@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.gui.render;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.render.BlockBakedQuadOutput;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ModelConsumer;
@@ -38,25 +39,26 @@ public class CrushWheelRenderer extends PictureInPictureRenderer<CrushWheelRende
 
         output.setPoseStack(matrices);
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
-        BlockStateModel model = mc.getModelManager().getBlockStateModelSet().get(blockState);
-        output.updateBuffer(model);
+        BlockStateModel model = AllPartialModels.CRUSHING_WHEEL.get();
         world.blockState(blockState);
-        ModelConsumer blockRenderer = ModelRenderHelper.getHelper(output);
 
         float angle = getCurrentAngle();
         matrices.pushPose();
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(-angle));
-        matrices.mulPose(com.mojang.math.Axis.YP.rotationDegrees(90));
+        matrices.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90));
+        matrices.mulPose(com.mojang.math.Axis.YP.rotationDegrees(angle));
         matrices.translate(-0.5f, -0.5f, -0.5f);
+        output.updateBuffer(model);
+        ModelConsumer blockRenderer = ModelRenderHelper.getHelper(output);
         blockRenderer.tesselateBlock(0, 0, 0, world, BlockPos.ZERO, blockState, model, 42L);
         matrices.popPose();
 
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.translate(2, 0, 0);
-        matrices.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(angle));
-        matrices.mulPose(com.mojang.math.Axis.YP.rotationDegrees(90));
+        matrices.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90));
+        matrices.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-angle));
         matrices.translate(-0.5f, -0.5f, -0.5f);
+        blockRenderer.updateOutput(output);
         blockRenderer.tesselateBlock(0, 0, 0, world, BlockPos.ZERO, blockState, model, 42L);
         output.clear();
     }

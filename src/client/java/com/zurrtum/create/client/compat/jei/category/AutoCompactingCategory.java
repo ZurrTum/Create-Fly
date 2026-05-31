@@ -16,7 +16,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import org.joml.Matrix3x2f;
@@ -63,7 +63,7 @@ public class AutoCompactingCategory extends CreateCategory<RecipeHolder<Crafting
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CraftingRecipe> entry, IFocusGroup focuses) {
         CraftingRecipe recipe = entry.value();
-        ItemStack result;
+        ItemStackTemplate result;
         List<Ingredient> ingredients;
         if (recipe instanceof ShapedRecipe shapedRecipe) {
             result = shapedRecipe.result;

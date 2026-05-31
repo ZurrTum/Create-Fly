@@ -7,6 +7,7 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.render.BlockBakedQuadOutput;
+import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ModelConsumer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ModelRenderHelper;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
@@ -16,8 +17,10 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -62,17 +65,16 @@ public class SawRenderer extends PictureInPictureRenderer<SawRenderState> {
         output.updateBuffer(model);
         blockRenderer.updateOutput(output);
         blockRenderer.tesselateBlock(0, 0, 0, world, BlockPos.ZERO, blockState, model, 42L);
+        output.clear();
 
-        blockState = Blocks.AIR.defaultBlockState();
-        world.blockState(blockState);
-        model = AllPartialModels.SAW_BLADE_VERTICAL_ACTIVE.get();
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.mulPose(Axis.ZP.rotationDegrees(-90));
         matrices.mulPose(Axis.YP.rotationDegrees(-90));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        output.updateBuffer(model);
-        blockRenderer.tesselateBlock(0, 0, 0, world, BlockPos.ZERO, blockState, model, 42L);
-        output.clear();
+        //noinspection deprecation
+        CachedBuffers.partial(AllPartialModels.SAW_BLADE_VERTICAL_ACTIVE, Blocks.AIR.defaultBlockState())
+            .light(LightCoordsUtil.FULL_BRIGHT)
+            .renderInto(matrices.last(), bufferSource.getBuffer(RenderTypes.cutoutMovingBlock()));
     }
 
     public static float getCurrentAngle() {
