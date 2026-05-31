@@ -24,8 +24,10 @@ public class PotionFluidHandler {
     public static boolean isPotionItem(ItemStack stack) {
         if (stack.getItem() instanceof PotionItem item) {
             ItemStackTemplate remainder = item.getCraftingRemainder();
-            return remainder != null && remainder.item()
-                .value() instanceof BucketItem && !stack.is(AllItemTags.NOT_POTION);
+            if (remainder == null) {
+                return true;
+            }
+            return !(remainder.item().value() instanceof BucketItem) && !stack.is(AllItemTags.NOT_POTION);
         }
         return false;
     }
