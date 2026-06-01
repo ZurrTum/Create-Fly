@@ -11,25 +11,27 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FanWashingDisplay extends CreateDisplay {
-    public List<ItemStack> results;
-    public List<Float> chances;
-    public List<ItemStack> ingredient;
+    public @UnknownNullability List<ItemStack> results;
+    public @UnknownNullability List<Float> chances;
+    public @UnknownNullability List<ItemStack> ingredient;
 
     public FanWashingDisplay() {
     }
 
     public FanWashingDisplay(RecipeHolder<SplashingRecipe> entry) {
         SplashingRecipe recipe = entry.value();
-        int size = recipe.results().size();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
         results = new ArrayList<>(size);
         chances = new ArrayList<>(size);
-        for (ProcessingOutput output : recipe.results()) {
-            results.add(output.stack());
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
             chances.add(output.chance());
         }
         ingredient = getItemStacks(recipe.ingredient());

@@ -12,15 +12,16 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
 public class SequencedAssemblyDisplay extends CreateDisplay {
     private static final Codec<List<Recipe<?>>> SEQUENCE_CODEC = Recipe.CODEC.listOf();
-    public List<ItemStack> ingredient;
-    public ProcessingOutput result;
+    public @UnknownNullability List<ItemStack> ingredient;
+    public @UnknownNullability ProcessingOutput result;
     public int loops;
-    public List<Recipe<?>> sequence;
+    public @UnknownNullability List<Recipe<?>> sequence;
 
     public SequencedAssemblyDisplay() {
     }

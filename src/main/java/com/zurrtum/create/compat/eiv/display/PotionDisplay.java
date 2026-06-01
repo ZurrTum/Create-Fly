@@ -11,13 +11,14 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
 public class PotionDisplay extends CreateDisplay {
-    public FluidStack result;
-    public List<ItemStack> ingredient;
-    public FluidIngredient fluidIngredient;
+    public @UnknownNullability FluidStack result;
+    public @UnknownNullability List<ItemStack> ingredient;
+    public @UnknownNullability FluidIngredient fluidIngredient;
 
     public PotionDisplay() {
     }

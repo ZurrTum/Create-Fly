@@ -4,16 +4,12 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -21,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class FanBlastingDisplay extends CreateDisplay {
-    public ItemStack result;
-    public List<ItemStack> ingredient;
+    public @UnknownNullability ItemStack result;
+    public @UnknownNullability List<ItemStack> ingredient;
 
     public FanBlastingDisplay() {
     }
@@ -35,7 +31,6 @@ public class FanBlastingDisplay extends CreateDisplay {
     @Nullable
     public static FanBlastingDisplay of(
         RecipeHolder<? extends AbstractCookingRecipe> entry,
-        RegistryAccess registryManager,
         @Nullable Collection<RecipeHolder<SmeltingRecipe>> smeltingRecipes,
         Collection<RecipeHolder<SmokingRecipe>> smokingRecipes
     ) {
@@ -43,28 +38,23 @@ public class FanBlastingDisplay extends CreateDisplay {
             return null;
         }
         AbstractCookingRecipe recipe = entry.value();
-        HolderSet<Item> entries = recipe.input().values;
-        if (entries instanceof HolderSet.Named<Item> named && !named.isBound()) {
-            entries = registryManager.lookupOrThrow(Registries.ITEM).getOrThrow(named.key());
-        }
-        Optional<Holder<Item>> firstInput = entries.stream().findFirst();
+        ItemStack firstInput = getFirstStack(recipe.input());
         if (firstInput.isEmpty()) {
             return null;
         }
-        ItemStack stack = firstInput.get().value().getDefaultInstance();
         if (smeltingRecipes != null) {
             Optional<RecipeHolder<SmeltingRecipe>> smeltingRecipe = smeltingRecipes.stream()
-                .filter(e -> e.value().input().test(stack)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+                .filter(e -> e.value().input().test(firstInput)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             if (smeltingRecipe.isPresent()) {
                 return null;
             }
         }
         Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = smokingRecipes.stream()
-            .filter(e -> e.value().input().test(stack)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
-        if (smokingRecipe.map(e -> ItemStack.isSameItem(e.value().result(), recipe.result())).orElse(false)) {
+            .filter(e -> e.value().input().test(firstInput)).findFirst().filter(AllRecipeTypes.CAN_BE_AUTOMATED);
+        if (smokingRecipe.map(e -> e.value().result().is(recipe.result().item())).orElse(false)) {
             return null;
         }
-        return new FanBlastingDisplay(recipe.result(), recipe.input());
+        return new FanBlastingDisplay(recipe.result().create(), recipe.input());
     }
 
     @Override

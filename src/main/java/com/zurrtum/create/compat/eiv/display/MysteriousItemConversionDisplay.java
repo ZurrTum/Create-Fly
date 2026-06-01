@@ -10,12 +10,13 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
 public class MysteriousItemConversionDisplay extends CreateDisplay {
-    public ItemStack ingredient;
-    public ItemStack result;
+    public @UnknownNullability ItemStack ingredient;
+    public @UnknownNullability ItemStack result;
 
     public MysteriousItemConversionDisplay() {
     }

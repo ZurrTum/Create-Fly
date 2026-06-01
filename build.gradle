@@ -67,21 +67,12 @@ sourceSets {
     main {
         java {
             exclude 'com/zurrtum/create/compat/rei/**'
-            exclude 'com/zurrtum/create/compat/eiv/**'
             exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
         }
     }
     client {
         java {
             exclude 'com/zurrtum/create/client/compat/rei/**'
-            exclude 'com/zurrtum/create/client/compat/eiv/**'
-            exclude 'com/zurrtum/create/client/mixin/CraftingViewRecipeAccessor.java'
-            exclude 'com/zurrtum/create/client/mixin/FabricEIVMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/FluidItemSpecialRendererMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/ItemSlotMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/RecipeViewMenuMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/RecipeViewScreenMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/ViewTypeButtonMixin.java'
         }
     }
 }
@@ -119,7 +110,7 @@ dependencies {
 //        modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 //    }
     compileOnly "mezz.jei:jei-${project.jei_version}"
-//    modCompileOnly "maven.modrinth:eiv:${project.eiv_version}"
+    compileOnly "maven.modrinth:eiv:${project.eiv_version}"
     compileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
     compileOnly "eu.pb4:trinkets:${project.trinkets_version}"
     clientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"

@@ -3,6 +3,7 @@ package com.zurrtum.create.client.compat.eiv;
 import com.zurrtum.create.client.compat.eiv.category.*;
 import com.zurrtum.create.client.compat.eiv.view.*;
 import com.zurrtum.create.client.content.logistics.stockTicker.StockKeeperRequestScreen;
+import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
@@ -10,7 +11,6 @@ import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
-import net.minecraft.client.gui.components.EditBox;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -75,16 +75,9 @@ public class EivClientPlugin implements IExtendedItemViewIntegration {
         ItemView.registerRecipeWrapper(EivCommonPlugin.FAN_WASHING, FanWashingView::new);
         ItemView.registerRecipeWrapper(EivCommonPlugin.AUTOMATIC_BREWING, PotionView::new);
         ItemView.registerRecipeWrapper(EivCommonPlugin.BLOCK_CUTTING, BlockCuttingView::new);
-        EivExclusionZoneHelper.setRuntime(OverlayManager.INSTANCE);
         addTransferHandler(CraftingViewType.INSTANCE, new BlueprintTransferHandler());
         addTransferHandler(new StockKeeperTransferHandler());
-        StockKeeperRequestScreen.setSearchConsumer(EivClientPlugin::setSearchText);
-    }
-
-    public static void setSearchText(String text) {
-        EditBox searchbar = ItemViewOverlay.INSTANCE.getSearchbar();
-        if (searchbar != null) {
-            searchbar.setValue(text);
-        }
+        AbstractSimiContainerScreen.setExclusionZoneSync(new EivExclusionZoneSync(OverlayManager.INSTANCE));
+        StockKeeperRequestScreen.setSearchSync(new EivStockSearchSync(ItemViewOverlay.INSTANCE));
     }
 }

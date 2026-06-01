@@ -9,19 +9,20 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
 public class SandPaperPolishingDisplay extends CreateDisplay {
-    public ItemStack result;
-    public List<ItemStack> ingredient;
+    public @UnknownNullability ItemStack result;
+    public @UnknownNullability List<ItemStack> ingredient;
 
     public SandPaperPolishingDisplay() {
     }
 
     public SandPaperPolishingDisplay(RecipeHolder<SandPaperPolishingRecipe> entry) {
         SandPaperPolishingRecipe recipe = entry.value();
-        result = recipe.result();
+        result = recipe.result().create();
         ingredient = getItemStacks(recipe.ingredient());
     }
 

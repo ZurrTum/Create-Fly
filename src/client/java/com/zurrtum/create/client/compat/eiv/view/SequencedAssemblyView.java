@@ -1,5 +1,8 @@
 package com.zurrtum.create.client.compat.eiv.view;
 
+import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
+import com.zurrtum.create.AllAssemblyRecipeNames;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.AllRecipeTypes;
@@ -28,6 +31,7 @@ import de.crafty.eiv.common.recipe.item.FluidItem;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.component.DataComponentPatch;
@@ -36,6 +40,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -63,7 +68,6 @@ public class SequencedAssemblyView extends CreateView {
     }
 
     @SuppressWarnings("unchecked")
-    @Nullable
     public static <T extends Recipe<?>> SequencedRenderer<T> getRenderer(T recipe) {
         return (SequencedRenderer<T>) RENDER.get(recipe.getType());
     }
@@ -81,7 +85,7 @@ public class SequencedAssemblyView extends CreateView {
 
     public SequencedAssemblyView(SequencedAssemblyDisplay display) {
         ProcessingOutput output = display.result;
-        result = SlotContent.of(output.stack());
+        result = SlotContent.of(output.create());
         chance = output.chance();
         sequence = display.sequence;
         int size = sequence.size();
@@ -195,11 +199,8 @@ public class SequencedAssemblyView extends CreateView {
             }
             if (checkHover && checkStep && mouseX > x - 7 && mouseX < x + 22) {
                 checkHover = false;
-                Component text = draw != null ? SequencedRenderer.getSequenceName(
-                    draw,
-                    recipe,
-                    stack
-                ) : SequencedRenderer.getSequenceName(recipe);
+                Component text = draw != null ? SequencedRenderer.getSequenceName(draw, recipe, stack) :
+                    SequencedRenderer.getSequenceName(recipe);
                 List<Component> tooltip = List.of(
                     CreateLang.translateDirect("recipe.assembly.step", i + 1),
                     text.copy().withStyle(ChatFormatting.DARK_GREEN)
@@ -247,21 +248,26 @@ public class SequencedAssemblyView extends CreateView {
     }
 
     public interface SequencedRenderer<T extends Recipe<?>> {
+        Map<Recipe<?>, Component> NAMES = new WeakHashMap<>();
+
         void render(GuiGraphicsExtractor graphics, int i, int x, int y, @Nullable ItemStack stack);
 
         static Component getSequenceName(Recipe<?> recipe) {
-            Identifier id = BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType());
-            if (id != null) {
-                String namespace = id.getNamespace();
-                String recipeName;
-                if (namespace.equals("create")) {
-                    recipeName = id.getPath();
-                } else {
-                    recipeName = id.getNamespace() + "." + id.getPath();
-                }
-                return Component.translatable("create.recipe.assembly." + recipeName);
+            Component name = NAMES.get(recipe);
+            if (name != null) {
+                return name;
             }
-            return CommonComponents.EMPTY;
+            Identifier id = BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType());
+            if (id == null) {
+                name = CommonComponents.EMPTY;
+            } else {
+                RegistryOps<JsonElement> ops = Minecraft.getInstance().level.registryAccess()
+                    .createSerializationContext(JsonOps.INSTANCE);
+                name = Recipe.CODEC.encodeStart(ops, recipe).result().map(json -> AllAssemblyRecipeNames.get(ops, json))
+                    .orElse(CommonComponents.EMPTY);
+            }
+            NAMES.put(recipe, name);
+            return name;
         }
 
         @SuppressWarnings("unchecked")

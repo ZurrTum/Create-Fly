@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.zurrtum.create.client.compat.eiv.*;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
@@ -69,42 +68,31 @@ public abstract class RecipeViewScreenMixin extends AbstractContainerScreen<Reci
         return original.call(message, onPress);
     }
 
-    @Inject(method = "checkGui()V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"))
+    @Inject(method = "checkGui()V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;", ordinal = 0))
     private void initButton(CallbackInfo ci, @Local Button button) {
         if (button instanceof RecipeButton recipeButton) {
             recipeButton.init();
         }
     }
 
-    @WrapOperation(method = "renderBg(Lnet/minecraft/client/gui/GuiGraphics;FII)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewMenu;guiOffsetTop(I)I"))
-    private int cacheIndex(
-        RecipeViewMenu instance,
-        int displayIndex,
-        Operation<Integer> original,
-        @Share("index") LocalIntRef ref
-    ) {
-        ref.set(displayIndex);
-        return original.call(instance, displayIndex);
-    }
-
-    @WrapOperation(method = "renderBg(Lnet/minecraft/client/gui/GuiGraphics;FII)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
+    @WrapOperation(method = "extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
     private Stream<Slot> filterSlots(
         Stream<Slot> stream,
         Predicate<Slot> predicate,
         Operation<Stream<Slot>> original,
-        @Share("index") LocalIntRef ref,
+        @Local(name = "i") int i,
         @Local IEivRecipeViewType type
     ) {
         if (type instanceof CreateCategory) {
             int size = type.getSlotCount();
-            int index = ref.get() * size;
+            int index = i * size;
             int end = index + size;
             stream = stream.filter(slot -> slot.index >= index && slot.index < end);
         }
         return original.call(stream, predicate);
     }
 
-    @Inject(method = "renderInvalidSlots(Lnet/minecraft/client/gui/GuiGraphics;I)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen;getMenu()Lnet/minecraft/world/inventory/AbstractContainerMenu;", ordinal = 0), cancellable = true)
+    @Inject(method = "renderInvalidSlots(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen;getMenu()Lnet/minecraft/world/inventory/AbstractContainerMenu;", ordinal = 0), cancellable = true)
     private void renderInvalidSlots(
         GuiGraphicsExtractor guiGraphics,
         int displayId,

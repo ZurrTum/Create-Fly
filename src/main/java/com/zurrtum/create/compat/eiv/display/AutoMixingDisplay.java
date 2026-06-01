@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
+import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AutoMixingDisplay extends CreateDisplay {
-    public List<List<ItemStack>> ingredients;
-    public ItemStack result;
+    public @UnknownNullability List<List<ItemStack>> ingredients;
+    public @UnknownNullability ItemStack result;
 
     public AutoMixingDisplay() {
     }
@@ -56,7 +57,7 @@ public class AutoMixingDisplay extends CreateDisplay {
         } while (iterator.hasNext());
         List<List<ItemStack>> ingredients = new ArrayList<>(map.size());
         addSizedIngredient(map, ingredients);
-        return new AutoMixingDisplay(shapelessRecipe.result, ingredients);
+        return new AutoMixingDisplay(shapelessRecipe.result.create(), ingredients);
     }
 
     @Override

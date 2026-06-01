@@ -10,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.Optional;
 
 public class AutoCompactingDisplay extends CreateDisplay {
     public int size;
-    public List<ItemStack> ingredient;
-    public ItemStack result;
+    public @UnknownNullability List<ItemStack> ingredient;
+    public @UnknownNullability ItemStack result;
 
     public AutoCompactingDisplay() {
     }
@@ -38,7 +39,7 @@ public class AutoCompactingDisplay extends CreateDisplay {
         if (recipe instanceof ShapelessRecipe shapelessRecipe) {
             List<Ingredient> ingredients = shapelessRecipe.ingredients;
             return new AutoCompactingDisplay(
-                shapelessRecipe.result,
+                shapelessRecipe.result.create(),
                 getItemStacks(ingredients.getFirst()),
                 ingredients.size()
             );
@@ -54,7 +55,7 @@ public class AutoCompactingDisplay extends CreateDisplay {
                 }
                 size++;
             }
-            return new AutoCompactingDisplay(shapedRecipe.result, input, size);
+            return new AutoCompactingDisplay(shapedRecipe.result.create(), input, size);
         }
         return null;
     }

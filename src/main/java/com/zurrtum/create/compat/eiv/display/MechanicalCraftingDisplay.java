@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,9 @@ import java.util.Optional;
 public class MechanicalCraftingDisplay extends CreateDisplay {
     public int width;
     public int height;
-    public List<List<ItemStack>> ingredients;
-    public int[] empty;
-    public ItemStack result;
+    public @UnknownNullability List<List<ItemStack>> ingredients;
+    public int @UnknownNullability [] empty;
+    public @UnknownNullability ItemStack result;
 
     public MechanicalCraftingDisplay() {
     }
@@ -47,7 +48,7 @@ public class MechanicalCraftingDisplay extends CreateDisplay {
         }
         empty = new int[actualSize];
         System.arraycopy(emptyList, 0, empty, 0, actualSize);
-        result = recipe.result();
+        result = recipe.result().create();
     }
 
     @Override

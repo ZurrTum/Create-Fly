@@ -24,21 +24,22 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class SpoutFillingDisplay extends CreateDisplay {
-    public ItemStack result;
-    public FluidIngredient fluidIngredient;
-    public List<ItemStack> ingredient;
+    public @UnknownNullability ItemStack result;
+    public @UnknownNullability FluidIngredient fluidIngredient;
+    public @UnknownNullability List<ItemStack> ingredient;
 
     public SpoutFillingDisplay() {
     }
 
     public SpoutFillingDisplay(RecipeHolder<FillingRecipe> entry) {
         FillingRecipe recipe = entry.value();
-        result = recipe.result();
+        result = recipe.result().create();
         fluidIngredient = recipe.fluidIngredient();
         ingredient = getItemStacks(recipe.ingredient());
     }

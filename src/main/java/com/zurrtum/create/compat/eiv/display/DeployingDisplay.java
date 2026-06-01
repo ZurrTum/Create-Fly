@@ -5,27 +5,48 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DeployingDisplay extends ManualApplicationDisplay {
     public DeployingDisplay() {
     }
 
-    public DeployingDisplay(ItemStack result, Ingredient target, Ingredient ingredient, boolean keepHeldItem) {
-        this.result = result;
+    public DeployingDisplay(
+        List<ProcessingOutput> outputs,
+        Ingredient target,
+        Ingredient ingredient,
+        boolean keepHeldItem
+    ) {
+        int size = outputs.size();
+        results = new ArrayList<>(size);
+        chances = new ArrayList<>(size);
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
+            chances.add(output.chance());
+        }
+        this.target = getItemStacks(target);
+        this.ingredient = getItemStacks(ingredient);
+        this.keepHeldItem = keepHeldItem;
+    }
+
+    public DeployingDisplay(ItemStackTemplate result, Ingredient target, Ingredient ingredient, boolean keepHeldItem) {
+        results = Collections.singletonList(result.create());
+        chances = Collections.singletonList(1f);
         this.target = getItemStacks(target);
         this.ingredient = getItemStacks(ingredient);
         this.keepHeldItem = keepHeldItem;
@@ -38,8 +59,8 @@ public class DeployingDisplay extends ManualApplicationDisplay {
         }
         Recipe<?> recipe = entry.value();
         if (recipe instanceof ItemApplicationRecipe r) {
-            return new DeployingDisplay(r.result(), r.target(), r.ingredient(), r.keepHeldItem());
-        } else if (recipe instanceof SandPaperPolishingRecipe(ItemStack result, Ingredient target)) {
+            return new DeployingDisplay(r.results(), r.target(), r.ingredient(), r.keepHeldItem());
+        } else if (recipe instanceof SandPaperPolishingRecipe(ItemStackTemplate result, Ingredient target)) {
             List<Holder<Item>> sandpaperList = new ArrayList<>();
             for (Holder<Item> item : BuiltInRegistries.ITEM.getTagOrEmpty(AllItemTags.SANDPAPER)) {
                 sandpaperList.add(item);

@@ -9,19 +9,20 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SmokingRecipe;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
 public class FanSmokingDisplay extends CreateDisplay {
-    public ItemStack result;
-    public List<ItemStack> ingredient;
+    public @UnknownNullability ItemStack result;
+    public @UnknownNullability List<ItemStack> ingredient;
 
     public FanSmokingDisplay() {
     }
 
     public FanSmokingDisplay(RecipeHolder<SmokingRecipe> entry) {
         SmokingRecipe recipe = entry.value();
-        result = recipe.result();
+        result = recipe.result().create();
         ingredient = getItemStacks(recipe.input());
     }
 

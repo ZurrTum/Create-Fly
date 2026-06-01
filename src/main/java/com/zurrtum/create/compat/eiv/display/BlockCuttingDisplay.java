@@ -8,6 +8,7 @@ import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.core.HolderSet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -15,14 +16,15 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class BlockCuttingDisplay extends CreateDisplay {
-    public List<ItemStack> ingredient;
-    public List<List<ItemStack>> results;
+    public @UnknownNullability List<ItemStack> ingredient;
+    public @UnknownNullability List<List<ItemStack>> results;
 
     public BlockCuttingDisplay() {
     }
@@ -39,6 +41,9 @@ public class BlockCuttingDisplay extends CreateDisplay {
             }
 
             public int hashCode(Ingredient ingredient) {
+                if (((FabricIngredient) ingredient).getCustomIngredient() != null) {
+                    return ingredient.hashCode();
+                }
                 if (ingredient.values instanceof HolderSet.Direct<Item> direct) {
                     return direct.hashCode();
                 }
@@ -53,7 +58,7 @@ public class BlockCuttingDisplay extends CreateDisplay {
                 continue;
             }
             StonecutterRecipe recipe = entry.value();
-            map.computeIfAbsent(recipe.input(), i -> new ArrayList<>()).add(recipe.result());
+            map.computeIfAbsent(recipe.input(), i -> new ArrayList<>()).add(recipe.result().create());
         }
         for (Object2ObjectMap.Entry<Ingredient, List<ItemStack>> entry : map.object2ObjectEntrySet()) {
             List<ItemStack> outputs = entry.getValue();

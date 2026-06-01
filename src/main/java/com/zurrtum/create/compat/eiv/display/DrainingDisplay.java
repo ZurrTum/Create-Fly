@@ -22,21 +22,22 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class DrainingDisplay extends CreateDisplay {
-    public ItemStack result;
-    public FluidStack fluidResult;
-    public List<ItemStack> ingredient;
+    public @UnknownNullability ItemStack result;
+    public @UnknownNullability FluidStack fluidResult;
+    public @UnknownNullability List<ItemStack> ingredient;
 
     public DrainingDisplay() {
     }
 
     public DrainingDisplay(RecipeHolder<EmptyingRecipe> entry) {
         EmptyingRecipe recipe = entry.value();
-        result = recipe.result();
+        result = recipe.result().create();
         fluidResult = recipe.fluidResult();
         ingredient = getItemStacks(recipe.ingredient());
     }

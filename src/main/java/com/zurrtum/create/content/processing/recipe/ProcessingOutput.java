@@ -11,6 +11,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 
@@ -39,6 +40,10 @@ public record ProcessingOutput(Holder<Item> item, int count, DataComponentPatch 
 
     public ProcessingOutput(ItemStack stack) {
         this(stack.typeHolder(), stack.getCount(), stack.getComponentsPatch(), 1);
+    }
+
+    public ProcessingOutput(ItemStackTemplate stack) {
+        this(stack.item(), stack.count(), stack.components(), 1);
     }
 
     public ProcessingOutput(Holder<Item> item, int count, int chance) {

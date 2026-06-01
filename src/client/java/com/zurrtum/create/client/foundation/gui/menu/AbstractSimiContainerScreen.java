@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
+    private static @Nullable ExclusionZoneSync exclusionZoneSync;
     protected int windowXOffset, windowYOffset;
 
     public AbstractSimiContainerScreen(T container, Inventory inv, Component title, int imageWidth, int imageHeight) {
@@ -62,23 +63,29 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
         topPos += windowYOffset;
     }
 
-    //    @Override
-    //    public void init(int width, int height) {
-    //        super.init(width, height);
-    //        EivExclusionZoneHelper.setExclusionZone(getExtraAreas());
-    //    }
-    //
-    //    @Override
-    //    public void resize(int width, int height) {
-    //        super.resize(width, height);
-    //        EivExclusionZoneHelper.setExclusionZone(getExtraAreas());
-    //    }
-    //
-    //    @Override
-    //    public void removed() {
-    //        super.removed();
-    //        EivExclusionZoneHelper.removeExclusionZone();
-    //    }
+    @Override
+    public void init(int width, int height) {
+        super.init(width, height);
+        if (exclusionZoneSync != null) {
+            exclusionZoneSync.set(getExtraAreas());
+        }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        if (exclusionZoneSync != null) {
+            exclusionZoneSync.set(getExtraAreas());
+        }
+    }
+
+    @Override
+    public void removed() {
+        super.removed();
+        if (exclusionZoneSync != null) {
+            exclusionZoneSync.clear();
+        }
+    }
 
     @Override
     protected void containerTick() {
@@ -232,5 +239,9 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
             return null;
         }
         return (T) world.getBlockEntity(extraData.readBlockPos());
+    }
+
+    public static void setExclusionZoneSync(ExclusionZoneSync exclusionZoneSync) {
+        AbstractSimiContainerScreen.exclusionZoneSync = exclusionZoneSync;
     }
 }

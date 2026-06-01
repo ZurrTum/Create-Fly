@@ -3,6 +3,8 @@ package com.zurrtum.create.compat.eiv;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -24,8 +26,10 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class CreateDisplay implements IEivServerRecipe {
-    public Codec<List<ItemStack>> STACKS_CODEC = ItemStack.CODEC.listOf();
-    public Codec<List<List<ItemStack>>> STACKS_LIST_CODEC = STACKS_CODEC.listOf();
+    public static final Codec<List<ItemStack>> STACKS_CODEC = ItemStack.CODEC.listOf();
+    public static final Codec<List<List<ItemStack>>> STACKS_LIST_CODEC = STACKS_CODEC.listOf();
+    public static final Codec<List<FluidStack>> FLUID_STACKS_CODEC = FluidStack.CODEC.listOf();
+    public static final Codec<List<FluidIngredient>> FLUID_INGREDIENTS_CODEC = FluidIngredient.CODEC.listOf();
 
     public static RegistryOps<Tag> getServerOps() {
         return ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE);
@@ -64,25 +68,33 @@ public abstract class CreateDisplay implements IEivServerRecipe {
         return getItemStacks(ingredient, 1, context);
     }
 
+    public static ItemStack getFirstStack(Ingredient ingredient) {
+        MinecraftServer server = ServerRecipeManager.INSTANCE.getServer();
+        ContextMap context = new ContextMap.Builder().withParameter(SlotDisplayContext.FUEL_VALUES, server.fuelValues())
+            .withParameter(SlotDisplayContext.REGISTRIES, server.registryAccess()).create(SlotDisplayContext.CONTEXT);
+        return ingredient.display().resolveForFirstStack(context);
+    }
+
     private static List<ItemStack> getItemStacks(Ingredient ingredient, int count, ContextMap context) {
         List<ItemStack> stacks = ingredient.display().resolveForStacks(context);
         Optional<TagKey<Item>> value = ingredient.values.unwrap().left();
         if (value.isPresent()) {
             String tag = value.get().location().toString();
             if (count == 1) {
-                for (ItemStack stack : stacks) {
+                stacks = stacks.stream().map(stack -> {
+                    stack = stack.copy();
                     setEivRecipeTag(stack, tag);
-                }
+                    return stack;
+                }).toList();
             } else {
-                for (ItemStack stack : stacks) {
+                stacks = stacks.stream().map(stack -> {
+                    stack = stack.copyWithCount(count);
                     setEivRecipeTag(stack, tag);
-                    stack.setCount(count);
-                }
+                    return stack;
+                }).toList();
             }
         } else if (count != 1) {
-            for (ItemStack stack : stacks) {
-                stack.setCount(count);
-            }
+            stacks = stacks.stream().map(stack -> stack.copyWithCount(count)).toList();
         }
         return stacks;
     }

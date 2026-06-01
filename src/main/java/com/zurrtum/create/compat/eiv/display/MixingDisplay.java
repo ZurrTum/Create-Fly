@@ -1,10 +1,11 @@
 package com.zurrtum.create.compat.eiv.display;
 
-import com.mojang.serialization.Codec;
 import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.EivCommonPlugin;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
+import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
@@ -13,25 +14,33 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MixingDisplay extends CreateDisplay {
-    private static final Codec<List<FluidIngredient>> FLUID_INGREDIENTS_CODEC = FluidIngredient.CODEC.listOf();
-    public ItemStack result;
-    public FluidStack fluidResult;
-    public List<List<ItemStack>> ingredients;
-    public List<FluidIngredient> fluidIngredients;
-    public HeatCondition heat;
+    public @UnknownNullability List<ItemStack> results;
+    public @UnknownNullability List<Float> chances;
+    public @UnknownNullability List<FluidStack> fluidResults;
+    public @UnknownNullability List<List<ItemStack>> ingredients;
+    public @UnknownNullability List<FluidIngredient> fluidIngredients;
+    public @UnknownNullability HeatCondition heat;
 
     public MixingDisplay() {
     }
 
     public MixingDisplay(RecipeHolder<MixingRecipe> entry) {
         MixingRecipe recipe = entry.value();
-        result = recipe.result();
-        fluidResult = recipe.fluidResult();
+        List<ProcessingOutput> outputs = recipe.results();
+        int size = outputs.size();
+        results = new ArrayList<>(size);
+        chances = new ArrayList<>(size);
+        for (ProcessingOutput output : outputs) {
+            results.add(output.create());
+            chances.add(output.chance());
+        }
+        fluidResults = recipe.fluidResults();
         ingredients = new ArrayList<>(recipe.ingredients().size());
         addSizedIngredient(recipe.ingredients(), ingredients);
         fluidIngredients = recipe.fluidIngredients();
@@ -41,10 +50,10 @@ public class MixingDisplay extends CreateDisplay {
     @Override
     public void writeToTag(CompoundTag tag) {
         RegistryOps<Tag> ops = getServerOps();
-        if (result.isEmpty()) {
-            tag.store("fluidResult", FluidStack.CODEC, fluidResult);
-        } else {
-            tag.store("result", ItemStack.CODEC, ops, result);
+        tag.store("results", STACKS_CODEC, ops, results);
+        tag.store("chances", CreateCodecs.FLOAT_LIST_CODEC, ops, chances);
+        if (!fluidResults.isEmpty()) {
+            tag.store("fluidResults", FLUID_STACKS_CODEC, fluidResults);
         }
         tag.store("ingredients", STACKS_LIST_CODEC, ops, ingredients);
         if (!fluidIngredients.isEmpty()) {
@@ -58,8 +67,9 @@ public class MixingDisplay extends CreateDisplay {
     @Override
     public void loadFromTag(CompoundTag tag) {
         RegistryOps<Tag> ops = getClientOps();
-        result = tag.read("result", ItemStack.CODEC, ops).orElse(ItemStack.EMPTY);
-        fluidResult = tag.read("fluidResult", FluidStack.CODEC, ops).orElse(FluidStack.EMPTY);
+        results = tag.read("results", STACKS_CODEC, ops).orElseThrow();
+        chances = tag.read("chances", CreateCodecs.FLOAT_LIST_CODEC, ops).orElseThrow();
+        fluidResults = tag.read("fluidResults", FLUID_STACKS_CODEC, ops).orElse(List.of());
         fluidIngredients = tag.read("fluidIngredients", FLUID_INGREDIENTS_CODEC, ops).orElse(List.of());
         ingredients = tag.read("ingredients", STACKS_LIST_CODEC, ops).orElseThrow();
         heat = tag.read("heat", HeatCondition.CODEC, ops).orElse(HeatCondition.NONE);

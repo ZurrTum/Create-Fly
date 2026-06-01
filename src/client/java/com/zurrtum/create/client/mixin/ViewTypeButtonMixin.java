@@ -22,16 +22,16 @@ public class ViewTypeButtonMixin {
     @Shadow(remap = false)
     private int y;
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen$ViewTypeButton;onHover(Lnet/minecraft/client/gui/GuiGraphics;II)V"))
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen$ViewTypeButton;onHover(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"))
     private void renderIcon(
-        GuiGraphicsExtractor guiGraphics,
+        GuiGraphicsExtractor guiGraphicsExtractor,
         int mouseX,
         int mouseY,
         float partialTicks,
         CallbackInfo ci
     ) {
         if (viewType instanceof CreateCategory category) {
-            category.renderSubIcon(guiGraphics, x, y);
+            category.renderSubIcon(guiGraphicsExtractor, x, y);
         }
     }
 }
