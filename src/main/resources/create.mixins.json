@@ -53,6 +53,7 @@
     "PistonHeadBlockMixin",
     "PlayerListMixin",
     "PlayerMixin",
+    "RailStateMixin",
     "RecipeManagerMixin",
     "RedStoneWireBlockMixin",
     "RegistryDataLoaderMixin",
@@ -78,5 +79,6 @@
   "injectors": {
     "maxShiftBy": 2,
     "defaultRequire": 1
-  }
+  },
+  "mixinextras": {"minVersion": "0.5.0-beta.1"}
 }
