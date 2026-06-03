@@ -5,6 +5,7 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.compat.eiv.display.*;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
+import com.zurrtum.create.content.kinetics.crusher.CrushingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.foundation.item.ItemHelper;
@@ -109,9 +110,11 @@ public class EivCommonPlugin implements IExtendedItemViewIntegration {
         preparedRecipes.byType(AllRecipeTypes.MIXING).stream().map(MixingDisplay::new).forEach(recipes::add);
         Collection<RecipeHolder<MillingRecipe>> millingRecipes = preparedRecipes.byType(AllRecipeTypes.MILLING);
         millingRecipes.stream().map(MilingDisplay::new).forEach(recipes::add);
-        millingRecipes.stream().map(CrushingDisplay::new).forEach(recipes::add);
         preparedRecipes.byType(AllRecipeTypes.CUTTING).stream().map(SawingDisplay::new).forEach(recipes::add);
-        preparedRecipes.byType(AllRecipeTypes.CRUSHING).stream().map(CrushingDisplay::new).forEach(recipes::add);
+        Collection<RecipeHolder<CrushingRecipe>> crushingRecipes = preparedRecipes.byType(AllRecipeTypes.CRUSHING);
+        crushingRecipes.stream().map(CrushingDisplay::new).forEach(recipes::add);
+        millingRecipes.stream().map(entry -> CrushingDisplay.of(entry, crushingRecipes)).filter(Objects::nonNull)
+            .forEach(recipes::add);
         Collection<RecipeHolder<ManualApplicationRecipe>> manualApplicationRecipes = preparedRecipes.byType(
             AllRecipeTypes.ITEM_APPLICATION);
         manualApplicationRecipes.stream().map(ManualApplicationDisplay::new).forEach(recipes::add);
