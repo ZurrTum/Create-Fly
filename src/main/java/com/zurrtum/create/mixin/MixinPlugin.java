@@ -29,6 +29,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("SavedDataStorageMixin");
             mixins.add("IngredientMixin");
         }
+        if (loader.isModLoaded("fabric-networking-api-v1")) {
+            mixins.add("MenuProviderMixin");
+        }
         if (loader.isModLoaded("fabric-resource-loader-v1")) {
             mixins.add("ReloadListenerMixin");
         }

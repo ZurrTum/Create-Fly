@@ -26,6 +26,17 @@ public interface MenuProvider {
         openHandledScreen(player, this);
     }
 
+    @Nullable
+    static MenuBase<?> createMenu(
+        MenuProvider provider,
+        int containerCounter,
+        Inventory inventory,
+        ServerPlayer player,
+        RegistryFriendlyByteBuf buf
+    ) {
+        return provider.createMenu(containerCounter, inventory, player, buf);
+    }
+
     static void openHandledScreen(ServerPlayer player, MenuProvider provider) {
         if (player.containerMenu != player.inventoryMenu) {
             player.closeContainer();
@@ -34,7 +45,7 @@ public interface MenuProvider {
         player.nextContainerCounter();
 
         RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess());
-        MenuBase<?> menu = provider.createMenu(player.containerCounter, player.getInventory(), player, buf);
+        MenuBase<?> menu = createMenu(provider, player.containerCounter, player.getInventory(), player, buf);
         if (menu == null) {
             if (player.isSpectator()) {
                 player.sendOverlayMessage(Component.translatable("container.spectatorCantOpen")
