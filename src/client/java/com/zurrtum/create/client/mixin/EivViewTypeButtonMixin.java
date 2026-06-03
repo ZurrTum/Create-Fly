@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "de.crafty.eiv.common.recipe.inventory.RecipeViewScreen$ViewTypeButton")
-public class ViewTypeButtonMixin {
+public class EivViewTypeButtonMixin {
     @Final
     @Shadow(remap = false)
     private IEivRecipeViewType viewType;

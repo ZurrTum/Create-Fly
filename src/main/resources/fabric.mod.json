@@ -30,6 +30,9 @@
     ],
     "eiv": [
       "com.zurrtum.create.compat.eiv.EivCommonPlugin"
+    ],
+    "rrv_client": [
+      "com.zurrtum.create.client.compat.rrv.RrvClientPlugin"
     ]
   },
   "accessWidener": "create.classtweaker",

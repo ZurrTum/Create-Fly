@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.List;
 
 @Mixin(ItemSlot.class)
-public class ItemSlotMixin {
+public class EivItemSlotMixin {
     @Shadow(remap = false)
     private boolean hovered;
 

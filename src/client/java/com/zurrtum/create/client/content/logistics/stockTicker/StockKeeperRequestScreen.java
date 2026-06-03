@@ -40,7 +40,6 @@ import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryHidingPac
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperLockPacket;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -185,7 +184,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             }
         }
 
-        if (FabricLoader.getInstance().isModLoaded("eiv")) {
+        if (searchSync != null && searchSync.slotSync()) {
             cursorSlot = new Slot(new ItemStackHandler(), 0, 0, 0);
         }
 

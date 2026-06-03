@@ -1,23 +1,23 @@
 package com.zurrtum.create.client.mixin;
 
+import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
+import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
+import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.zurrtum.create.client.compat.eiv.CreateView;
-import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
-import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
-import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
+import com.zurrtum.create.client.compat.rrv.CreateView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(RecipeViewMenu.class)
-public class RecipeViewMenuMixin {
-    @WrapOperation(method = "updateByPage()V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/api/recipe/IEivRecipeViewType;placeSlots(Lde/crafty/eiv/common/recipe/inventory/RecipeViewMenu$SlotDefinition;)V"), remap = false)
+public class RrvRecipeViewMenuMixin {
+    @WrapOperation(method = "updateByPage()V", at = @At(value = "INVOKE", target = "Lcc/cassian/rrv/api/recipe/ReliableClientRecipeType;placeSlots(Lcc/cassian/rrv/common/recipe/inventory/RecipeViewMenu$SlotDefinition;)V"), remap = false)
     private void placeSlots(
-        IEivRecipeViewType type,
+        ReliableClientRecipeType type,
         RecipeViewMenu.SlotDefinition slotDefinition,
         Operation<Void> original,
-        @Local(name = "recipe") IEivViewRecipe recipe
+        @Local(name = "recipe") ReliableClientRecipe recipe
     ) {
         if (recipe instanceof CreateView view) {
             view.placeSlots(slotDefinition);

@@ -1,9 +1,9 @@
-package com.zurrtum.create.compat.jei;
+package com.zurrtum.create.compat.fabric;
 
 import com.zurrtum.create.AllRecipeSerializers;
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 
-public class JeiCommonPlugin {
+public class RecipeCommonPlugin {
     public static void register() {
         RecipeSynchronization.synchronizeRecipeSerializer(AllRecipeSerializers.COMPACTING);
         RecipeSynchronization.synchronizeRecipeSerializer(AllRecipeSerializers.PRESSING);

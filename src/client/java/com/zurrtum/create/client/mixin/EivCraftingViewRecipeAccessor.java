@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.HashMap;
 
 @Mixin(CraftingViewRecipe.class)
-public interface CraftingViewRecipeAccessor {
+public interface EivCraftingViewRecipeAccessor {
     @Accessor(value = "ingredientSlotContents", remap = false)
     HashMap<Integer, SlotContent> getIngredientSlotContents();
 }

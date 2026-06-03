@@ -27,8 +27,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @Mixin(RecipeViewScreen.class)
-public abstract class RecipeViewScreenMixin extends AbstractContainerScreen<RecipeViewMenu> {
-    private RecipeViewScreenMixin(RecipeViewMenu handler, Inventory inventory, Component title) {
+public abstract class EivRecipeViewScreenMixin extends AbstractContainerScreen<RecipeViewMenu> {
+    private EivRecipeViewScreenMixin(RecipeViewMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
 

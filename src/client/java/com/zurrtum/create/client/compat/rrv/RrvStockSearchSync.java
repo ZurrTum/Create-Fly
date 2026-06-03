@@ -1,11 +1,11 @@
-package com.zurrtum.create.client.compat.eiv;
+package com.zurrtum.create.client.compat.rrv;
 
+import cc.cassian.rrv.common.overlay.itemlist.view.ItemViewOverlay;
 import com.zurrtum.create.client.content.logistics.stockTicker.StockSearchSync;
-import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.gui.components.EditBox;
 import org.jspecify.annotations.Nullable;
 
-public record EivStockSearchSync(ItemViewOverlay overlay) implements StockSearchSync {
+public record RrvStockSearchSync(ItemViewOverlay overlay) implements StockSearchSync {
     @Override
     public boolean slotSync() {
         return true;

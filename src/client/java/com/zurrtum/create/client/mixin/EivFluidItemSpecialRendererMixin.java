@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.awt.*;
 
 @Mixin(FluidItemSpecialRenderer.class)
-public class FluidItemSpecialRendererMixin {
+public class EivFluidItemSpecialRendererMixin {
     @WrapOperation(method = "submit(Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;IIZI)V", at = @At(value = "NEW", target = "(I)Ljava/awt/Color;"))
     private Color createColor(int rgb, Operation<Color> original, @Local ItemStack stack, @Local Fluid fluid) {
         if (fluid != Fluids.WATER && fluid != Fluids.LAVA) {

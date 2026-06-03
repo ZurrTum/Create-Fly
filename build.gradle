@@ -3,46 +3,26 @@ plugins {
 }
 
 repositories {
-    maven {
-        name "REI"
-        url "https://maven.shedaniel.me/"
-        content {
-            includeGroup "me.shedaniel"
-            includeGroup "me.shedaniel.cloth"
-            includeGroup "dev.architectury"
-        }
-    }
-    maven {
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-        content {
-            includeGroup "mezz.jei"
-        }
-    }
-    maven {
-        url "https://maven.squiddev.cc"
-        content {
-            includeGroup("cc.tweaked")
-        }
-    }
-    maven {
-        name = "Nucleoid"
-        url = 'https://maven.nucleoid.xyz/releases'
-        content {
-            includeGroup "eu.pb4"
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
+    def addGroup = { String url, String... groups ->
+        exclusiveContent {
+            forRepository {
+                maven {
+                    it.url = url
+                }
+            }
+            filter {
+                groups.each {
+                    includeGroup it
+                }
             }
         }
-        filter {
-            includeGroup "maven.modrinth"
-        }
     }
+    addGroup("https://maven.shedaniel.me", "me.shedaniel", "me.shedaniel.cloth", "dev.architectury")
+    addGroup("https://maven.blamejared.com", "mezz.jei")
+    addGroup("https://maven.cassian.cc", "cc.cassian.rrv")
+    addGroup("https://maven.squiddev.cc", "cc.tweaked")
+    addGroup("https://maven.nucleoid.xyz/releases", "eu.pb4")
+    addGroup("https://api.modrinth.com/maven", "maven.modrinth")
 }
 
 version = "$project.mod_version-$project.mod_id"
@@ -111,6 +91,7 @@ dependencies {
 //    }
     compileOnly "mezz.jei:jei-${project.jei_version}"
     compileOnly "maven.modrinth:eiv:${project.eiv_version}"
+    compileOnly "cc.cassian.rrv:reliable-recipe-viewer-fabric:${rrv_version}"
     compileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
     compileOnly "eu.pb4:trinkets:${project.trinkets_version}"
     clientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
