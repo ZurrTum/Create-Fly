@@ -3,7 +3,7 @@ package com.zurrtum.create.client.mixin;
 import com.zurrtum.create.client.infrastructure.render.BreakingRenderStateInfo;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.state.level.BlockBreakingRenderState;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -13,7 +13,7 @@ public class BlockBreakingRenderStateMixin implements BreakingRenderStateInfo {
     private BlockStateModel model;
 
     @Override
-    public void create$setRenderModel(@NonNull BlockStateModel model) {
+    public void create$setRenderModel(@Nullable BlockStateModel model) {
         this.model = model;
     }
 

@@ -53,6 +53,7 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
         return pos;
     }
 
+    @Nullable
     public static BlockStateModel getBlockDestroyModel(
         BlockStateModel model,
         BlockAndTintGetter level,
@@ -63,9 +64,10 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
         if (model instanceof WrapperBlockStateModel wrapper) {
             return extractBlockDestroyModel(wrapper, level, pos, state, seed);
         }
-        return model;
+        return null;
     }
 
+    @Nullable
     public static BlockStateModel getBlockDestroyModel(
         BlockStateModel model,
         BlockAndTintGetter level,
@@ -75,7 +77,7 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
         if (model instanceof WrapperBlockStateModel wrapper) {
             return extractBlockDestroyModel(wrapper, level, pos, state, state.getSeed(pos));
         }
-        return model;
+        return null;
     }
 
     private static BlockStateModel extractBlockDestroyModel(

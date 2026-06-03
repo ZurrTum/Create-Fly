@@ -205,7 +205,13 @@ public abstract class LevelRendererMixin {
             vertexConsumers,
             cameraPos,
             matrices
-        ) || TrackBlockOutline.drawCustomBlockSelection(minecraft, state.pos(), vertexConsumers, cameraPos, matrices)) {
+        ) || TrackBlockOutline.drawCustomBlockSelection(
+            minecraft,
+            state.pos(),
+            vertexConsumers,
+            cameraPos,
+            matrices
+        )) {
             ci.cancel();
         }
     }
@@ -222,11 +228,6 @@ public abstract class LevelRendererMixin {
         }
         return original.call(state);
     }
-
-    //    @Inject(method = "submitBlockEntities(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/state/level/LevelRenderState;Lnet/minecraft/client/renderer/SubmitNodeStorage;)V", at = @At("HEAD"))
-    //    private void markSpriteActive(CallbackInfo ci) {
-    //        SodiumCompat.markSpriteActive(minecraft);
-    //    }
 
     @Inject(method = "extractBlockDestroyAnimation(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/state/level/LevelRenderState;)V", at = @At("HEAD"))
     private void init(
@@ -251,13 +252,9 @@ public abstract class LevelRendererMixin {
         return e;
     }
 
-    @WrapOperation(method = "submitBlockDestroyAnimation(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/LevelRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockStateModelSet;get(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;"))
-    private BlockStateModel getRenderModel(
-        BlockStateModelSet instance,
-        BlockState state,
-        Operation<BlockStateModel> original,
-        @Local BlockBreakingRenderState renderState
-    ) {
-        return ((BreakingRenderStateInfo) (Object) renderState).create$getRenderModel();
+    @ModifyArg(method = "submitBlockDestroyAnimation(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/LevelRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitBreakingBlockModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;JI)V"), order = 1)
+    private BlockStateModel modifyModel(BlockStateModel model, @Local BlockBreakingRenderState renderState) {
+        BlockStateModel renderModel = ((BreakingRenderStateInfo) (Object) renderState).create$getRenderModel();
+        return renderModel != null ? renderModel : model;
     }
 }

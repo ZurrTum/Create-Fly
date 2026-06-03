@@ -83,7 +83,7 @@ public abstract class WrapperBlockStateModelMixin implements FabricBlockStateMod
         if (unwrap(model) instanceof WrapperBlockStateModel wrapper) {
             return extractBlockDestroyModel(wrapper, level, pos, state, seed);
         }
-        return model;
+        return null;
     }
 
     @Overwrite(remap = false)
@@ -96,7 +96,7 @@ public abstract class WrapperBlockStateModelMixin implements FabricBlockStateMod
         if (unwrap(model) instanceof WrapperBlockStateModel wrapper) {
             return extractBlockDestroyModel(wrapper, level, pos, state, state.getSeed(pos));
         }
-        return model;
+        return null;
     }
 
     @Override
