@@ -175,7 +175,7 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
 
     public static class FrogportRenderData {
         public @UnknownNullability SuperByteBufferRenderState body;
-        public @UnknownNullability Quaternionf tonguePitch;
+        public @Nullable Quaternionf tonguePitch;
         public @Nullable Quaternionf yRot;
         public @UnknownNullability SuperByteBufferRenderState head;
         public @Nullable Quaternionf headPitch;
@@ -203,7 +203,9 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
             body.submit(matrices, queue);
             matrices.pushPose();
             matrices.translate(0.5f, 0.625f, 0.6875f);
-            matrices.mulPose(tonguePitch);
+            if (tonguePitch != null) {
+                matrices.mulPose(tonguePitch);
+            }
             matrices.scale(1, 1, tongueScale);
             matrices.translate(-0.5f, -0.625f, -0.6875f);
             tongue.submit(matrices, queue);
