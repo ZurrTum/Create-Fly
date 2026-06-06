@@ -8,6 +8,7 @@ import com.zurrtum.create.client.content.contraptions.actors.harvester.Harvester
 import com.zurrtum.create.client.content.contraptions.actors.psi.PSIVisual;
 import com.zurrtum.create.client.content.contraptions.actors.psi.PortableStorageInterfaceRenderer;
 import com.zurrtum.create.client.content.contraptions.actors.roller.RollerRenderer;
+import com.zurrtum.create.client.content.contraptions.actors.roller.RollerVisual;
 import com.zurrtum.create.client.content.contraptions.bearing.BearingRenderer;
 import com.zurrtum.create.client.content.contraptions.bearing.BearingVisual;
 import com.zurrtum.create.client.content.contraptions.chassis.StickerRenderer;
@@ -303,7 +304,7 @@ public class AllBlockEntityRenders {
         visual(AllBlockEntityTypes.TRACK_SIGNAL, SignalRenderer::new, SignalVisual::new);
         render(AllBlockEntityTypes.TRACK_STATION, StationRenderer::new);
         normal(AllBlockEntityTypes.TRACK_OBSERVER, TrackObserverRenderer::new, TrackObserverVisual::new);
-        render(AllBlockEntityTypes.MECHANICAL_ROLLER, RollerRenderer::new);
+        normal(AllBlockEntityTypes.MECHANICAL_ROLLER, RollerRenderer::new, RollerVisual::new);
         render(AllBlockEntityTypes.LECTERN_CONTROLLER, LecternControllerRenderer::new);
         normal(AllBlockEntityTypes.PACKAGER, PackagerRenderer::new, PackagerVisual::new);
         render(AllBlockEntityTypes.PACKAGER_LINK, LinkBulbRenderer::new);

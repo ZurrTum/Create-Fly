@@ -9,6 +9,7 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.actors.roller.RollerRenderer.RollerRenderState;
+import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -21,9 +22,11 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Quaternionf;
@@ -51,7 +54,25 @@ public class RollerRenderer implements BlockEntityRenderer<RollerBlockEntity, Ro
         Vec3 cameraPos,
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
-        Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
+        Level level = be.getLevel();
+        if (VisualizationManager.supportsVisualization(level)) {
+            BlockPos blockPos = be.getBlockPos();
+            BlockState blockState = be.getBlockState();
+            state.filter = FilteringRenderer.getFilterRenderState(
+                be,
+                blockState,
+                itemModelManager,
+                be.isVirtual() ? -1 : cameraPos.distanceToSqr(VecHelper.getCenterOf(blockPos))
+            );
+            if (state.filter != null) {
+                state.blockPos = blockPos;
+                state.blockState = blockState;
+                state.blockEntityType = be.getType();
+                state.lightCoords = SmartBlockEntityRenderer.getLightCoords(level, blockPos);
+            }
+            return;
+        }
+        SmartBlockEntityRenderer.extractBase(level, be, state, crumblingOverlay);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
         state.filter = FilteringRenderer.getFilterRenderState(
             be,
@@ -82,27 +103,29 @@ public class RollerRenderer implements BlockEntityRenderer<RollerBlockEntity, Ro
         if (state.filter != null) {
             state.filter.submit(state.blockState, queue, matrices, state.lightCoords);
         }
-        matrices.pushPose();
-        matrices.translate(state.offset);
-        if (state.wheelAngle != null) {
-            matrices.rotateAround(state.wheelAngle, 0.5f, 0.5f, 0.5f);
+        if (state.wheel != null) {
+            matrices.pushPose();
+            matrices.translate(state.offset);
+            if (state.wheelAngle != null) {
+                matrices.rotateAround(state.wheelAngle, 0.5f, 0.5f, 0.5f);
+            }
+            if (state.rotate != null) {
+                matrices.mulPose(state.rotate);
+            }
+            matrices.translate(0, -0.5, 0.5);
+            matrices.mulPose(state.yRot);
+            state.wheel.submit(matrices, queue);
+            matrices.popPose();
+            if (state.frameAngle != null) {
+                matrices.rotateAround(state.frameAngle, 0.5f, 0.5f, 0.5f);
+            }
+            state.frame.submit(matrices, queue);
         }
-        if (state.rotate != null) {
-            matrices.mulPose(state.rotate);
-        }
-        matrices.translate(0, -0.5, 0.5);
-        matrices.mulPose(state.yRot);
-        state.wheel.submit(matrices, queue);
-        matrices.popPose();
-        if (state.frameAngle != null) {
-            matrices.rotateAround(state.frameAngle, 0.5f, 0.5f, 0.5f);
-        }
-        state.frame.submit(matrices, queue);
     }
 
     public static class RollerRenderState extends BlockEntityRenderState {
         public @Nullable FilterRenderState filter;
-        public @UnknownNullability SuperByteBufferRenderState wheel;
+        public @Nullable SuperByteBufferRenderState wheel;
         public @UnknownNullability SuperByteBufferRenderState frame;
         public @UnknownNullability Vec3 offset;
         public @Nullable Quaternionf wheelAngle;
