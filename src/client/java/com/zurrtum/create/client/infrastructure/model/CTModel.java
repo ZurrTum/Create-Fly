@@ -4,7 +4,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
-import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour.CTContext;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -117,7 +116,7 @@ public class CTModel extends WrapperBlockStateModel {
                 indices[face.get3DDataValue()] = -1;
                 continue;
             }
-            CTContext context = behaviour.buildContext(world, pos, state, face, dataType.getContextRequirement());
+            int context = behaviour.buildContext(world, pos, state, face, dataType);
             indices[face.get3DDataValue()] = dataType.getTextureIndex(context);
         }
         return indices;

@@ -5,6 +5,6 @@
     "4": "create:block/gearbox",
     "casing": "create:block/andesite_casing",
     "particle": "create:block/andesite_casing",
-    "side": "create:block/andesite_encased_cogwheel_side_connected"
+    "side": "create:block/andesite_encased_cogwheel_side_connected/3"
   }
 }

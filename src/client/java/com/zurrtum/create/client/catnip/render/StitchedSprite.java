@@ -3,7 +3,7 @@ package com.zurrtum.create.client.catnip.render;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class StitchedSprite {
 
     protected final Identifier atlasLocation;
     protected final Identifier location;
-    protected @Nullable TextureAtlasSprite sprite;
+    protected @UnknownNullability TextureAtlasSprite sprite;
 
     public StitchedSprite(Identifier atlas, Identifier location) {
         atlasLocation = atlas;
@@ -51,7 +51,6 @@ public class StitchedSprite {
     }
 
     public TextureAtlasSprite get() {
-        assert sprite != null;
         return sprite;
     }
 }

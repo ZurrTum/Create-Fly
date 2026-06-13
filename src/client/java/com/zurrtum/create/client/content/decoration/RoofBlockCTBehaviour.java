@@ -1,23 +1,19 @@
 package com.zurrtum.create.client.content.decoration;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
-import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
-import com.zurrtum.create.client.foundation.block.connected.CTType;
-import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
+import com.zurrtum.create.client.foundation.block.connected.*;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
-import net.minecraft.world.level.block.state.properties.StairsShape;
 import org.jspecify.annotations.Nullable;
 
 public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
@@ -46,19 +42,11 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public CTContext buildContext(
-        BlockAndTintGetter reader,
-        BlockPos pos,
-        BlockState state,
-        Direction face,
-        ContextRequirement requirement
-    ) {
-
+    public int buildContext(BlockAndTintGetter reader, BlockPos pos, BlockState state, Direction face, CTType type) {
         if (isUprightStair(state)) {
-            return getStairMapping(state);
+            return ((RoofCTType) type).getStairMapping(state);
         }
-
-        return super.buildContext(reader, pos, state, face, requirement);
+        return super.buildContext(reader, pos, state, face, type);
     }
 
     @Override
@@ -72,7 +60,6 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
         @Nullable Direction primaryOffset,
         @Nullable Direction secondaryOffset
     ) {
-
         if (connects(reader, pos, state, other) || connectsHigh(
             reader,
             pos,
@@ -119,31 +106,10 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
         return state.hasProperty(StairBlock.SHAPE) && state.getValueOrElse(StairBlock.HALF, Half.TOP) == Half.BOTTOM;
     }
 
-    public CTContext getStairMapping(BlockState state) {
-        CTContext context = new CTContext();
-        StairsShape shape = state.getValue(StairBlock.SHAPE);
-        Direction facing = state.getValue(StairBlock.FACING);
-
-        if (shape == StairsShape.OUTER_LEFT) {
-            facing = facing.getCounterClockWise();
-        }
-        if (shape == StairsShape.INNER_LEFT) {
-            facing = facing.getCounterClockWise();
-        }
-
-        int type = shape == StairsShape.STRAIGHT ? 0 : (shape == StairsShape.INNER_LEFT || shape == StairsShape.INNER_RIGHT) ? 1 : 2;
-        int rot = facing.get2DDataValue();
-        context.up = type >= 2;
-        context.right = type % 2 == 1;
-        context.left = rot >= 2;
-        context.down = rot % 2 == 1;
-        return context;
-    }
-
     protected boolean connects(BlockAndTintGetter reader, BlockPos pos, BlockState state, BlockState other) {
         double top = state.getCollisionShape(reader, pos).max(Axis.Y);
-        double topOther = other.getSoundType() != SoundType.COPPER ? 0 : other.getCollisionShape(reader, pos)
-            .max(Axis.Y);
+        double topOther =
+            other.getSoundType() != SoundType.COPPER ? 0 : other.getCollisionShape(reader, pos).max(Axis.Y);
         return Mth.equal(top, topOther);
     }
 
@@ -171,8 +137,8 @@ public class RoofBlockCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public @Nullable CTType getDataType(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction direction) {
-        return isUprightStair(state) ? AllCTTypes.ROOF_STAIR : AllCTTypes.ROOF;
+    public CTType getDataType(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction direction) {
+        return AllCTTypes.ROOF;
     }
 
 }

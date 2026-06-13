@@ -4,7 +4,7 @@
 	"textures": {
 		"casing": "create:block/andesite_casing",
 		"1": "block/stripped_spruce_log_top",
-		"side": "create:block/andesite_encased_cogwheel_side_connected",
+		"side": "create:block/andesite_encased_cogwheel_side_connected/3",
 		"4": "create:block/large_cogwheel",
 		"particle": "#casing"
 	},
@@ -13,10 +13,10 @@
 			"from": [0, 0, 0],
 			"to": [16, 6, 16],
 			"faces": {
-				"north": {"uv": [8, 13, 16, 16], "texture": "#side"},
-				"east": {"uv": [8, 13, 16, 16], "texture": "#side"},
-				"south": {"uv": [8, 13, 16, 16], "texture": "#side"},
-				"west": {"uv": [8, 13, 16, 16], "texture": "#side"},
+				"north": {"uv": [0, 10, 16, 16], "texture": "#side"},
+				"east": {"uv": [0, 10, 16, 16], "texture": "#side"},
+				"south": {"uv": [0, 10, 16, 16], "texture": "#side"},
+				"west": {"uv": [0, 10, 16, 16], "texture": "#side"},
 				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
 				"down": {"uv": [0, 0, 16, 16], "texture": "#casing"}
 			}
@@ -25,10 +25,10 @@
 			"from": [0, 10, 0],
 			"to": [16, 16, 16],
 			"faces": {
-				"north": {"uv": [8, 8, 16, 11], "texture": "#side"},
-				"east": {"uv": [8, 8, 16, 11], "texture": "#side"},
-				"south": {"uv": [8, 8, 16, 11], "texture": "#side"},
-				"west": {"uv": [8, 8, 16, 11], "texture": "#side"},
+				"north": {"uv": [0, 0, 16, 6], "texture": "#side"},
+				"east": {"uv": [0, 0, 16, 6], "texture": "#side"},
+				"south": {"uv": [0, 0, 16, 6], "texture": "#side"},
+				"west": {"uv": [0, 0, 16, 6], "texture": "#side"},
 				"up": {"uv": [0, 0, 16, 16], "texture": "#casing"},
 				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
 			}

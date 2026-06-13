@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.block.connected;
 import com.zurrtum.create.foundation.block.AppearanceControlBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
@@ -13,7 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public abstract class ConnectedTextureBehaviour {
-
     @Nullable
     public CTSpriteShiftEntry getShift(
         BlockState state,
@@ -71,8 +71,8 @@ public abstract class ConnectedTextureBehaviour {
         BlockPos pos,
         BlockPos otherPos,
         Direction face,
-        Direction primaryOffset,
-        Direction secondaryOffset
+        @Nullable Direction primaryOffset,
+        @Nullable Direction secondaryOffset
     ) {
         return connectsTo(state, other, reader, pos, otherPos, face);
     }
@@ -88,34 +88,25 @@ public abstract class ConnectedTextureBehaviour {
         return !isBeingBlocked(state, reader, pos, otherPos, face) && state.getBlock() == other.getBlock();
     }
 
-    private boolean testConnection(
+    public boolean testConnection(
         BlockAndTintGetter reader,
         BlockPos currentPos,
+        BlockPos targetPos,
+        BlockState trueCurrentState,
         BlockState connectiveCurrentState,
         Direction textureSide,
-        final Direction horizontal,
-        final Direction vertical,
-        int sh,
-        int sv
+        @Nullable Direction horizontal,
+        @Nullable Direction vertical
     ) {
-        BlockState trueCurrentState = reader.getBlockState(currentPos);
-        BlockPos targetPos = currentPos.relative(horizontal, sh).relative(vertical, sv);
-        BlockState connectiveTargetState = getCTBlockState(
-            reader,
-            trueCurrentState,
-            textureSide,
-            currentPos,
-            targetPos
-        );
         return connectsTo(
             connectiveCurrentState,
-            connectiveTargetState,
+            getCTBlockState(reader, trueCurrentState, textureSide, currentPos, targetPos),
             reader,
             currentPos,
             targetPos,
             textureSide,
-            sh == 0 ? null : sh == -1 ? horizontal.getOpposite() : horizontal,
-            sv == 0 ? null : sv == -1 ? vertical.getOpposite() : vertical
+            horizontal,
+            vertical
         );
     }
 
@@ -155,212 +146,40 @@ public abstract class ConnectedTextureBehaviour {
         return axis == Axis.X ? Direction.SOUTH : Direction.WEST;
     }
 
-    public CTContext buildContext(
-        BlockAndTintGetter reader,
-        BlockPos pos,
-        BlockState state,
-        Direction face,
-        ContextRequirement requirement
-    ) {
-        boolean positive = face.getAxisDirection() == AxisDirection.POSITIVE;
-        Direction h = getRightDirection(reader, pos, state, face);
-        Direction v = getUpDirection(reader, pos, state, face);
-        h = positive ? h.getOpposite() : h;
-        if (face == Direction.DOWN) {
-            v = v.getOpposite();
-            h = h.getOpposite();
+    public int buildContext(BlockAndTintGetter reader, BlockPos pos, BlockState state, Direction face, CTType type) {
+        Direction horizontal = getRightDirection(reader, pos, state, face);
+        Direction vertical = getUpDirection(reader, pos, state, face);
+        boolean down = face == Direction.DOWN;
+        if (down) {
+            vertical = vertical.getOpposite();
         }
-
-        final Direction horizontal = h;
-        final Direction vertical = v;
-
+        if (down ^ face.getAxisDirection() == AxisDirection.POSITIVE) {
+            horizontal = horizontal.getOpposite();
+        }
+        BlockState trueCurrentState = reader.getBlockState(pos);
         boolean flipH = reverseUVsHorizontally(state, face);
         boolean flipV = reverseUVsVertically(state, face);
-        int sh = flipH ? -1 : 1;
-        int sv = flipV ? -1 : 1;
-
-        CTContext context = new CTContext();
-
-        if (requirement.up) {
-            context.up = testConnection(reader, pos, state, face, horizontal, vertical, 0, sv);
-        }
-        if (requirement.down) {
-            context.down = testConnection(reader, pos, state, face, horizontal, vertical, 0, -sv);
-        }
-        if (requirement.left) {
-            context.left = testConnection(reader, pos, state, face, horizontal, vertical, -sh, 0);
-        }
-        if (requirement.right) {
-            context.right = testConnection(reader, pos, state, face, horizontal, vertical, sh, 0);
-        }
-
-        if (requirement.topLeft) {
-            context.topLeft = context.up && context.left && testConnection(
+        MutableBlockPos targetPos = new MutableBlockPos();
+        int context = 0;
+        for (CTPosStep step : type.getSteps()) {
+            if (step.test(
+                this,
+                context,
+                flipH,
+                flipV,
                 reader,
                 pos,
+                targetPos,
+                trueCurrentState,
                 state,
                 face,
                 horizontal,
-                vertical,
-                -sh,
-                sv
-            );
+                vertical
+            )) {
+                context |= step.flag();
+            }
         }
-        if (requirement.topRight) {
-            context.topRight = context.up && context.right && testConnection(
-                reader,
-                pos,
-                state,
-                face,
-                horizontal,
-                vertical,
-                sh,
-                sv
-            );
-        }
-        if (requirement.bottomLeft) {
-            context.bottomLeft = context.down && context.left && testConnection(
-                reader,
-                pos,
-                state,
-                face,
-                horizontal,
-                vertical,
-                -sh,
-                -sv
-            );
-        }
-        if (requirement.bottomRight) {
-            context.bottomRight = context.down && context.right && testConnection(
-                reader,
-                pos,
-                state,
-                face,
-                horizontal,
-                vertical,
-                sh,
-                -sv
-            );
-        }
-
         return context;
-    }
-
-    public static class CTContext {
-        public static final CTContext EMPTY = new CTContext();
-
-        public boolean up, down, left, right;
-        public boolean topLeft, topRight, bottomLeft, bottomRight;
-    }
-
-    public static class ContextRequirement {
-        public final boolean up, down, left, right;
-        public final boolean topLeft, topRight, bottomLeft, bottomRight;
-
-        public ContextRequirement(
-            boolean up,
-            boolean down,
-            boolean left,
-            boolean right,
-            boolean topLeft,
-            boolean topRight,
-            boolean bottomLeft,
-            boolean bottomRight
-        ) {
-            this.up = up;
-            this.down = down;
-            this.left = left;
-            this.right = right;
-            this.topLeft = topLeft;
-            this.topRight = topRight;
-            this.bottomLeft = bottomLeft;
-            this.bottomRight = bottomRight;
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        public static class Builder {
-            private boolean up, down, left, right;
-            private boolean topLeft, topRight, bottomLeft, bottomRight;
-
-            public Builder up() {
-                up = true;
-                return this;
-            }
-
-            public Builder down() {
-                down = true;
-                return this;
-            }
-
-            public Builder left() {
-                left = true;
-                return this;
-            }
-
-            public Builder right() {
-                right = true;
-                return this;
-            }
-
-            public Builder topLeft() {
-                topLeft = true;
-                return this;
-            }
-
-            public Builder topRight() {
-                topRight = true;
-                return this;
-            }
-
-            public Builder bottomLeft() {
-                bottomLeft = true;
-                return this;
-            }
-
-            public Builder bottomRight() {
-                bottomRight = true;
-                return this;
-            }
-
-            public Builder horizontal() {
-                left();
-                right();
-                return this;
-            }
-
-            public Builder vertical() {
-                up();
-                down();
-                return this;
-            }
-
-            public Builder axisAligned() {
-                horizontal();
-                vertical();
-                return this;
-            }
-
-            public Builder corners() {
-                topLeft();
-                topRight();
-                bottomLeft();
-                bottomRight();
-                return this;
-            }
-
-            public Builder all() {
-                axisAligned();
-                corners();
-                return this;
-            }
-
-            public ContextRequirement build() {
-                return new ContextRequirement(up, down, left, right, topLeft, topRight, bottomLeft, bottomRight);
-            }
-        }
     }
 
     public static abstract class Base extends ConnectedTextureBehaviour {
@@ -382,5 +201,4 @@ public abstract class ConnectedTextureBehaviour {
             return shift.getType();
         }
     }
-
 }

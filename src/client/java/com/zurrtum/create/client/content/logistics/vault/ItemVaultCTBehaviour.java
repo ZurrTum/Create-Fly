@@ -20,22 +20,21 @@ public class ItemVaultCTBehaviour extends ConnectedTextureBehaviour.Base {
     @Nullable
     public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         Axis vaultBlockAxis = ItemVaultBlock.getVaultBlockAxis(state);
-        boolean small = !ItemVaultBlock.isLarge(state);
         if (vaultBlockAxis == null) {
             return null;
         }
 
+        boolean large = ItemVaultBlock.isLarge(state);
         if (direction.getAxis() == vaultBlockAxis) {
-            return AllSpriteShifts.VAULT_FRONT.get(small);
+            return large ? AllSpriteShifts.VAULT_FRONT_LARGE : AllSpriteShifts.VAULT_FRONT_MEDIUM;
         }
         if (direction == Direction.UP) {
-            return AllSpriteShifts.VAULT_TOP.get(small);
+            return large ? AllSpriteShifts.VAULT_TOP_LARGE : AllSpriteShifts.VAULT_TOP_MEDIUM;
         }
         if (direction == Direction.DOWN) {
-            return AllSpriteShifts.VAULT_BOTTOM.get(small);
+            return large ? AllSpriteShifts.VAULT_BOTTOM_LARGE : AllSpriteShifts.VAULT_BOTTOM_MEDIUM;
         }
-
-        return AllSpriteShifts.VAULT_SIDE.get(small);
+        return large ? AllSpriteShifts.VAULT_SIDE_LARGE : AllSpriteShifts.VAULT_SIDE_MEDIUM;
     }
 
     @Override

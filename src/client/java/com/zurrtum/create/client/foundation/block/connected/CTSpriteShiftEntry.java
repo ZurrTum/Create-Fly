@@ -1,13 +1,29 @@
 package com.zurrtum.create.client.foundation.block.connected;
 
-import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.Identifier;
 
-public class CTSpriteShiftEntry extends SpriteShiftEntry {
-
+public class CTSpriteShiftEntry {
     protected final CTType type;
+    protected final CTStitchedSprite original;
+    protected final CTStitchedSprite[] targets;
 
-    public CTSpriteShiftEntry(CTType type) {
+    public CTSpriteShiftEntry(CTType type, Identifier originalLocation, Identifier targetLocation) {
         this.type = type;
+        int size = type.getSpriteSize();
+        targets = new CTStitchedSprite[size];
+        targets[0] = original = new CTStitchedSprite(originalLocation);
+        for (int i = type.replaceOriginal() ? 0 : 1; i < size; i++) {
+            targets[i] = new CTStitchedSprite(originalLocation, targetLocation.withSuffix("/" + i));
+        }
+    }
+
+    public TextureAtlasSprite getOriginal() {
+        return original.get();
+    }
+
+    public TextureAtlasSprite getTarget(int index) {
+        return targets[index].get();
     }
 
     public CTType getType() {
@@ -15,13 +31,10 @@ public class CTSpriteShiftEntry extends SpriteShiftEntry {
     }
 
     public float getTargetU(float localU, int index) {
-        float uOffset = (index % type.getSheetSize());
-        return getTarget().getU((getUnInterpolatedU(getOriginal(), localU) + uOffset) / ((float) type.getSheetSize()));
+        return targets[index].getTargetU(localU);
     }
 
     public float getTargetV(float localV, int index) {
-        float vOffset = (index / type.getSheetSize());
-        return getTarget().getV((getUnInterpolatedV(getOriginal(), localV) + vOffset) / ((float) type.getSheetSize()));
+        return targets[index].getTargetV(localV);
     }
-
 }

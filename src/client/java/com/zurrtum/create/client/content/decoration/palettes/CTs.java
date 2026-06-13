@@ -10,13 +10,9 @@ import net.minecraft.resources.Identifier;
 import java.util.function.Function;
 
 public enum CTs {
-    PILLAR(AllCTTypes.RECTANGLE, s -> toLocation(s, "pillar")), CAP(
-        AllCTTypes.OMNIDIRECTIONAL,
-        s -> toLocation(s, "cap")
-    ), LAYERED(
-        AllCTTypes.HORIZONTAL_KRYPPERS,
-        s -> toLocation(s, "layered")
-    );
+    PILLAR(AllCTTypes.RECTANGLE, s -> toLocation(s, "pillar")),
+    CAP(AllCTTypes.OMNIDIRECTIONAL, s -> toLocation(s, "cap")),
+    LAYERED(AllCTTypes.HORIZONTAL, s -> toLocation(s, "layered"));
 
     public final CTType type;
     private final Function<String, Identifier> srcFactory;

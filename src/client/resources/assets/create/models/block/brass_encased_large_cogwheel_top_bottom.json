@@ -5,6 +5,6 @@
     "4": "create:block/brass_gearbox",
     "casing": "create:block/brass_casing",
     "particle": "create:block/brass_casing",
-    "side": "create:block/brass_encased_cogwheel_side_connected"
+    "side": "create:block/brass_encased_cogwheel_side_connected/3"
   }
 }

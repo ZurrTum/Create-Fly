@@ -5,7 +5,7 @@
 		"3": "create:block/threshold_switch_back",
 		"5": "create:block/threshold_switch_front",
 		"7": "create:block/brass_block",
-		"8": "create:block/tunnel/brass_tunnel_top_connected",
+		"8": "create:block/tunnel/brass_tunnel_top",
 		"particle": "create:block/threshold_switch/level_0",
 		"level": "create:block/threshold_switch/level_0"
 	},

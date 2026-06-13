@@ -15,8 +15,7 @@ public class CTSpriteShifter {
             return ENTRY_CACHE.get(key);
         }
 
-        CTSpriteShiftEntry entry = new CTSpriteShiftEntry(type);
-        entry.set(blockTexture, connectedTexture);
+        CTSpriteShiftEntry entry = new CTSpriteShiftEntry(type, blockTexture, connectedTexture);
         ENTRY_CACHE.put(key, entry);
         return entry;
     }

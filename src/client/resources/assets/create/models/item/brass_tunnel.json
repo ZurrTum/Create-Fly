@@ -4,7 +4,7 @@
     "direction": "create:block/funnel/brass_funnel_neutral",
     "frame": "create:block/funnel/brass_funnel_frame",
     "particle": "create:block/brass_block",
-    "top": "create:block/tunnel/brass_tunnel_top",
+    "top": "create:block/tunnel/brass_tunnel_top_item",
     "tunnel": "create:block/tunnel/brass_tunnel"
   }
 }
