@@ -169,7 +169,9 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         }
         IControlContraption controller = getController();
         if (controller == null) {
-            discard();
+            if (!level().isClientSide()) {
+                discard();
+            }
             return;
         }
         if (!controller.isAttachedTo(this)) {
