@@ -67,15 +67,15 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onTrainEditReturn(TrainEditReturnPacket packet) {
+    public void onTrainEditReturn(ClientGamePacketListener listener, TrainEditReturnPacket packet) {
         warn();
     }
 
-    public void onTrainHUDControlUpdate(TrainHUDControlUpdatePacket packet) {
+    public void onTrainHUDControlUpdate(ClientGamePacketListener listener, TrainHUDControlUpdatePacket packet) {
         warn();
     }
 
-    public void onTrainHonkReturn(HonkReturnPacket packet) {
+    public void onTrainHonkReturn(ClientGamePacketListener listener, HonkReturnPacket packet) {
         warn();
     }
 
@@ -83,7 +83,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onContraptionColliderLock(ContraptionColliderLockPacket packet) {
+    public void onContraptionColliderLock(ClientGamePacketListener listener, ContraptionColliderLockPacket packet) {
         warn();
     }
 
@@ -95,7 +95,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onServerSpeed(ServerSpeedPacket packet) {
+    public void onServerSpeed(ClientGamePacketListener listener, ServerSpeedPacket packet) {
         warn();
     }
 
@@ -103,15 +103,15 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onContraptionStall(ContraptionStallPacket packet) {
+    public void onContraptionStall(ClientGamePacketListener listener, ContraptionStallPacket packet) {
         warn();
     }
 
-    public void onContraptionDisassembly(ContraptionDisassemblyPacket packet) {
+    public void onContraptionDisassembly(ClientGamePacketListener listener, ContraptionDisassemblyPacket packet) {
         warn();
     }
 
-    public void onContraptionBlockChanged(ContraptionBlockChangedPacket packet) {
+    public void onContraptionBlockChanged(ClientGamePacketListener listener, ContraptionBlockChangedPacket packet) {
         warn();
     }
 
@@ -119,7 +119,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onContraptionSeatMapping(ContraptionSeatMappingPacket packet) {
+    public void onContraptionSeatMapping(ClientGamePacketListener listener, ContraptionSeatMappingPacket packet) {
         warn();
     }
 
@@ -127,19 +127,19 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onMountedStorageSync(MountedStorageSyncPacket packet) {
+    public void onMountedStorageSync(ClientGamePacketListener listener, MountedStorageSyncPacket packet) {
         warn();
     }
 
-    public void onGantryContraptionUpdate(GantryContraptionUpdatePacket packet) {
+    public void onGantryContraptionUpdate(ClientGamePacketListener listener, GantryContraptionUpdatePacket packet) {
         warn();
     }
 
-    public void onHighlight(HighlightPacket packet) {
+    public void onHighlight(ClientGamePacketListener listener, HighlightPacket packet) {
         warn();
     }
 
-    public void onTunnelFlap(TunnelFlapPacket packet) {
+    public void onTunnelFlap(ClientGamePacketListener listener, TunnelFlapPacket packet) {
         warn();
     }
 
@@ -151,15 +151,15 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onSoulPulseEffect(SoulPulseEffectPacket packet) {
+    public void onSoulPulseEffect(ClientGamePacketListener listener, SoulPulseEffectPacket packet) {
         warn();
     }
 
-    public void onSignalEdgeGroup(SignalEdgeGroupPacket packet) {
+    public void onSignalEdgeGroup(ClientGamePacketListener listener, SignalEdgeGroupPacket packet) {
         warn();
     }
 
-    public void onRemoveTrain(RemoveTrainPacket packet) {
+    public void onRemoveTrain(ClientGamePacketListener listener, RemoveTrainPacket packet) {
         warn();
     }
 
@@ -167,27 +167,27 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onTrainPrompt(TrainPromptPacket packet) {
+    public void onTrainPrompt(ClientGamePacketListener listener, TrainPromptPacket packet) {
         warn();
     }
 
-    public void onContraptionRelocation(ContraptionRelocationPacket packet) {
+    public void onContraptionRelocation(ClientGamePacketListener listener, ContraptionRelocationPacket packet) {
         warn();
     }
 
-    public void onTrackGraphRollCall(TrackGraphRollCallPacket packet) {
+    public void onTrackGraphRollCall(ClientGamePacketListener listener, TrackGraphRollCallPacket packet) {
         warn();
     }
 
-    public void onArmPlacementRequest(ArmPlacementRequestPacket packet) {
+    public void onArmPlacementRequest(ClientGamePacketListener listener, ArmPlacementRequestPacket packet) {
         warn();
     }
 
-    public void onEjectorPlacementRequest(EjectorPlacementRequestPacket packet) {
+    public void onEjectorPlacementRequest(ClientGamePacketListener listener, EjectorPlacementRequestPacket packet) {
         warn();
     }
 
-    public void onPackagePortPlacementRequest(PackagePortPlacementRequestPacket packet) {
+    public void onPackagePortPlacementRequest(ClientGamePacketListener listener, PackagePortPlacementRequestPacket packet) {
         warn();
     }
 
@@ -199,7 +199,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onServerDebugInfo(ServerDebugInfoPacket packet) {
+    public void onServerDebugInfo(ClientGamePacketListener listener, ServerDebugInfoPacket packet) {
         warn();
     }
 
@@ -215,7 +215,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onClientboundChainConveyorRiding(ClientboundChainConveyorRidingPacket packet) {
+    public void onClientboundChainConveyorRiding(ClientGamePacketListener listener, ClientboundChainConveyorRidingPacket packet) {
         warn();
     }
 
@@ -223,11 +223,11 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onTrackGraphSync(TrackGraphSyncPacket packet) {
+    public void onTrackGraphSync(ClientGamePacketListener listener, TrackGraphSyncPacket packet) {
         warn();
     }
 
-    public void onAddTrain(AddTrainPacket packet) {
+    public void onAddTrain(ClientGamePacketListener listener, AddTrainPacket packet) {
         warn();
     }
 
@@ -235,7 +235,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onBlueprintPreview(BlueprintPreviewPacket packet) {
+    public void onBlueprintPreview(ClientGamePacketListener listener, BlueprintPreviewPacket packet) {
         warn();
     }
 

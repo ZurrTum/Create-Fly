@@ -16,7 +16,7 @@ public record AddTrainPacket(Train train) implements Packet<ClientGamePacketList
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onAddTrain(this);
+        AllClientHandle.INSTANCE.onAddTrain(listener, this);
     }
 
     @Override

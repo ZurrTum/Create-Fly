@@ -53,7 +53,7 @@ public record ServerDebugInfoPacket(String serverInfo) implements Packet<ClientG
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onServerDebugInfo(this);
+        AllClientHandle.INSTANCE.onServerDebugInfo(listener, this);
     }
 
     @Override

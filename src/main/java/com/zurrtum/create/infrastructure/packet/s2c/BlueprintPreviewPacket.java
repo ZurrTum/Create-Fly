@@ -77,7 +77,7 @@ public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> 
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onBlueprintPreview(this);
+        AllClientHandle.INSTANCE.onBlueprintPreview(listener, this);
     }
 
     @Override

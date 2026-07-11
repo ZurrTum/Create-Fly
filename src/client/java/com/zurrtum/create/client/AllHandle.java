@@ -208,7 +208,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onTrainEditReturn(TrainEditReturnPacket packet) {
+    public void onTrainEditReturn(ClientGamePacketListener listener, TrainEditReturnPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Train train = Create.RAILWAYS.trains.get(packet.id());
         if (train == null) {
             return;
@@ -221,7 +223,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onTrainHUDControlUpdate(TrainHUDControlUpdatePacket packet) {
+    public void onTrainHUDControlUpdate(ClientGamePacketListener listener, TrainHUDControlUpdatePacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
         if (train == null) {
             return;
@@ -236,7 +240,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onTrainHonkReturn(HonkReturnPacket packet) {
+    public void onTrainHonkReturn(ClientGamePacketListener listener, HonkReturnPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
         if (train == null) {
             return;
@@ -266,7 +272,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onContraptionColliderLock(ContraptionColliderLockPacket packet) {
+    public void onContraptionColliderLock(ClientGamePacketListener listener, ContraptionColliderLockPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         ContraptionColliderClient.lockPacketReceived(packet.contraption(), packet.sender(), packet.offset());
     }
 
@@ -285,11 +293,14 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void onControlsStopControlling() {
-        ControlsHandler.stopControlling(Minecraft.getInstance());
+        Minecraft mc = Minecraft.getInstance();
+        mc.execute(() -> ControlsHandler.stopControlling(mc));
     }
 
     @Override
-    public void onServerSpeed(ServerSpeedPacket packet) {
+    public void onServerSpeed(ClientGamePacketListener listener, ServerSpeedPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         if (!ServerSpeedProvider.initialized) {
             ServerSpeedProvider.initialized = true;
             ServerSpeedProvider.clientTimer = 0;
@@ -359,22 +370,28 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onContraptionStall(ContraptionStallPacket packet) {
-        if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce) {
+    public void onContraptionStall(ClientGamePacketListener listener, ContraptionStallPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce) {
             ce.handleStallInformation(packet.x(), packet.y(), packet.z(), packet.angle());
         }
     }
 
     @Override
-    public void onContraptionDisassembly(ContraptionDisassemblyPacket packet) {
-        if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce) {
+    public void onContraptionDisassembly(ClientGamePacketListener listener, ContraptionDisassemblyPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce) {
             ce.moveCollidedEntitiesOnDisassembly(packet.transform());
         }
     }
 
     @Override
-    public void onContraptionBlockChanged(ContraptionBlockChangedPacket packet) {
-        if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce) {
+    public void onContraptionBlockChanged(ClientGamePacketListener listener, ContraptionBlockChangedPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce) {
             Contraption contraption = ce.getContraption();
             if (contraption == null) {
                 return;
@@ -406,8 +423,10 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onContraptionSeatMapping(ContraptionSeatMappingPacket packet) {
-        LocalPlayer player = Minecraft.getInstance().player;
+    public void onContraptionSeatMapping(ClientGamePacketListener listener, ContraptionSeatMappingPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        LocalPlayer player = mc.player;
         Entity entityByID = player.level().getEntity(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity)) {
             return;
@@ -450,8 +469,10 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onMountedStorageSync(MountedStorageSyncPacket packet) {
-        Entity entity = Minecraft.getInstance().level.getEntity(packet.contraptionId());
+    public void onMountedStorageSync(ClientGamePacketListener listener, MountedStorageSyncPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        Entity entity = mc.level.getEntity(packet.contraptionId());
         if (!(entity instanceof AbstractContraptionEntity contraption)) {
             return;
         }
@@ -460,8 +481,10 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onGantryContraptionUpdate(GantryContraptionUpdatePacket packet) {
-        Entity entity = Minecraft.getInstance().level.getEntity(packet.entityID());
+    public void onGantryContraptionUpdate(ClientGamePacketListener listener, GantryContraptionUpdatePacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        Entity entity = mc.level.getEntity(packet.entityID());
         if (!(entity instanceof GantryContraptionEntity ce)) {
             return;
         }
@@ -471,8 +494,10 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onHighlight(HighlightPacket packet) {
-        if (!Minecraft.getInstance().level.isLoaded(packet.pos())) {
+    public void onHighlight(ClientGamePacketListener listener, HighlightPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (!mc.level.isLoaded(packet.pos())) {
             return;
         }
 
@@ -483,8 +508,10 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onTunnelFlap(TunnelFlapPacket packet) {
-        if (Minecraft.getInstance().level.getBlockEntity(packet.pos()) instanceof BeltTunnelBlockEntity blockEntity) {
+    public void onTunnelFlap(ClientGamePacketListener listener, TunnelFlapPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.level.getBlockEntity(packet.pos()) instanceof BeltTunnelBlockEntity blockEntity) {
             packet.flaps().forEach(flap -> {
                 blockEntity.flap(flap.getFirst(), flap.getSecond());
             });
@@ -501,7 +528,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onSoulPulseEffect(SoulPulseEffectPacket packet) {
+    public void onSoulPulseEffect(ClientGamePacketListener listener, SoulPulseEffectPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Create.SOUL_PULSE_EFFECT_HANDLER.addPulse(new SoulPulseEffect(
             packet.pos(),
             packet.distance(),
@@ -510,7 +539,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onSignalEdgeGroup(SignalEdgeGroupPacket packet) {
+    public void onSignalEdgeGroup(ClientGamePacketListener listener, SignalEdgeGroupPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Map<UUID, SignalEdgeGroup> signalEdgeGroups = Create.RAILWAYS.signalEdgeGroups;
         List<UUID> ids = packet.ids();
         for (int i = 0; i < ids.size(); i++) {
@@ -529,7 +560,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onRemoveTrain(RemoveTrainPacket packet) {
+    public void onRemoveTrain(ClientGamePacketListener listener, RemoveTrainPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Create.RAILWAYS.trains.remove(packet.id());
     }
 
@@ -548,21 +581,27 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onTrainPrompt(TrainPromptPacket packet) {
+    public void onTrainPrompt(ClientGamePacketListener listener, TrainPromptPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         TrainHUD.currentPrompt = packet.text();
         TrainHUD.currentPromptShadow = packet.shadow();
         TrainHUD.promptKeepAlive = 30;
     }
 
     @Override
-    public void onContraptionRelocation(ContraptionRelocationPacket packet) {
-        if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof OrientedContraptionEntity oce) {
+    public void onContraptionRelocation(ClientGamePacketListener listener, ContraptionRelocationPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.level.getEntity(packet.entityId()) instanceof OrientedContraptionEntity oce) {
             oce.nonDamageTicks = 10;
         }
     }
 
     @Override
-    public void onTrackGraphRollCall(TrackGraphRollCallPacket packet) {
+    public void onTrackGraphRollCall(ClientGamePacketListener listener, TrackGraphRollCallPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         GlobalRailwayManager manager = Create.RAILWAYS;
         Set<UUID> unusedIds = new HashSet<>(manager.trackNetworks.keySet());
         List<Integer> failedIds = new ArrayList<>();
@@ -584,7 +623,7 @@ public class AllHandle extends AllClientHandle {
             failedIds.add(entry.netId());
         }
 
-        ClientPacketListener networkHandler = Minecraft.getInstance().player.connection;
+        ClientPacketListener networkHandler = mc.player.connection;
         for (Integer failed : failedIds) {
             networkHandler.send(new TrackGraphRequestPacket(failed));
         }
@@ -594,18 +633,24 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onArmPlacementRequest(ArmPlacementRequestPacket packet) {
-        ArmInteractionPointHandler.flushSettings(Minecraft.getInstance().player, packet.pos());
+    public void onArmPlacementRequest(ClientGamePacketListener listener, ArmPlacementRequestPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        ArmInteractionPointHandler.flushSettings(mc.player, packet.pos());
     }
 
     @Override
-    public void onEjectorPlacementRequest(EjectorPlacementRequestPacket packet) {
+    public void onEjectorPlacementRequest(ClientGamePacketListener listener, EjectorPlacementRequestPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         EjectorTargetHandler.flushSettings(packet.pos());
     }
 
     @Override
-    public void onPackagePortPlacementRequest(PackagePortPlacementRequestPacket packet) {
-        PackagePortTargetSelectionHandler.flushSettings(Minecraft.getInstance().player, packet.pos());
+    public void onPackagePortPlacementRequest(ClientGamePacketListener listener, PackagePortPlacementRequestPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
+        PackagePortTargetSelectionHandler.flushSettings(mc.player, packet.pos());
     }
 
     @Override
@@ -648,11 +693,12 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onServerDebugInfo(ServerDebugInfoPacket packet) {
+    public void onServerDebugInfo(ClientGamePacketListener listener, ServerDebugInfoPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         StringBuilder output = new StringBuilder();
         List<DebugInfoSection> clientInfo = DebugInformation.getClientInfo();
 
-        Minecraft mc = Minecraft.getInstance();
         ServerDebugInfoPacket.printInfo("Client", mc.player, clientInfo, output);
         output.append("\n\n");
         output.append(packet.serverInfo());
@@ -710,7 +756,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onClientboundChainConveyorRiding(ClientboundChainConveyorRidingPacket packet) {
+    public void onClientboundChainConveyorRiding(ClientGamePacketListener listener, ClientboundChainConveyorRidingPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         PlayerSkyhookRenderer.updatePlayerList(packet.uuids());
     }
 
@@ -728,7 +776,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onTrackGraphSync(TrackGraphSyncPacket packet) {
+    public void onTrackGraphSync(ClientGamePacketListener listener, TrackGraphSyncPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         GlobalRailwayManager manager = Create.RAILWAYS;
         TrackGraph graph = manager.getOrCreateGraph(packet.graphId, packet.netId);
         manager.version++;
@@ -827,7 +877,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onAddTrain(AddTrainPacket packet) {
+    public void onAddTrain(ClientGamePacketListener listener, AddTrainPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         Train train = packet.train();
         Create.RAILWAYS.trains.put(train.id, train);
     }
@@ -847,7 +899,9 @@ public class AllHandle extends AllClientHandle {
     }
 
     @Override
-    public void onBlueprintPreview(BlueprintPreviewPacket packet) {
+    public void onBlueprintPreview(ClientGamePacketListener listener, BlueprintPreviewPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        forceMainThread(listener, mc, packet);
         BlueprintOverlayRenderer.updatePreview(packet.available(), packet.missing(), packet.result());
     }
 
