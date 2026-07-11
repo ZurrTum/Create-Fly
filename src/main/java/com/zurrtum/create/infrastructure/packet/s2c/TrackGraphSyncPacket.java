@@ -24,7 +24,7 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onTrackGraphSync(this);
+        AllClientHandle.INSTANCE.onTrackGraphSync(listener, this);
     }
 
     @Override

@@ -29,7 +29,7 @@ public record TrackGraphRollCallPacket(List<Entry> entries) implements Packet<Cl
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onTrackGraphRollCall(this);
+        AllClientHandle.INSTANCE.onTrackGraphRollCall(listener, this);
     }
 
     @Override

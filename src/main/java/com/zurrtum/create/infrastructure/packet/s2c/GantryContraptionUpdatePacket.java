@@ -25,7 +25,7 @@ public record GantryContraptionUpdatePacket(int entityID, double coord, double m
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onGantryContraptionUpdate(this);
+        AllClientHandle.INSTANCE.onGantryContraptionUpdate(listener, this);
     }
 
     @Override
