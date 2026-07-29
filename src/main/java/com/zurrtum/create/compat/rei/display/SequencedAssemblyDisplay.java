@@ -85,7 +85,7 @@ public record SequencedAssemblyDisplay(EntryIngredient input, SequenceData seque
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(EntryIngredients.of(output.stack()));
+        return List.of(EntryIngredients.of(output.create()));
     }
 
     @Override
