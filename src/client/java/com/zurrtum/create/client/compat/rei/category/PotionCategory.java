@@ -13,12 +13,12 @@ import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
@@ -47,7 +47,7 @@ public class PotionCategory extends CreateCategory<PotionDisplay> {
         Point fluid = new Point(bounds.x + 45, bounds.y + 56);
         Point output = new Point(bounds.x + 147, bounds.y + 56);
         HeatCondition requiredHeat = HeatCondition.HEATED;
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, fluid, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + 37);
             Matrix3x2f pose = new Matrix3x2f(graphics.pose());

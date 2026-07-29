@@ -12,11 +12,11 @@ import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 
@@ -73,7 +73,7 @@ public class MillingCategory extends CreateCategory<MillingDisplay> {
                 );
             }
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
             AllGuiTextures.JEI_ARROW.render(graphics, bounds.x + 90, bounds.y + 37);
