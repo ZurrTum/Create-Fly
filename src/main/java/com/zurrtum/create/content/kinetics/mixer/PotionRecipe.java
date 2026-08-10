@@ -61,6 +61,18 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient,
         if (data == null) {
             return;
         }
+
+        // Temporary compatibility fix:
+        // Calling PotionBrewing.bootstrap() this early causes a
+        // "Components not bound yet" crash when Alex's Mobs (and similar mods)
+        // are present, because they create ItemStacks during bootstrap.
+        // Skip early registration for now. Potion mixing recipes will need
+        // to be generated later via a proper runtime path.
+        data = null;
+        return;
+
+        /*
+        // Original code kept for reference
         PotionBrewing potionBrewing = PotionBrewing.bootstrap(data.enabledFeatures);
         int recipeIndex = 0;
         List<Item> allowedSupportedContainers = new ArrayList<>();
@@ -120,6 +132,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient,
             }
         }
         data = null;
+        */
     }
 
     @Override
