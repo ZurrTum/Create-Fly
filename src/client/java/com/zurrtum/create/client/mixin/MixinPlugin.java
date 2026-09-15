@@ -39,6 +39,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("CreativeModeInventoryScreenMixin");
         }
         if (loader.isModLoaded("fabric-renderer-api-v1")) {
+            mixins.add("SimpleModelPartMixin");
+            mixins.add("SimpleModelWrapperMixin");
             mixins.add("WrapperBlockStateModelMixin");
             mixins.add("WrapperBlockStateModelAccessor");
             mixins.add("CopycatModelMixin");
@@ -58,7 +60,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("BakedQuadMixin");
             mixins.add("VertexConsumerMixin");
             mixins.add("ModelBlockRendererMixin");
-            mixins.add("BlockModelLighterMixin");
             mixins.add("TerrainParticleMixin");
         }
         if (loader.isModLoaded("fabric-block-api-v1")) {

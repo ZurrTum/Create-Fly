@@ -5,13 +5,13 @@ import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
+import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
@@ -53,22 +53,14 @@ public class CTModel extends WrapperBlockStateModel {
                 builder.addUnculledFace(replaceQuad(state, random, indices[quad.direction().get3DDataValue()], quad));
             }
             for (Direction direction : Iterate.directions) {
-                addQuads(builder, part, direction, state, random, indices[direction.get3DDataValue()]);
+                for (BakedQuad quad : part.getQuads(direction)) {
+                    builder.addCulledFace(
+                        direction,
+                        replaceQuad(state, random, indices[quad.direction().get3DDataValue()], quad)
+                    );
+                }
             }
-            parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
-        }
-    }
-
-    protected void addQuads(
-        QuadCollection.Builder builder,
-        BlockStateModelPart part,
-        Direction direction,
-        BlockState state,
-        RandomSource random,
-        int index
-    ) {
-        for (BakedQuad quad : part.getQuads(direction)) {
-            builder.addCulledFace(direction, replaceQuad(state, random, index, quad));
+            parts.add(new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
         }
     }
 

@@ -3,6 +3,7 @@ package com.zurrtum.create.client.infrastructure.model;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
+import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import com.zurrtum.create.content.decoration.copycat.CopycatPanelBlock;
 import com.zurrtum.create.content.decoration.copycat.CopycatSpecialCases;
@@ -11,7 +12,6 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
@@ -104,7 +104,7 @@ public class CopycatPanelModel extends CopycatModel {
                     }
                 }
             }
-            parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
+            parts.add(new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
         }
     }
 
@@ -165,7 +165,7 @@ public class CopycatPanelModel extends CopycatModel {
                     }
                 }
             }
-            parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
+            parts.add(new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
         }
     }
 }

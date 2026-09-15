@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
@@ -148,7 +147,7 @@ public class BakedModelHelper {
             }
             quads = part.getQuads(null);
             swapSprites(quads, spriteSwapper).forEach(builder::addUnculledFace);
-            parts.set(i, new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), material));
+            parts.set(i, new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), material));
         }
         if (size == 1) {
             return new SingleVariant(parts.getFirst());
@@ -261,11 +260,11 @@ public class BakedModelHelper {
         return newQuad;
     }
 
-    public static void setNormals(BakedQuad quad, Vector3f[] normals) {
-        ((NormalsBakedQuad) (Object) quad).create$setNormals(normals[0], normals[1], normals[2], normals[3]);
+    public static void setNormals(BakedQuad quad, Vector3f normal) {
+        ((NormalsBakedQuad) (Object) quad).create$setNormal(normal);
     }
 
     public static void setNormals(BakedQuad quad, BakedQuad target) {
-        ((NormalsBakedQuad) (Object) quad).create$setNormals((NormalsBakedQuad) (Object) target);
+        ((NormalsBakedQuad) (Object) quad).create$setNormal(((NormalsBakedQuad) (Object) target).create$getNormal());
     }
 }

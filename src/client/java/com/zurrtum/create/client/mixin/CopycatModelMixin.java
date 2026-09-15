@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.mixin;
 
 import com.google.common.base.Predicates;
+import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import com.zurrtum.create.client.infrastructure.model.CopycatModel;
 import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
 import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
@@ -13,7 +14,6 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.geometry.QuadCollection.Builder;
@@ -66,11 +66,11 @@ public class CopycatModelMixin {
         Material.Baked particleMaterial = model.particleMaterial();
         QuadCollection quads = ao.build();
         if (quads != QuadCollection.EMPTY) {
-            parts.add(new SimpleModelWrapper(quads, true, particleMaterial));
+            parts.add(new SimpleModelPart(quads, true, particleMaterial));
         }
         quads = flat.build();
         if (quads != QuadCollection.EMPTY) {
-            parts.add(new SimpleModelWrapper(quads, false, particleMaterial));
+            parts.add(new SimpleModelPart(quads, false, particleMaterial));
         }
     }
 }

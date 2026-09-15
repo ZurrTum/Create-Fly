@@ -5,16 +5,15 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
+import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity.CasingType;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
@@ -78,13 +77,8 @@ public class BeltModel extends WrapperBlockStateModel {
         TextureAtlasSprite original = SPRITE_SHIFT.getOriginal();
         if (blockentity.covered) {
             boolean alongX = state.getValue(BeltBlock.HORIZONTAL_FACING).getAxis() == Axis.X;
-            BlockStateModel cover =
-                alongX ? AllPartialModels.ANDESITE_BELT_COVER_X.get() : AllPartialModels.ANDESITE_BELT_COVER_Z.get();
-            List<BlockStateModelPart> coverParts = new ObjectArrayList<>();
-            cover.collectParts(random, coverParts);
-            for (BlockStateModelPart part : coverParts) {
-                parts.add(replaceQuads(original, part));
-            }
+            (alongX ? AllPartialModels.ANDESITE_BELT_COVER_X.get() :
+                AllPartialModels.ANDESITE_BELT_COVER_Z.get()).collectParts(random, parts);
         }
         List<BlockStateModelPart> modelParts = new ObjectArrayList<>();
         model.collectParts(random, modelParts);
@@ -103,7 +97,7 @@ public class BeltModel extends WrapperBlockStateModel {
                 builder.addCulledFace(direction, replaceQuad(replace, quad));
             }
         }
-        return new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial());
+        return new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), part.particleMaterial());
     }
 
     private static long calcSpriteUv(long packedUv) {

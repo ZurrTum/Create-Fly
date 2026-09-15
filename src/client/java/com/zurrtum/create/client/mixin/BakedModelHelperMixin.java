@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 @Mixin(BakedModelHelper.class)
 public class BakedModelHelperMixin {
     @Overwrite(remap = false)
-    public static void setNormals(BakedQuad quad, Vector3f[] normals) {
+    public static void setNormals(BakedQuad quad, Vector3f normal) {
     }
 
     @Overwrite(remap = false)

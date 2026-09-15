@@ -4,10 +4,10 @@ import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
+import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.BlockPos;
@@ -52,9 +52,14 @@ public class FluidTankModel extends CTModel {
                 if (i != -1 && culls[i]) {
                     continue;
                 }
-                addQuads(builder, part, direction, state, random, indices[direction.get3DDataValue()]);
+                for (BakedQuad quad : part.getQuads(direction)) {
+                    builder.addCulledFace(
+                        direction,
+                        replaceQuad(state, random, indices[quad.direction().get3DDataValue()], quad)
+                    );
+                }
             }
-            parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
+            parts.add(new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
         }
     }
 

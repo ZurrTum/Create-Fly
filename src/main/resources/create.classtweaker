@@ -280,3 +280,5 @@ accessible field net/minecraft/world/item/crafting/ShapedRecipe result Lnet/mine
 accessible field net/minecraft/world/item/crafting/ShapelessRecipe result Lnet/minecraft/world/item/ItemStackTemplate;
 accessible method net/minecraft/world/item/crafting/SingleItemRecipe result ()Lnet/minecraft/world/item/ItemStackTemplate;
 accessible field net/minecraft/client/gui/components/AbstractWidget tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
+accessible field net/minecraft/client/renderer/block/BlockModelLighter cache Lnet/minecraft/client/renderer/block/BlockModelLighter$Cache;
+accessible field net/minecraft/client/renderer/block/BlockModelLighter scratchPos Lnet/minecraft/core/BlockPos$MutableBlockPos;

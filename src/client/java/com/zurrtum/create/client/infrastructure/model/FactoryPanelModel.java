@@ -4,6 +4,7 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehav
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
@@ -109,7 +109,7 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
         for (BakedQuad bakedQuad : part.getQuads(null)) {
             builder.addUnculledFace(replaceQuad(bakedQuad, xRot, yRot, xOffset, yOffset, ponder));
         }
-        return new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial());
+        return new SimpleModelPart(builder.build(), part.useAmbientOcclusion(), part.particleMaterial());
     }
 
     private static BakedQuad replaceQuad(

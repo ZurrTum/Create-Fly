@@ -10,16 +10,20 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.mojang.blaze3d.platform.Transparency;
 import com.mojang.math.Transformation;
+import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.client.model.ExtendedUnbakedGeometry;
 import com.zurrtum.create.client.model.NeoForgeModelProperties;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.obj.ObjMaterialLibrary.Material;
 import joptsimple.internal.Strings;
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelBaker.Interner;
 import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material.Baked;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
@@ -29,17 +33,14 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.tuple.Pair;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.Math;
 import java.util.*;
 
 public class ObjGeometry implements ExtendedUnbakedGeometry {
-    private static final Vector4f COLOR_WHITE = new Vector4f(1, 1, 1, 1);
     private static final Vec2[] DEFAULT_COORDS = {new Vec2(0, 0), new Vec2(0, 1), new Vec2(1, 1), new Vec2(1, 0),};
 
     private final Multimap<String, ModelGroup> parts = MultimapBuilder.linkedHashKeys().arrayListValues().build();
@@ -51,7 +52,6 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
 
     public final boolean automaticCulling;
     public final boolean shadeQuads;
-    public final boolean flipV;
     public final boolean emissiveAmbient;
     @Nullable
     public final String mtlOverride;
@@ -63,16 +63,16 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         modelLocation = settings.modelLocation();
         automaticCulling = settings.automaticCulling();
         shadeQuads = settings.shadeQuads();
-        flipV = settings.flipV();
         emissiveAmbient = settings.emissiveAmbient();
         mtlOverride = settings.mtlOverride();
         parameters = settings.parameters();
     }
 
     public static ObjGeometry parse(ObjTokenizer tokenizer, Settings settings) throws IOException {
-        var modelLocation = settings.modelLocation();
-        var materialLibraryOverrideLocation = settings.mtlOverride();
-        var model = new ObjGeometry(settings);
+        Identifier modelLocation = settings.modelLocation();
+        String materialLibraryOverrideLocation = settings.mtlOverride();
+        boolean flipV = settings.flipV();
+        ObjGeometry model = new ObjGeometry(settings);
 
         // for relative references to material libraries
         String modelDomain = modelLocation.getNamespace();
@@ -142,7 +142,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
                     model.positions.add(parseVector4To3(line));
                     break;
                 case "vt": // Vertex texcoord
-                    model.texCoords.add(parseVector2(line));
+                    model.texCoords.add(parseUv(line, flipV));
                     break;
                 case "vn": // Vertex normal
                     model.normals.add(parseVector3(line));
@@ -220,7 +220,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
                 case "g": {
                     String name = line[1];
                     if (objAboveGroup) {
-                        currentObject = model.new ModelObject(currentGroup.name() + "/" + name);
+                        currentObject = model.new ModelObject(currentGroup.name(), name);
                         currentGroup.parts.put(name, currentObject);
                     } else {
                         currentGroup = model.new ModelGroup(name);
@@ -257,11 +257,12 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         return new Vector3f(vec4.x() / vec4.w(), vec4.y() / vec4.w(), vec4.z() / vec4.w());
     }
 
-    private static Vec2 parseVector2(String[] line) {
+    private static Vec2 parseUv(String[] line, boolean flipV) {
         return switch (line.length) {
             case 1 -> new Vec2(0, 0);
-            case 2 -> new Vec2(Float.parseFloat(line[1]), 0);
-            default -> new Vec2(Float.parseFloat(line[1]), Float.parseFloat(line[2]));
+            case 2 -> new Vec2(Float.parseFloat(line[1]), flipV ? 1 : 0);
+            default ->
+                new Vec2(Float.parseFloat(line[1]), flipV ? 1 - Float.parseFloat(line[2]) : Float.parseFloat(line[2]));
         };
     }
 
@@ -320,161 +321,181 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         return builder.build();
     }
 
-    private Transformation blockCenterToCorner(Transformation transform) {
-        if (transform.equals(Transformation.IDENTITY)) {
-            return Transformation.IDENTITY;
+    private Transparency computeMaterialTransparency(Baked material, TextureAtlasSprite texture, Vec2[] tex) {
+        if (material.forceTranslucent()) {
+            return Transparency.TRANSLUCENT;
         }
-
-        Matrix4f ret = transform.getMatrixCopy();
-        Vector3f origin = new Vector3f(0.5f, 0.5f, 0.5f);
-        Matrix4f tmp = new Matrix4f().translation(origin.x(), origin.y(), origin.z());
-        tmp.mul(ret, ret);
-        tmp.translation(-origin.x(), -origin.y(), -origin.z());
-        ret.mul(tmp);
-        return new Transformation(ret);
+        Transparency transparency = texture.transparency();
+        if (transparency.isOpaque()) {
+            return transparency;
+        }
+        Vec2 t0 = tex[0], t1 = tex[1], t2 = tex[2], t3 = tex[3];
+        return texture.contents().computeTransparency(
+            Math.min(Math.min(t0.x, t1.x), Math.min(t2.x, t3.x)),
+            Math.min(Math.min(t0.y, t1.y), Math.min(t2.y, t3.y)),
+            Math.max(Math.max(t0.x, t1.x), Math.max(t2.x, t3.x)),
+            Math.max(Math.max(t0.y, t1.y), Math.max(t2.y, t3.y))
+        );
     }
 
-    private Pair<BakedQuad, Direction> makeQuad(
-        ModelBaker baker,
+    private long packUv(TextureAtlasSprite texture, Vec2 uv) {
+        return UVPair.pack(texture.getU(uv.x), texture.getV(uv.y));
+    }
+
+    private Pair<BakedQuad, @Nullable Direction> makeQuad(
+        Interner interner,
         int[][] indices,
         int tintIndex,
-        Vector4f colorTint,
         Vector4f ambientColor,
         Baked material,
-        Transparency transparency,
-        Transformation transform
+        Transformation transform,
+        @Nullable Direction cull
     ) {
         boolean needsNormalRecalculation = false;
-        for (int[] ints : indices) {
-            needsNormalRecalculation |= ints.length < 3;
-        }
         Vector3f faceNormal = new Vector3f();
-        if (needsNormalRecalculation) {
-            Vector3f a = positions.get(indices[0][0]);
-            Vector3f ab = positions.get(indices[1][0]);
-            Vector3f ac = positions.get(indices[2][0]);
-            Vector3f abs = new Vector3f(ab);
-            abs.sub(a);
-            Vector3f acs = new Vector3f(ac);
-            acs.sub(a);
-            abs.cross(acs);
-            abs.normalize();
-            faceNormal = abs;
+        for (int[] ints : indices) {
+            if (ints.length < 3) {
+                Vector3f a = positions.get(indices[0][0]);
+                Vector3f ab = positions.get(indices[1][0]);
+                Vector3f ac = positions.get(indices[2][0]);
+                Vector3f abs = new Vector3f(ab);
+                abs.sub(a);
+                Vector3f acs = new Vector3f(ac);
+                acs.sub(a);
+                abs.cross(acs);
+                abs.normalize();
+                faceNormal = abs;
+                break;
+            }
         }
-
-        var quadBaker = new QuadBakingVertexConsumer();
-
         TextureAtlasSprite texture = material.sprite();
-        quadBaker.setSprite(texture, transparency);
-        quadBaker.setTintIndex(tintIndex);
-
-        if (emissiveAmbient) {
-            int fakeLight = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
-            quadBaker.setLightEmission(fakeLight);
-            quadBaker.setShade(fakeLight == 0 && shadeQuads);
+        Vector3f[] pos = new Vector3f[4];
+        Vector3f norm;
+        Vec2[] tex = new Vec2[4];
+        if (transform.equals(Transformation.IDENTITY)) {
+            int[] index = indices[Math.min(0, indices.length - 1)];
+            pos[0] = positions.get(index[0]);
+            tex[0] = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[0];
+            norm = !needsNormalRecalculation && index.length >= 3 && !normals.isEmpty() ? normals.get(index[2]) :
+                faceNormal;
+            for (int i = 1; i < 4; i++) {
+                index = indices[Math.min(i, indices.length - 1)];
+                pos[i] = positions.get(index[0]);
+                tex[i] = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
+            }
         } else {
-            quadBaker.setShade(shadeQuads);
-        }
-
-        boolean hasTransform = !transform.equals(Transformation.IDENTITY);
-        // The incoming transform is referenced on the center of the block, but our coords are referenced on the corner
-        Transformation transformation = hasTransform ? blockCenterToCorner(transform) : transform;
-
-        Vector4f[] pos = new Vector4f[4];
-        Vector3f[] norm = new Vector3f[4];
-
-        for (int i = 0; i < 4; i++) {
-            int[] index = indices[Math.min(i, indices.length - 1)];
-            Vector4f position = new Vector4f(positions.get(index[0]), 1);
-            Vec2 texCoord = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
-            Vector3f norm0 =
-                !needsNormalRecalculation && index.length >= 3 && !normals.isEmpty() ? normals.get(index[2]) :
-                    faceNormal;
-            Vector3f normal = norm0;
-            Vector4f color = index.length >= 4 && !colors.isEmpty() ? colors.get(index[3]) : COLOR_WHITE;
-            if (hasTransform) {
-                normal = new Vector3f(norm0);
-                position.mul(transformation.getMatrix());
-                Matrix3f normalTransform = new Matrix3f(transformation.getMatrix());
-                normalTransform.invert();
-                normalTransform.transpose();
-                normal.mul(normalTransform);
-                normal.normalize();
+            Matrix4fc matrix = transform.getMatrixCopy().translateLocal(0.5f, 0.5f, 0.5f)
+                .translate(-0.5f, -0.5f, -0.5f);
+            int[] index = indices[Math.min(0, indices.length - 1)];
+            Vector4f position = new Vector4f(positions.get(index[0]), 1).mul(matrix);
+            pos[0] = new Vector3f(position.x(), position.y(), position.z());
+            norm = !needsNormalRecalculation && index.length >= 3 && !normals.isEmpty() ? normals.get(index[2]) :
+                faceNormal;
+            norm = new Vector3f(norm).mul(new Matrix3f(matrix).invert().transpose()).normalize();
+            tex[0] = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[0];
+            for (int i = 1; i < 4; i++) {
+                index = indices[Math.min(i, indices.length - 1)];
+                position = new Vector4f(positions.get(index[0]), 1).mul(matrix);
+                pos[i] = new Vector3f(position.x(), position.y(), position.z());
+                tex[i] = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
             }
-            Vector4f tintedColor = new Vector4f(
-                color.x() * colorTint.x(),
-                color.y() * colorTint.y(),
-                color.z() * colorTint.z(),
-                color.w() * colorTint.w()
-            );
-            quadBaker.addVertex(position.x(), position.y(), position.z());
-            quadBaker.setColor(tintedColor.x(), tintedColor.y(), tintedColor.z(), tintedColor.w());
-            quadBaker.setUv(texture.getU(texCoord.x), texture.getV(flipV ? 1 - texCoord.y : texCoord.y));
-            quadBaker.setNormal(normal.x(), normal.y(), normal.z());
-            if (i == 0) {
-                quadBaker.setDirection(Direction.getApproximateNearest(normal.x(), normal.y(), normal.z()));
-            }
-            pos[i] = position;
-            norm[i] = normal;
         }
-
-        Direction cull = null;
-        if (automaticCulling) {
+        int lightEmission;
+        boolean shade;
+        if (emissiveAmbient) {
+            lightEmission = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
+            shade = lightEmission == 0 && shadeQuads;
+        } else {
+            lightEmission = 0;
+            shade = shadeQuads;
+        }
+        MaterialInfo materialInfo = interner.materialInfo(MaterialInfo.of(
+            material,
+            computeMaterialTransparency(material, texture, tex),
+            tintIndex,
+            shade,
+            lightEmission
+        ));
+        float nx = norm.x(), ny = norm.y(), nz = norm.z();
+        Direction direction = Direction.getApproximateNearest(nx, ny, nz);
+        BakedQuad quad = new BakedQuad(
+            pos[0],
+            pos[1],
+            pos[2],
+            pos[3],
+            packUv(texture, tex[0]),
+            packUv(texture, tex[1]),
+            packUv(texture, tex[2]),
+            packUv(texture, tex[3]),
+            direction,
+            materialInfo
+        );
+        Vector3fc vec = direction.getUnitVec3f();
+        if (!Mth.equal(nx, vec.x()) || !Mth.equal(ny, vec.y()) || !Mth.equal(nz, vec.z())) {
+            BakedModelHelper.setNormals(quad, norm);
+        }
+        if (automaticCulling && cull == null) {
             if (Mth.equal(pos[0].x(), 0) && // vertex.position.x
                 Mth.equal(pos[1].x(), 0) && Mth.equal(pos[2].x(), 0) && Mth.equal(
                 pos[3].x(),
                 0
-            ) && norm[0].x() < 0) // vertex.normal.x
+            ) && nx < 0) // vertex.normal.x
             {
                 cull = Direction.WEST;
             } else if (Mth.equal(pos[0].x(), 1) && // vertex.position.x
                 Mth.equal(pos[1].x(), 1) && Mth.equal(pos[2].x(), 1) && Mth.equal(
                 pos[3].x(),
                 1
-            ) && norm[0].x() > 0) // vertex.normal.x
+            ) && nx > 0) // vertex.normal.x
             {
                 cull = Direction.EAST;
             } else if (Mth.equal(pos[0].z(), 0) && // vertex.position.z
                 Mth.equal(pos[1].z(), 0) && Mth.equal(pos[2].z(), 0) && Mth.equal(
                 pos[3].z(),
                 0
-            ) && norm[0].z() < 0) // vertex.normal.z
+            ) && nz < 0) // vertex.normal.z
             {
                 cull = Direction.NORTH; // can never remember
             } else if (Mth.equal(pos[0].z(), 1) && // vertex.position.z
                 Mth.equal(pos[1].z(), 1) && Mth.equal(pos[2].z(), 1) && Mth.equal(
                 pos[3].z(),
                 1
-            ) && norm[0].z() > 0) // vertex.normal.z
+            ) && nz > 0) // vertex.normal.z
             {
                 cull = Direction.SOUTH;
             } else if (Mth.equal(pos[0].y(), 0) && // vertex.position.y
                 Mth.equal(pos[1].y(), 0) && Mth.equal(pos[2].y(), 0) && Mth.equal(
                 pos[3].y(),
                 0
-            ) && norm[0].y() < 0) // vertex.normal.z
+            ) && ny < 0) // vertex.normal.z
             {
                 cull = Direction.DOWN; // can never remember
             } else if (Mth.equal(pos[0].y(), 1) && // vertex.position.y
                 Mth.equal(pos[1].y(), 1) && Mth.equal(pos[2].y(), 1) && Mth.equal(
                 pos[3].y(),
                 1
-            ) && norm[0].y() > 0) // vertex.normal.y
+            ) && ny > 0) // vertex.normal.y
             {
                 cull = Direction.UP;
             }
         }
-
-        return Pair.of(quadBaker.bakeQuad(baker.interner()), cull);
+        return Pair.of(quad, cull);
     }
 
     public class ModelObject {
         public final String name;
+        public final @Nullable Direction cull;
 
         List<ModelMesh> meshes = Lists.newArrayList();
 
         ModelObject(String name) {
             this.name = name;
+            cull = null;
+        }
+
+        ModelObject(String groupName, String name) {
+            this.name = groupName + "/" + name;
+            cull = Direction.byName(name);
         }
 
         public String name() {
@@ -490,7 +511,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
             ContextMap additionalProperties
         ) {
             for (ModelMesh mesh : meshes) {
-                mesh.addQuads(builder, slots, baker, state, debugName, additionalProperties);
+                mesh.addQuads(builder, slots, baker, state, debugName, additionalProperties, cull);
             }
         }
 
@@ -553,16 +574,15 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
             ModelBaker baker,
             ModelState state,
             ModelDebugName debugName,
-            ContextMap additionalProperties
+            ContextMap additionalProperties,
+            @Nullable Direction cull
         ) {
             if (mat == null) {
                 return;
             }
             Baked texture = baker.materials().resolveSlot(slots, mat.diffuseColorMap, debugName);
-            Transparency transparency =
-                texture.forceTranslucent() ? Transparency.TRANSLUCENT : texture.sprite().transparency();
             int tintIndex = mat.diffuseTintIndex;
-            Vector4f colorTint = mat.diffuseColor;
+            Vector4f ambientColor = mat.ambientColor;
 
             var rootTransform = additionalProperties.getOrDefault(
                 NeoForgeModelProperties.TRANSFORM,
@@ -570,16 +590,16 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
             );
             var transform = rootTransform.equals(Transformation.IDENTITY) ? state.transformation() :
                 state.transformation().compose(rootTransform);
+            Interner interner = baker.interner();
             for (int[][] face : faces) {
                 Pair<BakedQuad, @Nullable Direction> quad = makeQuad(
-                    baker,
+                    interner,
                     face,
                     tintIndex,
-                    colorTint,
-                    mat.ambientColor,
+                    ambientColor,
                     texture,
-                    transparency,
-                    transform
+                    transform,
+                    cull
                 );
                 if (quad.getRight() == null) {
                     builder.addUnculledFace(quad.getLeft());
