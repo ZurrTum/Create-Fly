@@ -1,0 +1,7 @@
+{
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/netherite_backtank",
+		"particle": "create:block/netherite_backtank"
+	}
+}
