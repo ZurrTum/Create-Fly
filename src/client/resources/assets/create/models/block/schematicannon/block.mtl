@@ -1,0 +1,11 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl schematicannon_1
+map_Kd #0
+
+newmtl stonecutter_bottom
+map_Kd #1
+
+newmtl stone
+map_Kd #2

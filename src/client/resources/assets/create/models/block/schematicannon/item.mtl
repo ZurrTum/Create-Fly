@@ -1,0 +1,20 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl schematicannon_1
+map_Kd #0
+
+newmtl stone
+map_Kd #1
+
+newmtl spruce_log_top
+map_Kd #2
+
+newmtl spruce_log
+map_Kd #3
+
+newmtl anvil
+map_Kd #4
+
+newmtl schematicannon_2
+map_Kd #5

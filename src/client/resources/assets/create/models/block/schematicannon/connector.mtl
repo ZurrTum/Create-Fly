@@ -1,0 +1,8 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl spruce_log
+map_Kd #0
+
+newmtl spruce_log_top
+map_Kd #1

@@ -1,0 +1,8 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl anvil
+map_Kd #0
+
+newmtl schematicannon_2
+map_Kd #1
