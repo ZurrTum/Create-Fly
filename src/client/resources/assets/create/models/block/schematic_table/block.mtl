@@ -1,0 +1,11 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl schematic_table_1
+map_Kd #0
+
+newmtl schematic_table_2
+map_Kd #1
+
+newmtl schematic_table_3
+map_Kd #2

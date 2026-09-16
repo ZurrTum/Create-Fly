@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=east": {
-      "model": "create:block/schematic_table",
+      "model": "create:block/schematic_table/block",
       "y": 270
     },
     "facing=north": {
-      "model": "create:block/schematic_table",
+      "model": "create:block/schematic_table/block",
       "y": 180
     },
     "facing=south": {
-      "model": "create:block/schematic_table"
+      "model": "create:block/schematic_table/block"
     },
     "facing=west": {
-      "model": "create:block/schematic_table",
+      "model": "create:block/schematic_table/block",
       "y": 90
     }
   }

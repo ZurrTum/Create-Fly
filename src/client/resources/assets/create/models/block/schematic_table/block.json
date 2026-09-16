@@ -1,0 +1,15 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/schematic_table_1",
+		"1": "create:block/schematic_table_2",
+		"2": "create:block/schematic_table_3",
+		"particle": "create:block/schematic_table_1"
+	},
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"automatic_culling": false,
+	"emissive_ambient":false,
+	"model": "create:models/block/schematic_table/block.obj"
+}
