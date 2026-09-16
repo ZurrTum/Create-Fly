@@ -399,6 +399,9 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
                 pos[i] = new Vector3f(position.x(), position.y(), position.z());
                 tex[i] = index.length >= 2 && !texCoords.isEmpty() ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
             }
+            if (cull != null) {
+                cull = Direction.rotate(matrix, cull);
+            }
         }
         int lightEmission;
         boolean shade;
