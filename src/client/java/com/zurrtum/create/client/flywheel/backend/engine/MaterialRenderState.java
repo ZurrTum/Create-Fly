@@ -196,6 +196,7 @@ public final class MaterialRenderState {
     }
 
     private static void resetTexture() {
+        GL33C.glBindSampler(Samplers.DIFFUSE.number, 0);
         Samplers.DIFFUSE.makeActive();
     }
 
