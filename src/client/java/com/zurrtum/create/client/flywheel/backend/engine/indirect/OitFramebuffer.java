@@ -307,7 +307,7 @@ public class OitFramebuffer {
             GlStateManager._bindTexture(0);
 
             GL32.glBindTexture(GL32.GL_TEXTURE_2D, depthBounds);
-            GL32.glTexImage2D(GL32.GL_TEXTURE_2D, 0, GL32.GL_RG32F, width, height, 0, GL46.GL_RGBA, GL46.GL_BYTE, 0);
+            GL32.glTexImage2D(GL32.GL_TEXTURE_2D, 0, GL32.GL_RG32F, width, height, 0, GL32.GL_RG, GL32.GL_FLOAT, 0);
 
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_MIN_FILTER, GL32.GL_NEAREST);
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_MAG_FILTER, GL32.GL_NEAREST);
@@ -323,8 +323,8 @@ public class OitFramebuffer {
                 height,
                 4,
                 0,
-                GL46.GL_RGBA,
-                GL46.GL_BYTE,
+                GL32.GL_RGBA,
+                GL32.GL_FLOAT,
                 0
             );
 
@@ -334,7 +334,7 @@ public class OitFramebuffer {
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D_ARRAY, GL32.GL_TEXTURE_WRAP_T, GL32.GL_CLAMP_TO_EDGE);
 
             GL32.glBindTexture(GL32.GL_TEXTURE_2D, accumulate);
-            GL32.glTexImage2D(GL32.GL_TEXTURE_2D, 0, GL32.GL_RGBA16F, width, height, 0, GL46.GL_RGBA, GL46.GL_BYTE, 0);
+            GL32.glTexImage2D(GL32.GL_TEXTURE_2D, 0, GL32.GL_RGBA16F, width, height, 0, GL32.GL_RGBA, GL32.GL_FLOAT, 0);
 
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_MIN_FILTER, GL32.GL_NEAREST);
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_MAG_FILTER, GL32.GL_NEAREST);

@@ -45,28 +45,28 @@ float linear_depth() {
 
 #ifdef _FLW_DEPTH_RANGE
 
-out vec2 _flw_depthRange_out;
+layout (location = 0) out vec2 _flw_depthRange_out;
 
 #endif
 
 #ifdef _FLW_COLLECT_COEFFS
 
-out vec4 _flw_coeffs0;
-out vec4 _flw_coeffs1;
-out vec4 _flw_coeffs2;
-out vec4 _flw_coeffs3;
+layout (location = 0) out vec4 _flw_coeffs0;
+layout (location = 1) out vec4 _flw_coeffs1;
+layout (location = 2) out vec4 _flw_coeffs2;
+layout (location = 3) out vec4 _flw_coeffs3;
 
 #endif
 
 #ifdef _FLW_EVALUATE
 
-out vec4 _flw_accumulate;
+layout (location = 0) out vec4 _flw_accumulate;
 
 #endif
 
 #else
 
-out vec4 _flw_outputColor;
+layout (location = 0) out vec4 _flw_outputColor;
 
 #endif
 
