@@ -317,12 +317,12 @@ public class AllBlocks {
     public static final EncasedShaftBlock ANDESITE_ENCASED_SHAFT = (EncasedShaftBlock) register(
         AllBlockItemIds.ANDESITE_ENCASED_SHAFT,
         EncasedShaftBlock::andesite,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL)
     );
     public static final EncasedShaftBlock BRASS_ENCASED_SHAFT = (EncasedShaftBlock) register(
         AllBlockItemIds.BRASS_ENCASED_SHAFT,
         EncasedShaftBlock::brass,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN)
     );
     public static final EncasedCogwheelBlock ANDESITE_ENCASED_COGWHEEL = (EncasedCogwheelBlock) register(
         AllBlockItemIds.ANDESITE_ENCASED_COGWHEEL,

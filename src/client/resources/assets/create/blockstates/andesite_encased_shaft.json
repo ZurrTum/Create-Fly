@@ -1,20 +1,13 @@
 {
   "variants": {
     "axis=x": {
-      "model": "create:block/encased_shaft/block_andesite",
-      "uvlock": true,
-      "x": 90,
-      "y": 90
+      "model": "create:block/encased_shaft/block_x"
     },
     "axis=y": {
-      "model": "create:block/encased_shaft/block_andesite",
-      "uvlock": true
+      "model": "create:block/encased_shaft/block"
     },
     "axis=z": {
-      "model": "create:block/encased_shaft/block_andesite",
-      "uvlock": true,
-      "x": 90,
-      "y": 180
+      "model": "create:block/encased_shaft/block_z"
     }
   }
 }

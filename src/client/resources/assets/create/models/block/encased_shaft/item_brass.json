@@ -1,7 +1,12 @@
 {
-	"parent": "create:block/encased_shaft/item",
-	"textures": {
-		"casing": "create:block/brass_casing",
-		"opening": "create:block/brass_gearbox"
-	}
+  "parent": "create:block/encased_shaft/textures_brass",
+  "textures": {
+    "4": "create:block/axis",
+    "5": "create:block/axis_top"
+  },
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "emissive_ambient": false,
+  "model": "create:models/block/encased_shaft/item.obj"
 }

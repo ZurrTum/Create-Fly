@@ -1,0 +1,10 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "0": "create:block/encased_border_1",
+    "1": "create:block/encased_border_2",
+    "2": "create:block/gearbox_3",
+    "3": "create:block/andesite_casing",
+    "particle": "#3"
+  }
+}

@@ -1,0 +1,20 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl encased_border_1
+map_Kd #0
+
+newmtl encased_border_2
+map_Kd #1
+
+newmtl gearbox_3
+map_Kd #2
+
+newmtl casing
+map_Kd #3
+
+newmtl axis
+map_Kd #4
+
+newmtl axis_top
+map_Kd #5

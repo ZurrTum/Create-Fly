@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "create:block/encased_shaft/item_andesite"
+    "model": "create:block/encased_shaft/item"
   }
 }

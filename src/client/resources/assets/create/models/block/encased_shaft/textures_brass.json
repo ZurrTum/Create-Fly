@@ -1,0 +1,10 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "0": "create:block/encased_brass_border_1",
+    "1": "create:block/encased_brass_border_2",
+    "2": "create:block/brass_gearbox_3",
+    "3": "create:block/brass_casing",
+    "particle": "#3"
+  }
+}

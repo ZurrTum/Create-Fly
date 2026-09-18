@@ -4,5 +4,5 @@
 	"flip_v": true,
 	"automatic_culling": false,
 	"emissive_ambient":false,
-	"model": "create:models/block/encased_shaft/block.obj"
+	"model": "create:models/block/encased_shaft/block_x.obj"
 }
