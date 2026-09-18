@@ -214,10 +214,19 @@ public class OitFramebuffer {
         GlTextureUnit.T0.makeActive();
         GlStateManager._bindTexture(accumulate);
 
+        // Clears sampler before texture is accessed.
+        // Not doing that is a problem if the sampler expects mipmap data
+        // but there is none written to the texture, because it can lead to the operation failing.
+        // This is exactly what broke the rendering of semi-transparent blocks on macOS,
+        // because it does fail there and creates a zero texture,
+        // which in turn leads to all semi-transparent blocks being rendered, regardless of how far away they are.
+        GL33C.glBindSampler(GlTextureUnit.T0.number, 0);
+
         programs.getOitCompositeProgram().bind();
 
         drawFullscreenQuad();
 
+        GL33C.glBindSampler(Samplers.NOISE.number, 0);
 
         bindRenderTarget(mainTarget, frameBufferCache, access);
     }
@@ -340,6 +349,10 @@ public class OitFramebuffer {
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_MAG_FILTER, GL32.GL_NEAREST);
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_WRAP_S, GL32.GL_CLAMP_TO_EDGE);
             GL32.glTexParameteri(GL32.GL_TEXTURE_2D, GL32.GL_TEXTURE_WRAP_T, GL32.GL_CLAMP_TO_EDGE);
+
+            // Unbinds both the GL_TEXTURE_2D and the GL_TEXTURE_2D_ARRAY because otherwise GlStateManager doesn't know they are bound and wouldn't unset them if asked to
+            GL32.glBindTexture(GL32.GL_TEXTURE_2D, 0);
+            GL32.glBindTexture(GL32.GL_TEXTURE_2D_ARRAY, 0);
 
             GlStateManager._glBindFramebuffer(GL32.GL_FRAMEBUFFER, fbo);
 
