@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "create:model/normal",
-    "model": "create:block/cogwheel"
+    "model": "create:block/cogwheel/block"
   }
 }

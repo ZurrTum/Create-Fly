@@ -1,0 +1,15 @@
+{
+	"parent": "create:block/large_wheels",
+	"textures": {
+		"0": "create:block/cogwheel_axis",
+		"1": "create:block/axis_top",
+		"2": "create:block/cogwheel_1",
+		"3": "create:block/cogwheel_2",
+		"particle": "block/stripped_spruce_log_top"
+	},
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"automatic_culling": false,
+	"emissive_ambient":false,
+	"model": "create:models/block/cogwheel/block.obj"
+}

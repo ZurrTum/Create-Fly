@@ -1,0 +1,14 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl cogwheel_axis
+map_Kd #0
+
+newmtl axis_top
+map_Kd #1
+
+newmtl cogwheel_1
+map_Kd #2
+
+newmtl cogwheel_2
+map_Kd #3

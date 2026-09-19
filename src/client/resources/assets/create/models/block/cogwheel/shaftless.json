@@ -1,0 +1,13 @@
+{
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/cogwheel_1",
+		"1": "create:block/cogwheel_2",
+		"particle": "block/stripped_spruce_log_top"
+	},
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"automatic_culling": false,
+	"emissive_ambient":false,
+	"model": "create:models/block/cogwheel/shaftless.obj"
+}
