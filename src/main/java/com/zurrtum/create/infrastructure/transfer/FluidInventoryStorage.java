@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.impl.transfer.DebugMessages;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.jspecify.annotations.Nullable;
@@ -39,16 +38,7 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
     }
 
     static boolean matches(FluidVariant variant, FluidStack stack) {
-        if (!variant.isOf(stack.getFluid())) {
-            return false;
-        }
-        DataComponentPatch stackComponents = stack.getComponentChanges();
-        DataComponentPatch variantComponents = variant.getComponentsPatch();
-        if (stackComponents == variantComponents) {
-            return true;
-        }
-        return stackComponents.map.reference2ObjectEntrySet()
-            .containsAll(variantComponents.map.reference2ObjectEntrySet());
+        return FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(getCachedStack(variant), stack);
     }
 
     @Override
