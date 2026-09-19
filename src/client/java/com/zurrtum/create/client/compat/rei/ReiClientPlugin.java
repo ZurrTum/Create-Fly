@@ -10,8 +10,6 @@ import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen
 import com.zurrtum.create.compat.rei.display.DrainingDisplay;
 import com.zurrtum.create.compat.rei.display.SpoutFillingDisplay;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.api.client.REIRuntime;
-import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry.CategoryConfiguration;
@@ -107,7 +105,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         EntryIngredient ingredient = EntryIngredients.ofItemTag(AllItemTags.TOOLBOXES);
         for (DyeColor color : DyeColor.values()) {
             registry.add(new ClientsidedCraftingDisplay.Shapeless(
-                List.of(ingredient, EntryIngredients.of(DyeItem.byColor(color))),
+                List.of(ingredient, EntryIngredients.of(DyeItem.byId(color.getId()))),
                 List.of(EntryIngredients.of(AllBlocks.TOOLBOX.pick(color))),
                 Optional.empty()
             ));
@@ -134,13 +132,6 @@ public class ReiClientPlugin implements REIClientPlugin {
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void registerInputMethods(InputMethodRegistry registry) {
-        StockKeeperRequestScreen.setSearchConsumer(ReiClientPlugin::setSearchField);
-    }
-
-    public static void setSearchField(String text) {
-        TextField search = REIRuntime.getInstance().getSearchTextField();
-        if (search != null) {
-            search.setText(text);
-        }
+        StockKeeperRequestScreen.setSearchSync(new ReiStockSearchSync());
     }
 }

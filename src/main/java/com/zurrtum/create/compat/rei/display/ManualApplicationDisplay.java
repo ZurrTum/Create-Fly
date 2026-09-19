@@ -3,6 +3,7 @@ package com.zurrtum.create.compat.rei.display;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -45,7 +46,7 @@ public record ManualApplicationDisplay(EntryIngredient input, EntryIngredient ta
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             EntryIngredients.ofIngredient(recipe.target()),
-            EntryIngredients.of(recipe.result()),
+            EntryIngredients.ofItemStacks(recipe.results().stream().map(ProcessingOutput::create).toList()),
             Optional.of(id)
         );
     }

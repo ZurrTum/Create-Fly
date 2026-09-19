@@ -19,6 +19,7 @@ import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.*;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
@@ -95,7 +96,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 if (stack != null) {
                     FluidStack fluidStack = stack.castValue();
                     fluid = fluidStack.getFluid();
-                    components = fluidStack.getComponents().asPatch();
+                    components = fluidStack.getPatch();
                 }
                 graphics.guiRenderState.addPicturesInPictureState(new SpoutRenderState(
                     i,
@@ -151,7 +152,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 noBackground[i] = true;
             }
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             for (int i = 0; i < size; i++) {
                 if (noBackground[i]) {
                     continue;
@@ -193,7 +194,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 slots.add(slot);
             }
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             Font textRenderer = graphics.minecraft.font;
             for (int i = 0; i < size; i++) {
                 Point point = points.get(i);

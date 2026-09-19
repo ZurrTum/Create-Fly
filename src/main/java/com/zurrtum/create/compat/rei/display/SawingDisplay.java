@@ -3,6 +3,7 @@ package com.zurrtum.create.compat.rei.display;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -39,7 +40,7 @@ public record SawingDisplay(EntryIngredient input, EntryIngredient output,
     }
 
     public SawingDisplay(Identifier id, CuttingRecipe recipe) {
-        this(EntryIngredients.ofIngredient(recipe.ingredient()), EntryIngredients.of(recipe.result()), Optional.of(id));
+        this(EntryIngredients.ofIngredient(recipe.ingredient()), EntryIngredients.ofItemStacks(recipe.results().stream().map(ProcessingOutput::create).toList()), Optional.of(id));
     }
 
     @Override

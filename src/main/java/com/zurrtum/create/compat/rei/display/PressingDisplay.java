@@ -4,6 +4,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -42,7 +43,7 @@ public record PressingDisplay(EntryIngredient input, EntryIngredient output,
     public PressingDisplay(Identifier id, PressingRecipe recipe) {
         this(
             IngredientHelper.getInputEntryIngredient(recipe.ingredient()),
-            EntryIngredients.of(recipe.result()),
+            EntryIngredients.ofItemStacks(recipe.results().stream().map(ProcessingOutput::create).toList()),
             Optional.of(id)
         );
     }

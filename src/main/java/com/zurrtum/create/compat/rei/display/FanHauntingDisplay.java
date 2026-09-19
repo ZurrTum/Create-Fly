@@ -53,7 +53,7 @@ public record FanHauntingDisplay(EntryIngredient input, List<ProcessingOutput> o
     public List<EntryIngredient> getOutputEntries() {
         List<EntryIngredient> list = new ArrayList<>();
         for (ProcessingOutput output : outputs) {
-            list.add(EntryIngredients.of(output.stack()));
+            list.add(EntryIngredients.of(output.create()));
         }
         return list;
     }
