@@ -327,12 +327,12 @@ public class AllBlocks {
     public static final EncasedCogwheelBlock ANDESITE_ENCASED_COGWHEEL = (EncasedCogwheelBlock) register(
         AllBlockItemIds.ANDESITE_ENCASED_COGWHEEL,
         p -> new EncasedCogwheelBlock(p, false, ANDESITE_CASING),
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL)
     );
     public static final EncasedCogwheelBlock BRASS_ENCASED_COGWHEEL = (EncasedCogwheelBlock) register(
         AllBlockItemIds.BRASS_ENCASED_COGWHEEL,
         p -> new EncasedCogwheelBlock(p, false, BRASS_CASING),
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.TERRACOTTA_BROWN)
     );
     public static final EncasedCogwheelBlock ANDESITE_ENCASED_LARGE_COGWHEEL = (EncasedCogwheelBlock) register(
         AllBlockItemIds.ANDESITE_ENCASED_LARGE_COGWHEEL,

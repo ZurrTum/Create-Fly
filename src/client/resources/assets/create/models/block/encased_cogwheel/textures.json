@@ -4,11 +4,8 @@
 		"1": "create:block/encased_border_1",
 		"2": "create:block/andesite_encased_cogwheel_side",
 		"3": "minecraft:block/stripped_spruce_log_top",
+		"4": "create:block/encased_border_2",
+		"5": "create:block/gearbox_3",
 		"particle": "#0"
-	},
-	"loader": "neoforge:obj",
-	"flip_v": true,
-	"automatic_culling": false,
-	"emissive_ambient":false,
-	"model": "create:models/block/encased_cogwheel/block.obj"
+	}
 }

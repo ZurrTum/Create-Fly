@@ -56,7 +56,7 @@ public class EncasedSmallCogRenderer implements BlockEntityRenderer<SimpleKineti
             return;
         }
         state.model = CachedBuffers.partialFacingVertical(
-            AllPartialModels.SHAFTLESS_COGWHEEL,
+            AllPartialModels.SHAFTLESS_COGWHEEL_CULL,
             state.blockState,
             direction
         ).cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();

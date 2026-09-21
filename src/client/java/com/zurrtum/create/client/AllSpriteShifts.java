@@ -133,10 +133,9 @@ public class AllSpriteShifts {
     public static final CTSpriteShiftEntry CRAFTER_SIDE = vertical("crafter_side");
     public static final CTSpriteShiftEntry CRAFTER_OTHERSIDE = horizontal("crafter_side");
     public static final CTSpriteShiftEntry ANDESITE_ENCASED_COGWHEEL_SIDE = vertical("andesite_encased_cogwheel_side");
-    public static final CTSpriteShiftEntry ANDESITE_ENCASED_COGWHEEL_OTHERSIDE = horizontal(
-        "andesite_encased_cogwheel_side");
+    public static final CTSpriteShiftEntry ANDESITE_ENCASED_BORDER = vertical("encased_border_1");
     public static final CTSpriteShiftEntry BRASS_ENCASED_COGWHEEL_SIDE = vertical("brass_encased_cogwheel_side");
-    public static final CTSpriteShiftEntry BRASS_ENCASED_COGWHEEL_OTHERSIDE = horizontal("brass_encased_cogwheel_side");
+    public static final CTSpriteShiftEntry BRASS_ENCASED_BORDER = vertical("encased_brass_border_1");
     public static final CTSpriteShiftEntry GIRDER_POLE = vertical("girder_pole_side");
     public static final CTSpriteShiftEntry ANDESITE_CASING = omni("andesite_casing");
     public static final CTSpriteShiftEntry BRASS_CASING = omni("brass_casing");

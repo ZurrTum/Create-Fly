@@ -1,6 +1,5 @@
 package com.zurrtum.create.client;
 
-import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.content.contraptions.chassis.ChassisCTBehaviour;
 import com.zurrtum.create.client.content.decoration.MetalScaffoldingCTBehaviour;
 import com.zurrtum.create.client.content.decoration.RoofBlockCTBehaviour;
@@ -13,6 +12,7 @@ import com.zurrtum.create.client.content.decoration.palettes.WeatheredIronWindow
 import com.zurrtum.create.client.content.fluids.tank.FluidTankCTBehaviour;
 import com.zurrtum.create.client.content.kinetics.crafter.CrafterCTBehaviour;
 import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedCogCTBehaviour;
+import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedLargeCogCTBehaviour;
 import com.zurrtum.create.client.content.logistics.tunnel.BrassTunnelCTBehaviour;
 import com.zurrtum.create.client.content.logistics.vault.ItemVaultCTBehaviour;
 import com.zurrtum.create.client.foundation.block.connected.GlassPaneCTBehaviour;
@@ -34,23 +34,16 @@ public class AllCTBehaviours {
     public static final EncasedCTBehaviour REFINED_RADIANCE_CASING = new EncasedCTBehaviour(AllSpriteShifts.REFINED_RADIANCE_CASING);
     public static final EncasedCogCTBehaviour COG_SIDE_ANDESITE_CASING = new EncasedCogCTBehaviour(
         AllSpriteShifts.ANDESITE_CASING,
-        Couple.create(
-            AllSpriteShifts.ANDESITE_ENCASED_COGWHEEL_SIDE,
-            AllSpriteShifts.ANDESITE_ENCASED_COGWHEEL_OTHERSIDE
-        )
+        AllSpriteShifts.ANDESITE_ENCASED_COGWHEEL_SIDE,
+        AllSpriteShifts.ANDESITE_ENCASED_BORDER
     );
     public static final EncasedCogCTBehaviour COG_SIDE_BRASS_CASING = new EncasedCogCTBehaviour(
         AllSpriteShifts.BRASS_CASING,
-        Couple.create(AllSpriteShifts.BRASS_ENCASED_COGWHEEL_SIDE, AllSpriteShifts.BRASS_ENCASED_COGWHEEL_OTHERSIDE)
+        AllSpriteShifts.BRASS_ENCASED_COGWHEEL_SIDE,
+        AllSpriteShifts.BRASS_ENCASED_BORDER
     );
-    public static final EncasedCogCTBehaviour COG_ANDESITE_CASING = new EncasedCogCTBehaviour(
-        AllSpriteShifts.ANDESITE_CASING,
-        null
-    );
-    public static final EncasedCogCTBehaviour COG_BRASS_CASING = new EncasedCogCTBehaviour(
-        AllSpriteShifts.BRASS_CASING,
-        null
-    );
+    public static final EncasedCTBehaviour COG_ANDESITE_CASING = new EncasedLargeCogCTBehaviour(AllSpriteShifts.ANDESITE_CASING);
+    public static final EncasedCTBehaviour COG_BRASS_CASING = new EncasedLargeCogCTBehaviour(AllSpriteShifts.BRASS_CASING);
     public static final ChassisCTBehaviour CHASSIS = new ChassisCTBehaviour();
     public static final FluidTankCTBehaviour FLUID_TANK = new FluidTankCTBehaviour(
         AllSpriteShifts.FLUID_TANK,

@@ -243,6 +243,8 @@ public class AllShapes {
         .forHorizontal(SOUTH);
     public static final VoxelShaper WHISTLE_LARGE_WALL = shape(WHISTLE_LARGE).add(WHISTLE_BASE.get(NORTH))
         .forHorizontal(SOUTH);
+    public static final VoxelShaper ENCASED_COGWHEEL = shape(Shapes.block()).erase(2, 6, 0, 14, 10, 16)
+        .erase(0, 6, 2, 16, 10, 14).forAxis();
 
     private static Builder shape(VoxelShape shape) {
         return new Builder(shape);

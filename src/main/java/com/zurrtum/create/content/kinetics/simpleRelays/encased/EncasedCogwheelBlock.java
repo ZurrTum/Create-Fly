@@ -2,6 +2,7 @@ package com.zurrtum.create.content.kinetics.simpleRelays.encased;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlock;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.catnip.data.Iterate;
@@ -39,6 +40,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements ICogWheel, IBE<SimpleKineticBlockEntity>, SpecialBlockItemRequirement, TransformableBlock, EncasedBlock {
@@ -81,9 +83,8 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
     }
 
     @Override
-    public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pDirection) {
-        return pState.getBlock() == pAdjacentBlockState.getBlock() && pState.getValue(AXIS) == pAdjacentBlockState.getValue(
-            AXIS);
+    protected VoxelShape getOcclusionShape(BlockState state) {
+        return AllShapes.ENCASED_COGWHEEL.get(state.getValue(AXIS));
     }
 
     @Override

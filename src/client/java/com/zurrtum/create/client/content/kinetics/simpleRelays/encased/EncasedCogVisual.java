@@ -38,7 +38,7 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
             blockEntity,
             false,
             partialTick,
-            Models.chunkPartial(AllPartialModels.SHAFTLESS_COGWHEEL)
+            Models.chunkPartial(AllPartialModels.SHAFTLESS_COGWHEEL_CULL)
         );
     }
 

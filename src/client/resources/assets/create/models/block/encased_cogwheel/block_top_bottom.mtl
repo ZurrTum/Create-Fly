@@ -1,0 +1,20 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl casing
+map_Kd #0
+
+newmtl encased_border_1
+map_Kd #1
+
+newmtl encased_cogwheel_side
+map_Kd #2
+
+newmtl stripped_spruce_log_top
+map_Kd #3
+
+newmtl encased_border_2
+map_Kd #4
+
+newmtl gearbox_3
+map_Kd #5

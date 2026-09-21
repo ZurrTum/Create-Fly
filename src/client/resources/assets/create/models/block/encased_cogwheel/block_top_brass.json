@@ -1,0 +1,8 @@
+{
+  "parent": "create:block/encased_cogwheel/textures_brass",
+  "loader": "neoforge:obj",
+  "flip_v": true,
+  "automatic_culling": false,
+  "emissive_ambient":false,
+  "model": "create:models/block/encased_cogwheel/block_top.obj"
+}

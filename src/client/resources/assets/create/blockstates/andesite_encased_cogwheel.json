@@ -1,54 +1,54 @@
 {
   "variants": {
     "axis=x,bottom_shaft=false,top_shaft=false": {
-      "model": "create:block/andesite_encased_cogwheel",
+      "model": "create:block/encased_cogwheel/block",
       "x": 90,
       "y": 90
     },
     "axis=x,bottom_shaft=false,top_shaft=true": {
-      "model": "create:block/andesite_encased_cogwheel_top",
+      "model": "create:block/encased_cogwheel/block_top",
       "x": 90,
       "y": 90
     },
     "axis=x,bottom_shaft=true,top_shaft=false": {
-      "model": "create:block/andesite_encased_cogwheel_bottom",
+      "model": "create:block/encased_cogwheel/block_bottom",
       "x": 90,
       "y": 90
     },
     "axis=x,bottom_shaft=true,top_shaft=true": {
-      "model": "create:block/andesite_encased_cogwheel_top_bottom",
+      "model": "create:block/encased_cogwheel/block_top_bottom",
       "x": 90,
       "y": 90
     },
     "axis=y,bottom_shaft=false,top_shaft=false": {
-      "model": "create:block/andesite_encased_cogwheel"
+      "model": "create:block/encased_cogwheel/block"
     },
     "axis=y,bottom_shaft=false,top_shaft=true": {
-      "model": "create:block/andesite_encased_cogwheel_top"
+      "model": "create:block/encased_cogwheel/block_top"
     },
     "axis=y,bottom_shaft=true,top_shaft=false": {
-      "model": "create:block/andesite_encased_cogwheel_bottom"
+      "model": "create:block/encased_cogwheel/block_bottom"
     },
     "axis=y,bottom_shaft=true,top_shaft=true": {
-      "model": "create:block/andesite_encased_cogwheel_top_bottom"
+      "model": "create:block/encased_cogwheel/block_top_bottom"
     },
     "axis=z,bottom_shaft=false,top_shaft=false": {
-      "model": "create:block/andesite_encased_cogwheel",
+      "model": "create:block/encased_cogwheel/block",
       "x": 90,
       "y": 180
     },
     "axis=z,bottom_shaft=false,top_shaft=true": {
-      "model": "create:block/andesite_encased_cogwheel_top",
+      "model": "create:block/encased_cogwheel/block_top",
       "x": 90,
       "y": 180
     },
     "axis=z,bottom_shaft=true,top_shaft=false": {
-      "model": "create:block/andesite_encased_cogwheel_bottom",
+      "model": "create:block/encased_cogwheel/block_bottom",
       "x": 90,
       "y": 180
     },
     "axis=z,bottom_shaft=true,top_shaft=true": {
-      "model": "create:block/andesite_encased_cogwheel_top_bottom",
+      "model": "create:block/encased_cogwheel/block_top_bottom",
       "x": 90,
       "y": 180
     }
