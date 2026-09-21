@@ -1,6 +1,8 @@
 package com.zurrtum.create.client.foundation.block.connected;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.resources.Identifier;
 
 public class CTSpriteShiftEntry {
@@ -28,6 +30,10 @@ public class CTSpriteShiftEntry {
 
     public CTType getType() {
         return type;
+    }
+
+    public BakedQuad replaceQuad(int index, BakedQuad quad, MaterialInfo info) {
+        return targets[index].replaceQuad(quad, info);
     }
 
     public float getTargetU(float localU, int index) {

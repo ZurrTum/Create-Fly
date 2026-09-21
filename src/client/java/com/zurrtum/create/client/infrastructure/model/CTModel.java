@@ -4,11 +4,9 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
-import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.client.foundation.model.SimpleModelPart;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -64,12 +62,6 @@ public class CTModel extends WrapperBlockStateModel {
         }
     }
 
-    private static long calcSpriteUv(long packedUv, CTSpriteShiftEntry spriteShift, int index) {
-        float u = UVPair.unpackU(packedUv);
-        float v = UVPair.unpackV(packedUv);
-        return UVPair.pack(spriteShift.getTargetU(u, index), spriteShift.getTargetV(v, index));
-    }
-
     protected BakedQuad replaceQuad(BlockState state, RandomSource random, int index, BakedQuad quad) {
         if (index == -1) {
             return quad;
@@ -80,14 +72,7 @@ public class CTModel extends WrapperBlockStateModel {
         if (spriteShift == null || sprite != spriteShift.getOriginal()) {
             return quad;
         }
-        return BakedModelHelper.replaceBakedQuadUV(
-            quad,
-            calcSpriteUv(quad.packedUV0(), spriteShift, index),
-            calcSpriteUv(quad.packedUV1(), spriteShift, index),
-            calcSpriteUv(quad.packedUV2(), spriteShift, index),
-            calcSpriteUv(quad.packedUV3(), spriteShift, index),
-            info
-        );
+        return spriteShift.replaceQuad(index, quad, info);
     }
 
     protected int[] createCTData(BlockAndTintGetter world, BlockPos pos, BlockState state) {
