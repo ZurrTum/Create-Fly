@@ -8,13 +8,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3fc;
 
 public class Face {
-    public static final int LIGHT_FACE_FLAG = 1;
-    public static final int CUBIC_FLAG_0 = 0;
-    public static final int CUBIC_FLAG_1 = 2;
-    public static final int CUBIC_FLAG_2 = 4;
-    public static final int CUBIC_FLAG_3 = 6;
-    public static final int CUBIC_FLAG = 1 << CUBIC_FLAG_0 | 1 << CUBIC_FLAG_1 | 1 << CUBIC_FLAG_2 | 1 << CUBIC_FLAG_3;
-    public static final int PARTIAL_FLAG = 8;
+    public static final int PARTIAL_FLAG = 0;
+    public static final int PARTIAL_LIGHT_FACE_FLAG = 1;
+    public static final int CUBIC_FLAG_0 = 2;
+    public static final int CUBIC_LIGHT_FACE_FLAG_0 = 3;
+    public static final int CUBIC_FLAG_1 = 4;
+    public static final int CUBIC_LIGHT_FACE_FLAG_1 = 5;
+    public static final int CUBIC_FLAG_2 = 6;
+    public static final int CUBIC_LIGHT_FACE_FLAG_2 = 7;
+    public static final int CUBIC_FLAG_3 = 8;
+    public static final int CUBIC_LIGHT_FACE_FLAG_3 = 9;
     public static final float EPS_MIN = 0.0001f;
     public static final float EPS_MAX = 1.0f - EPS_MIN;
 
@@ -576,25 +579,6 @@ public class Face {
         QuadInstance output
     ) {
         partialFace(2, f0, f1, clamp(w), u1, v1, u3, v3, u5, v5, u7, v7, output);
-    }
-
-    public static int computeFlag(
-        boolean b0,
-        boolean b1,
-        boolean b2,
-        boolean b3,
-        boolean b4,
-        boolean b5,
-        boolean b6,
-        boolean b7,
-        boolean b8
-    ) {
-        int cubic0 = (b0 ? 2 : 0) ^ (b1 ? 6 : 0);
-        int cubic1 = (b2 ? 2 : 0) ^ (b3 ? 6 : 0);
-        int cubic2 = (b4 ? 2 : 0) ^ (b5 ? 6 : 0);
-        int cubic3 = (b6 ? 2 : 0) ^ (b7 ? 6 : 0);
-        int cubic = 1 << cubic0 | 1 << cubic1 | 1 << cubic2 | 1 << cubic3;
-        return (cubic == CUBIC_FLAG ? cubic0 : PARTIAL_FLAG) | (b8 ? LIGHT_FACE_FLAG : 0);
     }
 
     private static int computeFlag(float nx, float ny, float nz) {

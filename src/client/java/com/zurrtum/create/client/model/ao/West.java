@@ -19,12 +19,132 @@ public class West extends Face {
         float z3,
         float x
     ) {
-        boolean b0 = y0 <= EPS_MIN, b1 = z0 <= EPS_MIN;
-        boolean b2 = y1 <= EPS_MIN, b3 = z1 <= EPS_MIN;
-        boolean b4 = y2 <= EPS_MIN, b5 = z2 <= EPS_MIN;
-        boolean b6 = y3 <= EPS_MIN, b7 = z3 <= EPS_MIN;
-        boolean b8 = x <= EPS_MIN;
-        return computeFlag(b0, b1, b2, b3, b4, b5, b6, b7, b8);
+        if (y0 <= EPS_MIN) {
+            if (z0 <= EPS_MIN) {
+                if (y1 <= EPS_MIN) {
+                    if (z1 >= EPS_MAX) {
+                        if (y2 >= EPS_MAX) {
+                            if (z2 <= EPS_MIN) {
+                                if (y3 >= EPS_MAX & z3 >= EPS_MAX) {
+                                    return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_2 : CUBIC_FLAG_2;
+                                }
+                            } else if (z2 >= EPS_MAX & y3 >= EPS_MAX & z3 <= EPS_MIN) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_2 : CUBIC_FLAG_2;
+                            }
+                        }
+                    }
+                } else if (y1 >= EPS_MAX) {
+                    if (z1 <= EPS_MIN) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 >= EPS_MAX & y3 >= EPS_MAX & z3 >= EPS_MAX) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_2 : CUBIC_FLAG_2;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 >= EPS_MAX & y3 <= EPS_MIN & z3 >= EPS_MAX) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_2 : CUBIC_FLAG_2;
+                        }
+                    } else if (z1 >= EPS_MAX) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 >= EPS_MAX & y3 >= EPS_MAX & z3 <= EPS_MIN) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_2 : CUBIC_FLAG_2;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 <= EPS_MIN & y3 <= EPS_MIN & z3 >= EPS_MAX) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_2 : CUBIC_FLAG_2;
+                        }
+                    }
+                }
+            } else if (z0 >= EPS_MAX) {
+                if (y1 <= EPS_MIN) {
+                    if (z1 <= EPS_MIN) {
+                        if (y2 >= EPS_MAX) {
+                            if (z2 <= EPS_MIN) {
+                                if (y3 >= EPS_MAX & z3 >= EPS_MAX) {
+                                    return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_1 : CUBIC_FLAG_1;
+                                }
+                            } else if (z2 >= EPS_MAX & y3 >= EPS_MAX & z3 <= EPS_MIN) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_1 : CUBIC_FLAG_1;
+                            }
+                        }
+                    }
+                } else if (y1 >= EPS_MAX) {
+                    if (z1 <= EPS_MIN) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 <= EPS_MIN & y3 >= EPS_MAX & z3 >= EPS_MAX) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_1 : CUBIC_FLAG_1;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 >= EPS_MAX & y3 <= EPS_MIN & z3 <= EPS_MIN) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_1 : CUBIC_FLAG_1;
+                        }
+                    } else if (z1 >= EPS_MAX) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 <= EPS_MIN & y3 >= EPS_MAX & z3 <= EPS_MIN) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_1 : CUBIC_FLAG_1;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 <= EPS_MIN & y3 <= EPS_MIN & z3 <= EPS_MIN) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_1 : CUBIC_FLAG_1;
+                        }
+                    }
+                }
+            }
+        } else if (y0 >= EPS_MAX) {
+            if (z0 <= EPS_MIN) {
+                if (y1 <= EPS_MIN) {
+                    if (z1 <= EPS_MIN) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 >= EPS_MAX & y3 >= EPS_MAX & z3 >= EPS_MAX) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_3 : CUBIC_FLAG_3;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 >= EPS_MAX & y3 <= EPS_MIN & z3 >= EPS_MAX) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_3 : CUBIC_FLAG_3;
+                        }
+                    } else if (z1 >= EPS_MAX) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 <= EPS_MIN & y3 >= EPS_MAX & z3 >= EPS_MAX) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_3 : CUBIC_FLAG_3;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 >= EPS_MAX & y3 <= EPS_MIN & z3 <= EPS_MIN) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_3 : CUBIC_FLAG_3;
+                        }
+                    }
+                } else if (y1 >= EPS_MAX & z1 >= EPS_MAX & y2 <= EPS_MIN) {
+                    if (z2 <= EPS_MIN) {
+                        if (y3 <= EPS_MIN & z3 >= EPS_MAX) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_3 : CUBIC_FLAG_3;
+                        }
+                    } else if (z2 >= EPS_MAX & y3 <= EPS_MIN & z3 <= EPS_MIN) {
+                        return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_3 : CUBIC_FLAG_3;
+                    }
+                }
+            } else if (z0 >= EPS_MAX) {
+                if (y1 <= EPS_MIN) {
+                    if (z1 <= EPS_MIN) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 >= EPS_MAX & y3 >= EPS_MAX & z3 <= EPS_MIN) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_0 : CUBIC_FLAG_0;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 <= EPS_MIN & y3 <= EPS_MIN & z3 >= EPS_MAX) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_0 : CUBIC_FLAG_0;
+                        }
+                    } else if (z1 >= EPS_MAX) {
+                        if (y2 <= EPS_MIN) {
+                            if (z2 <= EPS_MIN & y3 >= EPS_MAX & z3 <= EPS_MIN) {
+                                return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_0 : CUBIC_FLAG_0;
+                            }
+                        } else if (y2 >= EPS_MAX & z2 <= EPS_MIN & y3 <= EPS_MIN & z3 <= EPS_MIN) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_0 : CUBIC_FLAG_0;
+                        }
+                    }
+                } else if (y1 >= EPS_MAX & z1 <= EPS_MIN & y2 <= EPS_MIN) {
+                    if (z2 <= EPS_MIN) {
+                        if (y3 <= EPS_MIN & z3 >= EPS_MAX) {
+                            return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_0 : CUBIC_FLAG_0;
+                        }
+                    } else if (z2 >= EPS_MAX & y3 <= EPS_MIN & z3 <= EPS_MIN) {
+                        return x <= EPS_MIN ? CUBIC_LIGHT_FACE_FLAG_0 : CUBIC_FLAG_0;
+                    }
+                }
+            }
+        }
+        return x <= EPS_MIN ? PARTIAL_LIGHT_FACE_FLAG : PARTIAL_FLAG;
     }
 
     public static void prepareQuad(
@@ -52,18 +172,6 @@ public class West extends Face {
         float y0 = p0.y(), y1 = p1.y(), y2 = p2.y(), y3 = p3.y();
         float z0 = p0.z(), z1 = p1.z(), z2 = p2.z(), z3 = p3.z();
         switch (computeFlag(y0, z0, y1, z1, y2, z2, y3, z3, x0)) {
-            case CUBIC_FLAG_0 ->
-                fullFace0(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_0 -> fullFace0(cache.computeWestBlock(level, state, pos), output);
-            case CUBIC_FLAG_1 ->
-                fullFace1(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_1 -> fullFace1(cache.computeWestBlock(level, state, pos), output);
-            case CUBIC_FLAG_2 ->
-                fullFace2(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_2 -> fullFace2(cache.computeWestBlock(level, state, pos), output);
-            case CUBIC_FLAG_3 ->
-                fullFace3(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_3 -> fullFace3(cache.computeWestBlock(level, state, pos), output);
             case PARTIAL_FLAG -> partialFace1(
                 cache.computeWestBlock(level, state, pos),
                 cache.computeWest(level, state, pos),
@@ -78,8 +186,20 @@ public class West extends Face {
                 z3,
                 output
             );
-            case LIGHT_FACE_FLAG | PARTIAL_FLAG ->
+            case PARTIAL_LIGHT_FACE_FLAG ->
                 partialFace1(cache.computeWestBlock(level, state, pos), y0, z0, y1, z1, y2, z2, y3, z3, output);
+            case CUBIC_FLAG_0 ->
+                fullFace0(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
+            case CUBIC_LIGHT_FACE_FLAG_0 -> fullFace0(cache.computeWestBlock(level, state, pos), output);
+            case CUBIC_FLAG_1 ->
+                fullFace1(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
+            case CUBIC_LIGHT_FACE_FLAG_1 -> fullFace1(cache.computeWestBlock(level, state, pos), output);
+            case CUBIC_FLAG_2 ->
+                fullFace2(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
+            case CUBIC_LIGHT_FACE_FLAG_2 -> fullFace2(cache.computeWestBlock(level, state, pos), output);
+            case CUBIC_FLAG_3 ->
+                fullFace3(cache.computeWestBlock(level, state, pos), cache.computeWest(level, state, pos), x0, output);
+            case CUBIC_LIGHT_FACE_FLAG_3 -> fullFace3(cache.computeWestBlock(level, state, pos), output);
         }
     }
 
@@ -108,34 +228,6 @@ public class West extends Face {
         float y0 = p0.y(), y1 = p1.y(), y2 = p2.y(), y3 = p3.y();
         float z0 = p0.z(), z1 = p1.z(), z2 = p2.z(), z3 = p3.z();
         switch (computeFlag(y0, z0, y1, z1, y2, z2, y3, z3, x0)) {
-            case CUBIC_FLAG_0 -> fullFace0(
-                cache.computeWestBlockShade(level, state, pos),
-                cache.computeWestShade(level, state, pos),
-                x0,
-                output
-            );
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_0 -> fullFace0(cache.computeWestBlockShade(level, state, pos), output);
-            case CUBIC_FLAG_1 -> fullFace1(
-                cache.computeWestBlockShade(level, state, pos),
-                cache.computeWestShade(level, state, pos),
-                x0,
-                output
-            );
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_1 -> fullFace1(cache.computeWestBlockShade(level, state, pos), output);
-            case CUBIC_FLAG_2 -> fullFace2(
-                cache.computeWestBlockShade(level, state, pos),
-                cache.computeWestShade(level, state, pos),
-                x0,
-                output
-            );
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_2 -> fullFace2(cache.computeWestBlockShade(level, state, pos), output);
-            case CUBIC_FLAG_3 -> fullFace3(
-                cache.computeWestBlockShade(level, state, pos),
-                cache.computeWestShade(level, state, pos),
-                x0,
-                output
-            );
-            case LIGHT_FACE_FLAG | CUBIC_FLAG_3 -> fullFace3(cache.computeWestBlockShade(level, state, pos), output);
             case PARTIAL_FLAG -> partialFace1(
                 cache.computeWestBlockShade(level, state, pos),
                 cache.computeWestShade(level, state, pos),
@@ -150,8 +242,36 @@ public class West extends Face {
                 z3,
                 output
             );
-            case LIGHT_FACE_FLAG | PARTIAL_FLAG ->
+            case PARTIAL_LIGHT_FACE_FLAG ->
                 partialFace1(cache.computeWestBlockShade(level, state, pos), y0, z0, y1, z1, y2, z2, y3, z3, output);
+            case CUBIC_FLAG_0 -> fullFace0(
+                cache.computeWestBlockShade(level, state, pos),
+                cache.computeWestShade(level, state, pos),
+                x0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_0 -> fullFace0(cache.computeWestBlockShade(level, state, pos), output);
+            case CUBIC_FLAG_1 -> fullFace1(
+                cache.computeWestBlockShade(level, state, pos),
+                cache.computeWestShade(level, state, pos),
+                x0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_1 -> fullFace1(cache.computeWestBlockShade(level, state, pos), output);
+            case CUBIC_FLAG_2 -> fullFace2(
+                cache.computeWestBlockShade(level, state, pos),
+                cache.computeWestShade(level, state, pos),
+                x0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_2 -> fullFace2(cache.computeWestBlockShade(level, state, pos), output);
+            case CUBIC_FLAG_3 -> fullFace3(
+                cache.computeWestBlockShade(level, state, pos),
+                cache.computeWestShade(level, state, pos),
+                x0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_3 -> fullFace3(cache.computeWestBlockShade(level, state, pos), output);
         }
     }
 
