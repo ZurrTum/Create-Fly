@@ -75,6 +75,19 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
         );
     }
 
+    public static <T extends KineticBlockEntity> SingleAxisRotatingVisual<T> encasedShaft(
+        VisualizationContext context,
+        T blockEntity,
+        float partialTick
+    ) {
+        return new SingleAxisRotatingVisual<>(
+            context,
+            blockEntity,
+            partialTick,
+            Models.chunkPartial(AllPartialModels.ENCASED_SHAFT)
+        );
+    }
+
     @Override
     public void update(float pt) {
         rotatingModel.setup(blockEntity).setChanged();

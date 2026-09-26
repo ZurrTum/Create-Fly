@@ -2,6 +2,7 @@ package com.zurrtum.create.content.kinetics.simpleRelays.encased;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.content.decoration.encasing.EncasedBlock;
 import com.zurrtum.create.content.kinetics.base.AbstractEncasedShaftBlock;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 public class EncasedShaftBlock extends AbstractEncasedShaftBlock implements IBE<KineticBlockEntity>, SpecialBlockItemRequirement, EncasedBlock {
@@ -39,6 +41,11 @@ public class EncasedShaftBlock extends AbstractEncasedShaftBlock implements IBE<
 
     public static EncasedShaftBlock brass(Properties properties) {
         return new EncasedShaftBlock(properties, AllBlocks.BRASS_CASING);
+    }
+
+    @Override
+    protected VoxelShape getOcclusionShape(BlockState state) {
+        return AllShapes.ENCASED_SHAFT.get(state.getValue(AXIS));
     }
 
     @Override

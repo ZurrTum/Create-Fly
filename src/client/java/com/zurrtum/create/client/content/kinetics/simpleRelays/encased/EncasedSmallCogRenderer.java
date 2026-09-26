@@ -50,26 +50,32 @@ public class EncasedSmallCogRenderer implements BlockEntityRenderer<SimpleKineti
         state.angle = getRotateAngleWithoutBeOffset(axis, direction, be, state, level);
         boolean hasTop = state.blockState.getValue(EncasedCogwheelBlock.TOP_SHAFT);
         boolean hasBottom = state.blockState.getValue(EncasedCogwheelBlock.BOTTOM_SHAFT);
-        if (hasTop && hasBottom) {
-            state.model = CachedBuffers.partialFacingVertical(AllPartialModels.COGWHEEL, state.blockState, direction)
-                .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-            return;
-        }
+        int lightCoords = state.lightCoords;
         state.model = CachedBuffers.partialFacingVertical(
             AllPartialModels.SHAFTLESS_COGWHEEL_CULL,
             state.blockState,
             direction
-        ).cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
+        ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
         if (hasTop) {
-            state.top = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.blockState, direction)
-                .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-        }
-        if (hasBottom) {
-            state.bottom = CachedBuffers.partialFacing(
-                AllPartialModels.SHAFT_HALF,
+            if (hasBottom) {
+                state.shaft = CachedBuffers.partialFacingVertical(
+                    AllPartialModels.ENCASED_SHAFT,
+                    state.blockState,
+                    direction
+                ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
+            } else {
+                state.shaft = CachedBuffers.partialFacing(
+                    AllPartialModels.ENCASED_SHAFT_HALF,
+                    state.blockState,
+                    direction
+                ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
+            }
+        } else if (hasBottom) {
+            state.shaft = CachedBuffers.partialFacing(
+                AllPartialModels.ENCASED_SHAFT_HALF,
                 state.blockState,
-                direction.getOpposite()
-            ).cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
+                axis.getNegative()
+            ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
         }
     }
 
@@ -84,18 +90,14 @@ public class EncasedSmallCogRenderer implements BlockEntityRenderer<SimpleKineti
             matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
         }
         state.model.submit(matrices, queue);
-        if (state.top != null) {
-            state.top.submit(matrices, queue);
-        }
-        if (state.bottom != null) {
-            state.bottom.submit(matrices, queue);
+        if (state.shaft != null) {
+            state.shaft.submit(matrices, queue);
         }
     }
 
     public static class EncasedSmallCogRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState model;
         public @Nullable Quaternionf angle;
-        public @Nullable SuperByteBufferRenderState top;
-        public @Nullable SuperByteBufferRenderState bottom;
+        public @Nullable SuperByteBufferRenderState shaft;
     }
 }

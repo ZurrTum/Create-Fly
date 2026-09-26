@@ -22,7 +22,8 @@ public class AllPartialModels {
 
     SHAFTLESS_COGWHEEL = block("cogwheel/shaftless"), SHAFTLESS_COGWHEEL_CULL = block("cogwheel/shaftless_cull"), SHAFTLESS_LARGE_COGWHEEL = block(
         "large_cogwheel_shaftless"), COGWHEEL_SHAFT = block("cogwheel/shaft"), SHAFT_HALF = block("shaft_half"), SHAFT = block(
-        "shaft"), COGWHEEL = block("cogwheel/block"),
+        "shaft"), ENCASED_SHAFT = block("encased_shaft/shaft"), ENCASED_SHAFT_HALF = block("encased_shaft/shaft_half"), COGWHEEL = block(
+        "cogwheel/block"),
 
     BELT_PULLEY = block("belt_pulley"), BELT_START = block("belt/start"), BELT_MIDDLE = block("belt/middle"), BELT_END = block(
         "belt/end"), BELT_START_BOTTOM = block("belt/start_bottom"), BELT_MIDDLE_BOTTOM = block("belt/middle_bottom"), BELT_END_BOTTOM = block(

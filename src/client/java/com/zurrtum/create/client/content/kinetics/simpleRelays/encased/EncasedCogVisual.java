@@ -28,20 +28,6 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
     @Nullable
     protected final RotatingInstance rotatingBottomShaft;
 
-    public static EncasedCogVisual small(
-        VisualizationContext modelManager,
-        KineticBlockEntity blockEntity,
-        float partialTick
-    ) {
-        return new EncasedCogVisual(
-            modelManager,
-            blockEntity,
-            false,
-            partialTick,
-            Models.chunkPartial(AllPartialModels.SHAFTLESS_COGWHEEL_CULL)
-        );
-    }
-
     public static EncasedCogVisual large(
         VisualizationContext modelManager,
         KineticBlockEntity blockEntity,
