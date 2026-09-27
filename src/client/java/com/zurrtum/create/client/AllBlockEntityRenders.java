@@ -86,7 +86,6 @@ import com.zurrtum.create.client.content.kinetics.simpleRelays.BracketedKineticB
 import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedCogVisual;
 import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedLargeCogRenderer;
 import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedSmallCogRenderer;
-import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedSmallCogVisual;
 import com.zurrtum.create.client.content.kinetics.steamEngine.PoweredShaftRenderer;
 import com.zurrtum.create.client.content.kinetics.steamEngine.SteamEngineRenderer;
 import com.zurrtum.create.client.content.kinetics.steamEngine.SteamEngineVisual;
@@ -206,7 +205,7 @@ public class AllBlockEntityRenders {
         visual(AllBlockEntityTypes.ENCASED_SHAFT, EncasedShaftRenderer::new, SingleAxisRotatingVisual::encasedShaft);
         visual(AllBlockEntityTypes.ADJUSTABLE_CHAIN_GEARSHIFT, ShaftRenderer::new, SingleAxisRotatingVisual::shaft);
         normal(AllBlockEntityTypes.CHAIN_CONVEYOR, ChainConveyorRenderer::new, ChainConveyorVisual::new);
-        visual(AllBlockEntityTypes.ENCASED_COGWHEEL, EncasedSmallCogRenderer::new, EncasedSmallCogVisual::new);
+        visual(AllBlockEntityTypes.ENCASED_COGWHEEL, EncasedSmallCogRenderer::new, EncasedCogVisual::small);
         visual(AllBlockEntityTypes.ENCASED_LARGE_COGWHEEL, EncasedLargeCogRenderer::new, EncasedCogVisual::large);
         visual(AllBlockEntityTypes.HAND_CRANK, HandCrankRenderer::new, HandCrankVisual::new);
         visual(AllBlockEntityTypes.VALVE_HANDLE, ValveHandleRenderer::new, ValveHandleVisual::new);

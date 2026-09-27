@@ -1,9 +1,9 @@
 {
 	"parent": "create:block/large_wheels",
 	"textures": {
-		"stripped_spruce_log_top": "block/stripped_spruce_log_top",
-		"casing": "create:block/andesite_casing",
-		"side_1": "create:block/andesite_encased_cogwheel_side_connected/3",
+		"stripped_spruce_log_top": "block/stripped_dark_oak_log_top",
+		"casing": "create:block/brass_casing",
+		"side_1": "create:block/brass_encased_cogwheel_side_connected/3",
 		"large_cogwheel": "create:block/large_cogwheel",
 		"particle": "#casing"
 	},

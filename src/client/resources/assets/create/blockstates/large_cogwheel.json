@@ -1,15 +1,15 @@
 {
   "variants": {
     "axis=x": {
-      "model": "create:block/large_cogwheel",
+      "model": "create:block/large_cogwheel/block",
       "x": 90,
       "y": 90
     },
     "axis=y": {
-      "model": "create:block/large_cogwheel"
+      "model": "create:block/large_cogwheel/block"
     },
     "axis=z": {
-      "model": "create:block/large_cogwheel",
+      "model": "create:block/large_cogwheel/block",
       "x": 90,
       "y": 180
     }

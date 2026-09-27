@@ -1,0 +1,12 @@
+{
+	"textures": {
+		"stripped_spruce_log_top": "block/stripped_spruce_log_top",
+		"casing": "create:block/andesite_casing",
+		"side_1": "create:block/andesite_encased_cogwheel_side_connected/3",
+		"side_2": "create:block/andesite_encased_large_cogwheel_side",
+		"encased_border_1": "create:block/encased_border_1",
+		"encased_border_2": "create:block/encased_border_2",
+		"gearbox": "create:block/gearbox_3",
+		"particle": "#casing"
+	}
+}

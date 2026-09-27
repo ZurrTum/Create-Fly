@@ -1,0 +1,11 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl large_cogwheel
+map_Kd #0
+
+newmtl cogwheel_axis
+map_Kd #1
+
+newmtl axis_top
+map_Kd #2

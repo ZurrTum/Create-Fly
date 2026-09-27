@@ -21,7 +21,7 @@ public class AllPartialModels {
         SCHEMATICANNON_CONNECTOR = block("schematicannon/connector"), SCHEMATICANNON_PIPE = block("schematicannon/pipe"),
 
     SHAFTLESS_COGWHEEL = block("cogwheel/shaftless"), SHAFTLESS_COGWHEEL_CULL = block("cogwheel/shaftless_cull"), SHAFTLESS_LARGE_COGWHEEL = block(
-        "large_cogwheel_shaftless"), COGWHEEL_SHAFT = block("cogwheel/shaft"), SHAFT_HALF = block("shaft_half"), SHAFT = block(
+        "large_cogwheel/shaftless"), COGWHEEL_SHAFT = block("cogwheel/shaft"), SHAFT_HALF = block("shaft_half"), SHAFT = block(
         "shaft"), ENCASED_SHAFT = block("encased_shaft/shaft"), ENCASED_SHAFT_HALF = block("encased_shaft/shaft_half"), COGWHEEL = block(
         "cogwheel/block"),
 

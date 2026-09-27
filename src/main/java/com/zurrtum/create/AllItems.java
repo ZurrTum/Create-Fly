@@ -116,6 +116,14 @@ public class AllItems {
         AllBlocks.LARGE_COGWHEEL,
         CogwheelBlockItem::new
     );
+    public static final BlockItem ANDESITE_ENCASED_LARGE_COGWHEEL = (BlockItem) registerBlock(
+        AllBlockItemIds.ANDESITE_ENCASED_LARGE_COGWHEEL,
+        AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL
+    );
+    public static final BlockItem BRASS_ENCASED_LARGE_COGWHEEL = (BlockItem) registerBlock(
+        AllBlockItemIds.BRASS_ENCASED_LARGE_COGWHEEL,
+        AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL
+    );
     public static final BlockItem SHAFT = (BlockItem) registerBlock(AllBlockItemIds.SHAFT, AllBlocks.SHAFT);
     public static final BlockItem GANTRY_SHAFT = (BlockItem) registerBlock(
         AllBlockItemIds.GANTRY_SHAFT,

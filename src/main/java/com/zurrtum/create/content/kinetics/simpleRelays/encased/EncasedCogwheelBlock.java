@@ -84,7 +84,7 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
 
     @Override
     protected VoxelShape getOcclusionShape(BlockState state) {
-        return AllShapes.ENCASED_COGWHEEL.get(state.getValue(AXIS));
+        return (isLarge ? AllShapes.ENCASED_LARGE_COGWHEEL : AllShapes.ENCASED_COGWHEEL).get(state.getValue(AXIS));
     }
 
     @Override

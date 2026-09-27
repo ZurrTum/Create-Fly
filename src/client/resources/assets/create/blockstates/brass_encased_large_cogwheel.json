@@ -1,54 +1,54 @@
 {
   "variants": {
     "axis=x,bottom_shaft=false,top_shaft=false": {
-      "model": "create:block/brass_encased_large_cogwheel",
+      "model": "create:block/encased_large_cogwheel/block_brass",
       "x": 90,
       "y": 90
     },
     "axis=x,bottom_shaft=false,top_shaft=true": {
-      "model": "create:block/brass_encased_large_cogwheel_top",
+      "model": "create:block/encased_large_cogwheel/block_top_brass",
       "x": 90,
       "y": 90
     },
     "axis=x,bottom_shaft=true,top_shaft=false": {
-      "model": "create:block/brass_encased_large_cogwheel_bottom",
+      "model": "create:block/encased_large_cogwheel/block_bottom_brass",
       "x": 90,
       "y": 90
     },
     "axis=x,bottom_shaft=true,top_shaft=true": {
-      "model": "create:block/brass_encased_large_cogwheel_top_bottom",
+      "model": "create:block/encased_large_cogwheel/block_top_bottom_brass",
       "x": 90,
       "y": 90
     },
     "axis=y,bottom_shaft=false,top_shaft=false": {
-      "model": "create:block/brass_encased_large_cogwheel"
+      "model": "create:block/encased_large_cogwheel/block_brass"
     },
     "axis=y,bottom_shaft=false,top_shaft=true": {
-      "model": "create:block/brass_encased_large_cogwheel_top"
+      "model": "create:block/encased_large_cogwheel/block_top_brass"
     },
     "axis=y,bottom_shaft=true,top_shaft=false": {
-      "model": "create:block/brass_encased_large_cogwheel_bottom"
+      "model": "create:block/encased_large_cogwheel/block_bottom_brass"
     },
     "axis=y,bottom_shaft=true,top_shaft=true": {
-      "model": "create:block/brass_encased_large_cogwheel_top_bottom"
+      "model": "create:block/encased_large_cogwheel/block_top_bottom_brass"
     },
     "axis=z,bottom_shaft=false,top_shaft=false": {
-      "model": "create:block/brass_encased_large_cogwheel",
+      "model": "create:block/encased_large_cogwheel/block_brass",
       "x": 90,
       "y": 180
     },
     "axis=z,bottom_shaft=false,top_shaft=true": {
-      "model": "create:block/brass_encased_large_cogwheel_top",
+      "model": "create:block/encased_large_cogwheel/block_top_brass",
       "x": 90,
       "y": 180
     },
     "axis=z,bottom_shaft=true,top_shaft=false": {
-      "model": "create:block/brass_encased_large_cogwheel_bottom",
+      "model": "create:block/encased_large_cogwheel/block_bottom_brass",
       "x": 90,
       "y": 180
     },
     "axis=z,bottom_shaft=true,top_shaft=true": {
-      "model": "create:block/brass_encased_large_cogwheel_top_bottom",
+      "model": "create:block/encased_large_cogwheel/block_top_bottom_brass",
       "x": 90,
       "y": 180
     }

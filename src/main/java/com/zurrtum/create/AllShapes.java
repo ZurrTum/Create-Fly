@@ -246,6 +246,7 @@ public class AllShapes {
     public static final VoxelShaper ENCASED_SHAFT = shape(Shapes.block()).erase(6, 1, 6, 10, 15, 10).forAxis();
     public static final VoxelShaper ENCASED_COGWHEEL = shape(Shapes.block()).erase(2, 6, 0, 14, 10, 16)
         .erase(0, 6, 2, 16, 10, 14).forAxis();
+    public static final VoxelShaper ENCASED_LARGE_COGWHEEL = shape(Shapes.block()).erase(0, 6, 0, 16, 10, 16).forAxis();
 
     private static Builder shape(VoxelShape shape) {
         return new Builder(shape);

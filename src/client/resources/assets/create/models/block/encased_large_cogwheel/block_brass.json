@@ -1,6 +1,6 @@
 {
 	"credit": "Made with Blockbench",
-	"parent": "create:block/encased_large_cogwheel/textures",
+	"parent": "create:block/encased_large_cogwheel/textures_brass",
 	"elements": [
 		{
 			"from": [0, 0, 0],
