@@ -5,7 +5,6 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
 import com.zurrtum.create.client.content.kinetics.base.RotatingInstance;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
-import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
@@ -19,51 +18,18 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static com.zurrtum.create.client.content.kinetics.simpleRelays.BracketedKineticBlockEntityRenderer.getShaftAngleOffset;
-
-public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntity> {
+public class EncasedSmallCogVisual extends KineticBlockEntityVisual<KineticBlockEntity> {
     protected final RotatingInstance rotatingModel;
     @Nullable
     protected final RotatingInstance rotatingShaft;
 
-    public static EncasedCogVisual small(
-        VisualizationContext modelManager,
-        KineticBlockEntity blockEntity,
-        float partialTick
-    ) {
-        return new EncasedCogVisual(
-            modelManager,
-            blockEntity,
-            false,
-            partialTick,
-            Models.chunkPartial(AllPartialModels.SHAFTLESS_COGWHEEL_CULL)
-        );
-    }
-
-    public static EncasedCogVisual large(
-        VisualizationContext modelManager,
-        KineticBlockEntity blockEntity,
-        float partialTick
-    ) {
-        return new EncasedCogVisual(
-            modelManager,
-            blockEntity,
-            true,
-            partialTick,
-            Models.chunkPartial(AllPartialModels.SHAFTLESS_LARGE_COGWHEEL)
-        );
-    }
-
-    public EncasedCogVisual(
-        VisualizationContext modelManager,
-        KineticBlockEntity blockEntity,
-        boolean large,
-        float partialTick,
-        Model model
-    ) {
+    public EncasedSmallCogVisual(VisualizationContext modelManager, KineticBlockEntity blockEntity, float partialTick) {
         super(modelManager, blockEntity, partialTick);
         InstancerProvider instancerProvider = instancerProvider();
-        rotatingModel = instancerProvider.instancer(AllInstanceTypes.ROTATING, model).createInstance();
+        rotatingModel = instancerProvider.instancer(
+            AllInstanceTypes.ROTATING,
+            Models.chunkPartial(AllPartialModels.SHAFTLESS_COGWHEEL_CULL)
+        ).createInstance();
         Axis axis = rotationAxis();
         Direction direction = axis.getPositive();
         BlockPos visualPosition = getVisualPosition();
@@ -85,9 +51,6 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
                 rotatingShaft.setup(blockEntity).setPosition(visualPosition).rotateToFace(Direction.SOUTH, direction)
                     .setChanged();
             }
-            if (large) {
-                rotatingShaft.setRotationOffset(getShaftAngleOffset(axis, pos));
-            }
         } else if (hasBottom) {
             rotatingShaft = instancerProvider.instancer(
                 AllInstanceTypes.ROTATING,
@@ -95,9 +58,6 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
             ).createInstance();
             rotatingShaft.setup(blockEntity).setPosition(visualPosition)
                 .rotateToFace(Direction.SOUTH, axis.getNegative()).setChanged();
-            if (large) {
-                rotatingShaft.setRotationOffset(getShaftAngleOffset(axis, pos));
-            }
         } else {
             rotatingShaft = null;
         }
