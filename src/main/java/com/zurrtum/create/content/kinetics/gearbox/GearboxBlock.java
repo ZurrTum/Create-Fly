@@ -2,6 +2,7 @@ package com.zurrtum.create.content.kinetics.gearbox;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams.Builder;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
@@ -20,6 +22,11 @@ public class GearboxBlock extends RotatedPillarKineticBlock implements IBE<Gearb
 
     public GearboxBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected VoxelShape getOcclusionShape(BlockState state) {
+        return AllShapes.GEARBOX.get(state.getValue(AXIS));
     }
 
     @Override

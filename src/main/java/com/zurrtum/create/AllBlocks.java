@@ -219,8 +219,7 @@ public class AllBlocks {
     public static final GearboxBlock GEARBOX = (GearboxBlock) register(
         AllBlockItemIds.GEARBOX,
         GearboxBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
-            .pushReaction(PushReaction.PUSH_ONLY)
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).pushReaction(PushReaction.PUSH_ONLY)
     );
     public static final WaterWheelBlock WATER_WHEEL = (WaterWheelBlock) register(
         AllBlockItemIds.WATER_WHEEL,

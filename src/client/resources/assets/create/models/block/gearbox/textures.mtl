@@ -1,0 +1,23 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl andesite_casing
+map_Kd #andesite_casing
+
+newmtl encased_border_1
+map_Kd #encased_border_1
+
+newmtl gearbox_1
+map_Kd #gearbox_1
+
+newmtl gearbox_2
+map_Kd #gearbox_2
+
+newmtl gearbox_border
+map_Kd #gearbox_border
+
+newmtl axis_top
+map_Kd #axis_top
+
+newmtl axis
+map_Kd #axis

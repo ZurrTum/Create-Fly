@@ -34,7 +34,7 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
 
         var instancer = instancerProvider().instancer(
             AllInstanceTypes.ROTATING,
-            Models.chunkPartial(AllPartialModels.SHAFT_HALF)
+            Models.chunkPartial(AllPartialModels.ENCASED_SHAFT_HALF)
         );
 
         for (Direction direction : Iterate.directions) {

@@ -1,0 +1,13 @@
+{
+	"parent": "block/block",
+	"textures": {
+		"andesite_casing": "create:block/andesite_casing",
+		"encased_border_1": "create:block/encased_border_1",
+		"gearbox_1": "create:block/gearbox_1",
+		"gearbox_2": "create:block/gearbox_2",
+		"gearbox_border": "create:block/gearbox_border",
+		"axis_top": "create:block/axis_top",
+		"axis": "create:block/axis",
+		"particle": "#axis"
+	}
+}

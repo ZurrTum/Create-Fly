@@ -67,67 +67,46 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         int color = getTintColor(be);
         float angle = getProgress(speed, level) % 360;
         switch (axis) {
-            case Y -> {
-                updateFirst(angle, state, cardinalLighting, color, flag, Axis.Z, Direction.SOUTH);
-                updateSecond(angle, state, cardinalLighting, color, flag, Axis.X, Direction.EAST);
-            }
-            case Z -> {
-                updateFirst(angle, state, cardinalLighting, color, flag, Axis.Y, Direction.UP);
-                updateSecond(angle, state, cardinalLighting, color, flag, Axis.X, Direction.EAST);
-            }
-            case X -> {
-                updateFirst(angle, state, cardinalLighting, color, flag, Axis.Y, Direction.UP);
-                updateSecond(angle, state, cardinalLighting, color, flag, Axis.Z, Direction.SOUTH);
-            }
+            case Y -> updateState(state, angle, cardinalLighting, color, flag, Axis.Z, Axis.X);
+            case Z -> updateState(state, angle, cardinalLighting, color, flag, Axis.Y, Axis.X);
+            case X -> updateState(state, angle, cardinalLighting, color, flag, Axis.Y, Axis.Z);
         }
     }
 
-    public static void updateFirst(
-        float angle,
+    private static void updateState(
         GearboxRenderState state,
+        float angle,
         @Nullable CardinalLighting cardinalLighting,
         int color,
         boolean flag,
-        Axis axis,
-        Direction direction
+        Axis axis1,
+        Axis axis2
     ) {
         BlockState blockState = state.blockState;
-        float offset = KineticBlockEntityVisual.rotationOffset(blockState, axis, state.blockPos);
+        float offset1 = KineticBlockEntityVisual.rotationOffset(blockState, axis1, state.blockPos);
+        float offset2 = KineticBlockEntityVisual.rotationOffset(blockState, axis2, state.blockPos);
+        Direction direction1 = axis1.getPositive();
+        Direction direction2 = axis2.getPositive();
         if (flag) {
-            state.angle0 = getRotateAngle(angle + offset, direction);
-            state.angle1 = getRotateAngle(offset - angle, direction);
+            state.angle0 = getRotateAngle(angle + offset1, direction1);
+            state.angle1 = getRotateAngle(offset1 - angle, direction1);
+            state.angle2 = getRotateAngle(offset2 - angle, direction2);
+            state.angle3 = getRotateAngle(angle + offset2, direction2);
         } else {
-            state.angle0 = getRotateAngle(offset - angle, direction);
-            state.angle1 = getRotateAngle(angle + offset, direction);
+            state.angle0 = getRotateAngle(offset1 - angle, direction1);
+            state.angle1 = getRotateAngle(angle + offset1, direction1);
+            state.angle2 = getRotateAngle(angle + offset2, direction2);
+            state.angle3 = getRotateAngle(offset2 - angle, direction2);
         }
-        state.model0 = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockState, direction)
-            .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-        state.model1 = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockState, direction.getOpposite())
-            .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-    }
-
-    public static void updateSecond(
-        float angle,
-        GearboxRenderState state,
-        @Nullable CardinalLighting cardinalLighting,
-        int color,
-        boolean flag,
-        Axis axis,
-        Direction direction
-    ) {
-        BlockState blockState = state.blockState;
-        float offset = KineticBlockEntityVisual.rotationOffset(blockState, axis, state.blockPos);
-        if (flag) {
-            state.angle2 = getRotateAngle(offset - angle, direction);
-            state.angle3 = getRotateAngle(angle + offset, direction);
-        } else {
-            state.angle2 = getRotateAngle(angle + offset, direction);
-            state.angle3 = getRotateAngle(offset - angle, direction);
-        }
-        state.model2 = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockState, direction)
-            .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-        state.model3 = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockState, direction.getOpposite())
-            .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
+        int lightCoords = state.lightCoords;
+        state.model0 = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, blockState, direction1)
+            .cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
+        state.model1 = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, blockState, axis1.getNegative())
+            .cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
+        state.model2 = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, blockState, direction2)
+            .cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
+        state.model3 = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, blockState, axis2.getNegative())
+            .cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
     }
 
     @Override
