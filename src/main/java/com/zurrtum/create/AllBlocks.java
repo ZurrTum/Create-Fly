@@ -291,7 +291,7 @@ public class AllBlocks {
     public static final ClutchBlock CLUTCH = (ClutchBlock) register(
         AllBlockItemIds.CLUTCH,
         ClutchBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL)
     );
     public static final GearshiftBlock GEARSHIFT = (GearshiftBlock) register(
         AllBlockItemIds.GEARSHIFT,
