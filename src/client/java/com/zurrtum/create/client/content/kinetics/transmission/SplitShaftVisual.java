@@ -35,7 +35,7 @@ public class SplitShaftVisual extends KineticBlockEntityVisual<SplitShaftBlockEn
 
             var instance = instancerProvider().instancer(
                 AllInstanceTypes.ROTATING,
-                Models.chunkPartial(AllPartialModels.SHAFT_HALF)
+                Models.chunkPartial(AllPartialModels.ENCASED_SHAFT_HALF)
             ).createInstance();
 
             instance.setup(blockEntity, splitSpeed).setPosition(getVisualPosition()).rotateToFace(Direction.SOUTH, dir)

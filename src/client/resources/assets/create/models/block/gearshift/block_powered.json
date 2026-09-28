@@ -1,7 +1,6 @@
 {
 	"parent": "create:block/gearshift/block",
     "textures": {
-        "0": "create:block/gearshift_on",
-		"particle": "create:block/gearshift_on"
+        "side": "create:block/gearshift_on"
     }
 }

@@ -46,22 +46,16 @@ public class SplitShaftRenderer implements BlockEntityRenderer<SplitShaftBlockEn
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
         int color = getTintColor(be);
         Axis axis = getRotationAxisOf(state.blockState);
-        Direction direction = axis.getPositive();
+        Direction direction1 = axis.getPositive();
         float offset = rotationOffset(state.blockState, axis, state.blockPos);
         float progress = getProgress(be, level);
-        state.topAngle = getRotateAngle(progress * be.getRotationSpeedModifier(direction), offset, direction);
-        state.top = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.blockState, direction)
+        state.topAngle = getRotateAngle(progress * be.getRotationSpeedModifier(direction1), offset, direction1);
+        state.top = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, state.blockState, direction1)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-        Direction bottom = direction.getOpposite();
-        state.bottomAngle = getRotateAngle(progress * be.getRotationSpeedModifier(bottom), offset, direction);
-        state.bottom = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.blockState, bottom)
+        Direction direction2 = axis.getNegative();
+        state.bottomAngle = getRotateAngle(progress * be.getRotationSpeedModifier(direction2), offset, direction1);
+        state.bottom = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, state.blockState, direction2)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-    }
-
-    private static float getAngle(SplitShaftBlockEntity be, float angle, float offset, Direction direction) {
-        angle *= be.getRotationSpeedModifier(direction);
-        angle += offset;
-        return angle;
     }
 
     @Override

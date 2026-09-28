@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.transmission;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.kinetics.RotationPropagator;
 import com.zurrtum.create.content.kinetics.base.AbstractEncasedShaftBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.TickPriority;
 import org.jspecify.annotations.Nullable;
 
@@ -28,6 +30,11 @@ public class GearshiftBlock extends AbstractEncasedShaftBlock implements IBE<Spl
     public GearshiftBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(POWERED, false));
+    }
+
+    @Override
+    protected VoxelShape getOcclusionShape(BlockState state) {
+        return AllShapes.ENCASED_SHAFT.get(state.getValue(AXIS));
     }
 
     @Override

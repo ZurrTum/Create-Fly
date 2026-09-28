@@ -296,7 +296,7 @@ public class AllBlocks {
     public static final GearshiftBlock GEARSHIFT = (GearshiftBlock) register(
         AllBlockItemIds.GEARSHIFT,
         GearshiftBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL)
     );
     public static final ChainDriveBlock ENCASED_CHAIN_DRIVE = (ChainDriveBlock) register(
         AllBlockItemIds.ENCASED_CHAIN_DRIVE,
