@@ -301,12 +301,12 @@ public class AllBlocks {
     public static final ChainDriveBlock ENCASED_CHAIN_DRIVE = (ChainDriveBlock) register(
         AllBlockItemIds.ENCASED_CHAIN_DRIVE,
         ChainDriveBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL)
     );
     public static final ChainGearshiftBlock ADJUSTABLE_CHAIN_GEARSHIFT = (ChainGearshiftBlock) register(
         AllBlockItemIds.ADJUSTABLE_CHAIN_GEARSHIFT,
         ChainGearshiftBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.NETHER).noOcclusion()
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.NETHER)
     );
     public static final ChainConveyorBlock CHAIN_CONVEYOR = (ChainConveyorBlock) register(
         AllBlockItemIds.CHAIN_CONVEYOR,

@@ -1,0 +1,13 @@
+{
+	"textures": {
+		"side": "create:block/encased_chain_drive",
+		"gearbox_3": "create:block/gearbox_3",
+		"encased_border_1": "create:block/encased_border_1",
+		"encased_border_2": "create:block/encased_border_2",
+		"encased_chain_drive_1": "create:block/encased_chain_drive_1",
+		"encased_chain_drive_2": "create:block/encased_chain_drive_2",
+		"encased_chain_drive_3": "create:block/encased_chain_drive_3",
+		"encased_chain_drive_4": "create:block/encased_chain_drive_4",
+		"particle": "#side"
+	}
+}

@@ -4,6 +4,7 @@ import com.zurrtum.create.catnip.math.VoxelShaper;
 import com.zurrtum.create.content.logistics.chute.ChuteShapes;
 import com.zurrtum.create.content.trains.track.TrackVoxelShapes;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
@@ -248,6 +249,29 @@ public class AllShapes {
         .erase(0, 6, 2, 16, 10, 14).forAxis();
     public static final VoxelShaper ENCASED_LARGE_COGWHEEL = shape(Shapes.block()).erase(0, 6, 0, 16, 10, 16).forAxis();
     public static final VoxelShaper GEARBOX = shape(Shapes.block()).erase(0, 2, 0, 16, 14, 16).forAxis();
+    public static final VoxelShape[] ENCASED_CHAIN_DRIVE = Util.make(() -> {
+        VoxelShape[] map = new VoxelShape[18];
+        VoxelShape block = Shapes.block();
+        map[0] = shape(block).erase(0, 2, 2, 16, 14, 16).build();
+        map[1] = shape(block).erase(0, 2, 2, 16, 16, 14).build();
+        map[2] = shape(block).erase(2, 0, 2, 14, 16, 16).build();
+        map[3] = shape(block).erase(2, 0, 2, 16, 16, 14).build();
+        map[4] = shape(block).erase(2, 2, 0, 14, 16, 16).build();
+        map[5] = shape(block).erase(2, 2, 0, 16, 14, 16).build();
+        map[6] = shape(block).erase(0, 2, 0, 16, 14, 16).build();
+        map[7] = shape(block).erase(0, 0, 2, 16, 16, 14).build();
+        map[8] = shape(block).erase(2, 0, 0, 14, 16, 16).build();
+        map[9] = map[7];
+        map[10] = map[8];
+        map[11] = map[6];
+        map[12] = shape(block).erase(0, 2, 0, 16, 14, 14).build();
+        map[13] = shape(block).erase(0, 0, 2, 16, 14, 14).build();
+        map[14] = shape(block).erase(2, 0, 0, 14, 16, 14).build();
+        map[15] = shape(block).erase(0, 0, 2, 14, 16, 14).build();
+        map[16] = shape(block).erase(2, 0, 0, 14, 14, 16).build();
+        map[17] = shape(block).erase(0, 2, 0, 14, 14, 16).build();
+        return map;
+    });
 
     private static Builder shape(VoxelShape shape) {
         return new Builder(shape);

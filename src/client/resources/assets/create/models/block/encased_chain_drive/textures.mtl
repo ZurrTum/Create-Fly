@@ -1,0 +1,32 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl side
+map_Kd #side
+
+newmtl gearbox_3
+map_Kd #gearbox_3
+
+newmtl encased_border_1
+map_Kd #encased_border_1
+
+newmtl encased_border_2
+map_Kd #encased_border_2
+
+newmtl encased_chain_drive_1
+map_Kd #encased_chain_drive_1
+
+newmtl encased_chain_drive_2
+map_Kd #encased_chain_drive_2
+
+newmtl encased_chain_drive_3
+map_Kd #encased_chain_drive_3
+
+newmtl encased_chain_drive_4
+map_Kd #encased_chain_drive_4
+
+newmtl axis
+map_Kd #axis
+
+newmtl axis_top
+map_Kd #axis_top

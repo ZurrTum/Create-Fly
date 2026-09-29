@@ -204,7 +204,11 @@ public class AllBlockEntityRenders {
         visual(AllBlockEntityTypes.GEARSHIFT, SplitShaftRenderer::new, SplitShaftVisual::new);
         visual(AllBlockEntityTypes.SEQUENCED_GEARSHIFT, SplitShaftRenderer::new, SplitShaftVisual::new);
         visual(AllBlockEntityTypes.ENCASED_SHAFT, EncasedShaftRenderer::new, SingleAxisRotatingVisual::encasedShaft);
-        visual(AllBlockEntityTypes.ADJUSTABLE_CHAIN_GEARSHIFT, ShaftRenderer::new, SingleAxisRotatingVisual::shaft);
+        visual(
+            AllBlockEntityTypes.ADJUSTABLE_CHAIN_GEARSHIFT,
+            EncasedShaftRenderer::new,
+            SingleAxisRotatingVisual::encasedShaft
+        );
         normal(AllBlockEntityTypes.CHAIN_CONVEYOR, ChainConveyorRenderer::new, ChainConveyorVisual::new);
         visual(AllBlockEntityTypes.ENCASED_COGWHEEL, EncasedSmallCogRenderer::new, EncasedSmallCogVisual::new);
         visual(AllBlockEntityTypes.ENCASED_LARGE_COGWHEEL, EncasedLargeCogRenderer::new, EncasedLargeCogVisual::new);

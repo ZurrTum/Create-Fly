@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.kinetics.chainDrive;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlock;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.StructureTransform;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Locale;
 
@@ -41,6 +43,18 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
     public ChainDriveBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(PART, Part.NONE));
+    }
+
+    @Override
+    protected VoxelShape getOcclusionShape(BlockState state) {
+        Part part = state.getValue(PART);
+        Axis axis = state.getValue(AXIS);
+        if (part == Part.NONE) {
+            return AllShapes.ENCASED_SHAFT.get(axis);
+        }
+        Boolean connectionAlongFirst = state.getValue(CONNECTED_ALONG_FIRST_COORDINATE);
+        int index = (connectionAlongFirst ? 1 : 0) + (axis.ordinal() << 1) + part.ordinal() * 6;
+        return AllShapes.ENCASED_CHAIN_DRIVE[index];
     }
 
     @Override
