@@ -9,11 +9,11 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class MysteriousItemConversionCategory extends CreateCategory<MysteriousI
     public void addWidgets(List<Widget> widgets, MysteriousItemConversionDisplay display, Rectangle bounds) {
         Point input = new Point(bounds.x + 32, bounds.y + 22);
         Point output = new Point(bounds.x + 137, bounds.y + 22);
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, output);
             AllGuiTextures.JEI_LONG_ARROW.render(graphics, bounds.x + 57, bounds.y + 25);
             AllGuiTextures.JEI_QUESTION_MARK.render(graphics, bounds.x + 82, bounds.y + 10);

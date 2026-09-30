@@ -53,7 +53,7 @@ public record FanWashingDisplay(EntryIngredient input, List<ProcessingOutput> ou
     public List<EntryIngredient> getOutputEntries() {
         List<EntryIngredient> list = new ArrayList<>();
         for (ProcessingOutput output : outputs) {
-            list.add(EntryIngredients.of(output.stack()));
+            list.add(EntryIngredients.of(output.create()));
         }
         return list;
     }

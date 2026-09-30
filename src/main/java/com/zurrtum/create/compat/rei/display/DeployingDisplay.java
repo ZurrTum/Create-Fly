@@ -7,6 +7,7 @@ import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -63,7 +64,7 @@ public record DeployingDisplay(EntryIngredient input, EntryIngredient target, En
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.getInputEntryIngredient(recipe.target()),
-            EntryIngredients.of(recipe.result()),
+            EntryIngredients.ofItemStacks(recipe.results().stream().map(ProcessingOutput::create).toList()),
             Optional.of(id)
         );
     }
