@@ -145,37 +145,44 @@ public class FluidStack implements DataComponentHolder {
             if (stackComponents == otherStackComponents) {
                 return true;
             }
-            Reference2ObjectMap<DataComponentType<?>, Optional<?>> stackComponentMap = stackComponents.patch;
-            Reference2ObjectMap<DataComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.patch;
-            if (stackComponentMap == otherStackComponentMap) {
-                return true;
-            }
-            int stackComponentCount = stackComponentMap.size();
-            if (stackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
-                stackComponentCount--;
-            }
-            int otherStackComponentCount = otherStackComponentMap.size();
-            boolean hasMaxCapacityComponent = false;
-            if (otherStackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
-                otherStackComponentCount--;
-                hasMaxCapacityComponent = true;
-            }
-            if (stackComponentCount != otherStackComponentCount) {
-                return false;
-            }
-            if (hasMaxCapacityComponent) {
-                ObjectSet<Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
-                for (Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
-                    if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != AllDataComponents.FLUID_MAX_CAPACITY) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return stackComponentMap.reference2ObjectEntrySet()
-                .containsAll(otherStackComponentMap.reference2ObjectEntrySet());
+            return areFluidsAndComponentsEqualIgnoreCapacity(stackComponents, otherStackComponents);
         }
         return false;
+    }
+
+    public static boolean areFluidsAndComponentsEqualIgnoreCapacity(
+        PatchedDataComponentMap stackComponents,
+        PatchedDataComponentMap otherStackComponents
+    ) {
+        Reference2ObjectMap<DataComponentType<?>, Optional<?>> stackComponentMap = stackComponents.patch;
+        Reference2ObjectMap<DataComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.patch;
+        if (stackComponentMap == otherStackComponentMap) {
+            return true;
+        }
+        int stackComponentCount = stackComponentMap.size();
+        if (stackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
+            stackComponentCount--;
+        }
+        int otherStackComponentCount = otherStackComponentMap.size();
+        boolean hasMaxCapacityComponent = false;
+        if (otherStackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
+            otherStackComponentCount--;
+            hasMaxCapacityComponent = true;
+        }
+        if (stackComponentCount != otherStackComponentCount) {
+            return false;
+        }
+        if (hasMaxCapacityComponent) {
+            ObjectSet<Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
+            for (Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
+                if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != AllDataComponents.FLUID_MAX_CAPACITY) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return stackComponentMap.reference2ObjectEntrySet()
+            .containsAll(otherStackComponentMap.reference2ObjectEntrySet());
     }
 
     public static Optional<FluidStack> fromNbt(HolderLookup.Provider registries, Tag nbt) {

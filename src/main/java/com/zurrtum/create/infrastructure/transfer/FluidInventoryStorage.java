@@ -1,14 +1,18 @@
 package com.zurrtum.create.infrastructure.transfer;
 
 import com.google.common.collect.MapMaker;
+import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.impl.transfer.DebugMessages;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.jspecify.annotations.Nullable;
@@ -16,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
     Map<FluidVariant, FluidStack> CACHE = new MapMaker().weakKeys().makeMap();
@@ -42,13 +47,23 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
         if (!variant.isOf(stack.getFluid())) {
             return false;
         }
-        DataComponentPatch stackComponents = stack.getComponentChanges();
-        DataComponentPatch variantComponents = variant.getComponentsPatch();
-        if (stackComponents == variantComponents) {
+        PatchedDataComponentMap stackComponents = stack.directComponents();
+        DataComponentMap otherStackComponents = variant.getComponents();
+        if (stackComponents == otherStackComponents) {
             return true;
         }
-        return stackComponents.map.reference2ObjectEntrySet()
-            .containsAll(variantComponents.map.reference2ObjectEntrySet());
+        if (otherStackComponents == DataComponentMap.EMPTY) {
+            Reference2ObjectMap<DataComponentType<?>, Optional<?>> stackComponentMap = stackComponents.patch;
+            int stackComponentCount = stackComponentMap.size();
+            if (stackComponentCount == 0) {
+                return true;
+            }
+            return stackComponentCount == 1 && stackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY);
+        }
+        return FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(
+            stackComponents,
+            (PatchedDataComponentMap) otherStackComponents
+        );
     }
 
     @Override
