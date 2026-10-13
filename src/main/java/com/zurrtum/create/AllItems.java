@@ -1961,7 +1961,7 @@ public class AllItems {
         AllFluids::honeyBucket,
         new Properties().craftRemainder(Items.BUCKET).stacksTo(1)
     );
-    public static final BucketItem CHOCOLATE_BUCKET = (BucketItem) registerItem(
+    public static final BucketItem CHOCOLATE_BUCKET = AllFluidEntries.CHOCOLATE.bucket = (BucketItem) registerItem(
         AllItemIds.CHOCOLATE_BUCKET,
         AllFluids::chocolateBucket,
         new Properties().craftRemainder(Items.BUCKET).stacksTo(1)
