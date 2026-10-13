@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.kinetics.base;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -12,6 +14,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverl
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -19,6 +22,12 @@ import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntity
 
 public class EncasedShaftRenderer implements BlockEntityRenderer<KineticBlockEntity, SingleKineticRenderState> {
     public EncasedShaftRenderer(Context context) {
+    }
+
+    public static EncasedShaftRenderer defaultShaft(
+        Context context
+    ) {
+        return new EncasedShaftRenderer.Default(context);
     }
 
     @Override
@@ -35,13 +44,16 @@ public class EncasedShaftRenderer implements BlockEntityRenderer<KineticBlockEnt
         @Nullable CrumblingOverlay breakProgress
     ) {
         Level level = SmartBlockEntityRenderer.extractBase(be, state, breakProgress);
-        Axis axis = getRotationAxisOf(state.blockState);
-        state.model = CachedBuffers.partialFacingVertical(
-            AllPartialModels.ENCASED_SHAFT,
-            state.blockState,
-            axis.getPositive()
-        ).cardinalLighting(level).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
+        BlockState blockState = state.blockState;
+        Axis axis = getRotationAxisOf(blockState);
+        state.model = CachedBuffers.partialFacingVertical(getShaftModel(blockState), blockState, axis.getPositive())
+            .cardinalLighting(level).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
         state.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+    }
+
+    public PartialModel getShaftModel(BlockState state) {
+        return state.is(AllBlocks.METAL_GIRDER_ENCASED_SHAFT) ? AllPartialModels.METAL_GIRDER_ENCASED_SHAFT :
+            AllPartialModels.ENCASED_SHAFT;
     }
 
     @Override
@@ -52,5 +64,16 @@ public class EncasedShaftRenderer implements BlockEntityRenderer<KineticBlockEnt
         CameraRenderState camera
     ) {
         state.submit(matrices, queue);
+    }
+
+    private static class Default extends EncasedShaftRenderer {
+        public Default(Context context) {
+            super(context);
+        }
+
+        @Override
+        public PartialModel getShaftModel(BlockState state) {
+            return AllPartialModels.ENCASED_SHAFT;
+        }
     }
 }

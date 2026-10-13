@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.base;
 
+import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.model.Model;
@@ -84,7 +85,8 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
             context,
             blockEntity,
             partialTick,
-            Models.chunkPartial(AllPartialModels.ENCASED_SHAFT)
+            Models.chunkPartial(blockEntity.getBlockState().is(AllBlocks.METAL_GIRDER_ENCASED_SHAFT) ?
+                AllPartialModels.METAL_GIRDER_ENCASED_SHAFT : AllPartialModels.ENCASED_SHAFT)
         );
     }
 

@@ -206,7 +206,7 @@ public class AllBlockEntityRenders {
         visual(AllBlockEntityTypes.ENCASED_SHAFT, EncasedShaftRenderer::new, SingleAxisRotatingVisual::encasedShaft);
         visual(
             AllBlockEntityTypes.ADJUSTABLE_CHAIN_GEARSHIFT,
-            EncasedShaftRenderer::new,
+            EncasedShaftRenderer::defaultShaft,
             SingleAxisRotatingVisual::encasedShaft
         );
         normal(AllBlockEntityTypes.CHAIN_CONVEYOR, ChainConveyorRenderer::new, ChainConveyorVisual::new);
