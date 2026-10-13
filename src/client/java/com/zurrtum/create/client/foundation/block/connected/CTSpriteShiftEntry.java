@@ -16,7 +16,7 @@ public class CTSpriteShiftEntry {
         targets = new CTStitchedSprite[size];
         targets[0] = original = new CTStitchedSprite(originalLocation);
         for (int i = type.replaceOriginal() ? 0 : 1; i < size; i++) {
-            targets[i] = new CTStitchedSprite(originalLocation, targetLocation.withSuffix("/" + i));
+            targets[i] = new CTStitchedSprite(original, targetLocation.withSuffix("/" + i));
         }
     }
 

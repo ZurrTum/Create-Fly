@@ -1,0 +1,7 @@
+{
+	"textures": {
+		"encased_border_1": "create:block/encased_border_1",
+		"cover": "create:block/andesite_belt_cover",
+		"particle": "#cover"
+	}
+}

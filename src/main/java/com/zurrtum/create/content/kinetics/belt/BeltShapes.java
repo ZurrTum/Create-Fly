@@ -125,7 +125,32 @@ public class BeltShapes {
         Direction.SOUTH
     );
 
+    private static final VoxelShape HORIZONTAL_MIDDLE_CASING = box(0, 0, 0, 16, 11, 16);
+    private static final VoxelShaper HORIZONTAL_CASING = VoxelShaper.forAxis(
+        Shapes.join(
+            box(0, 0, 5, 16, 16, 16),
+            box(0, 4, 5, 16, 12, 11),
+            BooleanOp.ONLY_FIRST
+        ), Axis.Y
+    );
+    private static final VoxelShaper VERTICAL_MIDDLE_CASING = VoxelShaper.forAxis(box(5, 0, 0, 11, 16, 16), Axis.Y);
+    private static final VoxelShaper VERTICAL_CASING = VoxelShaper.forAxis(
+        Shapes.or(
+            box(2, 2, 0, 14, 14, 2),
+            box(2, 2, 14, 14, 14, 16),
+            VERTICAL_MIDDLE_CASING.get(Direction.UP)
+        ),
+        Axis.Y
+    );
+    private static final VoxelShape VERTICAL_MIDDLE_Z_CASING = box(0, 0, 5, 16, 16, 11);
+    private static final VoxelShape VERTICAL_Z_CASING = Shapes.or(
+        box(0, 2, 2, 2, 14, 14),
+        box(14, 2, 2, 16, 14, 14),
+        VERTICAL_MIDDLE_Z_CASING
+    );
+
     static Map<BlockState, VoxelShape> cache = new HashMap<>();
+    static Map<BlockState, VoxelShape> occlusionCache = new HashMap<>();
     static Map<BlockState, VoxelShape> collisionCache = new HashMap<>();
 
     private static VoxelShape compose(VoxelShape southPart, VoxelShape northPart) {
@@ -174,6 +199,44 @@ public class BeltShapes {
         }
         VoxelShape createdShape = Shapes.or(getBeltShape(state), getCasingShape(state));
         cache.put(state, createdShape);
+        return createdShape;
+    }
+
+    public static VoxelShape getOcclusionShape(BlockState state) {
+        if (occlusionCache.containsKey(state)) {
+            return occlusionCache.get(state);
+        }
+        VoxelShape createdShape;
+        if (state.getValue(BeltBlock.CASING)) {
+            BeltSlope slope = state.getValue(BeltBlock.SLOPE);
+            if (slope == BeltSlope.VERTICAL) {
+                VoxelShape casing;
+                boolean middle = state.getValue(BeltBlock.PART) == BeltPart.MIDDLE;
+                if (state.getValue(BeltBlock.HORIZONTAL_FACING).getAxis() == Axis.Z) {
+                    casing = middle ? VERTICAL_MIDDLE_Z_CASING : VERTICAL_Z_CASING;
+                } else {
+                    casing = (middle ? VERTICAL_MIDDLE_CASING : VERTICAL_CASING).get(Direction.UP);
+                }
+                createdShape = Shapes.or(getBeltShape(state), casing);
+            } else if (slope == BeltSlope.SIDEWAYS) {
+                boolean middle = state.getValue(BeltBlock.PART) == BeltPart.MIDDLE;
+                Direction direction = state.getValue(BeltBlock.HORIZONTAL_FACING).getAxis().getPositive();
+                VoxelShape casing = (middle ? VERTICAL_MIDDLE_CASING : VERTICAL_CASING).get(direction);
+                createdShape = Shapes.or(getBeltShape(state), casing);
+            } else if (slope == BeltSlope.HORIZONTAL) {
+                if (state.getValue(BeltBlock.PART) == BeltPart.MIDDLE) {
+                    createdShape = Shapes.or(getBeltShape(state), HORIZONTAL_MIDDLE_CASING);
+                } else {
+                    Direction direction = state.getValue(BeltBlock.HORIZONTAL_FACING).getAxis().getPositive();
+                    createdShape = Shapes.or(getBeltShape(state), HORIZONTAL_CASING.get(direction));
+                }
+            } else {
+                createdShape = getShape(state);
+            }
+        } else {
+            createdShape = getShape(state);
+        }
+        occlusionCache.put(state, createdShape);
         return createdShape;
     }
 

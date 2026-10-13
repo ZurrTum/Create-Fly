@@ -1,0 +1,8 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl cover
+map_Kd #cover
+
+newmtl encased_border_1
+map_Kd #encased_border_1

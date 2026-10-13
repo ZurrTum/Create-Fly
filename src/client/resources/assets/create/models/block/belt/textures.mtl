@@ -1,0 +1,20 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl belt
+map_Kd #belt
+
+newmtl belt_offset
+map_Kd #belt_offset
+
+newmtl belt_diagonal
+map_Kd #belt_diagonal
+
+newmtl axis
+map_Kd #axis
+
+newmtl axis_top
+map_Kd #axis_top
+
+newmtl belt_pulley
+map_Kd #belt_pulley

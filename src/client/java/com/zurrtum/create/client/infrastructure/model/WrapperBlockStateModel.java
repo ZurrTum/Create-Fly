@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,9 +46,12 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
         if (target == state) {
             return pos;
         }
-        BlockPos.MutableBlockPos position = pos.mutable();
+        MutableBlockPos position = new MutableBlockPos();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
         for (Vec3i move : DIRECTIONS) {
-            target = level.getBlockState(position.setWithOffset(pos, move));
+            target = level.getBlockState(position.set(x + move.getX(), y + move.getY(), z + move.getZ()));
             if (target == state) {
                 return position;
             }

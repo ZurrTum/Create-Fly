@@ -13,6 +13,7 @@ import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
@@ -77,7 +78,7 @@ public class BeltConnectorItem extends BlockItem {
             }
 
             if (firstPulley != null && !firstPulley.equals(pos)) {
-                createBelts(world, firstPulley, pos);
+                createSortedBelts(world, firstPulley, pos);
                 if (playerEntity instanceof ServerPlayer serverPlayerEntity) {
                     AllAdvancements.BELT.trigger(serverPlayerEntity);
                 }
@@ -96,6 +97,144 @@ public class BeltConnectorItem extends BlockItem {
         heldStack.set(AllDataComponents.BELT_FIRST_SHAFT, pos);
         playerEntity.getCooldowns().addCooldown(heldStack, 5);
         return InteractionResult.SUCCESS;
+    }
+
+    private static void createSortedBelts(Level world, BlockPos start, BlockPos end) {
+        world.playSound(
+            null,
+            BlockPos.containing(VecHelper.getCenterOf(start.offset(end)).scale(0.5f)),
+            SoundEvents.WOOL_PLACE,
+            SoundSource.BLOCKS,
+            0.5F,
+            1.0F
+        );
+        MutableBlockPos currentPos = new MutableBlockPos();
+        Direction facing;
+        int diffX = end.getX() - start.getX();
+        int diffY = end.getY() - start.getY();
+        int diffZ = end.getZ() - start.getZ();
+        int count, moveX, moveY, moveZ;
+        BlockState currentState;
+        BeltSlope slope;
+        if (diffY != 0) {
+            if (diffX != 0) {
+                boolean negative = diffX < 0;
+                boolean upward = diffY > 0 == negative;
+                currentPos.set(negative ? start : end);
+                currentState = world.getBlockState(currentPos);
+                slope = upward ? BeltSlope.UPWARD : BeltSlope.DOWNWARD;
+                moveY = upward ? 1 : -1;
+                facing = Direction.WEST;
+                moveX = -1;
+                moveZ = 0;
+                count = Math.abs(diffX);
+            } else if (diffZ != 0) {
+                boolean negative = diffZ < 0;
+                boolean upward = diffY > 0 == negative;
+                currentPos.set(negative ? start : end);
+                currentState = world.getBlockState(currentPos);
+                slope = upward ? BeltSlope.UPWARD : BeltSlope.DOWNWARD;
+                moveY = upward ? 1 : -1;
+                facing = Direction.NORTH;
+                moveX = 0;
+                moveZ = -1;
+                count = Math.abs(diffZ);
+            } else {
+                currentPos.set(diffY > 0 ? start : end);
+                currentState = world.getBlockState(currentPos);
+                slope = BeltSlope.VERTICAL;
+                moveY = 1;
+                Axis axis = currentState.getValue(AbstractSimpleShaftBlock.AXIS);
+                facing = axis == Axis.X ? Direction.SOUTH : Direction.EAST;
+                moveX = moveZ = 0;
+                count = Math.abs(diffY);
+            }
+        } else {
+            moveY = 0;
+            if (diffX != 0) {
+                currentPos.set(diffX > 0 ? start : end);
+                facing = Direction.EAST;
+                moveX = 1;
+                moveZ = 0;
+                count = Math.abs(diffX);
+            } else {
+                currentPos.set(diffZ > 0 ? start : end);
+                facing = Direction.SOUTH;
+                moveX = 0;
+                moveZ = 1;
+                count = Math.abs(diffZ);
+            }
+            currentState = world.getBlockState(currentPos);
+            Axis axis = currentState.getValue(AbstractSimpleShaftBlock.AXIS);
+            slope = axis == Axis.Y ? BeltSlope.SIDEWAYS : BeltSlope.HORIZONTAL;
+        }
+        if (currentState.getDestroySpeed(world, currentPos) == -1) {
+            return;
+        }
+        if (!currentState.canBeReplaced()) {
+            world.destroyBlock(currentPos, false);
+        }
+        BlockState beltBlock = AllBlocks.BELT.defaultBlockState();
+        KineticBlockEntity.switchToBlockState(
+            world, currentPos, ProperWaterloggedBlock.withWater(
+                world,
+                beltBlock.setValue(BeltBlock.SLOPE, slope).setValue(BeltBlock.PART, BeltPart.START)
+                    .setValue(BeltBlock.HORIZONTAL_FACING, facing),
+                currentPos
+            )
+        );
+        if (count > 1) {
+            for (int i = 1; i < count; i++) {
+                currentState = world.getBlockState(currentPos.move(moveX, moveY, moveZ));
+                if (currentState.getDestroySpeed(world, currentPos) == -1) {
+                    moveX = -moveX;
+                    moveY = -moveY;
+                    moveZ = -moveZ;
+                    for (int j = 0; j < i; j++) {
+                        if (world.getBlockState(currentPos.move(moveX, moveY, moveZ)).is(AllBlocks.BELT)) {
+                            world.destroyBlock(currentPos, false);
+                        }
+                    }
+                    return;
+                }
+                if (!currentState.canBeReplaced()) {
+                    world.destroyBlock(currentPos, false);
+                }
+                KineticBlockEntity.switchToBlockState(
+                    world, currentPos, ProperWaterloggedBlock.withWater(
+                        world,
+                        beltBlock.setValue(BeltBlock.SLOPE, slope).setValue(
+                            BeltBlock.PART,
+                            ShaftBlock.isShaft(currentState) ? BeltPart.PULLEY : BeltPart.MIDDLE
+                        ).setValue(BeltBlock.HORIZONTAL_FACING, facing),
+                        currentPos
+                    )
+                );
+            }
+        }
+        currentState = world.getBlockState(currentPos.move(moveX, moveY, moveZ));
+        if (currentState.getDestroySpeed(world, currentPos) == -1) {
+            moveX = -moveX;
+            moveY = -moveY;
+            moveZ = -moveZ;
+            for (int i = 0; i < count; i++) {
+                if (world.getBlockState(currentPos.move(moveX, moveY, moveZ)).is(AllBlocks.BELT)) {
+                    world.destroyBlock(currentPos, false);
+                }
+            }
+            return;
+        }
+        if (!currentState.canBeReplaced()) {
+            world.destroyBlock(currentPos, false);
+        }
+        KineticBlockEntity.switchToBlockState(
+            world, currentPos, ProperWaterloggedBlock.withWater(
+                world,
+                beltBlock.setValue(BeltBlock.SLOPE, slope).setValue(BeltBlock.PART, BeltPart.END)
+                    .setValue(BeltBlock.HORIZONTAL_FACING, facing),
+                currentPos
+            )
+        );
     }
 
     public static void createBelts(Level world, BlockPos start, BlockPos end) {

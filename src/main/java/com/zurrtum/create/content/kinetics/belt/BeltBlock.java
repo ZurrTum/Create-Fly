@@ -430,6 +430,11 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
     }
 
     @Override
+    protected VoxelShape getOcclusionShape(BlockState state) {
+        return BeltShapes.getOcclusionShape(state);
+    }
+
+    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (state.getBlock() != this) {
             return Shapes.empty();

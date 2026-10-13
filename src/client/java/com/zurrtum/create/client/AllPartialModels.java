@@ -25,12 +25,16 @@ public class AllPartialModels {
         "shaft"), ENCASED_SHAFT = block("encased_shaft/shaft"), ENCASED_SHAFT_HALF = block("encased_shaft/shaft_half"), COGWHEEL = block(
         "cogwheel/block"),
 
-    BELT_PULLEY = block("belt_pulley"), BELT_START = block("belt/start"), BELT_MIDDLE = block("belt/middle"), BELT_END = block(
-        "belt/end"), BELT_START_BOTTOM = block("belt/start_bottom"), BELT_MIDDLE_BOTTOM = block("belt/middle_bottom"), BELT_END_BOTTOM = block(
-        "belt/end_bottom"), BELT_DIAGONAL_START = block("belt/diagonal_start"), BELT_DIAGONAL_MIDDLE = block(
-        "belt/diagonal_middle"), BELT_DIAGONAL_END = block("belt/diagonal_end"), ANDESITE_BELT_COVER_X = block(
-        "belt_cover/andesite_belt_cover_x"), BRASS_BELT_COVER_X = block("belt_cover/brass_belt_cover_x"), ANDESITE_BELT_COVER_Z = block(
-        "belt_cover/andesite_belt_cover_z"), BRASS_BELT_COVER_Z = block("belt_cover/brass_belt_cover_z"),
+    BELT_PULLEY = block("belt/pulley"), BELT_START = block("belt/start"), BELT_MIDDLE = block("belt/middle"), BELT_END = block(
+        "belt/end"), CASING_BELT_START = block("belt/casing_start"), CASING_BELT_MIDDLE = block("belt/casing_middle"), CASING_BELT_END = block(
+        "belt/casing_end"), CASING_BELT_START_VERTICAL = block("belt/casing_start_vertical"), CASING_BELT_MIDDLE_VERTICAL = block(
+        "belt/casing_middle_vertical"), CASING_BELT_MIDDLE_VERTICAL_PULLEY = block("belt/casing_middle_vertical_pulley"), CASING_BELT_END_VERTICAL = block(
+        "belt/casing_end_vertical"), BELT_DIAGONAL_START = block("belt/diagonal_start"), BELT_DIAGONAL_MIDDLE = block(
+        "belt/diagonal_middle"), BELT_DIAGONAL_END = block("belt/diagonal_end"), CASING_BELT_DIAGONAL_START = block(
+        "belt/casing_diagonal_start"), CASING_BELT_DIAGONAL_MIDDLE = block("belt/casing_diagonal_middle"), CASING_BELT_DIAGONAL_END = block(
+        "belt/casing_diagonal_end"), ANDESITE_BELT_COVER_X = block("belt_cover/andesite_belt_cover_x"), BRASS_BELT_COVER_X = block(
+        "belt_cover/brass_belt_cover_x"), ANDESITE_BELT_COVER_Z = block("belt_cover/andesite_belt_cover_z"), BRASS_BELT_COVER_Z = block(
+        "belt_cover/brass_belt_cover_z"),
 
     ENCASED_FAN_INNER = block("encased_fan/propeller"), HAND_CRANK_HANDLE = block("hand_crank/handle"), HAND_CRANK_BASE = block(
         "hand_crank/block"), VALVE_HANDLE = block("valve_handle"), MECHANICAL_PRESS_HEAD = block("mechanical_press/head"), MECHANICAL_MIXER_POLE = block(

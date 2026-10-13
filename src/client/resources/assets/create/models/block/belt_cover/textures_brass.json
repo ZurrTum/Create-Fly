@@ -1,0 +1,7 @@
+{
+	"textures": {
+		"encased_border_1": "create:block/encased_brass_border_1",
+		"cover": "create:block/brass_belt_cover",
+		"particle": "#cover"
+	}
+}

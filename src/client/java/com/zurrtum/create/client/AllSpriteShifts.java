@@ -2,6 +2,7 @@ package com.zurrtum.create.client;
 
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
+import com.zurrtum.create.client.catnip.render.SpriteShiftMap;
 import com.zurrtum.create.client.catnip.render.SpriteShifter;
 import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
@@ -56,13 +57,6 @@ public class AllSpriteShifts {
         new EnumMap<>(DyeColor.class), map -> {
             for (DyeColor color : DyeColor.VALUES) {
                 map.put(color, get("block/belt", "block/belt/" + color.getSerializedName() + "_scroll"));
-            }
-        }
-    );
-    public static final Map<DyeColor, SpriteShiftEntry> DYED_OFFSET_BELTS = Util.make(
-        new EnumMap<>(DyeColor.class), map -> {
-            for (DyeColor color : DyeColor.VALUES) {
-                map.put(color, get("block/belt_offset", "block/belt/" + color.getSerializedName() + "_scroll"));
             }
         }
     );
@@ -221,12 +215,15 @@ public class AllSpriteShifts {
         "block/factory_panel_connections_animated"
     );
     public static final SpriteShiftEntry BELT = get("block/belt", "block/belt_scroll");
-    public static final SpriteShiftEntry BELT_OFFSET = get("block/belt_offset", "block/belt_scroll");
     public static final SpriteShiftEntry BELT_DIAGONAL = get("block/belt_diagonal", "block/belt_diagonal_scroll");
-    public static final SpriteShiftEntry ANDESIDE_BELT_CASING = get(
-        "block/belt/brass_belt_casing",
-        "block/belt/andesite_belt_casing"
-    );
+    public static final SpriteShiftMap ANDESIDE_BELT_CASING = SpriteShiftMap.create(map -> {
+        for (int i = 1; i < 16; i++) {
+            map.add(
+                Create.asResource("block/belt/brass_casing_" + i),
+                Create.asResource("block/belt/andesite_casing_" + i)
+            );
+        }
+    });
     public static final SpriteShiftEntry CRAFTER_THINGIES = get("block/crafter_thingies", "block/crafter_thingies");
     public static final SpriteShiftEntry BOGEY_BELT = get("block/bogey/belt", "block/bogey/belt_scroll");
 

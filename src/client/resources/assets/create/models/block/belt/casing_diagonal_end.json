@@ -1,0 +1,8 @@
+{
+	"parent": "create:block/belt/textures_diagonal",
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"automatic_culling": false,
+	"emissive_ambient":false,
+	"model": "create:models/block/belt/casing_diagonal_end.obj"
+}

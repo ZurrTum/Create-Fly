@@ -1,0 +1,13 @@
+{
+	"textures": {
+		"axis": "create:block/axis",
+		"axis_top": "create:block/axis_top",
+		"belt_pulley": "create:block/belt_pulley",
+		"particle": "block/dark_oak_log"
+	},
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"automatic_culling": false,
+	"emissive_ambient":false,
+	"model": "create:models/block/belt/pulley.obj"
+}

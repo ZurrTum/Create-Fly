@@ -1,0 +1,47 @@
+# Blender 5.2.1 LTS
+# www.blender.org
+
+newmtl casing_1
+map_Kd #casing_1
+
+newmtl casing_2
+map_Kd #casing_2
+
+newmtl casing_3
+map_Kd #casing_3
+
+newmtl casing_4
+map_Kd #casing_4
+
+newmtl casing_5
+map_Kd #casing_5
+
+newmtl casing_6
+map_Kd #casing_6
+
+newmtl casing_7
+map_Kd #casing_7
+
+newmtl casing_8
+map_Kd #casing_8
+
+newmtl casing_9
+map_Kd #casing_9
+
+newmtl casing_10
+map_Kd #casing_10
+
+newmtl casing_11
+map_Kd #casing_11
+
+newmtl casing_12
+map_Kd #casing_12
+
+newmtl casing_13
+map_Kd #casing_13
+
+newmtl casing_14
+map_Kd #casing_14
+
+newmtl casing_15
+map_Kd #casing_15

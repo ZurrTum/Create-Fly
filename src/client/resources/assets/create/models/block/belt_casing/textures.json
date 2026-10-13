@@ -1,0 +1,20 @@
+{
+	"textures": {
+		"casing_1": "create:block/belt/brass_casing_1",
+		"casing_2": "create:block/belt/brass_casing_2",
+		"casing_3": "create:block/belt/brass_casing_3",
+		"casing_4": "create:block/belt/brass_casing_4",
+		"casing_5": "create:block/belt/brass_casing_5",
+		"casing_6": "create:block/belt/brass_casing_6",
+		"casing_7": "create:block/belt/brass_casing_7",
+		"casing_8": "create:block/belt/brass_casing_8",
+		"casing_9": "create:block/belt/brass_casing_9",
+		"casing_10": "create:block/belt/brass_casing_10",
+		"casing_11": "create:block/belt/brass_casing_11",
+		"casing_12": "create:block/belt/brass_casing_12",
+		"casing_13": "create:block/belt/brass_casing_13",
+		"casing_14": "create:block/belt/brass_casing_14",
+		"casing_15": "create:block/belt/brass_casing_15",
+		"particle": "create:block/brass_casing"
+	}
+}

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -19,6 +18,7 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.kinetics.belt.*;
+import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity.CasingType;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltInventory;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
@@ -82,6 +82,50 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         pose.translate(-0.5f, -0.5f, -0.5f);
         return pose;
     });
+    protected static final PartialModel[] BELTS = Util.make(() -> {
+        PartialModel[] map = new PartialModel[40];
+        map[0] = AllPartialModels.BELT_START;
+        map[1] = AllPartialModels.BELT_MIDDLE;
+        map[2] = AllPartialModels.BELT_END;
+        map[3] = map[1];
+        map[4] = AllPartialModels.CASING_BELT_START;
+        map[5] = AllPartialModels.CASING_BELT_MIDDLE;
+        map[6] = AllPartialModels.CASING_BELT_END;
+        map[7] = map[5];
+        map[8] = AllPartialModels.BELT_DIAGONAL_START;
+        map[9] = AllPartialModels.BELT_DIAGONAL_MIDDLE;
+        map[10] = AllPartialModels.BELT_DIAGONAL_END;
+        map[11] = map[9];
+        map[12] = AllPartialModels.CASING_BELT_DIAGONAL_START;
+        map[13] = AllPartialModels.CASING_BELT_DIAGONAL_MIDDLE;
+        map[14] = AllPartialModels.CASING_BELT_DIAGONAL_END;
+        map[15] = map[13];
+        map[16] = map[10];
+        map[17] = map[9];
+        map[18] = map[8];
+        map[19] = map[11];
+        map[20] = map[14];
+        map[21] = map[13];
+        map[22] = map[12];
+        map[23] = map[15];
+        map[24] = map[0];
+        map[25] = map[1];
+        map[26] = map[2];
+        map[27] = map[1];
+        map[28] = AllPartialModels.CASING_BELT_START_VERTICAL;
+        map[29] = AllPartialModels.CASING_BELT_MIDDLE_VERTICAL;
+        map[30] = AllPartialModels.CASING_BELT_END_VERTICAL;
+        map[31] = AllPartialModels.CASING_BELT_MIDDLE_VERTICAL_PULLEY;
+        map[32] = map[24];
+        map[33] = map[25];
+        map[34] = map[26];
+        map[35] = map[27];
+        map[36] = map[28];
+        map[37] = map[29];
+        map[38] = map[30];
+        map[39] = map[31];
+        return map;
+    });
     protected final ItemModelResolver itemModelManager;
 
     public BeltRenderer(Context context) {
@@ -120,71 +164,55 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
             BeltSlope beltSlope = state.blockState.getValue(BeltBlock.SLOPE);
             BeltPart part = state.blockState.getValue(BeltBlock.PART);
             Direction facing = state.blockState.getValue(BeltBlock.HORIZONTAL_FACING);
-            AxisDirection axisDirection = facing.getAxisDirection();
-            boolean downward = beltSlope == BeltSlope.DOWNWARD;
             boolean upward = beltSlope == BeltSlope.UPWARD;
-            boolean diagonal = downward || upward;
-            boolean start = part == BeltPart.START;
-            boolean end = part == BeltPart.END;
+            boolean diagonal = upward || beltSlope == BeltSlope.DOWNWARD;
+            boolean casing = be.casing != CasingType.NONE;
+            boolean vertical = beltSlope == BeltSlope.VERTICAL;
             boolean sideways = beltSlope == BeltSlope.SIDEWAYS;
             boolean alongX = facing.getAxis() == Direction.Axis.X;
-            float degrees = AngleHelper.horizontalAngle(facing) + (upward ? 180 : 0) + (sideways ? 270 : 0);
-            state.yRot = getYRotateAngle(degrees);
-            if (sideways) {
-                state.zRot = Axis.ZP.rotation(RAD_90);
-            }
-            if (!diagonal && beltSlope != BeltSlope.HORIZONTAL) {
-                state.xRot = Axis.XP.rotation(RAD_90);
-            }
-            if (downward || beltSlope == BeltSlope.VERTICAL && axisDirection == AxisDirection.POSITIVE) {
-                boolean b = start;
-                start = end;
-                end = b;
+            boolean alongZ = facing.getAxis() == Direction.Axis.Z;
+            float rotX = (!diagonal && beltSlope != BeltSlope.HORIZONTAL ? 90 : 0) + (sideways ? 90 : 0) + (
+                vertical && alongZ ? 180 : 0);
+            float rotY = facing.toYRot() + (alongX ^ upward ? 180 : 0) + (sideways && alongZ ? 180 : 0) + (
+                vertical && alongX ? 90 : 0);
+            float rotZ = (sideways ? 90 : 0) + (vertical && alongX ? 90 : 0);
+            if (rotX != 0 || rotY != 0) {
+                state.rotate = new Quaternionf().rotationXYZ(
+                    rotX * Mth.DEG_TO_RAD,
+                    rotY * Mth.DEG_TO_RAD,
+                    rotZ * Mth.DEG_TO_RAD
+                );
             }
             DyeColor color = be.color.orElse(null);
             CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
-            SuperByteBuffer top = CachedBuffers.partial(getBeltPartial(diagonal, start, end, false), state.blockState);
+            PartialModel model = getBeltPartial(beltSlope, part, casing);
+            SuperByteBuffer belt = CachedBuffers.partial(model, state.blockState);
             float speed = be.getSpeed();
             stopped = speed == 0;
-            boolean needScroll = !stopped || color != null;
-            double scroll = 0;
-            if (needScroll) {
-                float time = AnimationTickHolder.getRenderTime(level) * axisDirection.getStep();
-                if (diagonal && downward ^ alongX || !sideways && !diagonal && alongX || sideways && axisDirection == AxisDirection.NEGATIVE) {
+            if (!stopped || color != null) {
+                if (facing.getAxisDirection() == AxisDirection.NEGATIVE ^ upward ^ (alongX && !diagonal || alongZ && diagonal)) {
                     speed = -speed;
                 }
-                scroll = speed * time / (31.5 * 16);
-                float scrollMult = diagonal ? 0.375f : 0.5f;
-                SpriteShiftEntry topShift = getSpriteShiftEntry(color, diagonal, false);
-                TextureAtlasSprite target = topShift.getTarget();
-                float spriteSize = target.getV1() - target.getV0();
-                float topScroll = (float) ((scroll - Math.floor(scroll)) * spriteSize * scrollMult);
-                top.shiftUVScrolling(topShift, topScroll);
-            }
-            state.top = top.cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
-            if (!diagonal) {
-                SuperByteBuffer bottom = CachedBuffers.partial(
-                    getBeltPartial(false, start, end, true),
-                    state.blockState
-                );
-                if (needScroll) {
-                    scroll += 0.5;
-                    SpriteShiftEntry bottomShift = getSpriteShiftEntry(color, false, true);
-                    TextureAtlasSprite target = bottomShift.getTarget();
-                    float spriteSize = target.getV1() - target.getV0();
-                    float bottomScroll = (float) ((scroll - Math.floor(scroll)) * spriteSize * 0.5f);
-                    bottom.shiftUVScrolling(bottomShift, bottomScroll);
+                if (sideways && (facing == Direction.SOUTH || facing == Direction.WEST) || vertical && facing == Direction.EAST) {
+                    speed = -speed;
                 }
-                state.bottom = bottom.cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
+                double scroll = speed * AnimationTickHolder.getRenderTime(level) / (31.5 * 16);
+                float scrollMult = diagonal ? 0.375f : 0.5f;
+                SpriteShiftEntry shift = getSpriteShiftEntry(color, diagonal);
+                TextureAtlasSprite target = shift.getTarget();
+                float spriteSize = target.getV1() - target.getV0();
+                float scrollV = (float) ((scroll - Math.floor(scroll)) * spriteSize * scrollMult);
+                belt.shiftUVScrolling(shift, scrollV);
             }
-            if (be.hasPulley()) {
+            state.belt = belt.cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
+            if (part != BeltPart.MIDDLE) {
                 Direction dir = sideways ? Direction.UP : facing.getClockWise();
                 Direction.Axis axis = getRotationAxisOf(state.blockState);
                 float pulleyAngle = getAngleForBe(be, state.blockPos, axis);
                 Direction pulleyDirection = Direction.get(AxisDirection.POSITIVE, axis);
                 int pulleyColor = getTintColor(be);
                 state.pulley = CachedBuffers.partialDirectional(
-                        AllPartialModels.BELT_PULLEY,
+                        casing ? AllPartialModels.ENCASED_SHAFT : AllPartialModels.BELT_PULLEY,
                         state.blockState,
                         dir,
                         PULLEY_POSE
@@ -257,30 +285,14 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         if (state.pulley != null) {
             state.pulley.submit(matrices, queue);
         }
-        if (state.top != null) {
-            if (state.yRot != null || state.zRot != null || state.xRot != null) {
+        if (state.belt != null) {
+            if (state.rotate != null) {
                 matrices.pushPose();
-                matrices.translate(0.5f, 0.5f, 0.5f);
-                if (state.yRot != null) {
-                    matrices.mulPose(state.yRot);
-                }
-                if (state.zRot != null) {
-                    matrices.mulPose(state.zRot);
-                }
-                if (state.xRot != null) {
-                    matrices.mulPose(state.xRot);
-                }
-                matrices.translate(-0.5f, -0.5f, -0.5f);
-                state.top.submit(matrices, queue);
-                if (state.bottom != null) {
-                    state.bottom.submit(matrices, queue);
-                }
+                matrices.rotateAround(state.rotate, 0.5f, 0.5f, 0.5f);
+                state.belt.submit(matrices, queue);
                 matrices.popPose();
             } else {
-                state.top.submit(matrices, queue);
-                if (state.bottom != null) {
-                    state.bottom.submit(matrices, queue);
-                }
+                state.belt.submit(matrices, queue);
             }
         }
         if (state.items != null) {
@@ -299,40 +311,15 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         return true;
     }
 
-    public static SpriteShiftEntry getSpriteShiftEntry(@Nullable DyeColor color, boolean diagonal, boolean bottom) {
+    public static SpriteShiftEntry getSpriteShiftEntry(@Nullable DyeColor color, boolean diagonal) {
         if (color != null) {
-            return (diagonal ? AllSpriteShifts.DYED_DIAGONAL_BELTS :
-                bottom ? AllSpriteShifts.DYED_OFFSET_BELTS : AllSpriteShifts.DYED_BELTS).get(color);
+            return (diagonal ? AllSpriteShifts.DYED_DIAGONAL_BELTS : AllSpriteShifts.DYED_BELTS).get(color);
         }
-        return diagonal ? AllSpriteShifts.BELT_DIAGONAL : bottom ? AllSpriteShifts.BELT_OFFSET : AllSpriteShifts.BELT;
+        return diagonal ? AllSpriteShifts.BELT_DIAGONAL : AllSpriteShifts.BELT;
     }
 
-    public static PartialModel getBeltPartial(boolean diagonal, boolean start, boolean end, boolean bottom) {
-        if (diagonal) {
-            if (start) {
-                return AllPartialModels.BELT_DIAGONAL_START;
-            }
-            if (end) {
-                return AllPartialModels.BELT_DIAGONAL_END;
-            }
-            return AllPartialModels.BELT_DIAGONAL_MIDDLE;
-        }
-        if (bottom) {
-            if (start) {
-                return AllPartialModels.BELT_START_BOTTOM;
-            }
-            if (end) {
-                return AllPartialModels.BELT_END_BOTTOM;
-            }
-            return AllPartialModels.BELT_MIDDLE_BOTTOM;
-        }
-        if (start) {
-            return AllPartialModels.BELT_START;
-        }
-        if (end) {
-            return AllPartialModels.BELT_END;
-        }
-        return AllPartialModels.BELT_MIDDLE;
+    public static PartialModel getBeltPartial(BeltSlope slope, BeltPart part, boolean casing) {
+        return BELTS[slope.ordinal() << 3 | (casing ? 4 : 0) | part.ordinal()];
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
@@ -460,12 +447,9 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     public static class BeltRenderState extends BlockEntityRenderState {
-        public @Nullable SuperByteBufferRenderState top;
-        public @Nullable SuperByteBufferRenderState bottom;
+        public @Nullable SuperByteBufferRenderState belt;
         public @Nullable SuperByteBufferRenderState pulley;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf zRot;
-        public @Nullable Quaternionf xRot;
+        public @Nullable Quaternionf rotate;
         public int beltLength;
         public BeltItemState @Nullable [] items;
         public @UnknownNullability Direction beltFacing;
