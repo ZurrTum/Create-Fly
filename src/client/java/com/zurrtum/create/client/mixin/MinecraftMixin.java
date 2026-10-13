@@ -55,6 +55,7 @@ import com.zurrtum.create.client.content.trains.track.TrackTargetingClient;
 import com.zurrtum.create.client.flywheel.backend.compile.FlwProgramsReloader;
 import com.zurrtum.create.client.flywheel.impl.BackendManagerImpl;
 import com.zurrtum.create.client.flywheel.impl.FlwImpl;
+import com.zurrtum.create.client.flywheel.impl.task.FlwTaskExecutor;
 import com.zurrtum.create.client.flywheel.impl.visualization.VisualizationEventHandler;
 import com.zurrtum.create.client.flywheel.lib.util.LevelAttached;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
@@ -328,5 +329,10 @@ public abstract class MinecraftMixin {
             return true;
         }
         return original.call(instance);
+    }
+
+    @Inject(at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V", shift = At.Shift.AFTER), method = "exitWorldAndClose()V")
+    private void onStopping(CallbackInfo ci) {
+        FlwTaskExecutor.get().shutdown();
     }
 }

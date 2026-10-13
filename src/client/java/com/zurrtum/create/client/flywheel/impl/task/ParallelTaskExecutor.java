@@ -187,6 +187,11 @@ public class ParallelTaskExecutor implements TaskExecutorImpl {
         }
     }
 
+    @Override
+    public void shutdown() {
+        stopWorkers();
+    }
+
     private class WorkerThread extends Thread {
         private int errorLogLatch = MAX_ERRORS_LOGGED_PER_THREAD;
 
