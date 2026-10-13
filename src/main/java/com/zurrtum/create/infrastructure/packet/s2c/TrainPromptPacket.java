@@ -22,7 +22,7 @@ public record TrainPromptPacket(Component text, boolean shadow) implements Packe
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onTrainPrompt(this);
+        AllClientHandle.INSTANCE.onTrainPrompt(listener, this);
     }
 
     @Override

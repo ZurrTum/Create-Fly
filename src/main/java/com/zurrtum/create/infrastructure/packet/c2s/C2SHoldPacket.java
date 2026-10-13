@@ -5,6 +5,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -25,7 +26,9 @@ public record C2SHoldPacket(PacketType<Packet<ServerGamePacketListener>> id,
 
     @Override
     public void handle(ServerGamePacketListener listener) {
-        consumer.accept((ServerGamePacketListenerImpl) listener);
+        ServerGamePacketListenerImpl serverListener = (ServerGamePacketListenerImpl) listener;
+        PacketUtils.ensureRunningOnSameThread(this, listener, serverListener.server.packetProcessor());
+        consumer.accept(serverListener);
     }
 
     @Override

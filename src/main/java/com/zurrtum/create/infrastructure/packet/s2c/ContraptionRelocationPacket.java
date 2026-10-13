@@ -16,7 +16,7 @@ public record ContraptionRelocationPacket(int entityId) implements Packet<Client
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onContraptionRelocation(this);
+        AllClientHandle.INSTANCE.onContraptionRelocation(listener, this);
     }
 
     @Override

@@ -24,7 +24,7 @@ public record RemoveTrainPacket(UUID id) implements Packet<ClientGamePacketListe
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onRemoveTrain(this);
+        AllClientHandle.INSTANCE.onRemoveTrain(listener, this);
     }
 
     @Override

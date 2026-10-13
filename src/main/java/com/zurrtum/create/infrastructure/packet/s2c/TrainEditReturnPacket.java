@@ -29,7 +29,7 @@ public record TrainEditReturnPacket(UUID id, String name, Identifier iconType,
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onTrainEditReturn(this);
+        AllClientHandle.INSTANCE.onTrainEditReturn(listener, this);
     }
 
     @Override

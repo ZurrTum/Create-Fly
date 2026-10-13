@@ -36,7 +36,7 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onContraptionSeatMapping(this);
+        AllClientHandle.INSTANCE.onContraptionSeatMapping(listener, this);
     }
 
     @Override

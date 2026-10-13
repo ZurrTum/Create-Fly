@@ -24,7 +24,7 @@ public record SoulPulseEffectPacket(BlockPos pos, int distance,
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onSoulPulseEffect(this);
+        AllClientHandle.INSTANCE.onSoulPulseEffect(listener, this);
     }
 
     @Override

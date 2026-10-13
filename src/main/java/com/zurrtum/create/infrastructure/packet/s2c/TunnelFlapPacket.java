@@ -33,7 +33,7 @@ public record TunnelFlapPacket(BlockPos pos,
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onTunnelFlap(this);
+        AllClientHandle.INSTANCE.onTunnelFlap(listener, this);
     }
 
     @Override

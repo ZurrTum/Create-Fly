@@ -18,13 +18,14 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 public class TrackGraphSyncPacket extends TrackGraphPacket {
-    public static final StreamCodec<FriendlyByteBuf, TrackGraphSyncPacket> CODEC = StreamCodec.ofMember(TrackGraphSyncPacket::write,
+    public static final StreamCodec<FriendlyByteBuf, TrackGraphSyncPacket> CODEC = StreamCodec.ofMember(
+        TrackGraphSyncPacket::write,
         TrackGraphSyncPacket::new
     );
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onTrackGraphSync(this);
+        AllClientHandle.INSTANCE.onTrackGraphSync(listener, this);
     }
 
     @Override
@@ -94,7 +95,10 @@ public class TrackGraphSyncPacket extends TrackGraphPacket {
         size = buffer.readVarInt();
         for (int i = 0; i < size; i++) {
             addedEdges.add(Pair.of(
-                Pair.of(Couple.create(buffer::readVarInt), TrackMaterial.PACKET_CODEC.decode(buffer)),
+                Pair.of(
+                    Couple.create(buffer::readVarInt),
+                    TrackMaterial.PACKET_CODEC.decode(buffer)
+                ),
                 buffer.readBoolean() ? new BezierConnection(buffer) : null
             ));
         }

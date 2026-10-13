@@ -16,7 +16,7 @@ public record EjectorPlacementRequestPacket(BlockPos pos) implements Packet<Clie
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onEjectorPlacementRequest(this);
+        AllClientHandle.INSTANCE.onEjectorPlacementRequest(listener, this);
     }
 
     @Override

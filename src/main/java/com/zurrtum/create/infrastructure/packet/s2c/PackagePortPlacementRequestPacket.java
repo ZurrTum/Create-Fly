@@ -16,7 +16,7 @@ public record PackagePortPlacementRequestPacket(BlockPos pos) implements Packet<
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onPackagePortPlacementRequest(this);
+        AllClientHandle.INSTANCE.onPackagePortPlacementRequest(listener, this);
     }
 
     @Override

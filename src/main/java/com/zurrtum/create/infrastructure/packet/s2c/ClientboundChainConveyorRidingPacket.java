@@ -23,7 +23,7 @@ public record ClientboundChainConveyorRidingPacket(Collection<UUID> uuids) imple
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onClientboundChainConveyorRiding(this);
+        AllClientHandle.INSTANCE.onClientboundChainConveyorRiding(listener, this);
     }
 
     @Override

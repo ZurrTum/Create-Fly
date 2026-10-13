@@ -29,7 +29,7 @@ public record MountedStorageSyncPacket(int contraptionId, Map<BlockPos, MountedI
 
     @Override
     public void handle(ClientGamePacketListener listener) {
-        AllClientHandle.INSTANCE.onMountedStorageSync(this);
+        AllClientHandle.INSTANCE.onMountedStorageSync(listener, this);
     }
 
     @Override

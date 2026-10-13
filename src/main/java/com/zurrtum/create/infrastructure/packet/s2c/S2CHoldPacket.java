@@ -25,6 +25,7 @@ public record S2CHoldPacket(PacketType<Packet<ClientGamePacketListener>> id,
 
     @Override
     public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.forceMainThread(listener, this);
         callback.accept(AllClientHandle.INSTANCE);
     }
 
