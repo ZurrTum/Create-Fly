@@ -3,7 +3,7 @@
 	"ambientocclusion": false,
 	"textures": {
 		"0": "create:block/clipboard_model_blank",
-		"1": "create:block/belt/andesite_belt_casing",
+		"1": "create:block/clipboard_down",
 		"particle": "create:block/clipboard_model_blank"
 	},
 	"elements": [
@@ -17,7 +17,7 @@
 				"south": {"uv": [1, 0, 11, 1], "rotation": 180, "texture": "#0"},
 				"west": {"uv": [0, 1, 1, 15], "rotation": 90, "texture": "#0"},
 				"up": {"uv": [1, 1, 11, 15], "rotation": 180, "texture": "#0"},
-				"down": {"uv": [8.75, 12, 11.25, 16], "texture": "#1"}
+				"down": {"uv": [3, 0, 13, 16], "texture": "#1"}
 			}
 		},
 		{
