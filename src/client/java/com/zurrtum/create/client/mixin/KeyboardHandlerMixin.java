@@ -20,7 +20,7 @@ public class KeyboardHandlerMixin {
     @Final
     private Minecraft minecraft;
 
-    @Inject(method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V", at = @At(value = "RETURN", ordinal = 5))
+    @Inject(method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V", at = @At(value = "RETURN", ordinal = 4))
     private void onKeyReleased(long handle, int action, KeyEvent event, CallbackInfo ci) {
         onKey(event, false);
     }
