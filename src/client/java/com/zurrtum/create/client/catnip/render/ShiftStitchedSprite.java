@@ -38,7 +38,6 @@ public class ShiftStitchedSprite extends StitchedSprite {
             layer = null;
             contents = sprite.contents();
         }
-        layer = sprite.transparency().isOpaque() ? ChunkSectionLayer.SOLID : null;
         TextureAtlasSprite originalSprite = original.get();
         u = originalSprite.getU0();
         v = originalSprite.getV0();
