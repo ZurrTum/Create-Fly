@@ -106,6 +106,17 @@ dependencies {
     modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
     modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
+
+    // Local-only: VulkanMod is the renderer backend we are porting Flywheel onto.
+    // The production jar is usable for compilation because every net.vulkanmod.vulkan.shader.*
+    // class we consume is free of net.minecraft.* references. Only PipelineConfig and
+    // GraphicsPipeline$VertexInputDescription carry them, and we use neither.
+    modCompileOnly files("libs/VulkanMod-0.6.8+1.21.11.jar")
+
+    // VkProgram references VK_DESCRIPTOR_TYPE_* constants directly for the descriptor
+    // layout table. lwjgl-vulkan is a runtime dependency of VulkanMod but is not on the
+    // dev classpath otherwise.
+    modCompileOnly "org.lwjgl:lwjgl-vulkan:${project.lwjgl_version}"
 }
 
 processResources {

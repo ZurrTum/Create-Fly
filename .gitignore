@@ -38,3 +38,10 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# --- Flywheel Vulkan backend (added by Ö÷¿Ø) ---
+# 19MB third-party binary pulled in for modCompileOnly; recreate locally instead
+libs/
+# transient gradle capture
+build-log.txt
+

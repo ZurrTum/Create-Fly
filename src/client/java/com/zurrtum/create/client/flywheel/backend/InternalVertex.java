@@ -21,6 +21,15 @@ public final class InternalVertex {
     public static final int STRIDE = LAYOUT.byteSize();
 
     public static final Identifier LAYOUT_SHADER = ResourceUtil.rl("internal/vertex_input.vert");
+    /**
+     * Vulkan variant of {@link #LAYOUT_SHADER}.
+     *
+     * <p>Declares the {@code overlay}/{@code light} attributes with the integer GLSL types that
+     * actually match the {@link #LAYOUT} element types ({@code SHORT} and {@code UNSIGNED_SHORT}),
+     * since Vulkan derives the vertex input format straight from the VertexFormat. The OpenGL
+     * variant keeps its float-based workaround for drivers that mishandle integer attributes.
+     */
+    public static final Identifier LAYOUT_SHADER_VK = ResourceUtil.rl("internal/vertex_input_vk.vert");
 
     private InternalVertex() {
     }
