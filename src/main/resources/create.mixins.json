@@ -30,7 +30,6 @@
     "ExperimentalRedstoneWireEvaluatorMixin",
     "ExplosionDamageCalculatorMixin",
     "FluidsMixin",
-    "FuelValuesMixin",
     "GameProtocolsMixin",
     "HoneycombItemMixin",
     "ItemEntityMixin",

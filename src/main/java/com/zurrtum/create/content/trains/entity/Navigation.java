@@ -15,6 +15,7 @@ import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -50,7 +51,7 @@ public class Navigation {
         waitingForChainedGroups = new HashMap<>();
     }
 
-    public void tick(Level level) {
+    public void tick(ServerLevel level) {
         if (destination == null) {
             return;
         }

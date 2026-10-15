@@ -592,7 +592,8 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         if (carriage.train.derailed) {
             return false;
         }
-        if (level().isClientSide()) {
+        Level level = level();
+        if (level.isClientSide()) {
             return true;
         }
         if (player.isSpectator()) {
@@ -639,7 +640,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         }
 
         if (targetSpeed != 0) {
-            carriage.train.burnFuel(level());
+            carriage.train.burnFuel((ServerLevel) level);
         }
 
         boolean slow = inverted ^ targetSpeed < 0;

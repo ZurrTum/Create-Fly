@@ -211,7 +211,7 @@ public class GlobalRailwayManager {
         //				TrackGraphVisualizer.debugViewNodes(trackGraph);
     }
 
-    private void tickTrains(Level level) {
+    private void tickTrains(ServerLevel level) {
         // keeping two lists ensures a tick order starting at longest waiting
         for (Train train : waitingTrains) {
             train.earlyTick(level);

@@ -634,7 +634,8 @@ public class AllItems {
     public static final BlockItem PACKAGER = (BlockItem) registerBlock(AllBlockItemIds.PACKAGER, AllBlocks.PACKAGER);
     public static final BlockItem CARDBOARD_BLOCK = (BlockItem) registerBlock(
         AllBlockItemIds.CARDBOARD_BLOCK,
-        AllBlocks.CARDBOARD_BLOCK
+        AllBlocks.CARDBOARD_BLOCK,
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD_BLOCK)
     );
     public static final LogisticallyLinkedBlockItem STOCK_LINK = (LogisticallyLinkedBlockItem) registerBlock(AllBlockItemIds.STOCK_LINK,
         AllBlocks.STOCK_LINK,
@@ -767,7 +768,8 @@ public class AllItems {
     );
     public static final BlockItem BOUND_CARDBOARD_BLOCK = (BlockItem) registerBlock(
         AllBlockItemIds.BOUND_CARDBOARD_BLOCK,
-        AllBlocks.BOUND_CARDBOARD_BLOCK
+        AllBlocks.BOUND_CARDBOARD_BLOCK,
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD_BLOCK)
     );
     public static final BlockItem EXPERIENCE_BLOCK = (BlockItem) registerBlock(
         AllBlockItemIds.EXPERIENCE_BLOCK,
@@ -2011,17 +2013,23 @@ public class AllItems {
         )
     );
     public static final Item BLAZE_CAKE_BASE = registerItem(AllItemIds.BLAZE_CAKE_BASE);
-    public static final Item BLAZE_CAKE = registerItem(AllItemIds.BLAZE_CAKE);
+    public static final Item BLAZE_CAKE = registerItem(
+        AllItemIds.BLAZE_CAKE,
+        new Item.Properties().cookingFuel(AllFuelTimes.BLAZE_CAKE)
+    );
     public static final Item CREATIVE_BLAZE_CAKE = registerItem(
         AllItemIds.CREATIVE_BLAZE_CAKE,
-        new Properties().rarity(Rarity.EPIC)
+        new Properties().rarity(Rarity.EPIC).cookingFuel(AllFuelTimes.CREATIVE)
     );
     public static final Item COPPER_SHEET = registerItem(AllItemIds.COPPER_SHEET);
     public static final Item BRASS_SHEET = registerItem(AllItemIds.BRASS_SHEET);
     public static final Item IRON_SHEET = registerItem(AllItemIds.IRON_SHEET);
     public static final Item GOLDEN_SHEET = registerItem(AllItemIds.GOLDEN_SHEET);
     public static final Item PULP = registerItem(AllItemIds.PULP);
-    public static final Item CARDBOARD = registerItem(AllItemIds.CARDBOARD);
+    public static final Item CARDBOARD = registerItem(
+        AllItemIds.CARDBOARD,
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD)
+    );
     public static final Item BRASS_INGOT = registerItem(AllItemIds.BRASS_INGOT);
     public static final Item WHEAT_FLOUR = registerItem(AllItemIds.WHEAT_FLOUR);
     public static final Item DOUGH = registerItem(AllItemIds.DOUGH);
@@ -2247,7 +2255,8 @@ public class AllItems {
     public static final CardboardArmorItem CARDBOARD_HELMET = (CardboardArmorItem) registerItem(
         AllItemIds.CARDBOARD_HELMET,
         CardboardArmorItem::new,
-        new Properties().durability(ArmorType.HELMET.getDurability(AllArmorMaterials.CARDBOARD.durability()))
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD)
+            .durability(ArmorType.HELMET.getDurability(AllArmorMaterials.CARDBOARD.durability()))
             .attributes(AllArmorMaterials.CARDBOARD.createAttributes(ArmorType.HELMET))
             .enchantable(AllArmorMaterials.CARDBOARD.enchantmentValue()).component(
                 DataComponents.EQUIPPABLE,
@@ -2259,23 +2268,25 @@ public class AllItems {
     public static final CardboardArmorItem CARDBOARD_CHESTPLATE = (CardboardArmorItem) registerItem(
         AllItemIds.CARDBOARD_CHESTPLATE,
         CardboardArmorItem::new,
-        new Properties().humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.CHESTPLATE)
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD)
+            .humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.CHESTPLATE)
     );
     public static final CardboardArmorItem CARDBOARD_LEGGINGS = (CardboardArmorItem) registerItem(
         AllItemIds.CARDBOARD_LEGGINGS,
         CardboardArmorItem::new,
-        new Properties().humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.LEGGINGS)
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD)
+            .humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.LEGGINGS)
     );
     public static final CardboardArmorItem CARDBOARD_BOOTS = (CardboardArmorItem) registerItem(
         AllItemIds.CARDBOARD_BOOTS,
         CardboardArmorItem::new,
-        new Properties().humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.BOOTS)
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD).humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.BOOTS)
     );
     @SuppressWarnings("deprecation")
     public static final CardboardSwordItem CARDBOARD_SWORD = (CardboardSwordItem) registerItem(
         AllItemIds.CARDBOARD_SWORD,
         CardboardSwordItem::new,
-        new Properties().durability(AllToolMaterials.CARDBOARD.durability())
+        new Properties().cookingFuel(AllFuelTimes.CARDBOARD).durability(AllToolMaterials.CARDBOARD.durability())
             .repairable(AllToolMaterials.CARDBOARD.repairItems())
             .enchantable(AllToolMaterials.CARDBOARD.enchantmentValue()).component(
                 DataComponents.TOOL, new Tool(

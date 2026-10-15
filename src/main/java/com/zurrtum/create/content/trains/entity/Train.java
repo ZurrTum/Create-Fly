@@ -33,6 +33,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -40,6 +41,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -47,12 +49,16 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -312,7 +318,7 @@ public class Train {
         }
     }
 
-    public void tick(Level level) {
+    public void tick(ServerLevel level) {
         Create.RAILWAYS.markTracksDirty();
 
         if (graph == null) {
@@ -1213,7 +1219,11 @@ public class Train {
         return Penalties.ANY_TRAIN;
     }
 
-    public void burnFuel(Level world) {
+    public LootContext getLootContext(final ServerLevel level) {
+        return new LootContext.Builder(new LootParams.Builder(level).create(LootContextParamSets.EMPTY)).create(Optional.empty());
+    }
+
+    public void burnFuel(ServerLevel level) {
         if (fuelTicks > 0) {
             fuelTicks--;
             return;
@@ -1222,7 +1232,7 @@ public class Train {
         boolean iterateFromBack = speed < 0;
         int carriageCount = carriages.size();
 
-        FuelValues fuelRegistry = world.fuelValues();
+        LootContext lootContext = getLootContext(level);
         for (int index = 0; index < carriageCount; index++) {
             int i = iterateFromBack ? carriageCount - 1 - index : index;
             Carriage carriage = carriages.get(i);
@@ -1234,7 +1244,13 @@ public class Train {
             MutableInt burnTime = new MutableInt();
             ItemStack extract = fuelItems.extract(
                 stack -> {
-                    int ticks = fuelRegistry.burnDuration(stack);
+                    int ticks = ResolvableInt.getFromItem(
+                        stack,
+                        DataComponents.COOKING_FUEL,
+                        CookingFuel::burnTime,
+                        lootContext,
+                        0
+                    );
                     if (ticks > 0) {
                         burnTime.setValue(ticks);
                         return true;

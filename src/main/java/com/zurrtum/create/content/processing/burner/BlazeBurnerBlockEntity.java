@@ -13,22 +13,33 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.SlotProvider;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
-public class BlazeBurnerBlockEntity extends SmartBlockEntity {
+public class BlazeBurnerBlockEntity extends SmartBlockEntity implements SlotProvider {
 
     public static final int MAX_HEAT_CAPACITY = 10000;
     public static final int INSERTION_THRESHOLD = 500;
@@ -188,33 +199,59 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         notifyUpdate();
     }
 
+    @Override
+    public @Nullable SlotAccess getSlot(int slot) {
+        return null;
+    }
+
+    public LootContext getLootContext(ServerLevel level) {
+        return new LootContext.Builder(new LootParams.Builder(level).withParameter(
+                LootContextParams.BLOCK_STATE,
+                getBlockState()
+            ).withParameter(LootContextParams.BLOCK_ENTITY, this)
+            .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(getBlockPos()))
+            .withParameter(LootContextParams.CONTAINER, this).create(LootContextParamSets.CONTAINER_PROCESS)).create(
+            Optional.empty());
+    }
+
     /**
      * @return true if the heater updated its burn time and an item should be
      * consumed
      */
     protected boolean tryUpdateFuel(ItemStack itemStack, boolean forceOverflow, boolean simulate) {
-        if (isCreative) {
+        if (isCreative || level == null) {
             return false;
         }
 
-        FuelType newFuel = FuelType.NONE;
+        FuelType newFuel;
         int newBurnTime;
 
         if (itemStack.is(AllItemTags.BLAZE_BURNER_FUEL_SPECIAL)) {
             newBurnTime = 3200;
             newFuel = FuelType.SPECIAL;
+        } else if (itemStack.is(AllItemTags.BLAZE_BURNER_FUEL_REGULAR)) {
+            newBurnTime = 1600; // Same as coal
+            newFuel = FuelType.NORMAL;
+        } else if (level.isClientSide()) {
+            if (itemStack.has(DataComponents.COOKING_FUEL)) {
+                newFuel = FuelType.NORMAL;
+                newBurnTime = 0;
+            } else {
+                return false;
+            }
         } else {
-            newBurnTime = level.fuelValues().burnDuration(itemStack);
+            newBurnTime = ResolvableInt.getFromItem(
+                itemStack,
+                DataComponents.COOKING_FUEL,
+                CookingFuel::burnTime,
+                getLootContext((ServerLevel) level),
+                0
+            );
             if (newBurnTime > 0) {
                 newFuel = FuelType.NORMAL;
-            } else if (itemStack.is(AllItemTags.BLAZE_BURNER_FUEL_REGULAR)) {
-                newBurnTime = 1600; // Same as coal
-                newFuel = FuelType.NORMAL;
+            } else {
+                return false;
             }
-        }
-
-        if (newFuel == FuelType.NONE) {
-            return false;
         }
         if (newFuel.ordinal() < activeFuel.ordinal()) {
             return false;
@@ -246,11 +283,12 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
             return true;
         }
 
-        HeatLevel prev = getHeatLevelFromBlock();
         playSound();
-        updateBlockState();
 
-        if (prev != getHeatLevelFromBlock()) {
+        HeatLevel prev = getHeatLevelFromBlock();
+        HeatLevel heat = getHeatLevel();
+        if (prev != heat) {
+            level.setBlockAndUpdate(worldPosition, getBlockState().setValue(BlazeBurnerBlock.HEAT_LEVEL, heat));
             level.playSound(
                 null,
                 worldPosition,
@@ -260,7 +298,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
                 1.15f - level.getRandom().nextFloat() * 0.25f
             );
         }
-
+        notifyUpdate();
         return true;
     }
 
@@ -374,7 +412,9 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
     }
 
     public enum FuelType {
-        NONE, NORMAL, SPECIAL
+        NONE,
+        NORMAL,
+        SPECIAL
     }
 
 }
