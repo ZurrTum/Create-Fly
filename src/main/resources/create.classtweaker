@@ -191,6 +191,7 @@ accessible method net/minecraft/world/item/alchemy/PotionBrewing isContainer (Ln
 accessible method net/minecraft/world/item/AxeItem getStripped (Lnet/minecraft/world/level/block/state/BlockState;)Ljava/util/Optional;
 accessible method net/minecraft/world/item/component/ItemContainerContents <init> (Ljava/util/List;)V
 accessible method net/minecraft/world/item/context/UseOnContext <init> (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
+accessible method net/minecraft/world/item/context/UseOnContext getHitResult ()Lnet/minecraft/world/phys/BlockHitResult;
 accessible method net/minecraft/world/item/crafting/CraftingInput <init> (IILjava/util/List;)V
 accessible method net/minecraft/world/item/crafting/Ingredient <init> (Lnet/minecraft/core/HolderSet;)V
 accessible method net/minecraft/world/item/crafting/ShapedRecipePattern unpack (Lnet/minecraft/world/item/crafting/ShapedRecipePattern$Data;)Lcom/mojang/serialization/DataResult;

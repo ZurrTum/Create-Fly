@@ -6,8 +6,10 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryPlacementContext;
+import com.zurrtum.create.content.kinetics.deployer.DeployerPlayer;
 import com.zurrtum.create.foundation.item.ItemPlacementSoundContext;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
@@ -15,6 +17,8 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockItem.class)
 public class BlockItemMixin {
@@ -24,6 +28,14 @@ public class BlockItemMixin {
             return placementContext;
         }
         return original.call(context);
+    }
+
+    @Inject(method = "place(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/InteractionResult;", at = @At("HEAD"), cancellable = true)
+    private void fixDeployerPlacement(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
+        BlockState state = context.getLevel().getBlockState(context.getHitResult().getBlockPos());
+        if (!state.canBeReplaced() && context.getPlayer() instanceof DeployerPlayer) {
+            cir.setReturnValue(InteractionResult.PASS);
+        }
     }
 
     @WrapOperation(method = "place(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getSoundType()Lnet/minecraft/world/level/block/SoundType;"))
