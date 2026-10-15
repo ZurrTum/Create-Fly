@@ -7,6 +7,8 @@ import net.minecraft.util.Mth;
 public class AngleHelper {
 
     public static float horizontalAngle(Direction facing) {
+        if (facing == null)
+            return 0;
         if (facing.getAxis().isVertical())
             return 0;
         float angle = facing.toYRot();
