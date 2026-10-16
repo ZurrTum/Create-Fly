@@ -23,7 +23,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeAccess;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
@@ -395,11 +394,6 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel, Blo
     @Override
     public FeatureFlagSet enabledFeatures() {
         return level.enabledFeatures();
-    }
-
-    @Override
-    public PotionBrewing potionBrewing() {
-        return level.potionBrewing();
     }
 
     // ADDITIONAL OVERRRIDES

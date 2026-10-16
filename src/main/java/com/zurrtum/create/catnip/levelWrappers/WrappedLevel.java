@@ -18,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeAccess;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
@@ -301,11 +300,6 @@ public class WrappedLevel extends Level {
     @Override
     public RegistryAccess registryAccess() {
         return level.registryAccess();
-    }
-
-    @Override
-    public PotionBrewing potionBrewing() {
-        return level.potionBrewing();
     }
 
     @Override

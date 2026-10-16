@@ -18,6 +18,7 @@ public interface FluidIngredientSerializer {
     );
     FluidIngredientSerializer FLUID_STACK = register("fluid_stack", FluidStackIngredient.Serializer::new);
     FluidIngredientSerializer FLUID_TAG = register("fluid_tag", FluidTagIngredient.Serializer::new);
+    FluidIngredientSerializer FLUID_POTION = register("fluid_potion", FluidPotionIngredient.Serializer::new);
 
     String type();
 

@@ -57,6 +57,7 @@
     "RedStoneWireBlockMixin",
     "RegistryDataLoaderMixin",
     "ReloadableServerResourcesMixin",
+    "ResourceManagerRegistryLoadTaskMixin",
     "ServerConfigurationPacketListenerImplMixin",
     "ServerGamePacketListenerImplMixin",
     "ServerLevelMixin",

@@ -18,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeAccess;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ExplosionDamageCalculator;
@@ -191,11 +190,6 @@ public class SchematicChunkSource extends ChunkSource {
             @Override
             public RegistryAccess registryAccess() {
                 return access;
-            }
-
-            @Override
-            public PotionBrewing potionBrewing() {
-                return null;
             }
 
             @Override
