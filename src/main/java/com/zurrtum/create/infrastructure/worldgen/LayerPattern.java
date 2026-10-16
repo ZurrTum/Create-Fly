@@ -9,7 +9,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+import net.minecraft.world.level.levelgen.feature.BlockReplacement;
+import net.minecraft.world.level.levelgen.structure.templatesystem.HeightMatchTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import org.jspecify.annotations.Nullable;
@@ -79,26 +80,25 @@ public class LayerPattern {
 
     public static class Layer {
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.list(Codec.list(OreConfiguration.TargetBlockState.CODEC)).fieldOf("targets")
-                .forGetter(layer -> layer.targets),
+            Codec.list(Codec.list(BlockReplacement.CODEC)).fieldOf("targets").forGetter(layer -> layer.targets),
             Codec.intRange(0, Integer.MAX_VALUE).fieldOf("min_size").forGetter(layer -> layer.minSize),
             Codec.intRange(0, Integer.MAX_VALUE).fieldOf("max_size").forGetter(layer -> layer.maxSize),
             Codec.intRange(0, Integer.MAX_VALUE).fieldOf("weight").forGetter(layer -> layer.weight)
         ).apply(instance, Layer::new));
 
-        public final List<List<OreConfiguration.TargetBlockState>> targets;
+        public final List<List<BlockReplacement>> targets;
         public final int minSize;
         public final int maxSize;
         public final int weight;
 
-        public Layer(List<List<OreConfiguration.TargetBlockState>> targets, int minSize, int maxSize, int weight) {
+        public Layer(List<List<BlockReplacement>> targets, int minSize, int maxSize, int weight) {
             this.targets = targets;
             this.minSize = minSize;
             this.maxSize = maxSize;
             this.weight = weight;
         }
 
-        public List<OreConfiguration.TargetBlockState> rollBlock(RandomSource random) {
+        public List<BlockReplacement> rollBlock(RandomSource random) {
             if (targets.size() == 1) {
                 return targets.getFirst();
             }
@@ -106,11 +106,19 @@ public class LayerPattern {
         }
 
         public static class Builder {
-            private static final RuleTest STONE_ORE_REPLACEABLES = new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES);
-            private static final RuleTest DEEPSLATE_ORE_REPLACEABLES = new TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES);
+            private static final RuleTest STONE_ORE_REPLACEABLES = RuleTest.either(
+                new TagMatchTest(BlockTags.HEIGHT_SPECIFIC_ORE_REPLACEABLES),
+                HeightMatchTest.min(0),
+                new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES)
+            );
+            private static final RuleTest DEEPSLATE_ORE_REPLACEABLES = RuleTest.either(
+                new TagMatchTest(BlockTags.HEIGHT_SPECIFIC_ORE_REPLACEABLES),
+                HeightMatchTest.max(8),
+                new TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES)
+            );
             private static final RuleTest NETHER_ORE_REPLACEABLES = new TagMatchTest(BlockTags.BASE_STONE_NETHER);
 
-            private final List<List<OreConfiguration.TargetBlockState>> targets = new ArrayList<>();
+            private final List<List<BlockReplacement>> targets = new ArrayList<>();
             private int minSize = 1;
             private int maxSize = 1;
             private int weight = 1;
@@ -126,7 +134,7 @@ public class LayerPattern {
 
             public Builder block(Block block) {
                 if (netherMode) {
-                    targets.add(ImmutableList.of(OreConfiguration.target(
+                    targets.add(ImmutableList.of(BlockReplacement.replace(
                         NETHER_ORE_REPLACEABLES,
                         block.defaultBlockState()
                     )));
@@ -148,8 +156,8 @@ public class LayerPattern {
 
             private Builder blocks(BlockState stone, BlockState deepslate) {
                 targets.add(ImmutableList.of(
-                    OreConfiguration.target(STONE_ORE_REPLACEABLES, stone),
-                    OreConfiguration.target(DEEPSLATE_ORE_REPLACEABLES, deepslate)
+                    BlockReplacement.replace(STONE_ORE_REPLACEABLES, stone),
+                    BlockReplacement.replace(DEEPSLATE_ORE_REPLACEABLES, deepslate)
                 ));
                 return this;
             }

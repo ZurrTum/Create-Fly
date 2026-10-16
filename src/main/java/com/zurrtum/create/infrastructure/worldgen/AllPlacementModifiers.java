@@ -5,22 +5,16 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllPlacementModifiers {
-    public static final PlacementModifierType<ConfigPlacementFilter> CONFIG_FILTER = register(
-        "config_filter",
-        ConfigPlacementFilter.CODEC
-    );
+    public static final Identifier CONFIG_FILTER = register("config_filter", ConfigPlacementFilter.CODEC);
 
-    private static <P extends PlacementModifier> PlacementModifierType<P> register(String id, MapCodec<P> codec) {
-        return Registry.register(
-            BuiltInRegistries.PLACEMENT_MODIFIER_TYPE,
-            Identifier.fromNamespaceAndPath(MOD_ID, id),
-            () -> codec
-        );
+    private static <P extends PlacementModifier> Identifier register(String name, MapCodec<P> codec) {
+        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, name);
+        Registry.register(BuiltInRegistries.PLACEMENT_MODIFIER_TYPE, id, codec);
+        return id;
     }
 
     public static void register() {

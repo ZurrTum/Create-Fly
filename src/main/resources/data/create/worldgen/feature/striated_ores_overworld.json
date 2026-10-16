@@ -1,0 +1,2364 @@
+{
+  "type": "create:layered_ore",
+  "discard_chance_on_air_exposure": 0.0,
+  "layer_patterns": [
+    [
+      {
+        "max_size": 5,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "create:scoria",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:scoria",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 3,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "state": "minecraft:andesite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:andesite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 2,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:andesite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 2,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:diorite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:diorite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      }
+    ],
+    [
+      {
+        "max_size": 5,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "create:crimsite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:crimsite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 3,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 2,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 2,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "create:limestone",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:limestone",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      }
+    ],
+    [
+      {
+        "max_size": 5,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "create:asurine",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:asurine",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 3,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 2,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 2,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:calcite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:calcite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      }
+    ],
+    [
+      {
+        "max_size": 5,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "create:veridium",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:veridium",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 4
+      },
+      {
+        "max_size": 3,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "state": "minecraft:andesite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:andesite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 2,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:andesite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 2,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:smooth_basalt",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:smooth_basalt",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 3
+      }
+    ],
+    [
+      {
+        "max_size": 1,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:stone",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 1,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:calcite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:calcite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 1,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:diorite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:diorite",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 1
+      },
+      {
+        "max_size": 4,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "create:limestone",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:limestone",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      }
+    ],
+    [
+      {
+        "max_size": 5,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "create:ochrum",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "create:ochrum",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 3,
+        "min_size": 2,
+        "targets": [
+          [
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:tuff",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:deepslate",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      },
+      {
+        "max_size": 2,
+        "min_size": 1,
+        "targets": [
+          [
+            {
+              "state": "minecraft:dripstone_block",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 2031,
+                        "min_inclusive": 0,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:stone_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "minecraft:dripstone_block",
+              "target": {
+                "predicate_type": "minecraft:any_of",
+                "rules": [
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:height_specific_ore_replaceables"
+                      },
+                      {
+                        "max_inclusive": 8,
+                        "min_inclusive": -2032,
+                        "predicate_type": "minecraft:height_match"
+                      }
+                    ]
+                  },
+                  {
+                    "predicate_type": "minecraft:all_of",
+                    "rules": [
+                      {
+                        "predicate_type": "minecraft:not",
+                        "rule": {
+                          "predicate_type": "minecraft:tag_match",
+                          "tag": "minecraft:height_specific_ore_replaceables"
+                        }
+                      },
+                      {
+                        "predicate_type": "minecraft:tag_match",
+                        "tag": "minecraft:deepslate_ore_replaceables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        ],
+        "weight": 2
+      }
+    ]
+  ],
+  "size": 32
+}

@@ -28,7 +28,6 @@ import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
 import com.zurrtum.create.content.trains.track.AllPortalTracks;
 import com.zurrtum.create.foundation.CreateNBTProcessors;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import com.zurrtum.create.infrastructure.worldgen.AllConfiguredFeatures;
 import com.zurrtum.create.infrastructure.worldgen.AllFeatures;
 import com.zurrtum.create.infrastructure.worldgen.AllPlacedFeatures;
 import com.zurrtum.create.infrastructure.worldgen.AllPlacementModifiers;
@@ -130,7 +129,6 @@ public class Create implements ModInitializer {
         AllStructureProcessorTypes.register();
         CreateNBTProcessors.register();
         AllFeatures.register();
-        AllConfiguredFeatures.register();
         AllPlacedFeatures.register();
         AllPlacementModifiers.register();
         AllMountedDispenseItemBehaviors.register();
