@@ -13,7 +13,7 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
@@ -208,7 +208,7 @@ public class GantryScenes {
         BlockPos leverPos = util.grid().at(4, 1, 0);
         scene.world().modifyBlocks(
             util.select().fromTo(1, 1, 0, 3, 1, 1),
-            s -> s.hasProperty(RedStoneWireBlock.POWER) ? s.setValue(RedStoneWireBlock.POWER, 15) : s,
+            s -> s.hasProperty(RedstoneWireBlock.POWER) ? s.setValue(RedstoneWireBlock.POWER, 15) : s,
             false
         );
         scene.world().toggleRedstonePower(util.select().position(leverPos));

@@ -15,7 +15,7 @@ import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.phys.AABB;
 
 public class ChainDriveScenes {
@@ -228,7 +228,7 @@ public class ChainDriveScenes {
             AnalogLeverBlockEntity.class,
             nbt -> nbt.putInt("State", 8)
         );
-        scene.world().modifyBlock(analogPos.south(), s -> s.setValue(RedStoneWireBlock.POWER, 8), false);
+        scene.world().modifyBlock(analogPos.south(), s -> s.setValue(RedstoneWireBlock.POWER, 8), false);
         scene.world().toggleRedstonePower(util.select().position(1, 1, 4));
         scene.world().modifyKineticSpeed(util.select().position(westGauge), f -> 0.75f * f);
         scene.effects().indicateRedstone(analogPos);

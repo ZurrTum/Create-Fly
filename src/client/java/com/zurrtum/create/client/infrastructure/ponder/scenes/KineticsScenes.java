@@ -28,7 +28,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -1048,7 +1048,7 @@ public class KineticsScenes {
             .showIndependentSection(util.select().fromTo(5, 1, 1, 4, 1, 0), Direction.SOUTH);
         scene.world().moveSection(comparator, util.vector().of(-2, 0, 0), 0);
         scene.world().toggleRedstonePower(util.select().position(5, 1, 1));
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 1));
 
         scene.idle(5);
@@ -1058,13 +1058,13 @@ public class KineticsScenes {
         scene.world().rotateBearing(bearingPos, -180, 40);
         scene.world().rotateSection(contraption, -180, 0, 0, 40);
         scene.effects().rotationDirectionIndicator(gearshiftPos.west());
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 2));
         scene.idle(40);
 
         scene.world().cycleBlockProperty(gearshiftPos, SequencedGearshiftBlock.STATE);
         scene.world().setKineticSpeed(outputKinetics, 0);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 3));
         scene.idle(20);
 
@@ -1073,13 +1073,13 @@ public class KineticsScenes {
         scene.world().rotateBearing(bearingPos, 90, 40);
         scene.world().rotateSection(contraption, 90, 0, 0, 40);
         scene.effects().rotationDirectionIndicator(gearshiftPos.west());
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 4));
         scene.idle(40);
 
         scene.world().cycleBlockProperty(gearshiftPos, SequencedGearshiftBlock.STATE);
         scene.world().cycleBlockProperty(gearshiftPos, SequencedGearshiftBlock.STATE);
-        scene.world().modifyBlock(wire, s -> s.setValue(RedStoneWireBlock.POWER, 0), false);
+        scene.world().modifyBlock(wire, s -> s.setValue(RedstoneWireBlock.POWER, 0), false);
         scene.world().toggleRedstonePower(util.select().position(5, 1, 1));
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 0));
         scene.world().setKineticSpeed(outputKinetics, 0);

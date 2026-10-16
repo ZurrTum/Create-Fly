@@ -31,7 +31,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -485,7 +485,7 @@ public class RedstoneScenes {
             .placeNearTarget().attachKeyFrame().pointAt(leverVec);
         scene.idle(70);
 
-        IntegerProperty power = RedStoneWireBlock.POWER;
+        IntegerProperty power = RedstoneWireBlock.POWER;
         scene.overlay().showControls(leverVec, Pointing.DOWN, 40).rightClick();
         scene.idle(7);
         for (int i = 0; i < 7; i++) {
@@ -562,7 +562,7 @@ public class RedstoneScenes {
             AnalogLeverBlockEntity.class,
             nbt -> nbt.putInt("State", 11)
         );
-        scene.world().modifyBlock(util.grid().at(2, 1, 2), s -> s.setValue(RedStoneWireBlock.POWER, 11), false);
+        scene.world().modifyBlock(util.grid().at(2, 1, 2), s -> s.setValue(RedstoneWireBlock.POWER, 11), false);
         scene.world()
             .modifyBlockEntityNBT(tubes, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 11));
         scene.idle(20);

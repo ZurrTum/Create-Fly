@@ -24,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -328,7 +328,7 @@ public class FunnelScenes {
 
             if (i == 3) {
                 scene.world().modifyBlock(lever, s -> s.cycle(LeverBlock.POWERED), false);
-                scene.world().modifyBlock(redstone, s -> s.setValue(RedStoneWireBlock.POWER, 15), false);
+                scene.world().modifyBlock(redstone, s -> s.setValue(RedstoneWireBlock.POWER, 15), false);
                 scene.world().modifyBlock(funnel, s -> s.cycle(FunnelBlock.POWERED), false);
                 scene.effects().indicateRedstone(lever);
                 scene.idle(4);
