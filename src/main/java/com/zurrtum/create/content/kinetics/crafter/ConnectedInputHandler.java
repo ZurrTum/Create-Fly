@@ -264,7 +264,7 @@ public class ConnectedInputHandler {
 
         @Override
         public ItemStack onExtract(ItemStack stack) {
-            return removeMaxSize(stack, CrafterItemHandler.LIMIT);
+            return removeMaxSize(stack, 1);
         }
 
         @Override

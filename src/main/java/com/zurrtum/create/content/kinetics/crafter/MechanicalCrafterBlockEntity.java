@@ -36,7 +36,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock.HORIZONTAL_FACING;
 
@@ -47,8 +50,6 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
     }
 
     public class CrafterItemHandler implements SidedItemInventory {
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        public static final Optional<Integer> LIMIT = Optional.of(1);
         private static final int[] SLOTS = {0};
         private ItemStack stack = ItemStack.EMPTY;
 
@@ -69,7 +70,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
 
         @Override
         public ItemStack onExtract(ItemStack stack) {
-            return removeMaxSize(stack, LIMIT);
+            return removeMaxSize(stack, 1);
         }
 
         @Override
@@ -124,7 +125,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
                 );
             }
             if (stack != ItemStack.EMPTY) {
-                setMaxSize(stack, LIMIT);
+                setMaxSize(stack, 1);
             }
             this.stack = stack;
         }

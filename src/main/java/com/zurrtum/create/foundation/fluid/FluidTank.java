@@ -5,16 +5,11 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-import java.util.Optional;
-
 public class FluidTank implements FluidInventory {
     protected FluidStack fluid = FluidStack.EMPTY;
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    protected Optional<Integer> max;
     protected int capacity;
 
     public FluidTank(int capacity) {
-        max = Optional.of(capacity);
         this.capacity = capacity;
     }
 
@@ -24,14 +19,14 @@ public class FluidTank implements FluidInventory {
 
     public void setFluid(FluidStack fluid) {
         if (fluid != FluidStack.EMPTY) {
-            setMaxSize(fluid, max);
+            setMaxSize(fluid, capacity);
         }
         this.fluid = fluid;
     }
 
     @Override
     public FluidStack onExtract(FluidStack stack) {
-        return removeMaxSize(stack, max);
+        return removeMaxSize(stack, capacity);
     }
 
     @Override
@@ -67,10 +62,9 @@ public class FluidTank implements FluidInventory {
     }
 
     public void setCapacity(int capacity) {
-        max = Optional.of(capacity);
         this.capacity = capacity;
         if (!fluid.isEmpty()) {
-            setMaxSize(fluid, max);
+            setMaxSize(fluid, capacity);
         }
     }
 

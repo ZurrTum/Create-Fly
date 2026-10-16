@@ -12,14 +12,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class HosePulleyFluidHandler implements SidedFluidInventory {
     private static final int HALF_BUCKET = BucketFluidInventory.CAPACITY / 2;
     private static final int CAPACITY = BucketFluidInventory.CAPACITY + HALF_BUCKET;
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static final Optional<Integer> MAX = Optional.of(CAPACITY);
     private static final int[] SLOTS = {0, 1};
     private static final int[] EMPTY_SLOTS = new int[0];
     private final FluidFillingBehaviour filler;
@@ -79,7 +76,7 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
 
     @Override
     public FluidStack onExtract(FluidStack stack) {
-        return removeMaxSize(stack, MAX);
+        return removeMaxSize(stack, CAPACITY);
     }
 
     @Override
@@ -103,7 +100,7 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
                 false
             )) {
                 filler.counterpartActed();
-                setMaxSize(stack, MAX);
+                setMaxSize(stack, CAPACITY);
                 if (amount > 0) {
                     stack.setAmount(amount + BucketFluidInventory.CAPACITY);
                 }
@@ -119,7 +116,7 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
             return;
         }
         if (stack != FluidStack.EMPTY) {
-            setMaxSize(stack, MAX);
+            setMaxSize(stack, CAPACITY);
         }
         this.stack = stack;
     }

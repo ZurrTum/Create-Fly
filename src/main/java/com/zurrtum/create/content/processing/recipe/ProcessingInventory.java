@@ -9,15 +9,12 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class ProcessingInventory implements SidedItemInventory {
     private static final int[] INPUT_SLOTS = {0};
     private static final int[] ALL_SLOTS = SlotRangeCache.get(32);
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static final Optional<Integer> LIMIT = Optional.of(1);
     public float remainingTime;
     public float recipeDuration;
     public boolean appliedRecipe;
@@ -77,7 +74,7 @@ public class ProcessingInventory implements SidedItemInventory {
     @Override
     public ItemStack onExtract(ItemStack stack) {
         if (limit) {
-            return removeMaxSize(stack, LIMIT);
+            return removeMaxSize(stack, 1);
         }
         return stack;
     }
@@ -96,7 +93,7 @@ public class ProcessingInventory implements SidedItemInventory {
             return;
         }
         if (limit && stack != ItemStack.EMPTY) {
-            setMaxSize(stack, LIMIT);
+            setMaxSize(stack, 1);
         }
         stacks.set(slot, stack);
         if (slot == 0 && !stack.isEmpty()) {

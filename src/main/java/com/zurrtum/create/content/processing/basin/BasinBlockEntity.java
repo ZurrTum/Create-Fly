@@ -595,8 +595,6 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public static class BasinFluidHandler implements FluidInventory {
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private static final Optional<Integer> LIMIT = Optional.of(BucketFluidInventory.CAPACITY);
         private final TankSegment[] output;
         private final TankSegment[] input;
 
@@ -612,7 +610,7 @@ public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
 
         @Override
         public FluidStack onExtract(FluidStack stack) {
-            return removeMaxSize(stack, LIMIT);
+            return removeMaxSize(stack, BucketFluidInventory.CAPACITY);
         }
 
         @Override

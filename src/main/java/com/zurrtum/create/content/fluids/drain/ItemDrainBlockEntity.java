@@ -29,7 +29,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class ItemDrainBlockEntity extends SmartBlockEntity {
 
@@ -307,9 +306,8 @@ public class ItemDrainBlockEntity extends SmartBlockEntity {
     public static class ItemDrainFluidHandler extends SmartFluidTankBehaviour.InternalFluidHandler {
         private static final int[] EMPTY_SLOTS = new int[0];
 
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        public ItemDrainFluidHandler(SmartFluidTankBehaviour behaviour, boolean enforceVariety, Optional<Integer> max) {
-            super(behaviour, enforceVariety, max);
+        public ItemDrainFluidHandler(SmartFluidTankBehaviour behaviour, boolean enforceVariety, int capacity) {
+            super(behaviour, enforceVariety, capacity);
         }
 
         @Override

@@ -15,7 +15,6 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
@@ -43,7 +42,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     public static SmartFluidTankBehaviour single(
         SmartBlockEntity be,
         int capacity,
-        TriFunction<SmartFluidTankBehaviour, Boolean, Optional<Integer>, InternalFluidHandler> factory
+        TriFunction<SmartFluidTankBehaviour, Boolean, Integer, InternalFluidHandler> factory
     ) {
         return new SmartFluidTankBehaviour(TYPE, be, 1, capacity, false, factory);
     }
@@ -54,18 +53,17 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         int tanks,
         int tankCapacity,
         boolean enforceVariety,
-        TriFunction<SmartFluidTankBehaviour, Boolean, Optional<Integer>, InternalFluidHandler> factory
+        TriFunction<SmartFluidTankBehaviour, Boolean, Integer, InternalFluidHandler> factory
     ) {
         super(be);
         insertionAllowed = true;
         extractionAllowed = true;
         behaviourType = type;
         this.tanks = new TankSegment[tanks];
-        Optional<Integer> capacity = Optional.of(tankCapacity);
         for (int i = 0; i < tanks; i++) {
-            this.tanks[i] = new TankSegment(capacity);
+            this.tanks[i] = new TankSegment(tankCapacity);
         }
-        capability = factory.apply(this, enforceVariety, capacity);
+        capability = factory.apply(this, enforceVariety, tankCapacity);
         fluidUpdateCallback = () -> {
         };
     }
@@ -215,23 +213,19 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         private final int[] slots;
         private final SmartFluidTankBehaviour behaviour;
         private final TankSegment[] tanks;
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private final Optional<Integer> max;
         private final int capacity;
 
-        @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalGetWithoutIsPresent"})
-        public InternalFluidHandler(SmartFluidTankBehaviour behaviour, boolean enforceVariety, Optional<Integer> max) {
+        public InternalFluidHandler(SmartFluidTankBehaviour behaviour, boolean enforceVariety, int capacity) {
             this.behaviour = behaviour;
             tanks = behaviour.tanks;
             this.enforceVariety = enforceVariety;
             slots = SlotRangeCache.get(tanks.length);
-            this.max = max;
-            capacity = max.get();
+            this.capacity = capacity;
         }
 
         @Override
         public FluidStack onExtract(FluidStack stack) {
-            return removeMaxSize(stack, max);
+            return removeMaxSize(stack, capacity);
         }
 
         @Override
@@ -316,19 +310,15 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         protected LerpedFloat fluidLevel = LerpedFloat.linear().startWithValue(0).chase(0, 0.25, Chaser.EXP);
         protected FluidStack renderedFluid = FluidStack.EMPTY;
         protected FluidStack fluid = FluidStack.EMPTY;
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        protected Optional<Integer> max;
         protected int capacity;
 
-        @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalGetWithoutIsPresent"})
-        public TankSegment(Optional<Integer> max) {
-            this.max = max;
-            capacity = max.get();
+        public TankSegment(int capacity) {
+            this.capacity = capacity;
         }
 
         @Override
         public FluidStack onExtract(FluidStack stack) {
-            return removeMaxSize(stack, max);
+            return removeMaxSize(stack, capacity);
         }
 
         @Override
@@ -347,7 +337,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
 
         public void setFluid(FluidStack fluid) {
             if (fluid != FluidStack.EMPTY) {
-                setMaxSize(fluid, max);
+                setMaxSize(fluid, capacity);
             }
             this.fluid = fluid;
         }

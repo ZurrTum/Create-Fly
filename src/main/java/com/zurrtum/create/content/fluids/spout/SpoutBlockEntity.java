@@ -31,7 +31,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour.ProcessingResult.HOLD;
 import static com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour.ProcessingResult.PASS;
@@ -297,9 +296,8 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     public static class SpoutFluidHandler extends SmartFluidTankBehaviour.InternalFluidHandler {
         private static final int[] EMPTY_SLOTS = new int[0];
 
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        public SpoutFluidHandler(SmartFluidTankBehaviour behaviour, boolean enforceVariety, Optional<Integer> max) {
-            super(behaviour, enforceVariety, max);
+        public SpoutFluidHandler(SmartFluidTankBehaviour behaviour, boolean enforceVariety, int capacity) {
+            super(behaviour, enforceVariety, capacity);
         }
 
         @Override

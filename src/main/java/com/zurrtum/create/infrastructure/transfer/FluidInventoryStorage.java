@@ -20,7 +20,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
     Map<FluidVariant, FluidStack> CACHE = new MapMaker().weakKeys().makeMap();
@@ -53,7 +52,7 @@ public interface FluidInventoryStorage extends SlottedStorage<FluidVariant> {
             return true;
         }
         if (otherStackComponents == DataComponentMap.EMPTY) {
-            Reference2ObjectMap<DataComponentType<?>, Optional<?>> stackComponentMap = stackComponents.patch;
+            Reference2ObjectMap<DataComponentType<?>, Object> stackComponentMap = stackComponents.patch;
             int stackComponentCount = stackComponentMap.size();
             if (stackComponentCount == 0) {
                 return true;

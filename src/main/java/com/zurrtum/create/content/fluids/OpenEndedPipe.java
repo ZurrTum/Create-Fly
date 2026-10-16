@@ -35,7 +35,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
@@ -243,15 +242,13 @@ public class OpenEndedPipe extends FlowSource {
     }
 
     private class OpenEndFluidHandler implements SidedFluidInventory {
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private static final Optional<Integer> MAX = Optional.of(BucketFluidInventory.CAPACITY);
         private static final int[] SLOTS = {0, 1};
         private FluidStack stack = FluidStack.EMPTY;
         private int previousAmount;
 
         @Override
         public FluidStack onExtract(FluidStack stack) {
-            return removeMaxSize(stack, MAX);
+            return removeMaxSize(stack, BucketFluidInventory.CAPACITY);
         }
 
         @Override
@@ -280,7 +277,7 @@ public class OpenEndedPipe extends FlowSource {
             if (stack == FluidStack.EMPTY) {
                 stack = removeFluidFromSpace(false);
                 if (!stack.isEmpty()) {
-                    setMaxSize(stack, MAX);
+                    setMaxSize(stack, BucketFluidInventory.CAPACITY);
                 }
                 return stack;
             }
@@ -334,7 +331,7 @@ public class OpenEndedPipe extends FlowSource {
                 return;
             }
             if (stack != FluidStack.EMPTY) {
-                setMaxSize(stack, MAX);
+                setMaxSize(stack, BucketFluidInventory.CAPACITY);
             }
             this.stack = stack;
         }
