@@ -11,8 +11,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.codec.RegistryCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -35,7 +35,7 @@ public record PotatoCannonProjectileType(HolderSet<Item> items, int reloadTicks,
                                          Optional<PotatoProjectileEntityHitAction> onEntityHit,
                                          Optional<PotatoProjectileBlockHitAction> onBlockHit) {
     public static final Codec<PotatoCannonProjectileType> CODEC = RecordCodecBuilder.create(i -> i.group(
-        RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("items").forGetter(PotatoCannonProjectileType::items),
+        RegistryCodecs.holderSet(Registries.ITEM).fieldOf("items").forGetter(PotatoCannonProjectileType::items),
         Codec.INT.optionalFieldOf("reload_ticks", 10).forGetter(PotatoCannonProjectileType::reloadTicks),
         Codec.INT.optionalFieldOf("damage", 1).forGetter(PotatoCannonProjectileType::damage),
         Codec.INT.optionalFieldOf("split", 1).forGetter(PotatoCannonProjectileType::split),
