@@ -36,7 +36,8 @@ public class CuckooClockAnimationBehaviour extends AnimationBehaviour<CuckooCloc
         Level world = blockEntity.getLevel();
         RegistryAccess registryAccess = world.registryAccess();
         int dayTime = world.dimensionType().defaultClock().or(() -> registryAccess.get(WorldClocks.OVERWORLD))
-            .map(clock -> (int) (world.clockManager().getTotalTicks(clock) % registryAccess.get(Timelines.OVERWORLD_DAY)
+            .map(clock -> (int) (world.clockManager().getInstance(clock)
+                .totalTicks() % registryAccess.get(Timelines.OVERWORLD_DAY)
                 .flatMap(timeline -> timeline.value().periodTicks()).orElse(24000))).orElse(0);
         int hours = (dayTime / 1000 + 6) % 24;
         int minutes = dayTime % 1000 * 60 / 1000;

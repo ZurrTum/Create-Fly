@@ -179,7 +179,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
 
     private int getDayTime() {
         return level.dimensionType().defaultClock().or(() -> level.registryAccess().get(WorldClocks.OVERWORLD))
-            .map(clock -> (int) (level.clockManager().getTotalTicks(clock) % level.registryAccess()
+            .map(clock -> (int) (level.clockManager().getInstance(clock).totalTicks() % level.registryAccess()
                 .get(Timelines.OVERWORLD_DAY).flatMap(timeline -> timeline.value().periodTicks()).orElse(24000)))
             .orElse(0);
     }
