@@ -25,6 +25,12 @@
     "create_plugin": [
       "com.zurrtum.create.AllEarlyRegistries"
     ],
+    "rei_client": [
+      "com.zurrtum.create.client.compat.rei.ReiClientPlugin"
+    ],
+    "rei_common": [
+      "com.zurrtum.create.compat.rei.ReiCommonPlugin"
+    ],
     "jei_mod_plugin": [
       "com.zurrtum.create.client.compat.jei.JeiClientPlugin"
     ],

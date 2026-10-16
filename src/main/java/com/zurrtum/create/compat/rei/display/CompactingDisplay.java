@@ -4,6 +4,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -45,8 +46,8 @@ public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient ou
         this(
             getEntryIngredients(
                 IngredientHelper.getSizedIngredientStream(recipe.ingredients()),
-                getFluidIngredientStream(recipe.fluidIngredient())
-            ), EntryIngredients.of(recipe.result()), Optional.of(id)
+                    IngredientHelper.getFluidIngredientStream(recipe.fluidIngredients())
+            ), EntryIngredients.ofItemStacks(recipe.results().stream().map(ProcessingOutput::create).toList()), Optional.of(id)
         );
     }
 

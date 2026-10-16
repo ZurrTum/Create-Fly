@@ -77,7 +77,7 @@ public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> o
                 recipe.input(),
                 ingredient -> Pair.of(EntryIngredients.ofIngredient((Ingredient) ingredient), new ArrayList<>())
             );
-            display.getSecond().add(recipe.result());
+            display.getSecond().add(recipe.result().create());
         }
         for (Pair<EntryIngredient, List<ItemStack>> pair : map.values()) {
             EntryIngredient input = pair.getFirst();

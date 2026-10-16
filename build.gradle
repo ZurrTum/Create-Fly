@@ -22,6 +22,7 @@ repositories {
     addGroup("https://maven.squiddev.cc", "cc.tweaked")
     addGroup("https://maven.nucleoid.xyz/releases", "eu.pb4")
     addGroup("https://api.modrinth.com/maven", "maven.modrinth")
+    addGroup("https://maven.shedaniel.me", "me.shedaniel", "dev.architectury", "me.shedaniel.cloth")
 }
 
 version = "$project.mod_version-$project.mod_id"
@@ -45,14 +46,11 @@ loom {
 sourceSets {
     main {
         java {
-            exclude 'com/zurrtum/create/compat/rei/**'
             exclude 'com/zurrtum/create/compat/eiv/**'
-            exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
         }
     }
     client {
         java {
-            exclude 'com/zurrtum/create/client/compat/rei/**'
             exclude 'com/zurrtum/create/client/compat/eiv/**'
             exclude 'com/zurrtum/create/client/mixin/CraftingViewRecipeAccessor.java'
             exclude 'com/zurrtum/create/client/mixin/FabricEIVMixin.java'
@@ -97,10 +95,12 @@ dependencies {
     } else {
         implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }
-//    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
-//    if (project.compile_only_rei.equals("false")) {
-//        modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
-//    }
+    compileOnly "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    compileOnly "dev.architectury:architectury-fabric:${project.architectury_api}"
+    if (project.compile_only_rei.equals("false")) {
+        clientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    }
     clientCompileOnly "mezz.jei:jei-${project.jei_version}"
 //    modCompileOnly "maven.modrinth:eiv:${project.eiv_version}"
     clientCompileOnly "cc.cassian.rrv:reliable-recipe-viewer-fabric:${rrv_version}"

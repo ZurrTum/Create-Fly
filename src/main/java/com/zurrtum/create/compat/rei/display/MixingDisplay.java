@@ -4,11 +4,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -51,10 +53,9 @@ public record MixingDisplay(List<EntryIngredient> inputs, EntryIngredient output
                 getSizedIngredientStream(recipe.ingredients()),
                 getFluidIngredientStream(recipe.fluidIngredients())
             ),
-            recipe.result().isEmpty() ? EntryIngredients.of(FluidStack.create(
-                recipe.fluidResult().getFluid(),
-                recipe.fluidResult().getAmount()
-            )) : EntryIngredients.of(recipe.result()),
+            recipe.results().isEmpty() ? EntryIngredients.of(VanillaEntryTypes.FLUID, recipe.fluidResults()
+                    .stream().map(fluidStack -> FluidStack.create(fluidStack.getFluid(), fluidStack.getAmount())).toList()
+            ) : EntryIngredients.ofItemStacks(recipe.results().stream().map(ProcessingOutput::create).toList()),
             recipe.heat(),
             Optional.of(id)
         );

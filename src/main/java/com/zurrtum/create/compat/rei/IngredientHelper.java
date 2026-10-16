@@ -81,11 +81,11 @@ public interface IngredientHelper {
         CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
         if (customIngredient instanceof ComponentsIngredient) {
             EntryDefinition<ItemStack> definition = VanillaEntryTypes.ITEM.getDefinition();
-            List<SlotDisplay> contents = ((SlotDisplay.Composite) customIngredient.toDisplay()).contents();
+            List<SlotDisplay> contents = ((SlotDisplay.Composite) customIngredient.display()).contents();
             EntryIngredient.Builder builder = EntryIngredient.builder(contents.size());
             for (SlotDisplay content : contents) {
                 SlotDisplay.ItemStackSlotDisplay display = (SlotDisplay.ItemStackSlotDisplay) content;
-                builder.add(EntryStack.of(definition, display.stack()));
+                builder.add(EntryStack.of(definition, display.stack().create()));
             }
             return builder.build();
         }

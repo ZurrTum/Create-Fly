@@ -3,11 +3,11 @@ package com.zurrtum.create.client.compat.rei.renderer;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
@@ -15,7 +15,7 @@ public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) 
     @Override
     public void render(
         EntryStack<ItemStack> entry,
-        GuiGraphicsExtractor graphics,
+        GuiGraphics graphics,
         Rectangle bounds,
         int mouseX,
         int mouseY,
