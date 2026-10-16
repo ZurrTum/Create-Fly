@@ -31,7 +31,7 @@ import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.equine.SkeletonHorse;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -481,7 +481,7 @@ public class AllFanProcessingTypes {
                 return;
             }
 
-            if (entity instanceof EnderMan || entity.getType() == EntityTypes.SNOW_GOLEM || entity.getType() == EntityTypes.BLAZE) {
+            if (entity instanceof Enderman || entity.getType() == EntityTypes.SNOW_GOLEM || entity.getType() == EntityTypes.BLAZE) {
                 entity.hurtServer((ServerLevel) level, entity.damageSources().drown(), 2);
             }
             if (entity.isOnFire()) {
