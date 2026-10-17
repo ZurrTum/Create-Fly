@@ -10,6 +10,7 @@ import com.zurrtum.create.content.logistics.depot.storage.DepotMountedStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -60,7 +61,7 @@ public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour
                 }
             }
             if (!heldItem.isEmpty()) {
-                player.getInventory().placeItemBackInInventory(heldItem);
+                player.getInventory().placeItemBackInInventory(heldItem, Prediction.SERVER_ONLY);
                 world.playSound(
                     null,
                     BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(localPos), 0)),

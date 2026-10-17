@@ -18,6 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -164,7 +165,7 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
                     return InteractionResult.SUCCESS;
                 }
                 if (!level.isClientSide()) {
-                    player.getInventory().placeItemBackInInventory(be.heldBox.copy());
+                    player.getInventory().placeItemBackInInventory(be.heldBox.copy(), Prediction.SERVER_ONLY);
                     player.level().playSound(
                         null,
                         player.blockPosition(),

@@ -12,6 +12,7 @@ import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -174,7 +175,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock, EntityCo
             ((Leashable) leashed.get()).removeLeash();
             Inventory playerInventory = player.getInventory();
             if (!player.isCreative() || playerInventory.findSlotMatchingItem(stack) == -1) {
-                playerInventory.placeItemBackInInventory(new ItemStack(Items.LEAD));
+                playerInventory.placeItemBackInInventory(new ItemStack(Items.LEAD), Prediction.SERVER_ONLY);
             }
         }
         sitDown(level, pos, leashed.or(player));

@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +37,7 @@ public interface IWrenchableWithBracket extends IWrenchable {
         if (bracket.isPresent()) {
             Player player = context.getPlayer();
             if (!world.isClientSide() && !player.isCreative()) {
-                player.getInventory().placeItemBackInInventory(bracket.get());
+                player.getInventory().placeItemBackInInventory(bracket.get(), Prediction.SERVER_ONLY);
             }
             if (!world.isClientSide() && blockState.getBlock() == AllBlocks.FLUID_PIPE) {
                 Axis preferred = FluidPropagator.getStraightPipeAxis(blockState);

@@ -13,6 +13,7 @@ import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -79,7 +80,7 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
         InteractionResult onWrenched = super.onWrenched(state, context);
         Player player = context.getPlayer();
         if (onWrenched == InteractionResult.SUCCESS && player != null && !player.isCreative()) {
-            player.getInventory().placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance());
+            player.getInventory().placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance(), Prediction.SERVER_ONLY);
         }
         return onWrenched;
     }

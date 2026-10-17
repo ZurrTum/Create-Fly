@@ -27,6 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -306,7 +307,7 @@ public class MinecartContraptionItem extends Item {
             AllAdvancements.CART_PICKUP.trigger(serverPlayer);
         }
 
-        player.getInventory().placeItemBackInInventory(generatedStack);
+        player.getInventory().placeItemBackInInventory(generatedStack, Prediction.SERVER_ONLY);
         oce.discard();
         entity.discard();
         return InteractionResult.SUCCESS;

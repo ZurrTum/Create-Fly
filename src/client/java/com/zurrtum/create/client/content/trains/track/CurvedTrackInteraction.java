@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -73,7 +74,8 @@ public class CurvedTrackInteraction {
 
             int progress = (int) (breakProgress * 10.0F) - 1;
             level.destroyBlockProgress(player.getId(), breakPos, progress);
-            player.swing(InteractionHand.MAIN_HAND);
+            SwingAnimation attackAnimation = player.getMainHandItem().getAttackAnimation();
+            player.swing(InteractionHand.MAIN_HAND, attackAnimation, false);
 
             if (breakProgress >= 1) {
                 player.connection.send(new CurvedTrackDestroyPacket(

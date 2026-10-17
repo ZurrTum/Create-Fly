@@ -17,6 +17,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -312,12 +313,18 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         Inventory inv = player.getInventory();
         int tracks = getTrackItemCost();
         while (tracks > 0) {
-            inv.placeItemBackInInventory(new ItemStack(getMaterial().getBlock(), Math.min(64, tracks)));
+            inv.placeItemBackInInventory(
+                new ItemStack(getMaterial().getBlock(), Math.min(64, tracks)),
+                Prediction.SERVER_ONLY
+            );
             tracks -= 64;
         }
         int girders = getGirderItemCost();
         while (girders > 0) {
-            inv.placeItemBackInInventory(new ItemStack(AllItems.METAL_GIRDER, Math.min(64, girders)));
+            inv.placeItemBackInInventory(
+                new ItemStack(AllItems.METAL_GIRDER, Math.min(64, girders)),
+                Prediction.SERVER_ONLY
+            );
             girders -= 64;
         }
     }

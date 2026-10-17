@@ -6,6 +6,7 @@ import com.zurrtum.create.AllSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -60,7 +61,8 @@ public class WrenchItem extends Item {
         }
         if (player != null && !player.isCreative()) {
             Block.getDrops(state, serverWorld, pos, world.getBlockEntity(pos), player, context.getItemInHand())
-                .forEach(itemStack -> player.getInventory().placeItemBackInInventory(itemStack));
+                .forEach(itemStack -> player.getInventory()
+                    .placeItemBackInInventory(itemStack, Prediction.SERVER_ONLY));
         }
         state.spawnAfterBreak(serverWorld, pos, ItemStack.EMPTY, true);
         world.destroyBlock(pos, false);

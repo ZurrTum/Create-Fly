@@ -20,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -337,7 +338,7 @@ public class PackageItem extends Item implements EntityItem {
                     }
                 }
 
-                playerIn.getInventory().placeItemBackInInventory(itemstack.copy());
+                playerIn.getInventory().placeItemBackInInventory(itemstack.copy(), Prediction.SERVER_ONLY);
             }
         }
 

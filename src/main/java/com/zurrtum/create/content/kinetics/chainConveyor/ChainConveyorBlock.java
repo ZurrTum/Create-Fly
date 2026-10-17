@@ -8,6 +8,7 @@ import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -108,8 +109,10 @@ public class ChainConveyorBlock extends KineticBlock implements IBE<ChainConveyo
                 for (BlockPos targetPos : be.connections) {
                     int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos);
                     while (chainCost > 0) {
-                        player.getInventory()
-                            .placeItemBackInInventory(new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)));
+                        player.getInventory().placeItemBackInInventory(
+                            new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)),
+                            Prediction.SERVER_ONLY
+                        );
                         chainCost -= 64;
                     }
                 }

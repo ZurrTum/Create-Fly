@@ -22,6 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -32,6 +33,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -134,11 +136,11 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @WrapOperation(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    @WrapOperation(method = "drop(Lnet/minecraft/world/item/ItemStack;ZLnet/minecraft/util/Prediction;)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean captureDrops(Level world, Entity entity, Operation<Boolean> original) {
         if (AllSynchedDatas.CRUSH_DROP.get(this)) {
             entity.setDeltaMovement(Vec3.ZERO);
-        } else if (world instanceof ServerLevel) {
+        } else {
             Optional<List<ItemStack>> value = AllSynchedDatas.CAPTURE_DROPS.get(this);
             if (value.isPresent()) {
                 value.get().add(((ItemEntity) entity).getItem());
@@ -182,7 +184,7 @@ public abstract class LivingEntityMixin extends Entity {
             case 1 -> AllSynchedDatas.CRUSH_DROP.set(this, false);
             case 2 -> AllSynchedDatas.CAPTURE_DROPS.get(this).ifPresent(drops -> {
                 Inventory inventory = ((DeployerPlayer) source.getEntity()).cast().getInventory();
-                drops.forEach(inventory::placeItemBackInInventory);
+                drops.forEach(stack -> inventory.placeItemBackInInventory(stack, Prediction.SERVER_ONLY));
                 AllSynchedDatas.CAPTURE_DROPS.set(this, Optional.empty());
             });
         }
@@ -205,12 +207,17 @@ public abstract class LivingEntityMixin extends Entity {
         return false;
     }
 
-    @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;Z)V", at = @At("HEAD"), cancellable = true)
-    private void swingHand(InteractionHand hand, boolean sendToSwingingEntity, CallbackInfo ci) {
+    @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/component/SwingAnimation;Z)Z", at = @At("HEAD"), cancellable = true)
+    private void swingHand(
+        InteractionHand hand,
+        SwingAnimation animation,
+        boolean sendToSwingingEntity,
+        CallbackInfoReturnable<Boolean> cir
+    ) {
         ItemStack stack = getItemInHand(hand);
         if (stack.getItem() instanceof SwingControlItem item) {
             if (item.onEntitySwing(stack, (LivingEntity) (Object) this, hand)) {
-                ci.cancel();
+                cir.setReturnValue(true);
             }
         }
     }

@@ -103,6 +103,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -112,6 +113,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -651,8 +653,10 @@ public class AllHandle {
                         if (!player.isCreative()) {
                             int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos.subtract(packet.pos()));
                             while (chainCost > 0) {
-                                player.getInventory()
-                                    .placeItemBackInInventory(new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)));
+                                player.getInventory().placeItemBackInInventory(
+                                    new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)),
+                                    Prediction.SERVER_ONLY
+                                );
                                 chainCost -= 64;
                             }
                         }
@@ -744,7 +748,7 @@ public class AllHandle {
                         if (player.getMainHandItem().isEmpty()) {
                             player.setItemInHand(InteractionHand.MAIN_HAND, best.item.copy());
                         } else {
-                            player.getInventory().placeItemBackInInventory(best.item.copy());
+                            player.getInventory().placeItemBackInInventory(best.item.copy(), Prediction.SERVER_ONLY);
                         }
 
                         list.remove(best);
@@ -946,7 +950,7 @@ public class AllHandle {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
                     ItemStack filter = packet.filter();
                     if (!filter.isEmpty() && filter.getItem() instanceof FilterItem) {
-                        listener.player.getInventory().placeItemBackInInventory(filter);
+                        listener.player.getInventory().placeItemBackInInventory(filter, Prediction.SERVER_ONLY);
                     }
                     return true;
                 }
@@ -1123,7 +1127,7 @@ public class AllHandle {
             return;
         }
         if (contraptionEntity.handlePlayerInteraction(sender, packet.localPos(), packet.face(), packet.hand())) {
-            sender.swing(packet.hand(), true);
+            sender.swing(packet.hand(), SwingAnimation.DEFAULT, true);
         }
     }
 

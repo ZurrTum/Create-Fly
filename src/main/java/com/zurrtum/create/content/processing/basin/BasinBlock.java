@@ -23,6 +23,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -168,7 +169,7 @@ public class BasinBlock extends Block implements IBE<BasinBlockEntity>, IWrencha
                     if (stackInSlot.isEmpty()) {
                         continue;
                     }
-                    player.getInventory().placeItemBackInInventory(stackInSlot);
+                    player.getInventory().placeItemBackInInventory(stackInSlot, Prediction.SERVER_ONLY);
                     inv.setItem(slot, ItemStack.EMPTY);
                     success = true;
                 }

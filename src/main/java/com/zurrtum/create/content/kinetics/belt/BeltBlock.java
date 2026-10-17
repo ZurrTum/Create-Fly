@@ -36,6 +36,7 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -316,7 +317,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
             MutableBoolean success = new MutableBoolean(false);
             controllerBelt.getInventory().applyToEachWithin(
                 belt.index + 0.5f, 0.55f, transportedItemStack -> {
-                    player.getInventory().placeItemBackInInventory(transportedItemStack.stack);
+                    player.getInventory().placeItemBackInInventory(transportedItemStack.stack, Prediction.SERVER_ONLY);
                     success.setTrue();
                     return TransportedResult.removeItem();
                 }
@@ -404,7 +405,8 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
             }
             KineticBlockEntity.switchToBlockState(world, pos, state.setValue(PART, BeltPart.MIDDLE));
             if (player != null && !player.isCreative()) {
-                player.getInventory().placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance());
+                player.getInventory()
+                    .placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance(), Prediction.SERVER_ONLY);
             }
             return InteractionResult.SUCCESS;
         }

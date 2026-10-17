@@ -18,6 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -215,7 +216,7 @@ public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock impleme
                 if (heldItem.isEmpty()) {
                     return;
                 }
-                pPlayer.getInventory().placeItemBackInInventory(heldItem);
+                pPlayer.getInventory().placeItemBackInInventory(heldItem, Prediction.SERVER_ONLY);
                 pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1, 1);
                 pte.setHeldItem(ItemStack.EMPTY);
             }

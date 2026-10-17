@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -68,7 +69,7 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
                 }
                 Player player = context.getPlayer();
                 if (!player.isCreative()) {
-                    player.getInventory().placeItemBackInInventory(consumedItem);
+                    player.getInventory().placeItemBackInInventory(consumedItem, Prediction.SERVER_ONLY);
                 }
                 context.getLevel().levelEvent(
                     LevelEvent.PARTICLES_DESTROY_BLOCK,

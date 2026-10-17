@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -77,7 +78,7 @@ public class SharedDepotBlockMethods {
                 }
             }
             if (!mainItemStack.isEmpty()) {
-                player.getInventory().placeItemBackInInventory(mainItemStack);
+                player.getInventory().placeItemBackInInventory(mainItemStack, Prediction.SERVER_ONLY);
                 behaviour.removeHeldItem();
                 level.playSound(
                     null,
@@ -96,7 +97,7 @@ public class SharedDepotBlockMethods {
             if (itemStack.isEmpty()) {
                 continue;
             }
-            player.getInventory().placeItemBackInInventory(itemStack);
+            player.getInventory().placeItemBackInInventory(itemStack, Prediction.SERVER_ONLY);
             change = true;
         }
         if (change) {

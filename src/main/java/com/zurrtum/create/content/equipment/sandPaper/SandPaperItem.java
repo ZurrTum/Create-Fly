@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -146,11 +147,11 @@ public class SandPaperItem extends Item {
                 ItemStack polished = recipe.value().assemble(input);
                 Inventory playerInv = player.getInventory();
                 if (!polished.isEmpty()) {
-                    playerInv.placeItemBackInInventory(polished);
+                    playerInv.placeItemBackInInventory(polished, Prediction.SERVER_ONLY);
                 }
                 ItemStackTemplate recipeRemainder = toPolish.getItem().getCraftingRemainder();
                 if (recipeRemainder != null) {
-                    playerInv.placeItemBackInInventory(recipeRemainder.create());
+                    playerInv.placeItemBackInInventory(recipeRemainder.create(), Prediction.SERVER_ONLY);
                 }
             });
 
@@ -182,7 +183,7 @@ public class SandPaperItem extends Item {
         if (stack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
             ItemStack toPolish = stack.get(AllDataComponents.SAND_PAPER_POLISHING).item();
             //noinspection DataFlowIssue - toPolish won't be null as we do call .has before calling .get
-            player.getInventory().placeItemBackInInventory(toPolish);
+            player.getInventory().placeItemBackInInventory(toPolish, Prediction.SERVER_ONLY);
             stack.remove(AllDataComponents.SAND_PAPER_POLISHING);
         }
         return false;

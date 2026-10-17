@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.world.InteractionHand;
@@ -144,7 +145,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
             player.setItemInHand(hand, filled);
             return;
         }
-        player.getInventory().placeItemBackInInventory(filled);
+        player.getInventory().placeItemBackInInventory(filled, Prediction.SERVER_ONLY);
     }
 
     private void spawnCaptureEffects(Level world, Vec3 vec) {

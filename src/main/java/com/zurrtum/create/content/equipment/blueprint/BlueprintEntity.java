@@ -41,6 +41,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -471,7 +472,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
                     }
                     playerInv.setChanged();
                     for (ItemStack stack : results) {
-                        player.getInventory().placeItemBackInInventory(stack);
+                        player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
                     }
                 } else {
                     break;

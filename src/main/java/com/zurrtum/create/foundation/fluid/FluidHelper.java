@@ -19,6 +19,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -203,7 +204,7 @@ public class FluidHelper {
                 player.setItemInHand(handIn, emptyingResult.getSecond());
             } else {
                 player.setItemInHand(handIn, copyOfHeld);
-                player.getInventory().placeItemBackInInventory(emptyingResult.getSecond());
+                player.getInventory().placeItemBackInInventory(emptyingResult.getSecond(), Prediction.SERVER_ONLY);
             }
         }
         return true;
@@ -252,7 +253,7 @@ public class FluidHelper {
             capability.extract(copy, null);
 
             if (!player.isCreative()) {
-                player.getInventory().placeItemBackInInventory(out);
+                player.getInventory().placeItemBackInInventory(out, Prediction.SERVER_ONLY);
             }
             be.notifyUpdate();
             return true;

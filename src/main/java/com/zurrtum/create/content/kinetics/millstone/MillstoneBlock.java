@@ -10,6 +10,7 @@ import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -83,12 +84,12 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
                         continue;
                     }
                     emptyOutput = false;
-                    player.getInventory().placeItemBackInInventory(stackInSlot);
+                    player.getInventory().placeItemBackInInventory(stackInSlot, Prediction.SERVER_ONLY);
                     inv.setItem(slot, ItemStack.EMPTY);
                 }
 
                 if (emptyOutput) {
-                    player.getInventory().placeItemBackInInventory(inv.getItem(0));
+                    player.getInventory().placeItemBackInInventory(inv.getItem(0), Prediction.SERVER_ONLY);
                     inv.setItem(0, ItemStack.EMPTY);
                 }
 

@@ -4,6 +4,7 @@ import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -73,7 +74,7 @@ public class BracketBlockItem extends BlockItem {
                 if (player == null) {
                     Block.popResource(world, pos, returnedStack);
                 } else {
-                    player.getInventory().placeItemBackInInventory(returnedStack);
+                    player.getInventory().placeItemBackInInventory(returnedStack, Prediction.SERVER_ONLY);
                 }
             }
         }

@@ -6,6 +6,7 @@ import com.zurrtum.create.content.kinetics.base.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -67,7 +68,7 @@ public interface IWrenchable {
         if (player != null && !player.isCreative()) {
             Block.getDrops(state, serverLevel, pos, world.getBlockEntity(pos), player, context.getItemInHand())
                 .forEach(itemStack -> {
-                    player.getInventory().placeItemBackInInventory(itemStack);
+                    player.getInventory().placeItemBackInInventory(itemStack, Prediction.SERVER_ONLY);
                 });
         }
 

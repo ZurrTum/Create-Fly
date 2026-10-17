@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -106,7 +107,10 @@ public class ScheduleItemEntityInteraction {
                 train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" :
                     "create.schedule.removed_from_train"));
 
-            player.getInventory().placeItemBackInInventory(train.runtime.returnSchedule(player.registryAccess()));
+            player.getInventory().placeItemBackInInventory(
+                train.runtime.returnSchedule(player.registryAccess()),
+                Prediction.SERVER_ONLY
+            );
         }
 
         player.getCooldowns().addCooldown(schedule, 5);

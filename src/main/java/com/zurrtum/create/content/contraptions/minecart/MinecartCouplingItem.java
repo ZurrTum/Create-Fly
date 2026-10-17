@@ -5,6 +5,7 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -90,7 +91,8 @@ public class MinecartCouplingItem extends Item {
         CouplingHandler.status(player, "removed");
         controller.decouple();
         if (!player.isCreative()) {
-            player.getInventory().placeItemBackInInventory(new ItemStack(AllItems.MINECART_COUPLING, couplings));
+            player.getInventory()
+                .placeItemBackInInventory(new ItemStack(AllItems.MINECART_COUPLING, couplings), Prediction.SERVER_ONLY);
         }
         return true;
     }

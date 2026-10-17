@@ -45,6 +45,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -485,7 +486,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
             return;
         }
         if (sender != null && sender.getMainHandItem().isEmpty()) {
-            sender.getInventory().placeItemBackInInventory(schedule);
+            sender.getInventory().placeItemBackInInventory(schedule, Prediction.SERVER_ONLY);
             return;
         }
 

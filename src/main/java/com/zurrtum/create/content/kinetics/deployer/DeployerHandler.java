@@ -24,6 +24,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -178,7 +179,8 @@ public class DeployerHandler {
                     serverPlayer.attack(entity);
                     AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.empty());
                 }
-                capturedDrops.forEach(e -> serverPlayer.getInventory().placeItemBackInInventory(e));
+                capturedDrops.forEach(e -> serverPlayer.getInventory()
+                    .placeItemBackInInventory(e, Prediction.SERVER_ONLY));
                 return;
             }
         } else {
@@ -237,7 +239,8 @@ public class DeployerHandler {
                 }
 
                 AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.empty());
-                capturedDrops.forEach(e -> serverPlayer.getInventory().placeItemBackInInventory(e));
+                capturedDrops.forEach(e -> serverPlayer.getInventory()
+                    .placeItemBackInInventory(e, Prediction.SERVER_ONLY));
                 if (success) {
                     return;
                 }
@@ -475,7 +478,7 @@ public class DeployerHandler {
         }
 
         net.minecraft.world.level.block.Block.getDrops(blockstate, world, pos, blockEntity, player.cast(), prevHeldItem)
-            .forEach(item -> serverPlayer.getInventory().placeItemBackInInventory(item));
+            .forEach(item -> serverPlayer.getInventory().placeItemBackInInventory(item, Prediction.SERVER_ONLY));
         blockstate.spawnAfterBreak(world, pos, prevHeldItem, true);
         return true;
     }
@@ -493,7 +496,7 @@ public class DeployerHandler {
         try {
             InteractionResult result = BlockHelper.invokeUse(state, world, player.cast(), hand, ray);
             for (ItemEntity itemEntity : drops) {
-                player.cast().getInventory().placeItemBackInInventory(itemEntity.getItem());
+                player.cast().getInventory().placeItemBackInInventory(itemEntity.getItem(), Prediction.SERVER_ONLY);
             }
             return result;
         } finally {

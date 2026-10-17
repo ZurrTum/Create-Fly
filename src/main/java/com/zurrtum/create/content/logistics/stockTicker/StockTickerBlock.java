@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -97,7 +98,7 @@ public class StockTickerBlock extends HorizontalDirectionalBlock implements IBE<
                             continue;
                         }
                         inventory.setItem(i, ItemStack.EMPTY);
-                        playerInventory.placeItemBackInInventory(target);
+                        playerInventory.placeItemBackInInventory(target, Prediction.SERVER_ONLY);
                         anySuccess = true;
                     }
                     if (anySuccess) {

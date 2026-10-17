@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -169,7 +170,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
                 if (level.isClientSide()) {
                     return InteractionResult.SUCCESS;
                 }
-                player.getInventory().placeItemBackInInventory(autoSchedule.copy());
+                player.getInventory().placeItemBackInInventory(autoSchedule.copy(), Prediction.SERVER_ONLY);
                 station.depotBehaviour.removeHeldItem();
                 station.notifyUpdate();
                 player.level().playSound(

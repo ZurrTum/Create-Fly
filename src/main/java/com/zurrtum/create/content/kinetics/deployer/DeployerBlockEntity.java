@@ -27,6 +27,7 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemStackWithSlot;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -502,7 +503,14 @@ public class DeployerBlockEntity extends KineticBlockEntity implements Clearable
         }
         ServerPlayer serverPlayer = player.cast();
         serverPlayer.getInventory().dropAll();
-        overflowItems.forEach(itemstack -> serverPlayer.drop(itemstack, true, false));
+        if (!level.isClientSide()) {
+            overflowItems.forEach(itemstack -> {
+                ItemEntity entity = serverPlayer.createItemStackToDrop(itemstack, true, false);
+                if (entity != null) {
+                    level.addFreshEntity(entity);
+                }
+            });
+        }
         serverPlayer.discard();
         player = null;
     }

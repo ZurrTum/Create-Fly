@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -168,7 +169,7 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
                         if (heldItemStack.isEmpty()) {
                             continue;
                         }
-                        player.getInventory().placeItemBackInInventory(heldItemStack);
+                        player.getInventory().placeItemBackInInventory(heldItemStack, Prediction.SERVER_ONLY);
                     }
                 }
                 be.inventory.clearContent();

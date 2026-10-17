@@ -29,6 +29,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -232,7 +233,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
                 if (player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
                     player.setItemInHand(InteractionHand.MAIN_HAND, prevListItem);
                 } else {
-                    player.getInventory().placeItemBackInInventory(prevListItem);
+                    player.getInventory().placeItemBackInInventory(prevListItem, Prediction.SERVER_ONLY);
                 }
             }
 
@@ -284,7 +285,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         if (player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
             player.setItemInHand(InteractionHand.MAIN_HAND, newListItem);
         } else {
-            player.getInventory().placeItemBackInInventory(newListItem);
+            player.getInventory().placeItemBackInInventory(newListItem, Prediction.SERVER_ONLY);
         }
 
         return InteractionResult.SUCCESS;

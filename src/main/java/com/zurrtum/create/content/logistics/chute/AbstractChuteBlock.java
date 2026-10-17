@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -248,7 +249,7 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
                 if (be.item.isEmpty()) {
                     return InteractionResult.TRY_WITH_EMPTY_HAND;
                 }
-                player.getInventory().placeItemBackInInventory(be.item);
+                player.getInventory().placeItemBackInInventory(be.item, Prediction.SERVER_ONLY);
                 be.setItem(ItemStack.EMPTY);
                 return InteractionResult.SUCCESS;
             }

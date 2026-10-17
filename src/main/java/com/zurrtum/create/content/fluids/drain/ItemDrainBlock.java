@@ -16,6 +16,7 @@ import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -97,7 +98,7 @@ public class ItemDrainBlock extends Block implements IWrenchable, IBE<ItemDrainB
 
                 ItemStack heldItemStack = be.getHeldItemStack();
                 if (!level.isClientSide() && !heldItemStack.isEmpty()) {
-                    player.getInventory().placeItemBackInInventory(heldItemStack);
+                    player.getInventory().placeItemBackInInventory(heldItemStack, Prediction.SERVER_ONLY);
                     be.heldItem = null;
                     be.notifyUpdate();
                 }

@@ -17,6 +17,7 @@ import com.zurrtum.create.infrastructure.packet.s2c.SymmetryEffectPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -281,7 +282,8 @@ public class SymmetryWandItem extends Item {
                 } else if (count != 0) {
                     targets.add(position);
                     tasks.forEach(Runnable::run);
-                    player.getInventory().placeItemBackInInventory(placementContext.getItemInHand());
+                    player.getInventory()
+                        .placeItemBackInInventory(placementContext.getItemInHand(), Prediction.SERVER_ONLY);
                 }
             }
         }

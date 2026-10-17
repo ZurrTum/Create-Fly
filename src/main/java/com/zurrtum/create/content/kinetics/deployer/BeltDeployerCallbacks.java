@@ -18,6 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -181,7 +182,7 @@ public class BeltDeployerCallbacks {
                     if (heldItem.isEmpty()) {
                         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
                     } else if (!player.getInventory().add(stack)) {
-                        player.drop(stack, false);
+                        player.drop(stack, false, Prediction.SERVER_ONLY);
                     }
                 }
             }

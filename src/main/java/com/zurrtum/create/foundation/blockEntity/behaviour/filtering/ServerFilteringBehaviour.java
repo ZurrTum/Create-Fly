@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -277,7 +278,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
                 1
             ).isEmpty()) {
                 if (!refund.isEmpty()) {
-                    inventory.placeItemBackInInventory(refund);
+                    inventory.placeItemBackInInventory(refund, Prediction.SERVER_ONLY);
                 }
                 setFilter(side, copied);
                 return true;
@@ -292,7 +293,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
         }
 
         if (!refund.isEmpty()) {
-            inventory.placeItemBackInInventory(refund);
+            inventory.placeItemBackInInventory(refund, Prediction.SERVER_ONLY);
         }
 
         return setFilter(side, copied);
@@ -316,7 +317,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
         if (filter.getItem() instanceof FilterItem) {
             Inventory inventory = player.getInventory();
             if (!player.isCreative() || inventory.count(filter, 1) == 0) {
-                inventory.placeItemBackInInventory(filter.copy());
+                inventory.placeItemBackInInventory(filter.copy(), Prediction.SERVER_ONLY);
             }
         }
 
