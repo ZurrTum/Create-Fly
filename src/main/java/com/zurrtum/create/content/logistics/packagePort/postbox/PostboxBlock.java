@@ -7,13 +7,17 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
+import com.zurrtum.create.infrastructure.packet.s2c.PackagePortPlacementRequestPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
@@ -39,6 +43,19 @@ public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<Post
         super(properties);
         this.color = color;
         registerDefaultState(defaultBlockState().setValue(OPEN, false).setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    public void setPlacedBy(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        @Nullable LivingEntity by,
+        ItemStack itemStack
+    ) {
+        if (!level.isClientSide() && by instanceof ServerPlayer sp) {
+            sp.connection.send(new PackagePortPlacementRequestPacket(pos));
+        }
     }
 
     @Override

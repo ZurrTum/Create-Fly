@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.Nullable;
 
 public class ItemVaultItem extends BlockItem {
 
@@ -41,30 +40,33 @@ public class ItemVaultItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(
-        BlockPos blockPos,
-        Level level,
-        @Nullable Player player,
-        ItemStack itemStack,
-        BlockState blockState
-    ) {
-        MinecraftServer minecraftserver = level.getServer();
-        if (minecraftserver == null) {
-            return false;
+    protected boolean placeBlock(BlockPlaceContext context, BlockState placementState) {
+        if (super.placeBlock(context, placementState)) {
+            BlockPos pos = context.getClickedPos();
+            Level level = context.getLevel();
+            BlockState placedState = level.getBlockState(pos);
+            if (placedState.is(placementState.getBlock())) {
+                MinecraftServer minecraftserver = level.getServer();
+                if (minecraftserver == null) {
+                    return false;
+                }
+                ItemStack itemStack = context.getItemInHand();
+                TypedEntityData<BlockEntityType<?>> data = itemStack.get(DataComponents.BLOCK_ENTITY_DATA);
+                if (data != null) {
+                    CompoundTag nbt = data.copyTagWithoutId();
+                    nbt.remove("Length");
+                    nbt.remove("Size");
+                    nbt.remove("Controller");
+                    nbt.remove("LastKnownPos");
+                    itemStack.set(
+                        DataComponents.BLOCK_ENTITY_DATA,
+                        TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), nbt)
+                    );
+                }
+            }
+            return true;
         }
-        TypedEntityData<BlockEntityType<?>> data = itemStack.get(DataComponents.BLOCK_ENTITY_DATA);
-        if (data != null) {
-            CompoundTag nbt = data.copyTagWithoutId();
-            nbt.remove("Length");
-            nbt.remove("Size");
-            nbt.remove("Controller");
-            nbt.remove("LastKnownPos");
-            itemStack.set(
-                DataComponents.BLOCK_ENTITY_DATA,
-                TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), nbt)
-            );
-        }
-        return super.updateCustomBlockEntityTag(blockPos, level, player, itemStack, blockState);
+        return false;
     }
 
     private void tryMultiPlace(BlockPlaceContext ctx) {

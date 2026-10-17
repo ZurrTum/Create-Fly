@@ -9,7 +9,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,36 +29,33 @@ public class VerticalGearboxItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(
-        BlockPos pos,
-        Level world,
-        @Nullable Player player,
-        ItemStack stack,
-        BlockState state
-    ) {
-        Axis prefferedAxis = null;
-        for (Direction side : Iterate.horizontalDirections) {
-            BlockState blockState = world.getBlockState(pos.relative(side));
-            if (blockState.getBlock() instanceof IRotate) {
-                if (((IRotate) blockState.getBlock()).hasShaftTowards(
-                    world,
-                    pos.relative(side),
-                    blockState,
-                    side.getOpposite()
-                )) {
-                    if (prefferedAxis != null && prefferedAxis != side.getAxis()) {
-                        prefferedAxis = null;
-                        break;
+    protected @Nullable BlockState getPlacementState(BlockPlaceContext context) {
+        BlockState state = super.getPlacementState(context);
+        if (state != null) {
+            BlockPos pos = context.getClickedPos();
+            Level level = context.getLevel();
+            Axis prefferedAxis = null;
+            for (Direction side : Iterate.horizontalDirections) {
+                BlockPos neighbor = pos.relative(side);
+                BlockState blockState = level.getBlockState(neighbor);
+                if (blockState.getBlock() instanceof IRotate rotate) {
+                    if (rotate.hasShaftTowards(level, neighbor, blockState, side.getOpposite())) {
+                        if (prefferedAxis != null && prefferedAxis != side.getAxis()) {
+                            prefferedAxis = null;
+                            break;
+                        }
+                        prefferedAxis = side.getAxis();
                     }
-                    prefferedAxis = side.getAxis();
                 }
             }
+            if (prefferedAxis != null) {
+                return state.setValue(BlockStateProperties.AXIS, prefferedAxis == Axis.X ? Axis.Z : Axis.X);
+            }
+            Player player = context.getPlayer();
+            if (player != null) {
+                return state.setValue(BlockStateProperties.AXIS, player.getDirection().getClockWise().getAxis());
+            }
         }
-
-        Axis axis = prefferedAxis == null ? player.getDirection().getClockWise().getAxis() :
-            prefferedAxis == Axis.X ? Axis.Z : Axis.X;
-        world.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.AXIS, axis));
-        return super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+        return state;
     }
-
 }

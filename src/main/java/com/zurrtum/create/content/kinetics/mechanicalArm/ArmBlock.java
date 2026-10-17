@@ -7,12 +7,15 @@ import com.zurrtum.create.content.kinetics.base.KineticBlock;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity.Phase;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.infrastructure.packet.s2c.ArmPlacementRequestPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -37,6 +40,20 @@ public class ArmBlock extends KineticBlock implements IBE<ArmBlockEntity>, ICogW
     public ArmBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(CEILING, false));
+    }
+
+    @Override
+    public void setPlacedBy(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        @Nullable LivingEntity by,
+        ItemStack itemStack
+    ) {
+        if (!level.isClientSide() && by instanceof ServerPlayer sp) {
+            sp.connection.send(new ArmPlacementRequestPacket(pos));
+        }
+        super.setPlacedBy(level, pos, state, by, itemStack);
     }
 
     @Override

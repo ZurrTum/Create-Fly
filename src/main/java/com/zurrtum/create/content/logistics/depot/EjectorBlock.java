@@ -11,14 +11,17 @@ import com.zurrtum.create.foundation.block.SlipperinessControlBlock;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import com.zurrtum.create.infrastructure.packet.c2s.EjectorTriggerPacket;
+import com.zurrtum.create.infrastructure.packet.s2c.EjectorPlacementRequestPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -43,6 +46,20 @@ public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorB
     public EjectorBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    public void setPlacedBy(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        @Nullable LivingEntity by,
+        ItemStack itemStack
+    ) {
+        if (!level.isClientSide() && by instanceof ServerPlayer sp) {
+            sp.connection.send(new EjectorPlacementRequestPacket(pos));
+        }
+        super.setPlacedBy(level, pos, state, by, itemStack);
     }
 
     @Override

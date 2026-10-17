@@ -11,7 +11,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.TypedEntityData;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -46,14 +44,17 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(
-        BlockPos pos,
-        Level level,
-        @Nullable Player player,
-        ItemStack stack,
-        BlockState state
-    ) {
-        return super.updateCustomBlockEntityTag(pos, level, player, fixCtrlCopiedStack(stack), state);
+    protected boolean placeBlock(BlockPlaceContext context, BlockState placementState) {
+        if (super.placeBlock(context, placementState)) {
+            BlockPos pos = context.getClickedPos();
+            Level level = context.getLevel();
+            BlockState placedState = level.getBlockState(pos);
+            if (placedState.is(placementState.getBlock())) {
+                fixCtrlCopiedStack(context.getItemInHand());
+            }
+            return true;
+        }
+        return false;
     }
 
     public static ItemStack fixCtrlCopiedStack(ItemStack stack) {

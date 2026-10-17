@@ -7,6 +7,7 @@ import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
+import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
@@ -21,6 +22,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.*;
@@ -46,6 +49,23 @@ public class BeltTunnelBlock extends Block implements IBE<BeltTunnelBlockEntity>
     public BeltTunnelBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(SHAPE, Shape.STRAIGHT));
+    }
+
+    @Override
+    public void setPlacedBy(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        @Nullable LivingEntity by,
+        ItemStack itemStack
+    ) {
+        if (!level.isClientSide()) {
+            BeltBlockEntity belt = BeltHelper.getSegmentBE(level, pos.below());
+            if (belt != null && belt.casing == BeltBlockEntity.CasingType.NONE) {
+                belt.setCasingType(state.is(AllBlocks.ANDESITE_TUNNEL) ? BeltBlockEntity.CasingType.ANDESITE :
+                    BeltBlockEntity.CasingType.BRASS);
+            }
+        }
     }
 
     @Override

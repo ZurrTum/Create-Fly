@@ -8,8 +8,10 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
+import com.zurrtum.create.infrastructure.packet.s2c.PackagePortPlacementRequestPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -63,6 +65,9 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         if (pPlacer == null) {
             return;
+        }
+        if (!pLevel.isClientSide() && pPlacer instanceof ServerPlayer sp) {
+            sp.connection.send(new PackagePortPlacementRequestPacket(pPos));
         }
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
         withBlockEntityDo(

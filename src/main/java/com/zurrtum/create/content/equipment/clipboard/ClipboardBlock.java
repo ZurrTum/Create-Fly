@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -47,6 +48,23 @@ public class ClipboardBlock extends FaceAttachedHorizontalDirectionalBlock imple
     public ClipboardBlock(Properties pProperties) {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(WRITTEN, false));
+    }
+
+    @Override
+    public void setPlacedBy(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        @Nullable LivingEntity by,
+        ItemStack itemStack
+    ) {
+        if (level.isClientSide()) {
+            return;
+        }
+        if (!(level.getBlockEntity(pos) instanceof ClipboardBlockEntity cbe)) {
+            return;
+        }
+        cbe.notifyUpdate();
     }
 
     @Override

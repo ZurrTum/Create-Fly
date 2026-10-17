@@ -5,7 +5,6 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -15,8 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.Nullable;
 
 public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying {
 
@@ -34,24 +31,6 @@ public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying
             return super.useOn(context);
         }
         return use(context.getLevel(), player, context.getHand());
-    }
-
-    @Override
-    protected boolean updateCustomBlockEntityTag(
-        BlockPos pPos,
-        Level pLevel,
-        @Nullable Player pPlayer,
-        ItemStack pStack,
-        BlockState pState
-    ) {
-        if (pLevel.isClientSide()) {
-            return false;
-        }
-        if (!(pLevel.getBlockEntity(pPos) instanceof ClipboardBlockEntity cbe)) {
-            return false;
-        }
-        cbe.notifyUpdate();
-        return true;
     }
 
     @Override
