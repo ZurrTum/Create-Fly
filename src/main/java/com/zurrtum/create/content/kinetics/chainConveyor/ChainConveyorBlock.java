@@ -19,7 +19,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -79,18 +78,6 @@ public class ChainConveyorBlock extends KineticBlock implements IBE<ChainConveyo
         }
         withBlockEntityDo(pLevel, pPos, be -> be.cancelDrops = true);
         return pState;
-    }
-
-    @Override
-    public void playerDestroy(
-        Level level,
-        Player player,
-        BlockPos pos,
-        BlockState state,
-        @Nullable BlockEntity blockEntity,
-        ItemStack tool
-    ) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
     }
 
     @Override
