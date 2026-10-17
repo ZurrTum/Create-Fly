@@ -21,7 +21,6 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.ComposterBlock;
 
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -84,7 +83,7 @@ public class AllItemAttributeTypes {
     );
     public static final ItemAttributeType COMPOSTABLE = singleton(
         "compostable",
-        s -> ComposterBlock.COMPOSTABLES.containsKey(s.getItem())
+        s -> s.has(DataComponents.COMPOSTABLE)
     );
 
     public static final ItemAttributeType IN_TAG = register("in_tag", new InTagAttribute.Type());
