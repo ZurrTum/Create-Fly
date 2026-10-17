@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.kinetics.crusher;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.*;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.block.IBE;
@@ -66,8 +65,6 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
     }
 
     public static final BooleanProperty VALID = BooleanProperty.create("valid");
-
-    public static final MapCodec<CrushingWheelControllerBlock> CODEC = simpleCodec(CrushingWheelControllerBlock::new);
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
@@ -255,10 +252,5 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
     @Override
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
-    }
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
     }
 }

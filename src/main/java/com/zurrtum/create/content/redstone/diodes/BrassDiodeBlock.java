@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.redstone.diodes;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
@@ -28,8 +27,6 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
 
     public static final BooleanProperty POWERING = BooleanProperty.create("powering");
     public static final BooleanProperty INVERTED = BooleanProperty.create("inverted");
-
-    public static final MapCodec<BrassDiodeBlock> CODEC = simpleCodec(BrassDiodeBlock::new);
 
     public BrassDiodeBlock(Properties properties) {
         super(properties);
@@ -113,10 +110,5 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
     public BlockEntityType<? extends BrassDiodeBlockEntity> getBlockEntityType() {
         return this == AllBlocks.PULSE_TIMER ? AllBlockEntityTypes.PULSE_TIMER :
             this == AllBlocks.PULSE_EXTENDER ? AllBlockEntityTypes.PULSE_EXTENDER : AllBlockEntityTypes.PULSE_REPEATER;
-    }
-
-    @Override
-    protected MapCodec<? extends AbstractDiodeBlock> codec() {
-        return CODEC;
     }
 }

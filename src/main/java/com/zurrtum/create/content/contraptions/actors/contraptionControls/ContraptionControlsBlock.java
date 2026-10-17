@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.contraptions.actors.contraptionControls;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.AllSoundEvents;
@@ -12,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
@@ -22,9 +20,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 public class ContraptionControlsBlock extends ControlsBlock implements IBE<ContraptionControlsBlockEntity> {
-
-    public static final MapCodec<ContraptionControlsBlock> CODEC = simpleCodec(ContraptionControlsBlock::new);
-
     public ContraptionControlsBlock(Properties pProperties) {
         super(pProperties);
     }
@@ -92,10 +87,5 @@ public class ContraptionControlsBlock extends ControlsBlock implements IBE<Contr
     @Override
     public BlockEntityType<? extends ContraptionControlsBlockEntity> getBlockEntityType() {
         return AllBlockEntityTypes.CONTRAPTION_CONTROLS;
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 }

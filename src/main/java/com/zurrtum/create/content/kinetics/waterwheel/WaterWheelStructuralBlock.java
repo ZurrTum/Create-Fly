@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.kinetics.waterwheel;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.api.equipment.goggles.IProxyHoveringInformation;
@@ -28,9 +27,6 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class WaterWheelStructuralBlock extends DirectionalBlock implements IWrenchable, IProxyHoveringInformation, LandingEffectControlBlock {
-
-    public static final MapCodec<WaterWheelStructuralBlock> CODEC = simpleCodec(WaterWheelStructuralBlock::new);
-
     public WaterWheelStructuralBlock(Properties p_52591_) {
         super(p_52591_);
     }
@@ -181,10 +177,5 @@ public class WaterWheelStructuralBlock extends DirectionalBlock implements IWren
     @Override
     public BlockPos getInformationSource(Level level, BlockPos pos, BlockState state) {
         return stillValid(level, pos, state, false) ? getMaster(level, pos, state) : pos;
-    }
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
     }
 }

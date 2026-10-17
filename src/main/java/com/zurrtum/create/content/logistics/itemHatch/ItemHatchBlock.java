@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.logistics.itemHatch;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllShapes;
@@ -44,8 +43,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 public class ItemHatchBlock extends HorizontalDirectionalBlock implements IBE<ItemHatchBlockEntity>, IWrenchable, ProperWaterloggedBlock {
-    public static final MapCodec<ItemHatchBlock> CODEC = simpleCodec(ItemHatchBlock::new);
-
     public static final BooleanProperty OPEN = BooleanProperty.create("open");
 
     public ItemHatchBlock(Properties pProperties) {
@@ -204,10 +201,5 @@ public class ItemHatchBlock extends HorizontalDirectionalBlock implements IBE<It
     @Override
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 }

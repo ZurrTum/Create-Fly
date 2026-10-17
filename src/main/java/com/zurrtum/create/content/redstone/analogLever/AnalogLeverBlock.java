@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.redstone.analogLever;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.block.IBE;
@@ -34,8 +33,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class AnalogLeverBlock extends FaceAttachedHorizontalDirectionalBlock implements IBE<AnalogLeverBlockEntity> {
-
-    public static final MapCodec<AnalogLeverBlock> CODEC = simpleCodec(AnalogLeverBlock::new);
     private final Function<BlockState, VoxelShape> shapeFunction;
 
     public AnalogLeverBlock(Properties p_i48402_1_) {
@@ -159,10 +156,5 @@ public class AnalogLeverBlock extends FaceAttachedHorizontalDirectionalBlock imp
     @Override
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
-    }
-
-    @Override
-    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 }

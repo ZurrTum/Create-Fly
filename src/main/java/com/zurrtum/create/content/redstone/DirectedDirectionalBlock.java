@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.redstone;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlock;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
@@ -19,8 +18,6 @@ import org.jspecify.annotations.Nullable;
 public class DirectedDirectionalBlock extends HorizontalDirectionalBlock implements IWrenchable, TransformableBlock {
 
     public static final EnumProperty<AttachFace> TARGET = EnumProperty.create("target", AttachFace.class);
-
-    public static final MapCodec<DirectedDirectionalBlock> CODEC = simpleCodec(DirectedDirectionalBlock::new);
 
     public DirectedDirectionalBlock(Properties pProperties) {
         super(pProperties);
@@ -95,10 +92,5 @@ public class DirectedDirectionalBlock extends HorizontalDirectionalBlock impleme
             return state.setValue(TARGET, newFacing == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR);
         }
         return state.setValue(TARGET, AttachFace.WALL).setValue(FACING, newFacing);
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 }

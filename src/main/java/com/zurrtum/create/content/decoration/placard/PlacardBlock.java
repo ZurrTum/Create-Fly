@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.decoration.placard;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
@@ -49,8 +48,6 @@ import java.util.List;
 public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock implements ProperWaterloggedBlock, IBE<PlacardBlockEntity>, SpecialBlockItemRequirement, IWrenchable {
 
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-
-    public static final MapCodec<PlacardBlock> CODEC = simpleCodec(PlacardBlock::new);
 
     public PlacardBlock(Properties p_53182_) {
         super(p_53182_);
@@ -247,10 +244,4 @@ public class PlacardBlock extends FaceAttachedHorizontalDirectionalBlock impleme
     public BlockEntityType<? extends PlacardBlockEntity> getBlockEntityType() {
         return AllBlockEntityTypes.PLACARD;
     }
-
-    @Override
-    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
-        return CODEC;
-    }
-
 }

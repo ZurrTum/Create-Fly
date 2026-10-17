@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.fluids.pipes;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.data.Iterate;
@@ -38,9 +37,6 @@ import net.minecraft.world.ticks.TickPriority;
 import org.jspecify.annotations.Nullable;
 
 public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock implements IBE<SmartFluidPipeBlockEntity>, IAxisPipe, IWrenchable, ProperWaterloggedBlock, NeighborUpdateListeningBlock {
-
-    public static final MapCodec<SmartFluidPipeBlock> CODEC = simpleCodec(SmartFluidPipeBlock::new);
-
     public SmartFluidPipeBlock(Properties p_i48339_1_) {
         super(p_i48339_1_);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
@@ -222,10 +218,4 @@ public class SmartFluidPipeBlock extends FaceAttachedHorizontalDirectionalBlock 
     public BlockEntityType<? extends SmartFluidPipeBlockEntity> getBlockEntityType() {
         return AllBlockEntityTypes.SMART_FLUID_PIPE;
     }
-
-    @Override
-    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
-        return CODEC;
-    }
-
 }

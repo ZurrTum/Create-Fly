@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.contraptions.mounted;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllShapes;
@@ -70,8 +69,6 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
         "rail_type",
         CartAssembleRailType.class
     );
-
-    public static final MapCodec<CartAssemblerBlock> CODEC = simpleCodec(CartAssemblerBlock::new);
 
     public CartAssemblerBlock(Properties properties) {
         super(true, properties);
@@ -386,10 +383,5 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
             return Direction.WEST;
         }
         return Direction.NORTH;
-    }
-
-    @Override
-    protected MapCodec<? extends BaseRailBlock> codec() {
-        return CODEC;
     }
 }

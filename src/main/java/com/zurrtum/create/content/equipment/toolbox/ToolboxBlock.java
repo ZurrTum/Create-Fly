@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.equipment.toolbox;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.foundation.block.IBE;
@@ -43,8 +42,6 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWaterloggedBlock, IBE<ToolboxBlockEntity>, ItemInventoryProvider<ToolboxBlockEntity> {
 
     protected final DyeColor color;
-
-    public static final MapCodec<ToolboxBlock> CODEC = simpleCodec(p -> new ToolboxBlock(DyeColor.WHITE, p));
 
     public ToolboxBlock(DyeColor color, Properties properties) {
         super(properties);
@@ -229,10 +226,5 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     @Override
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return ItemHelper.calcRedstoneFromBlockEntity(this, pLevel, pPos);
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 }

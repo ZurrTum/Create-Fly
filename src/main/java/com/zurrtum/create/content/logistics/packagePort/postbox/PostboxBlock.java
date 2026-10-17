@@ -1,7 +1,5 @@
 package com.zurrtum.create.content.logistics.packagePort.postbox;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
@@ -33,11 +31,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<PostboxBlockEntity>, IWrenchable, ProperWaterloggedBlock, ItemInventoryProvider<PostboxBlockEntity> {
-    public static MapCodec<PostboxBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        DyeColor.CODEC.fieldOf(
-            "color").forGetter(PostboxBlock::getColor), propertiesCodec()
-    ).apply(instance, PostboxBlock::new));
-
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 
     protected final DyeColor color;
@@ -134,10 +127,5 @@ public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<Post
     @Override
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(PackagePortBlockEntity::getComparatorOutput).orElse(0);
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 }

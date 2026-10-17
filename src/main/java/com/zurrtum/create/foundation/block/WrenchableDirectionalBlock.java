@@ -1,6 +1,5 @@
 package com.zurrtum.create.foundation.block;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -13,9 +12,6 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import org.jspecify.annotations.Nullable;
 
 public class WrenchableDirectionalBlock extends DirectionalBlock implements IWrenchable {
-
-    public static final MapCodec<WrenchableDirectionalBlock> CODEC = simpleCodec(WrenchableDirectionalBlock::new);
-
     public WrenchableDirectionalBlock(Properties properties) {
         super(properties);
     }
@@ -54,10 +50,4 @@ public class WrenchableDirectionalBlock extends DirectionalBlock implements IWre
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
-    }
-
 }

@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.contraptions.elevator;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
@@ -27,7 +26,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,8 +43,6 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty CALLING = BooleanProperty.create("calling");
     public static final BooleanProperty POWERING = BrassDiodeBlock.POWERING;
-
-    public static final MapCodec<ElevatorContactBlock> CODEC = simpleCodec(ElevatorContactBlock::new);
 
     public ElevatorContactBlock(Properties pProperties) {
         super(pProperties);
@@ -285,10 +281,5 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
 
     public static int getLight(BlockState state) {
         return state.getValue(POWERING) ? 10 : 0;
-    }
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
     }
 }

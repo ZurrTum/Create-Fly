@@ -1,6 +1,5 @@
 package com.zurrtum.create.content.kinetics.steamEngine;
 
-import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
@@ -52,8 +51,6 @@ import java.util.function.Predicate;
 public class SteamEngineBlock extends FaceAttachedHorizontalDirectionalBlock implements SimpleWaterloggedBlock, IWrenchable, IBE<SteamEngineBlockEntity> {
 
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
-
-    public static final MapCodec<SteamEngineBlock> CODEC = simpleCodec(SteamEngineBlock::new);
 
     public SteamEngineBlock(Properties properties) {
         super(properties);
@@ -253,10 +250,4 @@ public class SteamEngineBlock extends FaceAttachedHorizontalDirectionalBlock imp
     public static Direction getConnectedDirection(BlockState state) {
         return FaceAttachedHorizontalDirectionalBlock.getConnectedDirection(state);
     }
-
-    @Override
-    protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
-        return CODEC;
-    }
-
 }
