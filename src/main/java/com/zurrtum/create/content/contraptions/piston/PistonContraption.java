@@ -205,7 +205,7 @@ public class PistonContraption extends TranslatingContraption {
                 }
                 throw AssemblyException.unmovableBlock(currentPos, state);
             }
-            if (retracting && state.getPistonPushReaction() == PushReaction.PUSH_ONLY) {
+            if (retracting && state.getPistonPushReaction() == PushReaction.PUSH) {
                 return true;
             }
             frontier.add(currentPos);

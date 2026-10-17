@@ -818,7 +818,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     @Override
     public PushReaction getPistonPushReaction() {
-        return PushReaction.IGNORE;
+        return PushReaction.IGNORE_ENTITY;
     }
 
     public void setContraptionMotion(Vec3 vec) {
@@ -887,7 +887,7 @@ public abstract class AbstractContraptionEntity extends Entity {
             riding = riding.getVehicle();
         }
 
-        return e.getPistonPushReaction() == PushReaction.NORMAL;
+        return e.getPistonPushReaction() == PushReaction.PUSH_PULL;
     }
 
     @Override

@@ -203,7 +203,7 @@ public class BeltMovementHandler {
         if (other instanceof HangingEntity) {
             return true;
         }
-        if (other.getPistonPushReaction() == PushReaction.IGNORE) {
+        if (other.getPistonPushReaction() == PushReaction.IGNORE_ENTITY) {
             return true;
         }
         return isRidingOrBeingRiddenBy(me, other);

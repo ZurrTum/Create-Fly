@@ -219,7 +219,7 @@ public class AllBlocks {
     public static final GearboxBlock GEARBOX = (GearboxBlock) register(
         AllBlockItemIds.GEARBOX,
         GearboxBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).pushReaction(PushReaction.PUSH_ONLY)
+        Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.PODZOL).pushReaction(PushReaction.PUSH)
     );
     public static final WaterWheelBlock WATER_WHEEL = (WaterWheelBlock) register(
         AllBlockItemIds.WATER_WHEEL,
@@ -235,7 +235,7 @@ public class AllBlocks {
         AllBlockItemIds.WATER_WHEEL_STRUCTURAL,
         WaterWheelStructuralBlock::new,
         Properties.ofFullCopy(Blocks.STRIPPED_SPRUCE_WOOD).mapColor(MapColor.DIRT).noOcclusion()
-            .pushReaction(PushReaction.BLOCK)
+            .pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final CasingBlock ANDESITE_CASING = (CasingBlock) register(
         AllBlockItemIds.ANDESITE_CASING,
@@ -401,7 +401,7 @@ public class AllBlocks {
             .overrideLootTable(Optional.of(ResourceKey.create(
                 Registries.LOOT_TABLE,
                 Identifier.fromNamespaceAndPath(MOD_ID, "blocks/mechanical_piston_head")
-            ))).mapColor(MapColor.DIRT).pushReaction(PushReaction.NORMAL)
+            ))).mapColor(MapColor.DIRT).pushReaction(PushReaction.PUSH_PULL)
     );
     public static final PistonExtensionPoleBlock PISTON_EXTENSION_POLE = (PistonExtensionPoleBlock) register(
         AllBlockItemIds.PISTON_EXTENSION_POLE,
@@ -410,7 +410,7 @@ public class AllBlocks {
             .overrideLootTable(Optional.of(ResourceKey.create(
                 Registries.LOOT_TABLE,
                 Identifier.fromNamespaceAndPath(MOD_ID, "blocks/piston_extension_pole")
-            ))).sound(SoundType.SCAFFOLDING).mapColor(MapColor.DIRT).pushReaction(PushReaction.NORMAL).forceSolidOn()
+            ))).sound(SoundType.SCAFFOLDING).mapColor(MapColor.DIRT).pushReaction(PushReaction.PUSH_PULL).forceSolidOn()
     );
     public static final SailBlock SAIL_FRAME = (SailBlock) register(
         AllBlockItemIds.SAIL_FRAME,
@@ -488,12 +488,12 @@ public class AllBlocks {
     public static final RopeBlock ROPE = (RopeBlock) register(
         AllBlockItemIds.ROPE,
         RopeBlock::new,
-        Properties.of().sound(SoundType.WOOL).mapColor(MapColor.COLOR_BROWN).pushReaction(PushReaction.BLOCK)
+        Properties.of().sound(SoundType.WOOL).mapColor(MapColor.COLOR_BROWN).pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final MagnetBlock PULLEY_MAGNET = (MagnetBlock) register(
         AllBlockItemIds.PULLEY_MAGNET,
         MagnetBlock::new,
-        Properties.ofFullCopy(Blocks.ANDESITE).pushReaction(PushReaction.BLOCK)
+        Properties.ofFullCopy(Blocks.ANDESITE).pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final MillstoneBlock MILLSTONE = (MillstoneBlock) register(
         AllBlockItemIds.MILLSTONE,
@@ -610,7 +610,7 @@ public class AllBlocks {
         AllBlockItemIds.CART_ASSEMBLER,
         CartAssemblerBlock::new,
         Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY).noOcclusion()
-            .pushReaction(PushReaction.BLOCK)
+            .pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final MinecartAnchorBlock MINECART_ANCHOR = (MinecartAnchorBlock) register(
         AllBlockItemIds.MINECART_ANCHOR,
@@ -726,7 +726,7 @@ public class AllBlocks {
         AllBlockItemIds.CRUSHING_WHEEL_CONTROLLER,
         CrushingWheelControllerBlock::new,
         Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.STONE).noLootTable().noCollision()
-            .pushReaction(PushReaction.BLOCK)
+            .pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final Block RAW_ZINC_BLOCK = register(
         AllBlockItemIds.RAW_ZINC_BLOCK,
@@ -936,7 +936,7 @@ public class AllBlocks {
         AllBlockItemIds.TRACK,
         TrackBlock::andesite,
         Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL)
-            .noOcclusion().forceSolidOn().pushReaction(PushReaction.BLOCK)
+            .noOcclusion().forceSolidOn().pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final FakeTrackBlock FAKE_TRACK = (FakeTrackBlock) register(
         AllBlockItemIds.FAKE_TRACK,
@@ -1089,7 +1089,8 @@ public class AllBlocks {
     public static final SchematicTableBlock SCHEMATIC_TABLE = (SchematicTableBlock) register(
         AllBlockItemIds.SCHEMATIC_TABLE,
         SchematicTableBlock::new,
-        Properties.ofFullCopy(Blocks.LECTERN).mapColor(MapColor.PODZOL).forceSolidOn().pushReaction(PushReaction.BLOCK)
+        Properties.ofFullCopy(Blocks.LECTERN).mapColor(MapColor.PODZOL).forceSolidOn()
+            .pushReaction(PushReaction.IMMOVEABLE)
     );
     public static final SchematicannonBlock SCHEMATICANNON = (SchematicannonBlock) register(
         AllBlockItemIds.SCHEMATICANNON,

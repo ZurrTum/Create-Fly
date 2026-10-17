@@ -149,7 +149,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
             if (entity instanceof PackageEntity) {
                 continue;
             }
-            if (entity.getPistonPushReaction() == PushReaction.IGNORE) {
+            if (entity.getPistonPushReaction() == PushReaction.IGNORE_ENTITY) {
                 continue;
             }
 
@@ -434,7 +434,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
             if (!entity.isAlive()) {
                 continue;
             }
-            if (entity.getPistonPushReaction() == PushReaction.IGNORE) {
+            if (entity.getPistonPushReaction() == PushReaction.IGNORE_ENTITY) {
                 continue;
             }
             if (!(entity instanceof Player)) {
