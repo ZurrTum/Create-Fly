@@ -150,14 +150,19 @@ public class PackageEntity extends LivingEntity {
         motion = collideBoundingBox(this, motion, bb, level(), entityStream);
 
         Vec3 clientPos = position().add(motion);
-        if (isInterpolating()) {
-            clientPos = VecHelper.lerp(Math.min(1, tickCount / 20.0f), clientPos, getInterpolation().position());
+        InterpolationHandler interpolation = getInterpolation();
+        if (interpolation.hasActiveInterpolation()) {
+            clientPos = VecHelper.lerp(
+                Math.min(1, tickCount / 20.0f),
+                clientPos,
+                ((AbstractInterpolationHandler) interpolation).interpolationData().position()
+            );
         }
         if (tickCount < 5) {
             setPos(clientPos.x, clientPos.y, clientPos.z);
         }
         if (tickCount < 20) {
-            getInterpolation().interpolateTo(clientPos, getYRot(), getXRot());
+            interpolation.interpolateTo(PositionPath.of(clientPos), getYRot(), getXRot(), true);
         }
     }
 
