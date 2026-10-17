@@ -194,7 +194,7 @@ public class BeltMovementHandler {
         }
         if (movedPastEndingSlope) {
             entityIn.setDeltaMovement(movement);
-            entityIn.hurtMarked = true;
+            entityIn.syncVelocity = true;
         }
 
     }

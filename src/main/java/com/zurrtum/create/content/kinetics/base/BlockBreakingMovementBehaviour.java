@@ -97,7 +97,7 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
             motionBoost = motionBoost.subtract(motionBoost.normalize().scale(motionBoost.length() - maxBoost));
         }
         entity.setDeltaMovement(entity.getDeltaMovement().add(motionBoost));
-        entity.hurtMarked = true;
+        entity.syncVelocity = true;
     }
 
     @Nullable

@@ -110,7 +110,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
             Vec3 pushVec = diff.normalize().scale((range - distance) * (pushing ? 1 : -1));
             entity.setDeltaMovement(entity.getDeltaMovement().add(pushVec.scale(factor)));
             entity.fallDistance = 0;
-            entity.hurtMarked = true;
+            entity.syncVelocity = true;
         }
 
     }

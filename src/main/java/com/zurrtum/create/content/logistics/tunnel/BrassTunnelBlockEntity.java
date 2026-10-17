@@ -436,7 +436,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
                     ItemEntity entity = new ItemEntity(level, outPos.x, outPos.y + 6 / 16.0f, outPos.z, stack);
                     entity.setDeltaMovement(outMotion);
                     entity.setDefaultPickUpDelay();
-                    entity.hurtMarked = true;
+                    entity.syncVelocity = true;
                     level.addFreshEntity(entity);
                 }
 

@@ -68,7 +68,7 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
                         offset = VecHelper.rotate(offset, Mth.clamp(speed, -16, 16), Axis.Y);
                         Vec3 movement = origin.add(offset).subtract(e.position());
                         e.setDeltaMovement(e.getDeltaMovement().add(movement));
-                        e.hurtMarked = true;
+                        e.syncVelocity = true;
                     }
                 }
 
@@ -85,7 +85,7 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
                     e.setYBodyRot(diff);
                     e.setYHeadRot(diff);
                     e.setOnGround(false);
-                    e.hurtMarked = true;
+                    e.syncVelocity = true;
                 }
 
                 e.setYRot(e.getYRot() - speed);

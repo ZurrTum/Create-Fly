@@ -144,7 +144,7 @@ public class BeltSlicer {
                         );
                         entity.setDeltaMovement(Vec3.ZERO);
                         entity.setDefaultPickUpDelay();
-                        entity.hurtMarked = true;
+                        entity.syncVelocity = true;
                         world.addFreshEntity(entity);
                     } else {
                         segmentBE.getInventory().addItem(transportedItemStack);
