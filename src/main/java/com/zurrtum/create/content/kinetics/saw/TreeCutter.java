@@ -111,7 +111,7 @@ public class TreeCutter {
 
         visited.add(pos);
         BlockPos.betweenClosedStream(pos.offset(-1, 0, -1), pos.offset(1, 1, 1))
-            .forEach(p -> frontier.add(new BlockPos(p)));
+            .forEach(p -> frontier.add(p.immutable()));
 
         // Find all logs & roots
         boolean hasRoots = false;
@@ -128,7 +128,7 @@ public class TreeCutter {
                 continue;
             }
             logs.add(currentPos);
-            forNeighbours(currentPos, visited, SearchDirection.UP, p -> frontier.add(new BlockPos(p)));
+            forNeighbours(currentPos, visited, SearchDirection.UP, p -> frontier.add(p.immutable()));
         }
 
         visited.clear();

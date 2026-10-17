@@ -15,6 +15,7 @@ import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.StringRepresentable;
@@ -125,9 +126,10 @@ public class SchematicPrinter {
             return;
         }
 
+        Vec3i size = activeTemplate.getSize();
         BlockPos extraBounds = StructureTemplate.calculateRelativePosition(
             settings,
-            new BlockPos(activeTemplate.getSize()).offset(-1, -1, -1)
+            new BlockPos(size.getX() - 1, size.getY() - 1, size.getZ() - 1)
         );
         blockReader.setBounds(BBHelper.encapsulate(blockReader.getBounds(), extraBounds));
 

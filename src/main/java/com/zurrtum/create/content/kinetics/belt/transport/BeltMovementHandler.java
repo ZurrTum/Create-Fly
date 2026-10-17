@@ -44,7 +44,7 @@ public class BeltMovementHandler {
 
         public void refresh(BlockPos collision, BlockState belt) {
             ticksSinceLastCollision = 0;
-            lastCollidedPos = new BlockPos(collision).immutable();
+            lastCollidedPos = collision.immutable();
             lastCollidedState = belt;
         }
 

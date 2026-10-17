@@ -26,7 +26,7 @@ public class SphereBrush extends ShapedBrush {
             List<BlockPos> positions = BlockPos.betweenClosedStream(
                     BlockPos.ZERO.offset(-i - 1, -i - 1, -i - 1),
                     BlockPos.ZERO.offset(i + 1, i + 1, i + 1)
-                ).map(BlockPos::new)
+                ).map(BlockPos::immutable)
                 .filter(p -> VecHelper.getCenterOf(p).distanceTo(VecHelper.getCenterOf(BlockPos.ZERO)) < radius + 0.5f)
                 .collect(Collectors.toList());
             cachedBrushes.put(i, positions);
