@@ -43,8 +43,7 @@ public final class NBTProcessors {
     // Triggered by block tag, not BE type
     private static final UnaryOperator<@Nullable CompoundTag> signProcessor = data -> {
         for (String key : List.of("front_text", "back_text")) {
-            SignText text = data.getCompound(key).flatMap(k -> CatnipCodecUtils.decode(SignText.DIRECT_CODEC, k))
-                .orElse(null);
+            SignText text = data.getCompound(key).flatMap(k -> CatnipCodecUtils.decode(SignText.CODEC, k)).orElse(null);
             if (text != null) {
                 for (Component component : text.getMessages(false)) {
                     if (textComponentHasClickEvent(component)) {

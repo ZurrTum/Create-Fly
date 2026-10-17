@@ -62,7 +62,7 @@ public class FakePlayerEntity extends ServerPlayer {
     }
 
     @Override
-    public void openTextEdit(SignBlockEntity sign, boolean front) {
+    public void openTextEdit(SignBlockEntity sign, SignTextSlot slot) {
     }
 
     @Override

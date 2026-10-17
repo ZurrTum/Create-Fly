@@ -42,10 +42,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -644,20 +641,29 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         if (!(blockEntity instanceof SignBlockEntity sign)) {
             return null;
         }
-        for (boolean front : Iterate.trueAndFalse) {
-            SignText text = sign.getText(front);
-            String address = "";
-            for (Component component : text.getMessages(false)) {
-                String string = component.getString();
-                if (!string.isBlank()) {
-                    address += string.trim() + " ";
-                }
-            }
-            if (!address.isBlank()) {
-                return address.trim();
+        StringBuilder buffer = new StringBuilder();
+        appendSignText(buffer, sign, SignTextSlot.FRONT);
+        if (buffer.isEmpty()) {
+            appendSignText(buffer, sign, SignTextSlot.BACK);
+        }
+        return buffer.toString();
+    }
+
+    private static void appendSignText(StringBuilder buffer, SignBlockEntity sign, SignTextSlot slot) {
+        Iterator<Component> iterator = sign.getText(slot).getMessages(false).iterator();
+        while (iterator.hasNext()) {
+            String string = iterator.next().getString();
+            if (!string.isBlank()) {
+                buffer.append(string.trim());
+                break;
             }
         }
-        return null;
+        while (iterator.hasNext()) {
+            String string = iterator.next().getString();
+            if (!string.isBlank()) {
+                buffer.append(" ").append(string.trim());
+            }
+        }
     }
 
     protected void wakeTheFrogs() {
