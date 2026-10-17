@@ -259,7 +259,7 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile {
         }
 
         if (type.reloadTicks() < 10) {
-            livingentity.invulnerableTime = type.reloadTicks() + 10;
+            livingentity.damageCooldownTime = type.reloadTicks() + 10;
         }
 
         if (onServer && knockback > 0) {
