@@ -121,8 +121,8 @@ public class PackageEntity extends LivingEntity {
     }
 
     @Override
-    public boolean canSimulateMovement() {
-        return true;
+    public MoveSimulationType getMoveSimulationType() {
+        return MoveSimulationType.SERVER_AND_CLIENT;
     }
 
     @Override
