@@ -16,11 +16,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.attribute.EnvironmentAttributes;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -302,26 +299,12 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
             return toFill.isSame(fluidState.getType()) ? SpaceType.FILLED : SpaceType.BLOCKING;
         }
 
-        return canBeReplacedByFluid(world, pos, blockState) ? SpaceType.FILLABLE : SpaceType.BLOCKING;
+        return blockState.is(BlockTags.WASHED_AWAY_BY_FLUIDS) ? SpaceType.FILLABLE : SpaceType.BLOCKING;
     }
 
     protected void replaceBlock(Level world, BlockPos pos, BlockState state) {
         BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
         Block.dropResources(state, world, pos, blockEntity);
-    }
-
-    // From FlowingFluidBlock#isBlocked
-    protected boolean canBeReplacedByFluid(BlockGetter world, BlockPos pos, BlockState pState) {
-        Block block = pState.getBlock();
-        if (!(block instanceof DoorBlock) && !pState.is(BlockTags.ALL_SIGNS) && !pState.is(Blocks.LADDER) && !pState.is(
-            Blocks.SUGAR_CANE) && !pState.is(Blocks.BUBBLE_COLUMN)) {
-            if (!pState.is(Blocks.NETHER_PORTAL) && !pState.is(Blocks.END_PORTAL) && !pState.is(Blocks.END_GATEWAY) && !pState.is(
-                Blocks.STRUCTURE_VOID)) {
-                return !pState.blocksMotion();
-            }
-            return false;
-        }
-        return false;
     }
 
     protected BlockState updatePostWaterlogging(BlockState state) {

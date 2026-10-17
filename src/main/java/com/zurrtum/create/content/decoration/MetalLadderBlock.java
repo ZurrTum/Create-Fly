@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,12 +43,17 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
     //        return false;
     //    }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pDirection) {
-        if (pDirection != null && pDirection.getAxis().isHorizontal()) {
-            return pAdjacentBlockState.isAir() || !pAdjacentBlockState.blocksMotion();
+        if (pDirection != Direction.UP) {
+            if (pAdjacentBlockState.isAir()) {
+                return true;
+            }
+            Block block = pAdjacentBlockState.getBlock();
+            return block == Blocks.COBWEB || block == Blocks.BAMBOO_SAPLING || !pAdjacentBlockState.isSolid();
         }
-        return pDirection == Direction.UP && pAdjacentBlockState.getBlock() instanceof LadderBlock;
+        return pAdjacentBlockState.getBlock() instanceof LadderBlock;
     }
 
     @Override
