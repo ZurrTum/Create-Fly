@@ -19,7 +19,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class DynamicComponent {
     @Nullable
-    public static Component parseCustomText(Level level, BlockPos pos, Component customText) {
+    public static Component parseCustomText(@Nullable Level level, BlockPos pos, Component customText) {
         if (!(level instanceof ServerLevel serverLevel)) {
             return null;
         }
@@ -37,11 +37,8 @@ public class DynamicComponent {
             Vec2.ZERO,
             level,
             LevelBasedPermissionSet.GAMEMASTER,
-            MOD_ID,
             Component.literal(MOD_ID),
-            level.getServer(),
-            null
+            level.getServer()
         );
     }
-
 }

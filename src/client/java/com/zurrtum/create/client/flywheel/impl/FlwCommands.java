@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.Coordinates;
@@ -150,23 +151,23 @@ public final class FlwCommands {
         debug.then(ClientCommand.literal("crumbling")
             .then(ClientCommand.argument("pos", BlockPosArgument.blockPos()).then(ClientCommand.argument(
                 "stage", IntegerArgumentType.integer(0, 9), context -> {
-                    Minecraft minecraft = context.getSource().minecraft;
+                    ClientSuggestionProvider source = context.getSource();
+                    Minecraft minecraft = source.minecraft;
                     LocalPlayer player = minecraft.player;
 
                     if (player == null) {
                         return 0;
                     }
 
+                    //noinspection DataFlowIssue
                     BlockPos pos = context.getArgument("pos", Coordinates.class).getBlockPos(new CommandSourceStack(
-                        null,
+                        CommandSource.NULL,
                         player.position(),
                         player.getRotationVector(),
                         null,
+                        source.permissions(),
                         null,
-                        null,
-                        null,
-                        null,
-                        null
+                        player
                     ));
                     int value = IntegerArgumentType.getInteger(context, "stage");
 
