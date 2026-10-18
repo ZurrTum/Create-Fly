@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -169,7 +170,13 @@ public class AllPotatoProjectileEntityHitActions {
                 //                EntityTeleportEvent.ChorusFruit event = EventHooks.onChorusFruitTeleport(livingEntity, teleportX, teleportY, teleportZ);
                 //                if (event.isCanceled())
                 //                    return false;
-                if (livingEntity.randomTeleport(teleportX, teleportY, teleportZ, true)) {
+                if (livingEntity.randomTeleport(
+                    teleportX,
+                    teleportY,
+                    teleportZ,
+                    true,
+                    BlockTags.CONSUMABLE_DOES_NOT_TELEPORT_TO
+                )) {
                     if (livingEntity.isPassenger()) {
                         livingEntity.stopRiding();
                     }
