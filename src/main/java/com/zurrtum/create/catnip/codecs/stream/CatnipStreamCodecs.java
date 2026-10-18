@@ -41,17 +41,7 @@ public interface CatnipStreamCodecs {
         Function.identity(),
         tag -> (CompoundTag) tag
     );
-    StreamCodec<FriendlyByteBuf, ListTag> COMPOUND_LIST_TAG = new StreamCodec<>() {
-        @Override
-        public ListTag decode(FriendlyByteBuf buffer) {
-            return buffer.readCollection(size -> new ListTag(), COMPOUND_AS_TAG);
-        }
-
-        @Override
-        public void encode(FriendlyByteBuf buffer, ListTag value) {
-            buffer.writeCollection(value, COMPOUND_AS_TAG);
-        }
-    };
+    StreamCodec<ByteBuf, ListTag> COMPOUND_LIST_TAG = COMPOUND_AS_TAG.apply(ByteBufCodecs.collection(i -> new ListTag()));
     StreamCodec<ByteBuf, BlockState> BLOCK_STATE = ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY);
     StreamCodec<ByteBuf, BlockPos> NULLABLE_BLOCK_POS = CatnipStreamCodecBuilders.nullable(BlockPos.STREAM_CODEC);
     StreamCodec<ByteBuf, Direction.Axis> AXIS = CatnipStreamCodecBuilders.ofEnum(Direction.Axis.class);
