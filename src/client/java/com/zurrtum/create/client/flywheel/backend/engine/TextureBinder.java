@@ -1,12 +1,13 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
-import com.mojang.blaze3d.opengl.GlSampler;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuSampler;
-import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.mojang.renderpearl.backend.opengl.GlConst;
+import com.mojang.renderpearl.backend.opengl.GlSampler;
+import com.mojang.renderpearl.backend.opengl.GlStateManager;
+import com.mojang.renderpearl.backend.opengl.GlTexture;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.gl.GlTextureUnit;
 import net.minecraft.client.Minecraft;
@@ -17,8 +18,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL33C;
-
-import static com.mojang.blaze3d.opengl.GlConst.GL_TEXTURE_2D;
 
 public class TextureBinder {
     public static void bind(Identifier Identifier) {
@@ -45,7 +44,7 @@ public class TextureBinder {
             target = GL13.GL_TEXTURE_CUBE_MAP;
             GL11.glBindTexture(target, texture.glId());
         } else {
-            target = GL_TEXTURE_2D;
+            target = GlConst.GL_TEXTURE_2D;
             GlStateManager._bindTexture(texture.glId());
         }
         GL33C.glBindSampler(unit.number, ((GlSampler) sampler).getId());

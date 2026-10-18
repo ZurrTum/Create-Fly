@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.backend.gl;
 
-import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.renderpearl.backend.opengl.GlConst;
+import com.mojang.renderpearl.backend.opengl.GlStateManager;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
 
 /**

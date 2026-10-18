@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import org.joml.Vector4f;
 
 public final class FogUniforms extends UniformWriter {

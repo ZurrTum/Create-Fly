@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.mixin;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.renderpearl.backend.opengl.GlStateManager;
 import com.zurrtum.create.client.flywheel.backend.gl.GlStateTracker;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
 import org.spongepowered.asm.mixin.Mixin;

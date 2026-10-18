@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
-import com.mojang.blaze3d.opengl.*;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.backend.opengl.*;
 import com.zurrtum.create.client.flywheel.backend.NoiseTextures;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.compile.OitPrograms;
@@ -14,8 +14,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import org.lwjgl.opengl.*;
 
 import java.util.Collections;
-
-import static com.mojang.blaze3d.opengl.GlConst.*;
 
 public class OitFramebuffer {
     public static final float[] CLEAR_TO_ZERO = {0, 0, 0, 0};
@@ -93,7 +91,7 @@ public class OitFramebuffer {
         GlStateManager._depthMask(false);
         GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
         GlStateManager._enableBlend(0);
-        GlStateManager._blendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+        GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
         GL14.glBlendEquation(GL32.GL_MAX);
 
         var far = Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState.depthFar;
@@ -116,7 +114,7 @@ public class OitFramebuffer {
         GlStateManager._depthMask(false);
         GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
         GlStateManager._enableBlend(0);
-        GlStateManager._blendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+        GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
         GL14.glBlendEquation(GL32.GL_FUNC_ADD);
 
         if (GlCompat.SUPPORTS_DSA) {
@@ -163,7 +161,7 @@ public class OitFramebuffer {
         GlStateManager._depthMask(false);
         GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
         GlStateManager._enableBlend(0);
-        GlStateManager._blendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+        GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
         GL14.glBlendEquation(GL32.GL_FUNC_ADD);
 
         if (GlCompat.SUPPORTS_DSA) {
@@ -207,7 +205,12 @@ public class OitFramebuffer {
         //
         // Though note that the alpha value we emit in the fragment shader is actually (1. - transmittance_total).
         // The extra inversion step is so we can have a sane alpha value written out for the fabulous blit shader to consume.
-        GlStateManager._blendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager._blendFuncSeparate(
+            GlConst.GL_SRC_ALPHA,
+            GlConst.GL_ONE_MINUS_SRC_ALPHA,
+            GlConst.GL_ONE,
+            GlConst.GL_ONE_MINUS_SRC_ALPHA
+        );
         GL14.glBlendEquation(GL32.GL_FUNC_ADD);
         GlStateManager._depthFunc(GL32.GL_ALWAYS);
 
@@ -241,7 +244,7 @@ public class OitFramebuffer {
             Collections.singletonList((GlTexture) target.getColorTexture()),
             (GlTexture) target.getDepthTexture()
         );
-        GlStateManager._glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, fbo);
     }
 
     public void delete() {
