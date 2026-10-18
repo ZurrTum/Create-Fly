@@ -38,7 +38,7 @@ public class WaterEffectHandler implements OpenPipeEffectHandler {
             AbstractCandleBlock.extinguish(null, state, level, pos);
         } else if (CampfireBlock.isLitCampfire(state)) {
             level.levelEvent(null, LevelEvent.SOUND_EXTINGUISH_FIRE, pos, 0);
-            CampfireBlock.dowse(null, level, pos, state);
+            CampfireBlock.douse(null, level, pos, state);
             level.setBlockAndUpdate(pos, state.setValue(CampfireBlock.LIT, false));
         }
     }
