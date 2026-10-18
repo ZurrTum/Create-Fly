@@ -3,18 +3,15 @@ package com.zurrtum.create.client.content.equipment.zapper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.player.AvatarRenderer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.player.PlayerModelPart;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -69,9 +66,9 @@ public abstract class ShootableGadgetRenderHandler {
 
     public boolean onRenderPlayerHand(
         ItemStack heldItem,
-        Minecraft mc,
-        EntityRenderDispatcher entityRenderDispatcher,
-        ItemInHandRenderer firstPersonRenderer,
+        FirstPersonHandsAndItemsRenderer renderer,
+        PlayerRenderState playerState,
+        FirstPersonHandsAndItemsRenderState state,
         PoseStack ms,
         SubmitNodeCollector queue,
         int light,
@@ -84,10 +81,8 @@ public abstract class ShootableGadgetRenderHandler {
             return false;
         }
 
-        AbstractClientPlayer player = mc.player;
-        AvatarRenderer<AbstractClientPlayer> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
-
-        boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
+        boolean isMainHand = hand == InteractionHand.MAIN_HAND;
+        boolean rightHand = isMainHand ^ playerState.avatarRenderState.mainArm == HumanoidArm.LEFT;
         float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation) :
             Mth.lerp(pt, lastLeftHandAnimation, leftHandAnimation);
 
@@ -119,24 +114,7 @@ public abstract class ShootableGadgetRenderHandler {
         ms.translate(flip * 5.6F, 0.0F, 0.0F);
         ms.mulPose(Axis.YP.rotationDegrees(flip * 40.0F));
         transformHand(ms, flip, equipProgress, recoil, pt);
-        Identifier texture = player.getSkin().body().texturePath();
-        if (rightHand) {
-            playerrenderer.renderRightHand(
-                ms,
-                queue,
-                light,
-                texture,
-                player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE)
-            );
-        } else {
-            playerrenderer.renderLeftHand(
-                ms,
-                queue,
-                light,
-                texture,
-                player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE)
-            );
-        }
+        renderer.renderPlayerHand(ms, queue, light, rightHand ? HumanoidArm.RIGHT : HumanoidArm.LEFT, playerState);
         ms.popPose();
 
         // Render gadget
@@ -145,13 +123,12 @@ public abstract class ShootableGadgetRenderHandler {
         ms.mulPose(Axis.YP.rotationDegrees(flip * f6 * 70.0F));
         ms.mulPose(Axis.ZP.rotationDegrees(flip * f5 * -20.0F));
         transformTool(ms, flip, equipProgress, recoil, pt);
-        firstPersonRenderer.renderItem(
-            player,
-            heldItem,
-            rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
+        (isMainHand ? state.mainHandRenderState : state.offHandRenderState).submit(
             ms,
             queue,
-            light
+            light,
+            OverlayTexture.NO_OVERLAY,
+            0
         );
         ms.popPose();
         return true;
