@@ -12,6 +12,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -51,7 +52,8 @@ public class TreeFertilizerItem extends Item {
                 treesDreamWorld,
                 treesDreamWorld.getRandom(),
                 BlockPos.ZERO.above(10),
-                withStage(state, 1)
+                withStage(state, 1),
+                BonemealSource.INTERACTION
             );
 
             for (BlockPos pos : treesDreamWorld.blocksAdded.keySet()) {
