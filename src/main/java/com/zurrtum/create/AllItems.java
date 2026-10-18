@@ -75,11 +75,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.food.FoodProperties.Builder;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.component.Consumable;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.component.*;
 import net.minecraft.world.item.component.Tool.Rule;
-import net.minecraft.world.item.component.Weapon;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.Equippable;
@@ -2130,11 +2127,13 @@ public class AllItems {
         AllItemIds.SAND_PAPER,
         SandPaperItem::new,
         new Properties().durability(8).enchantable(1)
+            .delayedComponent(DataComponents.BLOCK_TRANSFORMER, context -> context.getOrThrow(BlockTransformers.AXE))
     );
     public static final SandPaperItem RED_SAND_PAPER = (SandPaperItem) registerItem(
         AllItemIds.RED_SAND_PAPER,
         SandPaperItem::new,
         new Properties().durability(8).enchantable(1)
+            .delayedComponent(DataComponents.BLOCK_TRANSFORMER, context -> context.getOrThrow(BlockTransformers.AXE))
     );
     public static final Item PRECISION_MECHANISM = registerItem(AllItemIds.PRECISION_MECHANISM);
     public static final Item POWDERED_OBSIDIAN = registerItem(AllItemIds.POWDERED_OBSIDIAN);

@@ -8,6 +8,7 @@
     "BlockItemMixin",
     "BlockPlaceContextMixin",
     "BlocksMixin",
+    "BlockTransformerMixin",
     "BuiltInPackSourceMixin",
     "BuiltInRegistriesMixin",
     "ChunkMapMixin",
