@@ -12,6 +12,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.scores.PlayerTeam;
 import org.jspecify.annotations.Nullable;
 
@@ -52,8 +53,9 @@ public class FakePlayerEntity extends ServerPlayer {
     }
 
     @Override
-    public void startSleeping(BlockPos pos) {
+    public boolean startSleeping(BlockPos pos) {
         // Don't lock bed forever.
+        return false;
     }
 
     @Override
