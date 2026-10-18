@@ -15,7 +15,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -276,10 +275,7 @@ public class TrackGraphVisualizer {
                         .colored(Color.mixColors(Color.WHITE, graph.color, 1)).lineWidth(1 / 4.0f);
                     continue;
                 }
-                if (other.hashCode() > hashCode && !InputConstants.isKeyDown(
-                    mc.getWindow(),
-                    GLFW.GLFW_KEY_LEFT_CONTROL
-                )) {
+                if (other.hashCode() > hashCode && !InputConstants.isKeyDown(InputConstants.KEY_LCONTROL)) {
                     continue;
                 }
 

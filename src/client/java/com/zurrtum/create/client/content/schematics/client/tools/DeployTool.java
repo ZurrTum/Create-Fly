@@ -14,7 +14,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.glfw.GLFW;
 
 public class DeployTool extends PlacementToolBase {
 
@@ -30,7 +29,7 @@ public class DeployTool extends PlacementToolBase {
             selectionRange = (int) (schematicHandler.getBounds().getCenter().length() / 2);
             selectionRange = Mth.clamp(selectionRange, 1, 100);
         }
-        selectIgnoreBlocks = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL);
+        selectIgnoreBlocks = InputConstants.isKeyDown(InputConstants.KEY_LCONTROL);
         super.updateSelection(mc);
     }
 

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.equipment.clipboard;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllDataComponents;
@@ -395,15 +396,15 @@ public class ClipboardScreen extends AbstractSimiScreen {
     @Override
     public boolean keyPressed(KeyEvent input) {
         int pKeyCode = input.key();
-        if (pKeyCode == 266) {
+        if (pKeyCode == InputConstants.KEY_PAGEUP) {
             backward.onPress(input);
             return true;
         }
-        if (pKeyCode == 267) {
+        if (pKeyCode == InputConstants.KEY_PAGEDOWN) {
             forward.onPress(input);
             return true;
         }
-        if (editingIndex != -1 && pKeyCode != 256) {
+        if (editingIndex != -1 && pKeyCode != InputConstants.KEY_ESCAPE) {
             keyPressedWhileEditing(input);
             clearDisplayCache();
             return true;
@@ -446,8 +447,8 @@ public class ClipboardScreen extends AbstractSimiScreen {
             return true;
         }
         switch (input.key()) {
-            case 257:
-            case 335:
+            case InputConstants.KEY_RETURN:
+            case InputConstants.KEY_NUMPADENTER:
                 if (input.hasShiftDown()) {
                     editContext.insertText("\n");
                     return true;
@@ -469,7 +470,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                 }
                 editingIndex = -1;
                 return true;
-            case 259:
+            case InputConstants.KEY_BACKSPACE:
                 if (currentEntries.get(editingIndex).text.getString().isEmpty() && currentEntries.size() > 1) {
                     currentEntries.remove(editingIndex);
                     editingIndex = Math.max(0, editingIndex - 1);
@@ -486,7 +487,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                 }
                 editContext.removeCharsFromCursor(-1);
                 return true;
-            case 261:
+            case InputConstants.KEY_DELETE:
                 if (input.hasControlDown()) {
                     int prevPos = editContext.getCursorPos();
                     editContext.moveByWords(1);
@@ -497,30 +498,30 @@ public class ClipboardScreen extends AbstractSimiScreen {
                 }
                 editContext.removeCharsFromCursor(1);
                 return true;
-            case 262:
+            case InputConstants.KEY_RIGHT:
                 if (input.hasControlDown()) {
                     editContext.moveByWords(1, input.hasShiftDown());
                     return true;
                 }
                 editContext.moveByChars(1, input.hasShiftDown());
                 return true;
-            case 263:
+            case InputConstants.KEY_LEFT:
                 if (input.hasControlDown()) {
                     editContext.moveByWords(-1, input.hasShiftDown());
                     return true;
                 }
                 editContext.moveByChars(-1, input.hasShiftDown());
                 return true;
-            case 264:
+            case InputConstants.KEY_DOWN:
                 keyDown(input);
                 return true;
-            case 265:
+            case InputConstants.KEY_UP:
                 keyUp(input);
                 return true;
-            case 268:
+            case InputConstants.KEY_HOME:
                 keyHome(input);
                 return true;
-            case 269:
+            case InputConstants.KEY_END:
                 keyEnd(input);
                 return true;
             default:
@@ -596,7 +597,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (super.mouseClicked(click, doubled)) {
             return true;
         }
-        if (click.button() != 0) {
+        if (click.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return true;
         }
 
@@ -685,7 +686,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (super.mouseDragged(click, pDragX, pDragY)) {
             return true;
         }
-        if (click.button() != 0) {
+        if (click.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return true;
         }
         if (editingIndex == -1) {

@@ -1,12 +1,11 @@
 package com.zurrtum.create.client.foundation.utility;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +28,13 @@ public class ControlsUtil {
         return standardControls;
     }
 
-    public static boolean isActuallyPressed(Minecraft mc, KeyMapping kb) {
-        Window window = mc.getWindow();
+    public static boolean isActuallyPressed(KeyMapping kb) {
         InputConstants.Key key = kb.key;
         int button = key.getValue();
         if (key.getType() == InputConstants.Type.MOUSE) {
-            return GLFW.glfwGetMouseButton(window.handle(), button) == 1;
+            return (SDLMouse.SDL_GetMouseState(null, null) & 1 << button - 1) != 0;
         }
-        return InputConstants.isKeyDown(window, button);
+        return InputConstants.isKeyDown(button);
     }
 
 }

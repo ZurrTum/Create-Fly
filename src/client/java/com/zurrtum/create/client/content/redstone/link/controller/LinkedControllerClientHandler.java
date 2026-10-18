@@ -30,7 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,8 +51,7 @@ public class LinkedControllerClientHandler {
             selectedLocation = location;
         } else {
             MODE = Mode.IDLE;
-            Minecraft mc = Minecraft.getInstance();
-            onReset(mc, mc.player);
+            onReset(Minecraft.getInstance().player);
         }
     }
 
@@ -63,8 +61,7 @@ public class LinkedControllerClientHandler {
             lecternPos = null;
         } else {
             MODE = Mode.IDLE;
-            Minecraft mc = Minecraft.getInstance();
-            onReset(mc, mc.player);
+            onReset(Minecraft.getInstance().player);
         }
     }
 
@@ -75,10 +72,10 @@ public class LinkedControllerClientHandler {
         }
     }
 
-    public static boolean deactivateInLectern(Minecraft mc, LocalPlayer player) {
+    public static boolean deactivateInLectern(LocalPlayer player) {
         if (MODE == Mode.ACTIVE && inLectern()) {
             MODE = Mode.IDLE;
-            onReset(mc, player);
+            onReset(player);
             return true;
         }
         return false;
@@ -88,8 +85,8 @@ public class LinkedControllerClientHandler {
         return lecternPos != null;
     }
 
-    protected static void onReset(Minecraft mc, LocalPlayer player) {
-        ControlsUtil.getControls().forEach(kb -> kb.setDown(ControlsUtil.isActuallyPressed(mc, kb)));
+    protected static void onReset(LocalPlayer player) {
+        ControlsUtil.getControls().forEach(kb -> kb.setDown(ControlsUtil.isActuallyPressed(kb)));
         packetCooldown = 0;
         selectedLocation = BlockPos.ZERO;
 
@@ -137,14 +134,14 @@ public class LinkedControllerClientHandler {
 
         if (player.isSpectator()) {
             MODE = Mode.IDLE;
-            onReset(mc, player);
+            onReset(player);
             return;
         }
 
         if (inLectern()) {
             if (AllBlocks.LECTERN_CONTROLLER.getBlockEntityOptional(world, lecternPos)
                 .map(be -> !be.isUsedBy(mc.player)).orElse(true)) {
-                deactivateInLectern(mc, player);
+                deactivateInLectern(player);
                 return;
             }
         } else {
@@ -156,22 +153,22 @@ public class LinkedControllerClientHandler {
                     hand = InteractionHand.OFF_HAND;
                 } else {
                     MODE = Mode.IDLE;
-                    onReset(mc, player);
+                    onReset(player);
                     return;
                 }
             }
         }
 
-        if (mc.gui.screen() != null || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
+        if (mc.gui.screen() != null || InputConstants.isKeyDown(InputConstants.KEY_ESCAPE)) {
             MODE = Mode.IDLE;
-            onReset(mc, player);
+            onReset(player);
             return;
         }
 
         List<KeyMapping> controls = ControlsUtil.getControls();
         Collection<Integer> pressedKeys = new HashSet<>();
         for (int i = 0; i < controls.size(); i++) {
-            if (ControlsUtil.isActuallyPressed(mc, controls.get(i))) {
+            if (ControlsUtil.isActuallyPressed(controls.get(i))) {
                 pressedKeys.add(i);
             }
         }

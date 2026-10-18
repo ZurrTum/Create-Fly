@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.schematics.client;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllDataComponents;
@@ -296,7 +297,7 @@ public class SchematicHandler {
         if (!active) {
             return false;
         }
-        if (button != 1) {
+        if (button != InputConstants.MOUSE_BUTTON_RIGHT) {
             return false;
         }
         if (mc.player.isShiftKeyDown()) {

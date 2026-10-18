@@ -1301,7 +1301,7 @@ public class AllHandle extends AllClientHandle {
         LocalPlayer player = mc.player;
         UUID uuid = player.getUUID();
         if (controller.user == null && uuid.equals(controller.prevUser)) {
-            LinkedControllerClientHandler.deactivateInLectern(mc, player);
+            LinkedControllerClientHandler.deactivateInLectern(player);
         } else if (controller.prevUser == null && uuid.equals(controller.user)) {
             LinkedControllerClientHandler.activateInLectern(controller.getBlockPos());
         }

@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.logistics.filter;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.client.content.logistics.AddressEditBox;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
@@ -17,7 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 public class PackageFilterScreen extends AbstractFilterScreen<PackageFilterMenu> {
 
@@ -88,7 +88,7 @@ public class PackageFilterScreen extends AbstractFilterScreen<PackageFilterMenu>
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (input.key() == GLFW.GLFW_KEY_ENTER) {
+        if (input.key() == InputConstants.KEY_RETURN) {
             setFocused(null);
         }
         return super.keyPressed(input);

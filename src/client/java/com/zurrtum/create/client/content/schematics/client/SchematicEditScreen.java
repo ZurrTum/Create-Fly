@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.schematics.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.Create;
@@ -114,7 +115,10 @@ public class SchematicEditScreen extends AbstractSimiScreen {
             widget.setBordered(false);
             widget.setTextColor(0xFFFFFFFF);
             widget.setFocused(false);
-            widget.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+            widget.mouseClicked(
+                new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)),
+                false
+            );
         }
 
         StructurePlaceSettings settings = handler.getTransformation().toSettings();

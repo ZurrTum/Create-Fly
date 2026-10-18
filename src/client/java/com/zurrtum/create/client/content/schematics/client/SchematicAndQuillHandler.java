@@ -31,7 +31,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -99,7 +98,7 @@ public class SchematicAndQuillHandler {
     }
 
     public boolean onMouseInput(Minecraft mc, int button) {
-        if (button != 1) {
+        if (button != InputConstants.MOUSE_BUTTON_RIGHT) {
             return false;
         }
         if (!isActive(mc)) {
@@ -146,7 +145,7 @@ public class SchematicAndQuillHandler {
         }
 
         LocalPlayer player = mc.player;
-        if (InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)) {
+        if (InputConstants.isKeyDown(InputConstants.KEY_LCONTROL)) {
             float pt = AnimationTickHolder.getPartialTicks();
             Vec3 targetVec = player.getEyePosition(pt).add(player.getLookAngle().scale(range));
             selectedPos = BlockPos.containing(targetVec);

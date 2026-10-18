@@ -94,7 +94,10 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         addressBox.setTextColor(0xFF3D3C48);
         addressBox.setValue(menu.contentHolder.addressFilter);
         addressBox.setFocused(false);
-        addressBox.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+        addressBox.mouseClicked(
+            new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)),
+            false
+        );
         addressBox.setResponder(onTextChanged);
         addressBox.setX(nameBoxX(addressBox.getValue(), addressBox));
         addRenderableWidget(addressBox);
@@ -204,14 +207,10 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        int pKeyCode = input.key();
-        boolean hitEnter = getFocused() instanceof EditBox && (pKeyCode == InputConstants.KEY_RETURN || pKeyCode == InputConstants.KEY_NUMPADENTER);
-
-        if (hitEnter && addressBox.isFocused()) {
+        if (getFocused() instanceof EditBox && input.isConfirmation() && addressBox.isFocused()) {
             addressBox.setFocused(false);
             return true;
         }
-
         return super.keyPressed(input);
     }
 

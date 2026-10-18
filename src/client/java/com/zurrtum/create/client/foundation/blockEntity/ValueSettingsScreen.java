@@ -12,6 +12,7 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -20,7 +21,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 import java.util.function.Consumer;
 
@@ -82,17 +83,16 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
 
     private void setCursor(Vec2 coordinateOfValue) {
         double guiScale = minecraft.getWindow().getGuiScale();
-        GLFW.glfwSetCursorPos(
+        SDLMouse.SDL_WarpMouseInWindow(
             minecraft.getWindow().handle(),
-            coordinateOfValue.x * guiScale,
-            coordinateOfValue.y * guiScale
+            (float) (coordinateOfValue.x * guiScale),
+            (float) (coordinateOfValue.y * guiScale)
         );
     }
 
-    public ValueSettings getClosestCoordinate(int mouseX, int mouseY) {
+    public ValueSettings getClosestCoordinate(boolean milestonesOnly, int mouseX, int mouseY) {
         int row = 0;
         int column = 0;
-        boolean milestonesOnly = minecraft.hasShiftDown();
 
         double bestDiff = Double.MAX_VALUE;
         for (; row < board.rows().size(); row++) {
@@ -263,7 +263,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             return;
         }
 
-        ValueSettings closest = getClosestCoordinate(mouseX, mouseY);
+        ValueSettings closest = getClosestCoordinate(minecraft.hasShiftDown(), mouseX, mouseY);
 
         if (!closest.equals(lastHovered)) {
             onHover.accept(closest);
@@ -348,9 +348,9 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
 
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
-        ValueSettings closest = getClosestCoordinate((int) pMouseX, (int) pMouseY);
-        int column = closest.value() + (int) Math.signum(pScrollY) * (minecraft.hasShiftDown() ?
-            board.milestoneInterval() : 1);
+        boolean milestonesOnly = minecraft.hasShiftDown();
+        ValueSettings closest = getClosestCoordinate(milestonesOnly, (int) pMouseX, (int) pMouseY);
+        int column = closest.value() + (int) Math.signum(pScrollY) * (milestonesOnly ? board.milestoneInterval() : 1);
         column = Mth.clamp(column, 0, board.maxValue());
         if (column == closest.value()) {
             return false;
@@ -365,7 +365,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             Window window = minecraft.getWindow();
             double x = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
             double y = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
-            saveAndClose(x, y);
+            saveAndClose(input, x, y);
             return true;
         }
         return super.keyReleased(input);
@@ -374,14 +374,14 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     @Override
     public boolean mouseReleased(MouseButtonEvent click) {
         if (minecraft.options.keyUse.matchesMouse(click)) {
-            saveAndClose(click.x(), click.y());
+            saveAndClose(click, click.x(), click.y());
             return true;
         }
         return super.mouseReleased(click);
     }
 
-    protected void saveAndClose(double pMouseX, double pMouseY) {
-        ValueSettings closest = getClosestCoordinate((int) pMouseX, (int) pMouseY);
+    protected void saveAndClose(InputWithModifiers input, double pMouseX, double pMouseY) {
+        ValueSettings closest = getClosestCoordinate(input.hasShiftDown(), (int) pMouseX, (int) pMouseY);
         minecraft.player.connection.send(new ValueSettingsPacket(
             pos,
             closest.row(),
@@ -389,7 +389,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             null,
             null,
             Direction.UP,
-            minecraft.hasControlDown(),
+            input.hasControlDown(),
             netId
         ));
         onClose();

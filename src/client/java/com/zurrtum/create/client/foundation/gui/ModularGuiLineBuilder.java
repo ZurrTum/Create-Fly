@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.foundation.gui.widget.*;
@@ -96,7 +97,7 @@ public class ModularGuiLineBuilder {
         input.setBordered(false);
         input.setTextColor(0xffffffff);
         input.setFocused(false);
-        input.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+        input.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
         TooltipArea tooltipArea = new TooltipArea(this.x + x, y - 4, width, 18);
         inputTransform.accept(input, tooltipArea);
         target.add(Pair.of(input, dataKey));

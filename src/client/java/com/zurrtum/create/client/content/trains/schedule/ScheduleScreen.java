@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.trains.schedule;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllSchedules;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
@@ -807,7 +808,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                 components.add(empty);
                 components.add(clickToEdit);
                 renderActionTooltip(graphics, components, mx, my);
-                if (click == 0) {
+                if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                     startEditing(
                         input, instruction, confirmed -> {
                             if (confirmed) {
@@ -827,7 +828,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                         mx,
                         my
                     );
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         entries.remove(entry);
                         renderedItem.getRenderElement().clear();
                         init();
@@ -841,7 +842,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                         mx,
                         my
                     );
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         entries.add(entries.indexOf(entry), entry.clone(minecraft.level.registryAccess()));
                         renderedItem.getRenderElement().clear();
                         init();
@@ -858,7 +859,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                         mx,
                         my
                     );
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         entries.remove(entry);
                         entries.add(i - 1, entry);
                         renderedItem.getRenderElement().clear();
@@ -873,7 +874,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                         mx,
                         my
                     );
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         entries.remove(entry);
                         entries.add(i + 1, entry);
                         renderedItem.getRenderElement().clear();
@@ -887,13 +888,13 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
             if (y > center - 1 && y <= center + 7 && isConditionAreaScrollable(entry)) {
                 float chaseTarget = horizontalScrolls.get(i).getChaseTarget();
                 if (x > 12 && x <= 19 && !Mth.equal(chaseTarget, 0)) {
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         horizontalScrolls.get(i).chase(chaseTarget - 1, 0.5f, Chaser.EXP);
                     }
                     return true;
                 }
                 if (x > 177 && x <= 184 && !Mth.equal(chaseTarget, entry.conditions.size() - 1)) {
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         horizontalScrolls.get(i).chase(chaseTarget + 1, 0.5f, Chaser.EXP);
                     }
                     return true;
@@ -934,13 +935,13 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                         components.add(rClickToDelete);
                     }
                     renderActionTooltip(graphics, components, mx, my);
-                    if (canRemove && click == 1) {
+                    if (canRemove && click == InputConstants.MOUSE_BUTTON_RIGHT) {
                         conditions.remove(row);
                         if (conditions.isEmpty()) {
                             columns.remove(conditions);
                         }
                     }
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         startEditing(
                             scheduleInput, condition, confirmed -> {
                                 conditions.remove(row);
@@ -964,7 +965,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                         mx,
                         my
                     );
-                    if (click == 0) {
+                    if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                         ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(AllSchedules.DELAY);
                         IScheduleInput<ScheduleWaitCondition> scheduleInput = AllScheduleRenders.get(condition);
                         startEditing(
@@ -991,7 +992,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
                 mx,
                 my
             );
-            if (click == 0) {
+            if (click == InputConstants.MOUSE_BUTTON_LEFT) {
                 ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(AllSchedules.DELAY);
                 IScheduleInput<ScheduleWaitCondition> scheduleInput = AllScheduleRenders.get(condition);
                 startEditing(
@@ -1013,7 +1014,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         }
 
         renderActionTooltip(graphics, ImmutableList.of(CreateLang.translateDirect("gui.schedule.add_entry")), mx, my);
-        if (click == 0) {
+        if (click == InputConstants.MOUSE_BUTTON_LEFT) {
             ScheduleInstruction instruction = AllSchedules.createScheduleInstruction(AllSchedules.DESTINATION);
             IScheduleInput<ScheduleInstruction> scheduleInput = AllScheduleRenders.get(instruction);
             startEditing(
@@ -1080,15 +1081,12 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         if (editingCondition == null && editingDestination == null) {
             return super.keyPressed(input);
         }
-        int pKeyCode = input.key();
-        boolean hitEnter = getFocused() instanceof EditBox && (pKeyCode == 257 || pKeyCode == 335);
-        boolean hitE = getFocused() == null || minecraft.options.keyInventory.matches(input);
-        if (hitEnter) {
+        if (getFocused() instanceof EditBox && input.isConfirmation()) {
             onEditorClose.accept(true);
             stopEditing();
             return true;
         }
-        if (hitE) {
+        if (getFocused() == null || minecraft.options.keyInventory.matches(input)) {
             return false;
         }
         return super.keyPressed(input);

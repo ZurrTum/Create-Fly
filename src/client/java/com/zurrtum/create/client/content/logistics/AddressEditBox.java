@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.logistics;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.content.trains.schedule.DestinationSuggestions;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
@@ -15,7 +16,6 @@ import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -57,7 +57,7 @@ public class AddressEditBox extends EditBox {
         setResponder(mainResponder);
         setBordered(false);
         setFocused(false);
-        mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+        mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
         setMaxLength(25);
     }
 
@@ -66,10 +66,10 @@ public class AddressEditBox extends EditBox {
         if (destinationSuggestions.keyPressed(input)) {
             return true;
         }
-        if (isFocused() && input.key() == GLFW.GLFW_KEY_ENTER) {
+        if (isFocused() && input.key() == InputConstants.KEY_RETURN) {
             setFocused(false);
             moveCursorToEnd(false);
-            mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+            mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
             return true;
         }
         return super.keyPressed(input);
@@ -85,7 +85,7 @@ public class AddressEditBox extends EditBox {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
             if (isMouseOver(click.x(), click.y())) {
                 setValue("");
                 return true;

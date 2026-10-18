@@ -4,6 +4,7 @@ import com.google.common.graph.ElementOrder;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.mojang.blaze3d.platform.ClipboardManager;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
@@ -950,26 +951,16 @@ public class PonderUI extends AbstractPonderScreen {
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if (identifyMode && hoveredBlockPos != null && PonderIndex.editingModeActive()) {
-            Window window = minecraft.getWindow();
-            if (copiedBlockPos != null && click.button() == 1) {
-                clipboardHelper.setClipboard(
-                    window,
-                    "util.select().fromTo(" + copiedBlockPos.getX() + ", " + copiedBlockPos.getY() + ", " + copiedBlockPos.getZ() + ", " + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")"
-                );
+            if (copiedBlockPos != null && click.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
+                clipboardHelper.setClipboard("util.select().fromTo(" + copiedBlockPos.getX() + ", " + copiedBlockPos.getY() + ", " + copiedBlockPos.getZ() + ", " + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")");
                 copiedBlockPos = hoveredBlockPos;
                 return true;
             }
 
-            if (minecraft.hasShiftDown()) {
-                clipboardHelper.setClipboard(
-                    window,
-                    "util.select().position(" + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")"
-                );
+            if (click.hasShiftDown()) {
+                clipboardHelper.setClipboard("util.select().position(" + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")");
             } else {
-                clipboardHelper.setClipboard(
-                    window,
-                    "util.grid().at(" + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")"
-                );
+                clipboardHelper.setClipboard("util.grid().at(" + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")");
             }
             copiedBlockPos = hoveredBlockPos;
             return true;

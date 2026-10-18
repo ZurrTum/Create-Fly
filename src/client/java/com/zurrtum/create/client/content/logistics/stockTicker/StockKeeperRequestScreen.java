@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.logistics.stockTicker;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
@@ -74,7 +75,7 @@ import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -1235,8 +1236,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         double pMouseX = click.x();
         double pMouseY = click.y();
         int pButton = click.button();
-        boolean lmb = pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT;
-        boolean rmb = pButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+        boolean lmb = pButton == InputConstants.MOUSE_BUTTON_LEFT;
+        boolean rmb = pButton == InputConstants.MOUSE_BUTTON_RIGHT;
 
         // Search
         if (rmb && searchBox.isMouseOver(pMouseX, pMouseY)) {
@@ -1267,7 +1268,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (getMaxScroll() > 0 && lmb && pMouseX > barX && pMouseX <= barX + 8 && pMouseY > topPos + 15 && pMouseY < topPos + imageHeight - 82) {
             scrollHandleActive = true;
             if (minecraft.isWindowActive()) {
-                GLFW.glfwSetInputMode(minecraft.getWindow().handle(), 208897, GLFW.GLFW_CURSOR_HIDDEN);
+                SDLMouse.SDL_HideCursor();
             }
             return true;
         }
@@ -1384,10 +1385,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
     @Override
     public boolean mouseReleased(MouseButtonEvent click) {
-        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT && scrollHandleActive) {
+        if (click.button() == InputConstants.MOUSE_BUTTON_LEFT && scrollHandleActive) {
             scrollHandleActive = false;
             if (minecraft.isWindowActive()) {
-                GLFW.glfwSetInputMode(minecraft.getWindow().handle(), 208897, GLFW.GLFW_CURSOR_NORMAL);
+                SDLMouse.SDL_ShowCursor();
             }
         }
         return super.mouseReleased(click);
@@ -1492,7 +1493,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
     @Override
     public boolean mouseDragged(MouseButtonEvent click, double pDragX, double pDragY) {
-        if (click.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT || !scrollHandleActive) {
+        if (click.button() != InputConstants.MOUSE_BUTTON_LEFT || !scrollHandleActive) {
             return super.mouseDragged(click, pDragX, pDragY);
         }
 
@@ -1518,7 +1519,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (minecraft.isWindowActive()) {
             double forceX = (barX + 2) / scaleX;
             double forceY = Mth.clamp(click.y(), minY, maxY) / scaleY;
-            GLFW.glfwSetCursorPos(window.handle(), forceX, forceY);
+            SDLMouse.SDL_WarpMouseInWindow(window.handle(), (float) forceX, (float) forceY);
         }
 
         return true;
@@ -1555,14 +1556,15 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         }
 
         int pKeyCode = input.key();
-        if (pKeyCode == GLFW.GLFW_KEY_ENTER && searchBox.isFocused()) {
-            searchBox.setFocused(false);
-            return true;
-        }
-
-        if (pKeyCode == GLFW.GLFW_KEY_ENTER && input.hasShiftDown()) {
-            sendIt();
-            return true;
+        if (pKeyCode == InputConstants.KEY_RETURN) {
+            if (searchBox.isFocused()) {
+                searchBox.setFocused(false);
+                return true;
+            }
+            if (input.hasShiftDown()) {
+                sendIt();
+                return true;
+            }
         }
 
         if (addressBox.isFocused() && addressBox.keyPressed(input)) {
@@ -1571,7 +1573,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         String s = searchBox.getValue();
         if (!searchBox.keyPressed(input)) {
-            return searchBox.isFocused() && searchBox.isVisible() && pKeyCode != 256 || super.keyPressed(input);
+            return searchBox.isFocused() && searchBox.isVisible() && pKeyCode != InputConstants.KEY_ESCAPE || super.keyPressed(
+                input);
         }
         if (!Objects.equals(s, searchBox.getValue())) {
             refreshSearchNextTick = true;

@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -49,7 +48,7 @@ public class ControlsHandler {
     }
 
     public static void stopControlling(Minecraft mc) {
-        ControlsUtil.getControls().forEach(kb -> kb.setDown(ControlsUtil.isActuallyPressed(mc, kb)));
+        ControlsUtil.getControls().forEach(kb -> kb.setDown(ControlsUtil.isActuallyPressed(kb)));
         AbstractContraptionEntity abstractContraptionEntity = entityRef.get();
 
         LocalPlayer player = mc.player;
@@ -80,10 +79,7 @@ public class ControlsHandler {
             packetCooldown--;
         }
 
-        if (controlsPos != null && (entity.isRemoved() || InputConstants.isKeyDown(
-            mc.getWindow(),
-            GLFW.GLFW_KEY_ESCAPE
-        ))) {
+        if (controlsPos != null && (entity.isRemoved() || InputConstants.isKeyDown(InputConstants.KEY_ESCAPE))) {
             BlockPos pos = controlsPos;
             stopControlling(mc);
             mc.player.connection.send(new ControlsInputPacket(currentlyPressed, false, entity.getId(), pos, true));
@@ -93,7 +89,7 @@ public class ControlsHandler {
         List<KeyMapping> controls = ControlsUtil.getControls();
         Collection<Integer> pressedKeys = new HashSet<>();
         for (int i = 0; i < controls.size(); i++) {
-            if (ControlsUtil.isActuallyPressed(mc, controls.get(i))) {
+            if (ControlsUtil.isActuallyPressed(controls.get(i))) {
                 pressedKeys.add(i);
             }
         }

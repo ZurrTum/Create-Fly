@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.schematics.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 public class SchematicPromptScreen extends AbstractSimiScreen {
 
@@ -100,11 +100,11 @@ public class SchematicPromptScreen extends AbstractSimiScreen {
     @Override
     public boolean keyPressed(KeyEvent input) {
         int keyCode = input.key();
-        if (keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (keyCode == InputConstants.KEY_RETURN) {
             confirm(false);
             return true;
         }
-        if (keyCode == 256 && shouldCloseOnEsc()) {
+        if (keyCode == InputConstants.KEY_ESCAPE && shouldCloseOnEsc()) {
             onClose();
             return true;
         }

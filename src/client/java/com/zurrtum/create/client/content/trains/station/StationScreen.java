@@ -90,7 +90,10 @@ public class StationScreen extends AbstractStationScreen {
         nameBox.setTextColor(0xFF592424);
         nameBox.setValue(station.name);
         nameBox.setFocused(false);
-        nameBox.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+        nameBox.mouseClicked(
+            new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)),
+            false
+        );
         nameBox.setResponder(onTextChanged);
         nameBox.setX(nameBoxX(nameBox.getValue(), nameBox));
         addRenderableWidget(nameBox);
@@ -137,7 +140,10 @@ public class StationScreen extends AbstractStationScreen {
         trainNameBox.setMaxLength(35);
         trainNameBox.setTextColor(0xFFC6C6C6);
         trainNameBox.setFocused(false);
-        trainNameBox.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
+        trainNameBox.mouseClicked(
+            new MouseButtonEvent(0, 0, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)),
+            false
+        );
         trainNameBox.setResponder(onTextChanged);
         trainNameBox.active = false;
 
@@ -423,21 +429,18 @@ public class StationScreen extends AbstractStationScreen {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        int pKeyCode = input.key();
-        boolean hitEnter = getFocused() instanceof EditBox && (pKeyCode == InputConstants.KEY_RETURN || pKeyCode == InputConstants.KEY_NUMPADENTER);
-
-        if (hitEnter && nameBox.isFocused()) {
-            nameBox.setFocused(false);
-            syncStationName();
-            return true;
+        if (getFocused() instanceof EditBox && input.isConfirmation()) {
+            if (nameBox.isFocused()) {
+                nameBox.setFocused(false);
+                syncStationName();
+                return true;
+            }
+            if (trainNameBox.isFocused()) {
+                trainNameBox.setFocused(false);
+                syncTrainNameAndColor();
+                return true;
+            }
         }
-
-        if (hitEnter && trainNameBox.isFocused()) {
-            trainNameBox.setFocused(false);
-            syncTrainNameAndColor();
-            return true;
-        }
-
         return super.keyPressed(input);
     }
 

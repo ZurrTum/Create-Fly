@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.catnip.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
@@ -19,7 +20,6 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,7 +181,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (input.key() == GLFW.GLFW_KEY_BACKSPACE) {
+        if (input.key() == InputConstants.KEY_BACKSPACE) {
             ScreenOpener.openPreviousScreen();
             return true;
         }
