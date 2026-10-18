@@ -11,24 +11,12 @@ import net.minecraft.world.level.saveddata.maps.MapDecorationType;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllMapDecorationTypes {
-    public static final Holder<MapDecorationType> STATION_MAP_DECORATION = register("station", true, -1, true, false);
+    public static final Holder<MapDecorationType> STATION_MAP_DECORATION = register("station", true, true);
 
-    private static Holder<MapDecorationType> register(
-        String id,
-        boolean showOnItemFrame,
-        int mapColor,
-        boolean trackCount,
-        boolean explorationMapElement
-    ) {
+    private static Holder<MapDecorationType> register(String id, boolean showOnItemFrame, boolean trackCount) {
         Identifier key = Identifier.fromNamespaceAndPath(MOD_ID, id);
         ResourceKey<MapDecorationType> registryKey = ResourceKey.create(Registries.MAP_DECORATION_TYPE, key);
-        MapDecorationType mapDecorationType = new MapDecorationType(
-            key,
-            showOnItemFrame,
-            mapColor,
-            explorationMapElement,
-            trackCount
-        );
+        MapDecorationType mapDecorationType = new MapDecorationType(key, showOnItemFrame, trackCount);
         return Registry.registerForHolder(BuiltInRegistries.MAP_DECORATION_TYPE, registryKey, mapDecorationType);
     }
 
