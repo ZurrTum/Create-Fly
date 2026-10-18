@@ -92,14 +92,13 @@ public record SequencedAssemblyRecipe(Ingredient ingredient, ItemStackTemplate t
 
     private static class SequencedAssemblyRecipeMapCodec extends MapCodec<SequencedAssemblyRecipe> {
         private static final Codec<List<ProcessingOutput>> JUNKS_CODEC = ProcessingOutput.CODEC.listOf();
-        private static final Codec<List<Recipe<?>>> RECIPE_CODEC = CODEC.listOf();
         private static final MapCodec<SequencedAssemblyRecipe> RAW_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Ingredient.CODEC.fieldOf("ingredient").forGetter(SequencedAssemblyRecipe::ingredient),
             ItemStackTemplate.CODEC.fieldOf("transitional_item").forGetter(SequencedAssemblyRecipe::transitionalItem),
             ProcessingOutput.CODEC.fieldOf("result").forGetter(SequencedAssemblyRecipe::result),
             JUNKS_CODEC.optionalFieldOf("junks", List.of()).forGetter(SequencedAssemblyRecipe::junks),
             Codec.INT.optionalFieldOf("loops", 1).forGetter(SequencedAssemblyRecipe::loops),
-            RECIPE_CODEC.fieldOf("sequence").forGetter(SequencedAssemblyRecipe::sequence)
+            Recipe.DIRECT_CODEC.listOf().fieldOf("sequence").forGetter(SequencedAssemblyRecipe::sequence)
         ).apply(instance, SequencedAssemblyRecipe::new));
         private static final AtomicInteger idGenerator = new AtomicInteger();
 
@@ -209,7 +208,7 @@ public record SequencedAssemblyRecipe(Ingredient ingredient, ItemStackTemplate t
                 List<Recipe<?>> sequence = new ArrayList<>(size);
                 TriConsumer<Integer, JsonElement, JsonElement> recipeAdd = (i, ingredientJson, resultJson) -> {
                     JsonObject object = sequenceJsonFactory.get(i % sequenceSize).apply(ingredientJson, resultJson);
-                    Recipe<?> recipe = CODEC.parse(ops, object).getOrThrow();
+                    Recipe<?> recipe = Recipe.DIRECT_CODEC.parse(ops, object).getOrThrow();
                     sequence.add(recipe);
                     GENERATE_RECIPES.put(id.withSuffix(String.valueOf(sequence.size())), recipe);
                 };
