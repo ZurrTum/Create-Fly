@@ -336,11 +336,9 @@ public class FactoryPanelRenderer implements BlockEntityRenderer<FactoryPanelBlo
         public @Nullable SuperByteBufferRenderState glow;
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
-            if (glow == null) {
-                model.submit(matrices, queue);
-            } else {
-                model.submit(CreateRenderTypes.translucent(), matrices, queue);
-                glow.submit(CreateRenderTypes.additive(), matrices, queue);
+            model.submit(matrices, queue);
+            if (glow != null) {
+                glow.submit(CreateRenderTypes.additive(), matrices, queue.order(1));
             }
         }
     }

@@ -368,12 +368,8 @@ public class VisualizationManagerImpl implements VisualizationManager {
         }
 
         @Override
-        public void beforeSolid(RenderContext ctx) {
+        public void afterSolid(RenderContext ctx) {
             render(ctx);
-        }
-
-        @Override
-        public void beforeTranslucent(RenderContext ctx) {
             renderCrumbling(ctx);
         }
     }

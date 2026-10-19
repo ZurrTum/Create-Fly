@@ -224,7 +224,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                         .extractRenderState();
                     left.glow = CachedBuffers.partial(AllPartialModels.SIGNAL_RED_GLOW, state.blockState)
                         .cardinalLighting(cardinalLighting).disableDiffuse().light(LightCoordsUtil.FULL_BRIGHT)
-                        .color(127, 127, 127, 127).extractRenderState();
+                        .extractRenderState();
                     if (vert) {
                         left.cubeX = 1;
                         left.cubeY = longSide;
@@ -239,7 +239,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                 }
                 left.signal = CachedBuffers.partial(AllPartialModels.SIGNAL_RED, state.blockState)
                     .cardinalLighting(cardinalLighting).disableDiffuse().light(LightCoordsUtil.FULL_BRIGHT)
-                    .color(127, 127, 127, 127).extractRenderState();
+                    .extractRenderState();
             } else {
                 left.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState)
                     .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
@@ -255,7 +255,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                             yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
                             state.blockState
                         ).cardinalLighting(cardinalLighting).disableDiffuse().light(LightCoordsUtil.FULL_BRIGHT)
-                        .color(127, 127, 127, 127).extractRenderState();
+                        .extractRenderState();
                     if (vert) {
                         right.cubeX = longSide;
                         right.cubeY = 1;
@@ -272,7 +272,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                         yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE,
                         state.blockState
                     ).cardinalLighting(cardinalLighting).disableDiffuse().light(LightCoordsUtil.FULL_BRIGHT)
-                    .color(127, 127, 127, 127).extractRenderState();
+                    .extractRenderState();
             } else {
                 right.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState)
                     .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
@@ -449,23 +449,21 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                 if (cube != null) {
                     matrices.pushPose();
                     matrices.scale(cubeX, cubeY, 1);
-                    cube.submit(CreateRenderTypes.translucent(), matrices, queue);
+                    cube.submit(matrices, queue);
                     matrices.popPose();
                 }
                 matrices.pushPose();
                 matrices.scale(1.0625f, 1.0625f, 1.0625f);
-                signal.submit(CreateRenderTypes.additive2(), matrices, queue);
-                signal.submit(CreateRenderTypes.additive(), matrices, queue.order(1));
+                signal.submit(CreateRenderTypes.additive(), matrices, queue);
                 matrices.popPose();
                 if (glow != null) {
                     matrices.pushPose();
                     matrices.scale(glowX, glowY, 2);
-                    glow.submit(CreateRenderTypes.additive2(), matrices, queue);
-                    glow.submit(CreateRenderTypes.additive(), matrices, queue.order(1));
+                    glow.submit(CreateRenderTypes.additive(), matrices, queue);
                     matrices.popPose();
                 }
             } else {
-                signal.submit(CreateRenderTypes.translucent(), matrices, queue);
+                signal.submit(matrices, queue);
             }
         }
     }

@@ -21,7 +21,6 @@ import com.zurrtum.create.client.content.trains.track.TrackTargetingClient;
 import com.zurrtum.create.client.flywheel.impl.event.RenderContextHolder;
 import com.zurrtum.create.client.flywheel.impl.event.RenderContextImpl;
 import com.zurrtum.create.client.infrastructure.render.BreakingRenderStateInfo;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
@@ -91,29 +90,23 @@ public abstract class LevelRendererMixin implements RenderContextHolder {
         renderContext.updateProjection(projection);
     }
 
-    @Inject(method = "render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lorg/joml/Matrix4fc;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/DeltaTracker;getGameTimeDeltaPartialTick(Z)F"))
+    @Inject(method = "render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZZ)V", at = @At("HEAD"))
     private void flywheel$beginRender(
         GraphicsResourceAllocator resourceAllocator,
-        DeltaTracker deltaTracker,
         boolean renderOutline,
         CameraRenderState cameraState,
-        Matrix4fc modelViewMatrix,
         GpuBufferSlice terrainFog,
         Vector4f fogColor,
         boolean shouldRenderSky,
+        boolean consistentDepthRequired,
         CallbackInfo ci
     ) {
         renderContext.onStartLevelRender();
     }
 
-    @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeSolid()V"))
-    private void flywheel$beforeSolid(CallbackInfo ci) {
-        renderContext.beforeSolid();
-    }
-
-    @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeTranslucent()V"))
-    private void flywheel$beforeTranslucent(CallbackInfo ci) {
-        renderContext.beforeTranslucent();
+    @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;executeSolid(Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;Lcom/mojang/renderpearl/api/commands/RenderPass;)V", shift = At.Shift.AFTER))
+    private void flywheel$afterSolid(CallbackInfo ci) {
+        renderContext.afterSolid();
     }
 
     @Inject(method = "submitFeatures(Lnet/minecraft/client/renderer/state/level/LevelRenderState;Lnet/minecraft/client/renderer/SubmitNodeCollector;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;finalizeGizmoCollection()V"))

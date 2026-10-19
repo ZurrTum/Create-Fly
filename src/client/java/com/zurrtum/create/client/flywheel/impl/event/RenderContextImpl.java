@@ -47,15 +47,9 @@ public class RenderContextImpl implements RenderContext {
         }
     }
 
-    public void beforeSolid() {
+    public void afterSolid() {
         if (visualizationManager != null) {
-            visualizationManager.renderDispatcher().beforeSolid(this);
-        }
-    }
-
-    public void beforeTranslucent() {
-        if (visualizationManager != null) {
-            visualizationManager.renderDispatcher().beforeTranslucent(this);
+            visualizationManager.renderDispatcher().afterSolid(this);
         }
     }
 

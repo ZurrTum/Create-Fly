@@ -138,7 +138,6 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
         matrixBuffer.bind();
         Uniforms.bindAll();
 
-        MaterialRenderState.setupFrameBuffer();
         for (var group : cullingGroups.values()) {
             group.submitSolid();
         }
@@ -237,7 +236,6 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
             IndirectBuffers.DRAW_COMMAND_STRIDE
         );
 
-        MaterialRenderState.setupFrameBuffer();
 
         for (var groupEntry : byType.entrySet()) {
             var byProgress = groupEntry.getValue();

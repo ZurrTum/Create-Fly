@@ -53,7 +53,7 @@ public interface VisualizationManager {
         /**
          * Prepare visuals for render.
          *
-         * <p>Guaranteed to be called before {@link #beforeSolid} and {@link #beforeTranslucent}.
+         * <p>Guaranteed to be called before {@link #afterSolid}.
          * <br>Guaranteed to be called after the render thread has processed all light updates.
          * <br>The caller is otherwise free to choose an invocation site, but it is recommended to call
          * this as early as possible to give the VisualizationManager time to process things off-thread.
@@ -63,17 +63,10 @@ public interface VisualizationManager {
         /**
          * Render instances.
          *
-         * <p>Guaranteed to be called after {@link #onStartLevelRender} and before {@link #beforeTranslucent}.
+         * <p>Guaranteed to be called after {@link #onStartLevelRender}.
          * <br>The caller is otherwise free to choose an invocation site, but it is recommended to call
          * this between rendering entities and block entities.
          */
-        void beforeSolid(RenderContext var1);
-
-        /**
-         * Render crumbling block entities.
-         *
-         * <p>Guaranteed to be called after {@link #onStartLevelRender} and {@link #beforeSolid}
-         */
-        void beforeTranslucent(RenderContext ctx);
+        void afterSolid(RenderContext var1);
     }
 }

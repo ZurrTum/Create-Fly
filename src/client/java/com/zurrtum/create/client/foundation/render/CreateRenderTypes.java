@@ -20,35 +20,12 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 @SuppressWarnings("deprecation")
 public class CreateRenderTypes {
-    private static final RenderType TRANSLUCENT = RenderType.create(
-        createLayerName("translucent"), RenderSetup.builder(RenderPipelines.TRANSLUCENT_BLOCK).withTexture(
-                "Sampler0",
-                TextureAtlas.LOCATION_BLOCKS,
-                () -> RenderSystem.getSamplerCache().getSampler(
-                    AddressMode.CLAMP_TO_EDGE,
-                    AddressMode.CLAMP_TO_EDGE,
-                    FilterMode.LINEAR,
-                    FilterMode.NEAREST,
-                    true
-                )
-            ).useLightmap().affectsCrumbling().setOutline(OutlineProperty.AFFECTS_OUTLINE).sortOnUpload()
-            .createRenderSetup()
-    );
-
     private static final RenderType ADDITIVE = RenderType.create(
         createLayerName("additive"),
-        RenderSetup.builder(AllRenderPipelines.ADDITIVE).affectsCrumbling().sortOnUpload()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
-            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
+        RenderSetup.builder(AllRenderPipelines.ADDITIVE).setOitPipelines(AllRenderPipelines.OIT_ADDITIVE)
+            .affectsCrumbling().sortOnUpload().withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap()
+            .useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
-
-    private static final RenderType ADDITIVE2 = RenderType.create(
-        createLayerName("additive2"),
-        RenderSetup.builder(AllRenderPipelines.ADDITIVE2).affectsCrumbling().sortOnUpload()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
-            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
-    );
-
     private static final RenderType ITEM_GLOWING_SOLID = RenderType.create(
         createLayerName("item_glowing_solid"),
         RenderSetup.builder(AllRenderPipelines.GLOWING).affectsCrumbling()
@@ -58,8 +35,8 @@ public class CreateRenderTypes {
 
     private static final RenderType ITEM_GLOWING_TRANSLUCENT = RenderType.create(
         createLayerName("item_glowing_translucent"),
-        RenderSetup.builder(AllRenderPipelines.GLOWING_TRANSLUCENT).affectsCrumbling().sortOnUpload()
-            .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay()
+        RenderSetup.builder(AllRenderPipelines.GLOWING_TRANSLUCENT).setOitPipelines(AllRenderPipelines.OIT_GLOWING)
+            .affectsCrumbling().sortOnUpload().withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap()
             .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     );
 
@@ -71,16 +48,8 @@ public class CreateRenderTypes {
             .useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     ));
 
-    public static RenderType translucent() {
-        return TRANSLUCENT;
-    }
-
     public static RenderType additive() {
         return ADDITIVE;
-    }
-
-    public static RenderType additive2() {
-        return ADDITIVE2;
     }
 
     public static BiFunction<Identifier, Boolean, RenderType> TRAIN_MAP = Util.memoize(CreateRenderTypes::getTrainMap);

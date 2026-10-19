@@ -1,12 +1,14 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.pipeline.ColorTargetState;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.mojang.renderpearl.api.textures.GpuSampler;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
-import com.mojang.renderpearl.backend.opengl.*;
+import com.mojang.renderpearl.backend.opengl.GlConst;
+import com.mojang.renderpearl.backend.opengl.GlSampler;
+import com.mojang.renderpearl.backend.opengl.GlStateManager;
+import com.mojang.renderpearl.backend.opengl.GlTexture;
 import com.zurrtum.create.client.flywheel.api.material.DepthTest;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.material.Transparency;
@@ -20,7 +22,6 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL33C;
 
-import java.util.Collections;
 import java.util.Comparator;
 
 public final class MaterialRenderState {
@@ -186,28 +187,12 @@ public final class MaterialRenderState {
     }
 
     public static void reset() {
-        resetFrameBuffer();
         resetTexture();
         resetBackfaceCulling();
         resetPolygonOffset();
         resetDepthTest();
         resetTransparency();
         resetWriteMask();
-    }
-
-    public static void setupFrameBuffer() {
-        RenderTarget target = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-        GlDevice device = (GlDevice) RenderSystem.getDevice().backend;
-        int fbo = device.frameBufferCache().getFbo(
-            device.directStateAccess(),
-            Collections.singletonList((GlTexture) target.getColorTexture()),
-            target.useDepth ? (GlTexture) target.getDepthTexture() : null
-        );
-        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, fbo);
-    }
-
-    private static void resetFrameBuffer() {
-        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
     }
 
     private static void resetTexture() {
