@@ -585,7 +585,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         int max = 0;
         for (StorageView<ItemVariant> view : storage) {
             long capacity = view.getCapacity();
-            if (max > capacity) {
+            if (max < capacity) {
                 max = (int) capacity;
             }
         }

@@ -369,7 +369,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         int max = 0;
         for (StorageView<FluidVariant> view : storage) {
             long capacity = view.getCapacity();
-            if (max > capacity) {
+            if (max < capacity) {
                 max = (int) capacity;
             }
         }
