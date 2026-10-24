@@ -79,9 +79,9 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
     public static EntryIngredient getRenderEntryStack(ProcessingOutput output) {
         float chance = output.chance();
         if (chance == 1) {
-            return EntryIngredients.of(output.stack());
+            return EntryIngredients.of(output.create());
         }
-        EntryStack<ItemStack> stack = EntryStacks.of(output.stack());
+        EntryStack<ItemStack> stack = EntryStacks.of(output.create());
         stack.withRenderer(new ChanceItemRenderer(chance, stack.getRenderer()));
         return EntryIngredient.of(stack);
     }

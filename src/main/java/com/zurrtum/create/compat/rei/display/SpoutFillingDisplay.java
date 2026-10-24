@@ -72,7 +72,7 @@ public record SpoutFillingDisplay(EntryIngredient input, EntryIngredient fluid, 
     ) {
         List<FluidStack> fluids = fluidStream.map(entry -> {
             dev.architectury.fluid.FluidStack stack = entry.castValue();
-            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getComponents().asPatch());
+            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getPatch());
         }).toList();
         itemStream.forEach(entry -> {
             ItemStack stack = entry.castValue();

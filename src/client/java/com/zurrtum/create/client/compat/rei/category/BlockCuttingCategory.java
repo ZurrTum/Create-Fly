@@ -11,11 +11,11 @@ import com.zurrtum.create.compat.rei.display.BlockCuttingDisplay;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
@@ -47,7 +47,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
         for (int i = 0, left = bounds.x + 83, top = bounds.y + 53; i < size; i++) {
             outputs[i] = new Point(left + i % 5 * 19, top + i / 5 * -19);
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input);
             drawSlotBackground(graphics, outputs);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 36, bounds.y + 11);

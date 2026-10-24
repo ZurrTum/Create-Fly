@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.compat.rei.widget;
 
 import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
@@ -35,7 +35,7 @@ public class TooltipWidget extends Widget {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         if (bounds.contains(mouseX, mouseY)) {
             Tooltip tooltip = this.tooltip.apply(minecraft);
             if (tooltip != null) {

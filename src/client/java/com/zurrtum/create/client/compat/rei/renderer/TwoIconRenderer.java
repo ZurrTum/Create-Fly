@@ -2,7 +2,7 @@ package com.zurrtum.create.client.compat.rei.renderer;
 
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2fStack;
@@ -13,7 +13,7 @@ public record TwoIconRenderer(ItemStack icon, ItemStack subIcon) implements Rend
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
         Matrix3x2fStack matrices = graphics.pose();
         matrices.pushMatrix();
         matrices.translate(bounds.x, bounds.y);
