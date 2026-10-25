@@ -1,0 +1,14 @@
+{
+  "argument.flywheel_backend.id.unknown": "未知的 Flywheel 后端“%s”",
+  "command.flywheel.backend.get": "当前 Flywheel 后端为“%s”",
+  "command.flywheel.backend.set": "Flywheel 后端现已设为“%s”",
+  "command.flywheel.backend.set.unavailable": "请求的后端“%s”不可用",
+  "command.flywheel.limit_updates.get.off": "更新限制当前已禁用",
+  "command.flywheel.limit_updates.get.on": "更新限制当前已启用",
+  "command.flywheel.limit_updates.set.off": "更新限制现已禁用",
+  "command.flywheel.limit_updates.set.on": "更新限制现已启用",
+  "command.flywheel.use_light_directions.get.off": "未使用光照方向",
+  "command.flywheel.use_light_directions.get.on": "正在使用光照方向",
+  "command.flywheel.use_light_directions.set.off": "已将光照方向设为关闭",
+  "command.flywheel.use_light_directions.set.on": "已将光照方向设为开启"
+}
