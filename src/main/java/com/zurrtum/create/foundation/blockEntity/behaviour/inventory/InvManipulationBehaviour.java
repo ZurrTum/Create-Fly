@@ -103,7 +103,7 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
         }
         int maxCount = extract.getMaxStackSize();
         if (count > maxCount) {
-            extract.setCount(count);
+            extract.setCount(maxCount);
         }
         if (shouldSimulate) {
             return extract;
