@@ -247,6 +247,14 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
             clientAngleDiff /= 2;
         }
 
+        // loaded as running but its contraption never showed up (e.g. placed from a schematic saved while it turned):
+        // without this it stays "running" with nothing attached and never assembles again while powered
+        if (!level.isClientSide() && running && movedContraption == null && level.getGameTime() % 20 == 0 && lostContraption()) {
+            running = false;
+            assembleNextTick = true;
+            sendData();
+        }
+
         if (!level.isClientSide() && assembleNextTick) {
             assembleNextTick = false;
             if (running) {
@@ -281,6 +289,20 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         }
 
         applyRotation();
+    }
+
+    private boolean lostContraption() {
+        if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel) || !getBlockState().hasProperty(BearingBlock.FACING)) {
+            return false;
+        }
+        BlockPos anchor = worldPosition.relative(getBlockState().getValue(BearingBlock.FACING));
+        // only decide once the entities around it are loaded, they can arrive after the block entity
+        if (!serverLevel.areEntitiesLoaded(net.minecraft.world.level.ChunkPos.pack(worldPosition)) || !serverLevel.areEntitiesLoaded(
+            net.minecraft.world.level.ChunkPos.pack(anchor))) {
+            return false;
+        }
+        return serverLevel.getEntitiesOfClass(ControlledContraptionEntity.class, new net.minecraft.world.phys.AABB(anchor).inflate(2),
+            entity -> worldPosition.equals(entity.getControllerPos())).isEmpty();
     }
 
     public boolean isNearInitialAngle() {
