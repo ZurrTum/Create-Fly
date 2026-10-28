@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.content.processing.basin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.IntAttached;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper.FluidRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.processing.basin.BasinRenderer.BasinRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
@@ -40,14 +41,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, BasinRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -108,15 +105,18 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
         }
         if (state.ingredients != null) {
             matrices.pushPose();
-            matrices.translate(0.5, 0.2f, 0.5);
-            if (state.ingredientYRot != null) {
-                matrices.mulPose(state.ingredientYRot);
+            Pose pose = matrices.last();
+            pose.translate(0.5f, 0.2f, 0.5f);
+            if (state.ingredientYRot != 0) {
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * state.ingredientYRot);
             }
             for (IngredientRenderData ingredient : state.ingredients) {
                 matrices.pushPose();
-                matrices.translate(ingredient.itemPosition);
-                matrices.mulPose(ingredient.yRot);
-                matrices.mulPose(state.ingredientXRot);
+                pose = matrices.last();
+                Vec3 itemPosition = ingredient.itemPosition;
+                pose.translate((float) itemPosition.x, (float) itemPosition.y, (float) itemPosition.z);
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * ingredient.yRot);
+                pose.rotate(Axis.XP, Radians.DEG_65);
                 for (Vec3 offset : ingredient.offsets) {
                     matrices.pushPose();
                     matrices.translate(offset);
@@ -130,12 +130,14 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
         if (state.outputs != null) {
             for (OutputItemRenderData item : state.outputs) {
                 matrices.pushPose();
-                matrices.translate(item.offset);
-                if (state.outputYRot != null) {
-                    matrices.mulPose(state.outputYRot);
+                Pose pose = matrices.last();
+                Vec3 offset = item.offset;
+                pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+                if (state.outputYRadians != 0) {
+                    pose.rotate(Axis.YP, state.outputYRadians);
                 }
-                if (item.xRot != null) {
-                    matrices.mulPose(item.xRot);
+                if (item.xRadians != 0) {
+                    pose.rotate(Axis.XP, item.xRadians);
                 }
                 item.renderState.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
                 matrices.popPose();
@@ -247,7 +249,7 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
                     0
                 );
             }
-            Quaternionf yRot = Axis.YP.rotation(Mth.DEG_TO_RAD * (anglePartition * itemCount + 35));
+            float yRot = anglePartition * itemCount + 35;
             ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.GROUND;
             itemModelManager.appendItemLayers(renderState, stack, renderState.displayContext, world, null, 0);
@@ -259,8 +261,7 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
             ingredients[i] = new IngredientRenderData(renderState, itemPosition, yRot, offsets);
             itemCount--;
         }
-        state.ingredientYRot = getYRotateAngle(be.ingredientRotation.getValue(partialTicks));
-        state.ingredientXRot = Axis.XP.rotation(Mth.DEG_TO_RAD * 65);
+        state.ingredientYRot = be.ingredientRotation.getValue(partialTicks);
         state.ingredients = ingredients;
     }
 
@@ -294,7 +295,7 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
             }
             Vec3 offset = outVec.add(0, Math.max(-0.55f, -(progress * progress * 2)), 0)
                 .add(directionVec.scale(progress * 0.5f));
-            Quaternionf xRot = getXRotateAngle(progress * 180);
+            float xRadians = progress * Radians.DEG_180;
             ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.GROUND;
             itemModelManager.appendItemLayers(
@@ -305,12 +306,12 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
                 null,
                 0
             );
-            outputs.add(new OutputItemRenderData(renderState, offset, xRot));
+            outputs.add(new OutputItemRenderData(renderState, offset, xRadians));
         }
         if (outputs.isEmpty()) {
             return;
         }
-        state.outputYRot = getYRotateAngle(AngleHelper.horizontalAngle(direction));
+        state.outputYRadians = Radians.horizontal(direction);
         state.outputs = outputs;
     }
 
@@ -322,17 +323,16 @@ public class BasinRenderer implements BlockEntityRenderer<BasinBlockEntity, Basi
     public static class BasinRenderState extends BlockEntityRenderState {
         public @UnknownNullability FilterRenderState filter;
         public @Nullable List<FluidRenderState> fluids;
-        public @Nullable Quaternionf ingredientYRot;
-        public @UnknownNullability Quaternionf ingredientXRot;
+        public float ingredientYRot;
         public IngredientRenderData @Nullable [] ingredients;
-        public @Nullable Quaternionf outputYRot;
+        public float outputYRadians;
         public @Nullable List<OutputItemRenderData> outputs;
     }
 
-    public record IngredientRenderData(ItemStackRenderState renderState, Vec3 itemPosition, Quaternionf yRot,
+    public record IngredientRenderData(ItemStackRenderState renderState, Vec3 itemPosition, float yRot,
                                        Vec3[] offsets) {
     }
 
-    public record OutputItemRenderData(ItemStackRenderState renderState, Vec3 offset, @Nullable Quaternionf xRot) {
+    public record OutputItemRenderData(ItemStackRenderState renderState, Vec3 offset, float xRadians) {
     }
 }

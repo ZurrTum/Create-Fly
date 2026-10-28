@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.equipment.hats;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.trains.schedule.hat.TrainHatInfo;
 import com.zurrtum.create.client.content.trains.schedule.hat.TrainHatInfoReloadListener;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -62,20 +64,21 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
             return;
         }
 
+        Pose pose = ms.last();
         if (!lastChild.isEmpty()) {
             ModelPart.Cube cube = lastChild.cubes.get(Mth.clamp(info.cubeIndex(), 0, lastChild.cubes.size() - 1));
-            ms.translate(
-                info.offset().x() / 16.0F,
-                (cube.minY - cube.maxY + info.offset().y()) / 16.0F,
-                info.offset().z() / 16.0F
+            pose.translate(
+                (float) (info.offset().x() / 16.0F),
+                (float) ((cube.minY - cube.maxY + info.offset().y()) / 16.0F),
+                (float) (info.offset().z() / 16.0F)
             );
             float max = Math.max(cube.maxX - cube.minX, cube.maxZ - cube.minZ) / 8.0F * info.scale();
-            ms.scale(max, max, max);
+            pose.scale(max, max, max);
         }
 
-        ms.scale(1, -1, -1);
-        ms.translate(0, -2.25F / 16.0F, 0);
-        ms.mulPose(Axis.XP.rotationDegrees(-8.5F));
+        pose.scale(1, -1, -1);
+        pose.translate(0, -2.25F / 16.0F, 0);
+        pose.rotate(Axis.XP, Radians.DEG_351P5);
         BlockState air = Blocks.AIR.defaultBlockState();
         CachedBuffers.partial(hat, air).light(light).submit(ms, queue);
         ms.popPose();

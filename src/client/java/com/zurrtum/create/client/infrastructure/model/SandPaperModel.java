@@ -2,11 +2,11 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ItemModelRenderHelper;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.client.Minecraft;
@@ -28,7 +28,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
@@ -80,14 +79,14 @@ public class SandPaperModel implements ItemModel {
             pose.translate(0.5F, 0.5F, 0.5F);
             if (leftHand) {
                 pose.translate(-0.5f, 0, -0.25f);
-                pose.rotate(Axis.ZP.rotationDegrees(-40));
-                pose.rotate(Axis.XP.rotationDegrees(-10));
-                pose.rotate(Axis.YP.rotationDegrees(-90));
+                pose.rotateZ(Radians.DEG_320);
+                pose.rotateX(Radians.DEG_350);
+                pose.rotateY(Radians.DEG_270);
             } else {
                 pose.translate(0.5f, 0, -0.25f);
-                pose.rotate(Axis.ZP.rotationDegrees(40));
-                pose.rotate(Axis.XP.rotationDegrees(10));
-                pose.rotate(Axis.YP.rotationDegrees(90));
+                pose.rotateZ(Radians.DEG_40);
+                pose.rotateX(Radians.DEG_10);
+                pose.rotateY(Radians.DEG_90);
             }
             pose.translate(-0.5F, -0.5F, -0.5F);
         }
@@ -107,7 +106,7 @@ public class SandPaperModel implements ItemModel {
                 boolean applyLeftHandFix = displayContext.leftHand();
                 boolean reverseBobbing = time / maxUseTime < 0.8F;
                 boolean isGui = displayContext == ItemDisplayContext.GUI;
-                Quaternionf rotate = isGui ? null : Axis.YP.rotationDegrees(leftHand ? -40 : 40);
+                float yRadians = leftHand ? Radians.DEG_320 : Radians.DEG_40;
                 float bobbing = reverseBobbing ? -Mth.abs(Mth.cos(time / 4.0F * (float) Math.PI) * 0.1F) : 0;
                 for (; i < size; i++) {
                     LayerRenderState layer = layers[i];
@@ -126,7 +125,7 @@ public class SandPaperModel implements ItemModel {
                         pose.scaleLocal(0.75f);
                         pose.translateLocal(0.5f, 0.7f, 1.5f);
                     } else {
-                        pose.rotateLocal(rotate);
+                        pose.rotateLocalY(yRadians);
                         pose.translateLocal(0.5f, 0.5f, 0.5f);
                     }
                 }

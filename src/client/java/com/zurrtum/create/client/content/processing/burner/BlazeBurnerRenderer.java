@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.processing.burner;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
@@ -8,9 +9,8 @@ import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
-import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
-import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.processing.burner.BlazeBurnerRenderer.BlazeBurnerRenderState;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -34,7 +34,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlockEntity, BlazeBurnerRenderState> {
@@ -138,7 +137,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         BlockState blockState,
         HeatLevel heatLevel,
         float animation,
-        float horizontalAngle,
+        float yRadians,
         boolean canDrawFlame,
         boolean drawGoggles,
         @Nullable PartialModel drawHat,
@@ -152,7 +151,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         float offset = Mth.sin(renderTick % Mth.TWO_PI) / (heatLevel.isAtLeast(HeatLevel.FADING) ? 64 : 16);
         PartialModel blazeModel = getBlazeModel(heatLevel, blockAbove);
         data.headY = offset - animation * 0.75f;
-        data.horizontalAngle = KineticBlockEntityRenderer.getUpRadiansRotateAngle(horizontalAngle);
+        data.yRadians = yRadians;
         data.blaze = CachedBuffers.partial(blazeModel, blockState).cardinalLighting(cardinalLighting)
             .light(LightCoordsUtil.FULL_BRIGHT).extractRenderState();
         if (drawGoggles) {
@@ -166,7 +165,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
             data.hat = CachedBuffers.partial(drawHat, blockState).cardinalLighting(cardinalLighting)
                 .light(LightCoordsUtil.FULL_BRIGHT).extractRenderState();
             data.hatScale = blazeModel == AllPartialModels.BLAZE_INERT;
-            data.hatAngle = new Quaternionf().setAngleAxis(horizontalAngle + Mth.PI, 0, 1, 0);
+            data.hatRadians = yRadians + Radians.DEG_180;
         }
         if (heatLevel.isAtLeast(HeatLevel.FADING)) {
             if (heatLevel == HeatLevel.SEETHING) {
@@ -215,50 +214,51 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         public @UnknownNullability SuperByteBufferRenderState rods2;
         public @Nullable SuperByteBufferRenderState flame;
         public float headY;
-        public @Nullable Quaternionf horizontalAngle;
+        public float yRadians;
         public boolean hatScale;
-        public @UnknownNullability Quaternionf hatAngle;
+        public float hatRadians;
         public float rodsY;
         public float rods2Y;
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            if (horizontalAngle != null) {
-                matrices.rotateAround(horizontalAngle, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            if (yRadians != 0) {
+                pose.rotateYCentered(yRadians);
             }
             if (flame != null) {
                 flame.submit(matrices, queue);
             }
-            matrices.translate(0, headY, 0);
+            pose.translate(0, headY, 0);
             blaze.submit(matrices, queue);
             if (goggles != null) {
-                matrices.translate(0, 0.5f, 0);
+                pose.translate(0, 0.5f, 0);
                 goggles.submit(matrices, queue);
             }
             matrices.popPose();
             if (hat != null) {
                 matrices.pushPose();
-                matrices.translate(0, headY, 0);
+                pose.translate(0, headY, 0);
                 if (hatScale) {
-                    matrices.translate(0, 0.5f, 0);
-                    SuperByteBuffer.scaleAround(matrices.last(), 0.75f, 0.5f, 0.5f, 0.5f);
+                    pose.translate(0, 0.5f, 0);
+                    pose.pose().scaleAround(0.75f, 0.5f, 0.5f, 0.5f);
                 } else {
-                    matrices.translate(0, 0.75f, 0);
+                    pose.translate(0, 0.75f, 0);
                 }
-                if (hatAngle != null) {
-                    matrices.rotateAround(hatAngle, 0.5f, 0.5f, 0.5f);
+                if (hatRadians != 0) {
+                    pose.rotateYCentered(hatRadians);
                 }
-                matrices.translate(0.5f, 0, 0.5f);
+                pose.translate(0.5f, 0, 0.5f);
                 hat.submit(matrices, queue);
                 matrices.popPose();
             }
             if (rods != null) {
                 matrices.pushPose();
-                matrices.translate(0, rodsY, 0);
+                pose.translate(0, rodsY, 0);
                 rods.submit(matrices, queue);
                 matrices.popPose();
                 matrices.pushPose();
-                matrices.translate(0, rods2Y, 0);
+                pose.translate(0, rods2Y, 0);
                 rods2.submit(matrices, queue);
                 matrices.popPose();
             }

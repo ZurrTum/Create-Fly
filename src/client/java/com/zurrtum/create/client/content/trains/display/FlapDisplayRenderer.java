@@ -3,12 +3,11 @@ package com.zurrtum.create.client.content.trains.display;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.trains.display.FlapDisplayRenderer.FlapDisplayRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -40,8 +39,8 @@ import net.minecraft.util.StringDecomposer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -50,7 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getProgress;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual.rotationOffset;
 
 public class FlapDisplayRenderer implements BlockEntityRenderer<FlapDisplayBlockEntity, FlapDisplayRenderState> {
@@ -96,7 +96,8 @@ public class FlapDisplayRenderer implements BlockEntityRenderer<FlapDisplayBlock
             Direction.Axis axis = facing.getAxis();
             float progress = getProgress(time, be.getSpeed());
             float offset = rotationOffset(state.blockState, axis, state.blockPos);
-            state.angle = getRotateAngle(progress, offset, axis);
+            state.axis = axis;
+            state.angle = (progress + offset) % 360;
             if (!be.isController) {
                 return;
             }
@@ -152,7 +153,7 @@ public class FlapDisplayRenderer implements BlockEntityRenderer<FlapDisplayBlock
         if (display.isEmpty()) {
             return;
         }
-        display.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
+        display.yRadians = Radians.horizontal(facing);
         state.display = display;
     }
 
@@ -164,9 +165,9 @@ public class FlapDisplayRenderer implements BlockEntityRenderer<FlapDisplayBlock
         CameraRenderState cameraState
     ) {
         if (state.model != null) {
-            if (state.angle != null) {
+            if (state.angle != 0) {
                 matrices.pushPose();
-                matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+                matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
                 state.model.submit(matrices, queue);
                 matrices.popPose();
             } else {
@@ -174,7 +175,7 @@ public class FlapDisplayRenderer implements BlockEntityRenderer<FlapDisplayBlock
             }
         }
         if (state.display != null) {
-            state.display.render(matrices, queue);
+            state.display.submit(matrices, queue);
         }
     }
 
@@ -314,25 +315,27 @@ public class FlapDisplayRenderer implements BlockEntityRenderer<FlapDisplayBlock
 
     public static class FlapDisplayRenderState extends BlockEntityRenderState {
         public @Nullable SuperByteBufferRenderState model;
-        public @Nullable Quaternionf angle;
+        public Direction.@UnknownNullability Axis axis;
+        public float angle;
         public @Nullable FlapDisplayData display;
     }
 
     public static class FlapDisplayData {
         public Map<RenderType, TextRenderState> map = new IdentityHashMap<>();
-        public float yRot;
+        public float yRadians;
 
         public void add(int light, boolean glowing, TextRenderable textDrawable) {
             map.computeIfAbsent(textDrawable.renderType(DisplayMode.NORMAL), layer -> new TextRenderState(light))
                 .add(glowing, textDrawable);
         }
 
-        public void render(PoseStack matrices, SubmitNodeCollector queue) {
+        public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.rotateAround(Axis.YP.rotation(yRot), 0.5f, 0.5f, 0.5f);
-            matrices.translate(0, 1.0f, 0.8125f);
-            matrices.scale(0.03125f, -0.03125f, 0.03125f);
-            matrices.translate(0, 0, 0.5f);
+            Pose pose = matrices.last();
+            pose.rotateYCentered(yRadians);
+            pose.translate(0, 1.0f, 0.8125f);
+            pose.scale(0.03125f, -0.03125f, 0.03125f);
+            pose.translate(0, 0, 0.5f);
             map.forEach((layer, state) -> queue.submitCustomGeometry(matrices, layer, state));
             matrices.popPose();
         }

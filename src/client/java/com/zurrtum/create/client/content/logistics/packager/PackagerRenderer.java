@@ -1,11 +1,13 @@
 package com.zurrtum.create.client.content.logistics.packager;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.logistics.packager.PackagerRenderer.PackagerRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -22,6 +24,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.CardinalLighting;
@@ -29,11 +32,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity, PackagerRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -66,7 +65,7 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
             state.lightCoords = SmartBlockEntityRenderer.getLightCoords(level, state.blockPos);
             Direction facing = be.getBlockState().getValue(PackagerBlock.FACING).getOpposite();
             state.trayOffset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(be.getTrayOffset(tickProgress));
-            state.trayYRot = getYRotateAngle(facing.toYRot());
+            state.trayYRot = facing.toYRot();
             ItemStackRenderState item = state.item = new ItemStackRenderState();
             item.displayContext = ItemDisplayContext.FIXED;
             itemModelManager.appendItemLayers(item, renderedBox, item.displayContext, level, null, 0);
@@ -78,13 +77,13 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
         state.lightCoords = SmartBlockEntityRenderer.getLightCoords(level, state.blockPos);
         Direction facing = state.blockState.getValue(PackagerBlock.FACING).getOpposite();
         state.trayOffset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(be.getTrayOffset(tickProgress));
-        state.trayYRot = getYRotateAngle(facing.toYRot());
+        state.trayYRot = facing.toYRot();
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
         state.hatch = CachedBuffers.partial(getHatchModel(be), state.blockState).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).extractRenderState();
         state.hatchOffset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(0.49999f);
-        state.hatchYRot = getYRotateAngle(AngleHelper.horizontalAngle(facing));
-        state.hatchXRot = getXRotateAngle(AngleHelper.verticalAngle(facing));
+        state.hatchYRadians = Radians.horizontal(facing);
+        state.hatchXRadians = Radians.vertical(facing);
         state.tray = CachedBuffers.partial(getTrayModel(state.blockState), state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         if (renderedBox.isEmpty()) {
@@ -104,31 +103,36 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
     ) {
         if (state.hatch != null) {
             matrices.pushPose();
-            matrices.translate(state.hatchOffset);
-            if (state.hatchYRot != null) {
-                matrices.rotateAround(state.hatchYRot, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            Vec3 offset = state.hatchOffset;
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (state.hatchYRadians != 0) {
+                pose.rotateYCentered(state.hatchYRadians);
             }
-            if (state.hatchXRot != null) {
-                matrices.rotateAround(state.hatchXRot, 0.5f, 0.5f, 0.5f);
+            if (state.hatchXRadians != 0) {
+                pose.rotateXCentered(state.hatchXRadians);
             }
             state.hatch.submit(matrices, queue);
             matrices.popPose();
             matrices.pushPose();
-            matrices.translate(state.trayOffset);
-            if (state.trayYRot != null) {
-                matrices.rotateAround(state.trayYRot, 0.5f, 0.5f, 0.5f);
+            offset = state.trayOffset;
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (state.trayYRot != 0) {
+                pose.rotateYCentered(Mth.DEG_TO_RAD * state.trayYRot);
             }
             state.tray.submit(matrices, queue);
             matrices.popPose();
         }
         if (state.item != null) {
-            matrices.translate(state.trayOffset);
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            if (state.trayYRot != null) {
-                matrices.mulPose(state.trayYRot);
+            Pose pose = matrices.last();
+            Vec3 offset = state.trayOffset;
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            pose.translate(0.5f, 0.5f, 0.5f);
+            if (state.trayYRot != 0) {
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * state.trayYRot);
             }
-            matrices.translate(0, 0.125f, 0);
-            matrices.scale(1.49f, 1.49f, 1.49f);
+            pose.translate(0, 0.125f, 0);
+            pose.scale(1.49f, 1.49f, 1.49f);
             state.item.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         }
     }
@@ -149,11 +153,11 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
 
     public static class PackagerRenderState extends BlockEntityRenderState {
         public @UnknownNullability Vec3 trayOffset;
-        public @Nullable Quaternionf trayYRot;
+        public float trayYRot;
         public @Nullable SuperByteBufferRenderState hatch;
         public @UnknownNullability Vec3 hatchOffset;
-        public @Nullable Quaternionf hatchYRot;
-        public @Nullable Quaternionf hatchXRot;
+        public float hatchYRadians;
+        public float hatchXRadians;
         public @UnknownNullability SuperByteBufferRenderState tray;
         public @Nullable ItemStackRenderState item;
     }

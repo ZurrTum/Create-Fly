@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.kinetics.crafter;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.SingleAxisRotatingVisual;
 import com.zurrtum.create.client.content.processing.burner.ScrollInstance;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -44,8 +44,8 @@ public class MechanicalCrafterVisual extends SingleAxisRotatingVisual<Mechanical
         lid = instancerProvider.instancer(
                 InstanceTypes.ORIENTED,
                 Models.chunkPartial(AllPartialModels.MECHANICAL_CRAFTER_LID)
-            ).createInstance().position(visualPos).rotateDegrees(AngleHelper.horizontalAngle(facing) + 90, Direction.UP)
-            .rotateDegrees(blockState.getValue(MechanicalCrafterBlock.POINTING).getXRotation(), Direction.EAST);
+            ).createInstance().position(visualPos).rotateY(Radians.horizontalPlus90(facing))
+            .rotateXDegrees(blockState.getValue(MechanicalCrafterBlock.POINTING).getXRotation());
         belt = instancerProvider.instancer(
                 AllInstanceTypes.SCROLLING_STEP,
                 Models.chunkPartial(AllPartialModels.MECHANICAL_CRAFTER_BELT)

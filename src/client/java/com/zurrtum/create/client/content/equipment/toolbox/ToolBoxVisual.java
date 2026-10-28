@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.equipment.toolbox;
 
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.Instancer;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -13,14 +14,14 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.function.Consumer;
 
 public class ToolBoxVisual extends AbstractBlockEntityVisual<ToolboxBlockEntity> implements SimpleDynamicVisual, ShaderLightVisual {
 
-    private final Direction facing;
+    private final float yRadians;
     private final TransformedInstance lid;
     private final TransformedInstance drawer1;
     private final TransformedInstance drawer2;
@@ -31,7 +32,7 @@ public class ToolBoxVisual extends AbstractBlockEntityVisual<ToolboxBlockEntity>
     public ToolBoxVisual(VisualizationContext context, ToolboxBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
-        facing = blockState.getValue(ToolboxBlock.FACING).getOpposite();
+        yRadians = Mth.DEG_TO_RAD * -blockState.getValue(ToolboxBlock.FACING).getOpposite().toYRot();
 
         Instancer<TransformedInstance> drawerModel = instancerProvider().instancer(
             InstanceTypes.TRANSFORMED,
@@ -73,16 +74,16 @@ public class ToolBoxVisual extends AbstractBlockEntityVisual<ToolboxBlockEntity>
         float drawerOffset = blockEntity.drawers.getValue(partialTicks);
 
         if (lidAngle != lastLidAngle) {
-            lid.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(-facing.toYRot())
-                .uncenter().translate(0, 6 / 16.0f, 12 / 16.0f).rotateXDegrees(135 * lidAngle)
+            lid.setIdentityTransform().translate(getVisualPosition()).rotateYCentered(yRadians)
+                .translate(0, 6 / 16.0f, 12 / 16.0f).rotateX(Radians.DEG_135 * lidAngle)
                 .translateBack(0, 6 / 16.0f, 12 / 16.0f).setChanged();
         }
 
         if (drawerOffset != lastDrawerOffset) {
-            drawer1.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(-facing.toYRot())
-                .uncenter().translate(0, 0, -drawerOffset * 0.35f).setChanged();
-            drawer2.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(-facing.toYRot())
-                .uncenter().translate(0, 0.125f, -drawerOffset * 0.175f).setChanged();
+            drawer1.setIdentityTransform().translate(getVisualPosition()).rotateYCentered(yRadians)
+                .translate(0, 0, -drawerOffset * 0.35f).setChanged();
+            drawer2.setIdentityTransform().translate(getVisualPosition()).rotateYCentered(yRadians)
+                .translate(0, 0.125f, -drawerOffset * 0.175f).setChanged();
         }
 
         lastLidAngle = lidAngle;

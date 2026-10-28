@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.content.logistics.packager;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -43,8 +43,7 @@ public class PackagerVisual<T extends PackagerBlockEntity> extends AbstractBlock
 
         var lowerCorner = Vec3.atLowerCornerOf(facing.getUnitVec3i());
         hatch.setIdentityTransform().translate(getVisualPosition()).translate(lowerCorner.scale(0.49999f))
-            .rotateYCenteredDegrees(AngleHelper.horizontalAngle(facing))
-            .rotateXCenteredDegrees(AngleHelper.verticalAngle(facing)).setChanged();
+            .rotateYCentered(Radians.horizontal(facing)).rotateXCentered(Radians.vertical(facing)).setChanged();
 
         // TODO: I think we need proper ItemVisuals to handle rendering the boxes in here
 

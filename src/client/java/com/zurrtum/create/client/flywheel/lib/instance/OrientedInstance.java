@@ -2,21 +2,17 @@ package com.zurrtum.create.client.flywheel.lib.instance;
 
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
-import com.zurrtum.create.client.flywheel.lib.transform.Rotate;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 
-public class OrientedInstance extends ColoredLitOverlayInstance implements Rotate<OrientedInstance> {
+public class OrientedInstance extends AbstractRotationInstance<OrientedInstance> {
     public float posX;
     public float posY;
     public float posZ;
     public float pivotX = 0.5f;
     public float pivotY = 0.5f;
     public float pivotZ = 0.5f;
-    public final Quaternionf rotation = new Quaternionf();
 
     public OrientedInstance(InstanceType<? extends OrientedInstance> type, InstanceHandle handle) {
         super(type, handle);
@@ -79,27 +75,6 @@ public class OrientedInstance extends ColoredLitOverlayInstance implements Rotat
         pivotX += x;
         pivotY += y;
         pivotZ += z;
-        return this;
-    }
-
-    public OrientedInstance rotation(Quaternionfc q) {
-        rotation.set(q);
-        return this;
-    }
-
-    public OrientedInstance rotation(float x, float y, float z, float w) {
-        rotation.set(x, y, z, w);
-        return this;
-    }
-
-    public OrientedInstance identityRotation() {
-        rotation.identity();
-        return this;
-    }
-
-    @Override
-    public OrientedInstance rotate(Quaternionfc quaternion) {
-        rotation.mul(quaternion);
         return this;
     }
 }

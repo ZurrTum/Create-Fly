@@ -2,7 +2,6 @@ package com.zurrtum.create.client.content.trains.track;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
@@ -202,9 +201,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
                 pose = new Pose();
                 pose.translate((float) prevMiddle.x, (float) prevMiddle.y, (float) prevMiddle.z);
-                pose.rotate(Axis.YP.rotation((float) tieAngles.y));
-                pose.rotate(Axis.XP.rotation((float) tieAngles.x));
-                pose.rotate(Axis.ZP.rotation((float) tieAngles.z));
+                pose.rotateYXZ((float) tieAngles.y, (float) tieAngles.x, (float) tieAngles.z);
                 pose.translate(-0.5f, -0.125f - 1 / 256.0f, 0);
                 tieTransform[i] = pose;
 
@@ -218,9 +215,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
                     pose = new Pose();
                     pose.translate((float) prevI.x, (float) prevI.y, (float) prevI.z);
-                    pose.rotate(Axis.YP.rotation((float) anglesI.y));
-                    pose.rotate(Axis.XP.rotation((float) anglesI.x));
-                    pose.rotate(Axis.ZP.rotation((float) anglesI.z));
+                    pose.rotateYXZ((float) anglesI.y, (float) anglesI.x, (float) anglesI.z);
                     pose.translate(0, -0.125f - 1 / 256.0f, -0.03125f);
                     pose.scale(1, 1, (float) diff.length() * scale);
                     railTransforms[i].set(first, pose);
@@ -297,9 +292,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
                     pose = new Pose();
                     pose.translate((float) previousBeam.x, (float) previousBeam.y, (float) previousBeam.z);
-                    pose.rotate(Axis.YP.rotation((float) beamAngles.y));
-                    pose.rotate(Axis.XP.rotation((float) beamAngles.x));
-                    pose.rotate(Axis.ZP.rotation((float) beamAngles.z));
+                    pose.rotateYXZ((float) beamAngles.y, (float) beamAngles.x, (float) beamAngles.z);
                     pose.translate(0, 0.125f + offsetSign / 2048.0f - 1 / 1024.0f, -0.03125f);
                     pose.scale(1, 1, (float) beamDiff.length() * scale);
                     beams[i].set(first, pose);
@@ -313,9 +306,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
 
                         pose = new Pose();
                         pose.translate((float) previous.x, (float) previous.y, (float) previous.z);
-                        pose.rotate(Axis.YP.rotation((float) capAngles.y));
-                        pose.rotate(Axis.XP.rotation((float) capAngles.x));
-                        pose.rotate(Axis.ZP.rotation((float) capAngles.z));
+                        pose.rotateYXZ((float) capAngles.y, (float) capAngles.x, (float) capAngles.z);
                         pose.translate(0, 0.125f + offsetSign / 2048.0f - 1 / 1024.0f, -0.03125f);
                         pose.scale(1, 1, (float) diff.length() * scale);
                         beamCaps[i].get(top).set(first, pose);

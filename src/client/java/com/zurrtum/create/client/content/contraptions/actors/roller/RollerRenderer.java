@@ -1,14 +1,15 @@
 package com.zurrtum.create.client.content.contraptions.actors.roller;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.actors.roller.RollerRenderer.RollerRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
@@ -24,15 +25,13 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 
 public class RollerRenderer implements BlockEntityRenderer<RollerBlockEntity, RollerRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -84,13 +83,14 @@ public class RollerRenderer implements BlockEntityRenderer<RollerBlockEntity, Ro
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         Direction facing = state.blockState.getValue(RollerBlock.FACING);
         state.offset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(1.0625f).add(0, -0.25f, 0);
-        float angle = AngleHelper.horizontalAngle(facing);
-        state.wheelAngle = getUpRotateAngle(angle);
-        state.rotate = getWestRotateAngle(AnimationTickHolder.getRenderTime(level) / 20 * be.getAnimatedSpeed() % 360);
-        state.yRot = Axis.YP.rotation(RAD_90);
+        state.wheelRadians = Radians.horizontal(facing);
+        float animatedSpeed = be.getAnimatedSpeed();
+        if (animatedSpeed != 0) {
+            state.xRadians = Mth.DEG_TO_RAD * -(AnimationTickHolder.getRenderTime(level) / 20 * animatedSpeed % 360);
+        }
         state.frame = CachedBuffers.partial(AllPartialModels.ROLLER_FRAME, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
-        state.frameAngle = getUpRotateAngle(angle + 180);
+        state.frameRadians = Radians.horizontalPlus180(facing);
     }
 
     @Override
@@ -105,19 +105,21 @@ public class RollerRenderer implements BlockEntityRenderer<RollerBlockEntity, Ro
         }
         if (state.wheel != null) {
             matrices.pushPose();
-            matrices.translate(state.offset);
-            if (state.wheelAngle != null) {
-                matrices.rotateAround(state.wheelAngle, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            Vec3 offset = state.offset;
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (state.wheelRadians != 0) {
+                pose.rotateYCentered(state.wheelRadians);
             }
-            if (state.rotate != null) {
-                matrices.mulPose(state.rotate);
+            if (state.xRadians != 0) {
+                pose.rotate(Axis.XP, state.xRadians);
             }
-            matrices.translate(0, -0.5, 0.5);
-            matrices.mulPose(state.yRot);
+            pose.translate(0, -0.5f, 0.5f);
+            pose.rotate(Axis.YP, Radians.DEG_90);
             state.wheel.submit(matrices, queue);
             matrices.popPose();
-            if (state.frameAngle != null) {
-                matrices.rotateAround(state.frameAngle, 0.5f, 0.5f, 0.5f);
+            if (state.frameRadians != 0) {
+                matrices.rotateYCentered(state.frameRadians);
             }
             state.frame.submit(matrices, queue);
         }
@@ -128,9 +130,8 @@ public class RollerRenderer implements BlockEntityRenderer<RollerBlockEntity, Ro
         public @Nullable SuperByteBufferRenderState wheel;
         public @UnknownNullability SuperByteBufferRenderState frame;
         public @UnknownNullability Vec3 offset;
-        public @Nullable Quaternionf wheelAngle;
-        public @Nullable Quaternionf rotate;
-        public @UnknownNullability Quaternionf yRot;
-        public @UnknownNullability Quaternionf frameAngle;
+        public float wheelRadians;
+        public float xRadians;
+        public float frameRadians;
     }
 }

@@ -1,14 +1,15 @@
 package com.zurrtum.create.client.content.contraptions.gantry;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.gantry.GantryCarriageRenderer.GantryCarriageRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlock;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlockEntity;
@@ -22,11 +23,11 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -56,7 +57,8 @@ public class GantryCarriageRenderer implements BlockEntityRenderer<GantryCarriag
             .light(state.lightCoords).color(getTintColor(be)).extractRenderState();
         float progress = getProgress(be, level);
         float offset = rotationOffset(state.blockState, rotationAxis, state.blockPos);
-        state.angle = getRotateAngle(progress, offset, rotationAxis);
+        state.axis = rotationAxis;
+        state.angle = (progress + offset) % 360;
         Direction facing = state.blockState.getValue(GantryCarriageBlock.FACING);
         if (facing.getAxisDirection() != AxisDirection.POSITIVE) {
             offset = rotationOffset(state.blockState, rotationAxis, state.blockPos.relative(facing.getOpposite()));
@@ -78,14 +80,12 @@ public class GantryCarriageRenderer implements BlockEntityRenderer<GantryCarriag
                 angleForBE = -angleForBE;
             }
         }
-        state.xRot2 = getXRotateAngle(angleForBE);
-        state.yRot = getYRotateAngle(AngleHelper.horizontalAngle(facing));
+        state.xRot2 = angleForBE;
+        state.yRadians = Radians.horizontal(facing);
         if (facing != Direction.UP) {
-            state.xRot = Axis.XP.rotation(facing == Direction.DOWN ? RAD_180 : RAD_90);
+            state.xRadians = facing == Direction.DOWN ? Radians.DEG_180 : Radians.DEG_90;
         }
-        if (state.blockState.getValue(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE) == (facingAxis == Direction.Axis.X)) {
-            state.yRot2 = Axis.YP.rotation(RAD_90);
-        }
+        state.alongFirst = state.blockState.getValue(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE) == (facingAxis == Direction.Axis.X);
         state.cogs = CachedBuffers.partial(AllPartialModels.GANTRY_COGS, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
     }
@@ -97,28 +97,29 @@ public class GantryCarriageRenderer implements BlockEntityRenderer<GantryCarriag
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.shaft.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.shaft.submit(matrices, queue);
         }
-        matrices.translate(0.5f, 0.5f, 0.5f);
-        if (state.yRot != null) {
-            matrices.mulPose(state.yRot);
+        Pose pose = matrices.last();
+        pose.translate(0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            pose.rotate(Axis.YP, state.yRadians);
         }
-        if (state.xRot != null) {
-            matrices.mulPose(state.xRot);
+        if (state.xRadians != 0) {
+            pose.rotate(Axis.XP, state.xRadians);
         }
-        if (state.yRot2 != null) {
-            matrices.mulPose(state.yRot2);
+        if (state.alongFirst) {
+            pose.rotate(Axis.YP, Radians.DEG_90);
         }
-        if (state.xRot2 != null) {
-            matrices.rotateAround(state.xRot2, 0, -0.5625f, 0);
+        if (state.xRot2 != 0) {
+            pose.rotateXAround(Mth.DEG_TO_RAD * state.xRot2, 0, -0.5625f, 0);
         }
-        matrices.translate(-0.5f, -0.5f, -0.5f);
+        pose.translate(-0.5f, -0.5f, -0.5f);
         state.cogs.submit(matrices, queue);
     }
 
@@ -131,10 +132,11 @@ public class GantryCarriageRenderer implements BlockEntityRenderer<GantryCarriag
     public static class GantryCarriageRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState shaft;
         public @UnknownNullability SuperByteBufferRenderState cogs;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
-        public @Nullable Quaternionf yRot2;
-        public @Nullable Quaternionf xRot2;
+        public Direction.@UnknownNullability Axis axis;
+        public float angle;
+        public float yRadians;
+        public float xRadians;
+        public boolean alongFirst;
+        public float xRot2;
     }
 }

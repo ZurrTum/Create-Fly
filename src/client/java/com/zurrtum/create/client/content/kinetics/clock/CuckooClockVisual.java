@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.kinetics.clock;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.OrientedRotatingVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -19,13 +19,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getEastRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRotateAngle;
 
 public class CuckooClockVisual extends OrientedRotatingVisual<CuckooClockBlockEntity> implements SimpleDynamicVisual {
     private final TransformedInstance hourHand;
@@ -64,9 +60,11 @@ public class CuckooClockVisual extends OrientedRotatingVisual<CuckooClockBlockEn
         ).createInstance();
         BlockPos visualPos = getVisualPosition();
         transform = new Matrix4f().translate(visualPos.getX(), visualPos.getY(), visualPos.getZ());
-        Quaternionf rotate = getUpRotateAngle(AngleHelper.horizontalAngle(facing.getCounterClockWise()));
-        if (rotate != null) {
-            transform.rotateAround(rotate, 0.5f, 0.5f, 0.5f);
+        float yRadians = Radians.horizontal(facing.getCounterClockWise());
+        if (yRadians != 0) {
+            transform.translate(0.5f, 0.5f, 0.5f);
+            transform.rotateY(yRadians);
+            transform.translate(-0.5f, -0.5f, -0.5f);
         }
         transformHandModels(partialTick);
         transformFigureModels(partialTick);
@@ -88,13 +86,13 @@ public class CuckooClockVisual extends OrientedRotatingVisual<CuckooClockBlockEn
         CuckooClockAnimationBehaviour behaviour = (CuckooClockAnimationBehaviour) blockEntity.getBehaviour(
             AnimationBehaviour.TYPE);
         if (behaviour != null) {
-            Quaternionf hourAngle = getEastRotateAngle(behaviour.hourHand.getValue(partialTick));
-            if (hourAngle != null) {
-                hourHand.rotateAround(hourAngle, 0.125f, 0.375f, 0.5f);
+            float hourAngle = behaviour.hourHand.getValue(partialTick);
+            if (hourAngle != 0) {
+                hourHand.translate(0.125f, 0.375f, 0.5f).rotateX(hourAngle).translate(-0.125f, -0.375f, -0.5f);
             }
-            Quaternionf minuteAngle = getEastRotateAngle(behaviour.minuteHand.getValue(partialTick));
-            if (minuteAngle != null) {
-                minuteHand.rotateAround(minuteAngle, 0.125f, 0.375f, 0.5f);
+            float minuteAngle = behaviour.minuteHand.getValue(partialTick);
+            if (minuteAngle != 0) {
+                minuteHand.translate(0.125f, 0.375f, 0.5f).rotateX(minuteAngle).translate(-0.125f, -0.375f, -0.5f);
             }
         }
         hourHand.setChanged();
@@ -106,9 +104,9 @@ public class CuckooClockVisual extends OrientedRotatingVisual<CuckooClockBlockEn
         leftDoor.setTransform(transform);
         float doorAngle = CuckooClockRenderer.getDoorAngle(blockEntity, partialTick);
         if (doorAngle != 0) {
-            Quaternionf rotate = new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * doorAngle, 0, 1, 0);
-            rightDoor.rotateAround(rotate, 0.125f, 0, 0.625f);
-            leftDoor.rotateAround(rotate.conjugate(), 0.125f, 0, 0.375f);
+            float doorRadians = Mth.DEG_TO_RAD * doorAngle;
+            rightDoor.translate(0.125f, 0, 0.625f).rotateY(doorRadians).translate(-0.125f, 0, -0.625f);
+            leftDoor.translate(0.125f, 0, 0.375f).rotateY(-doorRadians).translate(-0.125f, 0, -0.375f);
             if (blockEntity.animationType != Animation.NONE) {
                 float offset = -(doorAngle / 135) * 0.5f + 0.625f;
                 if (offset <= 0.4f) {

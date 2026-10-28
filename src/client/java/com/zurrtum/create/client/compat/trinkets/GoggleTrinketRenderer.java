@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.compat.trinkets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.equipment.goggles.GogglesItem;
 import eu.pb4.trinkets.api.TrinketSlotAccess;
 import eu.pb4.trinkets.api.TrinketsApi;
@@ -41,12 +43,13 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
             matrices.pushPose();
             entityModel.root().translateAndRotate(matrices);
             entityModel.getHead().translateAndRotate(matrices);
-            matrices.translate(0.0F, -0.25F, 0.0F);
-            matrices.mulPose(Axis.YP.rotationDegrees(180.0F));
-            matrices.scale(0.625F, -0.625F, -0.625F);
+            Pose pose = matrices.last();
+            pose.translate(0.0F, -0.25F, 0.0F);
+            pose.rotate(Axis.YP, Radians.DEG_180);
+            pose.scale(0.625F, -0.625F, -0.625F);
             if (!((AvatarRenderState) state).headEquipment.isEmpty()) {
-                matrices.mulPose(Axis.ZP.rotationDegrees(180.0F));
-                matrices.translate(0.0F, -0.25F, 0.0F);
+                pose.rotate(Axis.ZP, Radians.DEG_180);
+                pose.translate(0.0F, -0.25F, 0.0F);
             }
             ItemStackRenderState item = new ItemStackRenderState();
             item.displayContext = ItemDisplayContext.HEAD;

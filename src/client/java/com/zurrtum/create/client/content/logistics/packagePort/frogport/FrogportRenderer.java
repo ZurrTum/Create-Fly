@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.content.logistics.packagePort.frogport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.logistics.packagePort.frogport.FrogportRenderer.FrogportRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
@@ -26,11 +26,7 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity, FrogportRenderState> {
     public FrogportRenderer(Context context) {
@@ -92,10 +88,10 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         if (be.target != null) {
             diff = be.target.getExactTargetLocation(be, level, state.blockPos)
                 .subtract(0, animating && depositing ? 0 : 0.75, 0).subtract(Vec3.atCenterOf(state.blockPos));
-            float tonguePitch = (float) Mth.atan2(diff.y, diff.multiply(1, 0, 1).length() + 3 / 16.0f) * Mth.RAD_TO_DEG;
+            float tonguePitch = (float) Mth.atan2(diff.y, diff.multiply(1, 0, 1).length() + 3 / 16.0f);
             tongueLength = Math.max((float) diff.length(), 1);
-            headPitch = Mth.clamp(tonguePitch * 2, 60, 100);
-            data.tonguePitch = Axis.XP.rotation(Mth.DEG_TO_RAD * tonguePitch);
+            headPitch = Mth.clamp(tonguePitch * Mth.RAD_TO_DEG * 2, 60, 100);
+            data.tonguePitchRadians = tonguePitch;
         } else {
             diff = Vec3.ZERO;
             tongueLength = 0;
@@ -141,9 +137,9 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         headPitch *= headPitchModifier;
         float openProgress = be.manualOpenAnimationProgress.getValue(tickProgress);
         headPitch = Math.max(headPitch, openProgress * 60);
-        data.headPitch = getXRotateAngle(headPitch);
+        data.headPitch = headPitch;
         tongueLength = Math.max(tongueLength, openProgress * 0.25f);
-        data.yRot = getYRotateAngle(be.getYaw());
+        data.yRot = be.getYaw();
         data.head = CachedBuffers.partial(
             be.goggles ? AllPartialModels.FROGPORT_HEAD_GOGGLES : AllPartialModels.FROGPORT_HEAD,
             state.blockState
@@ -175,10 +171,10 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
 
     public static class FrogportRenderData {
         public @UnknownNullability SuperByteBufferRenderState body;
-        public @Nullable Quaternionf tonguePitch;
-        public @Nullable Quaternionf yRot;
+        public float tonguePitchRadians;
+        public float yRot;
         public @UnknownNullability SuperByteBufferRenderState head;
-        public @Nullable Quaternionf headPitch;
+        public float headPitch;
         public @UnknownNullability SuperByteBufferRenderState tongue;
         public float tongueScale;
         public @Nullable SuperByteBufferRenderState rig;
@@ -189,29 +185,31 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             if (box != null) {
                 matrices.pushPose();
-                matrices.translate(boxOffset);
-                SuperByteBuffer.scaleAround(matrices.last(), boxScale, 0.5f, 0.5f, 0.5f);
+                Pose pose = matrices.last();
+                pose.translate((float) boxOffset.x, (float) boxOffset.y, (float) boxOffset.z);
+                pose.pose().scaleAround(boxScale, 0.5f, 0.5f, 0.5f);
                 box.submit(matrices, queue);
                 if (rig != null) {
                     rig.submit(matrices, queue);
                 }
                 matrices.popPose();
             }
-            if (yRot != null) {
-                matrices.rotateAround(yRot, 0.5f, 0.5f, 0.5f);
+            if (yRot != 0) {
+                matrices.rotateYCentered(Mth.DEG_TO_RAD * yRot);
             }
             body.submit(matrices, queue);
             matrices.pushPose();
-            matrices.translate(0.5f, 0.625f, 0.6875f);
-            if (tonguePitch != null) {
-                matrices.mulPose(tonguePitch);
+            Pose pose = matrices.last();
+            pose.translate(0.5f, 0.625f, 0.6875f);
+            if (tonguePitchRadians != 0) {
+                pose.rotate(Axis.XP, tonguePitchRadians);
             }
-            matrices.scale(1, 1, tongueScale);
-            matrices.translate(-0.5f, -0.625f, -0.6875f);
+            pose.scale(1, 1, tongueScale);
+            pose.translate(-0.5f, -0.625f, -0.6875f);
             tongue.submit(matrices, queue);
             matrices.popPose();
-            if (headPitch != null) {
-                matrices.rotateAround(headPitch, 0.5f, 0.625f, 0.6875f);
+            if (headPitch != 0) {
+                matrices.rotateXAround(Mth.DEG_TO_RAD * headPitch, 0.5f, 0.625f, 0.6875f);
             }
             head.submit(matrices, queue);
         }

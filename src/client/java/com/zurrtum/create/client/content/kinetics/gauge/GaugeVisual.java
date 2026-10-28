@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.content.kinetics.gauge;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.Instancer;
@@ -14,10 +16,10 @@ import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 
@@ -41,8 +43,8 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
         );
         Instancer<TransformedInstance> headModel = getHeadModel();
 
-        var msr = TransformStack.of(ms);
-        msr.translate(getVisualPosition());
+        BlockPos position = getVisualPosition();
+        ms.translate(position.getX(), position.getY(), position.getZ());
 
         float progress = Mth.lerp(
             AnimationTickHolder.getPartialTicks(),
@@ -59,7 +61,7 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
             faces.add(face);
 
-            face.setupTransform(msr, progress);
+            face.setupTransform(ms, progress);
         }
     }
 
@@ -96,10 +98,8 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
         float progress = Mth.lerp(ctx.partialTick(), blockEntity.prevDialState, blockEntity.dialState);
 
-        var msr = TransformStack.of(ms);
-
         for (DialFace faceEntry : faces) {
-            faceEntry.updateTransform(msr, progress);
+            faceEntry.updateTransform(ms, progress);
         }
     }
 
@@ -136,37 +136,45 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
             this.face = face;
         }
 
-        private void setupTransform(TransformStack<?> msr, float progress) {
+        private void setupTransform(PoseStack ms, float progress) {
             float dialPivot = 5.75f / 16;
 
-            msr.pushPose();
-            rotateToFace(msr);
+            ms.pushPose();
+            Pose pose = ms.last();
+            rotateToFace(pose);
 
-            getSecond().setTransform(ms).setChanged();
+            getSecond().setTransform(pose).setChanged();
 
-            msr.translate(0, dialPivot, dialPivot).rotate((float) (Math.PI / 2 * -progress), Direction.EAST)
-                .translate(0, -dialPivot, -dialPivot);
+            if (progress != 0) {
+                pose.rotateXAround(-Radians.DEG_90 * progress, 0, dialPivot, dialPivot);
+            }
 
-            getFirst().setTransform(ms).setChanged();
+            getFirst().setTransform(pose).setChanged();
 
-            msr.popPose();
+            ms.popPose();
         }
 
-        private void updateTransform(TransformStack<?> msr, float progress) {
+        private void updateTransform(PoseStack ms, float progress) {
             float dialPivot = 5.75f / 16;
 
-            msr.pushPose();
+            ms.pushPose();
 
-            rotateToFace(msr).translate(0, dialPivot, dialPivot)
-                .rotate((float) (Math.PI / 2 * -progress), Direction.EAST).translate(0, -dialPivot, -dialPivot);
+            Pose pose = ms.last();
+            rotateToFace(pose);
+            if (progress != 0) {
+                pose.rotateXAround(progress * -Radians.DEG_90, 0, dialPivot, dialPivot);
+            }
 
-            getFirst().setTransform(ms).setChanged();
+            getFirst().setTransform(pose).setChanged();
 
-            msr.popPose();
+            ms.popPose();
         }
 
-        protected TransformStack<?> rotateToFace(TransformStack<?> msr) {
-            return msr.center().rotate((float) ((-face.toYRot() - 90) / 180 * Math.PI), Direction.UP).uncenter();
+        protected void rotateToFace(Pose pose) {
+            float angle = -face.toYRot() - 90;
+            if (angle != 0) {
+                pose.rotateYCentered(Mth.DEG_TO_RAD * angle);
+            }
         }
 
         private void delete() {

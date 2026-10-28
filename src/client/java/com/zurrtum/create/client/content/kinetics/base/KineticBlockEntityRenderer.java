@@ -36,9 +36,25 @@ import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends KineticRenderState> implements BlockEntityRenderer<T, S> {
+    /**
+     * @deprecated {@link Radians#DEG_90}
+     */
+    @Deprecated(forRemoval = true)
     public static final float RAD_90 = Mth.DEG_TO_RAD * 90;
+    /**
+     * @deprecated {@link Radians#DEG_180}
+     */
+    @Deprecated(forRemoval = true)
     public static final float RAD_180 = Mth.DEG_TO_RAD * 180;
+    /**
+     * @deprecated {@link Radians#DEG_270}
+     */
+    @Deprecated(forRemoval = true)
     public static final float RAD_270 = Mth.DEG_TO_RAD * 270;
+    /**
+     * @deprecated {@link Radians#DEG_360}
+     */
+    @Deprecated(forRemoval = true)
     public static final float RAD_360 = Mth.DEG_TO_RAD * 360;
     public static final Compartment<BlockState> KINETIC_BLOCK = new Compartment<>();
     public static boolean rainbowMode;
@@ -66,10 +82,9 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
             return;
         }
         updateBaseRenderState(be, state, world, crumblingOverlay);
-        state.angle = getAngleForBe(be, state.blockPos, state.axis);
-        state.model = getRotatedModel(be, state).cardinalLighting(state.cardinalLighting)
-            .rotateCentered(state.angle, state.direction).light(state.lightCoords).color(state.color)
-            .extractRenderState();
+        state.angle = getDegrees(state.axis, be, state, world);
+        state.model = getRotatedModel(be, state).cardinalLighting(state.cardinalLighting).light(state.lightCoords)
+            .color(state.color).extractRenderState();
     }
 
     public void updateBaseRenderState(
@@ -92,6 +107,9 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
     @Override
     public void submit(S state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.model != null) {
+            if (state.angle != 0) {
+                matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
+            }
             state.model.submit(matrices, queue);
         }
     }
@@ -110,6 +128,49 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return (time * be.getSpeed() * 0.3f + offset) % 360 * Mth.DEG_TO_RAD;
     }
 
+    public static float getDegrees(Axis axis, KineticBlockEntity be) {
+        float progress = getProgress(be, be.getLevel());
+        float offset = getRotationOffsetForPosition(be, be.getBlockPos(), axis);
+        return (progress + offset) % 360;
+    }
+
+    public static float getDegreesWithoutBeOffset(Axis axis, KineticBlockEntity be) {
+        float progress = getProgress(be, be.getLevel());
+        float offset = KineticBlockEntityVisual.rotationOffset(be.getBlockState(), axis, be.getBlockPos());
+        return (progress + offset) % 360;
+    }
+
+    public static float getDegrees(
+        Axis axis,
+        KineticBlockEntity be,
+        BlockEntityRenderState state,
+        @Nullable LevelAccessor level
+    ) {
+        float progress = getProgress(be, level);
+        float offset = KineticBlockEntityVisual.rotationOffset(
+            state.blockState,
+            axis,
+            state.blockPos
+        ) + be.getRotationAngleOffset(axis);
+        return (progress + offset) % 360;
+    }
+
+    public static float getDegreesWithoutBeOffset(
+        Axis axis,
+        KineticBlockEntity be,
+        BlockEntityRenderState state,
+        @Nullable LevelAccessor level
+    ) {
+        float progress = getProgress(be, level);
+        float offset = KineticBlockEntityVisual.rotationOffset(state.blockState, axis, state.blockPos);
+        return (progress + offset) % 360;
+    }
+
+    /**
+     * @deprecated {@link getDegrees(Axis, KineticBlockEntity, BlockEntityRenderState, LevelAccessor)}
+     * rotate(Axis, Mth.DEG_TO_RAD * degrees)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngleForBe(
         Axis axis,
@@ -126,6 +187,11 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return getRotateAngle(getProgress(be, level), offset, direction);
     }
 
+    /**
+     * @deprecated {@link getDegreesWithoutBeOffset(Axis, KineticBlockEntity, BlockEntityRenderState, LevelAccessor)}
+     * rotate(Axis, Mth.DEG_TO_RAD * degrees)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngleWithoutBeOffset(
         KineticBlockEntity be,
@@ -135,6 +201,11 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return getRotateAngleWithoutBeOffset(getRotationAxisOf(state.blockState), be, state, level);
     }
 
+    /**
+     * @deprecated {@link getDegreesWithoutBeOffset(Axis, KineticBlockEntity, BlockEntityRenderState, LevelAccessor)}
+     * rotate(Axis, Mth.DEG_TO_RAD * degrees)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngleWithoutBeOffset(
         Axis axis,
@@ -149,6 +220,11 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         );
     }
 
+    /**
+     * @deprecated {@link getDegreesWithoutBeOffset(Axis, KineticBlockEntity, BlockEntityRenderState, LevelAccessor)}
+     * rotate(Axis, Mth.DEG_TO_RAD * degrees)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngleWithoutBeOffset(
         Axis axis,
@@ -176,6 +252,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return time * speed * 0.3f;
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(Axis, float)} rotate(Axis, Mth.DEG_TO_RAD * ((progress + offset) % 360))
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngle(float progress, float offset, Axis axis) {
         float angle = (progress + offset) % 360;
@@ -191,6 +271,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         );
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(Direction, float)} rotate(Direction, Mth.DEG_TO_RAD * ((progress + offset) % 360))
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngle(float progress, float offset, Direction direction) {
         float angle = (progress + offset) % 360;
@@ -205,6 +289,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         );
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(Direction, float)} rotate(Direction, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRotateAngle(float angle, Direction direction) {
         if (angle == 0) {
@@ -218,6 +306,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         );
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(Direction, float)}
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getRadiansRotateAngle(float angle, Direction direction) {
         if (angle == 0) {
@@ -226,6 +318,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(angle, direction.getStepX(), direction.getStepY(), direction.getStepZ());
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.YP, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getUpRotateAngle(float angle) {
         if (angle == 0) {
@@ -234,6 +330,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * angle, 0, 1, 0);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.ZP, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getSouthRotateAngle(float angle) {
         if (angle == 0) {
@@ -242,6 +342,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * angle, 0, 0, 1);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.XP, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getEastRotateAngle(float angle) {
         if (angle == 0) {
@@ -250,6 +354,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * angle, 1, 0, 0);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.XP, Mth.DEG_TO_RAD * -float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getWestRotateAngle(float angle) {
         if (angle == 0) {
@@ -258,6 +366,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * angle, -1, 0, 0);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.YP, float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getUpRadiansRotateAngle(float angle) {
         if (angle == 0) {
@@ -266,6 +378,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(angle, 0, 1, 0);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.XP, float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getEastRadiansRotateAngle(float angle) {
         if (angle == 0) {
@@ -274,6 +390,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().setAngleAxis(angle, 1, 0, 0);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.XP, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getXRotateAngle(float angle) {
         if (angle == 0) {
@@ -282,6 +402,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().rotationX(Mth.DEG_TO_RAD * angle);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.YP, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getYRotateAngle(float angle) {
         if (angle == 0) {
@@ -290,6 +414,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().rotationY(Mth.DEG_TO_RAD * angle);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.ZP, Mth.DEG_TO_RAD * float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getZRotateAngle(float angle) {
         if (angle == 0) {
@@ -298,6 +426,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().rotationZ(Mth.DEG_TO_RAD * angle);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.YP, float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getYRadiansRotateAngle(float angle) {
         if (angle == 0) {
@@ -306,6 +438,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().rotationY(angle);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.XP, float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getXRadiansRotateAngle(float angle) {
         if (angle == 0) {
@@ -314,6 +450,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return new Quaternionf().rotationX(angle);
     }
 
+    /**
+     * @deprecated {@link PoseStack#rotate(com.mojang.math.Axis, float)} rotate(Axis.ZP, float)
+     */
+    @Deprecated
     @Nullable
     public static Quaternionf getZRadiansRotateAngle(float angle) {
         if (angle == 0) {

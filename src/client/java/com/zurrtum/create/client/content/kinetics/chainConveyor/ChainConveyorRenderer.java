@@ -10,7 +10,7 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
-import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.chainConveyor.ChainConveyorRenderer.ChainConveyorRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -42,7 +42,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
@@ -50,8 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.RAD_180;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRadiansRotateAngle;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getDegreesWithoutBeOffset;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotationAxisOf;
 
 public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorBlockEntity, ChainConveyorRenderState> {
     public static final Identifier CHAIN_LOCATION = Identifier.withDefaultNamespace("textures/block/iron_chain.png");
@@ -89,7 +88,9 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
         state.model = CachedBuffers.partial(AllPartialModels.CHAIN_CONVEYOR_SHAFT, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
-        state.angle = KineticBlockEntityRenderer.getRotateAngleWithoutBeOffset(be, state, level);
+        Direction.Axis axis = getRotationAxisOf(blockState);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         state.chains = getChainsRenderState(be, level, blockPos, cameraPos);
         if (state.chains != null) {
             state.chain = CreateRenderTypes.chain(CHAIN_LOCATION);
@@ -133,9 +134,9 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
         CameraRenderState cameraState
     ) {
         if (state.model != null) {
-            if (state.angle != null) {
+            if (state.angle != 0) {
                 matrices.pushPose();
-                matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+                matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
                 state.model.submit(matrices, queue);
                 matrices.popPose();
             } else {
@@ -146,9 +147,9 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
             if (state.guard != null) {
                 for (ChainRenderState chain : state.chains) {
                     chain.submit(matrices, state.chain, queue);
-                    if (chain.yaw != null) {
+                    if (chain.yawRadians != 0) {
                         matrices.pushPose();
-                        matrices.rotateAround(chain.yaw, 0.5f, 0.5f, 0.5f);
+                        matrices.rotateYCentered(chain.yawRadians);
                         state.guard.submit(matrices, queue);
                         matrices.popPose();
                     } else {
@@ -200,7 +201,7 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
         Vec3 position = physicsData.prevPos.lerp(physicsData.pos, partialTicks);
         Vec3 targetPosition = physicsData.prevTargetPos.lerp(physicsData.targetPos, partialTicks);
         float yaw = AngleHelper.angleLerp(partialTicks, physicsData.prevYaw, physicsData.yaw);
-        state.yaw = KineticBlockEntityRenderer.getYRotateAngle(yaw);
+        state.yaw = yaw;
         state.offset = new Vec3(
             targetPosition.x - pos.getX(),
             targetPosition.y - pos.getY() + 0.625f,
@@ -214,11 +215,9 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
         Vec3 dangleDiff = VecHelper.rotate(targetPosition.add(0, 0.5, 0).subtract(position), -yaw, Direction.Axis.Y);
         float zRot = Mth.wrapDegrees((float) Mth.atan2(-dangleDiff.x, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
         float xRot = Mth.wrapDegrees((float) Mth.atan2(dangleDiff.z, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
-        state.zRot = Axis.ZP.rotation(Mth.DEG_TO_RAD * Mth.clamp(zRot, -25, 25));
-        state.xRot = Axis.XP.rotation(Mth.DEG_TO_RAD * Mth.clamp(xRot, -25, 25));
-        if (physicsData.flipped) {
-            state.yRot = Axis.YP.rotation(RAD_180);
-        }
+        state.zRadians = Mth.DEG_TO_RAD * Mth.clamp(zRot, -25, 25);
+        state.xRadians = Mth.DEG_TO_RAD * Mth.clamp(xRot, -25, 25);
+        state.flipped = physicsData.flipped;
         state.offsetY = -PackageItem.getHookDistance(box.item) - 0.0625f;
         state.rig = CachedBuffers.partial(AllPartialModels.PACKAGE_RIGGING.get(physicsData.modelKey), blockState)
             .cardinalLighting(cardinalLighting).light(light).extractRenderState();
@@ -249,7 +248,6 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
             level.getBrightness(LightLayer.BLOCK, tilePos),
             level.getBrightness(LightLayer.SKY, tilePos)
         );
-        Quaternionf yRot = Axis.YP.rotation(Mth.DEG_TO_RAD * 45);
         for (BlockPos blockPos : be.connections) {
             ConnectionStats stats = be.connectionStats.get(blockPos);
             if (stats == null) {
@@ -262,12 +260,8 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
             ChainRenderState state = far ? new FarChainRenderState() : new ChainRenderState();
             Vec3 diff = stats.end().subtract(stats.start());
             state.startOffset = stats.start().subtract(x, y, z);
-            state.yaw = getYRadiansRotateAngle((float) Mth.atan2(diff.x, diff.z));
-            state.pitch = Axis.XP.rotation((float) (Mth.DEG_TO_RAD * (90 - Mth.RAD_TO_DEG * Mth.atan2(
-                diff.y,
-                diff.multiply(1, 0, 1).length()
-            ))));
-            state.yRot = yRot;
+            state.yawRadians = (float) Mth.atan2(diff.x, diff.z);
+            state.pitchRadians = (float) (Radians.DEG_90 - Mth.atan2(diff.y, diff.multiply(1, 0, 1).length()));
             BlockPos pos = tilePos.offset(blockPos);
             state.light1 = light1;
             state.light2 = LightCoordsUtil.pack(
@@ -457,7 +451,8 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
     }
 
     public static class ChainConveyorRenderState extends BlockEntityRenderState {
-        public @Nullable Quaternionf angle;
+        public Direction.Axis axis;
+        public float angle;
         public @Nullable SuperByteBufferRenderState model;
         public @Nullable SuperByteBufferRenderState guard;
         public @UnknownNullability RenderType chain;
@@ -467,9 +462,8 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
 
     public static class ChainRenderState implements CustomGeometryRenderer {
         public @UnknownNullability Vec3 startOffset;
-        public @Nullable Quaternionf yaw;
-        public @UnknownNullability Quaternionf pitch;
-        public @UnknownNullability Quaternionf yRot;
+        public float yawRadians;
+        public float pitchRadians;
         public float animation;
         public float length;
         public int light1;
@@ -478,12 +472,13 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
 
         public void submit(PoseStack matrices, RenderType layer, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.translate(startOffset);
-            if (yaw != null) {
-                matrices.mulPose(yaw);
+            Pose pose = matrices.last();
+            pose.translate((float) startOffset.x, (float) startOffset.y, (float) startOffset.z);
+            if (yawRadians != 0) {
+                pose.rotate(Axis.YP, yawRadians);
             }
-            matrices.mulPose(pitch);
-            matrices.mulPose(yRot);
+            pose.rotate(Axis.XP, pitchRadians);
+            pose.rotate(Axis.YP, Radians.DEG_45);
             queue.submitCustomGeometry(matrices, layer, this);
             matrices.popPose();
         }
@@ -542,31 +537,33 @@ public class ChainConveyorRenderer implements BlockEntityRenderer<ChainConveyorB
     public static class BoxRenderState {
         public @UnknownNullability SuperByteBufferRenderState rig;
         public @UnknownNullability SuperByteBufferRenderState box;
-        public @Nullable Quaternionf yaw;
+        public float yaw;
         public @UnknownNullability Vec3 offset;
-        public @UnknownNullability Quaternionf zRot;
-        public @UnknownNullability Quaternionf xRot;
-        public @Nullable Quaternionf yRot;
+        public float zRadians;
+        public float xRadians;
+        public boolean flipped;
         public float offsetY;
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.translate(offset);
-            if (yaw != null) {
-                matrices.mulPose(yaw);
+            Pose pose = matrices.last();
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (yaw != 0) {
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * yaw);
             }
-            matrices.mulPose(zRot);
-            matrices.mulPose(xRot);
-            if (yRot != null) {
+            pose.rotate(Axis.ZP, zRadians);
+            pose.rotate(Axis.XP, xRadians);
+            if (flipped) {
                 matrices.pushPose();
-                matrices.mulPose(yRot);
-                matrices.translate(-0.5f, offsetY, -0.5f);
+                pose = matrices.last();
+                pose.rotate(Axis.YP, Radians.DEG_180);
+                pose.translate(-0.5f, offsetY, -0.5f);
                 rig.submit(matrices, queue);
                 matrices.popPose();
                 matrices.translate(-0.5f, offsetY, -0.5f);
                 box.submit(matrices, queue);
             } else {
-                matrices.translate(-0.5f, offsetY, -0.5f);
+                pose.translate(-0.5f, offsetY, -0.5f);
                 rig.submit(matrices, queue);
                 box.submit(matrices, queue);
             }

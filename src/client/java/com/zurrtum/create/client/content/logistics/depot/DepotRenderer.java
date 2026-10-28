@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.content.logistics.depot;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotRenderState;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
@@ -32,8 +34,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.RAD_90;
 
 public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, DepotRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -132,7 +132,6 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         PoseStack ms,
         int light
     ) {
-        var msr = TransformStack.of(ms);
         Vec3 itemPosition = VecHelper.getCenterOf(pos);
 
         ms.pushPose();
@@ -142,12 +141,11 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         if (incoming != null) {
             for (DepotItemState item : incoming) {
                 ms.pushPose();
-                msr.nudge(0);
-
+                Pose pose = ms.last();
+                SuperByteBuffer.nudge(pose, 0);
                 if (item.offset != null) {
-                    ms.translate(item.offset.x, item.offset.y, item.offset.z);
+                    pose.translate((float) item.offset.x, (float) item.offset.y, (float) item.offset.z);
                 }
-
                 renderItem(
                     queue,
                     ms,
@@ -171,13 +169,15 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
             for (int i = 0, size = outputs.size(); i < size; i++) {
                 DepotOutputItemState item = outputs.get(i);
                 ms.pushPose();
-                msr.nudge(i);
+                Pose pose = ms.last();
+                SuperByteBuffer.nudge(pose, i);
 
                 boolean renderUpright = item.upright;
-                msr.rotateYDegrees(45 * i);
-                ms.translate(0.35f, 0, 0);
+                float yRadians = i * Radians.DEG_45;
+                pose.rotate(Axis.YP, yRadians);
+                pose.translate(0.35f, 0, 0);
                 if (renderUpright) {
-                    msr.rotateYDegrees(-45 * i);
+                    pose.rotate(Axis.YP, -yRadians);
                 }
                 Random r = new Random(i + 1);
                 int angle = (int) (360 * r.nextFloat());
@@ -220,43 +220,46 @@ public class DepotRenderer implements BlockEntityRenderer<DepotBlockEntity, Depo
         boolean renderUpright = upright || alwaysUpright && !blockItem;
 
         ms.pushPose();
-        ms.mulPose(Axis.YP.rotation(Mth.DEG_TO_RAD * angle));
+        Pose pose = ms.last();
+        pose.rotate(Axis.YP, Mth.DEG_TO_RAD * angle);
 
         if (renderUpright) {
             Vec3 diff = itemPosition.subtract(cameraPos);
-            float yRot = (float) (Mth.atan2(diff.x, diff.z) + Math.PI);
-            ms.mulPose(Axis.YP.rotation(yRot));
-            ms.translate(0, 0.09375f, -0.0625f);
+            float yRadians = (float) (Mth.atan2(diff.x, diff.z) + Math.PI);
+            pose.rotate(Axis.YP, yRadians);
+            pose.translate(0, 0.09375f, -0.0625f);
         }
 
         for (int i = 0; i <= count; i++) {
             ms.pushPose();
+            pose = ms.last();
             if (blockItem && r != null) {
-                ms.translate(r.nextFloat() * 0.0625f * i, 0, r.nextFloat() * 0.0625f * i);
+                pose.translate(r.nextFloat() * 0.0625f * i, 0, r.nextFloat() * 0.0625f * i);
             }
 
             if (box && !alwaysUpright) {
-                ms.translate(0, 0.25f, 0);
-                ms.scale(1.5f, 1.5f, 1.5f);
+                pose.translate(0, 0.25f, 0);
+                pose.scale(1.5f, 1.5f, 1.5f);
             } else if (blockItem && alwaysUpright) {
-                ms.translate(0, 0.0625f, 0);
-                ms.scale(0.755f, 0.755f, 0.755f);
+                pose.translate(0, 0.0625f, 0);
+                pose.scale(0.755f, 0.755f, 0.755f);
             } else {
-                ms.scale(0.5f, 0.5f, 0.5f);
+                pose.scale(0.5f, 0.5f, 0.5f);
             }
 
             if (!blockItem && !renderUpright) {
-                ms.translate(0, -0.1875f, 0);
-                ms.mulPose(Axis.XP.rotation(RAD_90));
+                pose.translate(0, -0.1875f, 0);
+                pose.rotate(Axis.XP, Radians.DEG_90);
             }
             state.submit(ms, queue, light, OverlayTexture.NO_OVERLAY, 0);
             ms.popPose();
 
             if (!renderUpright) {
+                pose = ms.last();
                 if (!blockItem) {
-                    ms.mulPose(Axis.YP.rotation(Mth.DEG_TO_RAD * 10));
+                    pose.rotate(Axis.YP, Radians.DEG_10);
                 }
-                ms.translate(0, blockItem ? 0.015625f : 0.0625f, 0);
+                pose.translate(0, blockItem ? 0.015625f : 0.0625f, 0);
             } else {
                 ms.translate(0, 0, -0.0625f);
             }

@@ -1,12 +1,12 @@
 package com.zurrtum.create.client.flywheel.lib.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.model.baked.BakedModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.model.baked.BlockModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -115,7 +115,13 @@ public final class Models {
     }
 
     private static void rotateAboutCenterToFace(Direction facing, PoseStack stack) {
-        TransformStack.of(stack).center().rotateToFace(facing.getOpposite()).uncenter();
+        switch (facing.getOpposite()) {
+            case DOWN -> stack.rotateXCentered(Radians.DEG_270);
+            case UP -> stack.rotateXCentered(Radians.DEG_90);
+            case SOUTH -> stack.rotateYCentered(Radians.DEG_180);
+            case WEST -> stack.rotateYCentered(Radians.DEG_90);
+            case EAST -> stack.rotateYCentered(Radians.DEG_270);
+        }
     }
 
     private record TransformedPartial<T>(PartialModel partial, T key, BiConsumer<T, PoseStack> transformer) {

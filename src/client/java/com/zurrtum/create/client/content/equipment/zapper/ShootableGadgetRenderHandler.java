@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.content.equipment.zapper;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
@@ -103,25 +105,27 @@ public abstract class ShootableGadgetRenderHandler {
         float f6 = Mth.sin(f1 * (float) Math.PI);
 
         ms.pushPose();
-        ms.translate(flip * (f2 + 0.64F - 0.1f), f3 + -0.4F + equipProgress * -0.6F, f4 + -0.72F + 0.3f + recoil);
-        ms.mulPose(Axis.YP.rotationDegrees(flip * 75.0F));
-        ms.mulPose(Axis.YP.rotationDegrees(flip * f6 * 70.0F));
-        ms.mulPose(Axis.ZP.rotationDegrees(flip * f5 * -20.0F));
-        ms.translate(flip * -1.0F, 3.6F, 3.5F);
-        ms.mulPose(Axis.ZP.rotationDegrees(flip * 120.0F));
-        ms.mulPose(Axis.XP.rotationDegrees(200.0F));
-        ms.mulPose(Axis.YP.rotationDegrees(flip * -135.0F));
-        ms.translate(flip * 5.6F, 0.0F, 0.0F);
-        ms.mulPose(Axis.YP.rotationDegrees(flip * 40.0F));
+        Pose pose = ms.last();
+        pose.translate(flip * (f2 + 0.64F - 0.1f), f3 + -0.4F + equipProgress * -0.6F, f4 + -0.72F + 0.3f + recoil);
+        pose.rotate(Axis.YP, flip * Radians.DEG_75);
+        pose.rotate(Axis.YP, flip * f6 * Radians.DEG_70);
+        pose.rotate(Axis.ZP, flip * f5 * -Radians.DEG_20);
+        pose.translate(flip * -1.0F, 3.6F, 3.5F);
+        pose.rotate(Axis.ZP, flip * Radians.DEG_120);
+        pose.rotate(Axis.XP, Radians.DEG_200);
+        pose.rotate(Axis.YP, flip * Radians.DEG_225);
+        pose.translate(flip * 5.6F, 0.0F, 0.0F);
+        pose.rotate(Axis.YP, flip * Radians.DEG_40);
         transformHand(ms, flip, equipProgress, recoil, pt);
         renderer.renderPlayerHand(ms, queue, light, rightHand ? HumanoidArm.RIGHT : HumanoidArm.LEFT, playerState);
         ms.popPose();
 
         // Render gadget
         ms.pushPose();
-        ms.translate(flip * (f2 + 0.64F - 0.1f), f3 + -0.4F + equipProgress * -0.6F, f4 + -0.72F - 0.1f + recoil);
-        ms.mulPose(Axis.YP.rotationDegrees(flip * f6 * 70.0F));
-        ms.mulPose(Axis.ZP.rotationDegrees(flip * f5 * -20.0F));
+        pose = ms.last();
+        pose.translate(flip * (f2 + 0.64F - 0.1f), f3 + -0.4F + equipProgress * -0.6F, f4 + -0.72F - 0.1f + recoil);
+        pose.rotate(Axis.YP, flip * f6 * Radians.DEG_70);
+        pose.rotate(Axis.ZP, flip * f5 * -Radians.DEG_20);
         transformTool(ms, flip, equipProgress, recoil, pt);
         (isMainHand ? state.mainHandRenderState : state.offHandRenderState).submit(
             ms,

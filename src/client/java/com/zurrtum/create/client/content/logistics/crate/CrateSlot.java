@@ -1,7 +1,8 @@
 package com.zurrtum.create.client.content.logistics.crate;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.mojang.math.Axis;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -9,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 public class CrateSlot extends ValueBoxTransform {
     @Override
     public void rotate(BlockState state, PoseStack ms) {
-        TransformStack.of(ms).rotateXDegrees(90);
+        ms.rotate(Axis.XP, Radians.DEG_90);
     }
 
     @Override

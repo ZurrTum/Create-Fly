@@ -3,6 +3,7 @@ package com.zurrtum.create.client.content.contraptions.actors.contraptionControl
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
@@ -39,7 +40,7 @@ public class ContraptionControlsVisual extends AbstractBlockEntityVisual<Contrap
         button = instancerProvider.instancer(
             InstanceTypes.ORIENTED,
             Models.chunkPartial(AllPartialModels.CONTRAPTION_CONTROLS_BUTTON)
-        ).createInstance().rotateYDegrees(horizontalAngle).rotateXDegrees(AngleHelper.verticalAngle(facing));
+        ).createInstance().rotateYDegrees(horizontalAngle).rotateX(Radians.vertical(facing));
         buttonMovementAxis = VecHelper.rotate(new Vec3(0, 1, -0.325), horizontalAngle, Direction.Axis.Y);
         transformButton(partialTick);
         int i = (int) blockEntity.indicator.getValue(partialTick) / 45 % 8 + 8;

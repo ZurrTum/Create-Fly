@@ -2,7 +2,6 @@ package com.zurrtum.create.client.content.contraptions.actors.roller;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
@@ -12,6 +11,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
@@ -62,22 +62,20 @@ public class RollerMovementRenderBehaviour implements MovementRenderBehaviour {
         if (context.contraption.stalled) {
             speed = 0;
         }
-        float angle = AngleHelper.horizontalAngle(facing);
-        float wheelAngle = AngleHelper.rad(angle);
+        float wheelRadians = Radians.horizontal(facing);
+        float frameRadians = Radians.horizontalPlus180(facing);
         float time = AnimationTickHolder.getRenderTime(context.world) / 20;
-        float rotate = AngleHelper.rad(time * speed % 360);
+        float xRadians = Mth.DEG_TO_RAD * -(time * speed % 360);
         int light = LightCoordsUtil.getLightCoords(renderWorld, pos);
-        float yRot = Mth.DEG_TO_RAD * 90;
-        float frameAngle = AngleHelper.rad(angle + 180);
         SuperByteBuffer frame = CachedBuffers.partial(AllPartialModels.ROLLER_FRAME, blockState).transform(transform)
             .translate(pos);
         SuperByteBuffer wheel = CachedBuffers.partial(AllPartialModels.ROLLER_WHEEL, blockState);
         SuperByteBuffer.copyTransform(frame, wheel);
-        state.frame = frame.rotateCentered(frameAngle, Direction.UP).light(light)
-            .useLevelLight(context.world, worldMatrix4f).extractRenderState();
+        state.frame = frame.rotateYCentered(frameRadians).light(light).useLevelLight(context.world, worldMatrix4f)
+            .extractRenderState();
         state.wheel = wheel.translate(Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(17 / 16.0f))
-            .rotateCentered(wheelAngle, Direction.UP).rotate(rotate, Direction.WEST).translate(0, -0.5, 0.5)
-            .rotateY(yRot).light(light).useLevelLight(context.world, worldMatrix4f).extractRenderState();
+            .rotateYCentered(wheelRadians).rotateX(xRadians).translate(0, -0.5, 0.5).rotateY(Radians.DEG_90)
+            .light(light).useLevelLight(context.world, worldMatrix4f).extractRenderState();
         return state;
     }
 

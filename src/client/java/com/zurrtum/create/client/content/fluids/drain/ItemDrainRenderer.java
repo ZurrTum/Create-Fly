@@ -1,12 +1,14 @@
 package com.zurrtum.create.client.content.fluids.drain;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper.FluidRenderState;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.fluids.drain.ItemDrainRenderer.ItemDrainRenderState;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.zurrtum.create.content.fluids.transfer.GenericItemEmptying;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
@@ -35,8 +37,6 @@ import org.jetbrains.annotations.UnknownNullability;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.RAD_90;
 
 public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEntity, ItemDrainRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -180,11 +180,12 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
         if (!alongX) {
             sideOffset *= -1;
         }
-        item.translate = SmartBlockEntityRenderer.createNudge(0).add(item.offsetVec)
-            .add(alongX ? sideOffset : 0, 0, alongX ? 0 : sideOffset);
         ItemStack itemStack = transported.stack;
+        boolean renderUpright = BeltHelper.isItemUpright(itemStack);
+        item.translate = item.offsetVec.add(alongX ? sideOffset : 0, 0, alongX ? 0 : sideOffset)
+            .add(0.5f, renderUpright ? 1.03125 : 0.9375f, 0.5f);
         item.count = Mth.log2(itemStack.getCount()) / 2;
-        item.upright = BeltHelper.isItemUpright(itemStack);
+        item.upright = renderUpright;
         int positive = insertedFrom.getAxisDirection().getStep();
         item.axis = insertedFrom.getAxis();
         item.verticalAngle = positive * offset * 360;
@@ -212,18 +213,16 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue, Vec3 positionVec, int light) {
             matrices.pushPose();
-            matrices.translate(0.5f, 0.9375f, 0.5f);
-            matrices.translate(translate);
-            boolean renderUpright = upright;
-            if (renderUpright) {
-                matrices.translate(0, 0.09375f, 0);
-            }
+            Pose pose = matrices.last();
+            pose.translate((float) translate.x, (float) translate.y, (float) translate.z);
+            SuperByteBuffer.nudge(pose, 0);
             if (axis != Direction.Axis.X) {
-                matrices.mulPose(Axis.XP.rotation(Mth.DEG_TO_RAD * verticalAngle));
+                pose.rotate(Axis.XP, Mth.DEG_TO_RAD * verticalAngle);
             }
             if (axis != Direction.Axis.Z) {
-                matrices.mulPose(Axis.ZP.rotation(Mth.DEG_TO_RAD * -verticalAngle));
+                pose.rotate(Axis.ZP, Mth.DEG_TO_RAD * -verticalAngle);
             }
+            boolean renderUpright = upright;
             if (renderUpright) {
                 Vec3 vectorForOffset = itemPosition.add(offsetVec);
                 Vec3 diff = vectorForOffset.subtract(positionVec);
@@ -233,39 +232,41 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                 if (axis != Direction.Axis.Z) {
                     diff = VecHelper.rotate(diff, -verticalAngle, Direction.Axis.Z);
                 }
-                float yRot = (float) Mth.atan2(diff.z, -diff.x);
-                matrices.mulPose(Axis.YP.rotation((float) (yRot - Math.PI / 2)));
-                matrices.translate(0, 0, -0.0625f);
+                pose.rotate(Axis.YP, (float) (Mth.atan2(diff.z, -diff.x) - Radians.DEG_90));
+                pose.translate(0, 0, -0.0625f);
             }
             Random r = new Random(0);
             boolean blockItem = state.usesBlockLight();
             for (int i = 0; i < count; i++) {
                 matrices.pushPose();
+                pose = matrices.last();
                 if (blockItem) {
-                    matrices.translate(r.nextFloat() * 0.0625f * i, 0, r.nextFloat() * 0.0625f * i);
+                    pose.translate(r.nextFloat() * 0.0625f * i, 0, r.nextFloat() * 0.0625f * i);
                 }
-                matrices.scale(0.5f, 0.5f, 0.5f);
+                pose.scale(0.5f, 0.5f, 0.5f);
                 if (!blockItem && !renderUpright) {
-                    matrices.mulPose(Axis.XP.rotation(RAD_90));
+                    pose.rotate(Axis.XP, Radians.DEG_90);
                 }
                 state.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
                 matrices.popPose();
                 if (!renderUpright) {
+                    pose = matrices.last();
                     if (!blockItem) {
-                        matrices.mulPose(Axis.YP.rotation(Mth.DEG_TO_RAD * 10));
+                        pose.rotate(Axis.YP, Radians.DEG_10);
                     }
-                    matrices.translate(0, blockItem ? 0.015625f : 0.0625f, 0);
+                    pose.translate(0, blockItem ? 0.015625f : 0.0625f, 0);
                 } else {
                     matrices.translate(0, 0, -0.0625f);
                 }
             }
             matrices.pushPose();
+            pose = matrices.last();
             if (blockItem) {
-                matrices.translate(r.nextFloat() * 0.0625f * count, 0, r.nextFloat() * 0.0625f * count);
+                pose.translate(r.nextFloat() * 0.0625f * count, 0, r.nextFloat() * 0.0625f * count);
             }
-            matrices.scale(0.5f, 0.5f, 0.5f);
+            pose.scale(0.5f, 0.5f, 0.5f);
             if (!blockItem && !renderUpright) {
-                matrices.mulPose(Axis.XP.rotation(RAD_90));
+                pose.rotate(Axis.XP, Radians.DEG_90);
             }
             state.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
             matrices.popPose();

@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.contraptions.pulley;
 
 import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.content.processing.burner.ScrollInstance;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -24,8 +24,6 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LightLayer;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 
 import java.util.function.Consumer;
 
@@ -47,11 +45,8 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
         rotatingAbout = Direction.get(Direction.AxisDirection.POSITIVE, rotationAxis());
         rotationAxis = Axis.of(rotatingAbout.step());
 
-        float blockStateAngle = AngleHelper.horizontalAngle(rotatingAbout);
-        Quaternionfc rotation = new Quaternionf().rotationY(Mth.DEG_TO_RAD * blockStateAngle);
-
-        coil = getCoilModel().createInstance().rotation(rotation).position(getVisualPosition())
-            .setSpriteShift(getCoilAnimation());
+        coil = getCoilModel().createInstance().rotationY(Radians.horizontal(rotatingAbout))
+            .position(getVisualPosition()).setSpriteShift(getCoilAnimation());
 
         coil.setChanged();
 

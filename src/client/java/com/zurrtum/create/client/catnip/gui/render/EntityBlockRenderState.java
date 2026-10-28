@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 public record EntityBlockRenderState(int id, Matrix3x2f pose, Level world, BlockPos pos, BlockEntity entity,
                                      BlockState state, int light, int x0, int y0, int x1, int y1, float scale,
-                                     float size, float xRot, float yRot, float zRot,
+                                     float size, float xRadians, float yRadians, float zRadians,
                                      ScreenRectangle bounds) implements PictureInPictureRenderState {
     public static EntityBlockRenderState create(
         int id,

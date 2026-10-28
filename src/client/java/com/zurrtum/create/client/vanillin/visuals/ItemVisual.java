@@ -1,12 +1,12 @@
 package com.zurrtum.create.client.vanillin.visuals;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.util.InstanceRecycler;
@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
+import org.joml.Vector3f;
 
 public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements SimpleDynamicVisual {
 
@@ -81,8 +82,10 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
     }
 
     private void animate(float partialTick) {
-        pPoseStack.setIdentity();
-        TransformStack.of(pPoseStack).translate(getVisualPosition(partialTick));
+        Pose pose = pPoseStack.last();
+        pose.setIdentity();
+        Vector3f visualPosition = getVisualPosition(partialTick);
+        pose.translate(visualPosition.x, visualPosition.y, visualPosition.z);
 
         instances.resetCount();
 
@@ -106,12 +109,11 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
         float f = -((float) box.minY) + 0.0625F;
         if (shouldBob()) {
             float g = Mth.sin(age / 10.0F + entity.bobOffs) * 0.1F + 0.1F;
-            pPoseStack.translate(0.0F, g + f, 0.0F);
+            pose.translate(0.0F, g + f, 0.0F);
         } else {
-            pPoseStack.translate(0.0F, f, 0.0F);
+            pose.translate(0.0F, f, 0.0F);
         }
-        float h = ItemEntity.getSpin(age, entity.bobOffs);
-        pPoseStack.mulPose(Axis.YP.rotation(h));
+        pose.rotate(Axis.YP, ItemEntity.getSpin(age, entity.bobOffs));
 
         int i = getRenderAmount(itemstack);
         int seed = itemstack.isEmpty() ? 187 : Item.getId(itemstack.getItem()) + itemstack.getDamageValue();
@@ -125,32 +127,34 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
 
         float lengthZ = (float) box.getZsize();
         if (lengthZ > 0.0625F) {
-            instances.get().setTransform(pPoseStack.last()).light(light).setChanged();
+            instances.get().setTransform(pose).light(light).setChanged();
 
             if (shouldSpreadItems()) {
                 for (int j = 1; j < i; j++) {
                     pPoseStack.pushPose();
+                    pose = pPoseStack.last();
                     float x = (random.nextFloat() * 2.0F - 1.0F) * 0.15F;
                     float y = (random.nextFloat() * 2.0F - 1.0F) * 0.15F;
                     float z = (random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    pPoseStack.translate(x, y, z);
-                    instances.get().setTransform(pPoseStack.last()).light(light).setChanged();
+                    pose.translate(x, y, z);
+                    instances.get().setTransform(pose).light(light).setChanged();
                     pPoseStack.popPose();
                 }
             }
         } else {
             float l = lengthZ * 1.5F;
-            pPoseStack.translate(0.0F, 0.0F, -(l * (i - 1) / 2.0F));
-            instances.get().setTransform(pPoseStack.last()).light(light).setChanged();
-            pPoseStack.translate(0.0F, 0.0F, l);
+            pose.translate(0.0F, 0.0F, -(l * (i - 1) / 2.0F));
+            instances.get().setTransform(pose).light(light).setChanged();
+            pose.translate(0.0F, 0.0F, l);
 
             if (shouldSpreadItems()) {
                 for (int m = 1; m < i; m++) {
                     pPoseStack.pushPose();
+                    pose = pPoseStack.last();
                     float x = (random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
                     float y = (random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    pPoseStack.translate(x, y, 0.0F);
-                    instances.get().setTransform(pPoseStack.last()).light(light).setChanged();
+                    pose.translate(x, y, 0.0F);
+                    instances.get().setTransform(pose).light(light).setChanged();
                     pPoseStack.popPose();
                     pPoseStack.translate(0.0F, 0.0F, l);
                 }

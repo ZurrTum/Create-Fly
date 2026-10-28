@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.actors.contraptionControls;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
@@ -109,11 +110,14 @@ public class ContraptionControlsRenderer implements BlockEntityRenderer<Contrapt
     ) {
         if (state.button != null) {
             matrices.pushPose();
-            matrices.translate(state.buttonMovement);
+            Pose pose = matrices.last();
+            Vec3 offset = state.buttonMovement;
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
             if (state.filter != null) {
                 state.filter.submit(state.blockState, queue, matrices, state.lightCoords);
             }
-            matrices.translate(state.buttonOffset);
+            offset = state.buttonOffset;
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
             state.button.submit(matrices, queue);
             matrices.popPose();
             state.indicator.submit(matrices, queue);

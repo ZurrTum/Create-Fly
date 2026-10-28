@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
@@ -8,6 +9,7 @@ import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -18,22 +20,24 @@ public class BasinBlazeBurnerRenderer extends GuiBlockRenderer<BasinBlazeBurnerR
     @Override
     protected void renderToTexture(BasinBlazeBurnerRenderState state, PoseStack matrices, SubmitNodeCollector queue) {
         Minecraft mc = Minecraft.getInstance();
-        matrices.scale(1, 1, -1);
-        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
-        matrices.translate(-0.5f, -0.5f, -0.5f);
-        matrices.scale(1, -1, 1);
+        Pose pose = matrices.last();
+        pose.scale(1, 1, -1);
+        pose.rotate(Axis.XP, Radians.DEG_344P5);
+        pose.rotate(Axis.YP, Radians.DEG_22P5);
+        pose.translate(-0.5f, -0.5f, -0.5f);
+        pose.scale(1, -1, 1);
         float offset = -(Mth.sin(AnimationTickHolder.getRenderTime() / 16.0f) + 0.5f) / 16.0f;
         CachedBuffers.block(AllBlocks.BLAZE_BURNER.defaultBlockState()).submit(matrices, queue);
 
         matrices.pushPose();
-        matrices.rotateAround(Axis.YP.rotationDegrees(180), 0.5f, 0.5f, 0.5f);
+        pose = matrices.last();
+        pose.rotateYCentered(Radians.DEG_180);
         boolean seething = state.heat() == HeatLevel.SEETHING;
         CachedBuffers.partial(
             seething ? AllPartialModels.BLAZE_SUPER : AllPartialModels.BLAZE_ACTIVE,
             Blocks.AIR.defaultBlockState()
         ).submit(matrices, queue);
-        matrices.translate(0, offset, 0);
+        pose.translate(0, offset, 0);
         CachedBuffers.partial(
             seething ? AllPartialModels.BLAZE_BURNER_SUPER_RODS_2 : AllPartialModels.BLAZE_BURNER_RODS_2,
             Blocks.AIR.defaultBlockState()

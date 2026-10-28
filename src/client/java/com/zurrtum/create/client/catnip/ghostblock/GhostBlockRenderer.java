@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.catnip.ghostblock;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.catnip.placement.PlacementClient;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -60,8 +60,13 @@ public abstract class GhostBlockRenderer {
         ) {
             BlockPos pos = params.pos;
             ms.pushPose();
-            ms.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
-            SuperByteBuffer.scaleAround(ms.last(), 0.85f, 0.5f, 0.5f, 0.5f);
+            Pose pose = ms.last();
+            pose.translate(
+                (float) (pos.getX() - camera.x),
+                (float) (pos.getY() - camera.y),
+                (float) (pos.getZ() - camera.z)
+            );
+            pose.pose().scaleAround(0.85f, 0.5f, 0.5f, 0.5f);
             int color = ARGB.white(params.alphaSupplier.get() * 0.75f * PlacementClient.getCurrentAlpha());
             CachedBuffers.block(params.state).color(color).light(LightCoordsUtil.FULL_BRIGHT)
                 .submit(RenderTypes.translucentMovingBlock(), ms, queue);

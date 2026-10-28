@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.infrastructure.ponder.scenes.highLogistics;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.Pointing;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.ponder.CreateSceneBuilder;
 import com.zurrtum.create.client.ponder.api.PonderPalette;
 import com.zurrtum.create.client.ponder.api.element.ElementLink;
@@ -249,23 +251,19 @@ public class FrogAndConveyorScenes {
             float angle = AngleHelper.angleLerp(pt, entity.yRotO, entity.getYRot());
 
             poseStack.pushPose();
-            poseStack.translate(location.x, location.y, location.z);
-            poseStack.translate(lx, ly, lz);
-            poseStack.mulPose(Axis.YP.rotationDegrees(angle));
+            Pose pose = poseStack.last();
+            pose.translate((float) (location.x + lx), (float) (location.y + ly), (float) (location.z + lz));
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * angle);
 
-            poseStack.rotateAround(
-                Axis.ZP.rotationDegrees(Mth.sin((world.scene.getCurrentTime() + pt) * 0.2f) * 10),
-                0,
-                1.5f,
-                0
-            );
+            pose.rotateZAround(Mth.DEG_TO_RAD * (Mth.sin((world.scene.getCurrentTime() + pt) * 0.2f) * 10), 0, 1.5f, 0);
 
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(90));
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-            poseStack.scale(1.5f, 1.5f, 1.5f);
-            poseStack.translate(-0.1, 0.2, -0.6);
+            pose = poseStack.last();
+            pose.rotate(Axis.YP, Radians.DEG_90);
+            pose.rotate(Axis.XP, Radians.DEG_90);
+            pose.rotate(Axis.ZP, Radians.DEG_90);
+            pose.scale(1.5f, 1.5f, 1.5f);
+            pose.translate(-0.1f, 0.2f, -0.6f);
             ItemStackRenderState itemRenderState = new ItemStackRenderState();
             itemRenderState.displayContext = ItemDisplayContext.GROUND;
             itemModelManager.appendItemLayers(

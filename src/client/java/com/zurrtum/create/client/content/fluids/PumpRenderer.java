@@ -12,12 +12,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Con
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotateAngleWithoutBeOffset;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getDegreesWithoutBeOffset;
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
 
 public class PumpRenderer implements BlockEntityRenderer<PumpBlockEntity, SingleKineticRenderState> {
@@ -41,7 +42,9 @@ public class PumpRenderer implements BlockEntityRenderer<PumpBlockEntity, Single
         Direction facing = state.blockState.getValue(BlockStateProperties.FACING);
         state.model = CachedBuffers.partialFacing(AllPartialModels.MECHANICAL_PUMP_COG, state.blockState, facing)
             .cardinalLighting(level).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(facing.getAxis(), be, state, level);
+        Axis axis = facing.getAxis();
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
     }
 
     @Override

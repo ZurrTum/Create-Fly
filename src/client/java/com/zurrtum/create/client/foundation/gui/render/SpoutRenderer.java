@@ -2,6 +2,7 @@ package com.zurrtum.create.client.foundation.gui.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.zurrtum.create.AllBlocks;
@@ -10,6 +11,7 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.render.GpuTexture;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.Minecraft;
@@ -52,14 +54,15 @@ public class SpoutRenderer extends GuiBlockRenderer<SpoutRenderState> {
         }
         texture.prepare(projection, projectionMatrixBuffer);
         matrices.pushPose();
-        matrices.translate(width / 2.0F, height / 2.0F, 0.0F);
+        Pose pose = matrices.last();
+        pose.translate(width / 2.0F, height / 2.0F, 0.0F);
         float scale = 20 * windowScaleFactor;
-        matrices.scale(scale, scale, scale);
+        pose.scale(scale, scale, scale);
 
-        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
-        matrices.translate(-0.5f, -0.5f, -0.5f);
-        matrices.scale(1, -1, 1);
+        pose.rotate(Axis.XP, Radians.DEG_344P5);
+        pose.rotate(Axis.YP, Radians.DEG_22P5);
+        pose.translate(-0.5f, -0.5f, -0.5f);
+        pose.scale(1, -1, 1);
 
         float time = AnimationTickHolder.getRenderTime();
         CachedBuffers.block(AllBlocks.SPOUT.defaultBlockState()).submit(matrices, submitNodeStorage);
@@ -69,29 +72,34 @@ public class SpoutRenderer extends GuiBlockRenderer<SpoutRenderState> {
         float move = -3 * squeeze / 32.0f;
 
         matrices.pushPose();
-        matrices.translate(0, move, 0);
+        pose = matrices.last();
+        pose.translate(0, move, 0);
         CachedBuffers.partial(AllPartialModels.SPOUT_MIDDLE, Blocks.AIR.defaultBlockState())
             .submit(matrices, submitNodeStorage);
-        matrices.translate(0, move, 0);
+        pose.translate(0, move, 0);
         CachedBuffers.partial(AllPartialModels.SPOUT_BOTTOM, Blocks.AIR.defaultBlockState())
             .submit(matrices, submitNodeStorage);
         matrices.popPose();
 
         matrices.pushPose();
-        matrices.translate(0.07f, -2, -0.14f);
+        pose.translate(0.07f, -2, -0.14f);
         CachedBuffers.block(AllBlocks.DEPOT.defaultBlockState()).submit(matrices, submitNodeStorage);
         matrices.popPose();
         matrices.popPose();
 
         Fluid fluid = item.fluid();
         if (fluid != Fluids.EMPTY) {
+            matrices.pushPose();
+            pose = matrices.last();
+            pose.rotate(Axis.XP, Radians.DEG_344P5);
+            pose.rotate(Axis.YP, Radians.DEG_22P5);
+
             DataComponentPatch components = item.components();
             matrices.pushPose();
-            matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-            matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
             float fluidScale = 16 * windowScaleFactor;
-            matrices.scale(fluidScale, -fluidScale, fluidScale);
-            matrices.translate(0, -1.4f, 0);
+            pose = matrices.last();
+            pose.scale(fluidScale, -fluidScale, fluidScale);
+            pose.translate(0, -1.4f, 0);
             float from = 3.0f / 16.0f;
             float to = 17.0f / 16.0f;
             FluidStateModelSet fluidStateModelSet = Minecraft.getInstance().getModelManager().getFluidStateModelSet();
@@ -113,12 +121,10 @@ public class SpoutRenderer extends GuiBlockRenderer<SpoutRenderState> {
             ).submit(matrices, submitNodeStorage);
             matrices.popPose();
 
-            matrices.pushPose();
-            matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-            matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
-            matrices.translate(scale / 2.0f, scale * 1.5f, scale / 2.0f);
-            matrices.scale(fluidScale, -fluidScale, fluidScale);
-            matrices.translate(-0.5f, -1.0f, -0.5f);
+            pose = matrices.last();
+            pose.translate(scale / 2.0f, scale * 1.5f, scale / 2.0f);
+            pose.scale(fluidScale, -fluidScale, fluidScale);
+            pose.translate(-0.5f, -1.0f, -0.5f);
             float fluidWidth = 1 / 128.0f * -squeeze * 16;
             from = -fluidWidth / 2 + 0.5f;
             to = fluidWidth / 2 + 0.5f;

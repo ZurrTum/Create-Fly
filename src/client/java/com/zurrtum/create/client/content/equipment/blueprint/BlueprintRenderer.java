@@ -8,6 +8,7 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.equipment.blueprint.BlueprintRenderer.BlueprintState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -29,10 +30,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
 
 public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, BlueprintState> {
     protected final ItemModelResolver itemModelManager;
@@ -60,9 +58,8 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
             size == 2 ? AllPartialModels.CRAFTING_BLUEPRINT_2x2 : AllPartialModels.CRAFTING_BLUEPRINT_1x1;
         state.model = CachedBuffers.partial(partialModel, Blocks.AIR.defaultBlockState())
             .cardinalLighting(cardinalLighting).light(state.lightCoords).disableDiffuse().extractRenderState();
-        state.yRot = yaw != 0 ? Axis.YP.rotation(Mth.DEG_TO_RAD * -yaw) : null;
-        float xRot = 90.0F + pitch;
-        state.xRot = xRot != 0 ? Axis.XP.rotation(Mth.DEG_TO_RAD * xRot) : null;
+        state.yRadians = Mth.DEG_TO_RAD * -yaw;
+        state.xRot = 90.0F + pitch;
         Vec3 offset = new Vec3(-0.5, -0.03125f, -0.5);
         if (size == 2) {
             offset = offset.add(0.5, 0, -0.5);
@@ -93,17 +90,17 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
         state.size = size;
         int bl = state.lightCoords >> 4 & 0xf;
         int sl = state.lightCoords >> 20 & 0xf;
-        state.horizontal = pitch == 0;
+        state.horizontal = pitch == 0 && yaw != 0;
         if (pitch == -90) {
-            state.normalXRot = Axis.XP.rotation(Mth.DEG_TO_RAD * -45);
+            state.normalXRadians = Radians.DEG_315;
         } else if (pitch == 90 || yaw % 180 != 0) {
-            state.normalXRot = Axis.XP.rotation(Mth.DEG_TO_RAD * -15);
+            state.normalXRadians = Radians.DEG_345;
             bl = (int) (bl / 1.35);
             sl = (int) (sl / 1.35);
         } else {
-            state.normalXRot = Axis.XP.rotation(Mth.DEG_TO_RAD * -15);
+            state.normalXRadians = Radians.DEG_345;
         }
-        state.itemXRot = getXRotateAngle(pitch);
+        state.itemXRot = pitch;
         state.itemOffsetZ = 1 / 32.0f + 0.001f;
         if (size == 3) {
             state.itemOffsetXY = -1;
@@ -130,30 +127,33 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
         CameraRenderState cameraState
     ) {
         matrices.pushPose();
-        if (state.yRot != null) {
-            matrices.mulPose(state.yRot);
+        Pose entry = matrices.last();
+        if (state.yRadians != 0) {
+            entry.rotate(Axis.YP, state.yRadians);
         }
-        if (state.xRot != null) {
-            matrices.mulPose(state.xRot);
+        if (state.xRot != 0) {
+            entry.rotate(Axis.XP, Mth.DEG_TO_RAD * state.xRot);
         }
-        matrices.translate(state.offset);
+        Vec3 offset = state.offset;
+        entry.translate((float) offset.x, (float) offset.y, (float) offset.z);
         state.model.submit(matrices, queue);
         matrices.popPose();
-        ItemStackRenderState[] items = state.items;
+        @Nullable ItemStackRenderState[] items = state.items;
         if (items == null) {
             return;
         }
         matrices.pushPose();
-        Pose entry = matrices.last();
         Matrix3f normal = entry.normal();
         if (state.horizontal) {
-            normal.rotate(state.yRot);
+            normal.rotateY(state.yRadians);
         }
-        normal.rotate(state.normalXRot);
+        normal.rotateX(state.normalXRadians);
         Matrix4f pose = entry.pose();
-        pose.rotate(state.yRot);
-        if (state.itemXRot != null) {
-            pose.rotate(state.itemXRot);
+        if (state.yRadians != 0) {
+            pose.rotateY(state.yRadians);
+        }
+        if (state.itemXRot != 0) {
+            pose.rotateX(Mth.DEG_TO_RAD * state.itemXRot);
         }
         pose.translate(state.itemOffsetXY, state.itemOffsetXY, state.itemOffsetZ);
         Matrix4f copy = new Matrix4f(pose);
@@ -186,14 +186,14 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
 
     public static class BlueprintState extends EntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState model;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
+        public float yRadians;
+        public float xRot;
         public @UnknownNullability Vec3 offset;
-        public ItemStackRenderState @Nullable [] items;
+        public @Nullable ItemStackRenderState @Nullable [] items;
         public int size;
         public boolean horizontal;
-        public @UnknownNullability Quaternionf normalXRot;
-        public @Nullable Quaternionf itemXRot;
+        public float normalXRadians;
+        public float itemXRot;
         public int itemOffsetXY;
         public float itemOffsetZ;
         public int itemLight;

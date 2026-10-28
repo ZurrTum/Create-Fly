@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -45,10 +44,10 @@ public class SingleAxisRotatingRenderer implements BlockEntityRenderer<KineticBl
     ) {
         Level level = SmartBlockEntityRenderer.extractBase(be, state, breakProgress);
         Axis axis = getRotationAxisOf(state.blockState);
-        Direction direction = axis.getPositive();
-        state.model = CachedBuffers.partialFacingVertical(model, state.blockState, direction).cardinalLighting(level)
-            .light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, direction, be, state, level);
+        state.model = CachedBuffers.partialFacingVertical(model, state.blockState, axis.getPositive())
+            .cardinalLighting(level).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
     }
 
     @Override

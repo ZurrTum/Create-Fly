@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.gui.render;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
@@ -28,8 +29,9 @@ public class SandPaperRenderer extends PictureInPictureRenderer<SandPaperRenderS
 
     @Override
     protected void renderToTexture(SandPaperRenderState state, PoseStack matrices, SubmitNodeCollector queue) {
-        matrices.translate(0, -0.35f, 0);
-        matrices.scale(1, -1, -1);
+        Pose pose = matrices.last();
+        pose.translate(0, -0.35f, 0);
+        pose.scale(1, -1, -1);
         Minecraft mc = Minecraft.getInstance();
         Lighting lighting = mc.gameRenderer.lighting();
         lighting.setupFor(Lighting.Entry.ITEMS_FLAT);

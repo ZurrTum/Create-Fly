@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.content.logistics.packagePort.postbox;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.logistics.packagePort.postbox.PostboxRenderer.PostboxRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer.NameplateRenderState;
@@ -21,11 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, PostboxRenderState> {
     public PostboxRenderer(Context context) {
@@ -47,7 +45,7 @@ public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, 
         Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
         state.flag = CachedBuffers.partial(AllPartialModels.POSTBOX_FLAG, state.blockState).cardinalLighting(level)
             .light(state.lightCoords).extractRenderState();
-        state.angle = getYRotateAngle(180 - state.blockState.getValue(PostboxBlock.FACING).toYRot());
+        state.yRot = 180 - state.blockState.getValue(PostboxBlock.FACING).toYRot();
         LerpedFloat flag = be.flag;
         float value = flag.getValue(tickProgress);
         float progress = (float) Math.pow(Math.min(value * 5, 1), 2);
@@ -58,7 +56,7 @@ public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, 
                 8.0f * wiggleProgress
             ));
         }
-        state.xRot = getXRotateAngle(-progress * 90);
+        state.progress = progress;
         String filter = be.addressFilter;
         if (filter != null && !filter.isBlank()) {
             state.name = SmartBlockEntityRenderer.getNameplateRenderState(
@@ -82,19 +80,20 @@ public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, 
         if (state.name != null) {
             state.name.submit(matrices, queue, cameraState);
         }
-        if (state.angle != null) {
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+        Pose pose = matrices.last();
+        if (state.yRot != 0) {
+            pose.rotateYCentered(Mth.DEG_TO_RAD * state.yRot);
         }
-        if (state.xRot != null) {
-            matrices.rotateAround(state.xRot, 0, 0.625f, 0.125f);
+        if (state.progress != 0) {
+            pose.rotateXAround(-Radians.DEG_90 * state.progress, 0, 0.625f, 0.125f);
         }
         state.flag.submit(matrices, queue);
     }
 
     public static class PostboxRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState flag;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf xRot;
+        public float yRot;
+        public float progress;
         public @Nullable NameplateRenderState name;
     }
 }

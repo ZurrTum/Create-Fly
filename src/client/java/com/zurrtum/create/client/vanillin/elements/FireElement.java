@@ -1,7 +1,5 @@
 package com.zurrtum.create.client.vanillin.elements;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.api.vertex.MutableVertexList;
@@ -24,6 +22,7 @@ import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 
@@ -43,7 +42,7 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
     });
 
     private final Entity entity;
-    private final PoseStack stack = new PoseStack();
+    private final Matrix4f pose = new Matrix4f();
 
     private final SmartRecycler<Model, TransformedInstance> recycler;
 
@@ -92,15 +91,19 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
         float y = 0;
         float z = 0;
 
-        stack.setIdentity();
-        stack.translate(entityX - renderOrigin.getX(), entityY - renderOrigin.getY(), entityZ - renderOrigin.getZ());
-        stack.scale(scale, scale, scale);
-        stack.mulPose(Axis.YP.rotationDegrees(-context.camera().yRot));
-        stack.translate(0.0F, 0.0F, -0.3F + (int) maxHeight * 0.02F);
+        pose.identity();
+        pose.translate(
+            (float) (entityX - renderOrigin.getX()),
+            (float) (entityY - renderOrigin.getY()),
+            (float) (entityZ - renderOrigin.getZ())
+        );
+        pose.scale(scale, scale, scale);
+        pose.rotateY(Mth.DEG_TO_RAD * -context.camera().yRot);
+        pose.translate(0.0F, 0.0F, -0.3F + (int) maxHeight * 0.02F);
 
         for (int i = 0; y < maxHeight; ++i) {
             var instance = recycler.get(FIRE_MODELS.get(i % 2 == 0 ? ModelBakery.FIRE_0 : ModelBakery.FIRE_1))
-                .setTransform(stack).scaleX(width).translate(0, y, z);
+                .setTransform(pose).scaleX(width).translate(0, y, z);
 
             if (i / 2 % 2 == 0) {
                 // Vanilla flips the uv directly, but it's easier for us to flip the whole model.

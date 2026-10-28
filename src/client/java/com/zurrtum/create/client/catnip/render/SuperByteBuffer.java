@@ -3,11 +3,14 @@ package com.zurrtum.create.client.catnip.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.theme.Color;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.transform.Transform;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.CardinalLighting;
@@ -173,6 +176,187 @@ public class SuperByteBuffer implements Transform<SuperByteBuffer> {
     @Override
     public SuperByteBuffer mulNormal(Matrix3fc normal) {
         task.pose.normal().mul(normal);
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateCentered(float radians, float axisX, float axisY, float axisZ) {
+        if (radians != 0) {
+            task.pose.rotateCentered(axisX, axisY, axisZ, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateCentered(float radians, Axis axis) {
+        if (radians != 0) {
+            task.pose.rotateCentered(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateCentered(float radians, Direction.Axis axis) {
+        if (radians != 0) {
+            task.pose.rotateCentered(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateCentered(float radians, Direction direction) {
+        if (radians != 0) {
+            task.pose.rotateCentered(direction, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateXCentered(float radians) {
+        if (radians != 0) {
+            task.pose.rotateXCentered(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateYCentered(float radians) {
+        if (radians != 0) {
+            task.pose.rotateYCentered(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateZCentered(float radians) {
+        if (radians != 0) {
+            task.pose.rotateZCentered(radians);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateAround(
+        float radians,
+        float axisX,
+        float axisY,
+        float axisZ,
+        float pivotX,
+        float pivotY,
+        float pivotZ
+    ) {
+        if (radians != 0) {
+            task.pose.rotateAround(axisX, axisY, axisZ, radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateAround(float radians, Axis axis, float pivotX, float pivotY, float pivotZ) {
+        if (radians != 0) {
+            task.pose.rotateAround(axis, radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateAround(float radians, Direction.Axis axis, float pivotX, float pivotY, float pivotZ) {
+        if (radians != 0) {
+            task.pose.rotateAround(axis, radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateAround(float radians, Direction direction, float pivotX, float pivotY, float pivotZ) {
+        if (radians != 0) {
+            task.pose.rotateAround(direction, radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateXAround(float radians, float pivotX, float pivotY, float pivotZ) {
+        if (radians != 0) {
+            task.pose.rotateXAround(radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateYAround(float radians, float pivotX, float pivotY, float pivotZ) {
+        if (radians != 0) {
+            task.pose.rotateYAround(radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    public SuperByteBuffer rotateZAround(float radians, float pivotX, float pivotY, float pivotZ) {
+        if (radians != 0) {
+            task.pose.rotateZAround(radians, pivotX, pivotY, pivotZ);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotate(float radians, float axisX, float axisY, float axisZ) {
+        if (radians != 0) {
+            task.pose.rotate(axisX, axisY, axisZ, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotate(float radians, Axis axis) {
+        if (radians != 0) {
+            task.pose.rotate(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotate(float radians, Direction direction) {
+        if (radians != 0) {
+            task.pose.rotate(direction, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotate(float radians, Direction.Axis axis) {
+        if (radians != 0) {
+            task.pose.rotate(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateX(float radians) {
+        if (radians != 0) {
+            task.pose.rotate(Axis.XP, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateY(float radians) {
+        if (radians != 0) {
+            task.pose.rotate(Axis.YP, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateZ(float radians) {
+        if (radians != 0) {
+            task.pose.rotate(Axis.ZP, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateToFace(Direction facing) {
+        switch (facing) {
+            case DOWN -> task.pose.rotate(Axis.XP, Radians.DEG_270);
+            case UP -> task.pose.rotate(Axis.XP, Radians.DEG_90);
+            case SOUTH -> task.pose.rotate(Axis.YP, Radians.DEG_180);
+            case WEST -> task.pose.rotate(Axis.YP, Radians.DEG_90);
+            case EAST -> task.pose.rotate(Axis.YP, Radians.DEG_270);
+        }
         return this;
     }
 

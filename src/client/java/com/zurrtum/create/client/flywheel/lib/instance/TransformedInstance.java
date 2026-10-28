@@ -1,9 +1,12 @@
 package com.zurrtum.create.client.flywheel.lib.instance;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.infrastructure.pose.AxisHolder;
+import net.minecraft.core.Direction;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -92,6 +95,30 @@ public class TransformedInstance extends ColoredLitOverlayInstance implements Af
     }
 
     @Override
+    public TransformedInstance rotateCentered(float radians, Axis axis) {
+        pose.translate(CENTER, CENTER, CENTER);
+        axis.rotate(pose, radians);
+        pose.translate(-CENTER, -CENTER, -CENTER);
+        return this;
+    }
+
+    @Override
+    public TransformedInstance rotateCentered(float radians, Direction axis) {
+        pose.translate(CENTER, CENTER, CENTER);
+        ((AxisHolder) (Object) axis).create$getMathAxis().rotate(pose, radians);
+        pose.translate(-CENTER, -CENTER, -CENTER);
+        return this;
+    }
+
+    @Override
+    public TransformedInstance rotateCentered(float radians, Direction.Axis axis) {
+        pose.translate(CENTER, CENTER, CENTER);
+        ((AxisHolder) (Object) axis).create$getMathAxis().rotate(pose, radians);
+        pose.translate(-CENTER, -CENTER, -CENTER);
+        return this;
+    }
+
+    @Override
     public TransformedInstance rotateXCentered(float radians) {
         pose.translate(CENTER, CENTER, CENTER).rotateX(radians).translate(-CENTER, -CENTER, -CENTER);
         return this;
@@ -112,6 +139,24 @@ public class TransformedInstance extends ColoredLitOverlayInstance implements Af
     @Override
     public TransformedInstance rotate(float radians, float axisX, float axisY, float axisZ) {
         pose.rotate(radians, axisX, axisY, axisZ);
+        return this;
+    }
+
+    @Override
+    public TransformedInstance rotate(float radians, Axis axis) {
+        axis.rotate(pose, radians);
+        return this;
+    }
+
+    @Override
+    public TransformedInstance rotate(float radians, Direction axis) {
+        ((AxisHolder) (Object) axis).create$getMathAxis().rotate(pose, radians);
+        return this;
+    }
+
+    @Override
+    public TransformedInstance rotate(float radians, Direction.Axis axis) {
+        ((AxisHolder) (Object) axis).create$getMathAxis().rotate(pose, radians);
         return this;
     }
 

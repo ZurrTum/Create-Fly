@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.pulley;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
@@ -23,15 +24,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.KINETIC_BLOCK;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.shaft;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 
 public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> implements BlockEntityRenderer<T, PulleyRenderState> {
     private final Int2ObjectMap<SuperByteBufferRenderState> cache = new Int2ObjectOpenHashMap<>();
@@ -68,7 +68,8 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> imple
         int color = KineticBlockEntityRenderer.getTintColor(be);
         state.shaft = CachedBuffers.block(KINETIC_BLOCK, shaft(axis)).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).color(color).extractRenderState();
-        state.angle = KineticBlockEntityRenderer.getRotateAngleWithoutBeOffset(axis, direction, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         float offset = getOffset(be, tickProgress);
         boolean running = isRunning(be);
         SuperByteBuffer coil = CachedBuffers.partialFacing(getCoil(), state.blockState, direction);
@@ -120,9 +121,9 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> imple
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.shaft.submit(matrices, queue);
             matrices.popPose();
         } else {
@@ -142,9 +143,10 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> imple
             matrices.popPose();
         }
         if (state.ropes != null) {
-            matrices.translate(0, state.ropeOffset, 0);
+            Pose pose = matrices.last();
+            pose.translate(0, state.ropeOffset, 0);
             for (SuperByteBufferRenderState rope : state.ropes) {
-                matrices.translate(0, 1, 0);
+                pose.translate(0, 1, 0);
                 rope.submit(matrices, queue);
             }
         }
@@ -181,7 +183,8 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> imple
 
     public static class PulleyRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState shaft;
-        public @Nullable Quaternionf angle;
+        public @UnknownNullability Axis axis;
+        public float angle;
         public @UnknownNullability SuperByteBufferRenderState coil;
         public @Nullable SuperByteBufferRenderState magnet;
         public float magnetOffset;

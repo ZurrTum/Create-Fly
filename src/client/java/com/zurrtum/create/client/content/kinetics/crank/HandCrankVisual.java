@@ -13,7 +13,6 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Quaternionf;
 
@@ -60,8 +59,7 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
         var facing = blockState.getValue(BlockStateProperties.FACING);
         float angle = AngleHelper.rad(HandCrankRenderer.getHandCrankIndependentAngle(blockEntity, pt));
 
-        crank.setIdentityTransform().translate(getVisualPosition()).center()
-            .rotate(angle, Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()))
+        crank.setIdentityTransform().translate(getVisualPosition()).center().rotate(angle, facing.getAxis())
             .rotate(new Quaternionf().rotateTo(0, 0, -1, facing.getStepX(), facing.getStepY(), facing.getStepZ()))
             .uncenter().setChanged();
     }

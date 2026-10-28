@@ -2,6 +2,7 @@ package com.zurrtum.create.client.catnip.gui.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
@@ -60,22 +61,23 @@ public class BlockTransformElementRenderer extends PictureInPictureRenderer<Bloc
             }
             texture.prepare(projection, projectionMatrixBuffer);
             matrices.pushPose();
-            matrices.translate(size / 2, size / 2, 0);
+            Pose pose = matrices.last();
+            pose.translate(size / 2, size / 2, 0);
             if (key.padding != 0) {
                 size -= key.padding * windowScaleFactor;
             }
-            matrices.scale(size, size, size);
-            if (key.zRot != 0) {
-                matrices.mulPose(Axis.ZP.rotation(key.zRot));
+            pose.scale(size, size, size);
+            if (key.zRadians != 0) {
+                pose.rotate(Axis.ZP, key.zRadians);
             }
-            if (key.xRot != 0) {
-                matrices.mulPose(Axis.XP.rotation(key.xRot));
+            if (key.xRadians != 0) {
+                pose.rotate(Axis.XP, key.xRadians);
             }
-            if (key.yRot != 0) {
-                matrices.mulPose(Axis.YP.rotation(key.yRot));
+            if (key.yRadians != 0) {
+                pose.rotate(Axis.YP, key.yRadians);
             }
-            matrices.scale(1, -1, 1);
-            matrices.translate(-0.5F, -0.5F, -0.5F);
+            pose.scale(1, -1, 1);
+            pose.translate(-0.5F, -0.5F, -0.5F);
             CachedBuffers.block(key.state).submit(matrices, submitNodeStorage);
             matrices.popPose();
             featureRenderDispatcher.renderAllFeatures(submitNodeStorage);

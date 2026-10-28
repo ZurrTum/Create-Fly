@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.content.kinetics.clock;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.clock.CuckooClockRenderer.CuckooClockRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -26,10 +26,10 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getDegreesWithoutBeOffset;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
 
 public class CuckooClockRenderer implements BlockEntityRenderer<CuckooClockBlockEntity, CuckooClockRenderState> {
     public CuckooClockRenderer(Context context) {
@@ -57,7 +57,9 @@ public class CuckooClockRenderer implements BlockEntityRenderer<CuckooClockBlock
                 state.blockState,
                 facing.getOpposite()
             ).cardinalLighting(cardinalLighting).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-            state.angle = getRotateAngleWithoutBeOffset(facing.getAxis(), be, state, level);
+            Direction.Axis axis = facing.getAxis();
+            state.axis = axis;
+            state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         }
         state.hourHand = CachedBuffers.partial(AllPartialModels.CUCKOO_HOUR_HAND, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
@@ -65,19 +67,17 @@ public class CuckooClockRenderer implements BlockEntityRenderer<CuckooClockBlock
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         CuckooClockAnimationBehaviour behaviour = (CuckooClockAnimationBehaviour) be.getBehaviour(AnimationBehaviour.TYPE);
         if (behaviour != null) {
-            state.hourAngle = getEastRotateAngle(behaviour.hourHand.getValue(tickProgress));
-            state.minuteAngle = getEastRotateAngle(behaviour.minuteHand.getValue(tickProgress));
+            state.hourAngle = behaviour.hourHand.getValue(tickProgress);
+            state.minuteAngle = behaviour.minuteHand.getValue(tickProgress);
         }
-        state.upAngle = getUpRotateAngle(AngleHelper.horizontalAngle(facing.getCounterClockWise()));
+        state.yRadians = Radians.horizontal(facing.getCounterClockWise());
         state.leftDoor = CachedBuffers.partial(AllPartialModels.CUCKOO_LEFT_DOOR, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         state.rightDoor = CachedBuffers.partial(AllPartialModels.CUCKOO_RIGHT_DOOR, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         float doorAngle = getDoorAngle(be, tickProgress);
         if (doorAngle != 0) {
-            float radians = Mth.DEG_TO_RAD * doorAngle;
-            state.rightDoorAngle = new Quaternionf().setAngleAxis(radians, 0, 1, 0);
-            state.leftDoorAngle = new Quaternionf(state.rightDoorAngle).conjugate();
+            state.doorRadians = Mth.DEG_TO_RAD * doorAngle;
             if (be.animationType == Animation.NONE) {
                 return;
             }
@@ -125,65 +125,65 @@ public class CuckooClockRenderer implements BlockEntityRenderer<CuckooClockBlock
         CameraRenderState cameraState
     ) {
         if (state.shaft != null) {
-            if (state.angle != null) {
+            if (state.angle != 0) {
                 matrices.pushPose();
-                matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+                matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
                 state.shaft.submit(matrices, queue);
                 matrices.popPose();
             } else {
                 state.shaft.submit(matrices, queue);
             }
         }
-        if (state.upAngle != null) {
-            matrices.rotateAround(state.upAngle, 0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            matrices.rotateYCentered(state.yRadians);
         }
-        if (state.hourAngle != null) {
+        if (state.hourAngle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.hourAngle, 0.125f, 0.375f, 0.5f);
+            matrices.rotateXAround(Mth.DEG_TO_RAD * state.hourAngle, 0.125f, 0.375f, 0.5f);
             state.hourHand.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.hourHand.submit(matrices, queue);
         }
-        if (state.minuteAngle != null) {
+        if (state.minuteAngle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.minuteAngle, 0.125f, 0.375f, 0.5f);
+            matrices.rotateXAround(Mth.DEG_TO_RAD * state.minuteAngle, 0.125f, 0.375f, 0.5f);
             state.minuteHand.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.minuteHand.submit(matrices, queue);
         }
-        if (state.leftDoorAngle != null) {
+        if (state.doorRadians != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.leftDoorAngle, 0.125f, 0, 0.375f);
+            matrices.rotateYAround(-state.doorRadians, 0.125f, 0, 0.375f);
             state.leftDoor.submit(matrices, queue);
             matrices.popPose();
             matrices.pushPose();
-            matrices.rotateAround(state.rightDoorAngle, 0.125f, 0, 0.625f);
+            matrices.rotateYAround(state.doorRadians, 0.125f, 0, 0.625f);
             state.rightDoor.submit(matrices, queue);
             matrices.popPose();
+            if (state.figure != null) {
+                matrices.translate(state.offset, 0, 0);
+                state.figure.submit(matrices, queue);
+            }
         } else {
             state.leftDoor.submit(matrices, queue);
             state.rightDoor.submit(matrices, queue);
-        }
-        if (state.figure != null) {
-            matrices.translate(state.offset, 0, 0);
-            state.figure.submit(matrices, queue);
         }
     }
 
     public static class CuckooClockRenderState extends BlockEntityRenderState {
         public @Nullable SuperByteBufferRenderState shaft;
-        public @Nullable Quaternionf angle;
+        public Direction.@UnknownNullability Axis axis;
+        public float angle;
         public @UnknownNullability SuperByteBufferRenderState hourHand;
         public @UnknownNullability SuperByteBufferRenderState minuteHand;
-        public @Nullable Quaternionf upAngle;
-        public @Nullable Quaternionf hourAngle;
-        public @Nullable Quaternionf minuteAngle;
+        public float yRadians;
+        public float hourAngle;
+        public float minuteAngle;
         public @UnknownNullability SuperByteBufferRenderState leftDoor;
         public @UnknownNullability SuperByteBufferRenderState rightDoor;
-        public @Nullable Quaternionf leftDoorAngle;
-        public @UnknownNullability Quaternionf rightDoorAngle;
+        public float doorRadians;
         public @Nullable SuperByteBufferRenderState figure;
         public float offset;
     }

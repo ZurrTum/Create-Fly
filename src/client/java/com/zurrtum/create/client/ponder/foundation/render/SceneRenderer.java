@@ -5,11 +5,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.catnip.gui.render.GpuTexture;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.PonderScene.SceneTransform;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -27,7 +27,6 @@ import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
@@ -131,9 +130,10 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
         transform.updateSceneRVE(partialTicks);
         if (!scene.shouldHidePlatformShadow()) {
             poseStack.pushPose();
-            poseStack.scale(1, -1, 1);
+            Pose pose = poseStack.last();
+            pose.scale(1, -1, 1);
             int basePlateSize = scene.getBasePlateSize();
-            poseStack.translate(scene.getBasePlateOffsetX() + basePlateSize, 0, scene.getBasePlateOffsetZ());
+            pose.translate(scene.getBasePlateOffsetX() + basePlateSize, 0, scene.getBasePlateOffsetZ());
             queue.submitCustomGeometry(
                 poseStack,
                 PonderRenderTypes.getGui(),
@@ -237,8 +237,6 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
 
     private record ShadowRenderState(float basePlateSize, @Nullable ShadowFlashRenderState flash,
                                      Vector3f pos) implements CustomGeometryRenderer {
-        private static final Quaternionf ROTATE = Axis.YP.rotationDegrees(-90);
-
         @Override
         public void render(Pose stack, VertexConsumer buffer) {
             Matrix4f pose = stack.pose();
@@ -261,7 +259,7 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
         }
 
         private void move(Matrix4f pose) {
-            pose.rotate(ROTATE);
+            pose.rotateY(Radians.DEG_270);
             pose.translate(basePlateSize, 0, 0);
         }
 

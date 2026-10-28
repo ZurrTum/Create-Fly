@@ -1,14 +1,16 @@
 package com.zurrtum.create.client.content.kinetics.steamEngine;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -32,8 +34,8 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
         }
 
         boolean recessed = roll % 180 == 0;
-        if (engineFacing.getAxis() == Axis.Y) {
-            recessed ^= state.getValue(SteamEngineBlock.FACING).getAxis() == Axis.X;
+        if (engineFacing.getAxis() == Direction.Axis.Y) {
+            recessed ^= state.getValue(SteamEngineBlock.FACING).getAxis() == Direction.Axis.X;
         }
 
         return !recessed;
@@ -58,9 +60,9 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
         float verticalAngle = AngleHelper.verticalAngle(engineFacing);
         Vec3 local = VecHelper.voxelSpace(8, 14.5, 9);
 
-        local = VecHelper.rotateCentered(local, roll, Axis.Z);
-        local = VecHelper.rotateCentered(local, horizontalAngle, Axis.Y);
-        local = VecHelper.rotateCentered(local, verticalAngle, Axis.X);
+        local = VecHelper.rotateCentered(local, roll, Direction.Axis.Z);
+        local = VecHelper.rotateCentered(local, horizontalAngle, Direction.Axis.Y);
+        local = VecHelper.rotateCentered(local, verticalAngle, Direction.Axis.X);
 
         return local;
     }
@@ -69,7 +71,7 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
     public void rotate(BlockState state, PoseStack ms) {
         Direction facing = SteamEngineBlock.getFacing(state);
 
-        if (facing.getAxis() == Axis.Y) {
+        if (facing.getAxis() == Direction.Axis.Y) {
             super.rotate(state, ms);
             return;
         }
@@ -81,9 +83,22 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
             }
         }
 
-        float yRot = AngleHelper.horizontalAngle(facing) + (facing == Direction.DOWN ? 180 : 0);
-        TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(facing == Direction.DOWN ? -90 : 90)
-            .rotateYDegrees(roll);
+        float yRadians, xRadians;
+        if (facing == Direction.DOWN) {
+            yRadians = Radians.horizontalPlus180(facing);
+            xRadians = Radians.DEG_270;
+        } else {
+            yRadians = Radians.horizontal(facing);
+            xRadians = Radians.DEG_90;
+        }
+        Pose pose = ms.last();
+        if (yRadians != 0) {
+            pose.rotate(Axis.YP, yRadians);
+        }
+        pose.rotate(Axis.XP, xRadians);
+        if (roll != 0) {
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * roll);
+        }
     }
 
     @Override

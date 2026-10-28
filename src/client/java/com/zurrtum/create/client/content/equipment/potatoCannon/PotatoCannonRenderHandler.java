@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.content.equipment.potatoCannon;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.content.equipment.zapper.ShootableGadgetRenderHandler;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoCannonItem;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoProjectileEntity;
 import com.zurrtum.create.infrastructure.particle.AirParticleData;
@@ -55,15 +57,17 @@ public class PotatoCannonRenderHandler extends ShootableGadgetRenderHandler {
 
     @Override
     protected void transformTool(PoseStack ms, float flip, float equipProgress, float recoil, float pt) {
-        ms.translate(flip * -0.1f, 0, 0.14f);
-        ms.scale(0.75f, 0.75f, 0.75f);
-        TransformStack.of(ms).rotateXDegrees(recoil * 80);
+        Pose pose = ms.last();
+        pose.translate(flip * -0.1f, 0, 0.14f);
+        pose.scale(0.75f, 0.75f, 0.75f);
+        pose.rotate(Axis.XP, recoil * Radians.DEG_80);
     }
 
     @Override
     protected void transformHand(PoseStack ms, float flip, float equipProgress, float recoil, float pt) {
-        ms.translate(flip * -0.09, -0.275, -0.25);
-        TransformStack.of(ms).rotateZDegrees(flip * -10);
+        Pose pose = ms.last();
+        pose.translate(flip * -0.09f, -0.275f, -0.25f);
+        pose.rotate(Axis.ZP, flip * Radians.DEG_350);
     }
 
 }

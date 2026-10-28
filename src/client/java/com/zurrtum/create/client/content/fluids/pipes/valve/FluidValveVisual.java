@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.fluids.pipes.valve;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -24,8 +24,8 @@ public class FluidValveVisual extends ShaftVisual<FluidValveBlockEntity> impleme
     protected TransformedInstance pointer;
     protected boolean settled;
 
-    protected final double xRot;
-    protected final double yRot;
+    protected final double xRadians;
+    protected final double yRadians;
     protected final int pointerRotationOffset;
 
     public FluidValveVisual(VisualizationContext dispatcher, FluidValveBlockEntity blockEntity, float partialTick) {
@@ -33,8 +33,8 @@ public class FluidValveVisual extends ShaftVisual<FluidValveBlockEntity> impleme
 
         Direction facing = blockState.getValue(FluidValveBlock.FACING);
 
-        yRot = AngleHelper.horizontalAngle(facing);
-        xRot = facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90;
+        yRadians = Radians.horizontal(facing);
+        xRadians = facing == Direction.UP ? 0 : facing == Direction.DOWN ? Radians.DEG_180 : Radians.DEG_90;
 
         Axis pipeAxis = FluidValveBlock.getPipeAxis(blockState);
         Axis shaftAxis = KineticBlockEntityRenderer.getRotationAxisOf(blockEntity);
@@ -65,9 +65,8 @@ public class FluidValveVisual extends ShaftVisual<FluidValveBlockEntity> impleme
         float pointerRotation = Mth.lerp(value, 0, -90);
         settled = (value == 0 || value == 1) && blockEntity.pointer.settled();
 
-        pointer.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees((float) yRot)
-            .rotateXDegrees((float) xRot).rotateYDegrees(pointerRotationOffset + pointerRotation).uncenter()
-            .setChanged();
+        pointer.setIdentityTransform().translate(getVisualPosition()).center().rotateY((float) yRadians)
+            .rotateX((float) xRadians).rotateYDegrees(pointerRotationOffset + pointerRotation).uncenter().setChanged();
     }
 
     @Override

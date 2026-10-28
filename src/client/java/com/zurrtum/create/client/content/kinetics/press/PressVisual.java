@@ -1,8 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.press;
 
-import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -14,7 +13,6 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.press.MechanicalPressBlock;
 import com.zurrtum.create.content.kinetics.press.MechanicalPressBlockEntity;
 import com.zurrtum.create.content.kinetics.press.PressingBehaviour;
-import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
 
@@ -30,9 +28,8 @@ public class PressVisual extends ShaftVisual<MechanicalPressBlockEntity> impleme
             Models.chunkPartial(AllPartialModels.MECHANICAL_PRESS_HEAD)
         ).createInstance();
 
-        Quaternionf q = Axis.YP.rotationDegrees(AngleHelper.horizontalAngle(blockState.getValue(MechanicalPressBlock.HORIZONTAL_FACING)));
-
-        pressHead.rotation(q);
+        float yRadians = Radians.horizontal(blockState.getValue(MechanicalPressBlock.HORIZONTAL_FACING));
+        pressHead.rotationY(yRadians);
 
         transformModels(partialTick);
     }

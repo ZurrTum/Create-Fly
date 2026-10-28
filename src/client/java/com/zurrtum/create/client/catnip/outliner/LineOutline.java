@@ -63,20 +63,19 @@ public class LineOutline extends Outline {
         boolean disableNormals
     ) {
         ms.pushPose();
+        Pose pose = ms.last();
         Vector3f diff = diffPosTemp.set(
             (float) (end.x - start.x),
             (float) (end.y - start.y),
             (float) (end.z - start.z)
         );
-        ms.translate((float) (start.x - camera.x), (float) (start.y - camera.y), (float) (start.z - camera.z));
-        double yRot = Mth.atan2(diff.x(), diff.z());
-        if (yRot != 0) {
-            ms.mulPose(Axis.YP.rotation((float) yRot));
+        pose.translate((float) (start.x - camera.x), (float) (start.y - camera.y), (float) (start.z - camera.z));
+        double yRadians = Mth.atan2(diff.x(), diff.z());
+        if (yRadians != 0) {
+            pose.rotate(Axis.YP, (float) yRadians);
         }
-        double xRot = Mth.atan2(Mth.sqrt(diff.x() * diff.x() + diff.z() * diff.z()), diff.y()) - Mth.HALF_PI;
-        if (xRot != 0) {
-            ms.mulPose(Axis.XP.rotation((float) xRot));
-        }
+        double xRadians = Mth.atan2(Mth.sqrt(diff.x() * diff.x() + diff.z() * diff.z()), diff.y()) - Mth.HALF_PI;
+        pose.rotate(Axis.XP, (float) xRadians);
         float length = Mth.sqrt(diff.x() * diff.x() + diff.y() * diff.y() + diff.z() * diff.z());
         LineRenderState state = new LineRenderState(this, length, width, color, lightmap, disableNormals);
         queue.submitCustomGeometry(ms, PonderRenderTypes.outlineSolid(), state);

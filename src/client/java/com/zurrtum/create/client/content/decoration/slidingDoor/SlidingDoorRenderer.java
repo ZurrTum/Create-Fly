@@ -1,14 +1,16 @@
 package com.zurrtum.create.client.content.decoration.slidingDoor;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Pair;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.decoration.slidingDoor.SlidingDoorRenderer.DoorRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.gui.widget.Label;
@@ -38,17 +40,12 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.function.Consumer;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlockEntity, DoorRenderState> {
     public static float DOOR_OFFSET = -1 / 512.0f;
@@ -82,16 +79,16 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
             renderState.offsetX = facingVec.getX() * scale;
             renderState.offsetY = Math.fma(facingVec.getY(), scale, DOOR_OFFSET);
             renderState.offsetZ = facingVec.getZ() * scale;
-            renderState.angle = getUpRotateAngle(AngleHelper.horizontalAngle(facing.getClockWise()));
+            renderState.yRadians = Radians.horizontal(facing.getClockWise());
             float v = value * value * (isLeft ? 1 : -1);
-            renderState.yRot = getYRotateAngle(91 * v);
+            renderState.yRot = 91 * v;
             renderState.flip = !isLeft;
             Couple<PartialModel> partials = AllPartialModels.FOLDING_DOORS.get(BuiltInRegistries.BLOCK.getKey(block));
             renderState.left = CachedBuffers.partial(partials.get(isLeft), state.blockState)
                 .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
             renderState.right = CachedBuffers.partial(partials.get(renderState.flip), state.blockState)
                 .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
-            renderState.rightYRot = getYRotateAngle(-181 * v);
+            renderState.rightYRot = -181 * v;
             state.door = renderState;
         } else {
             SlidingDoorRenderState renderState = new SlidingDoorRenderState();
@@ -173,39 +170,40 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
         public float offsetX;
         public float offsetY;
         public float offsetZ;
-        public @Nullable Quaternionfc yRot;
-        public @Nullable Quaternionfc rightYRot;
-        public @Nullable Quaternionf angle;
+        public float yRot;
+        public float rightYRot;
+        public float yRadians;
         public boolean flip;
 
         @Override
         public void submit(PoseStack matrices, OrderedSubmitNodeCollector queue) {
-            matrices.translate(offsetX, offsetY, offsetZ);
-            if (angle != null) {
-                matrices.rotateAround(angle, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            pose.translate(offsetX, offsetY, offsetZ);
+            if (yRadians != 0) {
+                pose.rotateYCentered(yRadians);
             }
             if (flip) {
-                if (yRot != null) {
-                    matrices.translate(0, 0, 1);
-                    matrices.mulPose(yRot);
-                    matrices.translate(0, 0, -0.5f);
+                if (yRot != 0) {
+                    pose.translate(0, 0, 1);
+                    pose.rotate(Axis.YP, Mth.DEG_TO_RAD * yRot);
+                    pose.translate(0, 0, -0.5f);
                 } else {
-                    matrices.translate(0, 0, 0.5f);
+                    pose.translate(0, 0, 0.5f);
                 }
                 left.submit(matrices, queue);
-                if (rightYRot != null) {
-                    matrices.mulPose(rightYRot);
+                if (rightYRot != 0) {
+                    pose.rotate(Axis.YP, Mth.DEG_TO_RAD * rightYRot);
                 }
-                matrices.translate(0, 0, -0.5f);
+                pose.translate(0, 0, -0.5f);
                 right.submit(matrices, queue);
             } else {
-                if (yRot != null) {
-                    matrices.mulPose(yRot);
+                if (yRot != 0) {
+                    pose.rotate(Axis.YP, Mth.DEG_TO_RAD * yRot);
                 }
                 left.submit(matrices, queue);
-                matrices.translate(0, 0, 0.5f);
-                if (rightYRot != null) {
-                    matrices.mulPose(rightYRot);
+                pose.translate(0, 0, 0.5f);
+                if (rightYRot != 0) {
+                    pose.rotate(Axis.YP, Mth.DEG_TO_RAD * rightYRot);
                 }
                 right.submit(matrices, queue);
             }

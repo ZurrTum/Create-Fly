@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.content.kinetics.crank;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -11,8 +10,8 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlock;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,8 +19,7 @@ import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getAngleForBe;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotationAxisOf;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getDegreesWithoutBeOffset;
 
 public class ValveHandleVisual extends KineticBlockEntityVisual<ValveHandleBlockEntity> implements SimpleDynamicVisual {
     private final TransformedInstance crank;
@@ -51,15 +49,15 @@ public class ValveHandleVisual extends KineticBlockEntityVisual<ValveHandleBlock
 
     private void rotateCrank(float pt) {
         var facing = blockState.getValue(BlockStateProperties.FACING);
+        Axis axis = facing.getAxis();
         float angle;
         if (blockEntity.inUse == 0 && blockEntity.source != null && blockEntity.getSpeed() != 0) {
-            angle = getAngleForBe(blockEntity, blockEntity.getBlockPos(), getRotationAxisOf(blockEntity));
+            angle = getDegreesWithoutBeOffset(axis, blockEntity);
         } else {
-            angle = AngleHelper.rad(ValveHandleRenderer.getValveHandleIndependentAngle(blockEntity, facing, pt));
+            angle = ValveHandleRenderer.getValveHandleIndependentAngle(blockEntity, facing, pt);
         }
 
-        crank.setIdentityTransform().translate(getVisualPosition()).center()
-            .rotate(angle, Direction.get(AxisDirection.POSITIVE, facing.getAxis()))
+        crank.setIdentityTransform().translate(getVisualPosition()).center().rotate(Mth.DEG_TO_RAD * angle, axis)
             .rotate(new Quaternionf().rotateTo(0, 1, 0, facing.getStepX(), facing.getStepY(), facing.getStepZ()))
             .uncenter().setChanged();
     }

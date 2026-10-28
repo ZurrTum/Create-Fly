@@ -37,7 +37,8 @@ public class ShaftRenderer implements BlockEntityRenderer<KineticBlockEntity, Si
         Axis axis = getRotationAxisOf(state.blockState);
         state.model = CachedBuffers.block(KINETIC_BLOCK, shaft(axis)).cardinalLighting(level).light(state.lightCoords)
             .color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
     }
 
     @Override

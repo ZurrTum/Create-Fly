@@ -22,7 +22,6 @@ import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
-import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
@@ -176,8 +175,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
 
         if (hat != null) {
             hat.setIdentityTransform().translate(getVisualPosition()).translateY(headY).translateY(0.75f);
-            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f)
-                .light(LightCoordsUtil.FULL_BRIGHT);
+            hat.rotateYCentered(horizontalAngle + Mth.PI).translate(0.5f, 0, 0.5f).light(LightCoordsUtil.FULL_BRIGHT);
 
             hat.setChanged();
         }

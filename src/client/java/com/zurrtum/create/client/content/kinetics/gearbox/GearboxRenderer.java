@@ -18,16 +18,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getProgress;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
 
 public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, GearboxRenderState> {
     public GearboxRenderer(Context context) {
@@ -87,16 +88,18 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         float offset2 = KineticBlockEntityVisual.rotationOffset(blockState, axis2, state.blockPos);
         Direction direction1 = axis1.getPositive();
         Direction direction2 = axis2.getPositive();
+        state.axis1 = axis1;
+        state.axis2 = axis2;
         if (flag) {
-            state.angle0 = getRotateAngle(angle + offset1, direction1);
-            state.angle1 = getRotateAngle(offset1 - angle, direction1);
-            state.angle2 = getRotateAngle(offset2 - angle, direction2);
-            state.angle3 = getRotateAngle(angle + offset2, direction2);
+            state.angle0 = angle + offset1;
+            state.angle1 = offset1 - angle;
+            state.angle2 = offset2 - angle;
+            state.angle3 = angle + offset2;
         } else {
-            state.angle0 = getRotateAngle(offset1 - angle, direction1);
-            state.angle1 = getRotateAngle(angle + offset1, direction1);
-            state.angle2 = getRotateAngle(angle + offset2, direction2);
-            state.angle3 = getRotateAngle(offset2 - angle, direction2);
+            state.angle0 = offset1 - angle;
+            state.angle1 = angle + offset1;
+            state.angle2 = angle + offset2;
+            state.angle3 = offset2 - angle;
         }
         int lightCoords = state.lightCoords;
         state.model0 = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, blockState, direction1)
@@ -116,32 +119,32 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle0 != null) {
+        if (state.angle0 != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle0, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis1, Mth.DEG_TO_RAD * state.angle0);
             state.model0.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.model0.submit(matrices, queue);
         }
-        if (state.angle1 != null) {
+        if (state.angle1 != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle1, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis1, Mth.DEG_TO_RAD * state.angle1);
             state.model1.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.model1.submit(matrices, queue);
         }
-        if (state.angle2 != null) {
+        if (state.angle2 != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle2, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis2, Mth.DEG_TO_RAD * state.angle2);
             state.model2.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.model2.submit(matrices, queue);
         }
-        if (state.angle3 != null) {
-            matrices.rotateAround(state.angle3, 0.5f, 0.5f, 0.5f);
+        if (state.angle3 != 0) {
+            matrices.rotateCentered(state.axis2, Mth.DEG_TO_RAD * state.angle3);
         }
         state.model3.submit(matrices, queue);
     }
@@ -151,9 +154,11 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         public @UnknownNullability SuperByteBufferRenderState model1;
         public @UnknownNullability SuperByteBufferRenderState model2;
         public @UnknownNullability SuperByteBufferRenderState model3;
-        public @Nullable Quaternionf angle0;
-        public @Nullable Quaternionf angle1;
-        public @Nullable Quaternionf angle2;
-        public @Nullable Quaternionf angle3;
+        public @UnknownNullability Axis axis1;
+        public @UnknownNullability Axis axis2;
+        public float angle0;
+        public float angle1;
+        public float angle2;
+        public float angle3;
     }
 }

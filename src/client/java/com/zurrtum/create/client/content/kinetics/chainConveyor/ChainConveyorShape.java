@@ -1,18 +1,19 @@
 package com.zurrtum.create.client.content.kinetics.chainConveyor;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VecHelper;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 public abstract class ChainConveyorShape {
@@ -63,30 +64,34 @@ public abstract class ChainConveyorShape {
 
         private Vec3 counterTransform(Vec3 from) {
             from = from.subtract(pivot);
-            from = VecHelper.rotate(from, -yaw, Axis.Y);
-            from = VecHelper.rotate(from, -pitch, Axis.X);
+            from = VecHelper.rotate(from, -yaw, Direction.Axis.Y);
+            from = VecHelper.rotate(from, -pitch, Direction.Axis.X);
             from = from.add(pivot);
             return from;
         }
 
         private Vec3 transform(Vec3 result) {
             result = result.subtract(pivot);
-            result = VecHelper.rotate(result, pitch, Axis.X);
-            result = VecHelper.rotate(result, yaw, Axis.Y);
+            result = VecHelper.rotate(result, pitch, Direction.Axis.X);
+            result = VecHelper.rotate(result, yaw, Direction.Axis.Y);
             result = result.add(pivot);
             return result;
         }
 
         @Override
         public void submitOutline(BlockPos anchor, PoseStack ms, SubmitNodeCollector queue, float width) {
-            ms.translate(pivot.x, pivot.y, pivot.z);
+            Pose pose = ms.last();
+            float x = (float) pivot.x;
+            float y = (float) pivot.y;
+            float z = (float) pivot.z;
+            pose.translate(x, y, z);
             if (yaw != 0) {
-                ms.mulPose(new Quaternionf().rotationY(Mth.DEG_TO_RAD * (float) yaw));
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * (float) yaw);
             }
             if (pitch != 0) {
-                ms.mulPose(new Quaternionf().rotationX(Mth.DEG_TO_RAD * (float) pitch));
+                pose.rotate(Axis.XP, Mth.DEG_TO_RAD * (float) pitch);
             }
-            ms.translate(-pivot.x, -pivot.y, -pivot.z);
+            pose.translate(-x, -y, -z);
             queue.submitShapeOutline(ms, voxelShape, RenderTypes.lines(), 0x66000000, width, true);
         }
 
@@ -155,7 +160,7 @@ public abstract class ChainConveyorShape {
         @Override
         public Vec3 getVec(BlockPos anchor, float position) {
             Vec3 point = bounds.getCenter();
-            point = point.add(VecHelper.rotate(new Vec3(0, 0, radius), position, Axis.Y));
+            point = point.add(VecHelper.rotate(new Vec3(0, 0, radius), position, Direction.Axis.Y));
             return point.add(Vec3.atLowerCornerOf(anchor)).add(0, -0.125, 0);
         }
 

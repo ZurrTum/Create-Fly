@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.content.contraptions.actors.psi;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
@@ -17,8 +17,8 @@ public class PIInstance {
     private final InstancerProvider instancerProvider;
     private final BlockState blockState;
     private final BlockPos instancePos;
-    private final float angleX;
-    private final float angleY;
+    private final float xRadians;
+    private final float yRadians;
 
     private boolean lit;
     TransformedInstance middle;
@@ -29,8 +29,8 @@ public class PIInstance {
         this.blockState = blockState;
         this.instancePos = instancePos;
         Direction facing = blockState.getValue(PortableStorageInterfaceBlock.FACING);
-        angleX = facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90;
-        angleY = AngleHelper.horizontalAngle(facing);
+        xRadians = facing == Direction.UP ? 0 : facing == Direction.DOWN ? Radians.DEG_180 : Radians.DEG_90;
+        yRadians = Radians.horizontal(facing);
         this.lit = lit;
 
         middle = instancerProvider.instancer(
@@ -44,11 +44,9 @@ public class PIInstance {
     }
 
     public void beginFrame(float progress) {
-        middle.setIdentityTransform().translate(instancePos).center().rotateYDegrees(angleY).rotateXDegrees(angleX)
-            .uncenter();
+        middle.setIdentityTransform().translate(instancePos).center().rotateY(yRadians).rotateX(xRadians).uncenter();
 
-        top.setIdentityTransform().translate(instancePos).center().rotateYDegrees(angleY).rotateXDegrees(angleX)
-            .uncenter();
+        top.setIdentityTransform().translate(instancePos).center().rotateY(yRadians).rotateX(xRadians).uncenter();
 
         middle.translate(0, progress * 0.5f + 0.375f, 0);
         top.translate(0, progress, 0);

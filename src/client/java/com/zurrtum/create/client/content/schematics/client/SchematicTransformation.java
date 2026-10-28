@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.content.schematics.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -54,21 +55,31 @@ public class SchematicTransformation {
     }
 
     public void applyTransformations(PoseStack ms, Vec3 camera) {
+        Pose pose = ms.last();
         float pt = AnimationTickHolder.getPartialTicks();
 
         // Translation
-        TransformStack.of(ms).translate(VecHelper.lerp(pt, prevChasingPos, chasingPos).subtract(camera));
+        Vec3 offset = VecHelper.lerp(pt, prevChasingPos, chasingPos).subtract(camera);
+        pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
         Vec3 rotationOffset = getRotationOffset(true);
 
         // Rotation & Mirror
         float fb = getScaleFB().getValue(pt);
         float lr = getScaleLR().getValue(pt);
         float rot = rotation.getValue(pt) + (fb < 0 && lr < 0 ? 180 : 0);
-        ms.translate(xOrigin, 0, zOrigin);
-        TransformStack.of(ms).translate(rotationOffset).rotateYDegrees(rot).translateBack(rotationOffset);
-        ms.scale(abs(fb), 1, abs(lr));
-        ms.translate(-xOrigin, 0, -zOrigin);
-
+        float x = (float) xOrigin;
+        float z = (float) zOrigin;
+        pose.translate(x, 0, z);
+        if (rot != 0) {
+            pose.rotateYAround(
+                Mth.DEG_TO_RAD * rot,
+                (float) rotationOffset.x,
+                (float) rotationOffset.y,
+                (float) rotationOffset.z
+            );
+        }
+        pose.scale(abs(fb), 1, abs(lr));
+        pose.translate(-x, 0, -z);
     }
 
     public boolean isFlipped() {

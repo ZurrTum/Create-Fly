@@ -1,12 +1,13 @@
 package com.zurrtum.create.client.content.decoration.steamWhistle;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.decoration.steamWhistle.WhistleRenderer.WhistleRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.animation.AnimationBehaviour;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.animation.WhistleAnimationBehaviour;
@@ -24,10 +25,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, WhistleRenderState> {
     public WhistleRenderer(Context context) {
@@ -59,7 +57,7 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
         }
         state.model = CachedBuffers.partial(getMouthModel(size), state.blockState).cardinalLighting(level)
             .light(state.lightCoords).extractRenderState();
-        state.yRot = getYRotateAngle(AngleHelper.horizontalAngle(state.blockState.getValue(WhistleBlock.FACING)));
+        state.yRadians = Radians.horizontal(state.blockState.getValue(WhistleBlock.FACING));
     }
 
     @Override
@@ -69,10 +67,11 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.yRot != null) {
-            matrices.rotateAround(state.yRot, 0.5f, 0.5f, 0.5f);
+        Pose pose = matrices.last();
+        if (state.yRadians != 0) {
+            pose.rotateYCentered(state.yRadians);
         }
-        matrices.translate(0, state.offset, 0);
+        pose.translate(0, state.offset, 0);
         state.model.submit(matrices, queue);
     }
 
@@ -86,7 +85,7 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
 
     public static class WhistleRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState model;
-        public @Nullable Quaternionf yRot;
+        public float yRadians;
         public float offset;
     }
 }

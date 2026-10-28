@@ -2,6 +2,7 @@ package com.zurrtum.create.client.foundation.gui.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.zurrtum.create.AllBlocks;
@@ -9,6 +10,7 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.render.GpuTexture;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.gui.render.TextureSetup;
@@ -18,6 +20,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -47,22 +50,23 @@ public class PressRenderer extends GuiBlockRenderer<PressRenderState> {
         }
         texture.prepare(projection, projectionMatrixBuffer);
         matrices.pushPose();
-        matrices.translate(width / 2.0F, height, 0.0F);
+        Pose pose = matrices.last();
+        pose.translate(width / 2.0F, height, 0.0F);
         float scale = 23 * windowScaleFactor;
-        matrices.scale(scale, scale, scale);
+        pose.scale(scale, scale, scale);
 
-        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
-        matrices.translate(-0.5f, -1.14f, -0.5f);
-        matrices.scale(1, -1, 1);
+        pose.rotate(Axis.XP, Radians.DEG_344P5);
+        pose.rotate(Axis.YP, Radians.DEG_22P5);
+        pose.translate(-0.5f, -1.14f, -0.5f);
+        pose.scale(1, -1, 1);
 
         float time = AnimationTickHolder.getRenderTime();
         CachedBuffers.block(AllBlocks.MECHANICAL_PRESS.defaultBlockState()).submit(matrices, submitNodeStorage);
 
         matrices.pushPose();
+        matrices.rotateZCentered(Mth.DEG_TO_RAD * getShaftAngle(time));
         CachedBuffers.block(AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Z))
             .submit(matrices, submitNodeStorage);
-        matrices.rotateAround(Axis.ZP.rotationDegrees(getShaftAngle(time)), 0.5f, 0.5f, 0.5f);
         matrices.popPose();
 
         matrices.pushPose();

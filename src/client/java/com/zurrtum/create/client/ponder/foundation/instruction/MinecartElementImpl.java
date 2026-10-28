@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder.foundation.instruction;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.api.element.MinecartElement;
@@ -115,14 +116,14 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
         }
 
         poseStack.pushPose();
-        poseStack.translate(location.x, location.y, location.z);
-        poseStack.translate(
-            Mth.lerp(pt, entity.xo, entity.getX()),
-            Mth.lerp(pt, entity.yo, entity.getY()),
-            Mth.lerp(pt, entity.zo, entity.getZ())
+        Pose pose = poseStack.last();
+        pose.translate(
+            (float) (location.x + Mth.lerp(pt, entity.xo, entity.getX())),
+            (float) (location.y + Mth.lerp(pt, entity.yo, entity.getY())),
+            (float) (location.z + Mth.lerp(pt, entity.zo, entity.getZ()))
         );
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(rotation.getValue(pt)));
+        pose.rotate(Axis.YP, Mth.DEG_TO_RAD * rotation.getValue(pt));
 
         EntityRenderState state = entityRenderManager.extractEntity(entity, pt);
         entityRenderManager.submit(state, cameraRenderState, 0, 0, 0, poseStack, queue);

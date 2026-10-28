@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.drill;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
@@ -10,6 +9,7 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
@@ -57,13 +57,13 @@ public class DrillMovementRenderBehaviour implements MovementRenderBehaviour {
             facing.getOpposite()
         ) ? context.getAnimationSpeed() : 0;
         float time = AnimationTickHolder.getRenderTime() / 20;
-        float yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
-        float xRot = Mth.DEG_TO_RAD * AngleHelper.verticalAngle(facing);
-        float zRot = Mth.DEG_TO_RAD * (time * speed % 360);
+        float yRadians = Radians.horizontal(facing);
+        float xRadians = Radians.vertical(facing);
+        float zRadians = Mth.DEG_TO_RAD * (time * speed % 360);
         int light = LightCoordsUtil.getLightCoords(renderWorld, pos);
         SuperByteBufferRenderState head = CachedBuffers.partial(AllPartialModels.DRILL_HEAD, blockState)
-            .transform(transform).translate(pos).center().rotateY(yRot).rotateX(xRot).rotateZ(zRot).uncenter()
-            .light(light).useLevelLight(context.world, worldMatrix4f).extractRenderState();
+            .transform(transform).translate(pos).center().rotateY(yRadians).rotateX(xRadians).rotateZ(zRadians)
+            .uncenter().light(light).useLevelLight(context.world, worldMatrix4f).extractRenderState();
         return head::submit;
     }
 }

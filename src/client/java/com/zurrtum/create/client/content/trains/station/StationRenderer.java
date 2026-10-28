@@ -1,11 +1,13 @@
 package com.zurrtum.create.client.content.trains.station;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllTrackRenders;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotItemState;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotOutputItemState;
@@ -34,13 +36,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, StationRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -139,13 +137,11 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
                 ));
             }
             float nudge = 1 / 512.0f;
-            state.flagYRot = getYRotateAngle(be.flagYRot);
+            state.flagYRot = be.flagYRot;
             boolean flipped = be.flagFlipped;
             state.flagOffsetZ = flipped ? 0.875f - nudge : 0.125f + nudge;
-            state.flagXRot = getXRotateAngle((flipped ? 1 : -1) * (progress * 90 + 270));
-            if (!flipped) {
-                state.flagYRot2 = Axis.YP.rotation(Mth.DEG_TO_RAD * 180);
-            }
+            state.flagXRot = (flipped ? 1 : -1) * (progress * 90 + 270);
+            state.flagYRot2 = !flipped;
         }
     }
 
@@ -169,17 +165,14 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
         }
         if (state.flag != null) {
             matrices.pushPose();
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            if (state.flagYRot != null) {
-                matrices.mulPose(state.flagYRot);
+            Pose pose = matrices.last();
+            if (state.flagYRot != 0) {
+                pose.rotateYCentered(Mth.DEG_TO_RAD * state.flagYRot);
             }
-            matrices.translate(0.001953125f, 0.59375f, state.flagOffsetZ);
-            matrices.translate(-0.5f, -0.5f, -0.5f);
-            if (state.flagXRot != null) {
-                matrices.mulPose(state.flagXRot);
-            }
-            if (state.flagYRot2 != null) {
-                matrices.rotateAround(state.flagYRot2, 0.03125f, 0, 0);
+            pose.translate(0.001953125f, 0.59375f, state.flagOffsetZ);
+            pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.flagXRot);
+            if (state.flagYRot2) {
+                pose.rotateYAround(Radians.DEG_180, 0.03125f, 0, 0);
             }
             state.flag.submit(matrices, queue);
             matrices.popPose();
@@ -203,10 +196,10 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
         public DepotItemState @Nullable [] incoming;
         public @Nullable List<DepotOutputItemState> outputs;
         public @Nullable SuperByteBufferRenderState flag;
-        public @Nullable Quaternionf flagYRot;
+        public float flagYRot;
         public float flagOffsetZ;
-        public @Nullable Quaternionf flagXRot;
-        public @Nullable Quaternionf flagYRot2;
+        public float flagXRot;
+        public boolean flagYRot2;
         public @Nullable TrackBlockRenderState block;
     }
 }

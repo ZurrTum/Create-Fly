@@ -2,9 +2,9 @@ package com.zurrtum.create.client.content.kinetics.motor;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlock;
 import net.minecraft.core.Direction;
@@ -33,7 +33,7 @@ public class MotorValueBox extends ValueBoxTransform.Sided {
         if (getSide() != Direction.UP) {
             return;
         }
-        TransformStack.of(ms).rotateZDegrees(-AngleHelper.horizontalAngle(facing) + 180);
+        ms.rotate(Axis.ZP, Radians.negatedHorizontalPlus180(facing));
     }
 
     @Override

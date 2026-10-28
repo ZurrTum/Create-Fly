@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.redstone.deskBell;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
@@ -35,8 +35,7 @@ public class DeskBellVisual extends AbstractBlockEntityVisual<DeskBellBlockEntit
             Models.chunkPartial(AllPartialModels.DESK_BELL_PLUNGER)
         ).createInstance();
         Direction facing = blockState.getValue(DeskBellBlock.FACING);
-        plunger.rotateYDegrees(AngleHelper.horizontalAngle(facing))
-            .rotateXDegrees(AngleHelper.verticalAngle(facing) + 90);
+        plunger.rotateY(Radians.horizontal(facing)).rotateX(Radians.verticalPlus90(facing));
         bell = instancerProvider.instancer(
             InstanceTypes.TRANSFORMED,
             Models.chunkPartial(AllPartialModels.DESK_BELL_BELL)
@@ -64,9 +63,9 @@ public class DeskBellVisual extends AbstractBlockEntityVisual<DeskBellBlockEntit
         float y = blockPos.getY() + plungerOffset * facingVec.getY();
         float z = blockPos.getZ() + plungerOffset * facingVec.getZ();
         plunger.position(x, y, z).setChanged();
-        bell.setIdentityTransform().translate(getVisualPosition()).center()
-            .rotateYDegrees(AngleHelper.horizontalAngle(facing)).rotateXDegrees(AngleHelper.verticalAngle(facing) + 90)
-            .translate(0, -0.0625, 0).rotateXDegrees(f2 * 8 * Mth.sin(p * Mth.PI * 4 + blockEntity.animationOffset))
+        bell.setIdentityTransform().translate(getVisualPosition()).center().rotateY(Radians.horizontal(facing))
+            .rotateX(Radians.verticalPlus90(facing)).translate(0, -0.0625, 0)
+            .rotateXDegrees(f2 * 8 * Mth.sin(p * Mth.PI * 4 + blockEntity.animationOffset))
             .rotateZDegrees(f2 * 8 * Mth.cos(p * Mth.PI * 4 + blockEntity.animationOffset)).translate(0, 0.0625, 0)
             .uncenter().setChanged();
     }

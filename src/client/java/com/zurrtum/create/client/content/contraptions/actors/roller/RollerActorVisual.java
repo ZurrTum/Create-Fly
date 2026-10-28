@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.contraptions.actors.roller;
 
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.contraptions.actors.harvester.HarvesterActorVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
@@ -29,12 +30,12 @@ public class RollerActorVisual extends HarvesterActorVisual {
 
     @Override
     public void beginFrame() {
-        harvester.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle).uncenter()
+        harvester.setIdentityTransform().translate(context.localPos).rotateYCentered(yRadians)
             .translate(0, -0.25, 17 / 16.0f).rotateXDegrees((float) getRotation()).translate(0, -0.5, 0.5)
-            .rotateYDegrees(90).setChanged();
+            .rotateY(Radians.DEG_90).setChanged();
 
-        frame.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle + 180)
-            .uncenter().setChanged();
+        frame.setIdentityTransform().translate(context.localPos).rotateYCentered(yRadians + Radians.DEG_180)
+            .setChanged();
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.content.logistics.chute;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.logistics.chute.ChuteRenderer.ChuteRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.logistics.box.PackageItem;
@@ -18,14 +20,12 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, ChuteRenderState> {
@@ -91,37 +91,35 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
         public @UnknownNullability ChuteItemRenderState item;
     }
 
-    public record ChuteItemRenderState(ItemStackRenderState item, float offset, @Nullable Quaternionf xRot,
-                                       Quaternionf yRot) {
+    public record ChuteItemRenderState(ItemStackRenderState item, float offset, float radians) {
         public static ChuteItemRenderState create(
             ItemModelResolver itemModelManager,
             ItemStack stack,
             float itemPosition,
             @Nullable Level world
         ) {
-            Quaternionf xRot, yRot;
+            float radians;
             if (itemPosition != 0 && !PackageItem.isPackage(stack)) {
-                float angle = Mth.DEG_TO_RAD * itemPosition * 180;
-                xRot = Axis.XP.rotation(angle);
-                yRot = Axis.YP.rotation(angle);
+                radians = Radians.DEG_180 * itemPosition;
             } else {
-                xRot = yRot = null;
+                radians = 0;
             }
             ItemStackRenderState item = new ItemStackRenderState();
             item.displayContext = ItemDisplayContext.FIXED;
             itemModelManager.appendItemLayers(item, stack, item.displayContext, world, null, 0);
-            return new ChuteItemRenderState(item, itemPosition, xRot, yRot);
+            return new ChuteItemRenderState(item, itemPosition, radians);
         }
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue, int light) {
             matrices.pushPose();
-            matrices.translate(0.5f, offset, 0.5f);
-            if (xRot == null) {
-                matrices.scale(1.5f, 1.5f, 1.5f);
+            Pose pose = matrices.last();
+            pose.translate(0.5f, offset, 0.5f);
+            if (radians == 0) {
+                pose.scale(1.5f, 1.5f, 1.5f);
             } else {
-                matrices.scale(0.5f, 0.5f, 0.5f);
-                matrices.mulPose(xRot);
-                matrices.mulPose(yRot);
+                pose.scale(0.5f, 0.5f, 0.5f);
+                pose.rotate(Axis.XP, radians);
+                pose.rotate(Axis.YP, radians);
             }
             item.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
             matrices.popPose();

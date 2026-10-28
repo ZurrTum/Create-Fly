@@ -3,12 +3,14 @@ package com.zurrtum.create.client.infrastructure.model;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler.Mode;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
@@ -217,10 +219,10 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
         int i
     ) {
         assert data != null;
-        render(data.displayContext, matrices, queue, light, overlay, data.bind, data.equip, data.active, true);
+        submit(data.displayContext, matrices, queue, light, overlay, data.bind, data.equip, data.active, true);
     }
 
-    public void renderInLectern(
+    public void submitInLectern(
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,
@@ -229,10 +231,10 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
         boolean active,
         boolean renderDepression
     ) {
-        render(displayContext, matrices, queue, light, overlay, false, false, active, renderDepression);
+        submit(displayContext, matrices, queue, light, overlay, false, false, active, renderDepression);
     }
 
-    private void render(
+    private void submit(
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,
@@ -250,50 +252,72 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
             pt = AnimationTickHolder.getPartialTicks();
             float progress = equipProgress.getValue(pt);
             int handModifier = displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1 : 1;
-            matrices.translate(0, progress / 4, progress / 4 * handModifier);
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            matrices.mulPose(Axis.YP.rotationDegrees(progress * -30 * handModifier));
-            matrices.mulPose(Axis.ZP.rotationDegrees(progress * -30));
-            matrices.translate(-0.5f, -0.5f, -0.5f);
+            Pose pose = matrices.last();
+            pose.translate(0, progress / 4, progress / 4 * handModifier);
+            pose.translate(0.5f, 0.5f, 0.5f);
+            float radians = progress * -Radians.DEG_30;
+            pose.rotate(Axis.YP, radians * handModifier);
+            pose.rotate(Axis.ZP, radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
         }
 
-        renderQuads(displayContext, matrices, queue, light, overlay, active ? powered : item);
+        submitQuads(displayContext, matrices, queue, light, overlay, active ? powered : item);
 
         if (!active) {
-            renderQuads(displayContext, matrices, queue, light, overlay, torchOff);
+            submitQuads(displayContext, matrices, queue, light, overlay, torchOff);
             matrices.popPose();
             return;
         }
-        renderQuads(displayContext, matrices, queue, light, overlay, torch);
+        submitQuads(displayContext, matrices, queue, light, overlay, torch);
         if (bind) {
             light = (int) Mth.lerp((Mth.sin(AnimationTickHolder.getRenderTime() / 4.0f) + 1) / 2, 5, 15) << 20;
         }
         float s = 1 / 16.0f;
-        float b = s * -0.75f;
-        int index = 0;
-        if (pt == -1) {
-            pt = AnimationTickHolder.getPartialTicks();
-        }
-        matrices.pushPose();
-        matrices.translate(2 * s, 0, 8 * s);
-        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
-        matrices.translate(4 * s, 0, 0);
-        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
-        matrices.translate(-2 * s, 0, 2 * s);
-        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
-        matrices.translate(0, 0, -4 * s);
-        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
-        matrices.popPose();
+        if (renderDepression) {
+            if (pt == -1) {
+                pt = AnimationTickHolder.getPartialTicks();
+            }
+            matrices.pushPose();
+            Pose pose = matrices.last();
+            pose.translate(2 * s, 0, 8 * s);
+            submitPressButton(displayContext, matrices, queue, light, overlay, button, pt, 0);
+            pose.translate(4 * s, 0, 0);
+            submitPressButton(displayContext, matrices, queue, light, overlay, button, pt, 1);
+            pose.translate(-2 * s, 0, 2 * s);
+            submitPressButton(displayContext, matrices, queue, light, overlay, button, pt, 2);
+            pose.translate(0, 0, -4 * s);
+            submitPressButton(displayContext, matrices, queue, light, overlay, button, pt, 3);
+            matrices.popPose();
 
-        matrices.translate(3 * s, 0, 3 * s);
-        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
-        matrices.translate(2 * s, 0, 0);
-        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index, renderDepression);
+            pose = matrices.last();
+            pose.translate(3 * s, 0, 3 * s);
+            submitPressButton(displayContext, matrices, queue, light, overlay, button, pt, 4);
+            pose.translate(2 * s, 0, 0);
+            submitPressButton(displayContext, matrices, queue, light, overlay, button, pt, 5);
+        } else {
+            matrices.pushPose();
+            Pose pose = matrices.last();
+            pose.translate(2 * s, 0, 8 * s);
+            submitQuads(displayContext, matrices, queue, light, overlay, button);
+            pose.translate(4 * s, 0, 0);
+            submitQuads(displayContext, matrices, queue, light, overlay, button);
+            pose.translate(-2 * s, 0, 2 * s);
+            submitQuads(displayContext, matrices, queue, light, overlay, button);
+            pose.translate(0, 0, -4 * s);
+            submitQuads(displayContext, matrices, queue, light, overlay, button);
+            matrices.popPose();
+
+            pose = matrices.last();
+            pose.translate(3 * s, 0, 3 * s);
+            submitQuads(displayContext, matrices, queue, light, overlay, button);
+            pose.translate(2 * s, 0, 0);
+            submitQuads(displayContext, matrices, queue, light, overlay, button);
+        }
 
         matrices.popPose();
     }
 
-    private void renderButton(
+    private void submitPressButton(
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,
@@ -301,20 +325,15 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
         int overlay,
         List<BakedQuad> button,
         float pt,
-        float b,
-        int index,
-        boolean renderDepression
+        int index
     ) {
         matrices.pushPose();
-        if (renderDepression) {
-            float depression = b * buttons.get(index).getValue(pt);
-            matrices.translate(0, depression, 0);
-        }
-        renderQuads(displayContext, matrices, queue, light, overlay, button);
+        matrices.translate(0, -0.046875f * buttons.get(index).getValue(pt), 0);
+        submitQuads(displayContext, matrices, queue, light, overlay, button);
         matrices.popPose();
     }
 
-    private void renderQuads(
+    private void submitQuads(
         ItemDisplayContext displayContext,
         PoseStack matrices,
         SubmitNodeCollector queue,

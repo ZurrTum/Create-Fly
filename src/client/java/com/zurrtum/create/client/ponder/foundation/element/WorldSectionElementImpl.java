@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder.foundation.element;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
@@ -13,7 +14,6 @@ import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache.Compartment;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ModelConsumer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ModelRenderHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
@@ -35,7 +35,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ClipContext;
@@ -228,15 +228,15 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             double rotZ = Mth.lerp(pt, prevAnimatedRotation.z, animatedRotation.z);
             double rotY = Mth.lerp(pt, prevAnimatedRotation.y, animatedRotation.y);
             in = in.subtract(centerOfRotation);
-            in = VecHelper.rotate(in, -rotX, Axis.X);
-            in = VecHelper.rotate(in, -rotZ, Axis.Z);
-            in = VecHelper.rotate(in, -rotY, Axis.Y);
+            in = VecHelper.rotate(in, -rotX, Direction.Axis.X);
+            in = VecHelper.rotate(in, -rotZ, Direction.Axis.Z);
+            in = VecHelper.rotate(in, -rotY, Direction.Axis.Y);
             in = in.add(centerOfRotation);
             if (stabilizationAnchor != null) {
                 in = in.subtract(stabilizationAnchor);
-                in = VecHelper.rotate(in, rotX, Axis.X);
-                in = VecHelper.rotate(in, rotZ, Axis.Z);
-                in = VecHelper.rotate(in, rotY, Axis.Y);
+                in = VecHelper.rotate(in, rotX, Direction.Axis.X);
+                in = VecHelper.rotate(in, rotZ, Direction.Axis.Z);
+                in = VecHelper.rotate(in, rotY, Direction.Axis.Y);
                 in = in.add(stabilizationAnchor);
             }
         }
@@ -244,20 +244,27 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     }
 
     public void transformMS(PoseStack ms, float pt) {
-
+        Pose pose = ms.last();
         Vec3 vec = VecHelper.lerp(pt, prevAnimatedOffset, animatedOffset);
-        ms.translate(vec.x, vec.y, vec.z);
+        pose.translate((float) vec.x, (float) vec.y, (float) vec.z);
         if (!animatedRotation.equals(Vec3.ZERO) || !prevAnimatedRotation.equals(Vec3.ZERO)) {
-            double rotX = Mth.lerp(pt, prevAnimatedRotation.x, animatedRotation.x);
-            double rotZ = Mth.lerp(pt, prevAnimatedRotation.z, animatedRotation.z);
-            double rotY = Mth.lerp(pt, prevAnimatedRotation.y, animatedRotation.y);
-
-            TransformStack.of(ms).translate(centerOfRotation).rotateXDegrees((float) rotX).rotateYDegrees((float) rotY)
-                .rotateZDegrees((float) rotZ).translateBack(centerOfRotation);
+            float xRadians = (float) (Mth.DEG_TO_RAD * Mth.lerp(pt, prevAnimatedRotation.x, animatedRotation.x));
+            float zRadians = (float) (Mth.DEG_TO_RAD * Mth.lerp(pt, prevAnimatedRotation.z, animatedRotation.z));
+            float yRadians = (float) (Mth.DEG_TO_RAD * Mth.lerp(pt, prevAnimatedRotation.y, animatedRotation.y));
+            float x = (float) centerOfRotation.x;
+            float y = (float) centerOfRotation.y;
+            float z = (float) centerOfRotation.z;
+            pose.translate(x, y, z);
+            pose.rotateXYZ(xRadians, yRadians, zRadians);
+            pose.translate(-x, -y, -z);
 
             if (stabilizationAnchor != null) {
-                TransformStack.of(ms).translate(stabilizationAnchor).rotateXDegrees((float) -rotX)
-                    .rotateYDegrees((float) -rotY).rotateZDegrees((float) -rotZ).translateBack(stabilizationAnchor);
+                x = (float) stabilizationAnchor.x;
+                y = (float) stabilizationAnchor.y;
+                z = (float) stabilizationAnchor.z;
+                pose.translate(x, y, z);
+                pose.rotateXYZ(-xRadians, -yRadians, -zRadians);
+                pose.translate(-x, -y, -z);
             }
         }
     }

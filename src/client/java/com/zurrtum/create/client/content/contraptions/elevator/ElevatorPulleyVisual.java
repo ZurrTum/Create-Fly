@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.content.contraptions.elevator;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.content.contraptions.pulley.PulleyRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.content.processing.burner.ScrollInstance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -20,7 +20,6 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlockEntit
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.SectionPos;
-import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
@@ -49,9 +48,9 @@ public class ElevatorPulleyVisual extends ShaftVisual<ElevatorPulleyBlockEntity>
     ) {
         super(context, blockEntity, partialTick);
 
-        float blockStateAngle = AngleHelper.horizontalAngle(blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING));
+        float yRadians = Radians.horizontal(blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING));
 
-        Quaternionfc rotation = new Quaternionf().rotationY(Mth.DEG_TO_RAD * blockStateAngle);
+        Quaternionfc rotation = new Quaternionf().rotationY(yRadians);
 
         topSection = SectionPos.of(pos).asLong();
 
@@ -74,8 +73,7 @@ public class ElevatorPulleyVisual extends ShaftVisual<ElevatorPulleyBlockEntity>
             .createInstance();
 
         // Cache the magnet's transform to avoid recalculating this unchanging bit every frame
-        magnet.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(blockStateAngle)
-            .uncenter();
+        magnet.setIdentityTransform().translate(getVisualPosition()).rotateYCentered(yRadians);
 
         cachedMagnetTransform = new Matrix4f(magnet.pose);
 

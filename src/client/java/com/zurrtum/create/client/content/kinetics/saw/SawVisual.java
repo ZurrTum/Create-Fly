@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.content.kinetics.saw;
 
 import com.google.common.base.Suppliers;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.QuadRenderHelper;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.RotatingInstance;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
@@ -120,10 +120,9 @@ public class SawVisual extends KineticBlockEntityVisual<SawBlockEntity> implemen
         saw = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.chunkPartial(partial)).createInstance()
             .position(getVisualPosition());
         if (rotate) {
-            saw.rotateDegrees(90, Direction.UP);
+            saw.rotateY(Radians.DEG_90);
         }
-        saw.rotateYDegrees(AngleHelper.horizontalAngle(facing)).rotateXDegrees(AngleHelper.verticalAngle(facing))
-            .setChanged();
+        saw.rotateY(Radians.horizontal(facing)).rotateX(Radians.vertical(facing)).setChanged();
     }
 
     @Override

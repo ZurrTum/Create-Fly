@@ -3,6 +3,7 @@ package com.zurrtum.create.client.catnip.gui.render;
 import com.mojang.blaze3d.platform.Lighting.Entry;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
@@ -60,24 +61,25 @@ public class EntityBlockRenderer extends PictureInPictureRenderer<EntityBlockRen
         }
         texture.prepare(projection, projectionMatrixBuffer);
         matrices.pushPose();
-        matrices.translate(size / 2, size / 2, 0);
+        Pose pose = matrices.last();
+        pose.translate(size / 2, size / 2, 0);
         float scale = block.scale() * windowScaleFactor;
-        matrices.scale(scale, -scale, scale);
+        pose.scale(scale, -scale, scale);
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
         boolean lightOption = gameRenderer.useUiLightmap;
         gameRenderer.useUiLightmap = false;
         gameRenderer.lighting().setupFor(Entry.ENTITY_IN_UI);
-        if (block.zRot() != 0) {
-            matrices.mulPose(Axis.ZP.rotation(block.zRot()));
+        if (block.zRadians() != 0) {
+            pose.rotate(Axis.ZP, block.zRadians());
         }
-        if (block.xRot() != 0) {
-            matrices.mulPose(Axis.XP.rotation(block.xRot()));
+        if (block.xRadians() != 0) {
+            pose.rotate(Axis.XP, block.xRadians());
         }
-        if (block.yRot() != 0) {
-            matrices.mulPose(Axis.YP.rotation(block.yRot()));
+        if (block.yRadians() != 0) {
+            pose.rotate(Axis.YP, block.yRadians());
         }
-        matrices.translate(-0.5F, -0.5F, -0.5F);
+        pose.translate(-0.5F, -0.5F, -0.5F);
         Level world = block.world();
         BlockState blockState = block.state();
         BlockEntity blockEntity = block.entity();

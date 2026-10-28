@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.content.redstone.displayLink;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.redstone.displayLink.LinkBulbRenderer.LinkBulbRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
@@ -22,11 +24,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEntity, LinkBulbRenderState> {
     public LinkBulbRenderer(Context context) {
@@ -51,8 +49,8 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         state.lightCoords = LightCoordsUtil.FULL_BRIGHT;
         state.breakProgress = crumblingOverlay;
         Direction face = be.getBulbFacing(state.blockState);
-        state.yRot = getYRotateAngle(AngleHelper.horizontalAngle(face) + 180);
-        state.xRot = getXRotateAngle(-AngleHelper.verticalAngle(face) - 90);
+        state.yRadians = Radians.horizontalPlus180(face);
+        state.xRadians = Radians.negatedVerticalPlus90(face);
         state.offset = be.getBulbOffset(state.blockState);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(be.getLevel());
         state.tube = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_TUBE, state.blockState)
@@ -76,17 +74,19 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.yRot != null || state.xRot != null) {
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            if (state.yRot != null) {
-                matrices.mulPose(state.yRot);
+        Pose pose = matrices.last();
+        if (state.yRadians != 0 || state.xRadians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            if (state.yRadians != 0) {
+                pose.rotate(Axis.YP, state.yRadians);
             }
-            if (state.xRot != null) {
-                matrices.mulPose(state.xRot);
+            if (state.xRadians != 0) {
+                pose.rotate(Axis.XP, state.xRadians);
             }
-            matrices.translate(-0.5f, -0.5f, -0.5f);
+            pose.translate(-0.5f, -0.5f, -0.5f);
         }
-        matrices.translate(state.offset);
+        Vec3 offset = state.offset;
+        pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
         state.tube.submit(matrices, queue);
         if (state.glow != null) {
             state.glow.submit(CreateRenderTypes.additive(), matrices, queue.order(1));
@@ -96,8 +96,8 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
     public static class LinkBulbRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState tube;
         public @Nullable SuperByteBufferRenderState glow;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
+        public float yRadians;
+        public float xRadians;
         public @UnknownNullability Vec3 offset;
     }
 }

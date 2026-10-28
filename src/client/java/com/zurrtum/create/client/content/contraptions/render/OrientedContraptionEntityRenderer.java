@@ -61,14 +61,14 @@ public class OrientedContraptionEntityRenderer<C extends OrientedContraptionEnti
             anglePitch = AngleHelper.angleLerp(tickProgress, entity.prevPitch, entity.pitch);
         }
         if (angleYaw != 0) {
-            pose.rotate(Axis.YP.rotation(Mth.DEG_TO_RAD * angleYaw));
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * angleYaw);
         }
         if (anglePitch != 0) {
-            pose.rotate(Axis.ZP.rotation(Mth.DEG_TO_RAD * anglePitch));
+            pose.rotate(Axis.ZP, Mth.DEG_TO_RAD * anglePitch);
         }
         float angleInitialYaw = entity.getInitialYaw();
         if (angleInitialYaw != 0) {
-            pose.rotate(Axis.YP.rotation(Mth.DEG_TO_RAD * angleInitialYaw));
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * angleInitialYaw);
         }
         pose.translate(-0.5f, -0.5f, -0.5f);
         return pose;

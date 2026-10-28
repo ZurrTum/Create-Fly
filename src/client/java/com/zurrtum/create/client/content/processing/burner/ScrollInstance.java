@@ -3,16 +3,14 @@ package com.zurrtum.create.client.content.processing.burner;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
+import com.zurrtum.create.client.flywheel.lib.instance.AbstractRotationInstance;
 import com.zurrtum.create.client.flywheel.lib.instance.ColoredLitOverlayInstance;
 import net.minecraft.core.Vec3i;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 
-public class ScrollInstance extends ColoredLitOverlayInstance {
+public class ScrollInstance extends AbstractRotationInstance<ScrollInstance> {
     public float x;
     public float y;
     public float z;
-    public final Quaternionf rotation = new Quaternionf();
 
     public float speedU;
     public float speedV;
@@ -48,11 +46,6 @@ public class ScrollInstance extends ColoredLitOverlayInstance {
         this.x += x;
         this.y += y;
         this.z += z;
-        return this;
-    }
-
-    public ScrollInstance rotation(Quaternionfc rotation) {
-        this.rotation.set(rotation);
         return this;
     }
 

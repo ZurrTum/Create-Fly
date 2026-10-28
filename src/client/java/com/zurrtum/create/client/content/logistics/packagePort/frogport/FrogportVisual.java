@@ -133,8 +133,7 @@ public class FrogportVisual extends AbstractBlockEntityVisual<FrogportBlockEntit
         headPitch = Math.max(headPitch, blockEntity.manualOpenAnimationProgress.getValue(partialTicks) * 60);
         tongueLength = Math.max(tongueLength, blockEntity.manualOpenAnimationProgress.getValue(partialTicks) * 0.25f);
         if (yaw != lastYaw) {
-            body.setIdentityTransform().translate(getVisualPosition()).center().rotateYDegrees(yaw).uncenter()
-                .setChanged();
+            body.setIdentityTransform().translate(getVisualPosition()).rotateYCenteredDegrees(yaw).setChanged();
 
             // Save the base pose to avoid recalculating it twice every frame
             basePose.set(body.pose).translate(8 / 16.0f, 10 / 16.0f, 11 / 16.0f);

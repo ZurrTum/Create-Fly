@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.elevator;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
@@ -11,6 +11,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.elevator.ElevatorPulleyRenderer.ElevatorPulleyRenderState;
 import com.zurrtum.create.client.content.contraptions.pulley.AbstractPulleyRenderer;
 import com.zurrtum.create.client.content.contraptions.pulley.PulleyRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlock;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlockEntity;
@@ -27,11 +28,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -61,10 +62,11 @@ public class ElevatorPulleyRenderer implements BlockEntityRenderer<ElevatorPulle
         Axis axis = facing.getClockWise().getAxis();
         state.shaft = CachedBuffers.block(KINETIC_BLOCK, shaft(axis)).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         float offset = PulleyRenderer.getBlockEntityOffset(tickProgress, be);
         boolean running = PulleyRenderer.isPulleyRunning(be);
-        state.yRot = getYRotateAngle(180 + AngleHelper.horizontalAngle(facing));
+        state.yRadians = Radians.horizontalPlus180(facing);
         BlockPos blockPos = state.blockPos;
         if (running || offset == 0) {
             state.magnetOffset = -offset;
@@ -126,17 +128,17 @@ public class ElevatorPulleyRenderer implements BlockEntityRenderer<ElevatorPulle
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.shaft.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.shaft.submit(matrices, queue);
         }
         state.rotatedCoil.submit(matrices, queue);
-        if (state.yRot != null) {
-            matrices.rotateAround(state.yRot, 0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            matrices.rotateYCentered(state.yRadians);
         }
         if (state.magnet != null) {
             matrices.pushPose();
@@ -151,9 +153,10 @@ public class ElevatorPulleyRenderer implements BlockEntityRenderer<ElevatorPulle
             matrices.popPose();
         }
         if (state.ropes != null) {
-            matrices.translate(0, state.ropeOffset, 0);
+            Pose pose = matrices.last();
+            pose.translate(0, state.ropeOffset, 0);
             for (SuperByteBufferRenderState rope : state.ropes) {
-                matrices.translate(0, 1, 0);
+                pose.translate(0, 1, 0);
                 rope.submit(matrices, queue);
             }
         }
@@ -173,8 +176,9 @@ public class ElevatorPulleyRenderer implements BlockEntityRenderer<ElevatorPulle
 
     public static class ElevatorPulleyRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState shaft;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf yRot;
+        public @UnknownNullability Axis axis;
+        public float angle;
+        public float yRadians;
         public float magnetOffset;
         public float halfRopeOffset;
         public float ropeOffset;

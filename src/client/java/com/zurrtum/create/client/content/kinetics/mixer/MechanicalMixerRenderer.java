@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.mixer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
@@ -16,14 +17,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Con
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -55,7 +54,8 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
         float time = AnimationTickHolder.getRenderTime(level);
         float progress = getProgress(speed, time);
         float offset = rotationOffset(state.blockState, axis, state.blockPos);
-        state.angle = getRotateAngle(progress, offset, axis);
+        state.axis = axis;
+        state.angle = (progress + offset) % 360;
         state.headOffset = getRenderedHeadOffset(be, tickProgress);
         state.pole = CachedBuffers.partial(AllPartialModels.MECHANICAL_MIXER_POLE, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
@@ -63,7 +63,7 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         MechanicalMixerAnimationBehaviour behaviour = (MechanicalMixerAnimationBehaviour) be.getBehaviour(
             AnimationBehaviour.TYPE);
-        state.headAngle = getRotateAngle(progress, behaviour.getOffset(speed, tickProgress), Direction.UP);
+        state.headAngle = (progress + behaviour.getOffset(speed, tickProgress)) % 360;
     }
 
     public static float getRenderedHeadOffset(MechanicalMixerBlockEntity be, float partialTicks) {
@@ -87,18 +87,19 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.cogwheel.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.cogwheel.submit(matrices, queue);
         }
-        matrices.translate(0, state.headOffset, 0);
+        Pose pose = matrices.last();
+        pose.translate(0, state.headOffset, 0);
         state.pole.submit(matrices, queue);
-        if (state.headAngle != null) {
-            matrices.rotateAround(state.headAngle, 0.5f, 0.5f, 0.5f);
+        if (state.headAngle != 0) {
+            pose.rotateYCentered(Mth.DEG_TO_RAD * state.headAngle);
         }
         state.head.submit(matrices, queue);
     }
@@ -107,8 +108,9 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
         public @UnknownNullability SuperByteBufferRenderState cogwheel;
         public @UnknownNullability SuperByteBufferRenderState pole;
         public @UnknownNullability SuperByteBufferRenderState head;
-        public @Nullable Quaternionf angle;
+        public @UnknownNullability Axis axis;
+        public float angle;
         public float headOffset;
-        public @Nullable Quaternionf headAngle;
+        public float headAngle;
     }
 }

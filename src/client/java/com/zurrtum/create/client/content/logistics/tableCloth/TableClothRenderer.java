@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.logistics.tableCloth;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
@@ -26,12 +27,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRotateAngle;
 
 public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEntity, TableClothRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -62,8 +60,8 @@ public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEn
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
         Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
-        float radians = 180 - be.facing.toYRot();
-        state.radians = getUpRotateAngle(radians);
+        float yRot = be.facing.toYRot();
+        state.rotation = 180 - yRot;
         List<ItemStack> stacks;
         if (be.isShop()) {
             state.shop = CachedBuffers.partial(
@@ -89,7 +87,7 @@ public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEn
             items[i] = DepotOutputItemState.create(itemModelManager, stacks.get(i), level);
         }
         state.itemPosition = Vec3.atCenterOf(state.blockPos);
-        state.rotate = new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * (-radians + Mth.PI), 0, 1, 0);
+        state.yRadians = Mth.DEG_TO_RAD * yRot;
     }
 
     @Override
@@ -99,11 +97,12 @@ public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEn
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
+        Pose pose = matrices.last();
         if (state.filter != null) {
             state.filter.submit(state.blockState, queue, matrices, state.lightCoords);
         }
-        if (state.radians != null) {
-            matrices.rotateAround(state.radians, 0.5f, 0.5f, 0.5f);
+        if (state.rotation != 0) {
+            pose.rotateYCentered(Mth.DEG_TO_RAD * state.rotation);
         }
         if (state.shop != null) {
             state.shop.submit(matrices, queue);
@@ -112,11 +111,11 @@ public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEn
         if (items != null) {
             int size = items.length;
             if (size == 1) {
-                matrices.translate(0.5f, 0.1875f, 0.5f);
+                pose.translate(0.5f, 0.1875f, 0.5f);
                 DepotOutputItemState item = items[0];
                 ItemStackRenderState renderState = item.state();
-                if (!renderState.usesBlockLight()) {
-                    matrices.mulPose(state.rotate);
+                if (!renderState.usesBlockLight() && state.yRadians != 0) {
+                    pose.rotate(Axis.YP, state.yRadians);
                 }
                 DepotRenderer.renderItem(
                     queue,
@@ -136,14 +135,15 @@ public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEn
             }
             for (int i = 0; i < size; i++) {
                 matrices.pushPose();
-                matrices.translate(0.5f, 0.1875f, 0.5f);
-                matrices.mulPose(Axis.YP.rotationDegrees(i * (360.0f / size) + 45.0f));
-                matrices.translate(0, i % 2 == 0 ? -0.005f : 0, 0.3125f);
-                matrices.mulPose(Axis.YP.rotationDegrees(-i * (360.0f / size) - 45.0f));
+                pose = matrices.last();
+                pose.translate(0.5f, 0.1875f, 0.5f);
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * (i * (360.0f / size) + 45.0f));
+                pose.translate(0, i % 2 == 0 ? -0.005f : 0, 0.3125f);
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * (-i * (360.0f / size) - 45.0f));
                 DepotOutputItemState item = items[i];
                 ItemStackRenderState renderState = item.state();
-                if (!renderState.usesBlockLight()) {
-                    matrices.mulPose(state.rotate);
+                if (!renderState.usesBlockLight() && state.yRadians != 0) {
+                    pose.rotate(Axis.YP, state.yRadians);
                 }
                 DepotRenderer.renderItem(
                     queue,
@@ -167,9 +167,9 @@ public class TableClothRenderer implements BlockEntityRenderer<TableClothBlockEn
     public static class TableClothRenderState extends BlockEntityRenderState {
         public @Nullable FilterRenderState filter;
         public @Nullable SuperByteBufferRenderState shop;
-        public @Nullable Quaternionf radians;
+        public float rotation;
         public DepotOutputItemState @Nullable [] items;
         public @UnknownNullability Vec3 itemPosition;
-        public @UnknownNullability Quaternionf rotate;
+        public float yRadians;
     }
 }

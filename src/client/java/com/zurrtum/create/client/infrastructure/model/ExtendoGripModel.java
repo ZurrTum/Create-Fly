@@ -2,11 +2,11 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.equipment.extendoGrip.ExtendoGripRenderHandler;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.ItemModelRenderHelper;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import net.minecraft.client.Minecraft;
@@ -29,7 +29,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
@@ -136,7 +135,7 @@ public class ExtendoGripModel implements ItemModel {
         }
         animation = animation * animation * animation;
         float extensionAngle = Mth.lerp(animation, 24.0f, 156.0f);
-        float oppositeAngle = 180 - extensionAngle;
+        float oppositeRadians = Mth.DEG_TO_RAD * (180 - extensionAngle);
         float halfAngle = extensionAngle / 2;
         float angle = AnimationTickHolder.getRenderTime() * -2;
         if (leftHand || rightHand) {
@@ -153,32 +152,35 @@ public class ExtendoGripModel implements ItemModel {
         LayerRenderState wideShortLayer2 = submitQuads(state, settings, displayContext, wideShort);
         LayerRenderState thinLongLayer1 = submitQuads(state, settings, displayContext, thinLong);
         LayerRenderState handLayer1 = submitQuads(state, settings, displayContext, hand);
-        cogLayer.localTransform.rotateAround(Axis.ZP.rotationDegrees(angle % 360), 0.5f, 0.5625f, 0.5f);
-        Matrix4f pose = thinShortLayer1.localTransform;
+        Matrix4f pose = cogLayer.localTransform;
+        pose.translate(0.5f, 0.5625f, 0.5f);
+        pose.rotateZ(Mth.DEG_TO_RAD * (angle % 360));
+        pose.translate(-0.5f, -0.5625f, -0.5f);
+        pose = thinShortLayer1.localTransform;
         pose.translate(0, 0.5625f, 0.0625f);
         pose.scale(1, 1, 1 + animation);
         wideShortLayer1.localTransform.set(pose);
-        pose.rotate(Axis.XN.rotationDegrees(halfAngle));
+        pose.rotateX(Mth.DEG_TO_RAD * -halfAngle);
         pose = wideLongLayer1.localTransform.set(pose);
         pose.translate(0, 0.34375f, 0);
-        pose.rotate(Axis.XN.rotationDegrees(oppositeAngle));
+        pose.rotateX(-oppositeRadians);
         pose = thinShortLayer2.localTransform.set(pose);
         pose.translate(0, 0.6875f, 0);
-        pose.rotate(Axis.XP.rotationDegrees(oppositeAngle));
+        pose.rotateX(oppositeRadians);
         pose.translate(0, 0.03125f, 0);
         pose = wideShortLayer1.localTransform;
-        pose.rotate(Axis.XP.rotationDegrees(halfAngle - 180));
+        pose.rotateX(Mth.DEG_TO_RAD * (halfAngle - 180));
         pose = thinLongLayer1.localTransform.set(pose);
         pose.translate(0, 0.34375f, 0);
-        pose.rotate(Axis.XP.rotationDegrees(oppositeAngle));
+        pose.rotateX(oppositeRadians);
         pose = wideShortLayer2.localTransform.set(pose);
         pose.translate(0, 0.6875f, 0);
-        pose.rotate(Axis.XN.rotationDegrees(oppositeAngle));
+        pose.rotateX(-oppositeRadians);
         pose.translate(0, 0.03125f, 0);
         pose = handLayer1.localTransform.set(pose);
         pose.translate(0, 0.34375f, 0);
-        pose.rotate(Axis.XP.rotationDegrees(180 - halfAngle));
-        pose.rotate(Axis.YP.rotationDegrees(180));
+        pose.rotateX(Mth.DEG_TO_RAD * (180 - halfAngle));
+        pose.rotateY(Radians.DEG_180);
         pose.translate(0, 0, -0.25f);
         pose.scale(1, 1, 1 / (1 + animation));
         pose.translate(-1.0f, -0.5f, -0.5f);
@@ -222,18 +224,18 @@ public class ExtendoGripModel implements ItemModel {
                     }
                 }
                 float blockOffsetX;
-                Quaternionf blockRotate;
+                float yRadians;
                 if (blockLight) {
                     if (rightHand ^ mainArm == HumanoidArm.LEFT) {
                         blockOffsetX = 0.15f;
-                        blockRotate = Axis.YP.rotationDegrees(45);
+                        yRadians = Radians.DEG_45;
                     } else {
                         blockOffsetX = -0.15f;
-                        blockRotate = Axis.YP.rotationDegrees(-45);
+                        yRadians = Radians.DEG_315;
                     }
                 } else {
                     blockOffsetX = 0;
-                    blockRotate = null;
+                    yRadians = 0;
                 }
                 do {
                     ItemTransform itemTransform = layer.itemTransform;
@@ -243,7 +245,7 @@ public class ExtendoGripModel implements ItemModel {
                     if (blockLight) {
                         pose.scaleLocal(1.25f);
                         pose.translateLocal(blockOffsetX, -0.15f, -0.05f);
-                        pose.rotateLocal(blockRotate);
+                        pose.rotateLocalY(yRadians);
                     }
                     pose.translateLocal(0.45f, 0.65f, offsetZ);
                     if (++i == size) {

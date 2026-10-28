@@ -1,12 +1,14 @@
 package com.zurrtum.create.client.ponder.foundation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.ponder.api.element.*;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry.SceneOrderingEntry;
@@ -32,6 +34,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
@@ -579,19 +582,20 @@ public class PonderScene {
         }
 
         public PoseStack apply(PoseStack ms, float pt) {
-            ms.translate(width / 2, height / 2, 200 + offset);
+            Pose pose = ms.last();
+            pose.translate(width / 2, height / 2, (float) (200 + offset));
 
-            ms.mulPose(Axis.XP.rotationDegrees(-35));
-            ms.mulPose(Axis.YP.rotationDegrees(55));
-            ms.translate(offset, 0, 0);
-            ms.mulPose(Axis.YP.rotationDegrees(-55));
-            ms.mulPose(Axis.XP.rotationDegrees(35));
-            ms.mulPose(Axis.XP.rotationDegrees(xRotation.getValue(pt)));
-            ms.mulPose(Axis.YP.rotationDegrees(yRotation.getValue(pt)));
+            pose.rotate(Axis.XP, Radians.DEG_325);
+            pose.rotate(Axis.YP, Radians.DEG_55);
+            pose.translate((float) offset, 0, 0);
+            pose.rotate(Axis.YP, Radians.DEG_305);
+            pose.rotate(Axis.XP, Radians.DEG_35);
+            pose.rotate(Axis.XP, Mth.DEG_TO_RAD * xRotation.getValue(pt));
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * yRotation.getValue(pt));
 
             float f = 30 * scaleFactor;
-            ms.scale(f, -f, f);
-            ms.translate(
+            pose.scale(f, -f, f);
+            pose.translate(
                 basePlateSize / -2.0f - basePlateOffsetX,
                 -1.0f + yOffset,
                 basePlateSize / -2.0f - basePlateOffsetZ

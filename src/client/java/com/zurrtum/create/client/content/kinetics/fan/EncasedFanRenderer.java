@@ -23,11 +23,9 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getProgress;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotateAngle;
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual.rotationOffset;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
@@ -65,18 +63,18 @@ public class EncasedFanRenderer implements BlockEntityRenderer<EncasedFanBlockEn
         state.fanInner = CachedBuffers.partialFacing(AllPartialModels.ENCASED_FAN_INNER, state.blockState, opposite)
             .cardinalLighting(cardinalLighting).light(lightInFront).color(color).extractRenderState();
         Axis axis = facing.getAxis();
-        Direction direction = axis.getPositive();
         float speed = be.getSpeed();
         float time = AnimationTickHolder.getRenderTime(level);
         float offset = rotationOffset(state.blockState, axis, state.blockPos);
-        state.angle = getRotateAngle(getProgress(speed, time), offset, direction);
+        state.axis = axis;
+        state.angle = (getProgress(speed, time) + offset) % 360;
         speed *= 5;
         if (speed > 0) {
             speed = Mth.clamp(speed, 80, 1280);
         } else if (speed < 0) {
             speed = Mth.clamp(speed, -1280, -80);
         }
-        state.fanAngle = getRotateAngle(getProgress(speed, time) % 360, offset, direction);
+        state.fanAngle = (getProgress(speed, time) + offset) % 360;
     }
 
     @Override
@@ -86,16 +84,16 @@ public class EncasedFanRenderer implements BlockEntityRenderer<EncasedFanBlockEn
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.shaftHalf.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.shaftHalf.submit(matrices, queue);
         }
-        if (state.fanAngle != null) {
-            matrices.rotateAround(state.fanAngle, 0.5f, 0.5f, 0.5f);
+        if (state.fanAngle != 0) {
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.fanAngle);
         }
         state.fanInner.submit(matrices, queue);
     }
@@ -103,7 +101,8 @@ public class EncasedFanRenderer implements BlockEntityRenderer<EncasedFanBlockEn
     public static class EncasedFanRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState shaftHalf;
         public @UnknownNullability SuperByteBufferRenderState fanInner;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf fanAngle;
+        public @UnknownNullability Axis axis;
+        public float angle;
+        public float fanAngle;
     }
 }

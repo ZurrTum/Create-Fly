@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyBlockEntityRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
@@ -18,10 +20,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.RAD_90;
 
 public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implements BlockEntityRenderer<T, BogeyBlockEntityRenderState> {
     public BogeyBlockEntityRenderer(Context context) {
@@ -42,9 +41,7 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
     ) {
         Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
-        if (state.blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
-            state.yRot = Axis.YP.rotation(RAD_90);
-        }
+        state.rotate = state.blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X;
         BogeySize size = ((AbstractBogeyBlock<?>) state.blockState.getBlock()).getSize();
         state.data = AllBogeyStyleRenders.getRenderData(
             be.getStyle(),
@@ -69,16 +66,17 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
             return;
         }
         matrices.pushPose();
-        matrices.translate(0.5f, 0.5f, 0.5f);
-        if (state.yRot != null) {
-            matrices.mulPose(state.yRot);
+        Pose pose = matrices.last();
+        pose.translate(0.5f, 0.5f, 0.5f);
+        if (state.rotate) {
+            pose.rotate(Axis.YP, Radians.DEG_90);
         }
         state.data.submit(matrices, queue);
         matrices.popPose();
     }
 
     public static class BogeyBlockEntityRenderState extends BlockEntityRenderState {
-        public @Nullable Quaternionf yRot;
+        public boolean rotate;
         public @Nullable BogeyRenderState data;
     }
 

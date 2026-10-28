@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.content.contraptions.bearing;
 
-import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
@@ -14,9 +13,11 @@ import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Quaternionf;
+import org.joml.Vector3fc;
 
 public class StabilizedBearingVisual extends ActorVisual {
 
@@ -24,7 +25,7 @@ public class StabilizedBearingVisual extends ActorVisual {
     final RotatingInstance shaft;
 
     final Direction facing;
-    final Axis rotationAxis;
+    final Vector3fc rotationAxis;
     final Quaternionf blockOrientation;
 
     public StabilizedBearingVisual(
@@ -37,7 +38,7 @@ public class StabilizedBearingVisual extends ActorVisual {
         BlockState blockState = movementContext.state;
 
         facing = blockState.getValue(BlockStateProperties.FACING);
-        rotationAxis = Axis.of(Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()).step());
+        rotationAxis = facing.getAxis().getPositive().getUnitVec3f();
 
         blockOrientation = BearingVisual.getBlockStateOrientation(facing);
 
@@ -66,12 +67,7 @@ public class StabilizedBearingVisual extends ActorVisual {
             facing,
             AnimationTickHolder.getPartialTicks()
         );
-
-        Quaternionf rotation = rotationAxis.rotationDegrees(counterRotationAngle);
-
-        rotation.mul(blockOrientation);
-
-        topInstance.rotation(rotation).setChanged();
+        topInstance.rotation(rotationAxis, Mth.DEG_TO_RAD * counterRotationAngle).rotate(blockOrientation).setChanged();
     }
 
     @Override

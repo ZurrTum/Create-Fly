@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.contraptions;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.mojang.math.Axis;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,8 +26,10 @@ public class DirectionalExtenderScrollOptionSlot extends CenteredSideValueBoxTra
     @Override
     public void rotate(BlockState state, PoseStack ms) {
         if (!getSide().getAxis().isHorizontal()) {
-            TransformStack.of(ms)
-                .rotateYDegrees(AngleHelper.horizontalAngle(state.getValue(BlockStateProperties.FACING)) + 180);
+            float yRadians = Radians.horizontalPlus180(state.getValue(BlockStateProperties.FACING));
+            if (yRadians != 0) {
+                ms.rotate(Axis.YP, yRadians);
+            }
         }
         super.rotate(state, ms);
     }

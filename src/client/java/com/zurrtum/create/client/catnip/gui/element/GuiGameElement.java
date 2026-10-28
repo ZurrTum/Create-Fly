@@ -35,7 +35,7 @@ public class GuiGameElement {
     }
 
     public static abstract class GuiRenderBuilder<T extends GuiRenderBuilder<T>> extends AbstractRenderElement {
-        protected float xRot, yRot, zRot;
+        protected float xRadians, yRadians, zRadians;
         protected float scale = 1;
         protected int padding;
 
@@ -47,9 +47,9 @@ public class GuiGameElement {
         }
 
         public T rotate(float x, float y, float z) {
-            xRot = Mth.DEG_TO_RAD * x;
-            yRot = Mth.DEG_TO_RAD * y;
-            zRot = Mth.DEG_TO_RAD * z;
+            xRadians = Mth.DEG_TO_RAD * x;
+            yRadians = Mth.DEG_TO_RAD * y;
+            zRadians = Mth.DEG_TO_RAD * z;
             return self();
         }
 
@@ -73,7 +73,7 @@ public class GuiGameElement {
 
         @Override
         public void render(GuiGraphicsExtractor graphics) {
-            if (scale <= 1 && xRot == 0 && yRot == 0 && zRot == 0) {
+            if (scale <= 1 && xRadians == 0 && yRadians == 0 && zRadians == 0) {
                 if (scale == 1) {
                     graphics.item(key.stack, (int) x, (int) y);
                 } else {
@@ -85,7 +85,7 @@ public class GuiGameElement {
                 }
                 return;
             }
-            key.update(scale, padding, xRot, yRot, zRot);
+            key.update(scale, padding, xRadians, yRadians, zRadians);
             graphics.guiRenderState.addPicturesInPictureState(ItemTransformRenderState.create(graphics, key, x, y));
         }
 
@@ -98,9 +98,9 @@ public class GuiGameElement {
             GuiItemRenderBuilder builder = new GuiItemRenderBuilder(key.stack);
             builder.scale = scale;
             builder.padding = padding;
-            builder.xRot = xRot;
-            builder.yRot = yRot;
-            builder.zRot = zRot;
+            builder.xRadians = xRadians;
+            builder.yRadians = yRadians;
+            builder.zRadians = zRadians;
             builder.x = x;
             builder.y = y;
             return builder;
@@ -121,7 +121,7 @@ public class GuiGameElement {
 
         @Override
         public void render(GuiGraphicsExtractor graphics) {
-            key.update(scale, padding, xRot, yRot, zRot);
+            key.update(scale, padding, xRadians, yRadians, zRadians);
             graphics.guiRenderState.addPicturesInPictureState(BlockTransformRenderState.create(graphics, key, x, y));
         }
 

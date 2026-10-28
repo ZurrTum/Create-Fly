@@ -13,6 +13,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
@@ -24,7 +25,7 @@ public class HarvesterActorVisual extends ActorVisual {
     protected TransformedInstance harvester;
     private final Direction facing;
 
-    protected float horizontalAngle;
+    protected float yRadians;
 
     private double rotation;
     private double previousRotation;
@@ -43,7 +44,7 @@ public class HarvesterActorVisual extends ActorVisual {
         harvester = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(getRollingPartial()))
             .createInstance();
 
-        horizontalAngle = facing.toYRot() + (facing.getAxis() == Direction.Axis.X ? 180 : 0);
+        yRadians = Mth.DEG_TO_RAD * ((facing.toYRot() + (facing.getAxis() == Direction.Axis.X ? 180 : 0)) % 360);
 
         harvester.light(localBlockLight(), 0);
         harvester.setChanged();
@@ -89,7 +90,7 @@ public class HarvesterActorVisual extends ActorVisual {
 
     @Override
     public void beginFrame() {
-        harvester.setIdentityTransform().translate(context.localPos).center().rotateYDegrees(horizontalAngle).uncenter()
+        harvester.setIdentityTransform().translate(context.localPos).rotateYCentered(yRadians)
             .translate(getRotationOffset()).rotateXDegrees((float) getRotation()).translateBack(getRotationOffset())
             .setChanged();
     }

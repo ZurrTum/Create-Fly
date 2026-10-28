@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -41,12 +43,13 @@ public class BogeyBlockEntityVisual extends AbstractBlockEntityVisual<AbstractBo
         bogeySize = block.getSize();
 
         BlockPos visualPos = getVisualPosition();
-        poseStack.translate(visualPos.getX(), visualPos.getY(), visualPos.getZ());
-        poseStack.translate(0.5f, 0.5f, 0.5f);
+        Pose pose = poseStack.last();
+        pose.translate(visualPos.getX(), visualPos.getY(), visualPos.getZ());
+        pose.translate(0.5f, 0.5f, 0.5f);
         if (blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
-            poseStack.mulPose(Axis.YP.rotationDegrees(90));
+            pose.rotate(Axis.YP, Radians.DEG_90);
         }
-        poseStack.translate(0, -1.5 - 1 / 128.0f, 0);
+        pose.translate(0, -1.5078125f, 0);
 
         bogey = AllBogeyStyleRenders.createVisual(lastStyle, bogeySize, visualizationContext, partialTick, false);
 

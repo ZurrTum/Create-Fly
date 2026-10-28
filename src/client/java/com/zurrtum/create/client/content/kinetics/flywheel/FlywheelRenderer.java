@@ -13,13 +13,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Con
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -43,17 +43,18 @@ public class FlywheelRenderer implements BlockEntityRenderer<FlywheelBlockEntity
     ) {
         Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
-        Axis axis = getRotationAxisOf(state.blockState);
-        Direction direction = axis.getPositive();
+        BlockState blockState = state.blockState;
+        int lightCoords = state.lightCoords;
+        Axis axis = getRotationAxisOf(blockState);
         int color = getTintColor(be);
         state.shaft = CachedBuffers.block(KINETIC_BLOCK, shaft(axis)).cardinalLighting(cardinalLighting)
-            .light(state.lightCoords).color(color).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, direction, be, state, level);
-        state.wheel = CachedBuffers.partialFacingVertical(AllPartialModels.FLYWHEEL, state.blockState, direction)
-            .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
+            .light(lightCoords).color(color).extractRenderState();
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
+        state.wheel = CachedBuffers.partialFacingVertical(AllPartialModels.FLYWHEEL, blockState, axis.getPositive())
+            .cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
         float speed = be.visualSpeed.getValue(tickProgress) * 0.3f;
-        float angle = be.angle + speed * tickProgress;
-        state.wheelAngle = getRotateAngle(angle, direction);
+        state.wheelAngle = be.angle + speed * tickProgress;
     }
 
     @Override
@@ -63,24 +64,25 @@ public class FlywheelRenderer implements BlockEntityRenderer<FlywheelBlockEntity
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.shaft.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.shaft.submit(matrices, queue);
         }
-        if (state.wheelAngle != null) {
-            matrices.rotateAround(state.wheelAngle, 0.5f, 0.5f, 0.5f);
+        if (state.wheelAngle != 0) {
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.wheelAngle);
         }
         state.wheel.submit(matrices, queue);
     }
 
     public static class FlywheelRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState shaft;
-        public @Nullable Quaternionf angle;
+        public @UnknownNullability Axis axis;
+        public float angle;
         public @UnknownNullability SuperByteBufferRenderState wheel;
-        public @Nullable Quaternionf wheelAngle;
+        public float wheelAngle;
     }
 }

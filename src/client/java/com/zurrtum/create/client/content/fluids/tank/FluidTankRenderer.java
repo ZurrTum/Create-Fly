@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.fluids.tank;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.AllPartialModels;
@@ -9,7 +10,7 @@ import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper.FluidRenderState;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.fluids.tank.FluidTankRenderer.FluidTankRenderState;
-import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEntity, FluidTankRenderState> {
@@ -144,7 +144,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
         BoilerRenderState data = new BoilerRenderState();
         state.boiler = data;
         data.translateX = state.translate - 0.875f;
-        data.xRot = KineticBlockEntityRenderer.getXRotateAngle(-145 * be.boiler.gauge.getValue(tickProgress) + 90);
+        data.xRadians = -Radians.DEG_145 * be.boiler.gauge.getValue(tickProgress) + Radians.DEG_90;
         data.gauge = CachedBuffers.partial(AllPartialModels.BOILER_GAUGE, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         data.gaugeDial = CachedBuffers.partial(AllPartialModels.BOILER_GAUGE_DIAL, state.blockState)
@@ -185,39 +185,34 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
     }
 
     public static class BoilerRenderState {
-        private static final Quaternionf SOUTH_Y_ROTATE = Axis.YP.rotation(Mth.DEG_TO_RAD * -90);
-        private static final Quaternionf WEST_Y_ROTATE = Axis.YP.rotation(Mth.DEG_TO_RAD * -180);
-        private static final Quaternionf NORTH_Y_ROTATE = Axis.YP.rotation(Mth.DEG_TO_RAD * -270);
-        private static final Quaternionf EAST_Y_ROTATE = Axis.YP.rotation(Mth.DEG_TO_RAD * -360);
         @UnknownNullability
         public SuperByteBufferRenderState gauge, gaugeDial;
         public float translateX;
-        public @Nullable Quaternionf xRot;
+        public float xRadians;
         public boolean south, west, north, east;
 
         public void submit(SubmitNodeCollector queue, PoseStack poseStack) {
             if (south) {
-                submit(poseStack, queue, SOUTH_Y_ROTATE);
+                submit(poseStack, queue, Radians.DEG_270);
             }
             if (west) {
-                submit(poseStack, queue, WEST_Y_ROTATE);
+                submit(poseStack, queue, Radians.DEG_180);
             }
             if (north) {
-                submit(poseStack, queue, NORTH_Y_ROTATE);
+                submit(poseStack, queue, Radians.DEG_90);
             }
             if (east) {
-                submit(poseStack, queue, EAST_Y_ROTATE);
+                submit(poseStack, queue, 0);
             }
         }
 
-        public void submit(PoseStack poseStack, SubmitNodeCollector queue, Quaternionf yRot) {
+        public void submit(PoseStack poseStack, SubmitNodeCollector queue, float yRadians) {
             poseStack.pushPose();
-            poseStack.mulPose(yRot);
-            poseStack.translate(translateX, -0.5f, -0.5f);
+            Pose pose = poseStack.last();
+            pose.rotate(Axis.YP, yRadians);
+            pose.translate(translateX, -0.5f, -0.5f);
             gauge.submit(poseStack, queue);
-            if (xRot != null) {
-                poseStack.rotateAround(xRot, 0, 0.375f, 0.5f);
-            }
+            pose.rotateXAround(xRadians, 0, 0.375f, 0.5f);
             gaugeDial.submit(poseStack, queue);
             poseStack.popPose();
         }

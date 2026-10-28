@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.equipment.extendoGrip;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
@@ -71,7 +73,6 @@ public class ExtendoGripRenderHandler {
         }
         boolean rightHand = hand == InteractionHand.MAIN_HAND ^ playerState.avatarRenderState.mainArm == HumanoidArm.LEFT;
 
-        var msr = TransformStack.of(ms);
         float flip = rightHand ? 1.0F : -1.0F;
         boolean blockItem = heldItem.getItem() instanceof BlockItem;
         equipProgress = blockItem ? 0 : equipProgress / 4;
@@ -85,12 +86,15 @@ public class ExtendoGripRenderHandler {
             ms.translate(flip * (0.64000005F - 0.1f), -0.4F + equipProgress * -0.6F, -0.71999997F + 0.3f);
 
             ms.pushPose();
-            msr.rotateYDegrees(flip * 75.0F);
-            ms.translate(flip * -1.0F, 3.6F, 3.5F);
-            msr.rotateZDegrees(flip * 120).rotateXDegrees(200).rotateYDegrees(flip * -135.0F);
-            ms.translate(flip * 5.6F, 0.0F, 0.0F);
-            msr.rotateYDegrees(flip * 40.0F);
-            ms.translate(flip * 0.05f, -0.3f, -0.3f);
+            Pose pose = ms.last();
+            pose.rotate(Axis.YP, flip * Radians.DEG_75);
+            pose.translate(flip * -1.0F, 3.6F, 3.5F);
+            pose.rotate(Axis.ZP, flip * Radians.DEG_120);
+            pose.rotate(Axis.XP, Radians.DEG_200);
+            pose.rotate(Axis.YP, flip * Radians.DEG_225);
+            pose.translate(flip * 5.6F, 0.0F, 0.0F);
+            pose.rotate(Axis.YP, flip * Radians.DEG_40);
+            pose.translate(flip * 0.05f, -0.3f, -0.3f);
             renderer.renderPlayerHand(ms, queue, light, rightHand ? HumanoidArm.RIGHT : HumanoidArm.LEFT, playerState);
             ms.popPose();
 

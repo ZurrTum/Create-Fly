@@ -1,11 +1,12 @@
 package com.zurrtum.create.client.content.contraptions.bearing;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.bearing.BearingRenderer.BearingRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.contraptions.bearing.IBearingBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
@@ -17,15 +18,17 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverl
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getDegreesWithoutBeOffset;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
 
 public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity> implements BlockEntityRenderer<T, BearingRenderState> {
     public BearingRenderer(Context context) {
@@ -46,26 +49,23 @@ public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity>
     ) {
         Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
-        Direction facing = state.blockState.getValue(BlockStateProperties.FACING);
+        int lightCoords = state.lightCoords;
+        BlockState blockState = state.blockState;
+        Direction facing = blockState.getValue(BlockStateProperties.FACING);
         Axis axis = facing.getAxis();
-        Direction direction = axis.getPositive();
         int color = getTintColor(be);
         Direction opposite = facing.getOpposite();
-        state.angle = getRotateAngleWithoutBeOffset(axis, direction, be, state, level);
-        state.shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.blockState, opposite)
-            .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
-        state.topAngle = getRadiansRotateAngle(
-            (float) (be.getInterpolatedAngle(tickProgress - 1) / 180 * Math.PI),
-            direction
-        );
-        state.eastAngle = getEastRotateAngle(-90 - AngleHelper.verticalAngle(facing));
-        if (axis != Axis.Y) {
-            state.upAngle = getUpRotateAngle(AngleHelper.horizontalAngle(opposite));
-        }
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
+        state.shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockState, opposite)
+            .cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
+        state.topAngle = be.getInterpolatedAngle(tickProgress - 1);
+        state.xRadians = Radians.negatedVerticalPlus90(facing);
+        state.yRadians = Radians.horizontal(opposite);
         state.top = CachedBuffers.partial(
             be.isWoodenTop() ? AllPartialModels.BEARING_TOP_WOODEN : AllPartialModels.BEARING_TOP,
-            state.blockState
-        ).cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
+            blockState
+        ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
     }
 
     @Override
@@ -75,22 +75,23 @@ public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity>
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.shaft.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.shaft.submit(matrices, queue);
         }
-        if (state.topAngle != null) {
-            matrices.rotateAround(state.topAngle, 0.5f, 0.5f, 0.5f);
+        Pose pose = matrices.last();
+        if (state.topAngle != 0) {
+            pose.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.topAngle);
         }
-        if (state.upAngle != null) {
-            matrices.rotateAround(state.upAngle, 0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            pose.rotateYCentered(state.yRadians);
         }
-        if (state.eastAngle != null) {
-            matrices.rotateAround(state.eastAngle, 0.5f, 0.5f, 0.5f);
+        if (state.xRadians != 0) {
+            pose.rotateXCentered(state.xRadians);
         }
         state.top.submit(matrices, queue);
     }
@@ -98,9 +99,10 @@ public class BearingRenderer<T extends KineticBlockEntity & IBearingBlockEntity>
     public static class BearingRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState shaft;
         public @UnknownNullability SuperByteBufferRenderState top;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf topAngle;
-        public @Nullable Quaternionf upAngle;
-        public @Nullable Quaternionf eastAngle;
+        public @UnknownNullability Axis axis;
+        public float angle;
+        public float topAngle;
+        public float yRadians;
+        public float xRadians;
     }
 }

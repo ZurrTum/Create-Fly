@@ -15,11 +15,11 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverl
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -49,11 +49,12 @@ public class SplitShaftRenderer implements BlockEntityRenderer<SplitShaftBlockEn
         Direction direction1 = axis.getPositive();
         float offset = rotationOffset(state.blockState, axis, state.blockPos);
         float progress = getProgress(be, level);
-        state.topAngle = getRotateAngle(progress * be.getRotationSpeedModifier(direction1), offset, direction1);
+        state.axis = axis;
+        state.topAngle = (progress * be.getRotationSpeedModifier(direction1) + offset) % 360;
         state.top = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, state.blockState, direction1)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
         Direction direction2 = axis.getNegative();
-        state.bottomAngle = getRotateAngle(progress * be.getRotationSpeedModifier(direction2), offset, direction1);
+        state.bottomAngle = (progress * be.getRotationSpeedModifier(direction2) + offset) % 360;
         state.bottom = CachedBuffers.partialFacing(AllPartialModels.ENCASED_SHAFT_HALF, state.blockState, direction2)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).color(color).extractRenderState();
     }
@@ -65,16 +66,16 @@ public class SplitShaftRenderer implements BlockEntityRenderer<SplitShaftBlockEn
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.topAngle != null) {
+        if (state.topAngle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.topAngle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.topAngle);
             state.top.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.top.submit(matrices, queue);
         }
-        if (state.bottomAngle != null) {
-            matrices.rotateAround(state.bottomAngle, 0.5f, 0.5f, 0.5f);
+        if (state.bottomAngle != 0) {
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.bottomAngle);
         }
         state.bottom.submit(matrices, queue);
     }
@@ -82,7 +83,8 @@ public class SplitShaftRenderer implements BlockEntityRenderer<SplitShaftBlockEn
     public static class SplitShaftRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState top;
         public @UnknownNullability SuperByteBufferRenderState bottom;
-        public @Nullable Quaternionf topAngle;
-        public @Nullable Quaternionf bottomAngle;
+        public @UnknownNullability Axis axis;
+        public float topAngle;
+        public float bottomAngle;
     }
 }

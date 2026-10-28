@@ -2,11 +2,11 @@ package com.zurrtum.create.client.content.schematics.client.tools;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.outliner.AABBOutline;
 import com.zurrtum.create.client.content.schematics.client.SchematicTransformation;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.core.BlockPos;
@@ -53,13 +53,18 @@ public class DeployTool extends PlacementToolBase {
         Vec3 rotationOffset = transformation.getRotationOffset(true);
         int centerX = (int) center.x;
         int centerZ = (int) center.z;
-        double xOrigin = bounds.getXsize() / 2.0f;
-        double zOrigin = bounds.getZsize() / 2.0f;
-        Vec3 origin = new Vec3(xOrigin, 0, zOrigin);
 
-        ms.translate(x - centerX - camera.x, y - camera.y, z - centerZ - camera.z);
-        TransformStack.of(ms).translate(origin).translate(rotationOffset)
-            .rotateYDegrees(transformation.getCurrentRotation()).translateBack(rotationOffset).translateBack(origin);
+        Pose pose = ms.last();
+        pose.translate((float) (x - centerX - camera.x), (float) (y - camera.y), (float) (z - centerZ - camera.z));
+        float currentRotation = transformation.getCurrentRotation();
+        if (currentRotation != 0) {
+            pose.rotateYAround(
+                Mth.DEG_TO_RAD * currentRotation,
+                (float) (bounds.getXsize() / 2 + rotationOffset.x),
+                (float) rotationOffset.y,
+                (float) (bounds.getZsize() / 2 + rotationOffset.z)
+            );
+        }
 
         AABBOutline outline = schematicHandler.getOutline();
         outline.submit(mc, ms, queue, Vec3.ZERO, pt);

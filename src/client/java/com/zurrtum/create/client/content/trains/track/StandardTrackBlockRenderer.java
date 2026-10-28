@@ -1,12 +1,14 @@
 package com.zurrtum.create.client.content.trains.track;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -32,12 +34,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.function.IntFunction;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 
 public class StandardTrackBlockRenderer implements TrackBlockRenderer {
     @Override
@@ -88,7 +87,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         } else {
             affine.translate(0, 4 / 16.0f, 0);
             if (direction == AxisDirection.NEGATIVE) {
-                affine.rotateCentered(Mth.PI, Direction.UP);
+                affine.rotateYCentered(Radians.DEG_180);
             }
         }
 
@@ -97,8 +96,8 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
             for (BezierConnection bc : trackTE.getConnections().values()) {
                 yOffset += bc.starts.getFirst().y - pos.getY();
             }
-            affine.center().rotateXDegrees((float) (-direction.getStep() * trackTE.tilt.smoothingAngle.get()))
-                .uncenter().translate(0, yOffset / 2, 0);
+            affine.rotateXCenteredDegrees((float) (-direction.getStep() * trackTE.tilt.smoothingAngle.get()))
+                .translate(0, yOffset / 2, 0);
         }
     }
 
@@ -143,8 +142,8 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         StandardTrackBlockRenderState state = new StandardTrackBlockRenderState();
         state.offset = offset;
         Vec3 angles = TrackRenderer.getModelAngles(normal, diff);
-        state.yRot = getYRadiansRotateAngle((float) angles.y);
-        state.xRot = getXRadiansRotateAngle((float) angles.x);
+        state.yRadians = (float) angles.y;
+        state.xRadians = (float) angles.x;
         if (axis != null) {
             state.offset2 = axis.y != 0 ? new Vec3(0, 7 / 16.0f, direction.getStep() * 2.5f / 16.0f) : Vec3.ZERO;
         } else if (direction == AxisDirection.NEGATIVE) {
@@ -155,7 +154,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
             for (BezierConnection bc : trackTE.getConnections().values()) {
                 yOffset += bc.starts.getFirst().y - pos.getY();
             }
-            state.xRot2 = getXRotateAngle((float) (-direction.getStep() * trackTE.tilt.smoothingAngle.get()));
+            state.xRot2 = (float) (-direction.getStep() * trackTE.tilt.smoothingAngle.get());
             state.offset3 = (float) (yOffset / 2);
         }
         PartialModel partial = switch (type) {
@@ -194,7 +193,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         }
         StandardTrackAssemblyRenderState state = new StandardTrackAssemblyRenderState();
         state.offset = offset;
-        state.angle = getUpRotateAngle(AngleHelper.horizontalAngle(direction));
+        state.yRadians = Radians.horizontal(direction);
         SuperByteBuffer model = CachedBuffers.partial(AllPartialModels.TRACK_ASSEMBLING_OVERLAY, blockState);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(world);
         Int2ObjectMap<SuperByteBufferRenderState> valid = new Int2ObjectOpenHashMap<>();
@@ -243,10 +242,10 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
 
     public static class StandardTrackBlockRenderState implements TrackBlockRenderState {
         public @UnknownNullability Vec3 offset;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
+        public float yRadians;
+        public float xRadians;
         public @Nullable Vec3 offset2;
-        public @Nullable Quaternionf xRot2;
+        public float xRot2;
         public float offset3;
         public boolean negative;
         public @UnknownNullability SuperByteBufferRenderState model;
@@ -255,32 +254,33 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         @Override
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.translate(offset);
-            if (yRot != null || xRot != null) {
-                matrices.translate(0.5f, 0.5f, 0.5f);
-                if (yRot != null) {
-                    matrices.mulPose(yRot);
+            Pose pose = matrices.last();
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (yRadians != 0 || xRadians != 0) {
+                pose.translate(0.5f, 0.5f, 0.5f);
+                if (yRadians != 0) {
+                    pose.rotate(Axis.YP, yRadians);
                 }
-                if (xRot != null) {
-                    matrices.mulPose(xRot);
+                if (xRadians != 0) {
+                    pose.rotate(Axis.XP, xRadians);
                 }
-                matrices.translate(-0.5f, -0.5f, -0.5f);
+                pose.translate(-0.5f, -0.5f, -0.5f);
             }
             if (offset2 != null) {
                 if (offset2 != Vec3.ZERO) {
-                    matrices.translate(offset2);
+                    pose.translate((float) offset2.x, (float) offset2.y, (float) offset2.z);
                 }
             } else {
-                matrices.translate(0, 0.25f, 0);
+                pose.translate(0, 0.25f, 0);
                 if (negative) {
-                    matrices.rotateAround(new Quaternionf().setAngleAxis(Math.PI, 0, 1, 0), 0.5f, 0.5f, 0.5f);
+                    pose.rotateYCentered(Radians.DEG_180);
                 }
             }
-            if (xRot2 != null) {
-                matrices.rotateAround(xRot2, 0.5f, 0.5f, 0.5f);
-                matrices.translate(0, offset3, 0);
+            if (xRot2 != 0) {
+                pose.rotateXCentered(Mth.DEG_TO_RAD * xRot2);
+                pose.translate(0, offset3, 0);
             }
-            SuperByteBuffer.scaleAround(matrices.last(), scale, 0.5f, 0, 0.5f);
+            pose.pose().scaleAround(scale, 0.5f, 0, 0.5f);
             model.submit(matrices, queue);
             matrices.popPose();
         }
@@ -288,18 +288,19 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
 
     public static class StandardTrackAssemblyRenderState implements TrackBlockRenderState {
         public @UnknownNullability Vec3 offset;
-        public @Nullable Quaternionf angle;
+        public float yRadians;
         public @Nullable SuperByteBufferRenderState @UnknownNullability [] states;
 
         @Override
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.translate(offset);
-            if (angle != null) {
-                matrices.rotateAround(angle, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (yRadians != 0) {
+                pose.rotateYCentered(yRadians);
             }
             for (SuperByteBufferRenderState state : states) {
-                matrices.translate(0, 0, 1);
+                pose.translate(0, 0, 1);
                 if (state != null) {
                     state.submit(matrices, queue);
                 }

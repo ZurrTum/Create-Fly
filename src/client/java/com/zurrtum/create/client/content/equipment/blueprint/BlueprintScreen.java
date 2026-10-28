@@ -2,11 +2,13 @@ package com.zurrtum.create.client.content.equipment.blueprint;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
@@ -102,11 +104,12 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
     }
 
     private void transform(PoseStack ms, float p) {
-        ms.translate(0.48F, 0.04F, 0);
-        ms.scale(1, -1, 1);
-        ms.mulPose(Axis.ZP.rotationDegrees(22.5F));
-        ms.mulPose(Axis.XP.rotationDegrees(45.0F));
-        ms.mulPose(Axis.YP.rotationDegrees(-45.0F));
+        Pose pose = ms.last();
+        pose.translate(0.48F, 0.04F, 0);
+        pose.scale(1, -1, 1);
+        pose.rotate(Axis.ZP, Radians.DEG_22P5);
+        pose.rotate(Axis.XP, Radians.DEG_45);
+        pose.rotate(Axis.YP, Radians.DEG_315);
     }
 
     @Override

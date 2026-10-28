@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.decoration.slidingDoor;
 
 import com.zurrtum.create.catnip.data.Couple;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.model.Model;
@@ -85,14 +85,14 @@ public abstract class SlidingDoorVisual extends AbstractBlockEntityVisual<Slidin
         private final TransformedInstance right;
         private final Vector3fc facingVec;
         private final boolean flip;
-        private final float angle;
+        private final float yRadians;
 
         public FoldingVisual(VisualizationContext ctx, SlidingDoorBlockEntity blockEntity, float partialTick) {
             super(ctx, blockEntity, partialTick);
             flip = blockState.getValue(DoorBlock.HINGE) != DoorHingeSide.LEFT;
             Direction facing = blockState.getValue(DoorBlock.FACING);
             facingVec = facing.getUnitVec3f();
-            angle = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing.getClockWise());
+            yRadians = Radians.horizontal(facing.getClockWise());
             InstancerProvider instancerProvider = instancerProvider();
             Couple<PartialModel> partials = AllPartialModels.FOLDING_DOORS.get(BuiltInRegistries.BLOCK.getKey(blockState.getBlock()));
             left = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.chunkPartial(partials.get(!flip)))
@@ -113,7 +113,7 @@ public abstract class SlidingDoorVisual extends AbstractBlockEntityVisual<Slidin
                     Math.fma(facingVec.x(), scale, pos.getX()),
                     Math.fma(facingVec.y(), scale, pos.getY() + SlidingDoorRenderer.DOOR_OFFSET),
                     Math.fma(facingVec.z(), scale, pos.getZ())
-                ).rotateCentered(angle, Direction.UP);
+                ).rotateYCentered(yRadians);
                 if (flip) {
                     left.translate(0, 0, 1).rotateYDegrees(-91 * v).translate(0, 0, -0.5f);
                     right.setTransform(left.pose).rotateYDegrees(181 * v).translate(0, 0, -0.5f);
@@ -124,7 +124,7 @@ public abstract class SlidingDoorVisual extends AbstractBlockEntityVisual<Slidin
             } else {
                 left.setIdentityTransform()
                     .translate(pos.getX(), pos.getY() + SlidingDoorRenderer.DOOR_OFFSET, pos.getZ())
-                    .rotateCentered(angle, Direction.UP);
+                    .rotateYCentered(yRadians);
                 if (flip) {
                     right.setTransform(left.pose);
                     left.translate(0, 0, 0.5f);
@@ -169,11 +169,11 @@ public abstract class SlidingDoorVisual extends AbstractBlockEntityVisual<Slidin
                 facing.getCounterClockWise().getUnitVec3f() : facing.getClockWise().getUnitVec3f();
             facingVec = facing.getUnitVec3f();
             switch (facing) {
-                case NORTH -> door.rotation.rotationY(Mth.DEG_TO_RAD * 180);
-                case WEST -> door.rotation.rotationY(Mth.DEG_TO_RAD * -90);
-                case EAST -> door.rotation.rotationY(Mth.DEG_TO_RAD * -270);
-                case UP -> door.rotation.rotationX(Mth.DEG_TO_RAD * -90);
-                case DOWN -> door.rotation.rotationX(Mth.DEG_TO_RAD * 90);
+                case NORTH -> door.rotation.rotationY(Radians.DEG_180);
+                case WEST -> door.rotation.rotationY(Radians.DEG_270);
+                case EAST -> door.rotation.rotationY(Radians.DEG_90);
+                case UP -> door.rotation.rotationX(Radians.DEG_270);
+                case DOWN -> door.rotation.rotationX(Radians.DEG_90);
             }
             transformModels(partialTick);
         }

@@ -1,10 +1,11 @@
 package com.zurrtum.create.client.content.equipment.bell;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.equipment.bell.BellRenderer.BellRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.equipment.bell.AbstractBellBlockEntity;
@@ -22,11 +23,7 @@ import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.state.properties.BellAttachType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRadiansRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRotateAngle;
 
 public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEntityRenderer<BE, BellRenderState> {
     private final PartialModel model;
@@ -56,15 +53,15 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
         state.model = CachedBuffers.partial(model, state.blockState).cardinalLighting(level).light(state.lightCoords)
             .extractRenderState();
         if (be.isRinging) {
-            Direction direction = be.ringDirection.getCounterClockWise();
-            state.angle = getRadiansRotateAngle(getSwingAngle(be.ringingTicks + tickProgress), direction);
+            state.direction = be.ringDirection.getCounterClockWise();
+            state.swingRadians = getSwingAngle(be.ringingTicks + tickProgress);
         }
         Direction facing = state.blockState.getValue(BellBlock.FACING);
         BellAttachType attachment = state.blockState.getValue(BellBlock.ATTACHMENT);
         if (attachment == BellAttachType.SINGLE_WALL || attachment == BellAttachType.DOUBLE_WALL) {
-            state.upAngle = getUpRotateAngle(AngleHelper.horizontalAngle(facing) + 90);
+            state.yRadians = Radians.horizontalPlus90(facing);
         } else {
-            state.upAngle = getUpRotateAngle(AngleHelper.horizontalAngle(facing));
+            state.yRadians = Radians.horizontal(facing);
         }
     }
 
@@ -75,11 +72,12 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+        Pose pose = matrices.last();
+        if (state.swingRadians != 0) {
+            pose.rotateCentered(state.direction, state.swingRadians);
         }
-        if (state.upAngle != null) {
-            matrices.rotateAround(state.upAngle, 0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            pose.rotateYCentered(state.yRadians);
         }
         state.model.submit(matrices, queue);
     }
@@ -91,7 +89,8 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
 
     public static class BellRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState model;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf upAngle;
+        public @UnknownNullability Direction direction;
+        public float swingRadians;
+        public float yRadians;
     }
 }

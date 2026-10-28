@@ -1,12 +1,13 @@
 package com.zurrtum.create.client.content.kinetics.steamEngine;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.steamEngine.SteamEngineRenderer.SteamEngineRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
@@ -26,10 +27,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getAngleForBe;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotationAxisOf;
 
 public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlockEntity, SteamEngineRenderState> {
     public SteamEngineRenderer(Context context) {
@@ -59,9 +60,7 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
         Direction.Axis facingAxis = facing.getAxis();
         PoweredShaftBlockEntity shaft = be.getShaft();
         Direction.Axis axis = getRotationAxisOf(shaft);
-        if (facingAxis.isHorizontal() && axis == Direction.Axis.Y || facingAxis.isVertical() && axis == Direction.Axis.Z) {
-            state.rollAngle = Axis.YP.rotation(Mth.DEG_TO_RAD * -90);
-        }
+        state.roll = facingAxis.isHorizontal() && axis == Direction.Axis.Y || facingAxis.isVertical() && axis == Direction.Axis.Z;
         float angle = getAngleForBe(shaft, shaft.getBlockPos(), axis);
         if (axis.isHorizontal() && facingAxis == Direction.Axis.X ^ facing.getAxisDirection() == AxisDirection.POSITIVE) {
             angle *= -1;
@@ -79,11 +78,11 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         state.connector = CachedBuffers.partial(AllPartialModels.ENGINE_CONNECTOR, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
-        state.yRot = getYRotateAngle(AngleHelper.horizontalAngle(facing));
-        state.xRot = getXRotateAngle(AngleHelper.verticalAngle(facing) + 90);
-        state.linkageRotate = Axis.XP.rotation((float) (cosAngle >= 0 ? Math.acos(distance) : -Math.acos(distance)));
+        state.yRadians = Radians.horizontal(facing);
+        state.xRadians = Radians.verticalPlus90(facing);
+        state.linkageRotate = (float) (Math.acos(distance) * (cosAngle >= 0 ? 1 : -1));
         state.pistonTranslate = piston + 0.75f;
-        state.connectorRotate = Axis.XP.rotation(-(angle + Mth.HALF_PI));
+        state.connectorRotate = -(angle + Radians.DEG_90);
     }
 
     @Override
@@ -93,25 +92,28 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        matrices.translate(0.5f, 0.5f, 0.5f);
-        if (state.yRot != null) {
-            matrices.mulPose(state.yRot);
+        Pose pose = matrices.last();
+        pose.translate(0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            pose.rotate(Axis.YP, state.yRadians);
         }
-        if (state.xRot != null) {
-            matrices.mulPose(state.xRot);
+        if (state.xRadians != 0) {
+            pose.rotate(Axis.XP, state.xRadians);
         }
-        if (state.rollAngle != null) {
-            matrices.mulPose(state.rollAngle);
+        if (state.roll) {
+            pose.rotate(Axis.YP, Radians.DEG_270);
         }
         matrices.pushPose();
-        matrices.translate(-0.5f, state.pistonTranslate, -0.5f);
+        pose = matrices.last();
+        pose.translate(-0.5f, state.pistonTranslate, -0.5f);
         state.piston.submit(matrices, queue);
-        matrices.translate(0, 1.0f, 0);
-        matrices.rotateAround(state.linkageRotate, 0, 0.25f, 0.5f);
+        pose.translate(0, 1.0f, 0);
+        pose.rotateXAround(state.linkageRotate, 0, 0.25f, 0.5f);
         state.linkage.submit(matrices, queue);
         matrices.popPose();
-        matrices.translate(-0.5f, 1.5f, -0.5f);
-        matrices.rotateAround(state.connectorRotate, 0.5f, 0.5f, 0.5f);
+        pose = matrices.last();
+        pose.translate(-0.5f, 1.5f, -0.5f);
+        pose.rotateXCentered(state.connectorRotate);
         state.connector.submit(matrices, queue);
     }
 
@@ -159,11 +161,11 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
         public @UnknownNullability SuperByteBufferRenderState piston;
         public @UnknownNullability SuperByteBufferRenderState linkage;
         public @UnknownNullability SuperByteBufferRenderState connector;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
-        public @Nullable Quaternionf rollAngle;
-        public @UnknownNullability Quaternionf linkageRotate;
+        public float yRadians;
+        public float xRadians;
+        public boolean roll;
+        public float linkageRotate;
         public float pistonTranslate;
-        public @UnknownNullability Quaternionf connectorRotate;
+        public float connectorRotate;
     }
 }

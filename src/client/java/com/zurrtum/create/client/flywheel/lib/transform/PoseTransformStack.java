@@ -1,6 +1,8 @@
 package com.zurrtum.create.client.flywheel.lib.transform;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
@@ -48,9 +50,7 @@ public final class PoseTransformStack implements TransformStack<PoseTransformSta
 
     @Override
     public PoseTransformStack rotateAround(Quaternionfc quaternion, float x, float y, float z) {
-        PoseStack.Pose pose = stack.last();
-        pose.pose().rotateAround(quaternion, x, y, z);
-        pose.normal().rotate(quaternion);
+        stack.rotateAround(quaternion, x, y, z);
         return this;
     }
 
@@ -62,15 +62,125 @@ public final class PoseTransformStack implements TransformStack<PoseTransformSta
 
     @Override
     public PoseTransformStack rotate(Quaternionfc quaternion) {
-        PoseStack.Pose pose = stack.last();
-        pose.pose().rotate(quaternion);
-        pose.normal().rotate(quaternion);
+        stack.rotate(quaternion);
         return this;
     }
 
     @Override
     public PoseTransformStack scale(float factorX, float factorY, float factorZ) {
         stack.scale(factorX, factorY, factorZ);
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateCentered(float radians, float axisX, float axisY, float axisZ) {
+        if (radians != 0) {
+            stack.rotateCentered(axisX, axisY, axisZ, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateCentered(float radians, Axis axis) {
+        if (radians != 0) {
+            stack.rotateCentered(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateCentered(float radians, Direction.Axis axis) {
+        if (radians != 0) {
+            stack.rotateCentered(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateCentered(float radians, Direction direction) {
+        if (radians != 0) {
+            stack.rotateCentered(direction, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateXCentered(float radians) {
+        if (radians != 0) {
+            stack.rotateXCentered(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateYCentered(float radians) {
+        if (radians != 0) {
+            stack.rotateYCentered(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateZCentered(float radians) {
+        if (radians != 0) {
+            stack.rotateZCentered(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotate(float radians, float axisX, float axisY, float axisZ) {
+        if (radians != 0) {
+            stack.rotate(axisX, axisY, axisZ, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotate(float radians, Axis axis) {
+        if (radians != 0) {
+            stack.rotate(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotate(float radians, Direction direction) {
+        if (radians != 0) {
+            stack.rotate(direction, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotate(float radians, Direction.Axis axis) {
+        if (radians != 0) {
+            stack.rotate(axis, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateX(float radians) {
+        if (radians != 0) {
+            stack.rotate(Axis.XP, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateY(float radians) {
+        if (radians != 0) {
+            stack.rotate(Axis.YP, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PoseTransformStack rotateZ(float radians) {
+        if (radians != 0) {
+            stack.rotate(Axis.ZP, radians);
+        }
         return this;
     }
 

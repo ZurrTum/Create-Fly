@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.render;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.util.Mth;
@@ -59,14 +60,14 @@ public class PlayerSkyhookRenderer {
         //		model.rightArm.y = offsetX * Mth.sin(bodySwing) + offsetY * Mth.cos(bodySwing);
         float armPivotX = offsetX * Mth.cos(bodySwing) - offsetY * Mth.sin(bodySwing) + (isLeftArmMain ? -1 : 1) * 4.5f;
         float armPivotY = offsetX * Mth.sin(bodySwing) + offsetY * Mth.cos(bodySwing) + 2;
-        hangingArm.xRot = -AngleHelper.rad(150);
-        hangingArm.zRot = (isLeftArmMain ? -1 : 1) * AngleHelper.rad(15);
+        hangingArm.xRot = -Radians.DEG_150;
+        hangingArm.zRot = isLeftArmMain ? -Radians.DEG_15 : Radians.DEG_15;
 
         offsetX = otherArm.x;
         offsetY = otherArm.y;
         otherArm.x = offsetX * Mth.cos(bodySwing) - offsetY * Mth.sin(bodySwing);
         otherArm.y = offsetX * Mth.sin(bodySwing) + offsetY * Mth.cos(bodySwing);
-        otherArm.zRot = (isLeftArmMain ? -1 : 1) * -AngleHelper.rad(20) + 0.5f * bodySwing + limbSwing;
+        otherArm.zRot = (isLeftArmMain ? Radians.DEG_20 : -Radians.DEG_20) + 0.5f * bodySwing + limbSwing;
 
         ModelPart leadingLeg = isLeftArmMain ? model.leftLeg : model.rightLeg;
         ModelPart trailingLeg = isLeftArmMain ? model.rightLeg : model.leftLeg;
@@ -76,15 +77,15 @@ public class PlayerSkyhookRenderer {
         offsetY = leadingLeg.y;
         leadingLeg.x = offsetX * Mth.cos(bodySwing) - offsetY * Mth.sin(bodySwing);
         leadingLeg.y = offsetX * Mth.sin(bodySwing) + offsetY * Mth.cos(bodySwing);
-        leadingLeg.xRot = -AngleHelper.rad(25);
-        leadingLeg.zRot = (isLeftArmMain ? -1 : 1) * AngleHelper.rad(10) + 0.5f * bodySwing + limbSwing;
+        leadingLeg.xRot = -Radians.DEG_25;
+        leadingLeg.zRot = (isLeftArmMain ? -Radians.DEG_10 : Radians.DEG_10) + 0.5f * bodySwing + limbSwing;
         trailingLeg.y -= 0.8f;
         offsetX = trailingLeg.x;
         offsetY = trailingLeg.y;
         trailingLeg.x = offsetX * Mth.cos(bodySwing) - offsetY * Mth.sin(bodySwing);
         trailingLeg.y = offsetX * Mth.sin(bodySwing) + offsetY * Mth.cos(bodySwing);
-        trailingLeg.xRot = AngleHelper.rad(10);
-        trailingLeg.zRot = (isLeftArmMain ? -1 : 1) * -AngleHelper.rad(10) + 0.5f * bodySwing + limbSwing;
+        trailingLeg.xRot = Radians.DEG_10;
+        trailingLeg.zRot = (isLeftArmMain ? Radians.DEG_10 : -Radians.DEG_10) + 0.5f * bodySwing + limbSwing;
         model.head.x -= armPivotX;
         model.body.x -= armPivotX;
         otherArm.x -= armPivotX;

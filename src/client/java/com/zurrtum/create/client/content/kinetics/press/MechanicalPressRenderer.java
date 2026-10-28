@@ -15,12 +15,12 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -48,7 +48,8 @@ public class MechanicalPressRenderer implements BlockEntityRenderer<MechanicalPr
         int color = getTintColor(be);
         state.model = CachedBuffers.block(KINETIC_BLOCK, shaft(axis)).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).color(color).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         PressingBehaviour pressingBehaviour = be.getPressingBehaviour();
         state.offset = -(pressingBehaviour.getRenderedHeadOffset(tickProgress) * pressingBehaviour.mode.headOffset);
         state.head = CachedBuffers.partialFacing(
@@ -65,9 +66,9 @@ public class MechanicalPressRenderer implements BlockEntityRenderer<MechanicalPr
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.model.submit(matrices, queue);
             matrices.popPose();
         } else {
@@ -81,6 +82,7 @@ public class MechanicalPressRenderer implements BlockEntityRenderer<MechanicalPr
         public @UnknownNullability SuperByteBufferRenderState model;
         public @UnknownNullability SuperByteBufferRenderState head;
         public float offset;
-        public @Nullable Quaternionf angle;
+        public @UnknownNullability Axis axis;
+        public float angle;
     }
 }

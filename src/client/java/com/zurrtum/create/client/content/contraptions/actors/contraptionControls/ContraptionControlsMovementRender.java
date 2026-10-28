@@ -2,9 +2,9 @@ package com.zurrtum.create.client.content.contraptions.actors.contraptionControl
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Couple;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
@@ -13,6 +13,7 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsBlock;
@@ -31,7 +32,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
@@ -87,8 +87,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         if (hideText && hideDescription) {
             return state;
         }
-        state.upAngle = AngleHelper.rad(AngleHelper.horizontalAngle(facing));
-        state.westAngle = AngleHelper.rad(67.5f);
+        state.yRadians = Radians.horizontal(facing);
         Couple<Integer> couple = DyeHelper.getDyeColors(efs.targetYEqualsSelection ? DyeColor.WHITE : DyeColor.ORANGE);
         int brightColor = couple.getFirst();
         int darkColor = couple.getSecond();
@@ -116,8 +115,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
 
     public static class ContraptionControlsMovementRenderState implements MovementRenderState {
         public @UnknownNullability SuperByteBufferRenderState button;
-        public float upAngle;
-        public float westAngle;
+        public float yRadians;
         public float offsetZ;
         public @Nullable FormattedCharSequence text;
         public @Nullable FormattedCharSequence description;
@@ -138,13 +136,17 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
             if (text != null || description != null) {
                 matrices.pushPose();
                 transform(matrices, pose, pos);
-                matrices.rotateAround(new Quaternionf().setAngleAxis(upAngle, 0, 1, 0), 0.5f, 0.5f, 0.5f);
-                matrices.translate(0.4f, 1.125f, 0.5f);
-                matrices.mulPose(new Quaternionf().setAngleAxis(westAngle, -1, 0, 0));
+                Pose last = matrices.last();
+                if (yRadians != 0) {
+                    last.rotateYCentered(yRadians);
+                }
+                last.translate(0.4f, 1.125f, 0.5f);
+                last.rotate(Axis.XP, Radians.DEG_292P5);
                 if (text != null) {
                     matrices.pushPose();
-                    matrices.translate(0, 0.15f, offsetZ);
-                    matrices.scale(textScale, -textScale, textScale);
+                    last = matrices.last();
+                    last.translate(0, 0.15f, offsetZ);
+                    last.scale(textScale, -textScale, textScale);
                     queue.submitText(
                         matrices,
                         textX,
@@ -157,7 +159,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                         0,
                         0
                     );
-                    matrices.translate(0.5f, 0.5f, -0.0625f);
+                    last.translate(0.5f, 0.5f, -0.0625f);
                     queue.submitText(
                         matrices,
                         textX,
@@ -174,8 +176,9 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                 }
                 if (description != null) {
                     matrices.pushPose();
-                    matrices.translate(-0.0635f, 0.06f, offsetZ);
-                    matrices.scale(descriptionScale, -descriptionScale, descriptionScale);
+                    last = matrices.last();
+                    last.translate(-0.0635f, 0.06f, offsetZ);
+                    last.scale(descriptionScale, -descriptionScale, descriptionScale);
                     queue.submitText(
                         matrices,
                         descriptionX,

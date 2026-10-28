@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.content.equipment.zapper;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.equipment.zapper.ZapperItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -50,8 +52,9 @@ public class ZapperRenderHandler extends ShootableGadgetRenderHandler {
 
     @Override
     protected void transformTool(PoseStack ms, float flip, float equipProgress, float recoil, float pt) {
-        ms.translate(flip * -0.1f, 0.1f, -0.4f);
-        ms.mulPose(Axis.YP.rotationDegrees(flip * 5.0F));
+        Pose pose = ms.last();
+        pose.translate(flip * -0.1f, 0.1f, -0.4f);
+        pose.rotate(Axis.YP, flip * Radians.DEG_5);
     }
 
     @Override

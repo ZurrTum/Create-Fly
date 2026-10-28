@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.vanillin.visuals;
 
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visual.TickableVisual;
@@ -124,7 +125,7 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
             stack.pushMatrix();
             stack.scale(0.75F, 0.75F, 0.75F);
             stack.translate(-0.5F, (float) (displayOffset - 8) / 16, 0.5F);
-            stack.rotateY(90 * Mth.DEG_TO_RAD);
+            stack.rotateY(Radians.DEG_90);
             updateContents(contents, stack, partialTick);
             stack.popMatrix();
         }

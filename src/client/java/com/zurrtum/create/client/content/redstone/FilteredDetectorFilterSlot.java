@@ -1,13 +1,12 @@
 package com.zurrtum.create.client.content.redstone;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -29,7 +28,7 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
             return true;
         }
 
-        if (targetDirection.getAxis() != Axis.Y) {
+        if (targetDirection.getAxis() != Direction.Axis.Y) {
             return direction == Direction.UP || direction == Direction.DOWN && hasSlotAtBottom;
         }
         if (targetDirection == Direction.UP) {
@@ -46,13 +45,13 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
     public void rotate(BlockState state, PoseStack ms) {
         super.rotate(state, ms);
         Direction facing = state.getValue(DirectedDirectionalBlock.FACING);
-        if (facing.getAxis() == Axis.Y) {
+        if (facing.getAxis() == Direction.Axis.Y) {
             return;
         }
         if (getSide() != Direction.UP) {
             return;
         }
-        TransformStack.of(ms).rotateZDegrees(-AngleHelper.horizontalAngle(facing) + 180);
+        ms.rotate(Axis.ZP, Radians.negatedHorizontalPlus180(facing));
     }
 
     @Override

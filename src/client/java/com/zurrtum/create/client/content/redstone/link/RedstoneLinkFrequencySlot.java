@@ -1,13 +1,12 @@
 package com.zurrtum.create.client.content.redstone.link;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -36,16 +35,20 @@ public class RedstoneLinkFrequencySlot extends ValueBoxTransform.Dual {
         if (isFirst()) {
             location = location.add(0, 0, 5 / 16.0f);
         }
-        location = VecHelper.rotateCentered(location, facing == Direction.DOWN ? 180 : 0, Axis.X);
+        location = VecHelper.rotateCentered(location, facing == Direction.DOWN ? 180 : 0, Direction.Axis.X);
         return location;
     }
 
     @Override
     public void rotate(BlockState state, PoseStack ms) {
         Direction facing = state.getValue(RedstoneLinkBlock.FACING);
-        float yRot = facing.getAxis().isVertical() ? 0 : AngleHelper.horizontalAngle(facing) + 180;
-        float xRot = facing == Direction.UP ? 90 : facing == Direction.DOWN ? 270 : 0;
-        TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(xRot);
+        if (facing == Direction.UP) {
+            ms.rotate(Axis.XP, Radians.DEG_90);
+        } else if (facing == Direction.DOWN) {
+            ms.rotate(Axis.XP, Radians.DEG_270);
+        } else {
+            ms.rotate(Axis.YP, Radians.horizontalPlus180(facing));
+        }
     }
 
     @Override

@@ -2,10 +2,11 @@ package com.zurrtum.create.client.content.equipment.symmetryWand;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
@@ -27,11 +28,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public class SymmetryWandScreen extends AbstractSimiScreen {
+    private final Vector3fc AXIS = new Vector3f(0.3f, 1.0f, 0.0f).normalize();
 
     private final AllGuiTextures background = AllGuiTextures.WAND_OF_SYMMETRY;
 
@@ -178,9 +181,10 @@ public class SymmetryWandScreen extends AbstractSimiScreen {
     }
 
     private void transformBlock(PoseStack ms, float p) {
-        ms.translate(0.1875F, 0.9375f, 0);
-        ms.mulPose(Axis.of(new Vector3f(0.3f, 1.0f, 0.0f)).rotationDegrees(-22.5f));
-        ms.scale(1, -1, 1);
+        Pose pose = ms.last();
+        pose.translate(0.1875F, 0.9375f, 0);
+        pose.rotate(AXIS, Radians.DEG_337P5);
+        pose.scale(1, -1, 1);
         SymmetryHandlerClient.applyModelTransform(currentElement, ms);
     }
 

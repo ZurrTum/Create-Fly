@@ -1,9 +1,10 @@
 package com.zurrtum.create.client.content.redstone.diodes;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -18,8 +19,12 @@ public class BrassDiodeScrollSlot extends ValueBoxTransform {
 
     @Override
     public void rotate(BlockState state, PoseStack ms) {
-        float yRot = AngleHelper.horizontalAngle(state.getValue(BlockStateProperties.HORIZONTAL_FACING)) + 180;
-        TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(90);
+        float yRadians = Radians.horizontalPlus180(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
+        Pose pose = ms.last();
+        if (yRadians != 0) {
+            pose.rotate(Axis.YP, yRadians);
+        }
+        pose.rotate(Axis.XP, Radians.DEG_90);
     }
 
     @Override

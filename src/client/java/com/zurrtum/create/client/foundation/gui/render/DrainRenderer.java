@@ -2,12 +2,14 @@ package com.zurrtum.create.client.foundation.gui.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.catnip.gui.render.GpuTexture;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -52,14 +54,15 @@ public class DrainRenderer extends GuiBlockRenderer<DrainRenderState> {
         }
         texture.prepare(projection, projectionMatrixBuffer);
         matrices.pushPose();
-        matrices.translate(width / 2.0F, height, 0.0F);
+        Pose pose = matrices.last();
+        pose.translate(width / 2.0F, height, 0.0F);
         float scale = 20 * windowScaleFactor;
-        matrices.scale(scale, scale, scale);
+        pose.scale(scale, scale, scale);
 
-        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
-        matrices.scale(1, -1, 1);
-        matrices.translate(-0.5f, 0.2f, -0.5f);
+        pose.rotate(Axis.XP, Radians.DEG_344P5);
+        pose.rotate(Axis.YP, Radians.DEG_22P5);
+        pose.scale(1, -1, 1);
+        pose.translate(-0.5f, 0.2f, -0.5f);
 
         CachedBuffers.block(AllBlocks.ITEM_DRAIN.defaultBlockState()).submit(matrices, submitNodeStorage);
 

@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.content.logistics.itemHatch;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.logistics.itemHatch.ItemHatchBlock;
 import net.minecraft.core.BlockPos;
@@ -16,7 +18,11 @@ public class HatchFilterSlot extends ValueBoxTransform {
 
     @Override
     public Vec3 getLocalOffset(BlockState state) {
-        return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 5.15, 9.5), angle(state), Direction.Axis.Y);
+        return VecHelper.rotateCentered(
+            VecHelper.voxelSpace(8, 5.15, 9.5),
+            AngleHelper.horizontalAngle(state.getValueOrElse(ItemHatchBlock.FACING, Direction.NORTH)),
+            Direction.Axis.Y
+        );
     }
 
     @Override
@@ -31,12 +37,11 @@ public class HatchFilterSlot extends ValueBoxTransform {
 
     @Override
     public void rotate(BlockState state, PoseStack ms) {
-        ms.mulPose(Axis.YP.rotationDegrees(angle(state)));
-        ms.mulPose(Axis.XP.rotationDegrees(-45));
+        Pose pose = ms.last();
+        float yRadians = Radians.horizontal(state.getValueOrElse(ItemHatchBlock.FACING, Direction.NORTH));
+        if (yRadians != 0) {
+            pose.rotate(Axis.YP, yRadians);
+        }
+        pose.rotate(Axis.XP, Radians.DEG_315);
     }
-
-    private float angle(BlockState state) {
-        return AngleHelper.horizontalAngle(state.getValueOrElse(ItemHatchBlock.FACING, Direction.NORTH));
-    }
-
 }

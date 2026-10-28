@@ -21,6 +21,8 @@
     "DetectorRailBlockMixin",
     "DimensionStorageFileFixMixin",
     "DiodeBlockMixin",
+    "DirectionAxisMixin",
+    "DirectionMixin",
     "EnchantingTableBlockMixin",
     "EnchantmentMixin",
     "EntityCallbacksMixin",

@@ -1,11 +1,13 @@
 package com.zurrtum.create.client.content.schematics.cannon;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.schematics.cannon.SchematicannonRenderer.SchematicannonRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -36,13 +38,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 
 public class SchematicannonRenderer implements BlockEntityRenderer<SchematicannonBlockEntity, SchematicannonRenderState> {
     public static final BlockDisplayContext BLOCK_DISPLAY_CONTEXT = BlockDisplayContext.create();
@@ -140,7 +139,7 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
             // Height is determined through a bezier curve
             double yOffset = 2 * (1 - t) * t * throwHeight + t * t * yDifference;
             Vec3 blockLocation = blockLocationXZ.add(0.5, yOffset + 1.5, 0.5).add(cannonOffset);
-            float angle = RAD_360 * t;
+            float radians = Radians.DEG_360 * t;
             if (launched instanceof ForBlockState forBlockState) {
                 // Render the Block
                 BlockState state;
@@ -152,12 +151,12 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
                 }
                 BlockModelRenderState model = new BlockModelRenderState();
                 blockModelResolver.update(model, state, BLOCK_DISPLAY_CONTEXT);
-                blocks.add(new LaunchedBlockRenderState(blockLocation, angle, 0.3f, model));
+                blocks.add(new LaunchedBlockRenderState(blockLocation, radians, 0.3f, model));
             } else if (launched instanceof ForEntity) {
                 ItemStackRenderState item = new ItemStackRenderState();
                 item.displayContext = ItemDisplayContext.GROUND;
                 itemModelManager.appendItemLayers(item, launched.stack, item.displayContext, level, null, 0);
-                blocks.add(new LaunchedEntityRenderState(blockLocation, angle, 1.2f, item));
+                blocks.add(new LaunchedEntityRenderState(blockLocation, radians, 1.2f, item));
             }
             // Render particles for launch
             if (launched.ticksRemaining == launched.totalTicks && be.firstRenderTick) {
@@ -199,13 +198,12 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
             }
             double diffX = diff.x();
             double diffZ = diff.z();
-            data.yaw = getUpRadiansRotateAngle((float) (Mth.atan2(diffX, diffZ) + Mth.HALF_PI));
+            data.yawRadians = (float) (Mth.atan2(diffX, diffZ) + Radians.DEG_90);
             float distance = Mth.sqrt((float) (diffX * diffX + diffZ * diffZ));
-            float pitch = (float) (Mth.atan2(distance, diff.y() * 3 + distance * 2.0f) / Math.PI * 180 + 10);
-            data.pitch = getSouthRotateAngle(pitch);
+            data.pitchRadians = (float) (Mth.atan2(distance, diff.y() * 3 + distance * 2.0f) + Radians.DEG_10);
         } else {
-            data.yaw = getUpRotateAngle(blockEntity.defaultYaw + 90);
-            data.pitch = new Quaternionf().setAngleAxis(Mth.DEG_TO_RAD * 40, 0, 0, 1);
+            data.yawRadians = Mth.DEG_TO_RAD * blockEntity.defaultYaw + Radians.DEG_90;
+            data.pitchRadians = Radians.DEG_40;
         }
     }
 
@@ -277,24 +275,25 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     public static class SchematicannonRenderData {
         public @UnknownNullability SuperByteBufferRenderState connector;
         public @UnknownNullability SuperByteBufferRenderState pipe;
-        public @Nullable Quaternionf yaw;
-        public @Nullable Quaternionf pitch;
+        public float yawRadians;
+        public float pitchRadians;
         public float offset;
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.translate(0.5f, 0.9375f, 0.5f);
-            if (yaw != null) {
-                matrices.mulPose(yaw);
+            Pose pose = matrices.last();
+            pose.translate(0.5f, 0.9375f, 0.5f);
+            if (yawRadians != 0) {
+                pose.rotate(Axis.YP, yawRadians);
             }
-            if (pitch != null) {
-                matrices.mulPose(pitch);
+            if (pitchRadians != 0) {
+                pose.rotate(Axis.ZP, pitchRadians);
             }
-            matrices.translate(-0.5f, offset - 0.9375f, -0.5f);
+            pose.translate(-0.5f, offset - 0.9375f, -0.5f);
             pipe.submit(matrices, queue);
             matrices.popPose();
-            if (yaw != null) {
-                matrices.rotateAround(yaw, 0.5f, 0, 0.5f);
+            if (yawRadians != 0) {
+                matrices.rotateYAround(yawRadians, 0.5f, 0, 0.5f);
             }
             connector.submit(matrices, queue);
         }
@@ -302,29 +301,26 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
 
     public static abstract class LaunchedRenderState {
         public Vec3 offset;
-        public @Nullable Quaternionf yRot;
-        public @UnknownNullability Quaternionf XRot;
+        public float radians;
         public float scale;
 
-        public LaunchedRenderState(Vec3 offset, float angle, float scale) {
+        public LaunchedRenderState(Vec3 offset, float radians, float scale) {
             this.offset = offset;
             this.scale = scale;
-            if (angle != 0) {
-                yRot = Axis.YP.rotation(angle);
-                XRot = Axis.XP.rotation(angle);
-            }
+            this.radians = radians;
         }
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue, int light) {
             matrices.pushPose();
-            matrices.translate(offset);
-            if (yRot != null) {
-                matrices.translate(0.125f, 0.125f, 0.125f);
-                matrices.mulPose(yRot);
-                matrices.mulPose(XRot);
-                matrices.translate(-0.125f, -0.125f, -0.125f);
+            Pose pose = matrices.last();
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (radians != 0) {
+                pose.translate(0.125f, 0.125f, 0.125f);
+                pose.rotate(Axis.YP, radians);
+                pose.rotate(Axis.XP, radians);
+                pose.translate(-0.125f, -0.125f, -0.125f);
             }
-            matrices.scale(scale, scale, scale);
+            pose.scale(scale, scale, scale);
             submit(queue, matrices, light);
             matrices.popPose();
         }
@@ -335,8 +331,8 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     public static class LaunchedBlockRenderState extends LaunchedRenderState {
         public BlockModelRenderState model;
 
-        public LaunchedBlockRenderState(Vec3 offset, float angle, float scale, BlockModelRenderState model) {
-            super(offset, angle, scale);
+        public LaunchedBlockRenderState(Vec3 offset, float radians, float scale, BlockModelRenderState model) {
+            super(offset, radians, scale);
             this.model = model;
         }
 
@@ -349,8 +345,8 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
     public static class LaunchedEntityRenderState extends LaunchedRenderState {
         public ItemStackRenderState item;
 
-        public LaunchedEntityRenderState(Vec3 offset, float angle, float scale, ItemStackRenderState item) {
-            super(offset, angle, scale);
+        public LaunchedEntityRenderState(Vec3 offset, float radians, float scale, ItemStackRenderState item) {
+            super(offset, radians, scale);
             this.item = item;
         }
 

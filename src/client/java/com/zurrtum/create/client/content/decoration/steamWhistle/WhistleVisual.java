@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.decoration.steamWhistle;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -31,7 +31,7 @@ public class WhistleVisual extends AbstractBlockEntityVisual<WhistleBlockEntity>
             InstanceTypes.ORIENTED,
             Models.chunkPartial(WhistleRenderer.getMouthModel(size))
         ).createInstance();
-        mouth.rotateYDegrees(AngleHelper.horizontalAngle(blockState.getValue(WhistleBlock.FACING)));
+        mouth.rotateY(Radians.horizontal(blockState.getValue(WhistleBlock.FACING)));
         powered = blockState.getValue(WhistleBlock.POWERED);
         WhistleAnimationBehaviour behaviour = (WhistleAnimationBehaviour) blockEntity.getBehaviour(AnimationBehaviour.TYPE);
         if (behaviour != null) {

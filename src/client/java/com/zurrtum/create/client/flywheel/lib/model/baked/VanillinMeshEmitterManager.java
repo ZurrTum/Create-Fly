@@ -42,8 +42,9 @@ public class VanillinMeshEmitterManager extends MeshEmitterManager<MeshEmitter> 
         if (buffer != null) {
             if (x != 0.0F || y != 0.0F || z != 0.0F) {
                 poseStack.pushPose();
-                poseStack.translate(x, y, z);
-                buffer.putBakedQuad(poseStack.last(), quad, instance);
+                Pose pose = poseStack.last();
+                pose.translate(x, y, z);
+                buffer.putBakedQuad(pose, quad, instance);
                 poseStack.popPose();
             } else {
                 buffer.putBakedQuad(poseStack.last(), quad, instance);

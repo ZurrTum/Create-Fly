@@ -11,7 +11,7 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.schematics.cannon.SchematicannonBlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
 import java.util.function.Consumer;
 
@@ -62,15 +62,14 @@ public class SchematicannonVisual extends AbstractBlockEntityVisual<Schematicann
         double recoil = SchematicannonRenderer.getRecoil(blockEntity, partialTicks);
 
         if (yaw != lastYaw) {
-            connector.setIdentityTransform().translate(getVisualPosition()).center()
-                .rotate((float) ((yaw + 90) / 180 * Math.PI), Direction.UP).uncenter().setChanged();
+            connector.setIdentityTransform().translate(getVisualPosition())
+                .rotateYCentered((float) ((yaw + 90) * Mth.DEG_TO_RAD)).setChanged();
         }
 
         if (pitch != lastPitch || recoil != lastRecoil) {
             pipe.setIdentityTransform().translate(getVisualPosition()).translate(0.5f, 15 / 16.0f, 0.5f)
-                .rotate((float) ((yaw + 90) / 180 * Math.PI), Direction.UP)
-                .rotate((float) (pitch / 180 * Math.PI), Direction.SOUTH).translateBack(0.5f, 15 / 16.0f, 0.5f)
-                .translate(0, -recoil / 100, 0).setChanged();
+                .rotateY((float) ((yaw + 90) * Mth.DEG_TO_RAD)).rotateZ((float) (pitch * Mth.DEG_TO_RAD))
+                .translateBack(0.5f, 15 / 16.0f, 0.5f).translate(0, -recoil / 100, 0).setChanged();
         }
 
         lastYaw = yaw;

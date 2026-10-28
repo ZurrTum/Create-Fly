@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
-import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueHandler;
@@ -14,11 +13,12 @@ import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
@@ -69,8 +69,11 @@ public class WrenchModel implements ItemModel {
         submitQuads(state, itemSettings, displayContext, itemQuads).setExtents(itemExtents);
         LayerRenderState gearLayer = submitQuads(state, gearSettings, displayContext, gearQuads);
         gearLayer.setExtents(gearExtents);
-        Quaternionf rotate = Axis.YP.rotationDegrees(ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks()));
-        gearLayer.localTransform.rotateAround(rotate, 0.5625f, 0.5f, 0.5f);
+        float scroll = ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks());
+        Matrix4f pose = gearLayer.localTransform;
+        pose.translate(0.5625f, 0.5f, 0.5f);
+        pose.rotateY(Mth.DEG_TO_RAD * scroll);
+        pose.translate(-0.5625f, -0.5f, -0.5f);
     }
 
     public static class Unbaked implements ItemModel.Unbaked {

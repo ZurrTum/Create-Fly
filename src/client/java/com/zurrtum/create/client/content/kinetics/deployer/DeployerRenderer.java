@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.content.kinetics.deployer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.deployer.DeployerRenderer.DeployerRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -36,7 +37,6 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -109,17 +109,16 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         components.hand = CachedBuffers.partial(getHandPose(be), state.blockState).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).extractRenderState();
-        components.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+        components.axis = axis;
+        components.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         components.offset = getHandOffset(state, be, tickProgress, facing);
-        components.yRot = getUpRotateAngle(AngleHelper.horizontalAngle(facing));
+        components.yRadians = Radians.horizontal(facing);
         if (facing == Direction.UP) {
-            components.xRot = new Quaternionf().setAngleAxis(RAD_270, 1, 0, 0);
+            components.xRadians = Radians.DEG_270;
         } else if (facing == Direction.DOWN) {
-            components.xRot = new Quaternionf().setAngleAxis(RAD_90, 1, 0, 0);
+            components.xRadians = Radians.DEG_90;
         }
-        if (state.blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z) {
-            components.zRot = new Quaternionf().setAngleAxis(RAD_90, 0, 0, 1);
-        }
+        components.zRot = state.blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
     }
 
     @Override
@@ -130,7 +129,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         CameraRenderState cameraState
     ) {
         if (state.item != null) {
-            state.item.render(matrices, queue, state.lightCoords);
+            state.item.submit(matrices, queue, state.lightCoords);
         }
         if (state.filter != null) {
             state.filter.submit(state.blockState, queue, matrices, state.lightCoords);
@@ -196,7 +195,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
 
     public static abstract class DeployerItemRenderState {
         public Vec3 offset;
-        public @Nullable Quaternionf yRot;
+        public float yRadians;
         public ItemStackRenderState item;
 
         public DeployerItemRenderState(
@@ -207,7 +206,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
             Direction facing
         ) {
             this.offset = offset;
-            yRot = getYRotateAngle(AngleHelper.horizontalAngle(facing) + 180);
+            yRadians = Radians.horizontalPlus180(facing);
             item = new ItemStackRenderState();
             item.displayContext = getDisplayContext();
             itemModelManager.appendItemLayers(item, heldItem, item.displayContext, world, null, 0);
@@ -230,11 +229,12 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
             return new DeployerItemUseRenderState(itemModelManager, world, heldItem, offset, facing);
         }
 
-        public void render(PoseStack matrices, SubmitNodeCollector queue, int light) {
+        public void submit(PoseStack matrices, SubmitNodeCollector queue, int light) {
             matrices.pushPose();
-            matrices.translate(offset);
-            if (yRot != null) {
-                matrices.mulPose(yRot);
+            Pose pose = matrices.last();
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (yRadians != 0) {
+                pose.rotate(Axis.YP, yRadians);
             }
             transform(matrices);
             item.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
@@ -247,7 +247,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
     }
 
     public static class DeployerItemUseRenderState extends DeployerItemRenderState {
-        public @Nullable Quaternionf xRot;
+        public float xRadians;
         public boolean isBlockItem;
 
         public DeployerItemUseRenderState(
@@ -259,9 +259,9 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         ) {
             super(itemModelManager, world, heldItem, offset, facing);
             if (facing == Direction.UP) {
-                xRot = Axis.XP.rotation(RAD_90);
+                xRadians = Radians.DEG_90;
             } else if (facing == Direction.DOWN) {
-                xRot = Axis.XP.rotation(RAD_270);
+                xRadians = Radians.DEG_270;
             }
             isBlockItem = heldItem.getItem() instanceof BlockItem && item.usesBlockLight();
         }
@@ -273,20 +273,21 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
 
         @Override
         protected void transform(PoseStack matrices) {
-            if (xRot != null) {
-                matrices.mulPose(xRot);
+            Pose pose = matrices.last();
+            if (xRadians != 0) {
+                pose.rotate(Axis.XP, xRadians);
             }
-            matrices.translate(0, 0, -0.6875f);
+            pose.translate(0, 0, -0.6875f);
             if (isBlockItem) {
-                matrices.scale(0.734375f, 0.734375f, 0.734375f);
+                pose.scale(0.734375f, 0.734375f, 0.734375f);
             } else {
-                matrices.scale(0.5f, 0.5f, 0.5f);
+                pose.scale(0.5f, 0.5f, 0.5f);
             }
         }
     }
 
     public static class DeployerItemPunchRenderState extends DeployerItemRenderState {
-        public @Nullable Quaternionf xRot;
+        public float xRadians;
         public boolean isSpears;
 
         public DeployerItemPunchRenderState(
@@ -300,17 +301,17 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
             isSpears = heldItem.is(ItemTags.SPEARS);
             if (isSpears) {
                 if (facing == Direction.UP) {
-                    xRot = Axis.XP.rotation(Mth.DEG_TO_RAD * 20);
+                    xRadians = Radians.DEG_20;
                 } else if (facing == Direction.DOWN) {
-                    xRot = Axis.XP.rotation(Mth.DEG_TO_RAD * 200);
+                    xRadians = Radians.DEG_200;
                 } else {
-                    xRot = Axis.XP.rotation(Mth.DEG_TO_RAD * -70);
+                    xRadians = Radians.DEG_290;
                 }
             } else {
                 if (facing == Direction.UP) {
-                    xRot = Axis.XP.rotation(RAD_90);
+                    xRadians = Radians.DEG_90;
                 } else if (facing == Direction.DOWN) {
-                    xRot = Axis.XP.rotation(RAD_270);
+                    xRadians = Radians.DEG_270;
                 }
             }
         }
@@ -322,20 +323,21 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
 
         @Override
         protected void transform(PoseStack matrices) {
-            if (xRot != null) {
-                matrices.mulPose(xRot);
+            Pose pose = matrices.last();
+            if (xRadians != 0) {
+                pose.rotate(Axis.XP, xRadians);
             }
-            matrices.translate(0, 0.125f, -0.75f);
+            pose.translate(0, 0.125f, -0.75f);
             if (isSpears) {
-                matrices.translate(0, 0.6f, 0.6f);
+                pose.translate(0, 0.6f, 0.6f);
             }
-            matrices.scale(0.75f, 0.75f, 0.75f);
+            pose.scale(0.75f, 0.75f, 0.75f);
         }
     }
 
     public static class DeployerItemDisplayRenderState extends DeployerItemRenderState {
         public boolean isBlockItem;
-        public Quaternionf yRot2;
+        public float yRadians2;
 
         public DeployerItemDisplayRenderState(
             ItemModelResolver itemModelManager,
@@ -346,7 +348,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         ) {
             super(itemModelManager, world, heldItem, offset, facing);
             isBlockItem = heldItem.getItem() instanceof BlockItem && item.usesBlockLight();
-            yRot2 = Axis.YP.rotation(Mth.DEG_TO_RAD * AnimationTickHolder.getRenderTime(world));
+            yRadians2 = Mth.DEG_TO_RAD * AnimationTickHolder.getRenderTime(world);
         }
 
         @Override
@@ -356,13 +358,14 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
 
         @Override
         protected void transform(PoseStack matrices) {
+            Pose pose = matrices.last();
             if (isBlockItem) {
-                matrices.translate(0, 0.5625f, 0);
-                matrices.scale(1.25f, 1.25f, 1.25f);
+                pose.translate(0, 0.5625f, 0);
+                pose.scale(1.25f, 1.25f, 1.25f);
             } else {
-                matrices.translate(0, 0.6875f, 0);
+                pose.translate(0, 0.6875f, 0);
             }
-            matrices.mulPose(yRot2);
+            pose.rotate(Axis.YP, yRadians2);
         }
     }
 
@@ -370,31 +373,33 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         public @UnknownNullability SuperByteBufferRenderState shaft;
         public @UnknownNullability SuperByteBufferRenderState pole;
         public @UnknownNullability SuperByteBufferRenderState hand;
-        public @Nullable Quaternionf angle;
+        public Direction.@UnknownNullability Axis axis;
+        public float angle;
         public @UnknownNullability Vec3 offset;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
-        public @Nullable Quaternionf zRot;
+        public float yRadians;
+        public float xRadians;
+        public boolean zRot;
 
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
-            if (angle != null) {
+            if (angle != 0) {
                 matrices.pushPose();
-                matrices.rotateAround(angle, 0.5f, 0.5f, 0.5f);
+                matrices.rotateCentered(axis, Mth.DEG_TO_RAD * angle);
                 shaft.submit(matrices, queue);
                 matrices.popPose();
             } else {
                 shaft.submit(matrices, queue);
             }
-            matrices.translate(offset);
-            if (yRot != null) {
-                matrices.rotateAround(yRot, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+            if (yRadians != 0) {
+                pose.rotateYCentered(yRadians);
             }
-            if (xRot != null) {
-                matrices.rotateAround(xRot, 0.5f, 0.5f, 0.5f);
+            if (xRadians != 0) {
+                pose.rotateXCentered(xRadians);
             }
             hand.submit(matrices, queue);
-            if (zRot != null) {
-                matrices.rotateAround(zRot, 0.5f, 0.5f, 0.5f);
+            if (zRot) {
+                pose.rotateZCentered(Radians.DEG_90);
             }
             pole.submit(matrices, queue);
         }

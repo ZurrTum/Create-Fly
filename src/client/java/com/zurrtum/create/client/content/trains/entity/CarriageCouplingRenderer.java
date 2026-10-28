@@ -1,14 +1,15 @@
 package com.zurrtum.create.client.content.trains.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -69,43 +69,46 @@ public class CarriageCouplingRenderer {
                 double diffX = anchor2.x - anchor.x;
                 double diffY = anchor2.y - anchor.y;
                 double diffZ = anchor2.z - anchor.z;
-                float yRot = AngleHelper.deg(Mth.atan2(diffZ, diffX)) + 90;
-                float xRot = AngleHelper.deg(Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ)));
+                float yRadians = (float) -(Mth.atan2(diffZ, diffX) + Radians.DEG_90);
+                float xRadians = (float) Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ));
                 SuperByteBufferRenderState head = render.createHeadRenderState();
 
                 ms.pushPose();
                 ms.translate(anchor.x - camera.x, anchor.y - camera.y, anchor.z - camera.z);
                 ms.pushPose();
-                ms.mulPose(Axis.YP.rotation(Mth.DEG_TO_RAD * -yRot));
-                ms.mulPose(Axis.XP.rotation(Mth.DEG_TO_RAD * xRot));
+                Pose pose = ms.last();
+                pose.rotate(Axis.YP, yRadians);
+                pose.rotate(Axis.XP, xRadians);
                 head.submit(ms, queue);
                 ms.popPose();
 
                 double couplingDistance = train.carriageSpacing.get(i) - 0.375f - bogey1.type.getConnectorAnchorOffset(
                     bogey1.isUpsideDown()).z - bogey2.type.getConnectorAnchorOffset(bogey2.isUpsideDown()).z;
                 int couplingSegments = (int) Math.round(couplingDistance * 4);
-                Quaternionf yRot2 = Axis.YP.rotation(Mth.DEG_TO_RAD * (-yRot + 180));
-                Quaternionf xRot2 = Axis.XP.rotation(Mth.DEG_TO_RAD * -xRot);
+                float yRadians2 = yRadians + Radians.DEG_180;
+                float xRadians2 = -xRadians;
                 if (couplingSegments > 0) {
                     double stretch = (anchor2.distanceTo(anchor) - 0.375f) * 4 / couplingSegments;
-                    ms.mulPose(yRot2);
-                    ms.mulPose(xRot2);
-                    ms.translate(0, 0, 0.3125f);
-                    ms.scale(1, 1, (float) stretch);
+                    pose = ms.last();
+                    pose.rotate(Axis.YP, yRadians2);
+                    pose.rotate(Axis.XP, xRadians2);
+                    pose.translate(0, 0, 0.3125f);
+                    pose.scale(1, 1, (float) stretch);
                     SuperByteBufferRenderState cable = render.createCableRenderState();
                     cable.submit(ms, queue);
                     for (int j = 1; j < couplingSegments; j++) {
-                        ms.translate(0, 0, 0.25f);
+                        pose.translate(0, 0, 0.25f);
                         cable.submit(ms, queue);
                     }
                 }
                 ms.popPose();
 
                 ms.pushPose();
+                pose = ms.last();
                 Vec3 translation = anchor2.subtract(camera);
-                ms.translate(translation.x, translation.y, translation.z);
-                ms.mulPose(yRot2);
-                ms.mulPose(xRot2);
+                pose.translate((float) translation.x, (float) translation.y, (float) translation.z);
+                pose.rotate(Axis.YP, yRadians2);
+                pose.rotate(Axis.XP, xRadians2);
                 head.submit(ms, queue);
                 ms.popPose();
             }

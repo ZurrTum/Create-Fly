@@ -58,19 +58,22 @@ public class CardboardArmorHandlerClient {
         ms.pushPose();
 
         Vec3 renderOffset = renderer.getRenderOffset(state);
-        ms.translate(0, -renderOffset.y, 0);
+        PoseStack.Pose pose = ms.last();
+        pose.translate(0, (float) -renderOffset.y, 0);
 
         if (renderState.create$isOnGround()) {
-            ms.translate(
-                0, Math.min(
+            pose.translate(
+                0,
+                (float) Math.min(
                     Math.abs(Mth.cos(AnimationTickHolder.getRenderTime() % 256 / 2.0f)) * -renderOffset.y,
                     renderState.create$getMovement() * 5
-                ), 0
+                ),
+                0
             );
         }
 
         float scale = state.scale;
-        ms.scale(scale, scale, scale);
+        pose.scale(scale, scale, scale);
 
         try {
             PartialModel model = AllPartialModels.PACKAGES_TO_HIDE_AS.get(getCurrentBoxIndex(state.id));

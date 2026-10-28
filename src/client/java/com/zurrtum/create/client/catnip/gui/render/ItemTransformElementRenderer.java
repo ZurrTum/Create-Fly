@@ -3,6 +3,7 @@ package com.zurrtum.create.client.catnip.gui.render;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import net.minecraft.client.Minecraft;
@@ -69,19 +70,20 @@ public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemT
             }
             texture.prepare(projection, projectionMatrixBuffer);
             matrices.pushPose();
-            matrices.translate(size / 2, size / 2, 0);
+            Pose pose = matrices.last();
+            pose.translate(size / 2, size / 2, 0);
             if (key.padding != 0) {
                 size -= key.padding * windowScaleFactor;
             }
-            matrices.scale(size, -size, size);
-            if (key.zRot != 0) {
-                matrices.mulPose(Axis.ZP.rotation(key.zRot));
+            pose.scale(size, -size, size);
+            if (key.zRadians != 0) {
+                pose.rotate(Axis.ZP, key.zRadians);
             }
-            if (key.xRot != 0) {
-                matrices.mulPose(Axis.XP.rotation(key.xRot));
+            if (key.xRadians != 0) {
+                pose.rotate(Axis.XP, key.xRadians);
             }
-            if (key.yRot != 0) {
-                matrices.mulPose(Axis.YP.rotation(key.yRot));
+            if (key.yRadians != 0) {
+                pose.rotate(Axis.YP, key.yRadians);
             }
             Lighting lighting = Minecraft.getInstance().gameRenderer.lighting();
             if (key.state.usesBlockLight()) {

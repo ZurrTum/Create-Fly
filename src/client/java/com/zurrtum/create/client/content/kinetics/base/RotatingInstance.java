@@ -3,15 +3,14 @@ package com.zurrtum.create.client.content.kinetics.base;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
-import com.zurrtum.create.client.flywheel.lib.instance.ColoredLitOverlayInstance;
+import com.zurrtum.create.client.flywheel.lib.instance.AbstractRotationInstance;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class RotatingInstance extends ColoredLitOverlayInstance {
+public class RotatingInstance extends AbstractRotationInstance<RotatingInstance> {
     public static final float SPEED_MULTIPLIER = 6;
 
     public byte rotationAxisX;
@@ -28,11 +27,6 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
      * Offset in degrees
      */
     public float rotationOffset;
-
-    /**
-     * Base rotation of the instance, applied before kinetic rotation
-     */
-    public final Quaternionf rotation = new Quaternionf();
 
     public RotatingInstance(InstanceType<? extends RotatingInstance> type, InstanceHandle handle) {
         super(type, handle);
@@ -99,11 +93,6 @@ public class RotatingInstance extends ColoredLitOverlayInstance {
 
     public RotatingInstance rotateToFace(float stepX, float stepY, float stepZ) {
         return rotateTo(0, 1, 0, stepX, stepY, stepZ);
-    }
-
-    public RotatingInstance rotateTo(float fromX, float fromY, float fromZ, float toX, float toY, float toZ) {
-        rotation.rotateTo(fromX, fromY, fromZ, toX, toY, toZ);
-        return this;
     }
 
     public RotatingInstance setRotationAxis(Direction.Axis axis) {

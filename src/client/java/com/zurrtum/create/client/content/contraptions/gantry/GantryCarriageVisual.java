@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.content.contraptions.gantry;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -72,10 +72,9 @@ public class GantryCarriageVisual extends ShaftVisual<GantryCarriageBlockEntity>
     }
 
     private void animateCogs(float cogAngle) {
-        gantryCogs.setIdentityTransform().translate(getVisualPosition()).center()
-            .rotateYDegrees(AngleHelper.horizontalAngle(facing))
-            .rotateXDegrees(facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90)
-            .rotateYDegrees(alongFirst ^ facing.getAxis() == Direction.Axis.X ? 0 : 90).translate(0, -9 / 16.0f, 0)
+        gantryCogs.setIdentityTransform().translate(getVisualPosition()).center().rotateY(Radians.horizontal(facing))
+            .rotateX(facing == Direction.UP ? 0 : facing == Direction.DOWN ? Radians.DEG_180 : Radians.DEG_90)
+            .rotateY(alongFirst ^ facing.getAxis() == Direction.Axis.X ? 0 : Radians.DEG_90).translate(0, -9 / 16.0f, 0)
             .rotateXDegrees(-cogAngle).translate(0, 9 / 16.0f, 0).uncenter().setChanged();
     }
 

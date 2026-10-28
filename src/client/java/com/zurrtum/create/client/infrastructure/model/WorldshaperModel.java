@@ -4,11 +4,13 @@ import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.platform.Lighting.Entry;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import net.minecraft.client.Minecraft;
@@ -39,6 +41,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
@@ -163,7 +166,10 @@ public class WorldshaperModel implements ItemModel {
             submitCustomLayerWithLightTint(state, settings, displayContext, glowLight, TINTS, coreGlow);
         }
         LayerRenderState acceleratorLayer = submitQuads(state, settings, displayContext, accelerator);
-        acceleratorLayer.localTransform.rotateAround(Axis.ZP.rotationDegrees(angle % 360), 0.5f, 0.345f, 0.5f);
+        Matrix4f pose = acceleratorLayer.localTransform;
+        pose.translate(0.5f, 0.345f, 0.5f);
+        pose.rotateZ(Mth.DEG_TO_RAD * (angle % 360));
+        pose.translate(-0.5f, -0.345f, -0.5f);
         if (displayContext == ItemDisplayContext.GUI) {
             BlockState blockState = stack.get(AllDataComponents.SHAPER_BLOCK_USED);
             if (blockState != null) {
@@ -273,10 +279,11 @@ public class WorldshaperModel implements ItemModel {
             boolean hasFoil,
             int outlineColor
         ) {
-            matrices.translate(0.258f, 0.222f, 0.5f);
-            matrices.scale(0.25f, 0.25f, 0.25f);
-            matrices.mulPose(Axis.XP.rotationDegrees(30));
-            matrices.mulPose(Axis.YP.rotationDegrees(45));
+            Pose pose = matrices.last();
+            pose.translate(0.258f, 0.222f, 0.5f);
+            pose.scale(0.25f, 0.25f, 0.25f);
+            pose.rotate(Axis.XP, Radians.DEG_30);
+            pose.rotate(Axis.YP, Radians.DEG_45);
             state.submit(matrices, queue, lightCoords, overlayCoords, outlineColor);
         }
 
@@ -328,10 +335,11 @@ public class WorldshaperModel implements ItemModel {
             boolean hasFoil,
             int outlineColor
         ) {
-            matrices.translate(0.08f, 0.115f, 0.5f);
-            matrices.scale(0.25f, 0.25f, 0.25f);
-            matrices.mulPose(Axis.XP.rotationDegrees(30));
-            matrices.mulPose(Axis.YP.rotationDegrees(45));
+            Pose pose = matrices.last();
+            pose.translate(0.08f, 0.115f, 0.5f);
+            pose.scale(0.25f, 0.25f, 0.25f);
+            pose.rotate(Axis.XP, Radians.DEG_30);
+            pose.rotate(Axis.YP, Radians.DEG_45);
             model.submit(matrices, queue, lightCoords, overlayCoords, outlineColor);
         }
     }

@@ -4,17 +4,18 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
-import org.jspecify.annotations.Nullable;
 
 public class SingleKineticRenderState extends BlockEntityRenderState {
     public @UnknownNullability SuperByteBufferRenderState model;
-    public @Nullable Quaternionf angle;
+    public @UnknownNullability Axis axis;
+    public float angle;
 
     public void submit(PoseStack matrices, SubmitNodeCollector queue) {
-        if (angle != null) {
-            matrices.rotateAround(angle, 0.5f, 0.5f, 0.5f);
+        if (angle != 0) {
+            matrices.rotateCentered(axis, Mth.DEG_TO_RAD * angle);
         }
         model.submit(matrices, queue);
     }

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.logistics.factoryBoard;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
@@ -9,6 +10,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.QuadRenderHelper;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.logistics.factoryBoard.FactoryPanelRenderer.FactoryPanelRenderState;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
@@ -38,8 +40,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -47,11 +47,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zurrtum.create.Create.MOD_ID;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getEastRadiansRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRadiansRotateAngle;
 
 public class FactoryPanelRenderer implements BlockEntityRenderer<FactoryPanelBlockEntity, FactoryPanelRenderState> {
-    public static final Quaternionfc UP_ANGLE = new Quaternionf().setAngleAxis(Mth.PI, 0, 1, 0);
     protected final ItemModelResolver itemModelManager;
     protected final TextureAtlasSprite sprite;
 
@@ -161,8 +158,8 @@ public class FactoryPanelRenderer implements BlockEntityRenderer<FactoryPanelBlo
             }
         }
         if (!panels.isEmpty()) {
-            state.xRot = getEastRadiansRotateAngle(FactoryPanelBlock.getXRot(blockState) + Mth.PI / 2);
-            state.yRot = getUpRadiansRotateAngle(FactoryPanelBlock.getYRot(blockState));
+            state.xRadians = FactoryPanelBlock.getXRot(blockState) + Mth.PI / 2;
+            state.yRadians = FactoryPanelBlock.getYRot(blockState);
             state.panels = panels;
         }
         if (state.filter != null || state.panels != null) {
@@ -184,21 +181,23 @@ public class FactoryPanelRenderer implements BlockEntityRenderer<FactoryPanelBlo
             state.filter.submit(state.blockState, queue, matrices, state.lightCoords);
         }
         if (state.panels != null) {
-            if (state.yRot != null) {
-                matrices.rotateAround(state.yRot, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            if (state.yRadians != 0) {
+                pose.rotateYCentered(state.yRadians);
             }
-            if (state.xRot != null) {
-                matrices.rotateAround(state.xRot, 0.5f, 0.5f, 0.5f);
+            if (state.xRadians != 0) {
+                pose.rotateXCentered(state.xRadians);
             }
-            matrices.rotateAround(UP_ANGLE, 0.5f, 0.5f, 0.5f);
+            pose.rotateYCentered(Radians.DEG_180);
             for (SingleFactoryPanelRenderState panel : state.panels) {
                 matrices.pushPose();
-                matrices.translate(panel.offsetX, 0, panel.offsetY);
+                pose = matrices.last();
+                pose.translate(panel.offsetX, 0, panel.offsetY);
                 if (panel.bulb != null) {
                     panel.bulb.submit(matrices, queue);
                 }
                 if (panel.paths != null) {
-                    matrices.translate(0.25f, 0, 0.25f);
+                    pose.translate(0.25f, 0, 0.25f);
                     for (List<LineRenderData> path : panel.paths) {
                         for (LineRenderData line : path) {
                             matrices.pushPose();
@@ -319,8 +318,8 @@ public class FactoryPanelRenderer implements BlockEntityRenderer<FactoryPanelBlo
 
     public static class FactoryPanelRenderState extends BlockEntityRenderState {
         public @Nullable FilterRenderState filter;
-        public @Nullable Quaternionf xRot;
-        public @Nullable Quaternionf yRot;
+        public float xRadians;
+        public float yRadians;
         public @Nullable List<SingleFactoryPanelRenderState> panels;
     }
 

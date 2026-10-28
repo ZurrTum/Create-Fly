@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.catnip.outliner.ChasingAABBOutline;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform.Sided;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
@@ -92,8 +93,9 @@ public class ValueBox extends ChasingAABBOutline {
         }
         if (!isPassive) {
             ms.pushPose();
-            ms.scale(-2.01f, -2.01f, 2.01f);
-            ms.translate(-8 / 16.0, -8 / 16.0, -0.5 / 16.0);
+            Pose pose = ms.last();
+            pose.scale(-2.01f, -2.01f, 2.01f);
+            pose.translate(-0.5f, -0.5f, -0.03125f);
             getOutline().submit(ms, queue, 0xffffffff);
             ms.popPose();
         }
@@ -134,32 +136,33 @@ public class ValueBox extends ChasingAABBOutline {
             }
 
             Font font = mc.font;
-            ms.translate(17.5, -5, 7);
+            Pose pose = ms.last();
+            pose.translate(17.5f, -5, 7);
 
             ItemModelResolver itemModelManager = mc.getItemModelResolver();
             itemModelManager.updateForTopItem(state, stack, ItemDisplayContext.GUI, mc.level, mc.player, 0);
             boolean blockItem = state.usesBlockLight();
 
             float scale = 1.5f;
-            ms.translate(-font.width(count), 0, 0);
+            pose.translate(-font.width(count), 0, 0);
 
             if (stack.getItem() instanceof FilterItem) {
-                ms.translate(-5, 8, 0);
+                pose.translate(-5, 8, 0);
                 color = 0xFFFFFFFF;
             } else if (stack.isEmpty()) {
-                ms.translate(-15, -1, -2.75);
+                pose.translate(-15, -1, -2.75f);
                 scale = 1.65f;
                 color = 0xFFEDEDED;
             } else {
-                ms.translate(-7, 10, blockItem ? 10 + 1 / 4.0f : 0);
+                pose.translate(-7, 10, blockItem ? 10 + 1 / 4.0f : 0);
                 color = 0xFFEDEDED;
             }
 
             if (count.getString().equals("*")) {
-                ms.translate(-1, 3, 0);
+                pose.translate(-1, 3, 0);
             }
 
-            ms.scale(scale, scale, scale);
+            pose.scale(scale, scale, scale);
             submitText(ms, queue, count, color, 0xff333333);
         }
 
@@ -180,10 +183,11 @@ public class ValueBox extends ChasingAABBOutline {
 
         @Override
         public void submitContents(Minecraft mc, PoseStack ms, SubmitNodeCollector queue, int color) {
+            Pose pose = ms.last();
             Font font = mc.font;
             float scale = 3;
-            ms.scale(scale, scale, 1);
-            ms.translate(-4, -3.75, 5);
+            pose.scale(scale, scale, 1);
+            pose.translate(-4, -3.75f, 5);
 
             int stringWidth = font.width(text);
             float numberScale = (float) font.lineHeight / stringWidth;
@@ -193,8 +197,8 @@ public class ValueBox extends ChasingAABBOutline {
             }
             float verticalMargin = (stringWidth - font.lineHeight) / 2.0f;
 
-            ms.scale(numberScale, numberScale, numberScale);
-            ms.translate(singleDigit ? stringWidth / 2 : 0, singleDigit ? -verticalMargin : verticalMargin, 0);
+            pose.scale(numberScale, numberScale, numberScale);
+            pose.translate(singleDigit ? stringWidth / 2 : 0, singleDigit ? -verticalMargin : verticalMargin, 0);
 
             if (color == -1) {
                 submitText(ms, queue, text, 0xFFEDEDED, 0xff333333);
@@ -215,9 +219,10 @@ public class ValueBox extends ChasingAABBOutline {
 
         @Override
         public void submitContents(Minecraft mc, PoseStack ms, SubmitNodeCollector queue, int color) {
+            Pose pose = ms.last();
             float scale = 2 * 16;
-            ms.scale(scale, scale, scale);
-            ms.translate(-0.5f, -0.5f, 5 / 32.0f);
+            pose.scale(scale, scale, scale);
+            pose.translate(-0.5f, -0.5f, 5 / 32.0f);
             icon.submit(ms, queue, color);
         }
 

@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.decoration.placard;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.content.decoration.placard.PlacardRenderer.PlacardRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.decoration.placard.PlacardBlock;
 import com.zurrtum.create.content.decoration.placard.PlacardBlockEntity;
@@ -16,17 +18,12 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRadiansRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getUpRotateAngle;
 
 public class PlacardRenderer implements BlockEntityRenderer<PlacardBlockEntity, PlacardRenderState> {
     protected final ItemModelResolver itemModelManager;
@@ -61,12 +58,12 @@ public class PlacardRenderer implements BlockEntityRenderer<PlacardBlockEntity, 
         boolean isCeiling = face == AttachFace.CEILING;
         Direction facing = state.blockState.getValue(PlacardBlock.FACING);
         if (isCeiling) {
-            state.upAngle = getUpRadiansRotateAngle(Mth.PI + AngleHelper.rad(180 + AngleHelper.horizontalAngle(facing)));
-            state.eastAngle = new Quaternionf().setAngleAxis(-Mth.HALF_PI, 1, 0, 0);
+            state.yRadians = Radians.horizontal(facing);
+            state.xRadians = Radians.DEG_270;
         } else {
-            state.upAngle = getUpRotateAngle(180 + AngleHelper.horizontalAngle(facing));
+            state.yRadians = Radians.horizontalPlus180(facing);
             if (face == AttachFace.FLOOR) {
-                state.eastAngle = new Quaternionf().setAngleAxis(Mth.HALF_PI, 1, 0, 0);
+                state.xRadians = Radians.DEG_90;
             }
         }
         state.scale = item.usesBlockLight() ? 0.5f : 0.375f;
@@ -79,23 +76,24 @@ public class PlacardRenderer implements BlockEntityRenderer<PlacardBlockEntity, 
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        matrices.translate(0.5f, 0.5f, 0.5f);
-        if (state.upAngle != null) {
-            matrices.mulPose(state.upAngle);
+        Pose pose = matrices.last();
+        pose.translate(0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            pose.rotate(Axis.YP, state.yRadians);
         }
-        if (state.eastAngle != null) {
-            matrices.mulPose(state.eastAngle);
+        if (state.xRadians != 0) {
+            pose.rotate(Axis.XP, state.xRadians);
         }
-        matrices.translate(0, 0, 0.28125f);
+        pose.translate(0, 0, 0.28125f);
         float scale = state.scale;
-        matrices.scale(scale, scale, scale);
+        pose.scale(scale, scale, scale);
         state.item.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
     }
 
     public static class PlacardRenderState extends BlockEntityRenderState {
         public @UnknownNullability ItemStackRenderState item;
-        public @Nullable Quaternionf upAngle;
-        public @Nullable Quaternionf eastAngle;
+        public float yRadians;
+        public float xRadians;
         public float scale;
     }
 }

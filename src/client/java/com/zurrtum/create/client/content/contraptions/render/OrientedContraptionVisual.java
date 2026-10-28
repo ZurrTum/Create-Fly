@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.content.contraptions.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
 import net.minecraft.util.Mth;
@@ -24,7 +26,8 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
         float angleYaw = entity.getViewYRot(partialTicks);
         float anglePitch = entity.getViewXRot(partialTicks);
 
-        matrixStack.translate(-0.5f, 0, -0.5f);
+        Pose pose = matrixStack.last();
+        pose.translate(-0.5f, 0, -0.5f);
 
         Entity ridingEntity = entity.getVehicle();
         if (ridingEntity instanceof AbstractMinecart cart) {
@@ -37,8 +40,12 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
             }
         }
 
-        TransformStack.of(matrixStack).nudge(entity.getId()).center().rotateYDegrees(angleYaw)
-            .rotateZDegrees(anglePitch).rotateYDegrees(angleInitialYaw).uncenter();
+        SuperByteBuffer.nudge(pose, entity.getId());
+        pose.translate(0.5f, 0.5f, 0.5f);
+        pose.rotate(Axis.YP, Mth.DEG_TO_RAD * angleYaw);
+        pose.rotate(Axis.ZP, Mth.DEG_TO_RAD * anglePitch);
+        pose.rotate(Axis.YP, Mth.DEG_TO_RAD * angleInitialYaw);
+        pose.translate(-0.5f, -0.5f, -0.5f);
     }
 
     // Minecarts do not always render at their exact location, so the contraption

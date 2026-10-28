@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.logistics.depot;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
@@ -15,8 +16,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
-import org.jspecify.annotations.Nullable;
 
 public class EjectorItemEntityRenderer extends ItemEntityRenderer {
     public EjectorItemEntityRenderer(Context context) {
@@ -52,10 +51,10 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
             state.isPackage = PackageItem.isPackage(entity.getItem());
             float time = entity.progress + f;
             if (state.isPackage) {
-                state.rotateY = Axis.YP.rotation(Mth.DEG_TO_RAD * time * 20);
+                state.rotateY = time * 20;
             } else {
-                state.rotateY = Axis.YP.rotation(entity.data.rotateY);
-                state.rotateX = Axis.XP.rotation(Mth.DEG_TO_RAD * time * 40);
+                state.rotateY = entity.data.rotateY;
+                state.rotateX = time * 40;
             }
             state.location = entity.getLaunchedItemLocation(time).subtract(entity.position());
         }
@@ -82,26 +81,28 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
             RenderState state = (RenderState) itemEntityRenderState;
             AABB box = state.item.getModelBoundingBox();
             matrixStack.pushPose();
+            Pose pose = matrixStack.last();
             float f = -((float) box.minY) + 0.0625F;
-            matrixStack.translate(0, state.bobOffset + f, -0.0625f);
+            pose.translate(0, state.bobOffset + f, -0.0625f);
             if (!state.alive) {
-                matrixStack.translate(state.location);
-                matrixStack.translate(0, 0.25f, 0);
+                Vec3 location = state.location;
+                pose.translate((float) location.x, (float) location.y, (float) location.z);
+                pose.translate(0, 0.25f, 0);
                 if (state.isPackage) {
-                    matrixStack.translate(0, 0.25f, 0);
-                    matrixStack.scale(3.0f, 3.0f, 3.0f);
+                    pose.translate(0, 0.25f, 0);
+                    pose.scale(3.0f, 3.0f, 3.0f);
                 }
-                if (state.rotateY != null) {
-                    matrixStack.mulPose(state.rotateY);
+                if (state.rotateY != 0) {
+                    pose.rotate(Axis.YP, Mth.DEG_TO_RAD * state.rotateY);
                 }
-                if (state.rotateX != null) {
-                    matrixStack.mulPose(state.rotateX);
+                if (state.rotateX != 0) {
+                    pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.rotateX);
                 }
-                matrixStack.translate(0, -0.25f, 0);
+                pose.translate(0, -0.25f, 0);
             } else if (state.ageInTicks > 0) {
                 float g = Mth.sin(state.ageInTicks) * 0.1F + 0.1F;
-                matrixStack.translate(0, g, 0);
-                matrixStack.mulPose(Axis.YP.rotation(state.ageInTicks / 2.0F));
+                pose.translate(0, g, 0);
+                pose.rotate(Axis.YP, state.ageInTicks / 2.0F);
             }
             submitMultipleFromCount(matrixStack, queue, state.lightCoords, state, random, box);
             matrixStack.popPose();
@@ -120,8 +121,8 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
 
     public static class RenderState extends ItemEntityRenderState {
         public boolean alive;
-        public @Nullable Quaternionf rotateY;
-        public @Nullable Quaternionf rotateX;
+        public float rotateY;
+        public float rotateX;
         public @UnknownNullability Vec3 location;
         public boolean isPackage;
     }

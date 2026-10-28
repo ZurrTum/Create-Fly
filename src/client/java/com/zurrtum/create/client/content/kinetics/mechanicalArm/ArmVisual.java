@@ -2,10 +2,13 @@ package com.zurrtum.create.client.content.kinetics.mechanicalArm;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.SingleAxisRotatingVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -15,13 +18,13 @@ import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlock;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity.Phase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -82,12 +85,12 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         models = Lists.newArrayList(base, lowerBody, upperBody, claw, clawGrip1, clawGrip2);
         ceiling = blockState.getValue(ArmBlock.CEILING);
 
-        var msr = TransformStack.of(poseStack);
-        msr.translate(getVisualPosition());
-        msr.center();
+        Pose pose = poseStack.last();
+        BlockPos position = getVisualPosition();
+        pose.translate(position.getX() + 0.5f, position.getY() + 0.5f, position.getZ() + 0.5f);
 
         if (ceiling) {
-            msr.rotateXDegrees(180);
+            pose.rotate(Axis.XP, Radians.DEG_180);
         }
 
         animate(partialTick);
@@ -150,28 +153,25 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
 
     private void updateAngles(float baseAngle, float lowerArmAngle, float upperArmAngle, float headAngle, int color) {
         poseStack.pushPose();
+        Pose pose = poseStack.last();
 
-        var msr = TransformStack.of(poseStack);
+        transformBase(pose, baseAngle);
+        base.setTransform(pose).setChanged();
 
-        transformBase(msr, baseAngle);
-        base.setTransform(poseStack).setChanged();
+        transformLowerArm(pose, lowerArmAngle);
+        lowerBody.setTransform(pose).colorRgb(color).setChanged();
 
-        transformLowerArm(msr, lowerArmAngle);
-        lowerBody.setTransform(poseStack).colorRgb(color).setChanged();
+        transformUpperArm(pose, upperArmAngle);
+        upperBody.setTransform(pose).colorRgb(color).setChanged();
 
-        transformUpperArm(msr, upperArmAngle);
-        upperBody.setTransform(poseStack).colorRgb(color).setChanged();
-
-        transformHead(msr, headAngle);
-
-        if (ceiling && blockEntity.goggles) {
-            msr.rotateZDegrees(180);
-        }
-
-        claw.setTransform(poseStack).setChanged();
+        transformHead(pose, headAngle);
 
         if (ceiling && blockEntity.goggles) {
-            msr.rotateZDegrees(180);
+            pose.rotate(Axis.ZP, Radians.DEG_180);
+            claw.setTransform(pose).setChanged();
+            pose.rotate(Axis.ZP, Radians.DEG_180);
+        } else {
+            claw.setTransform(pose).setChanged();
         }
 
         ItemStack item = blockEntity.heldItem;
@@ -188,9 +188,9 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
 
         for (int index : Iterate.zeroAndOne) {
             poseStack.pushPose();
-            int flip = index * 2 - 1;
-            transformClawHalf(msr, hasItem, isBlockItem, flip);
-            clawGrips.get(index).setTransform(poseStack).setChanged();
+            pose = poseStack.last();
+            transformClawHalf(pose, hasItem, isBlockItem, index * 2 - 1);
+            clawGrips.get(index).setTransform(pose).setChanged();
             poseStack.popPose();
         }
 
@@ -226,27 +226,29 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         models.forEach(consumer);
     }
 
-    public static void transformClawHalf(TransformStack<?> msr, boolean hasItem, boolean isBlockItem, int flip) {
-        msr.translate(0, -flip * (hasItem ? isBlockItem ? 3 / 16.0f : 5 / 64.0f : 1 / 16.0f), -6 / 16.0d);
+    public static void transformClawHalf(Pose pose, boolean hasItem, boolean isBlockItem, int flip) {
+        pose.translate(0, -flip * (hasItem ? isBlockItem ? 0.1875f : 0.078125f : 0.0625f), -0.375f);
     }
 
-    public static void transformHead(TransformStack<?> msr, float headAngle) {
-        msr.translate(0, 0, -15 / 16.0d);
-        msr.rotateXDegrees(headAngle - 45.0f);
+    public static void transformHead(Pose pose, float headAngle) {
+        pose.translate(0, 0, -0.9375f);
+        pose.rotate(Axis.XP, Mth.DEG_TO_RAD * (headAngle - 45));
     }
 
-    public static void transformUpperArm(TransformStack<?> msr, float upperArmAngle) {
-        msr.translate(0, 0, -14 / 16.0d);
-        msr.rotateXDegrees(upperArmAngle - 90);
+    public static void transformUpperArm(Pose pose, float upperArmAngle) {
+        pose.translate(0, 0, -0.875f);
+        pose.rotate(Axis.XP, Mth.DEG_TO_RAD * (upperArmAngle - 90));
     }
 
-    public static void transformLowerArm(TransformStack<?> msr, float lowerArmAngle) {
-        msr.translate(0, 2 / 16.0d, 0);
-        msr.rotateXDegrees(lowerArmAngle + 135);
+    public static void transformLowerArm(Pose pose, float lowerArmAngle) {
+        pose.translate(0, 0.125f, 0);
+        pose.rotate(Axis.XP, Mth.DEG_TO_RAD * (lowerArmAngle + 135));
     }
 
-    public static void transformBase(TransformStack<?> msr, float baseAngle) {
-        msr.translate(0, 4 / 16.0d, 0);
-        msr.rotateYDegrees(baseAngle);
+    public static void transformBase(Pose pose, float baseAngle) {
+        pose.translate(0, 0.25f, 0);
+        if (baseAngle != 0) {
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * baseAngle);
+        }
     }
 }

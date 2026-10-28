@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.minecart;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -11,8 +12,7 @@ import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.KineticDebugger;
-import com.zurrtum.create.client.flywheel.lib.transform.PoseTransformStack;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.contraptions.minecart.CouplingHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
 import net.minecraft.client.Minecraft;
@@ -81,8 +81,8 @@ public class CouplingRenderer {
         Vec3 firstEndpoint = transforms.getFirst().apply(zero);
         Vec3 secondEndpoint = transforms.getSecond().apply(zero);
         Vec3 endPointDiff = secondEndpoint.subtract(firstEndpoint);
-        double connectorYaw = -Math.atan2(endPointDiff.z, endPointDiff.x) * 180.0D / Math.PI;
-        double connectorPitch = Math.atan2(endPointDiff.y, endPointDiff.multiply(1, 0, 1).length()) * 180 / Math.PI;
+        double connectorYaw = -Math.atan2(endPointDiff.z, endPointDiff.x);
+        double connectorPitch = Math.atan2(endPointDiff.y, endPointDiff.multiply(1, 0, 1).length());
 
         carts.forEachWithContext((cart, isFirst) -> {
             CartEndpoint cartTransform = transforms.get(isFirst);
@@ -90,7 +90,7 @@ public class CouplingRenderer {
             ms.pushPose();
             cartTransform.apply(ms, camera);
             attachment.light(lightValues.get(isFirst)).submit(ms, queue);
-            ms.mulPose(Axis.YP.rotation((float) (Mth.DEG_TO_RAD * (connectorYaw - cartTransform.yaw))));
+            ms.rotate(Axis.YP, (float) (connectorYaw - Mth.DEG_TO_RAD * cartTransform.yaw));
             ring.light(lightValues.get(isFirst)).submit(ms, queue);
             ms.popPose();
         });
@@ -101,10 +101,12 @@ public class CouplingRenderer {
         int meanSkyLight = ((l1 >> 20 & 0xf) + (l2 >> 20 & 0xf)) / 2;
 
         ms.pushPose();
-        ms.translate(firstEndpoint.subtract(camera));
-        ms.mulPose(Axis.YP.rotation((float) (Mth.DEG_TO_RAD * connectorYaw)));
-        ms.mulPose(Axis.ZP.rotation((float) (Mth.DEG_TO_RAD * connectorPitch)));
-        ms.scale((float) endPointDiff.length(), 1, 1);
+        Pose pose = ms.last();
+        Vec3 offset = firstEndpoint.subtract(camera);
+        pose.translate((float) offset.x, (float) offset.y, (float) offset.z);
+        pose.rotate(Axis.YP, (float) connectorYaw);
+        pose.rotate(Axis.ZP, (float) connectorPitch);
+        pose.scale((float) endPointDiff.length(), 1, 1);
 
         connector.light(meanSkyLight << 20 | meanBlockLight << 4).submit(ms, queue);
         ms.popPose();
@@ -250,14 +252,23 @@ public class CouplingRenderer {
         }
 
         public void apply(PoseStack ms, Vec3 camera) {
-            PoseTransformStack msr = TransformStack.of(ms);
-            msr.translate(camera.scale(-1).add(x, y, z));
+            Pose pose = ms.last();
+            Vec3 position = camera.scale(-1).add(x, y, z);
+            pose.translate((float) position.x, (float) position.y, (float) position.z);
             if (old) {
-                msr.translateY(0.375F + 2 / 16.0f).rotateYDegrees(yaw).rotateZDegrees(pitch);
+                pose.translate(0, 0.5f, 0);
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * yaw);
+                pose.rotate(Axis.ZP, Mth.DEG_TO_RAD * pitch);
             } else {
-                msr.rotateYDegrees(yaw).rotateZDegrees(pitch).translateY(0.375F + 2 / 16.0f);
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * yaw);
+                pose.rotate(Axis.ZP, Mth.DEG_TO_RAD * pitch);
+                pose.translate(0, 0.5f, 0);
             }
-            msr.rotateXDegrees(roll).translate(offset, 0, 0).rotateYDegrees(flip ? 180 : 0);
+            pose.rotate(Axis.XP, Mth.DEG_TO_RAD * roll);
+            pose.translate(offset, 0, 0);
+            if (flip) {
+                pose.rotate(Axis.YP, Radians.DEG_180);
+            }
         }
 
     }

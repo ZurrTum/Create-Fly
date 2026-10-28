@@ -1,30 +1,34 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class PressBasinRenderer extends GuiBlockRenderer<PressBasinRenderState> {
     @Override
     protected void renderToTexture(PressBasinRenderState state, PoseStack matrices, SubmitNodeCollector queue) {
-        matrices.scale(1, 1, -1);
-        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
-        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
-        matrices.translate(-0.5f, -1.8f, -0.5f);
-        matrices.scale(1, -1, 1);
+        Pose pose = matrices.last();
+        pose.scale(1, 1, -1);
+        pose.rotate(Axis.XP, Radians.DEG_344P5);
+        pose.rotate(Axis.YP, Radians.DEG_22P5);
+        pose.translate(-0.5f, -1.8f, -0.5f);
+        pose.scale(1, -1, 1);
 
         float time = AnimationTickHolder.getRenderTime();
         CachedBuffers.block(AllBlocks.MECHANICAL_PRESS.defaultBlockState()).submit(matrices, queue);
 
         matrices.pushPose();
-        matrices.rotateAround(Axis.ZP.rotationDegrees(getShaftAngle(time)), 0.5f, 0.5f, 0.5f);
+        matrices.rotateZCentered(Mth.DEG_TO_RAD * getShaftAngle(time));
         CachedBuffers.block(AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Z))
             .submit(matrices, queue);
         matrices.popPose();

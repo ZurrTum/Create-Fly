@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.chassis;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -74,8 +74,8 @@ public class StickerVisual extends AbstractBlockEntityVisual<StickerBlockEntity>
 
     private void animateHead(float offset) {
         head.setIdentityTransform().translate(getVisualPosition()).nudge(blockEntity.hashCode()).center()
-            .rotateYDegrees(AngleHelper.horizontalAngle(facing)).rotateXDegrees(AngleHelper.verticalAngle(facing) + 90)
-            .uncenter().translate(0, offset * offset * 4 / 16.0f, 0).setChanged();
+            .rotateY(Radians.horizontal(facing)).rotateX(Radians.verticalPlus90(facing)).uncenter()
+            .translate(0, offset * offset * 4 / 16.0f, 0).setChanged();
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.ModularGuiLine;
@@ -675,7 +676,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         matrixStack.popMatrix();
 
         if (xOffset + 16 > cardWidth - 26) {
-            matrixStack.rotate(Mth.DEG_TO_RAD * -90);
+            matrixStack.rotate(Radians.DEG_270);
             graphics.fillGradient(-cardHeight + 2, 18, -2 - cardHeader, 28, 0x44000000, 0x00000000);
             graphics.fillGradient(
                 -cardHeight + 2,

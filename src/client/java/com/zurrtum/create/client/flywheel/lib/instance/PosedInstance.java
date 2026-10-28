@@ -1,9 +1,12 @@
 package com.zurrtum.create.client.flywheel.lib.instance;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.transform.Transform;
+import com.zurrtum.create.infrastructure.pose.AxisHolder;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import org.joml.*;
 
@@ -66,6 +69,150 @@ public class PosedInstance extends ColoredLitOverlayInstance implements Transfor
         float invZ = 1.0f / z;
         float f = Mth.fastInvCubeRoot(Math.abs(invX * invY * invZ));
         normal.scale(f * invX, f * invY, f * invZ);
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateCentered(float radians, float axisX, float axisY, float axisZ) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            pose.rotate(radians, axisX, axisY, axisZ);
+            normal.rotate(radians, axisX, axisY, axisZ);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateCentered(float radians, Axis axis) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            axis.rotate(pose, radians);
+            axis.rotate(normal, radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateCentered(float radians, Direction.Axis directionAxis) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            Axis axis = ((AxisHolder) (Object) directionAxis).create$getMathAxis();
+            axis.rotate(pose, radians);
+            axis.rotate(normal, radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateCentered(float radians, Direction direction) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            Axis axis = ((AxisHolder) (Object) direction).create$getMathAxis();
+            axis.rotate(pose, radians);
+            axis.rotate(normal, radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateXCentered(float radians) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            pose.rotateX(radians);
+            normal.rotateX(radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateYCentered(float radians) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            pose.rotateY(radians);
+            normal.rotateY(radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateZCentered(float radians) {
+        if (radians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            pose.rotateZ(radians);
+            normal.rotateZ(radians);
+            pose.translate(-0.5f, -0.5f, -0.5f);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotate(float radians, float axisX, float axisY, float axisZ) {
+        if (radians != 0) {
+            pose.rotate(radians, axisX, axisY, axisZ);
+            normal.rotate(radians, axisX, axisY, axisZ);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotate(float radians, Axis axis) {
+        if (radians != 0) {
+            axis.rotate(pose, radians);
+            axis.rotate(normal, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotate(float radians, Direction direction) {
+        if (radians != 0) {
+            Axis axis = ((AxisHolder) (Object) direction).create$getMathAxis();
+            axis.rotate(pose, radians);
+            axis.rotate(normal, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotate(float radians, Direction.Axis directionAxis) {
+        if (radians != 0) {
+            Axis axis = ((AxisHolder) (Object) directionAxis).create$getMathAxis();
+            axis.rotate(pose, radians);
+            axis.rotate(normal, radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateX(float radians) {
+        if (radians != 0) {
+            pose.rotateX(radians);
+            normal.rotateX(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateY(float radians) {
+        if (radians != 0) {
+            pose.rotateY(radians);
+            normal.rotateY(radians);
+        }
+        return this;
+    }
+
+    @Override
+    public PosedInstance rotateZ(float radians) {
+        if (radians != 0) {
+            pose.rotateZ(radians);
+            normal.rotateZ(radians);
+        }
         return this;
     }
 

@@ -1,12 +1,13 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -38,9 +39,10 @@ public abstract class ValueBoxTransform {
         if (position == null) {
             return;
         }
-        ms.translate(position.x, position.y, position.z);
+        Pose pose = ms.last();
+        pose.translate((float) position.x, (float) position.y, (float) position.z);
         rotate(state, ms);
-        ms.scale(scale, scale, scale);
+        pose.scale(scale, scale, scale);
     }
 
     public boolean shouldRender(BlockState state) {
@@ -59,7 +61,7 @@ public abstract class ValueBoxTransform {
         if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
             yRot = AngleHelper.horizontalAngle(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
         }
-        return VecHelper.rotateCentered(vec, yRot, Axis.Y);
+        return VecHelper.rotateCentered(vec, yRot, Direction.Axis.Y);
     }
 
     public float getScale() {
@@ -108,8 +110,8 @@ public abstract class ValueBoxTransform {
         @Override
         public Vec3 getLocalOffset(BlockState state) {
             Vec3 location = getSouthLocation();
-            location = VecHelper.rotateCentered(location, AngleHelper.horizontalAngle(getSide()), Axis.Y);
-            location = VecHelper.rotateCentered(location, AngleHelper.verticalAngle(getSide()), Axis.X);
+            location = VecHelper.rotateCentered(location, AngleHelper.horizontalAngle(getSide()), Direction.Axis.Y);
+            location = VecHelper.rotateCentered(location, AngleHelper.verticalAngle(getSide()), Direction.Axis.X);
             return location;
         }
 
@@ -117,9 +119,17 @@ public abstract class ValueBoxTransform {
 
         @Override
         public void rotate(BlockState state, PoseStack ms) {
-            float yRot = AngleHelper.horizontalAngle(getSide()) + 180;
-            float xRot = getSide() == Direction.UP ? 90 : getSide() == Direction.DOWN ? 270 : 0;
-            TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(xRot);
+            Direction side = getSide();
+            float yRadians = Radians.horizontalPlus180(side);
+            Pose pose = ms.last();
+            if (yRadians != 0) {
+                pose.rotate(Axis.YP, yRadians);
+            }
+            if (side == Direction.UP) {
+                pose.rotate(Axis.XP, Radians.DEG_90);
+            } else if (side == Direction.DOWN) {
+                pose.rotate(Axis.XP, Radians.DEG_270);
+            }
         }
 
         @Override

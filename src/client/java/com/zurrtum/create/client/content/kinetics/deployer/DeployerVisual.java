@@ -1,8 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.deployer;
 
-import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
@@ -19,7 +18,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
-import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
 
@@ -29,9 +27,6 @@ import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.F
 public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements SimpleDynamicVisual, SimpleTickableVisual {
 
     final Direction facing;
-    final float yRot;
-    final float xRot;
-    final float zRot;
 
     protected final OrientedInstance pole;
 
@@ -45,12 +40,6 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
 
         facing = blockState.getValue(FACING);
 
-        boolean rotatePole = blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
-
-        yRot = AngleHelper.horizontalAngle(facing);
-        xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
-        zRot = rotatePole ? 90 : 0;
-
         pole = instancerProvider().instancer(
             InstanceTypes.ORIENTED,
             Models.chunkPartial(AllPartialModels.DEPLOYER_POLE)
@@ -60,8 +49,20 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
 
         hand = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.chunkPartial(currentHand)).createInstance();
 
+        hand.rotationY(Radians.horizontal(facing));
+        if (facing == Direction.UP) {
+            hand.rotateX(Radians.DEG_270);
+        } else if (facing == Direction.DOWN) {
+            hand.rotateX(Radians.DEG_90);
+        }
+        hand.setChanged();
+        pole.rotation(hand);
+        if (blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z) {
+            pole.rotateZ(Radians.DEG_90);
+        }
+        pole.setChanged();
+
         progress = getProgress(partialTick);
-        updateRotation(pole, hand, yRot, xRot, zRot);
         updatePosition();
     }
 
@@ -140,18 +141,6 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
 
         pole.position(x, y, z).setChanged();
         hand.position(x, y, z).setChanged();
-    }
-
-    static void updateRotation(OrientedInstance pole, OrientedInstance hand, float yRot, float xRot, float zRot) {
-
-        Quaternionf q = Axis.YP.rotationDegrees(yRot);
-        q.mul(Axis.XP.rotationDegrees(xRot));
-
-        hand.rotation(q).setChanged();
-
-        q.mul(Axis.ZP.rotationDegrees(zRot));
-
-        pole.rotation(q).setChanged();
     }
 
     @Override

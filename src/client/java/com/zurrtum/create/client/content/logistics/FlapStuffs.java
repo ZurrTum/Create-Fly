@@ -1,9 +1,10 @@
 package com.zurrtum.create.client.content.logistics;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.model.Model;
@@ -17,13 +18,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
-import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
 
 public class FlapStuffs {
     public static final int FLAP_COUNT = 4;
@@ -39,13 +35,12 @@ public class FlapStuffs {
         float flapness,
         float zOffset
     ) {
-        float horizontalAngle = AngleHelper.horizontalAngle(funnelFacing.getOpposite());
-        @Nullable Quaternionf[] angles = new Quaternionf[FLAP_COUNT];
+        float yRadians = Radians.horizontal(funnelFacing.getOpposite());
+        float[] angles = new float[FLAP_COUNT];
         for (int segment = 0; segment < FLAP_COUNT; segment++) {
-            float angle = flapAngle(flapness, segment);
-            angles[segment] = getXRotateAngle(angle);
+            angles[segment] = flapAngle(flapness, segment);
         }
-        return new FlapsRenderState(flapBuffer, pivot, zOffset, getYRotateAngle(horizontalAngle), angles);
+        return new FlapsRenderState(flapBuffer, pivot, zOffset, yRadians, angles);
     }
 
     public static float flapAngle(float flapness, int segment) {
@@ -59,10 +54,10 @@ public class FlapStuffs {
     }
 
     public static Matrix4f commonTransform(BlockPos visualPosition, Direction side, float baseZOffset) {
-        float horizontalAngle = AngleHelper.horizontalAngle(side.getOpposite());
+        float yRadians = Radians.horizontal(side.getOpposite());
 
         return new Matrix4f().translate(visualPosition.getX(), visualPosition.getY(), visualPosition.getZ())
-            .translate(Translate.CENTER, Translate.CENTER, Translate.CENTER).rotateY(Mth.DEG_TO_RAD * horizontalAngle)
+            .translate(Translate.CENTER, Translate.CENTER, Translate.CENTER).rotateY(yRadians)
             .translate(-Translate.CENTER, -Translate.CENTER, -Translate.CENTER).translate(X_OFFSET, 0, baseZOffset);
     }
 
@@ -109,25 +104,29 @@ public class FlapStuffs {
         }
     }
 
-    public record FlapsRenderState(SuperByteBufferRenderState model, Vec3 pivot, float zOffset,
-                                   @Nullable Quaternionf horizontalAngle, @Nullable Quaternionf[] angles) {
+    public record FlapsRenderState(SuperByteBufferRenderState model, Vec3 pivot, float zOffset, float yRadians,
+                                   float[] angles) {
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            if (horizontalAngle != null) {
-                matrices.rotateAround(horizontalAngle, 0.5f, 0.5f, 0.5f);
+            Pose pose = matrices.last();
+            if (yRadians != 0) {
+                pose.rotateYCentered(yRadians);
             }
-            matrices.translate(X_OFFSET, 0, zOffset);
+            pose.translate(X_OFFSET, 0, zOffset);
+            float x = (float) pivot.x;
+            float y = (float) pivot.y;
+            float z = (float) pivot.z;
             for (int segment = 0; segment < FLAP_COUNT; segment++) {
-                Quaternionf angle = angles[segment];
-                if (angle != null) {
+                float angle = angles[segment];
+                if (angle != 0) {
                     matrices.pushPose();
-                    matrices.rotateAround(angle, (float) pivot.x, (float) pivot.y, (float) pivot.z);
+                    matrices.rotateXAround(Mth.DEG_TO_RAD * angle, x, y, z);
                     model.submit(matrices, queue);
                     matrices.popPose();
                 } else {
                     model.submit(matrices, queue);
                 }
-                matrices.translate(SEGMENT_STEP, 0, 0);
+                pose.translate(SEGMENT_STEP, 0, 0);
             }
             matrices.popPose();
         }

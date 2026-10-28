@@ -1,15 +1,16 @@
 package com.zurrtum.create.client.content.logistics.depot;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.logistics.depot.EjectorBlock;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -28,7 +29,7 @@ public class EjectorSlot extends ValueBoxTransform.Sided {
         return new Vec3(0.5, 10.5 / 16.0f, 0.5).add(VecHelper.rotate(
             VecHelper.voxelSpace(0, 0, -5),
             angle(state),
-            Axis.Y
+            Direction.Axis.Y
         ));
     }
 
@@ -38,7 +39,14 @@ public class EjectorSlot extends ValueBoxTransform.Sided {
             super.rotate(state, ms);
             return;
         }
-        TransformStack.of(ms).rotateYDegrees(angle(state)).rotateXDegrees(90);
+        Pose pose = ms.last();
+        if (state.is(AllBlocks.WEIGHTED_EJECTOR)) {
+            float yRadians = Radians.horizontal(state.getValue(EjectorBlock.HORIZONTAL_FACING));
+            if (yRadians != 0) {
+                pose.rotate(Axis.YP, yRadians);
+            }
+        }
+        pose.rotate(Axis.XP, Radians.DEG_90);
     }
 
     protected float angle(BlockState state) {

@@ -2,6 +2,7 @@ package com.zurrtum.create.client.infrastructure.particle;
 
 import com.mojang.math.Axis;
 import com.zurrtum.create.client.content.equipment.bell.SoulPulseEffect;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.SpriteSet;
@@ -45,6 +46,6 @@ public class SoulBaseParticle extends CustomRotationParticle {
 
     @Override
     public Quaternionf getCustomRotation(Camera camera, float partialTicks) {
-        return Axis.XP.rotationDegrees(-90);
+        return Axis.XP.rotation(Radians.DEG_270);
     }
 }

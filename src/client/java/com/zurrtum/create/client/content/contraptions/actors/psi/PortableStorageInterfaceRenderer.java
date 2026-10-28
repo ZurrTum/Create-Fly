@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.content.contraptions.actors.psi;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.actors.psi.PortableStorageInterfaceRenderer.PortableStorageInterfaceRenderState;
-import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlock;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 public class PortableStorageInterfaceRenderer implements BlockEntityRenderer<PortableStorageInterfaceBlockEntity, PortableStorageInterfaceRenderState> {
@@ -51,9 +51,9 @@ public class PortableStorageInterfaceRenderer implements BlockEntityRenderer<Por
         state.top = CachedBuffers.partial(getTopForState(state.blockState), state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         Direction facing = state.blockState.getValue(PortableStorageInterfaceBlock.FACING);
-        state.yRot = KineticBlockEntityRenderer.getYRotateAngle(AngleHelper.horizontalAngle(facing));
+        state.yRadians = Radians.horizontal(facing);
         if (facing != Direction.UP) {
-            state.xRot = KineticBlockEntityRenderer.getXRotateAngle(facing == Direction.DOWN ? 180 : 90);
+            state.xRadians = facing == Direction.DOWN ? Radians.DEG_180 : Radians.DEG_90;
         }
         float offset = be.getExtensionDistance(tickProgress) * 0.5f;
         state.middleOffset = offset + 0.375f;
@@ -67,19 +67,20 @@ public class PortableStorageInterfaceRenderer implements BlockEntityRenderer<Por
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.yRot != null || state.xRot != null) {
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            if (state.yRot != null) {
-                matrices.mulPose(state.yRot);
+        Pose pose = matrices.last();
+        if (state.yRadians != 0 || state.xRadians != 0) {
+            pose.translate(0.5f, 0.5f, 0.5f);
+            if (state.yRadians != 0) {
+                pose.rotate(Axis.YP, state.yRadians);
             }
-            if (state.xRot != null) {
-                matrices.mulPose(state.xRot);
+            if (state.xRadians != 0) {
+                pose.rotate(Axis.XP, state.xRadians);
             }
-            matrices.translate(-0.5f, -0.5f, -0.5f);
+            pose.translate(-0.5f, -0.5f, -0.5f);
         }
-        matrices.translate(0, state.middleOffset, 0);
+        pose.translate(0, state.middleOffset, 0);
         state.middle.submit(matrices, queue);
-        matrices.translate(0, state.topOffset, 0);
+        pose.translate(0, state.topOffset, 0);
         state.top.submit(matrices, queue);
     }
 
@@ -102,8 +103,8 @@ public class PortableStorageInterfaceRenderer implements BlockEntityRenderer<Por
     public static class PortableStorageInterfaceRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState middle;
         public @UnknownNullability SuperByteBufferRenderState top;
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf xRot;
+        public float yRadians;
+        public float xRadians;
         public float middleOffset;
         public float topOffset;
     }

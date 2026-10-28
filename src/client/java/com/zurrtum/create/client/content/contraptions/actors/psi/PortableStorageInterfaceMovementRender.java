@@ -2,7 +2,6 @@ package com.zurrtum.create.client.content.contraptions.actors.psi;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderState;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -10,6 +9,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
@@ -58,8 +57,8 @@ public class PortableStorageInterfaceMovementRender implements MovementRenderBeh
         float renderPartialTicks = AnimationTickHolder.getPartialTicks();
         LerpedFloat animation = PortableStorageInterfaceMovement.getAnimation(context);
         Direction facing = blockState.getValue(PortableStorageInterfaceBlock.FACING);
-        float yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
-        float xRot = Mth.DEG_TO_RAD * (facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90);
+        float yRadians = Radians.horizontal(facing);
+        float xRadians = facing == Direction.UP ? 0 : facing == Direction.DOWN ? Radians.DEG_180 : Radians.DEG_90;
         float topOffset = animation.getValue(renderPartialTicks);
         float middleOffset = topOffset * 0.5f + 0.375f;
         int light = LightCoordsUtil.getLightCoords(renderWorld, pos);
@@ -68,7 +67,7 @@ public class PortableStorageInterfaceMovementRender implements MovementRenderBeh
                 blockState,
                 animation.settled()
             ), blockState
-        ).transform(transform).translate(pos).center().rotateY(yRot).rotateX(xRot).uncenter();
+        ).transform(transform).translate(pos).center().rotateY(yRadians).rotateX(xRadians).uncenter();
         SuperByteBuffer top = CachedBuffers.partial(
             PortableStorageInterfaceRenderer.getTopForState(blockState),
             blockState

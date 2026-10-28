@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.content.kinetics.deployer;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.RotatingInstance;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
@@ -53,9 +53,9 @@ public class DeployerActorVisual extends ActorVisual {
         facing = state.getValue(FACING);
 
         boolean rotatePole = state.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
-        float yRot = AngleHelper.horizontalAngle(facing);
-        float xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
-        float zRot = rotatePole ? 90 : 0;
+        float yRadians = Radians.horizontal(facing);
+        float xRadians = facing == Direction.UP ? Radians.DEG_270 : facing == Direction.DOWN ? Radians.DEG_90 : 0;
+        float zRadians = rotatePole ? Radians.DEG_90 : 0;
 
         pole = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.DEPLOYER_POLE))
             .createInstance();
@@ -71,14 +71,13 @@ public class DeployerActorVisual extends ActorVisual {
             .setRotationOffset(KineticBlockEntityVisual.rotationOffset(state, axis, context.localPos))
             .setPosition(context.localPos).light(blockLight, 0).setChanged();
 
-        pole.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP)
-            .rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST).rotate(zRot * Mth.DEG_TO_RAD, Direction.SOUTH).uncenter()
+        pole.translate(context.localPos).center().rotateY(yRadians).rotateX(xRadians).rotateZ(zRadians).uncenter()
             .light(blockLight, 0).setChanged();
 
         basePoleTransform = new Matrix4f(pole.pose);
 
-        hand.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP)
-            .rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST).uncenter().light(blockLight, 0).setChanged();
+        hand.translate(context.localPos).center().rotateY(yRadians).rotateX(xRadians).uncenter().light(blockLight, 0)
+            .setChanged();
 
         baseHandTransform = new Matrix4f(hand.pose);
     }

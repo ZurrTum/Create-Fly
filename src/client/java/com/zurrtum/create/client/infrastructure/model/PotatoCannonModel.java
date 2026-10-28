@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
-import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -27,6 +26,7 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2fStack;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
@@ -85,7 +85,10 @@ public class PotatoCannonModel implements ItemModel {
                 angle += 360 * Mth.clamp(speed * 5, 0, 1);
             }
         }
-        cogLayer.localTransform.rotateAround(Axis.ZP.rotationDegrees(angle % 360), 0.5f, 0.53125f, 0.5f);
+        Matrix4f pose = cogLayer.localTransform;
+        pose.translate(0.5f, 0.53125f, 0.5f);
+        pose.rotateZ(Mth.DEG_TO_RAD * (angle % 360));
+        pose.translate(-0.5f, -0.53125f, -0.5f);
         if (stack.hasFoil()) {
             state.appendModelIdentityElement(FoilType.STANDARD);
             itemLayer.setFoilType(FoilType.STANDARD);

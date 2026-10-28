@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
-import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
@@ -106,8 +105,9 @@ public class SymmetryWandModel implements ItemModel {
         float floating = Mth.sin(worldTime) * 0.05f;
         float angle = worldTime * -10 % 360;
         Matrix4f pose = bitsLayer.localTransform;
-        pose.rotateAround(Axis.YP.rotationDegrees(angle), 0.5f, 0.5f, 0.5f);
-        pose.translate(0, floating, 0);
+        pose.translate(0.5f, 0.5f, 0.5f);
+        pose.rotateY(Mth.DEG_TO_RAD * angle);
+        pose.translate(-0.5f, floating - 0.5f, -0.5f);
     }
 
     public static class Unbaked implements ItemModel.Unbaked {

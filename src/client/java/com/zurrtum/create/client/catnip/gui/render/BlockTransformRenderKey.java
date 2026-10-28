@@ -9,22 +9,22 @@ public class BlockTransformRenderKey {
     public BlockStateModel model;
     public boolean dirty;
     public int padding;
-    public float size, xRot, yRot, zRot;
+    public float size, xRadians, yRadians, zRadians;
 
     public BlockTransformRenderKey(BlockState state) {
         this.state = state;
         model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
     }
 
-    public void update(float scale, int padding, float xRot, float yRot, float zRot) {
+    public void update(float scale, int padding, float xRadians, float yRadians, float zRadians) {
         float size = scale * 16 + padding;
-        if (size != this.size || xRot != this.xRot || yRot != this.yRot || zRot != this.zRot) {
+        if (size != this.size || xRadians != this.xRadians || yRadians != this.yRadians || zRadians != this.zRadians) {
             dirty = true;
             this.size = size;
             this.padding = padding;
-            this.xRot = xRot;
-            this.yRot = yRot;
-            this.zRot = zRot;
+            this.xRadians = xRadians;
+            this.yRadians = yRadians;
+            this.zRadians = zRadians;
         }
     }
 }

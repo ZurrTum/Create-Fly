@@ -1,16 +1,19 @@
 package com.zurrtum.create.client.content.kinetics.gauge;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.gauge.GaugeRenderer.GaugeRenderState;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock.Type;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlockEntity;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
@@ -26,11 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 
@@ -67,14 +66,15 @@ public class GaugeRenderer implements BlockEntityRenderer<GaugeBlockEntity, Gaug
         Axis axis = getRotationAxisOf(state.blockState);
         state.model = CachedBuffers.block(KINETIC_BLOCK, shaft(axis)).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         BlockPos pos = state.blockPos;
         BlockState gaugeState = state.blockState;
         GaugeBlock block = (GaugeBlock) gaugeState.getBlock();
-        List<@Nullable Quaternionf> angles = new ArrayList<>(2);
+        FloatArrayList angles = new FloatArrayList(2);
         for (Direction facing : Iterate.directions) {
             if (block.shouldRenderHeadOnFace(level, pos, gaugeState, facing)) {
-                angles.add(getUpRotateAngle(-facing.toYRot() - 90));
+                angles.add(-facing.toYRot() - 90);
             }
         }
         if (angles.isEmpty()) {
@@ -87,7 +87,7 @@ public class GaugeRenderer implements BlockEntityRenderer<GaugeBlockEntity, Gaug
             .light(state.lightCoords).extractRenderState();
         float progress = Mth.lerp(tickProgress, be.prevDialState, be.dialState);
         if (progress != 0) {
-            state.rotate = new Quaternionf().setAngleAxis(Math.PI / 2 * -progress, 1, 0, 0);
+            state.xRadians = -Radians.DEG_90 * progress;
         }
     }
 
@@ -98,31 +98,32 @@ public class GaugeRenderer implements BlockEntityRenderer<GaugeBlockEntity, Gaug
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.model.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.model.submit(matrices, queue);
         }
         if (state.angles != null) {
-            if (state.rotate != null) {
-                for (Quaternionf angle : state.angles) {
+            if (state.xRadians != 0) {
+                for (float angle : state.angles) {
                     matrices.pushPose();
-                    if (angle != null) {
-                        matrices.rotateAround(angle, 0.5f, 0.5f, 0.5f);
+                    Pose pose = matrices.last();
+                    if (angle != 0) {
+                        pose.rotateYCentered(Mth.DEG_TO_RAD * angle);
                     }
                     state.head.submit(matrices, queue);
-                    matrices.rotateAround(state.rotate, 0, 0.359375f, 0.359375f);
+                    pose.rotateXAround(state.xRadians, 0, 0.359375f, 0.359375f);
                     state.dial.submit(matrices, queue);
                     matrices.popPose();
                 }
             } else {
-                for (Quaternionf angle : state.angles) {
-                    if (angle != null) {
+                for (float angle : state.angles) {
+                    if (angle != 0) {
                         matrices.pushPose();
-                        matrices.rotateAround(angle, 0.5f, 0.5f, 0.5f);
+                        matrices.rotateYCentered(Mth.DEG_TO_RAD * angle);
                         state.head.submit(matrices, queue);
                         state.dial.submit(matrices, queue);
                         matrices.popPose();
@@ -139,8 +140,9 @@ public class GaugeRenderer implements BlockEntityRenderer<GaugeBlockEntity, Gaug
         public @UnknownNullability SuperByteBufferRenderState model;
         public @UnknownNullability SuperByteBufferRenderState head;
         public @UnknownNullability SuperByteBufferRenderState dial;
-        public @Nullable Quaternionf angle;
-        public @Nullable List<@Nullable Quaternionf> angles;
-        public @Nullable Quaternionf rotate;
+        public @UnknownNullability Axis axis;
+        public float angle;
+        public @UnknownNullability FloatArrayList angles;
+        public float xRadians;
     }
 }

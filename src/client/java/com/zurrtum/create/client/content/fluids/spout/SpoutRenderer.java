@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.fluids.spout;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
@@ -154,9 +155,10 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
     ) {
         if (state.middle != null) {
             matrices.pushPose();
-            matrices.translate(0, state.bitOffset, 0);
+            Pose pose = matrices.last();
+            pose.translate(0, state.bitOffset, 0);
             state.middle.submit(matrices, queue);
-            matrices.translate(0, state.bitOffset, 0);
+            pose.translate(0, state.bitOffset, 0);
             state.bottom.submit(matrices, queue);
             matrices.popPose();
         }

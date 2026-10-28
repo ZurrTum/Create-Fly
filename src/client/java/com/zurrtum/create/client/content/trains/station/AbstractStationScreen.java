@@ -1,6 +1,8 @@
 package com.zurrtum.create.client.content.trains.station;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllTrainIcons;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
@@ -10,9 +12,9 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiPartialRen
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.compat.computercraft.ComputerScreen;
 import com.zurrtum.create.client.compat.computercraft.ComputerScreen.AdditionalRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.trains.entity.TrainIcon;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
@@ -156,7 +158,8 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
     }
 
     private void transform(PoseStack ms, float partialTicks) {
-        ms.scale(1, -1, 1);
+        Pose pose = ms.last();
+        pose.scale(1, -1, 1);
         float value = blockEntity.flag.getValue(partialTicks);
         float progress = (float) Math.pow(Math.min(value * 5, 1), 2);
         if (blockEntity.flag.getChaseTarget() > 0 && !blockEntity.flag.settled() && progress == 1) {
@@ -164,8 +167,11 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
             progress += Math.sin(wiggleProgress * (2 * Mth.PI) * 4) / 8.0f / Math.max(1, 8.0f * wiggleProgress);
         }
 
-        TransformStack.of(ms).rotateXDegrees(24).rotateYDegrees(-210).translate(-0.12F, -0.81F, 0).rotateYDegrees(90)
-            .rotateXDegrees(progress * 90 + 270);
+        pose.rotate(Axis.XP, Radians.DEG_24);
+        pose.rotate(Axis.YP, Radians.DEG_150);
+        pose.translate(-0.12F, -0.81F, 0);
+        pose.rotate(Axis.YP, Radians.DEG_90);
+        pose.rotate(Axis.XP, progress * Radians.DEG_90 + Radians.DEG_270);
     }
 
     protected abstract PartialModel getFlag(float partialTicks);

@@ -58,6 +58,7 @@
     "ParticleEngineMixin",
     "ParticleResourcesMixin",
     "PlayerModelMixin",
+    "PoseMixin",
     "PoseStackMixin",
     "QuadParticleFeatureRendererMixin",
     "RemotePlayerMixin",

@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -45,8 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotateAngleWithoutBeOffset;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 
 public class WaterWheelRenderer implements BlockEntityRenderer<WaterWheelBlockEntity, SingleKineticRenderState> {
     public static final Compartment<ModelKey> WATER_WHEEL = new Compartment<>();
@@ -85,7 +85,9 @@ public class WaterWheelRenderer implements BlockEntityRenderer<WaterWheelBlockEn
         Level level = SmartBlockEntityRenderer.extractBase(be, state, breakProgress);
         state.model = getRotatedModel(be.material, state.blockState).cardinalLighting(level).light(state.lightCoords)
             .color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(be, state, level);
+        Axis axis = getRotationAxisOf(state.blockState);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
     }
 
     @Override

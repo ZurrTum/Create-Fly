@@ -1,7 +1,8 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -13,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceBlock;
-import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class ValueBoxRenderer {
     public static void renderItemIntoValueBox(
@@ -23,11 +24,12 @@ public class ValueBoxRenderer {
         int light,
         float offset
     ) {
+        Pose pose = ms.last();
         boolean blockItem = state.usesBlockLight();
         float scale = (!blockItem ? 0.5f : 1.0f) + 1 / 64.0f;
         float zOffset = (!blockItem ? -0.15f : 0) + offset;
-        ms.scale(scale, scale, scale);
-        ms.translate(0, 0, zOffset);
+        pose.scale(scale, scale, scale);
+        pose.translate(0, 0, zOffset);
         state.submit(ms, queue, light, OverlayTexture.NO_OVERLAY, 0);
     }
 
@@ -37,24 +39,17 @@ public class ValueBoxRenderer {
         PoseStack ms,
         int light
     ) {
+        ms.pushPose();
+        Pose pose = ms.last();
+        Matrix4f matrix4f = pose.pose();
+        matrix4f.translate(0, 0, -0.21775f);
+        matrix4f.rotateY(Radians.DEG_180);
+        matrix4f.scale(0.5f, 0.5f, 1 / 1024.0f);
+        pose.normal().rotateX(Radians.DEG_230);
         int bl = light >> 4 & 0xf;
         int sl = light >> 20 & 0xf;
         int itemLight = Mth.floor(sl + 0.5) << 20 | (Mth.floor(bl + 0.5) & 0xf) << 4;
-
-        ms.pushPose();
-        TransformStack.of(ms).rotateXDegrees(230);
-        Matrix3f copy = new Matrix3f(ms.last().normal());
-        ms.popPose();
-
-        ms.pushPose();
-        TransformStack.of(ms).translate(0, 0, -1 / 4.0f).translate(0, 0, 1 / 32.0f + 0.001).rotateYDegrees(180);
-
-        PoseStack squashedMS = new PoseStack();
-        squashedMS.last().pose().mul(ms.last().pose());
-        squashedMS.scale(0.5f, 0.5f, 1 / 1024.0f);
-        squashedMS.last().normal().set(copy);
-        state.submit(squashedMS, queue, itemLight, OverlayTexture.NO_OVERLAY, 0);
-
+        state.submit(ms, queue, itemLight, OverlayTexture.NO_OVERLAY, 0);
         ms.popPose();
     }
 

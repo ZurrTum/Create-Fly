@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
@@ -13,11 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getXRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getZRotateAngle;
 
 public class StandardBogeyRenderer implements BogeyRenderer {
     public static void updateRenderState(
@@ -28,7 +23,7 @@ public class StandardBogeyRenderer implements BogeyRenderer {
     ) {
         data.shaft = CachedBuffers.block(AllBlocks.SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, Axis.Z))
             .cardinalLighting(cardinalLighting).light(light).extractRenderState();
-        data.angle = getZRotateAngle(wheelAngle);
+        data.wheelRadians = Mth.DEG_TO_RAD * wheelAngle;
         data.offset = -1.5 - 1 / 128.0f;
     }
 
@@ -63,7 +58,6 @@ public class StandardBogeyRenderer implements BogeyRenderer {
                 .light(light).extractRenderState();
             data.wheels = CachedBuffers.partial(AllPartialModels.SMALL_BOGEY_WHEELS, air)
                 .cardinalLighting(cardinalLighting).light(light).extractRenderState();
-            data.wheelAngle = getXRotateAngle(wheelAngle);
             return data;
         }
     }
@@ -91,7 +85,7 @@ public class StandardBogeyRenderer implements BogeyRenderer {
                 .light(light).extractRenderState();
             float spriteSize = AllSpriteShifts.BOGEY_BELT.getTarget().getV1() - AllSpriteShifts.BOGEY_BELT.getTarget()
                 .getV0();
-            float scroll = BELT_RADIUS_IN_UV_SPACE * Mth.DEG_TO_RAD * wheelAngle;
+            float scroll = BELT_RADIUS_IN_UV_SPACE * data.wheelRadians;
             scroll = scroll - Mth.floor(scroll);
             scroll = scroll * spriteSize * 0.5f;
             data.belt = CachedBuffers.partial(AllPartialModels.BOGEY_DRIVE_BELT, air)
@@ -99,13 +93,11 @@ public class StandardBogeyRenderer implements BogeyRenderer {
                 .extractRenderState();
             data.piston = CachedBuffers.partial(AllPartialModels.BOGEY_PISTON, air).cardinalLighting(cardinalLighting)
                 .light(light).extractRenderState();
-            data.pistonOffset = (float) (1 / 4.0f * Math.sin(AngleHelper.rad(wheelAngle)));
+            data.pistonOffset = (float) (1 / 4.0f * Math.sin(data.wheelRadians));
             data.wheels = CachedBuffers.partial(AllPartialModels.LARGE_BOGEY_WHEELS, air)
                 .cardinalLighting(cardinalLighting).light(light).extractRenderState();
             data.pin = CachedBuffers.partial(AllPartialModels.BOGEY_PIN, air).cardinalLighting(cardinalLighting)
                 .light(light).extractRenderState();
-            data.wheelAngle = getXRotateAngle(wheelAngle);
-            data.wheelAngleInvert = data.wheelAngle != null ? data.wheelAngle.conjugate(new Quaternionf()) : null;
             return data;
         }
     }

@@ -2,7 +2,6 @@ package com.zurrtum.create.client.content.kinetics.deployer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
@@ -12,6 +11,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -83,27 +83,28 @@ public class DeployerMovementRenderBehaviour implements MovementRenderBehaviour 
         }
         float time = AnimationTickHolder.getRenderTime(context.world) / 20;
         float angle = time * speed % 360;
-        float yRot = axis == Direction.Axis.Z ? Mth.DEG_TO_RAD * 90 : 0;
-        float zRot = axis.isHorizontal() ? Mth.DEG_TO_RAD * 90 : 0;
+        float yRadians = axis == Direction.Axis.Z ? Radians.DEG_90 : 0;
+        float zRadians = axis.isHorizontal() ? Radians.DEG_90 : 0;
         int light = LightCoordsUtil.getLightCoords(renderWorld, pos);
-        float upAngle = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
-        float eastAngle = Mth.DEG_TO_RAD * (facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0);
-        float southAngle = Mth.DEG_TO_RAD * (
-            blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z ? 90 : 0);
+        float handYRadians = Radians.horizontal(facing);
+        float handXRadians = facing == Direction.UP ? Radians.DEG_270 : facing == Direction.DOWN ? Radians.DEG_90 : 0;
+        float poleZRadians =
+            blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z ? Radians.DEG_90 :
+                0;
         SuperByteBuffer hand = CachedBuffers.partial(handPose, blockState).transform(transform).translate(pos);
         SuperByteBuffer shaft = CachedBuffers.block(AllBlocks.SHAFT.defaultBlockState());
         SuperByteBuffer.copyTransform(hand, shaft);
-        state.shaft = shaft.center().rotateY(yRot).rotateZ(zRot).uncenter().rotateCentered(angle, Direction.UP)
-            .light(light).useLevelLight(context.world, worldMatrix4f).extractRenderState();
+        state.shaft = shaft.center().rotateY(yRadians).rotateZ(zRadians).uncenter().rotateYCentered(angle).light(light)
+            .useLevelLight(context.world, worldMatrix4f).extractRenderState();
         if (!context.disabled) {
             Vec3 offset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(factor);
             hand.translate(offset);
         }
-        hand.rotateCentered(upAngle, Direction.UP).rotateCentered(eastAngle, Direction.EAST);
+        hand.rotateYCentered(handYRadians).rotateXCentered(handXRadians);
         SuperByteBuffer pole = CachedBuffers.partial(AllPartialModels.DEPLOYER_POLE, blockState);
         SuperByteBuffer.copyTransform(hand, pole);
-        state.pole = pole.rotateCentered(southAngle, Direction.SOUTH).light(light)
-            .useLevelLight(context.world, worldMatrix4f).extractRenderState();
+        state.pole = pole.rotateZCentered(poleZRadians).light(light).useLevelLight(context.world, worldMatrix4f)
+            .extractRenderState();
         state.hand = hand.light(light).useLevelLight(context.world, worldMatrix4f).extractRenderState();
         return state;
     }

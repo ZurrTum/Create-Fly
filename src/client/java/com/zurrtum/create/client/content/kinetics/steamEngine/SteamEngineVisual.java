@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.content.kinetics.steamEngine;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
@@ -110,17 +110,26 @@ public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBloc
 
         transformed(this.piston, facing, roll90).translate(0, piston + 20 / 16.0f, 0).setChanged();
 
-        transformed(linkage, facing, roll90).center().translate(0, 1, 0).uncenter().translate(0, piston + 20 / 16.0f, 0)
-            .translate(0, 4 / 16.0f, 8 / 16.0f).rotateX(angle2).translate(0, -4 / 16.0f, -8 / 16.0f).setChanged();
+        transformed(linkage, facing, roll90).translate(0, 1 + piston + 20 / 16.0f + 4 / 16.0f, 8 / 16.0f)
+            .rotateX(angle2).translate(0, -4 / 16.0f, -8 / 16.0f).setChanged();
 
-        transformed(connector, facing, roll90).translate(0, 2, 0).center().rotateX(-(angle + Mth.HALF_PI)).uncenter()
-            .setChanged();
+        transformed(connector, facing, roll90).translate(0, 2, 0).rotateXCentered(-(angle + Mth.HALF_PI)).setChanged();
     }
 
     protected TransformedInstance transformed(TransformedInstance modelData, Direction facing, boolean roll90) {
-        return modelData.setIdentityTransform().translate(getVisualPosition()).center()
-            .rotateYDegrees(AngleHelper.horizontalAngle(facing)).rotateXDegrees(AngleHelper.verticalAngle(facing) + 90)
-            .rotateYDegrees(roll90 ? -90 : 0).uncenter();
+        modelData.setIdentityTransform().translate(getVisualPosition()).center();
+        float yRadians = Radians.horizontal(facing);
+        if (yRadians != 0) {
+            modelData.rotateY(yRadians);
+        }
+        float xRadians = Radians.verticalPlus90(facing);
+        if (xRadians != 0) {
+            modelData.rotateX(xRadians);
+        }
+        if (roll90) {
+            modelData.rotateY(Radians.DEG_270);
+        }
+        return modelData.uncenter();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.actors.roller;
 
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
@@ -27,19 +27,20 @@ public class RollerVisual extends AbstractBlockEntityVisual<RollerBlockEntity> i
         super(ctx, blockEntity, partialTick);
         InstancerProvider instancerProvider = instancerProvider();
         Direction facing = blockState.getValue(RollerBlock.FACING);
-        float angle = AngleHelper.horizontalAngle(facing);
+        float wheelRadians = Radians.horizontal(facing);
+        float frameRadians = Radians.horizontalPlus180(facing);
         float x = visualPos.getX();
         float y = visualPos.getY();
         float z = visualPos.getZ();
         frame = instancerProvider.instancer(InstanceTypes.ORIENTED, Models.chunkPartial(AllPartialModels.ROLLER_FRAME))
-            .createInstance().position(x, y, z).rotateDegrees(angle + 180, Direction.UP);
+            .createInstance().position(x, y, z).rotateY(frameRadians);
         frame.setChanged();
         Vec3i vec = facing.getUnitVec3i();
         x = x + vec.getX() * 0.5625f;
         y = y - 0.75f;
         z = z + vec.getZ() * 0.5625f;
         wheel = instancerProvider.instancer(InstanceTypes.ORIENTED, Models.chunkPartial(AllPartialModels.ROLLER_WHEEL))
-            .createInstance().position(x, y, z).rotateDegrees(angle, Direction.UP).rotateYDegrees(90);
+            .createInstance().position(x, y, z).rotateY(wheelRadians).rotateY(Radians.DEG_90);
         wheel.setChanged();
     }
 

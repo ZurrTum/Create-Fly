@@ -7,7 +7,6 @@ import com.zurrtum.create.client.content.contraptions.render.OrientedContraption
 import com.zurrtum.create.client.content.trains.bogey.BogeyVisual;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
@@ -18,7 +17,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 public class CarriageContraptionVisual extends OrientedContraptionVisual<CarriageContraptionEntity> {
@@ -127,8 +125,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
 
         poseStack.pushPose();
 
-        Vector3f visualPosition = getVisualPosition(partialTick);
-        TransformStack.of(poseStack).translate(visualPosition);
+        poseStack.last().pose().translate(getVisualPosition(partialTick));
 
         for (int bogeyIdx = 0; bogeyIdx < numBogeys; bogeyIdx++) {
             if (contraption.isHiddenInPortal(bogeyPos[bogeyIdx])) {

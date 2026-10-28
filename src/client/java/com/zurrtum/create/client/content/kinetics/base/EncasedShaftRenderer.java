@@ -48,7 +48,8 @@ public class EncasedShaftRenderer implements BlockEntityRenderer<KineticBlockEnt
         Axis axis = getRotationAxisOf(blockState);
         state.model = CachedBuffers.partialFacingVertical(getShaftModel(blockState), blockState, axis.getPositive())
             .cardinalLighting(level).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleWithoutBeOffset(axis, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
     }
 
     public PartialModel getShaftModel(BlockState state) {

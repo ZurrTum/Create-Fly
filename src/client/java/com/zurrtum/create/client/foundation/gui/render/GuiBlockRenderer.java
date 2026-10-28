@@ -3,7 +3,8 @@ package com.zurrtum.create.client.foundation.gui.render;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
@@ -15,10 +16,10 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 public abstract class GuiBlockRenderer<T extends PictureInPictureRenderState> extends PictureInPictureRenderer<T> {
-    private static final Vector3fc DIFFUSE_LIGHT_0 = new Vector3f(0, 0, 1).rotate(Axis.YP.rotationDegrees(12.5f))
-        .rotate(Axis.XP.rotationDegrees(45.0f));
-    private static final Vector3fc DIFFUSE_LIGHT_1 = new Vector3f(0, 0, 1).rotate(Axis.YP.rotationDegrees(-20.0f))
-        .rotate(Axis.XP.rotationDegrees(50.0f));
+    private static final Vector3fc DIFFUSE_LIGHT_0 = new Vector3f(0, 0, 1).rotateY(Radians.DEG_12P5)
+        .rotateX(Radians.DEG_45);
+    private static final Vector3fc DIFFUSE_LIGHT_1 = new Vector3f(0, 0, 1).rotateY(Radians.DEG_340)
+        .rotateX(Radians.DEG_50);
 
     @Override
     public void prepare(
@@ -39,9 +40,10 @@ public abstract class GuiBlockRenderer<T extends PictureInPictureRenderState> ex
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             PoseStack poseStack = new PoseStack();
-            poseStack.translate(width / 2.0F, getTranslateY(height, guiScale), 0.0F);
+            Pose pose = poseStack.last();
+            pose.translate(width / 2.0F, getTranslateY(height, guiScale), 0.0F);
             float scale = guiScale * renderState.scale();
-            poseStack.scale(scale, scale, -scale);
+            pose.scale(scale, scale, -scale);
             renderToTexture(renderState, poseStack, submitNodeStorage);
             renderAllFeatures(featureRenderDispatcher);
             modelViewStack.popMatrix();

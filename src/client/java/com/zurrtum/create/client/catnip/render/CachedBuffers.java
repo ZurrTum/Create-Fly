@@ -1,15 +1,15 @@
 package com.zurrtum.create.client.catnip.render;
 
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache.Compartment;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.apache.commons.lang3.tuple.Pair;
-import org.joml.Quaternionf;
 
 import java.util.function.Function;
 
@@ -23,40 +23,37 @@ public class CachedBuffers {
     private static final Function<Direction, Pose> ROTATE_TO_FACE = Util.memoize(facing -> {
         Pose pose = new Pose();
         switch (facing) {
-            case NORTH -> pose.rotateAround(new Quaternionf().rotationY(Mth.DEG_TO_RAD * 180), 0.5f, 0.5f, 0.5f);
-            case WEST -> pose.rotateAround(new Quaternionf().rotationY(Mth.DEG_TO_RAD * -90), 0.5f, 0.5f, 0.5f);
-            case EAST -> pose.rotateAround(new Quaternionf().rotationY(Mth.DEG_TO_RAD * -270), 0.5f, 0.5f, 0.5f);
-            case UP -> pose.rotateAround(new Quaternionf().rotationX(Mth.DEG_TO_RAD * -90), 0.5f, 0.5f, 0.5f);
-            case DOWN -> pose.rotateAround(new Quaternionf().rotationX(Mth.DEG_TO_RAD * 90), 0.5f, 0.5f, 0.5f);
+            case NORTH -> pose.rotateYCentered(Radians.DEG_180);
+            case WEST -> pose.rotateYCentered(Radians.DEG_270);
+            case EAST -> pose.rotateYCentered(Radians.DEG_90);
+            case UP -> pose.rotateXCentered(Radians.DEG_270);
+            case DOWN -> pose.rotateXCentered(Radians.DEG_90);
         }
         return pose;
     });
     private static final Function<Direction, Pose> ROTATE_TO_FACE_VERTICAL = Util.memoize(facing -> {
         Pose pose = new Pose();
         switch (facing) {
-            case NORTH ->
-                pose.rotateAround(
-                    new Quaternionf().rotationY(Mth.DEG_TO_RAD * 180).rotateX(Mth.DEG_TO_RAD * 90),
-                    0.5f,
-                    0.5f,
-                    0.5f
-                );
-            case WEST ->
-                pose.rotateAround(
-                    new Quaternionf().rotationY(Mth.DEG_TO_RAD * -90).rotateX(Mth.DEG_TO_RAD * 90),
-                    0.5f,
-                    0.5f,
-                    0.5f
-                );
-            case EAST ->
-                pose.rotateAround(
-                    new Quaternionf().rotationY(Mth.DEG_TO_RAD * -270).rotateX(Mth.DEG_TO_RAD * 90),
-                    0.5f,
-                    0.5f,
-                    0.5f
-                );
-            case SOUTH -> pose.rotateAround(new Quaternionf().rotationX(Mth.DEG_TO_RAD * 90), 0.5f, 0.5f, 0.5f);
-            case DOWN -> pose.rotateAround(new Quaternionf().rotationX(Mth.DEG_TO_RAD * 180), 0.5f, 0.5f, 0.5f);
+            case NORTH -> {
+                pose.translate(0.5f, 0.5f, 0.5f);
+                pose.rotate(Axis.YP, Radians.DEG_180);
+                pose.rotate(Axis.XP, Radians.DEG_90);
+                pose.translate(-0.5f, -0.5f, -0.5f);
+            }
+            case WEST -> {
+                pose.translate(0.5f, 0.5f, 0.5f);
+                pose.rotate(Axis.YP, Radians.DEG_270);
+                pose.rotate(Axis.XP, Radians.DEG_90);
+                pose.translate(-0.5f, -0.5f, -0.5f);
+            }
+            case EAST -> {
+                pose.translate(0.5f, 0.5f, 0.5f);
+                pose.rotate(Axis.YP, Radians.DEG_90);
+                pose.rotate(Axis.XP, Radians.DEG_90);
+                pose.translate(-0.5f, -0.5f, -0.5f);
+            }
+            case SOUTH -> pose.rotateXCentered(Radians.DEG_90);
+            case DOWN -> pose.rotateXCentered(Radians.DEG_180);
         }
         return pose;
     });

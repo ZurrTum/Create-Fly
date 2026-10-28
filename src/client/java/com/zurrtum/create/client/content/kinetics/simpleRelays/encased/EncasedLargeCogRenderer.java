@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.content.kinetics.simpleRelays.encased;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.simpleRelays.encased.EncasedLargeCogRenderer.EncasedLargeCogRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.simpleRelays.SimpleKineticBlockEntity;
@@ -21,24 +23,13 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual.shouldOffset;
 
 public class EncasedLargeCogRenderer implements BlockEntityRenderer<SimpleKineticBlockEntity, EncasedLargeCogRenderState> {
-    private static final float ANGLE = Mth.DEG_TO_RAD * -11.25f;
-
     public EncasedLargeCogRenderer(Context context) {
-    }
-
-    @Nullable
-    private static Quaternionf createShaftAngle(boolean offset, Direction direction) {
-        if (offset) {
-            return null;
-        }
-        return new Quaternionf().setAngleAxis(ANGLE, direction.getStepX(), direction.getStepY(), direction.getStepZ());
     }
 
     @Override
@@ -67,19 +58,19 @@ public class EncasedLargeCogRenderer implements BlockEntityRenderer<SimpleKineti
             state.blockState,
             direction
         ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
-        state.angle = getRotateAngle(progress, offset ? 22.5f : 11.25f, direction);
+        state.axis = axis;
+        state.angle = (progress + (offset ? 22.5f : 11.25f)) % 360;
+        state.offset = !offset;
         boolean hasTop = state.blockState.getValue(EncasedCogwheelBlock.TOP_SHAFT);
         boolean hasBottom = state.blockState.getValue(EncasedCogwheelBlock.BOTTOM_SHAFT);
         if (hasTop) {
             if (hasBottom) {
-                state.shaftAngle = createShaftAngle(offset, direction);
                 state.shaft = CachedBuffers.partialFacingVertical(
                     AllPartialModels.ENCASED_SHAFT,
                     state.blockState,
                     direction
                 ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
             } else {
-                state.shaftAngle = createShaftAngle(offset, direction);
                 state.shaft = CachedBuffers.partialFacing(
                     AllPartialModels.ENCASED_SHAFT_HALF,
                     state.blockState,
@@ -87,7 +78,6 @@ public class EncasedLargeCogRenderer implements BlockEntityRenderer<SimpleKineti
                 ).cardinalLighting(cardinalLighting).light(lightCoords).color(color).extractRenderState();
             }
         } else if (hasBottom) {
-            state.shaftAngle = createShaftAngle(offset, direction);
             state.shaft = CachedBuffers.partialFacing(
                 AllPartialModels.ENCASED_SHAFT_HALF,
                 state.blockState,
@@ -103,22 +93,24 @@ public class EncasedLargeCogRenderer implements BlockEntityRenderer<SimpleKineti
         SubmitNodeCollector queue,
         CameraRenderState camera
     ) {
-        if (state.angle != null) {
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+        Pose pose = matrices.last();
+        if (state.angle != 0) {
+            pose.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
         }
         state.model.submit(matrices, queue);
-        if (state.shaftAngle != null) {
-            matrices.rotateAround(state.shaftAngle, 0.5f, 0.5f, 0.5f);
-        }
         if (state.shaft != null) {
+            if (state.offset) {
+                pose.rotateCentered(state.axis, Radians.DEG_348P75);
+            }
             state.shaft.submit(matrices, queue);
         }
     }
 
     public static class EncasedLargeCogRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState model;
-        public @Nullable Quaternionf angle;
+        public @UnknownNullability Axis axis;
+        public float angle;
         public @Nullable SuperByteBufferRenderState shaft;
-        public @Nullable Quaternionf shaftAngle;
+        public boolean offset;
     }
 }

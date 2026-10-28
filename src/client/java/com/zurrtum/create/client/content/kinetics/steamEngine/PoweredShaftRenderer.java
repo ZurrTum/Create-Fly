@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getRotateAngleForBe;
+import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getDegrees;
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getTintColor;
 
 public class PoweredShaftRenderer implements BlockEntityRenderer<PoweredShaftBlockEntity, SingleKineticRenderState> {
@@ -43,7 +43,8 @@ public class PoweredShaftRenderer implements BlockEntityRenderer<PoweredShaftBlo
         Direction direction = axis.getPositive();
         state.model = CachedBuffers.partialFacingVertical(AllPartialModels.POWERED_SHAFT, state.blockState, direction)
             .cardinalLighting(level).light(state.lightCoords).color(getTintColor(be)).extractRenderState();
-        state.angle = getRotateAngleForBe(axis, direction, be, state, level);
+        state.axis = axis;
+        state.angle = getDegrees(axis, be, state, level);
     }
 
     @Override

@@ -1,12 +1,13 @@
 package com.zurrtum.create.client.content.equipment.symmetryWand;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryWandItem;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.CrossPlaneMirror;
@@ -56,8 +57,12 @@ public class SymmetryHandlerClient {
             float yShift = Mth.sin((float) (AnimationTickHolder.getRenderTime() * speed)) / 5.0f;
 
             ms.pushPose();
-            ms.translate(pos.getX() - cameraPos.x(), pos.getY() - cameraPos.y(), pos.getZ() - cameraPos.z());
-            ms.translate(0, yShift + 0.2f, 0);
+            Pose pose = ms.last();
+            pose.translate(
+                (float) (pos.getX() - cameraPos.x()),
+                (float) (pos.getY() - cameraPos.y() + yShift + 0.2f),
+                (float) (pos.getZ() - cameraPos.z())
+            );
             applyModelTransform(mirror, ms);
             int light = SmartBlockEntityRenderer.getLightCoords(level, pos);
             CachedBuffers.partial(model, Blocks.AIR.defaultBlockState()).light(light).submit(ms, queue);
@@ -82,11 +87,11 @@ public class SymmetryHandlerClient {
     public static void applyModelTransform(SymmetryMirror mirror, PoseStack ms) {
         if (mirror instanceof PlaneMirror) {
             if (mirror.orientation != PlaneMirror.Align.XY) {
-                TransformStack.of(ms).center().rotateYDegrees(90).uncenter();
+                ms.rotateYCentered(Radians.DEG_90);
             }
         } else if (mirror instanceof CrossPlaneMirror) {
             if (mirror.orientation != CrossPlaneMirror.Align.Y) {
-                TransformStack.of(ms).center().rotateYDegrees(45).uncenter();
+                ms.rotateYCentered(Radians.DEG_45);
             }
         }
     }

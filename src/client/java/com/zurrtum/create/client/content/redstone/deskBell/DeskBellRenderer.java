@@ -1,12 +1,12 @@
 package com.zurrtum.create.client.content.redstone.deskBell;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
-import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.redstone.deskBell.DeskBellRenderer.DeskBellRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.redstone.deskBell.DeskBellBlock;
@@ -24,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionfc;
 import org.jspecify.annotations.Nullable;
 
 public class DeskBellRenderer implements BlockEntityRenderer<DeskBellBlockEntity, DeskBellRenderState> {
@@ -51,8 +50,8 @@ public class DeskBellRenderer implements BlockEntityRenderer<DeskBellBlockEntity
         float f = (float) (1 - 4 * Math.pow(Math.max(p - 0.5, 0) - 0.5, 2));
         float f2 = (float) Math.pow(p, 1.25f);
         Direction facing = blockState.getValue(DeskBellBlock.FACING);
-        state.yRot = KineticBlockEntityRenderer.getYRotateAngle(AngleHelper.horizontalAngle(facing));
-        state.xRot = KineticBlockEntityRenderer.getXRotateAngle(AngleHelper.verticalAngle(facing) + 90);
+        state.yRadians = Radians.horizontal(facing);
+        state.xRadians = Radians.verticalPlus90(facing);
         state.plunger = CachedBuffers.partial(AllPartialModels.DESK_BELL_PLUNGER, blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         state.plungerOffset = f * -0.046875f;
@@ -60,8 +59,8 @@ public class DeskBellRenderer implements BlockEntityRenderer<DeskBellBlockEntity
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         state.bellOffset = -1 / 16;
         float offset = p * Mth.PI * 4 + be.animationOffset;
-        state.bellXRot = Axis.XP.rotation(Mth.DEG_TO_RAD * (f2 * 8 * Mth.sin(offset)));
-        state.bellZRot = Axis.ZP.rotation(Mth.DEG_TO_RAD * (f2 * 8 * Mth.cos(offset)));
+        state.bellXRadians = Mth.DEG_TO_RAD * (f2 * 8 * Mth.sin(offset));
+        state.bellZRadians = Mth.DEG_TO_RAD * (f2 * 8 * Mth.cos(offset));
     }
 
     @Override
@@ -71,31 +70,32 @@ public class DeskBellRenderer implements BlockEntityRenderer<DeskBellBlockEntity
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
-        matrices.translate(0.5f, 0.5f, 0.5f);
-        if (state.yRot != null) {
-            matrices.mulPose(state.yRot);
+        Pose pose = matrices.last();
+        pose.translate(0.5f, 0.5f, 0.5f);
+        if (state.yRadians != 0) {
+            pose.rotate(Axis.YP, state.yRadians);
         }
-        if (state.xRot != null) {
-            matrices.mulPose(state.xRot);
+        if (state.xRadians != 0) {
+            pose.rotate(Axis.XP, state.xRadians);
         }
         matrices.pushPose();
         matrices.translate(-0.5f, state.plungerOffset - 0.5f, -0.5f);
         state.plunger.submit(matrices, queue);
         matrices.popPose();
-        matrices.translate(0, state.bellOffset, 0);
-        matrices.mulPose(state.bellXRot);
-        matrices.mulPose(state.bellZRot);
-        matrices.translate(-0.5f, -state.bellOffset - 0.5f, -0.5f);
+        pose.translate(0, state.bellOffset, 0);
+        pose.rotate(Axis.XP, state.bellXRadians);
+        pose.rotate(Axis.ZP, state.bellZRadians);
+        pose.translate(-0.5f, -state.bellOffset - 0.5f, -0.5f);
         state.bell.submit(matrices, queue);
     }
 
     public static class DeskBellRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState plunger;
         public @UnknownNullability SuperByteBufferRenderState bell;
-        public @Nullable Quaternionfc yRot;
-        public @Nullable Quaternionfc xRot;
-        public @UnknownNullability Quaternionfc bellXRot;
-        public @UnknownNullability Quaternionfc bellZRot;
+        public float yRadians;
+        public float xRadians;
+        public float bellXRadians;
+        public float bellZRadians;
         public float plungerOffset;
         public int bellOffset;
     }

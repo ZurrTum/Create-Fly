@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.saw;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
@@ -12,6 +11,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
@@ -62,19 +62,19 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
         boolean moving = context.getAnimationSpeed() != 0;
         boolean shouldAnimate = context.contraption.stalled && horizontal || !context.contraption.stalled && !backwards && moving;
         SuperByteBuffer saw;
-        float zRot;
+        float zRadians;
         if (SawBlock.isHorizontal(blockState)) {
             saw = CachedBuffers.partial(
                 shouldAnimate ? AllPartialModels.SAW_BLADE_HORIZONTAL_ACTIVE : AllPartialModels.SAW_BLADE_HORIZONTAL_INACTIVE,
                 blockState
             );
-            zRot = 0;
+            zRadians = 0;
         } else {
             saw = CachedBuffers.partial(
                 shouldAnimate ? AllPartialModels.SAW_BLADE_VERTICAL_ACTIVE : AllPartialModels.SAW_BLADE_VERTICAL_INACTIVE,
                 blockState
             );
-            zRot = blockState.getValue(SawBlock.AXIS_ALONG_FIRST_COORDINATE) ? Mth.DEG_TO_RAD * 90 : 0;
+            zRadians = blockState.getValue(SawBlock.AXIS_ALONG_FIRST_COORDINATE) ? Radians.DEG_90 : 0;
         }
         BlockPos pos = context.localPos;
         int light = LightCoordsUtil.getLightCoords(renderWorld, pos);
@@ -107,9 +107,9 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
             state.shaft = shaft.rotateCentered(angle, direction).light(light)
                 .useLevelLight(context.world, worldMatrix4f).extractRenderState();
         }
-        float yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
-        float xRot = Mth.DEG_TO_RAD * AngleHelper.verticalAngle(facing);
-        state.saw = saw.center().rotateY(yRot).rotateX(xRot).rotateZ(zRot).uncenter().light(light)
+        float yRadians = Radians.horizontal(facing);
+        float xRadians = Radians.vertical(facing);
+        state.saw = saw.center().rotateY(yRadians).rotateX(xRadians).rotateZ(zRadians).uncenter().light(light)
             .useLevelLight(context.world, worldMatrix4f).extractRenderState();
         return state;
     }

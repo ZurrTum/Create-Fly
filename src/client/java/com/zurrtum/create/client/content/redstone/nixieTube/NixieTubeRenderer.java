@@ -6,13 +6,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
-import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.redstone.nixieTube.NixieTubeRenderer.NixieTubeRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
@@ -43,11 +42,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
-
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getYRotateAngle;
-import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.getZRotateAngle;
 
 public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEntity, NixieTubeRenderState> {
     protected final Font textRenderer;
@@ -86,13 +81,14 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         TextRenderState data = new TextRenderState();
         DoubleAttachFace face = state.blockState.getValue(NixieTubeBlock.FACE);
         Direction facing = state.blockState.getValue(NixieTubeBlock.FACING);
-        data.yRot = getYRotateAngle(AngleHelper.horizontalAngle(facing) - 90 + (face == DoubleAttachFace.WALL_REVERSED ?
-            180 : 0));
-        data.zRot = getZRotateAngle(
-            face == DoubleAttachFace.WALL ? -90 : face == DoubleAttachFace.WALL_REVERSED ? 90 : 0);
-        if (face == DoubleAttachFace.CEILING || facing == Direction.DOWN) {
-            data.zRot2 = Axis.ZP.rotation(KineticBlockEntityRenderer.RAD_180);
+        if (face == DoubleAttachFace.WALL_REVERSED) {
+            data.yRadians = Radians.horizontalPlus90(facing);
+            data.zRadians = Radians.DEG_90;
+        } else {
+            data.yRadians = Radians.horizontalPlus270(facing);
+            data.zRadians = face == DoubleAttachFace.WALL ? Radians.DEG_270 : 0;
         }
+        data.zRot2 = face == DoubleAttachFace.CEILING || facing == Direction.DOWN;
         data.tube = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE, state.blockState).cardinalLighting(level)
             .light(state.lightCoords).extractRenderState();
         Couple<String> s = be.getDisplayedStrings();
@@ -190,16 +186,17 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         state.data = data;
         DoubleAttachFace face = state.blockState.getValue(NixieTubeBlock.FACE);
         Direction facing = NixieTubeBlock.getFacing(state.blockState);
-        float yRot = AngleHelper.horizontalAngle(state.blockState.getValue(NixieTubeBlock.FACING)) - 90;
+        Direction direction = state.blockState.getValue(NixieTubeBlock.FACING);
         if (face == DoubleAttachFace.WALL_REVERSED) {
-            yRot += 180;
+            data.yRadians = Radians.horizontalPlus90(direction);
+            data.zRadians = facing == Direction.DOWN ? Radians.DEG_270 : Radians.DEG_90;
+        } else if (face == DoubleAttachFace.WALL) {
+            data.yRadians = Radians.horizontalPlus270(direction);
+            data.zRadians = facing == Direction.DOWN ? Radians.DEG_90 : Radians.DEG_270;
+        } else {
+            data.yRadians = Radians.horizontalPlus270(direction);
+            data.zRadians = facing == Direction.DOWN ? Radians.DEG_180 : 0;
         }
-        data.yRot = getYRotateAngle(yRot);
-        int zRot = face == DoubleAttachFace.WALL ? -90 : face == DoubleAttachFace.WALL_REVERSED ? 90 : 0;
-        if (facing == Direction.DOWN) {
-            zRot += 180;
-        }
-        data.zRot = getZRotateAngle(zRot);
         data.panel = CachedBuffers.partial(AllPartialModels.SIGNAL_PANEL, state.blockState)
             .cardinalLighting(cardinalLighting).light(state.lightCoords).extractRenderState();
         data.offset =
@@ -343,9 +340,9 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     public static class TextRenderState implements NixieTubeRenderData {
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf zRot;
-        public @Nullable Quaternionf zRot2;
+        public float yRadians;
+        public float zRadians;
+        public boolean zRot2;
         public @Nullable TextDrawableState left;
         public @Nullable TextDrawableState right;
         public @UnknownNullability SuperByteBufferRenderState tube;
@@ -353,16 +350,17 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         @Override
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            if (yRot != null) {
-                matrices.mulPose(yRot);
+            Pose pose = matrices.last();
+            pose.translate(0.5f, 0.5f, 0.5f);
+            if (yRadians != 0) {
+                pose.rotate(Axis.YP, yRadians);
             }
-            if (zRot != null) {
-                matrices.mulPose(zRot);
+            if (zRadians != 0) {
+                pose.rotate(Axis.ZP, zRadians);
             }
-            if (zRot2 != null) {
+            if (zRot2) {
                 matrices.pushPose();
-                matrices.mulPose(zRot2);
+                matrices.rotate(Axis.ZP, Radians.DEG_180);
                 tube.submit(matrices, queue.order(1));
                 matrices.popPose();
             } else {
@@ -370,14 +368,16 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             }
             if (left != null) {
                 matrices.pushPose();
-                matrices.translate(-0.25f, 0, 0);
-                matrices.scale(0.05f, -0.05f, 0.05f);
+                pose = matrices.last();
+                pose.translate(-0.25f, 0, 0);
+                pose.scale(0.05f, -0.05f, 0.05f);
                 queue.submitCustomGeometry(matrices, left.layer, left);
                 matrices.popPose();
             }
             if (right != null) {
-                matrices.translate(0.25f, 0, 0);
-                matrices.scale(0.05f, -0.05f, 0.05f);
+                pose = matrices.last();
+                pose.translate(0.25f, 0, 0);
+                pose.scale(0.05f, -0.05f, 0.05f);
                 queue.submitCustomGeometry(matrices, right.layer, right);
             }
             matrices.popPose();
@@ -402,8 +402,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     public static class SignalRenderState implements NixieTubeRenderData {
-        public @Nullable Quaternionf yRot;
-        public @Nullable Quaternionf zRot;
+        public float yRadians;
+        public float zRadians;
         public @UnknownNullability SuperByteBufferRenderState panel;
         public float offset;
         public @UnknownNullability SignalDrawableState left;
@@ -412,23 +412,24 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         @Override
         public void submit(PoseStack matrices, SubmitNodeCollector queue) {
             matrices.pushPose();
-            if (yRot != null || zRot != null) {
-                matrices.translate(0.5f, 0.5f, 0.5f);
-                if (yRot != null) {
-                    matrices.mulPose(yRot);
+            Pose pose = matrices.last();
+            if (yRadians != 0 || zRadians != 0) {
+                pose.translate(0.5f, 0.5f, 0.5f);
+                if (yRadians != 0) {
+                    pose.rotate(Axis.YP, yRadians);
                 }
-                if (zRot != null) {
-                    matrices.mulPose(zRot);
+                if (zRadians != 0) {
+                    pose.rotate(Axis.ZP, zRadians);
                 }
-                matrices.translate(-0.5f, -0.5f, -0.5f);
+                pose.translate(-0.5f, -0.5f, -0.5f);
             }
             panel.submit(matrices, queue);
-            matrices.translate(0.5f, 0.46875f, 0.5f);
+            pose.translate(0.5f, 0.46875f, 0.5f);
             matrices.pushPose();
             matrices.translate(offset, 0, 0);
             left.render(matrices, queue);
             matrices.popPose();
-            matrices.translate(-offset, 0, 0);
+            pose.translate(-offset, 0, 0);
             right.render(matrices, queue);
             matrices.popPose();
         }

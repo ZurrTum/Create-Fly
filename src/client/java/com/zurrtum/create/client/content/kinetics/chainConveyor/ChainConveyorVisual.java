@@ -3,6 +3,7 @@ package com.zurrtum.create.client.content.kinetics.chainConveyor;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.base.SingleAxisRotatingVisual;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visual.TickableVisual;
@@ -168,7 +169,7 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
             buf.rotateXDegrees(xRot);
 
             if (physicsData.flipped && buf == rigBuffer) {
-                buf.rotateYDegrees(180);
+                buf.rotateY(Radians.DEG_180);
             }
 
             buf.uncenter();
@@ -202,11 +203,10 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
             }
 
             Vec3 diff = stats.end().subtract(stats.start());
-            double yaw = Mth.RAD_TO_DEG * Mth.atan2(diff.x, diff.z);
+            float yawRadians = (float) Mth.atan2(diff.x, diff.z);
 
             TransformedInstance guard = guardInstancer.createInstance();
-            guard.translate(getVisualPosition()).center().rotateYDegrees((float) yaw).uncenter()
-                .light(rotatingModel.light).setChanged();
+            guard.translate(getVisualPosition()).rotateYCentered(yawRadians).light(rotatingModel.light).setChanged();
 
             guards.add(guard);
         }

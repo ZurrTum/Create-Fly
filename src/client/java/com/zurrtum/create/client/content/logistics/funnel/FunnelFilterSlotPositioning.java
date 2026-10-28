@@ -1,16 +1,16 @@
 package com.zurrtum.create.client.content.logistics.funnel;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.zurrtum.create.content.logistics.funnel.AbstractFunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock.Shape;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -25,19 +25,21 @@ public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
 
         if (state.getBlock() instanceof BeltFunnelBlock) {
             return switch (state.getValue(BeltFunnelBlock.SHAPE)) {
-                case EXTENDED -> VecHelper.rotateCentered(VecHelper.voxelSpace(8, 15.5f, 13), stateAngle, Axis.Y);
+                case EXTENDED ->
+                    VecHelper.rotateCentered(VecHelper.voxelSpace(8, 15.5f, 13), stateAngle, Direction.Axis.Y);
                 case PULLING, PUSHING ->
-                    VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.0f, 8.675f), horizontalAngle, Axis.Y);
-                default -> VecHelper.rotateCentered(VecHelper.voxelSpace(8, 13, 7.5f), horizontalAngle, Axis.Y);
+                    VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.0f, 8.675f), horizontalAngle, Direction.Axis.Y);
+                default ->
+                    VecHelper.rotateCentered(VecHelper.voxelSpace(8, 13, 7.5f), horizontalAngle, Direction.Axis.Y);
             };
         }
 
         if (!funnelFacing.getAxis().isHorizontal()) {
             Vec3 southLocation = VecHelper.voxelSpace(8, funnelFacing == Direction.DOWN ? 14 : 2, 15.5f);
-            return VecHelper.rotateCentered(southLocation, horizontalAngle, Axis.Y);
+            return VecHelper.rotateCentered(southLocation, horizontalAngle, Direction.Axis.Y);
         }
 
-        return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.2, 8.55f), horizontalAngle, Axis.Y);
+        return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.2, 8.55f), horizontalAngle, Direction.Axis.Y);
     }
 
     @Override
@@ -54,20 +56,29 @@ public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
             Shape shape = state.getValue(BeltFunnelBlock.SHAPE);
             super.rotate(state, ms);
             if (shape == Shape.PULLING || shape == Shape.PUSHING) {
-                TransformStack.of(ms).rotateXDegrees(-22.5f);
+                ms.rotate(Axis.XP, Radians.DEG_337P5);
             }
             return;
         }
 
         if (state.getBlock() instanceof FunnelBlock) {
             super.rotate(state, ms);
-            TransformStack.of(ms).rotateXDegrees(-22.5f);
+            ms.rotate(Axis.XP, Radians.DEG_337P5);
             return;
         }
-
-        float yRot = AngleHelper.horizontalAngle(AbstractFunnelBlock.getFunnelFacing(state)) + (
-            facing == Direction.DOWN ? 180 : 0);
-        TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(facing == Direction.DOWN ? -90 : 90);
+        float yRadians, xRadians;
+        if (facing == Direction.DOWN) {
+            yRadians = Radians.horizontalPlus180(facing);
+            xRadians = Radians.DEG_270;
+        } else {
+            yRadians = Radians.horizontal(facing);
+            xRadians = Radians.DEG_90;
+        }
+        Pose pose = ms.last();
+        if (yRadians != 0) {
+            pose.rotate(Axis.YP, yRadians);
+        }
+        pose.rotate(Axis.XP, xRadians);
     }
 
     @Override

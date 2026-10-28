@@ -31,6 +31,10 @@ class EmptySuperByteBuffer extends SuperByteBuffer {
     }
 
     @Override
+    public void submit(RenderType type, PoseStack matrices, OrderedSubmitNodeCollector queue) {
+    }
+
+    @Override
     public void renderInto(Pose pose, VertexConsumer consumer) {
     }
 
@@ -345,6 +349,11 @@ class EmptySuperByteBuffer extends SuperByteBuffer {
     }
 
     @Override
+    public SuperByteBuffer keepAlive() {
+        return this;
+    }
+
+    @Override
     public SuperByteBuffer shiftUV(SpriteShiftEntry entry) {
         return this;
     }
@@ -461,6 +470,49 @@ class EmptySuperByteBuffer extends SuperByteBuffer {
 
     @Override
     public SuperByteBuffer rotateZCentered(float radians) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateAround(
+        float radians,
+        float axisX,
+        float axisY,
+        float axisZ,
+        float pivotX,
+        float pivotY,
+        float pivotZ
+    ) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateAround(float radians, Axis axis, float pivotX, float pivotY, float pivotZ) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateAround(float radians, Direction.Axis axis, float pivotX, float pivotY, float pivotZ) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateAround(float radians, Direction direction, float pivotX, float pivotY, float pivotZ) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateXAround(float radians, float pivotX, float pivotY, float pivotZ) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateYAround(float radians, float pivotX, float pivotY, float pivotZ) {
+        return this;
+    }
+
+    @Override
+    public SuperByteBuffer rotateZAround(float radians, float pivotX, float pivotY, float pivotZ) {
         return this;
     }
 

@@ -16,11 +16,11 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverl
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -47,7 +47,8 @@ public class EncasedSmallCogRenderer implements BlockEntityRenderer<SimpleKineti
         Axis axis = getRotationAxisOf(state.blockState);
         Direction direction = axis.getPositive();
         int color = getTintColor(be);
-        state.angle = getRotateAngleWithoutBeOffset(axis, direction, be, state, level);
+        state.axis = axis;
+        state.angle = getDegreesWithoutBeOffset(axis, be, state, level);
         boolean hasTop = state.blockState.getValue(EncasedCogwheelBlock.TOP_SHAFT);
         boolean hasBottom = state.blockState.getValue(EncasedCogwheelBlock.BOTTOM_SHAFT);
         int lightCoords = state.lightCoords;
@@ -86,8 +87,8 @@ public class EncasedSmallCogRenderer implements BlockEntityRenderer<SimpleKineti
         SubmitNodeCollector queue,
         CameraRenderState camera
     ) {
-        if (state.angle != null) {
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+        if (state.angle != 0) {
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
         }
         state.model.submit(matrices, queue);
         if (state.shaft != null) {
@@ -97,7 +98,8 @@ public class EncasedSmallCogRenderer implements BlockEntityRenderer<SimpleKineti
 
     public static class EncasedSmallCogRenderState extends BlockEntityRenderState {
         public @UnknownNullability SuperByteBufferRenderState model;
-        public @Nullable Quaternionf angle;
+        public @UnknownNullability Axis axis;
+        public float angle;
         public @Nullable SuperByteBufferRenderState shaft;
     }
 }

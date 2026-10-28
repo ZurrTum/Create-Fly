@@ -2,13 +2,15 @@ package com.zurrtum.create.client.content.equipment.toolbox;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.math.Axis;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiPartialRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
@@ -149,24 +151,33 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
     }
 
     private void transformLid(PoseStack ms, float partialTicks) {
-        ms.translate(0.796F, 1.408F, 0);
-        TransformStack.of(ms).rotateXDegrees(-22).rotateYDegrees(-202).translate(0, -6 / 16.0f, 12 / 16.0f)
-            .rotateXDegrees(-105 * menu.contentHolder.lid.getValue(partialTicks)).translate(0, 6 / 16.0f, -12 / 16.0f);
-        ms.scale(1, -1, 1);
+        Pose pose = ms.last();
+        pose.translate(0.796F, 1.408F, 0);
+        pose.rotate(Axis.XP, Radians.DEG_338);
+        pose.rotate(Axis.YP, Radians.DEG_158);
+        float value = menu.contentHolder.lid.getValue(partialTicks);
+        if (value != 0) {
+            pose.rotateXAround(value * -Radians.DEG_105, 0, -0.375f, 0.75f);
+        }
+        pose.scale(1, -1, 1);
     }
 
     private void transformTopDrawer(PoseStack ms, float partialTicks) {
-        ms.translate(1.02F, 0.384F, 0);
-        TransformStack.of(ms).rotateXDegrees(-22).rotateYDegrees(-202)
-            .translate(0, 0, menu.contentHolder.drawers.getValue(partialTicks) * -0.175f);
-        ms.scale(1, -1, 1);
+        Pose pose = ms.last();
+        pose.translate(1.02F, 0.384F, 0);
+        pose.rotate(Axis.XP, Radians.DEG_338);
+        pose.rotate(Axis.YP, Radians.DEG_158);
+        pose.translate(0, 0, menu.contentHolder.drawers.getValue(partialTicks) * -0.175f);
+        pose.scale(1, -1, 1);
     }
 
     private void transformBottomDrawer(PoseStack ms, float partialTicks) {
-        ms.translate(1.02F, 0.38F, 0);
-        TransformStack.of(ms).rotateXDegrees(-22).rotateYDegrees(-202)
-            .translate(0, 0, menu.contentHolder.drawers.getValue(partialTicks) * -0.175f * 2);
-        ms.scale(1, -1, 1);
+        Pose pose = ms.last();
+        pose.translate(1.02F, 0.38F, 0);
+        pose.rotate(Axis.XP, Radians.DEG_338);
+        pose.rotate(Axis.YP, Radians.DEG_158);
+        pose.translate(0, 0, menu.contentHolder.drawers.getValue(partialTicks) * -0.175f * 2);
+        pose.scale(1, -1, 1);
     }
 
     @Override

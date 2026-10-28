@@ -3,10 +3,10 @@ package com.zurrtum.create.client.foundation.fluid;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllFluidConfigs;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.QuadRenderHelper;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidModel;
@@ -86,9 +86,15 @@ public class FluidRenderer {
 
         entry = entry.copy();
         entry.translate(0.5f, 0.5f, 0.5f);
-        entry.rotate(Axis.YP.rotation(Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(direction)));
-        entry.rotate(Axis.XP.rotation(Mth.DEG_TO_RAD * (direction == Direction.UP ? 180 :
-            direction == Direction.DOWN ? 0 : 270)));
+        float yRadians = Radians.horizontal(direction);
+        if (yRadians != 0) {
+            entry.rotate(Axis.YP, yRadians);
+        }
+        if (direction == Direction.UP) {
+            entry.rotate(Axis.XP, Radians.DEG_180);
+        } else if (direction != Direction.DOWN) {
+            entry.rotate(Axis.XP, Radians.DEG_270);
+        }
         entry.translate(0, -0.5f, 0);
 
         float hMin = -radius;
@@ -109,7 +115,7 @@ public class FluidRenderer {
                 tint,
                 flowTexture
             );
-            entry.rotate(Axis.YP.rotation(Mth.DEG_TO_RAD * 90));
+            entry.rotate(Axis.YP, Radians.DEG_90);
         }
 
         if (stillTexture != null) {

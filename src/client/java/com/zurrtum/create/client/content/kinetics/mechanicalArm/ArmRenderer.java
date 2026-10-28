@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.mechanicalArm;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
@@ -9,6 +10,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
+import com.zurrtum.create.client.content.kinetics.base.Radians;
 import com.zurrtum.create.client.content.kinetics.mechanicalArm.ArmRenderer.ArmRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
@@ -33,7 +35,6 @@ import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Quaternionf;
 import org.jspecify.annotations.Nullable;
 
 import static com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.*;
@@ -70,7 +71,6 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
             renderState.displayContext = ItemDisplayContext.FIXED;
             itemModelManager.appendItemLayers(renderState, heldItem, renderState.displayContext, level, null, 0);
             item.state = renderState;
-            item.xRot = Axis.XP.rotation(RAD_90);
             if (heldItem.getItem() instanceof BlockItem && renderState.usesBlockLight()) {
                 item.offset = -0.5625f;
                 item.scale = 0.5f;
@@ -78,21 +78,19 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
                 item.offset = -0.625f;
                 item.scale = 0.625f;
             }
-            if (state.blockState.getValue(ArmBlock.CEILING)) {
-                state.rotate = Axis.XP.rotation(RAD_180);
-            }
+            state.rotate = state.blockState.getValue(ArmBlock.CEILING);
             if (be.phase != Phase.DANCING || be.getSpeed() == 0) {
-                state.baseAngle = getYRotateAngle(be.baseAngle.getValue(tickProgress));
-                state.lowerArmAngle = getXRotateAngle(be.lowerArmAngle.getValue(tickProgress));
-                state.upperArmAngle = getXRotateAngle(be.upperArmAngle.getValue(tickProgress) - 180);
-                state.headAngle = getXRotateAngle(be.headAngle.getValue(tickProgress) - 45);
+                state.baseAngle = be.baseAngle.getValue(tickProgress);
+                state.lowerArmAngle = be.lowerArmAngle.getValue(tickProgress);
+                state.upperArmAngle = be.upperArmAngle.getValue(tickProgress) - 180;
+                state.headAngle = be.headAngle.getValue(tickProgress) - 45;
             } else {
                 float renderTick = AnimationTickHolder.getRenderTime(level) + be.hashCode() % 64;
-                state.baseAngle = getYRotateAngle(renderTick * 10 % 360);
+                state.baseAngle = renderTick * 10 % 360;
                 float lowerArmAngle = Mth.lerp((Mth.sin(renderTick / 4) + 1) / 2, -45, 15);
-                state.lowerArmAngle = getXRotateAngle(lowerArmAngle + 135);
-                state.upperArmAngle = getXRotateAngle(Mth.lerp((Mth.sin(renderTick / 8) + 1) / 4, -45, 95) - 90);
-                state.headAngle = getXRotateAngle(-lowerArmAngle - 45);
+                state.lowerArmAngle = lowerArmAngle + 135;
+                state.upperArmAngle = Mth.lerp((Mth.sin(renderTick / 8) + 1) / 4, -45, 95) - 90;
+                state.headAngle = -lowerArmAngle - 45;
             }
             return;
         }
@@ -105,7 +103,8 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
         float offset = KineticBlockEntityVisual.rotationOffset(state.blockState, axis, state.blockPos);
         float speed = be.getSpeed();
         float progress = getProgress(speed, time);
-        state.angle = getRotateAngle(progress, offset, axis);
+        state.axis = axis;
+        state.angle = (progress + offset) % 360;
         ArmRenderData arm = state.arm = new ArmRenderData();
         if (heldItem.isEmpty()) {
             arm.clawOffset = 0.0625f;
@@ -115,7 +114,6 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
             renderState.displayContext = ItemDisplayContext.FIXED;
             itemModelManager.appendItemLayers(renderState, heldItem, renderState.displayContext, level, null, 0);
             item.state = renderState;
-            item.xRot = Axis.XP.rotation(RAD_90);
             if (heldItem.getItem() instanceof BlockItem && renderState.usesBlockLight()) {
                 item.offset = -0.5625f;
                 item.scale = 0.5f;
@@ -127,28 +125,26 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
             }
         }
         if (state.blockState.getValue(ArmBlock.CEILING)) {
-            state.rotate = Axis.XP.rotation(RAD_180);
-            if (be.goggles) {
-                arm.inverted = Axis.ZP.rotation(RAD_180);
-            }
+            state.rotate = true;
+            arm.inverted = be.goggles;
         }
         SuperByteBuffer lower = CachedBuffers.partial(AllPartialModels.ARM_LOWER_BODY, state.blockState);
         SuperByteBuffer upper = CachedBuffers.partial(AllPartialModels.ARM_UPPER_BODY, state.blockState);
         if (be.phase != Phase.DANCING || speed == 0) {
-            state.baseAngle = getYRotateAngle(be.baseAngle.getValue(tickProgress));
-            state.lowerArmAngle = getXRotateAngle(be.lowerArmAngle.getValue(tickProgress));
-            state.upperArmAngle = getXRotateAngle(be.upperArmAngle.getValue(tickProgress) - 180);
-            state.headAngle = getXRotateAngle(be.headAngle.getValue(tickProgress) - 45);
+            state.baseAngle = be.baseAngle.getValue(tickProgress);
+            state.lowerArmAngle = be.lowerArmAngle.getValue(tickProgress);
+            state.upperArmAngle = be.upperArmAngle.getValue(tickProgress) - 180;
+            state.headAngle = be.headAngle.getValue(tickProgress) - 45;
         } else {
             Color color = Color.rainbowColor(AnimationTickHolder.getTicks() * 100);
             lower.color(color);
             upper.color(color);
             float renderTick = time + be.hashCode() % 64;
-            state.baseAngle = getYRotateAngle(renderTick * 10 % 360);
+            state.baseAngle = renderTick * 10 % 360;
             float lowerArmAngle = Mth.lerp((Mth.sin(renderTick / 4) + 1) / 2, -45, 15);
-            state.lowerArmAngle = getXRotateAngle(lowerArmAngle + 135);
-            state.upperArmAngle = getXRotateAngle(Mth.lerp((Mth.sin(renderTick / 8) + 1) / 4, -45, 95) - 90);
-            state.headAngle = getXRotateAngle(-lowerArmAngle - 45);
+            state.lowerArmAngle = lowerArmAngle + 135;
+            state.upperArmAngle = Mth.lerp((Mth.sin(renderTick / 8) + 1) / 4, -45, 95) - 90;
+            state.headAngle = -lowerArmAngle - 45;
         }
         arm.base = CachedBuffers.partial(AllPartialModels.ARM_BASE, state.blockState).cardinalLighting(cardinalLighting)
             .light(state.lightCoords).extractRenderState();
@@ -171,66 +167,67 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
         SubmitNodeCollector queue,
         CameraRenderState cameraState
     ) {
+        Pose pose = matrices.last();
         if (state.cog == null) {
-            matrices.translate(0.5f, 0.5f, 0.5f);
-            if (state.rotate != null) {
-                matrices.mulPose(state.rotate);
+            pose.translate(0.5f, 0.5f, 0.5f);
+            if (state.rotate) {
+                pose.rotate(Axis.XP, Radians.DEG_180);
             }
-            matrices.translate(0, 0.25f, 0);
-            if (state.baseAngle != null) {
-                matrices.mulPose(state.baseAngle);
+            pose.translate(0, 0.25f, 0);
+            if (state.baseAngle != 0) {
+                pose.rotate(Axis.YP, Mth.DEG_TO_RAD * state.baseAngle);
             }
-            matrices.translate(0, 0.125f, 0);
-            if (state.lowerArmAngle != null) {
-                matrices.mulPose(state.lowerArmAngle);
+            pose.translate(0, 0.125f, 0);
+            if (state.lowerArmAngle != 0) {
+                pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.lowerArmAngle);
             }
-            matrices.translate(0, 0, -0.875f);
-            if (state.upperArmAngle != null) {
-                matrices.mulPose(state.upperArmAngle);
+            pose.translate(0, 0, -0.875f);
+            if (state.upperArmAngle != 0) {
+                pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.upperArmAngle);
             }
-            matrices.translate(0, 0, -0.9375f);
-            if (state.headAngle != null) {
-                matrices.mulPose(state.headAngle);
+            pose.translate(0, 0, -0.9375f);
+            if (state.headAngle != 0) {
+                pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.headAngle);
             }
-            state.item.render(matrices, queue, state.lightCoords);
+            state.item.submit(matrices, queue, state.lightCoords);
             return;
         }
-        if (state.angle != null) {
+        if (state.angle != 0) {
             matrices.pushPose();
-            matrices.rotateAround(state.angle, 0.5f, 0.5f, 0.5f);
+            matrices.rotateCentered(state.axis, Mth.DEG_TO_RAD * state.angle);
             state.cog.submit(matrices, queue);
             matrices.popPose();
         } else {
             state.cog.submit(matrices, queue);
         }
-        matrices.translate(0.5f, 0.5f, 0.5f);
-        if (state.rotate != null) {
-            matrices.mulPose(state.rotate);
+        pose.translate(0.5f, 0.5f, 0.5f);
+        if (state.rotate) {
+            pose.rotate(Axis.XP, Radians.DEG_180);
         }
-        matrices.translate(0, 0.25f, 0);
-        if (state.baseAngle != null) {
-            matrices.mulPose(state.baseAngle);
+        pose.translate(0, 0.25f, 0);
+        if (state.baseAngle != 0) {
+            pose.rotate(Axis.YP, Mth.DEG_TO_RAD * state.baseAngle);
         }
         ArmRenderData arm = state.arm;
         arm.base.submit(matrices, queue);
-        matrices.translate(0, 0.125f, 0);
-        if (state.lowerArmAngle != null) {
-            matrices.mulPose(state.lowerArmAngle);
+        pose.translate(0, 0.125f, 0);
+        if (state.lowerArmAngle != 0) {
+            pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.lowerArmAngle);
         }
         arm.lower.submit(matrices, queue);
-        matrices.translate(0, 0, -0.875f);
-        if (state.upperArmAngle != null) {
-            matrices.mulPose(state.upperArmAngle);
+        pose.translate(0, 0, -0.875f);
+        if (state.upperArmAngle != 0) {
+            pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.upperArmAngle);
         }
         arm.upper.submit(matrices, queue);
-        matrices.translate(0, 0, -0.9375f);
-        if (state.headAngle != null) {
-            matrices.mulPose(state.headAngle);
+        pose.translate(0, 0, -0.9375f);
+        if (state.headAngle != 0) {
+            pose.rotate(Axis.XP, Mth.DEG_TO_RAD * state.headAngle);
         }
-        if (arm.inverted != null) {
-            matrices.mulPose(arm.inverted);
+        if (arm.inverted) {
+            pose.rotate(Axis.ZP, Radians.DEG_180);
             arm.claw.submit(matrices, queue);
-            matrices.mulPose(arm.inverted);
+            pose.rotate(Axis.ZP, Radians.DEG_180);
         } else {
             arm.claw.submit(matrices, queue);
         }
@@ -243,7 +240,7 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
         arm.clawUpper.submit(matrices, queue);
         matrices.popPose();
         if (state.item != null) {
-            state.item.render(matrices, queue, state.lightCoords);
+            state.item.submit(matrices, queue, state.lightCoords);
         }
     }
 
@@ -254,26 +251,27 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
 
     public static class ArmRenderState extends BlockEntityRenderState {
         public @Nullable SuperByteBufferRenderState cog;
-        public @Nullable Quaternionf angle;
-        public @Nullable Quaternionf rotate;
-        public @Nullable Quaternionf baseAngle;
-        public @Nullable Quaternionf lowerArmAngle;
-        public @Nullable Quaternionf upperArmAngle;
-        public @Nullable Quaternionf headAngle;
+        public Direction.@UnknownNullability Axis axis;
+        public float angle;
+        public boolean rotate;
+        public float baseAngle;
+        public float lowerArmAngle;
+        public float upperArmAngle;
+        public float headAngle;
         public @UnknownNullability ArmRenderData arm;
         public @Nullable ArmItemData item;
     }
 
     public static class ArmItemData {
         public @UnknownNullability ItemStackRenderState state;
-        public @UnknownNullability Quaternionf xRot;
         public float offset;
         public float scale;
 
-        public void render(PoseStack matrices, SubmitNodeCollector queue, int light) {
-            matrices.mulPose(xRot);
-            matrices.translate(0, offset, 0);
-            matrices.scale(scale, scale, scale);
+        public void submit(PoseStack matrices, SubmitNodeCollector queue, int light) {
+            Pose pose = matrices.last();
+            pose.rotate(Axis.XP, Radians.DEG_90);
+            pose.translate(0, offset, 0);
+            pose.scale(scale, scale, scale);
             state.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
         }
     }
@@ -285,7 +283,7 @@ public class ArmRenderer implements BlockEntityRenderer<ArmBlockEntity, ArmRende
         public @UnknownNullability SuperByteBufferRenderState claw;
         public @UnknownNullability SuperByteBufferRenderState clawUpper;
         public @UnknownNullability SuperByteBufferRenderState clawLower;
-        public @Nullable Quaternionf inverted;
+        public boolean inverted;
         public float clawOffset;
     }
 }
