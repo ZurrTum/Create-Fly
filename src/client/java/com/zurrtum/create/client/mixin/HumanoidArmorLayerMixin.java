@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.zurrtum.create.client.content.equipment.armor.LayerRenderState;
 import com.zurrtum.create.foundation.item.LayeredArmorItem;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -9,7 +8,10 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,15 +37,20 @@ public abstract class HumanoidArmorLayerMixin<S extends HumanoidRenderState, M e
     ) {
         if (itemStack.getItem() instanceof LayeredArmorItem item) {
             M model = getParentModel();
-            LayerRenderState<S, M> layer = new LayerRenderState<>();
-            layer.model = model;
-            layer.state = state;
-            layer.light = lightCoords;
-            submitNodeCollector.order(0)
-                .submitCustomGeometry(poseStack, RenderTypes.armorCutoutNoCull(item.getLayerTexture()), layer);
-            if (itemStack.hasFoil()) {
-                submitNodeCollector.order(1).submitCustomGeometry(poseStack, RenderTypes.armorEntityGlint(), layer);
-            }
+            Identifier layerTexture = item.getLayerTexture();
+            RenderType renderType = itemStack.hasFoil() ? RenderTypes.armorCutoutNoCullGlint(layerTexture) :
+                RenderTypes.armorCutoutNoCull(layerTexture);
+            submitNodeCollector.submitModel(
+                model,
+                state,
+                poseStack,
+                renderType,
+                lightCoords,
+                OverlayTexture.NO_OVERLAY,
+                -1,
+                null,
+                0
+            );
         }
     }
 }

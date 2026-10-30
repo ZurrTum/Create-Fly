@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
@@ -24,6 +25,7 @@ public class BacktankFeatureRenderer<S extends HumanoidRenderState, M extends Hu
         super(context);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void submit(
         PoseStack ms,
@@ -51,14 +53,15 @@ public class BacktankFeatureRenderer<S extends HumanoidRenderState, M extends Hu
         PoseStack.Pose pose = ms.last();
         pose.translate(-0.5f, 0.625f, 1.0f);
         pose.scale(1, -1, -1);
-        backtank.submit(ms, queue);
-        cogs.submit(ms, queue);
-        nob.submit(ms, queue);
         if (entityState.chestEquipment.hasFoil()) {
-            RenderType glint = RenderTypes.entityGlint();
+            RenderType glint = RenderTypes.armorCutoutNoCullGlint(TextureAtlas.LOCATION_BLOCKS);
             backtank.submit(glint, ms, queue);
             cogs.submit(glint, ms, queue);
             nob.submit(glint, ms, queue);
+        } else {
+            backtank.submit(ms, queue);
+            cogs.submit(ms, queue);
+            nob.submit(ms, queue);
         }
         ms.popPose();
     }
