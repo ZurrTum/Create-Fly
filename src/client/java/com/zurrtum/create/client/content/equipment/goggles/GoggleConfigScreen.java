@@ -109,7 +109,8 @@ public class GoggleConfigScreen extends AbstractSimiScreen {
             posX,
             posY,
             DefaultTooltipPositioner.INSTANCE,
-            null
+            null,
+            false
         );
         ItemStack item = AllItems.GOGGLES.getDefaultInstance();
         graphics.item(item, posX + 10, posY - 16);

@@ -335,7 +335,8 @@ public class BlueprintOverlayRenderer {
                         window.getGuiScaledWidth(),
                         window.getGuiScaledHeight(),
                         DefaultTooltipPositioner.INSTANCE,
-                        null
+                        null,
+                        false
                     );
                 }
             }
