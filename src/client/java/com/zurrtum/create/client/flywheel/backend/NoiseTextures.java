@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.flywheel.backend;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.renderpearl.api.device.GpuDevice;
@@ -10,9 +11,17 @@ import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.PngInfo;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.UnknownNullability;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 public class NoiseTextures {
     public static final Identifier NOISE_TEXTURE = ResourceUtil.rl("textures/flywheel/noise/blue.png");
@@ -32,10 +41,41 @@ public class NoiseTextures {
         }
 
         try (var is = optional.get().open()) {
-            var image = NativeImage.read(NativeImage.Format.LUMINANCE, is);
+            var image = readLuminance(is);
             BLUE_NOISE = new NoiseTexture(image);
-        } catch (IOException e) {
+        } catch (IOException _) {
+        }
+    }
 
+    private static NativeImage readLuminance(final InputStream inputStream) throws IOException {
+        ByteBuffer bytes = null;
+        try {
+            bytes = TextureUtil.readResource(inputStream);
+            if (MemoryUtil.memAddress(bytes) == 0L) {
+                throw new IllegalArgumentException("Invalid buffer");
+            }
+            PngInfo.validateHeader(bytes);
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer w = stack.mallocInt(1);
+                IntBuffer h = stack.mallocInt(1);
+                IntBuffer comp = stack.mallocInt(1);
+                ByteBuffer pixels = STBImage.stbi_load_from_memory(
+                    bytes,
+                    w,
+                    h,
+                    comp,
+                    NativeImage.Format.LUMINANCE.components()
+                );
+                if (pixels == null) {
+                    throw new IOException("Could not load image: " + STBImage.stbi_failure_reason());
+                }
+                long address = MemoryUtil.memAddress(pixels);
+                NativeImage.MEMORY_POOL.malloc(address, pixels.limit());
+                return new NativeImage(NativeImage.Format.LUMINANCE, w.get(0), h.get(0), true, address);
+            }
+        } finally {
+            MemoryUtil.memFree(bytes);
+            IOUtils.closeQuietly(inputStream);
         }
     }
 
