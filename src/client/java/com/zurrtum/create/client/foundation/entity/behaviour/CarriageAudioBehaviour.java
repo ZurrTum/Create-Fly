@@ -346,7 +346,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         private static final SubtitleOverlay OVERLAY = Minecraft.getInstance().gui.hud.subtitleOverlay;
 
         private final boolean repeatSubtitle;
-        private final WeighedSoundEvents weighedSoundEvents = resolve(Minecraft.getInstance().getSoundManager());
+        private final WeighedSoundEvents weighedSoundEvents = getOrResolve(Minecraft.getInstance().getSoundManager());
         private byte subtitleTimer;
 
         protected LoopingSound(SoundEvent soundEvent, SoundSource source, boolean repeatSubtitle) {
