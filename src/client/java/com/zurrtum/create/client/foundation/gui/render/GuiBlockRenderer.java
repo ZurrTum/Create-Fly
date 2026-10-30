@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.zurrtum.create.client.catnip.gui.render.GpuTexture;
 import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
@@ -35,8 +36,6 @@ public abstract class GuiBlockRenderer<T extends PictureInPictureRenderState> ex
             blitTexture(renderState, guiRenderState);
         } else {
             prepareTexturesAndProjection(needsAResize, width, height);
-            RenderSystem.outputColorTextureOverride = textureView;
-            RenderSystem.outputDepthTextureOverride = depthTextureView;
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             PoseStack poseStack = new PoseStack();
@@ -45,20 +44,27 @@ public abstract class GuiBlockRenderer<T extends PictureInPictureRenderState> ex
             float scale = guiScale * renderState.scale();
             pose.scale(scale, scale, -scale);
             renderToTexture(renderState, poseStack, submitNodeStorage);
-            renderAllFeatures(featureRenderDispatcher);
+            Minecraft mc = Minecraft.getInstance();
+            Lighting lighting = mc.gameRenderer.lighting();
+            lighting.updateBuffer(Lighting.Entry.LEVEL, getLight0(), getLight1());
+            lighting.setupFor(Lighting.Entry.LEVEL);
+            GpuTexture.render(featureRenderDispatcher, submitNodeStorage, textureView, depthTextureView);
+            if (mc.level != null) {
+                lighting.updateLevel(mc.level.dimensionType().cardinalLightType());
+            } else {
+                lighting.updateLevel(CardinalLighting.Type.DEFAULT);
+            }
             modelViewStack.popMatrix();
-            RenderSystem.outputColorTextureOverride = null;
-            RenderSystem.outputDepthTextureOverride = null;
             blitTexture(renderState, guiRenderState);
         }
     }
 
-    protected void renderAllFeatures(FeatureRenderDispatcher featureRenderDispatcher) {
+    protected void renderAllFeatures(GpuTexture texture, FeatureRenderDispatcher featureRenderDispatcher) {
         Minecraft mc = Minecraft.getInstance();
         Lighting lighting = mc.gameRenderer.lighting();
         lighting.updateBuffer(Lighting.Entry.LEVEL, getLight0(), getLight1());
         lighting.setupFor(Lighting.Entry.LEVEL);
-        featureRenderDispatcher.renderAllFeatures(submitNodeStorage);
+        texture.render(featureRenderDispatcher, submitNodeStorage);
         if (mc.level != null) {
             lighting.updateLevel(mc.level.dimensionType().cardinalLightType());
         } else {

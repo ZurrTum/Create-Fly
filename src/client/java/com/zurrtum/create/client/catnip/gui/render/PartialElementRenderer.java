@@ -67,8 +67,7 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
             partial.transform(matrices);
             CachedBuffers.partial(partial.model, Blocks.AIR.defaultBlockState()).submit(matrices, submitNodeStorage);
             matrices.popPose();
-            featureRenderDispatcher.renderAllFeatures(submitNodeStorage);
-            texture.clear();
+            texture.render(featureRenderDispatcher, submitNodeStorage);
         }
         state.addBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,

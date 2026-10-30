@@ -78,19 +78,12 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
             QuadParticleFeatureRenderer.TYPE);
         Matrix4f particleTransforms = RenderSystem.getModelViewMatrixCopy().mul(matrices.last().pose());
         particle.ponder$updateTransforms(RenderSystem.getDynamicUniforms().writeTransform(particleTransforms));
-        try (FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(submitNodeStorage)) {
-            frame.executeSolid();
-            frame.executeTranslucent();
-            frame.executeOutline();
-            frame.executeTranslucentAfterTerrain();
-            frame.executeAlwaysOnTop();
-        }
+        texture.render(featureRenderDispatcher, submitNodeStorage);
         particle.ponder$updateTransforms(null);
         scene.resetParticles();
         lighting.updateLevel(mc.level.dimensionType().cardinalLightType());
         gameRenderer.useUiLightmap = lightOption;
         matrices.popPose();
-        texture.clear();
         state.addBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.singleTexture(

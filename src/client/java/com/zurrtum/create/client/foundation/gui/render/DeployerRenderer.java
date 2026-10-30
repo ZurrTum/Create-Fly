@@ -90,8 +90,7 @@ public class DeployerRenderer extends GuiBlockRenderer<DeployerRenderState> {
         CachedBuffers.block(AllBlocks.DEPOT.defaultBlockState()).submit(matrices, submitNodeStorage);
 
         matrices.popPose();
-        renderAllFeatures(featureRenderDispatcher);
-        texture.clear();
+        renderAllFeatures(texture, featureRenderDispatcher);
         state.addBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.singleTexture(

@@ -75,8 +75,7 @@ public class PressRenderer extends GuiBlockRenderer<PressRenderState> {
             .submit(matrices, submitNodeStorage);
         matrices.popPose();
         matrices.popPose();
-        renderAllFeatures(featureRenderDispatcher);
-        texture.clear();
+        renderAllFeatures(texture, featureRenderDispatcher);
         state.addBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.singleTexture(

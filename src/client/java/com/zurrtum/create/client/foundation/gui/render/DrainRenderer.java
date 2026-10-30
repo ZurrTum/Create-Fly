@@ -87,8 +87,7 @@ public class DrainRenderer extends GuiBlockRenderer<DrainRenderState> {
         ).submit(matrices, submitNodeStorage);
 
         matrices.popPose();
-        renderAllFeatures(featureRenderDispatcher);
-        texture.clear();
+        renderAllFeatures(texture, featureRenderDispatcher);
         state.addBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.singleTexture(

@@ -3,11 +3,17 @@ package com.zurrtum.create.client.catnip.gui.render;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.device.GpuDevice;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.Projection;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 public record GpuTexture(int width, int height, com.mojang.renderpearl.api.textures.GpuTexture texture,
                          GpuTextureView textureView, com.mojang.renderpearl.api.textures.GpuTexture depthTexture,
@@ -50,13 +56,29 @@ public record GpuTexture(int width, int height, com.mojang.renderpearl.api.textu
             .clearColorAndDepthTextures(texture, GuiRenderer.CLEAR_COLOR, depthTexture, 0);
         projection.setupOrtho(-1000.0F, 1000.0F, width, height, true);
         RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(projection), ProjectionType.ORTHOGRAPHIC);
-        RenderSystem.outputColorTextureOverride = textureView;
-        RenderSystem.outputDepthTextureOverride = depthTextureView;
     }
 
-    public void clear() {
-        RenderSystem.outputColorTextureOverride = null;
-        RenderSystem.outputDepthTextureOverride = null;
+    public void render(FeatureRenderDispatcher featureRenderDispatcher, SubmitNodeStorage submitNodeStorage) {
+        render(featureRenderDispatcher, submitNodeStorage, textureView, depthTextureView);
+    }
+
+    public static void render(
+        FeatureRenderDispatcher featureRenderDispatcher,
+        SubmitNodeStorage submitNodeStorage,
+        GpuTextureView textureView,
+        GpuTextureView depthTextureView
+    ) {
+        try (FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(submitNodeStorage);
+             RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                 () -> "UI Item Transform texture",
+                 textureView,
+                 Optional.empty(),
+                 depthTextureView,
+                 OptionalDouble.empty()
+             )) {
+            RenderSystem.bindDefaultUniforms(renderPass);
+            FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
+        }
     }
 
     public void close() {
