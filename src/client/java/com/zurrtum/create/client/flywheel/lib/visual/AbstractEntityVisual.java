@@ -88,9 +88,9 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
         );
     }
 
-    public boolean isVisible(FrustumIntersection frustum) {
+    public boolean isVisible(FrustumIntersection frustum, float partialTicks) {
         return !Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity)
-            .affectedByCulling(entity) || visibilityTester.check(frustum);
+            .affectedByCulling(entity) || visibilityTester.check(frustum, partialTicks);
     }
 
     protected int computePackedLight(float partialTick) {

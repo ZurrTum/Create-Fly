@@ -88,7 +88,7 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
 
     @Override
     public void beginFrame(DynamicVisual.Context context) {
-        if (!isVisible(context.frustum())) {
+        if (!isVisible(context.frustum(), context.partialTick())) {
             return;
         }
 

@@ -58,7 +58,7 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
 
     @Override
     public void beginFrame(Context ctx) {
-        if (!isVisible(ctx.frustum())) {
+        if (!isVisible(ctx.frustum(), ctx.partialTick())) {
             return;
         }
 
