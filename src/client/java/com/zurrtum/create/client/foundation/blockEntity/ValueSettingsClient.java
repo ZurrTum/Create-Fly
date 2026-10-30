@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity.SwingState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jspecify.annotations.Nullable;
@@ -98,7 +99,10 @@ public class ValueSettingsClient {
         }
 
         if (interactHeldTicks > 3) {
-            player.swinging = false;
+            SwingState swingState = player.swingState;
+            swingState.currentSwing = null;
+            swingState.oldAnimation = 0;
+            swingState.animation = 0;
         }
         if (interactHeldTicks++ < 5) {
             return;
