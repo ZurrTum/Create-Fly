@@ -131,13 +131,15 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
             null
         );
         MaterialInfo info = bakedQuad.materialInfo();
-        if (ponder && info.shade()) {
+        if (ponder && info.shadeDirectionOverride() != Direction.UP) {
             info = new MaterialInfo(
                 info.sprite(),
                 info.layer(),
                 info.itemRenderType(),
+                info.itemGlintRenderType(),
+                info.itemGlintSpecialRenderType(),
                 info.tintIndex(),
-                false,
+                Direction.UP,
                 info.lightEmission()
             );
         }

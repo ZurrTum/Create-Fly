@@ -3,6 +3,7 @@ package com.zurrtum.create.client.model.ao;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3fc;
@@ -592,6 +593,7 @@ public class Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -604,32 +606,156 @@ public class Face {
         float y = normal.y();
         float z = normal.z();
         switch (computeFlag(x, y, z)) {
-            case 1 -> East.irregularFace(level, state, pos, output, cache, p0, p1, p2, p3);
-            case 2 -> West.irregularFace(level, state, pos, output, cache, p0, p1, p2, p3);
-            case 3 -> Up.irregularFace(level, state, pos, output, cache, p0, p1, p2, p3);
-            case 4 -> Two.irregularEastUp(level, state, pos, output, cache, p0, p1, p2, p3, x, y);
-            case 5 -> Two.irregularWestUp(level, state, pos, output, cache, p0, p1, p2, p3, x, y);
-            case 6 -> Down.irregularFace(level, state, pos, output, cache, p0, p1, p2, p3);
-            case 7 -> Two.irregularEastDown(level, state, pos, output, cache, p0, p1, p2, p3, x, y);
-            case 8 -> Two.irregularWestDown(level, state, pos, output, cache, p0, p1, p2, p3, x, y);
-            case 9 -> South.irregularFace(level, state, pos, output, cache, p0, p1, p2, p3);
-            case 10 -> Two.irregularEastSouth(level, state, pos, output, cache, p0, p1, p2, p3, x, z);
-            case 11 -> Two.irregularWestSouth(level, state, pos, output, cache, p0, p1, p2, p3, x, z);
-            case 12 -> Two.irregularUpSouth(level, state, pos, output, cache, p0, p1, p2, p3, y, z);
-            case 13 -> Three.irregularEastUpSouth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 14 -> Three.irregularWestUpSouth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 15 -> Two.irregularDownSouth(level, state, pos, output, cache, p0, p1, p2, p3, y, z);
-            case 16 -> Three.irregularEastDownSouth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 17 -> Three.irregularWestDownSouth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 18 -> North.irregularFace(level, state, pos, output, cache, p0, p1, p2, p3);
-            case 19 -> Two.irregularEastNorth(level, state, pos, output, cache, p0, p1, p2, p3, x, z);
-            case 20 -> Two.irregularWestNorth(level, state, pos, output, cache, p0, p1, p2, p3, x, z);
-            case 21 -> Two.irregularUpNorth(level, state, pos, output, cache, p0, p1, p2, p3, y, z);
-            case 22 -> Three.irregularEastUpNorth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 23 -> Three.irregularWestUpNorth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 24 -> Two.irregularDownNorth(level, state, pos, output, cache, p0, p1, p2, p3, y, z);
-            case 25 -> Three.irregularEastDownNorth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
-            case 26 -> Three.irregularWestDownNorth(level, state, pos, output, cache, p0, p1, p2, p3, x, y, z);
+            case 1 -> East.irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3);
+            case 2 -> West.irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3);
+            case 3 -> Up.irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3);
+            case 4 ->
+                Two.irregularEastUp(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, y);
+            case 5 ->
+                Two.irregularWestUp(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, y);
+            case 6 -> Down.irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3);
+            case 7 ->
+                Two.irregularEastDown(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, y);
+            case 8 ->
+                Two.irregularWestDown(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, y);
+            case 9 -> South.irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3);
+            case 10 ->
+                Two.irregularEastSouth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, z);
+            case 11 ->
+                Two.irregularWestSouth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, z);
+            case 12 ->
+                Two.irregularUpSouth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, y, z);
+            case 13 -> Three.irregularEastUpSouth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 14 -> Three.irregularWestUpSouth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 15 ->
+                Two.irregularDownSouth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, y, z);
+            case 16 -> Three.irregularEastDownSouth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 17 -> Three.irregularWestDownSouth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 18 -> North.irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3);
+            case 19 ->
+                Two.irregularEastNorth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, z);
+            case 20 ->
+                Two.irregularWestNorth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, x, z);
+            case 21 ->
+                Two.irregularUpNorth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, y, z);
+            case 22 -> Three.irregularEastUpNorth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 23 -> Three.irregularWestUpNorth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 24 ->
+                Two.irregularDownNorth(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, y, z);
+            case 25 -> Three.irregularEastDownNorth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
+            case 26 -> Three.irregularWestDownNorth(
+                level,
+                state,
+                pos,
+                shadeDirectionOverride,
+                output,
+                cache,
+                p0,
+                p1,
+                p2,
+                p3,
+                x,
+                y,
+                z
+            );
             default -> {
                 output.setColor(0);
                 output.setLightCoords(0);

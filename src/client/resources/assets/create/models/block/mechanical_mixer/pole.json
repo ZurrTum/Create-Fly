@@ -11,7 +11,7 @@
 			"name": "polebase",
 			"from": [5, 7, 5],
 			"to": [11, 9, 11],
-			"shade": false,
+			"shade_direction_override": "up",
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 9, 8]},
 			"faces": {
 				"north": {"uv": [10, 6, 16, 8], "texture": "#6"},

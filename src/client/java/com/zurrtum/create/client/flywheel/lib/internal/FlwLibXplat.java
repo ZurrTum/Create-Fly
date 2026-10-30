@@ -11,4 +11,6 @@ public interface FlwLibXplat {
     SimpleModel buildBakedModelBuilder(BakedModelBuilder builder);
 
     SimpleModel buildBlockModelBuilder(BlockModelBuilder builder);
+
+    SimpleModel buildSingleBlockModelBuilder(BlockModelBuilder builder);
 }

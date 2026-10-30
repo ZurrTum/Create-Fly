@@ -7,7 +7,7 @@
 	"elements": [
 		{
 			"name": "Saw",
-			"shade": false,
+			"shade_direction_override": "up",
 			"from": [0, 8, 11],
 			"to": [16, 8, 19],
 			"faces": {

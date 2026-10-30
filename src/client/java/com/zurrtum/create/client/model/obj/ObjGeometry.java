@@ -404,19 +404,19 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
             }
         }
         int lightEmission;
-        boolean shade;
+        Direction shadeDirectionOverride;
         if (emissiveAmbient) {
             lightEmission = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
-            shade = lightEmission == 0 && shadeQuads;
+            shadeDirectionOverride = lightEmission == 0 && shadeQuads ? null : Direction.UP;
         } else {
             lightEmission = 0;
-            shade = shadeQuads;
+            shadeDirectionOverride = shadeQuads ? null : Direction.UP;
         }
         MaterialInfo materialInfo = interner.materialInfo(MaterialInfo.of(
             material,
             computeMaterialTransparency(material, texture, tex),
             tintIndex,
-            shade,
+            shadeDirectionOverride,
             lightEmission
         ));
         float nx = norm.x(), ny = norm.y(), nz = norm.z();

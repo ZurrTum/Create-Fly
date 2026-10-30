@@ -30,14 +30,14 @@ public class ModelRenderHelper {
         return INSTANCE;
     }
 
-    public static ModelConsumer getAoCullHelper(BufferAoPoseEmitter output) {
-        AO_INSTANCE.updateOutput(output);
-        return CULL_INSTANCE;
+    public static ModelConsumer getAoCullHelper(BufferAoEmitter output) {
+        AO_CULL_INSTANCE.updateOutput(output);
+        return AO_CULL_INSTANCE;
     }
 
-    public static ModelConsumer getAoHelper(BufferAoPoseEmitter output) {
-        AO_CULL_INSTANCE.updateOutput(output);
-        return INSTANCE;
+    public static ModelConsumer getAoHelper(BufferAoEmitter output) {
+        AO_INSTANCE.updateOutput(output);
+        return AO_INSTANCE;
     }
 
     public static ModelConsumer getCurrentThreadCullHelper(BufferEmitterOutput output) {
@@ -52,13 +52,13 @@ public class ModelRenderHelper {
         return instance;
     }
 
-    public static ModelConsumer getCurrentThreadAoCullHelper(BufferAoPoseEmitter output) {
+    public static ModelConsumer getCurrentThreadAoCullHelper(BufferAoEmitter output) {
         ModelConsumer cullInstance = THREAD_LOCAL_OBJECTS.get().aoCullInstance;
         cullInstance.updateOutput(output);
         return cullInstance;
     }
 
-    public static ModelConsumer getCurrentThreadAoHelper(BufferAoPoseEmitter output) {
+    public static ModelConsumer getCurrentThreadAoHelper(BufferAoEmitter output) {
         ModelConsumer instance = THREAD_LOCAL_OBJECTS.get().aoInstance;
         instance.updateOutput(output);
         return instance;

@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 
 public final class BlockModelBuilder {
     final BlockAndTintGetter level;
-    final Iterable<BlockPos> positions;
+    final @Nullable Iterable<BlockPos> positions;
     @Nullable PoseStack poseStack;
     boolean renderFluids;
     @Nullable BlockMaterialFunction materialFunc;
@@ -22,6 +22,11 @@ public final class BlockModelBuilder {
     public BlockModelBuilder(BlockAndTintGetter level, Iterable<BlockPos> positions) {
         this.level = level;
         this.positions = positions;
+    }
+
+    public BlockModelBuilder(BlockAndTintGetter level) {
+        this.level = level;
+        positions = null;
     }
 
     public BlockModelBuilder poseStack(@Nullable PoseStack poseStack) {
@@ -56,7 +61,9 @@ public final class BlockModelBuilder {
         if (materialFunc == null) {
             materialFunc = ModelUtil::getMaterial;
         }
-
+        if (positions == null) {
+            FlwLibXplat.INSTANCE.buildSingleBlockModelBuilder(this);
+        }
         return FlwLibXplat.INSTANCE.buildBlockModelBuilder(this);
     }
 }

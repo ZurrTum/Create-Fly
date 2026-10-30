@@ -1,34 +1,42 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.zurrtum.create.client.flywheel.lib.model.SimpleModel;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
 import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.Nullable;
 
-public class VanillinMeshEmitterManager extends MeshEmitterManager<MeshEmitter> implements BufferAoPoseEmitter, FluidRenderer.Output {
-    private final TransformingVertexConsumer transformingWrapper = new TransformingVertexConsumer();
-    private boolean useAo;
-    @UnknownNullability
-    private PoseStack poseStack;
-    @UnknownNullability
-    private BlockPos pos;
+import java.util.function.Function;
+
+public class VanillinMeshEmitterManager extends MeshEmitterManager<MeshEmitter> implements BufferAoEmitter, FluidRenderer.Output {
+    protected @UnknownNullability FluidBufferBuilder fluidBufferBuilder;
+    protected boolean useAo;
+    protected @Nullable Object cache;
 
     VanillinMeshEmitterManager() {
         super(MeshEmitter::new);
+        fluidBufferBuilder = new FluidBufferBuilder();
     }
 
-    public void prepare(BlockMaterialFunction blockMaterialFunction, PoseStack poseStack) {
-        prepare(blockMaterialFunction);
-        transformingWrapper.setPoseStack(poseStack);
-        this.poseStack = poseStack;
+    @SuppressWarnings("CopyConstructorMissesField")
+    VanillinMeshEmitterManager(VanillinMeshEmitterManager manager) {
+        super(manager);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends BufferEmitterOutput, Emitter> Emitter getOrCreateEmitter(Function<T, Emitter> func) {
+        if (cache != null) {
+            return (Emitter) cache;
+        }
+        Emitter emitter = func.apply((T) this);
+        cache = emitter;
+        return emitter;
     }
 
     public void prepareForModelLayer(boolean useAo) {
@@ -38,48 +46,55 @@ public class VanillinMeshEmitterManager extends MeshEmitterManager<MeshEmitter> 
     @Override
     public void put(float x, float y, float z, BakedQuad quad, QuadInstance instance) {
         MaterialInfo info = quad.materialInfo();
-        BufferBuilder buffer = getBuffer(info.layer(), info.shade(), useAo);
+        VertexConsumer buffer = getBuffer(info.layer(), info.shadeDirectionOverride(), useAo);
         if (buffer != null) {
-            if (x != 0.0F || y != 0.0F || z != 0.0F) {
-                poseStack.pushPose();
-                Pose pose = poseStack.last();
-                pose.translate(x, y, z);
-                buffer.putBakedQuad(pose, quad, instance);
-                poseStack.popPose();
-            } else {
-                buffer.putBakedQuad(poseStack.last(), quad, instance);
-            }
+            buffer.putBlockBakedQuad(x, y, z, quad, instance);
         }
     }
 
     public void prepareForFluid(BlockPos pos) {
-        this.pos = pos;
+        fluidBufferBuilder.prepare(pos);
     }
 
     @Override
     public VertexConsumer getBuilder(ChunkSectionLayer layer) {
-        BufferBuilder buffer = getBuffer(layer, true, false);
-        if (buffer == null) {
-            return EmptyVertexConsumer.INSTANCE;
+        BufferBuilder buffer = getFluidBuffer(layer);
+        if (buffer != null) {
+            return fluidBufferBuilder.wrap(buffer);
         }
-        poseStack.translate(
-            pos.getX() - (pos.getX() & 0xF),
-            pos.getY() - (pos.getY() & 0xF),
-            pos.getZ() - (pos.getZ() & 0xF)
-        );
-        return transformingWrapper.wrap(buffer);
+        return EmptyVertexConsumer.INSTANCE;
     }
 
-    @Override
-    public SimpleModel end() {
-        poseStack = null;
-        pos = null;
-        transformingWrapper.clear();
-        return super.end();
-    }
+    protected static class FluidBufferBuilder extends AbstractMeshBuffer {
+        protected int fluidX, fluidY, fluidZ;
+        protected @UnknownNullability BufferBuilder buffer;
 
-    @Override
-    public Pose getPose() {
-        return poseStack.last();
+        public void prepare(BlockPos pos) {
+            fluidX = pos.getX() & -16;
+            fluidY = pos.getY() & -16;
+            fluidZ = pos.getZ() & -16;
+        }
+
+        public VertexConsumer wrap(BufferBuilder buffer) {
+            this.buffer = buffer;
+            return this;
+        }
+
+        @Override
+        public void addVertex(
+            float x,
+            float y,
+            float z,
+            int color,
+            float u,
+            float v,
+            int overlayCoords,
+            int lightCoords,
+            float nx,
+            float ny,
+            float nz
+        ) {
+            buffer.addVertex(fluidX + x, fluidY + y, fluidZ + z, color, u, v, overlayCoords, lightCoords, nx, ny, nz);
+        }
     }
 }

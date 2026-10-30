@@ -33,13 +33,59 @@ final class BakedModelBufferer {
         BlockMaterialFunction blockMaterialFunction
     ) {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
+        VanillinMeshEmitterManager emitters;
         if (poseStack == null) {
-            poseStack = objects.identityPoseStack;
+            emitters = objects.emitters;
+            emitters.prepare(blockMaterialFunction);
+        } else {
+            emitters = objects.transformEmitters.prepare(blockMaterialFunction, poseStack);
         }
-        VanillinMeshEmitterManager emitters = objects.emitters;
-        emitters.prepare(blockMaterialFunction, poseStack);
         ModelRenderHelper.getCurrentThreadAoHelper(emitters)
             .tesselateBlock(0, 0, 0, level, pos, state, model, state.getSeed(pos));
+        return emitters.end();
+    }
+
+    public static SimpleModel bufferBlock(
+        BlockAndTintGetter level,
+        @Nullable PoseStack poseStack,
+        boolean renderFluids,
+        BlockMaterialFunction blockMaterialFunction
+    ) {
+        ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
+        VanillinMeshEmitterManager emitters;
+        if (poseStack == null) {
+            emitters = objects.emitters;
+            emitters.prepare(blockMaterialFunction);
+        } else {
+            emitters = objects.transformEmitters.prepare(blockMaterialFunction, poseStack);
+        }
+        ModelManager modelManager = Minecraft.getInstance().getModelManager();
+        BlockState state = level.getBlockState(BlockPos.ZERO);
+        if (renderFluids) {
+            FluidState fluidState = state.getFluidState();
+            if (!fluidState.isEmpty()) {
+                emitters.prepareForFluid(BlockPos.ZERO);
+                new FluidRenderer(modelManager.getFluidStateModelSet()).tesselate(
+                    level,
+                    BlockPos.ZERO,
+                    emitters,
+                    state,
+                    fluidState
+                );
+            }
+        }
+        if (state.getRenderShape() == RenderShape.MODEL) {
+            ModelRenderHelper.getCurrentThreadAoHelper(emitters).tesselateBlock(
+                0,
+                0,
+                0,
+                level,
+                BlockPos.ZERO,
+                state,
+                modelManager.getBlockStateModelSet().get(state),
+                state.getSeed(BlockPos.ZERO)
+            );
+        }
         return emitters.end();
     }
 
@@ -51,11 +97,13 @@ final class BakedModelBufferer {
         BlockMaterialFunction blockMaterialFunction
     ) {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
+        VanillinMeshEmitterManager emitters;
         if (poseStack == null) {
-            poseStack = objects.identityPoseStack;
+            emitters = objects.emitters;
+            emitters.prepare(blockMaterialFunction);
+        } else {
+            emitters = objects.transformEmitters.prepare(blockMaterialFunction, poseStack);
         }
-        VanillinMeshEmitterManager emitters = objects.emitters;
-        emitters.prepare(blockMaterialFunction, poseStack);
 
         ModelManager modelManager = Minecraft.getInstance().getModelManager();
         BlockStateModelSet blockStateModelSet = modelManager.getBlockStateModelSet();
@@ -73,10 +121,8 @@ final class BakedModelBufferer {
             if (renderFluids) {
                 FluidState fluidState = state.getFluidState();
                 if (!fluidState.isEmpty()) {
-                    poseStack.pushPose();
                     emitters.prepareForFluid(pos);
                     fluidRenderer.tesselate(level, pos, emitters, state, fluidState);
-                    poseStack.popPose();
                 }
             }
 
@@ -99,7 +145,8 @@ final class BakedModelBufferer {
     }
 
     private static class ThreadLocalObjects {
-        public final PoseStack identityPoseStack = new PoseStack();
         public final VanillinMeshEmitterManager emitters = new VanillinMeshEmitterManager();
+        public final VanillinTransformMeshEmitterManager transformEmitters = new VanillinTransformMeshEmitterManager(
+            emitters);
     }
 }

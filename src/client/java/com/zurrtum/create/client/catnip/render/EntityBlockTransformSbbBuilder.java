@@ -6,27 +6,49 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.BufferPoseEmitter;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.UnknownNullability;
+import org.joml.Vector3f;
 
 public class EntityBlockTransformSbbBuilder extends EntityBlockSbbBuilder implements BufferPoseEmitter {
-    private final Pose origin = new Pose();
-    private final Pose target = new Pose();
+    private final Pose pose = new Pose();
+    private @UnknownNullability Pose origin;
+
+    public EntityBlockTransformSbbBuilder() {
+        super();
+    }
+
+    public EntityBlockTransformSbbBuilder(EntityBlockSbbBuilder builder) {
+        super(builder);
+    }
 
     public EntityBlockTransformSbbBuilder wrap(Pose pose) {
-        origin.set(pose);
+        origin = pose;
         return this;
+    }
+
+    @Override
+    protected void shadeDirectionOverride(Direction direction, Vector3f normal) {
+        origin.transformNormal(direction.getUnitVec3f(), normal);
     }
 
     @Override
     public void put(float x, float y, float z, BakedQuad quad, QuadInstance instance) {
         MaterialInfo info = quad.materialInfo();
-        VertexConsumer buffer = getBuffer(info.shade(), info.layer());
+        VertexConsumer buffer = getBuffer(info.shadeDirectionOverride(), info.layer());
         if (x != 0 || y != 0 || z != 0) {
-            target.set(origin);
-            target.translate(x, y, z);
-            buffer.putBakedQuad(target, quad, instance);
+            pose.set(origin);
+            pose.translate(x, y, z);
+            buffer.putBakedQuad(pose, quad, instance);
         } else {
             buffer.putBakedQuad(origin, quad, instance);
         }
+    }
+
+    @Override
+    public SuperByteBuffer build() {
+        origin = null;
+        return super.build();
     }
 
     @Override

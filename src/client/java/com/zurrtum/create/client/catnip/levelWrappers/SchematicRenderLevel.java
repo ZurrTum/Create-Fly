@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.catnip.levelWrappers;
 
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
+import com.zurrtum.create.client.flywheel.lib.model.baked.VirtualBlockGetter;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.CardinalLighting;
@@ -8,8 +9,6 @@ import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
 
 public class SchematicRenderLevel extends SchematicLevel implements BlockAndTintGetter {
-    private static final CardinalLighting FULL_LIGHTING = new CardinalLighting(1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
-
     public SchematicRenderLevel(Level original) {
         super(original);
     }
@@ -20,7 +19,7 @@ public class SchematicRenderLevel extends SchematicLevel implements BlockAndTint
 
     @Override
     public CardinalLighting cardinalLighting() {
-        return FULL_LIGHTING;
+        return VirtualBlockGetter.FULL_LIGHTING;
     }
 
     @Override

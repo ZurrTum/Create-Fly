@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.virtualWorld;
 
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationLevel;
+import com.zurrtum.create.client.flywheel.lib.model.baked.VirtualBlockGetter;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -55,7 +56,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 public class VirtualRenderWorld extends Level implements VisualizationLevel, BlockAndTintGetter {
-    private static final CardinalLighting FULL_LIGHTING = new CardinalLighting(1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
     protected final Level level;
     protected final int minBuildHeight;
     protected final int height;
@@ -356,7 +356,7 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel, Blo
 
     @Override
     public CardinalLighting cardinalLighting() {
-        return FULL_LIGHTING;
+        return VirtualBlockGetter.FULL_LIGHTING;
     }
 
     @Override

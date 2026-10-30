@@ -101,10 +101,7 @@ public abstract class AoFaceData {
         int light = lightCache.getLightCoords(centerState, level, centerPos);
         int centerBlock = light & 0xFFFF;
         int centerSky = light >>> 16;
-        boolean translucentCenter = !centerState.isViewBlocking(
-            level,
-            centerPos
-        ) || centerState.getLightDampening() == 0;
+        boolean translucentCenter = centerState.isLightPermeable();
         int centerTranslucentBlock = translucentCenter ? centerBlock : 0x100;
         int centerMinBlock = translucentCenter ? centerBlock : 0;
         int centerTranslucentSky = translucentCenter ? centerSky : 0x100;
@@ -115,7 +112,7 @@ public abstract class AoFaceData {
         light = lightCache.getLightCoords(searchState, level, searchPos);
         int blockU0 = light & 0xFFFF;
         int skyU0 = light >>> 16;
-        boolean translucentU0 = !searchState.isViewBlocking(level, searchPos) || searchState.getLightDampening() == 0;
+        boolean translucentU0 = searchState.isLightPermeable();
         int translucentBlockU0 = translucentU0 ? blockU0 : 0x100;
         int translucentSkyU0 = translucentU0 ? skyU0 : 0x100;
         moveU1(searchPos, x, y, z);
@@ -124,7 +121,7 @@ public abstract class AoFaceData {
         light = lightCache.getLightCoords(searchState, level, searchPos);
         int blockU1 = light & 0xFFFF;
         int skyU1 = light >>> 16;
-        boolean translucentU1 = !searchState.isViewBlocking(level, searchPos) || searchState.getLightDampening() == 0;
+        boolean translucentU1 = searchState.isLightPermeable();
         int translucentBlockU1 = translucentU1 ? blockU1 : 0x100;
         int translucentSkyU1 = translucentU1 ? skyU1 : 0x100;
         moveU(searchPos, x, y, z);
@@ -136,7 +133,7 @@ public abstract class AoFaceData {
         light = lightCache.getLightCoords(searchState, level, searchPos);
         int blockV0 = light & 0xFFFF;
         int skyV0 = light >>> 16;
-        boolean translucentV0 = !searchState.isViewBlocking(level, searchPos) || searchState.getLightDampening() == 0;
+        boolean translucentV0 = searchState.isLightPermeable();
         int translucentBlockV0 = translucentV0 ? blockV0 : 0x100;
         int translucentSkyV0 = translucentV0 ? skyV0 : 0x100;
         boolean hasU0V0 = translucentV0 | translucentU0;
@@ -149,7 +146,7 @@ public abstract class AoFaceData {
         light = lightCache.getLightCoords(searchState, level, searchPos);
         int blockV1 = light & 0xFFFF;
         int skyV1 = light >>> 16;
-        boolean translucentV1 = !searchState.isViewBlocking(level, searchPos) || searchState.getLightDampening() == 0;
+        boolean translucentV1 = searchState.isLightPermeable();
         int translucentBlockV1 = translucentV1 ? blockV1 : 0x100;
         int translucentSkyV1 = translucentV1 ? skyV1 : 0x100;
         boolean hasU0V1 = translucentV1 | translucentU0;
@@ -161,10 +158,7 @@ public abstract class AoFaceData {
             light = lightCache.getLightCoords(searchState, level, searchPos);
             int blockU0V1 = light & 0xFFFF;
             int skyU0V1 = light >>> 16;
-            boolean translucentU0V1 = !searchState.isViewBlocking(
-                level,
-                searchPos
-            ) || searchState.getLightDampening() == 0;
+            boolean translucentU0V1 = searchState.isLightPermeable();
             int translucentBlockU0V1 = translucentU0V1 ? blockU0V1 : 0x100;
             int translucentSkyU0V1 = translucentU0V1 ? skyU0V1 : 0x100;
             int minBlock = Math.min(
@@ -194,10 +188,7 @@ public abstract class AoFaceData {
             light = lightCache.getLightCoords(searchState, level, searchPos);
             int blockU1V1 = light & 0xFFFF;
             int skyU1V1 = light >>> 16;
-            boolean translucentU1V1 = !searchState.isViewBlocking(
-                level,
-                searchPos
-            ) || searchState.getLightDampening() == 0;
+            boolean translucentU1V1 = searchState.isLightPermeable();
             int translucentBlockU1V1 = translucentU1V1 ? blockU1V1 : 0x100;
             int translucentSkyU1V1 = translucentU1V1 ? skyU1V1 : 0x100;
             int minBlock = Math.min(
@@ -228,10 +219,7 @@ public abstract class AoFaceData {
             light = lightCache.getLightCoords(searchState, level, searchPos);
             int blockU0V0 = light & 0xFFFF;
             int skyU0V0 = light >>> 16;
-            boolean translucentU0V0 = !searchState.isViewBlocking(
-                level,
-                searchPos
-            ) || searchState.getLightDampening() == 0;
+            boolean translucentU0V0 = searchState.isLightPermeable();
             int translucentBlockU0V0 = translucentU0V0 ? blockU0V0 : 0x100;
             int translucentSkyU0V0 = translucentU0V0 ? skyU0V0 : 0x100;
             int minBlock = Math.min(
@@ -261,10 +249,7 @@ public abstract class AoFaceData {
             light = lightCache.getLightCoords(searchState, level, searchPos);
             int blockU1V0 = light & 0xFFFF;
             int skyU1V0 = light >>> 16;
-            boolean translucentU1V0 = !searchState.isViewBlocking(
-                level,
-                searchPos
-            ) || searchState.getLightDampening() == 0;
+            boolean translucentU1V0 = searchState.isLightPermeable();
             int translucentBlockU1V0 = translucentU1V0 ? blockU1V0 : 0x100;
             int translucentSkyU1V0 = translucentU1V0 ? skyU1V0 : 0x100;
             int minBlock = Math.min(

@@ -3,6 +3,7 @@ package com.zurrtum.create.client.model.ao;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3fc;
 
@@ -11,6 +12,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -21,10 +23,10 @@ public class Two extends Face {
         float y
     ) {
         float x2 = x * x, y2 = y * y;
-        irregularEastUp(0, level, state, pos, output, cache, p0, x2, y2);
-        irregularEastUp(1, level, state, pos, output, cache, p1, x2, y2);
-        irregularEastUp(2, level, state, pos, output, cache, p2, x2, y2);
-        irregularEastUp(3, level, state, pos, output, cache, p3, x2, y2);
+        irregularEastUp(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, y2);
+        irregularEastUp(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, y2);
+        irregularEastUp(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, y2);
+        irregularEastUp(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, y2);
     }
 
     public static void irregularShadeEastUp(
@@ -52,6 +54,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -63,18 +66,18 @@ public class Two extends Face {
         float a0, w0 = fy * cz, w1 = fy * fz, w2 = cy * fz, w3 = cy * cz;
         int b0, s0;
         if (fx < 0.00001f) {
-            AoFaceData faceData = cache.computeEastBlock(level, state, pos);
+            AoFaceData faceData = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (fx > 0.99999f) {
-            AoFaceData faceData = cache.computeEast(level, state, pos);
+            AoFaceData faceData = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeEastBlock(level, state, pos);
-            AoFaceData f1 = cache.computeEast(level, state, pos);
+            AoFaceData f0 = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, fx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, fx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, fx, w0, w1, w2, w3);
@@ -82,18 +85,18 @@ public class Two extends Face {
         float a1, w4 = cx * cz, w5 = cx * fz, w6 = fx * fz, w7 = fx * cz;
         int b1, s1;
         if (fy < 0.00001f) {
-            AoFaceData faceData = cache.computeUpBlock(level, state, pos);
+            AoFaceData faceData = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (fy > 0.99999f) {
-            AoFaceData faceData = cache.computeUp(level, state, pos);
+            AoFaceData faceData = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeUpBlock(level, state, pos);
-            AoFaceData f1 = cache.computeUp(level, state, pos);
+            AoFaceData f0 = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, fy, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, fy, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, fy, w4, w5, w6, w7);
@@ -159,6 +162,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -169,10 +173,10 @@ public class Two extends Face {
         float y
     ) {
         float x2 = x * x, y2 = y * y;
-        irregularWestUp(0, level, state, pos, output, cache, p0, x2, y2);
-        irregularWestUp(1, level, state, pos, output, cache, p1, x2, y2);
-        irregularWestUp(2, level, state, pos, output, cache, p2, x2, y2);
-        irregularWestUp(3, level, state, pos, output, cache, p3, x2, y2);
+        irregularWestUp(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, y2);
+        irregularWestUp(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, y2);
+        irregularWestUp(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, y2);
+        irregularWestUp(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, y2);
     }
 
     public static void irregularShadeWestUp(
@@ -200,6 +204,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -211,18 +216,18 @@ public class Two extends Face {
         float a0, w0 = cy * cz, w1 = cy * fz, w2 = fy * fz, w3 = fy * cz;
         int b0, s0;
         if (cx < 0.00001f) {
-            AoFaceData faceData = cache.computeWestBlock(level, state, pos);
+            AoFaceData faceData = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (cx > 0.99999f) {
-            AoFaceData faceData = cache.computeWest(level, state, pos);
+            AoFaceData faceData = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeWestBlock(level, state, pos);
-            AoFaceData f1 = cache.computeWest(level, state, pos);
+            AoFaceData f0 = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, cx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, cx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, cx, w0, w1, w2, w3);
@@ -230,18 +235,18 @@ public class Two extends Face {
         float a1, w4 = cx * cz, w5 = cx * fz, w6 = fx * fz, w7 = fx * cz;
         int b1, s1;
         if (fy < 0.00001f) {
-            AoFaceData faceData = cache.computeUpBlock(level, state, pos);
+            AoFaceData faceData = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (fy > 0.99999f) {
-            AoFaceData faceData = cache.computeUp(level, state, pos);
+            AoFaceData faceData = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeUpBlock(level, state, pos);
-            AoFaceData f1 = cache.computeUp(level, state, pos);
+            AoFaceData f0 = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, fy, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, fy, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, fy, w4, w5, w6, w7);
@@ -307,6 +312,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -317,10 +323,10 @@ public class Two extends Face {
         float y
     ) {
         float x2 = x * x, y2 = y * y;
-        irregularEastDown(0, level, state, pos, output, cache, p0, x2, y2);
-        irregularEastDown(1, level, state, pos, output, cache, p1, x2, y2);
-        irregularEastDown(2, level, state, pos, output, cache, p2, x2, y2);
-        irregularEastDown(3, level, state, pos, output, cache, p3, x2, y2);
+        irregularEastDown(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, y2);
+        irregularEastDown(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, y2);
+        irregularEastDown(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, y2);
+        irregularEastDown(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, y2);
     }
 
     public static void irregularShadeEastDown(
@@ -348,6 +354,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -359,18 +366,18 @@ public class Two extends Face {
         float a0, w0 = fy * cz, w1 = fy * fz, w2 = cy * fz, w3 = cy * cz;
         int b0, s0;
         if (fx < 0.00001f) {
-            AoFaceData faceData = cache.computeEastBlock(level, state, pos);
+            AoFaceData faceData = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (fx > 0.99999f) {
-            AoFaceData faceData = cache.computeEast(level, state, pos);
+            AoFaceData faceData = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeEastBlock(level, state, pos);
-            AoFaceData f1 = cache.computeEast(level, state, pos);
+            AoFaceData f0 = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, fx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, fx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, fx, w0, w1, w2, w3);
@@ -378,18 +385,18 @@ public class Two extends Face {
         float a1, w4 = fx * cz, w5 = fx * fz, w6 = cx * fz, w7 = cx * cz;
         int b1, s1;
         if (cy < 0.00001f) {
-            AoFaceData faceData = cache.computeDownBlock(level, state, pos);
+            AoFaceData faceData = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (cy > 0.99999f) {
-            AoFaceData faceData = cache.computeDown(level, state, pos);
+            AoFaceData faceData = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeDownBlock(level, state, pos);
-            AoFaceData f1 = cache.computeDown(level, state, pos);
+            AoFaceData f0 = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, cy, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, cy, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, cy, w4, w5, w6, w7);
@@ -455,6 +462,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -465,10 +473,10 @@ public class Two extends Face {
         float y
     ) {
         float x2 = x * x, y2 = y * y;
-        irregularWestDown(0, level, state, pos, output, cache, p0, x2, y2);
-        irregularWestDown(1, level, state, pos, output, cache, p1, x2, y2);
-        irregularWestDown(2, level, state, pos, output, cache, p2, x2, y2);
-        irregularWestDown(3, level, state, pos, output, cache, p3, x2, y2);
+        irregularWestDown(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, y2);
+        irregularWestDown(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, y2);
+        irregularWestDown(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, y2);
+        irregularWestDown(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, y2);
     }
 
     public static void irregularShadeWestDown(
@@ -496,6 +504,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -507,18 +516,18 @@ public class Two extends Face {
         float a0, w0 = cy * cz, w1 = cy * fz, w2 = fy * fz, w3 = fy * cz;
         int b0, s0;
         if (cx < 0.00001f) {
-            AoFaceData faceData = cache.computeWestBlock(level, state, pos);
+            AoFaceData faceData = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (cx > 0.99999f) {
-            AoFaceData faceData = cache.computeWest(level, state, pos);
+            AoFaceData faceData = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeWestBlock(level, state, pos);
-            AoFaceData f1 = cache.computeWest(level, state, pos);
+            AoFaceData f0 = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, cx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, cx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, cx, w0, w1, w2, w3);
@@ -526,18 +535,18 @@ public class Two extends Face {
         float a1, w4 = fx * cz, w5 = fx * fz, w6 = cx * fz, w7 = cx * cz;
         int b1, s1;
         if (cy < 0.00001f) {
-            AoFaceData faceData = cache.computeDownBlock(level, state, pos);
+            AoFaceData faceData = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (cy > 0.99999f) {
-            AoFaceData faceData = cache.computeDown(level, state, pos);
+            AoFaceData faceData = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeDownBlock(level, state, pos);
-            AoFaceData f1 = cache.computeDown(level, state, pos);
+            AoFaceData f0 = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, cy, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, cy, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, cy, w4, w5, w6, w7);
@@ -603,6 +612,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -613,10 +623,10 @@ public class Two extends Face {
         float z
     ) {
         float x2 = x * x, z2 = z * z;
-        irregularEastSouth(0, level, state, pos, output, cache, p0, x2, z2);
-        irregularEastSouth(1, level, state, pos, output, cache, p1, x2, z2);
-        irregularEastSouth(2, level, state, pos, output, cache, p2, x2, z2);
-        irregularEastSouth(3, level, state, pos, output, cache, p3, x2, z2);
+        irregularEastSouth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, z2);
+        irregularEastSouth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, z2);
+        irregularEastSouth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, z2);
+        irregularEastSouth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, z2);
     }
 
     public static void irregularShadeEastSouth(
@@ -644,6 +654,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -655,18 +666,18 @@ public class Two extends Face {
         float a0, w0 = fy * cz, w1 = fy * fz, w2 = cy * fz, w3 = cy * cz;
         int b0, s0;
         if (fx < 0.00001f) {
-            AoFaceData faceData = cache.computeEastBlock(level, state, pos);
+            AoFaceData faceData = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (fx > 0.99999f) {
-            AoFaceData faceData = cache.computeEast(level, state, pos);
+            AoFaceData faceData = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeEastBlock(level, state, pos);
-            AoFaceData f1 = cache.computeEast(level, state, pos);
+            AoFaceData f0 = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, fx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, fx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, fx, w0, w1, w2, w3);
@@ -674,18 +685,18 @@ public class Two extends Face {
         float a1, w4 = fx * cy, w5 = fx * fy, w6 = cx * fy, w7 = cx * cy;
         int b1, s1;
         if (fz < 0.00001f) {
-            AoFaceData faceData = cache.computeSouthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (fz > 0.99999f) {
-            AoFaceData faceData = cache.computeSouth(level, state, pos);
+            AoFaceData faceData = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeSouthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeSouth(level, state, pos);
+            AoFaceData f0 = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, fz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, fz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, fz, w4, w5, w6, w7);
@@ -751,6 +762,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -761,10 +773,10 @@ public class Two extends Face {
         float z
     ) {
         float x2 = x * x, z2 = z * z;
-        irregularWestSouth(0, level, state, pos, output, cache, p0, x2, z2);
-        irregularWestSouth(1, level, state, pos, output, cache, p1, x2, z2);
-        irregularWestSouth(2, level, state, pos, output, cache, p2, x2, z2);
-        irregularWestSouth(3, level, state, pos, output, cache, p3, x2, z2);
+        irregularWestSouth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, z2);
+        irregularWestSouth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, z2);
+        irregularWestSouth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, z2);
+        irregularWestSouth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, z2);
     }
 
     public static void irregularShadeWestSouth(
@@ -792,6 +804,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -803,18 +816,18 @@ public class Two extends Face {
         float a0, w0 = cy * cz, w1 = cy * fz, w2 = fy * fz, w3 = fy * cz;
         int b0, s0;
         if (cx < 0.00001f) {
-            AoFaceData faceData = cache.computeWestBlock(level, state, pos);
+            AoFaceData faceData = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (cx > 0.99999f) {
-            AoFaceData faceData = cache.computeWest(level, state, pos);
+            AoFaceData faceData = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeWestBlock(level, state, pos);
-            AoFaceData f1 = cache.computeWest(level, state, pos);
+            AoFaceData f0 = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, cx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, cx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, cx, w0, w1, w2, w3);
@@ -822,18 +835,18 @@ public class Two extends Face {
         float a1, w4 = fx * cy, w5 = fx * fy, w6 = cx * fy, w7 = cx * cy;
         int b1, s1;
         if (fz < 0.00001f) {
-            AoFaceData faceData = cache.computeSouthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (fz > 0.99999f) {
-            AoFaceData faceData = cache.computeSouth(level, state, pos);
+            AoFaceData faceData = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeSouthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeSouth(level, state, pos);
+            AoFaceData f0 = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, fz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, fz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, fz, w4, w5, w6, w7);
@@ -899,6 +912,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -909,10 +923,10 @@ public class Two extends Face {
         float z
     ) {
         float y2 = y * y, z2 = z * z;
-        irregularUpSouth(0, level, state, pos, output, cache, p0, y2, z2);
-        irregularUpSouth(1, level, state, pos, output, cache, p1, y2, z2);
-        irregularUpSouth(2, level, state, pos, output, cache, p2, y2, z2);
-        irregularUpSouth(3, level, state, pos, output, cache, p3, y2, z2);
+        irregularUpSouth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, y2, z2);
+        irregularUpSouth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, y2, z2);
+        irregularUpSouth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, y2, z2);
+        irregularUpSouth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, y2, z2);
     }
 
     public static void irregularShadeUpSouth(
@@ -940,6 +954,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -951,18 +966,18 @@ public class Two extends Face {
         float a0, w0 = cx * cz, w1 = cx * fz, w2 = fx * fz, w3 = fx * cz;
         int b0, s0;
         if (fy < 0.00001f) {
-            AoFaceData faceData = cache.computeUpBlock(level, state, pos);
+            AoFaceData faceData = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (fy > 0.99999f) {
-            AoFaceData faceData = cache.computeUp(level, state, pos);
+            AoFaceData faceData = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeUpBlock(level, state, pos);
-            AoFaceData f1 = cache.computeUp(level, state, pos);
+            AoFaceData f0 = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, fy, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, fy, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, fy, w0, w1, w2, w3);
@@ -970,18 +985,18 @@ public class Two extends Face {
         float a1, w4 = fx * cy, w5 = fx * fy, w6 = cx * fy, w7 = cx * cy;
         int b1, s1;
         if (fz < 0.00001f) {
-            AoFaceData faceData = cache.computeSouthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (fz > 0.99999f) {
-            AoFaceData faceData = cache.computeSouth(level, state, pos);
+            AoFaceData faceData = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeSouthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeSouth(level, state, pos);
+            AoFaceData f0 = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, fz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, fz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, fz, w4, w5, w6, w7);
@@ -1047,6 +1062,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -1057,10 +1073,10 @@ public class Two extends Face {
         float z
     ) {
         float y2 = y * y, z2 = z * z;
-        irregularDownSouth(0, level, state, pos, output, cache, p0, y2, z2);
-        irregularDownSouth(1, level, state, pos, output, cache, p1, y2, z2);
-        irregularDownSouth(2, level, state, pos, output, cache, p2, y2, z2);
-        irregularDownSouth(3, level, state, pos, output, cache, p3, y2, z2);
+        irregularDownSouth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, y2, z2);
+        irregularDownSouth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, y2, z2);
+        irregularDownSouth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, y2, z2);
+        irregularDownSouth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, y2, z2);
     }
 
     public static void irregularShadeDownSouth(
@@ -1088,6 +1104,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -1099,18 +1116,18 @@ public class Two extends Face {
         float a0, w0 = fx * cz, w1 = fx * fz, w2 = cx * fz, w3 = cx * cz;
         int b0, s0;
         if (cy < 0.00001f) {
-            AoFaceData faceData = cache.computeDownBlock(level, state, pos);
+            AoFaceData faceData = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (cy > 0.99999f) {
-            AoFaceData faceData = cache.computeDown(level, state, pos);
+            AoFaceData faceData = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeDownBlock(level, state, pos);
-            AoFaceData f1 = cache.computeDown(level, state, pos);
+            AoFaceData f0 = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, cy, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, cy, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, cy, w0, w1, w2, w3);
@@ -1118,18 +1135,18 @@ public class Two extends Face {
         float a1, w4 = fx * cy, w5 = fx * fy, w6 = cx * fy, w7 = cx * cy;
         int b1, s1;
         if (fz < 0.00001f) {
-            AoFaceData faceData = cache.computeSouthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (fz > 0.99999f) {
-            AoFaceData faceData = cache.computeSouth(level, state, pos);
+            AoFaceData faceData = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeSouthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeSouth(level, state, pos);
+            AoFaceData f0 = cache.computeSouthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeSouth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, fz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, fz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, fz, w4, w5, w6, w7);
@@ -1195,6 +1212,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -1205,10 +1223,10 @@ public class Two extends Face {
         float z
     ) {
         float x2 = x * x, z2 = z * z;
-        irregularEastNorth(0, level, state, pos, output, cache, p0, x2, z2);
-        irregularEastNorth(1, level, state, pos, output, cache, p1, x2, z2);
-        irregularEastNorth(2, level, state, pos, output, cache, p2, x2, z2);
-        irregularEastNorth(3, level, state, pos, output, cache, p3, x2, z2);
+        irregularEastNorth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, z2);
+        irregularEastNorth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, z2);
+        irregularEastNorth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, z2);
+        irregularEastNorth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, z2);
     }
 
     public static void irregularShadeEastNorth(
@@ -1236,6 +1254,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -1247,18 +1266,18 @@ public class Two extends Face {
         float a0, w0 = fy * cz, w1 = fy * fz, w2 = cy * fz, w3 = cy * cz;
         int b0, s0;
         if (fx < 0.00001f) {
-            AoFaceData faceData = cache.computeEastBlock(level, state, pos);
+            AoFaceData faceData = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (fx > 0.99999f) {
-            AoFaceData faceData = cache.computeEast(level, state, pos);
+            AoFaceData faceData = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeEastBlock(level, state, pos);
-            AoFaceData f1 = cache.computeEast(level, state, pos);
+            AoFaceData f0 = cache.computeEastBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeEast(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, fx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, fx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, fx, w0, w1, w2, w3);
@@ -1266,18 +1285,18 @@ public class Two extends Face {
         float a1, w4 = cy * fx, w5 = cy * cx, w6 = fy * cx, w7 = fy * fx;
         int b1, s1;
         if (cz < 0.00001f) {
-            AoFaceData faceData = cache.computeNorthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (cz > 0.99999f) {
-            AoFaceData faceData = cache.computeNorth(level, state, pos);
+            AoFaceData faceData = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeNorthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeNorth(level, state, pos);
+            AoFaceData f0 = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, cz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, cz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, cz, w4, w5, w6, w7);
@@ -1343,6 +1362,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -1353,10 +1373,10 @@ public class Two extends Face {
         float z
     ) {
         float x2 = x * x, z2 = z * z;
-        irregularWestNorth(0, level, state, pos, output, cache, p0, x2, z2);
-        irregularWestNorth(1, level, state, pos, output, cache, p1, x2, z2);
-        irregularWestNorth(2, level, state, pos, output, cache, p2, x2, z2);
-        irregularWestNorth(3, level, state, pos, output, cache, p3, x2, z2);
+        irregularWestNorth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, x2, z2);
+        irregularWestNorth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, x2, z2);
+        irregularWestNorth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, x2, z2);
+        irregularWestNorth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, x2, z2);
     }
 
     public static void irregularShadeWestNorth(
@@ -1384,6 +1404,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -1395,18 +1416,18 @@ public class Two extends Face {
         float a0, w0 = cy * cz, w1 = cy * fz, w2 = fy * fz, w3 = fy * cz;
         int b0, s0;
         if (cx < 0.00001f) {
-            AoFaceData faceData = cache.computeWestBlock(level, state, pos);
+            AoFaceData faceData = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (cx > 0.99999f) {
-            AoFaceData faceData = cache.computeWest(level, state, pos);
+            AoFaceData faceData = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeWestBlock(level, state, pos);
-            AoFaceData f1 = cache.computeWest(level, state, pos);
+            AoFaceData f0 = cache.computeWestBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeWest(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, cx, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, cx, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, cx, w0, w1, w2, w3);
@@ -1414,18 +1435,18 @@ public class Two extends Face {
         float a1, w4 = cy * fx, w5 = cy * cx, w6 = fy * cx, w7 = fy * fx;
         int b1, s1;
         if (cz < 0.00001f) {
-            AoFaceData faceData = cache.computeNorthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (cz > 0.99999f) {
-            AoFaceData faceData = cache.computeNorth(level, state, pos);
+            AoFaceData faceData = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeNorthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeNorth(level, state, pos);
+            AoFaceData f0 = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, cz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, cz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, cz, w4, w5, w6, w7);
@@ -1491,6 +1512,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -1501,10 +1523,10 @@ public class Two extends Face {
         float z
     ) {
         float y2 = y * y, z2 = z * z;
-        irregularUpNorth(0, level, state, pos, output, cache, p0, y2, z2);
-        irregularUpNorth(1, level, state, pos, output, cache, p1, y2, z2);
-        irregularUpNorth(2, level, state, pos, output, cache, p2, y2, z2);
-        irregularUpNorth(3, level, state, pos, output, cache, p3, y2, z2);
+        irregularUpNorth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, y2, z2);
+        irregularUpNorth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, y2, z2);
+        irregularUpNorth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, y2, z2);
+        irregularUpNorth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, y2, z2);
     }
 
     public static void irregularShadeUpNorth(
@@ -1532,6 +1554,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -1543,18 +1566,18 @@ public class Two extends Face {
         float a0, w0 = cx * cz, w1 = cx * fz, w2 = fx * fz, w3 = fx * cz;
         int b0, s0;
         if (fy < 0.00001f) {
-            AoFaceData faceData = cache.computeUpBlock(level, state, pos);
+            AoFaceData faceData = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (fy > 0.99999f) {
-            AoFaceData faceData = cache.computeUp(level, state, pos);
+            AoFaceData faceData = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeUpBlock(level, state, pos);
-            AoFaceData f1 = cache.computeUp(level, state, pos);
+            AoFaceData f0 = cache.computeUpBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeUp(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, fy, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, fy, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, fy, w0, w1, w2, w3);
@@ -1562,18 +1585,18 @@ public class Two extends Face {
         float a1, w4 = cy * fx, w5 = cy * cx, w6 = fy * cx, w7 = fy * fx;
         int b1, s1;
         if (cz < 0.00001f) {
-            AoFaceData faceData = cache.computeNorthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (cz > 0.99999f) {
-            AoFaceData faceData = cache.computeNorth(level, state, pos);
+            AoFaceData faceData = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeNorthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeNorth(level, state, pos);
+            AoFaceData f0 = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, cz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, cz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, cz, w4, w5, w6, w7);
@@ -1639,6 +1662,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -1649,10 +1673,10 @@ public class Two extends Face {
         float z
     ) {
         float y2 = y * y, z2 = z * z;
-        irregularDownNorth(0, level, state, pos, output, cache, p0, y2, z2);
-        irregularDownNorth(1, level, state, pos, output, cache, p1, y2, z2);
-        irregularDownNorth(2, level, state, pos, output, cache, p2, y2, z2);
-        irregularDownNorth(3, level, state, pos, output, cache, p3, y2, z2);
+        irregularDownNorth(0, level, state, pos, shadeDirectionOverride, output, cache, p0, y2, z2);
+        irregularDownNorth(1, level, state, pos, shadeDirectionOverride, output, cache, p1, y2, z2);
+        irregularDownNorth(2, level, state, pos, shadeDirectionOverride, output, cache, p2, y2, z2);
+        irregularDownNorth(3, level, state, pos, shadeDirectionOverride, output, cache, p3, y2, z2);
     }
 
     public static void irregularShadeDownNorth(
@@ -1680,6 +1704,7 @@ public class Two extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc position,
@@ -1691,18 +1716,18 @@ public class Two extends Face {
         float a0, w0 = fx * cz, w1 = fx * fz, w2 = cx * fz, w3 = cx * cz;
         int b0, s0;
         if (cy < 0.00001f) {
-            AoFaceData faceData = cache.computeDownBlock(level, state, pos);
+            AoFaceData faceData = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else if (cy > 0.99999f) {
-            AoFaceData faceData = cache.computeDown(level, state, pos);
+            AoFaceData faceData = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(faceData, w0, w1, w2, w3);
             b0 = weightedBlockLight(faceData, w0, w1, w2, w3);
             s0 = weightedSkyLight(faceData, w0, w1, w2, w3);
         } else {
-            AoFaceData f0 = cache.computeDownBlock(level, state, pos);
-            AoFaceData f1 = cache.computeDown(level, state, pos);
+            AoFaceData f0 = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeDown(level, state, pos, shadeDirectionOverride);
             a0 = weightedAo(f0, f1, cy, w0, w1, w2, w3);
             b0 = weightedBlockLight(f0, f1, cy, w0, w1, w2, w3);
             s0 = weightedSkyLight(f0, f1, cy, w0, w1, w2, w3);
@@ -1710,18 +1735,18 @@ public class Two extends Face {
         float a1, w4 = cy * fx, w5 = cy * cx, w6 = fy * cx, w7 = fy * fx;
         int b1, s1;
         if (cz < 0.00001f) {
-            AoFaceData faceData = cache.computeNorthBlock(level, state, pos);
+            AoFaceData faceData = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else if (cz > 0.99999f) {
-            AoFaceData faceData = cache.computeNorth(level, state, pos);
+            AoFaceData faceData = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(faceData, w4, w5, w6, w7);
             b1 = weightedBlockLight(faceData, w4, w5, w6, w7);
             s1 = weightedSkyLight(faceData, w4, w5, w6, w7);
         } else {
-            AoFaceData f0 = cache.computeNorthBlock(level, state, pos);
-            AoFaceData f1 = cache.computeNorth(level, state, pos);
+            AoFaceData f0 = cache.computeNorthBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeNorth(level, state, pos, shadeDirectionOverride);
             a1 = weightedAo(f0, f1, cz, w4, w5, w6, w7);
             b1 = weightedBlockLight(f0, f1, cz, w4, w5, w6, w7);
             s1 = weightedSkyLight(f0, f1, cz, w4, w5, w6, w7);

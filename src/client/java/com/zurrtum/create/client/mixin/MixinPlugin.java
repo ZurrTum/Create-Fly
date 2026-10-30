@@ -49,7 +49,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("ModelRenderHelperMixin");
             mixins.add("BufferEmitterMixin");
             mixins.add("BufferPoseEmitterMixin");
-            mixins.add("BufferColorPoseEmitterMixin");
+            mixins.add("BufferAoEmitterMixin");
             mixins.add("BufferAoPoseEmitterMixin");
             mixins.add("ItemModelRenderHelperMixin");
             mixins.add("BakedModelHelperMixin");

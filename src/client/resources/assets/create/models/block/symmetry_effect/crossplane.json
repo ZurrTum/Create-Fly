@@ -83,7 +83,7 @@
 			"name": "rod_left",
 			"from": [1, 4, 7.5],
 			"to": [3, 12, 8.5],
-			"shade": false,
+			"shade_direction_override": "up",
 			"neoforge_data": {"calculate_normals": true},
 			"rotation": {"angle": -22.5, "axis": "y", "origin": [8, 8, 8]},
 			"faces": {
@@ -97,7 +97,7 @@
 			"name": "rod_left",
 			"from": [13, 4, 7.5],
 			"to": [15, 12, 8.5],
-			"shade": false,
+			"shade_direction_override": "up",
 			"neoforge_data": {"calculate_normals": true},
 			"rotation": {"angle": -22.5, "axis": "y", "origin": [8, 8, 8]},
 			"faces": {

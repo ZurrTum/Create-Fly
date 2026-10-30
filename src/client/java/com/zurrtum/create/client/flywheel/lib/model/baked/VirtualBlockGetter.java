@@ -14,7 +14,7 @@ import net.minecraft.world.level.material.FluidState;
 import java.util.function.ToIntFunction;
 
 public abstract class VirtualBlockGetter implements BlockAndTintGetter {
-    private static final CardinalLighting FULL_LIGHTING = new CardinalLighting(1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
+    public static final CardinalLighting FULL_LIGHTING = new CardinalLighting(1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
     protected final VirtualLightEngine lightEngine;
 
     public VirtualBlockGetter(ToIntFunction<BlockPos> blockLightFunc, ToIntFunction<BlockPos> skyLightFunc) {

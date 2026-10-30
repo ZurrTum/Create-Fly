@@ -17,4 +17,9 @@ public class FlwLibXplatImpl implements FlwLibXplat {
     public SimpleModel buildBlockModelBuilder(BlockModelBuilder builder) {
         return ModelBuilderImpl.buildBlockModelBuilder(builder);
     }
+
+    @Override
+    public SimpleModel buildSingleBlockModelBuilder(BlockModelBuilder builder) {
+        return ModelBuilderImpl.buildSingleBlockModelBuilder(builder);
+    }
 }

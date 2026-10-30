@@ -14,7 +14,7 @@ public class EntityBlockTemplateMesh {
     public final int[] colors;
     public final float[] uvs;
     public final int[] lights;
-    public final Vector3fc[] normals;
+    public final Vector3fc @Nullable [] normals;
     private Vector4fc @Nullable [] lightPositions;
     private final ConcurrentLinkedQueue<int[]> colorsPool = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<float[]> uvsPool = new ConcurrentLinkedQueue<>();
@@ -27,7 +27,7 @@ public class EntityBlockTemplateMesh {
         int[] colors,
         float[] uvs,
         int[] lights,
-        Vector3fc[] normals
+        Vector3fc @Nullable [] normals
     ) {
         this.type = type;
         this.vertexCount = vertexCount;
@@ -56,17 +56,17 @@ public class EntityBlockTemplateMesh {
     }
 
     public int[] createColors() {
-        int @Nullable [] colors = colorsPool.poll();
+        int[] colors = colorsPool.poll();
         return colors == null ? new int[vertexCount] : colors;
     }
 
     public float[] createUVs() {
-        float @Nullable [] uvs = uvsPool.poll();
+        float[] uvs = uvsPool.poll();
         return uvs == null ? new float[vertexCount << 1] : uvs;
     }
 
     public int[] createLights() {
-        int @Nullable [] lights = lightsPool.poll();
+        int[] lights = lightsPool.poll();
         return lights == null ? new int[vertexCount] : lights;
     }
 

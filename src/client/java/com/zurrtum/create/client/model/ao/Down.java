@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.QuadInstance;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3fc;
 
@@ -156,6 +157,7 @@ public class Down extends Face {
         Vector3fc p1,
         Vector3fc p2,
         Vector3fc p3,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache
     ) {
@@ -163,9 +165,9 @@ public class Down extends Face {
         if (isIrregular(y0, y1, y2, y3)) {
             Vector3fc normal = ((NormalsBakedQuad) normals).create$getNormal();
             if (normal != null) {
-                irregularFace(level, state, pos, output, cache, p0, p1, p2, p3, normal);
+                irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, normal);
             } else {
-                irregularFace(level, state, pos, output, cache, p0, p1, p2, p3, y0, y1, y2, y3);
+                irregularFace(level, state, pos, shadeDirectionOverride, output, cache, p0, p1, p2, p3, y0, y1, y2, y3);
             }
             return;
         }
@@ -173,8 +175,8 @@ public class Down extends Face {
         float z0 = p0.z(), z1 = p1.z(), z2 = p2.z(), z3 = p3.z();
         switch (computeFlag(x0, z0, x1, z1, x2, z2, x3, z3, y0)) {
             case PARTIAL_FLAG -> partialFace0(
-                cache.computeDownBlock(level, state, pos),
-                cache.computeDown(level, state, pos),
+                cache.computeDownBlock(level, state, pos, shadeDirectionOverride),
+                cache.computeDown(level, state, pos, shadeDirectionOverride),
                 y0,
                 x0,
                 z0,
@@ -186,20 +188,50 @@ public class Down extends Face {
                 z3,
                 output
             );
-            case PARTIAL_LIGHT_FACE_FLAG ->
-                partialFace0(cache.computeDownBlock(level, state, pos), x0, z0, x1, z1, x2, z2, x3, z3, output);
-            case CUBIC_FLAG_0 ->
-                fullFace0(cache.computeDownBlock(level, state, pos), cache.computeDown(level, state, pos), y0, output);
-            case CUBIC_LIGHT_FACE_FLAG_0 -> fullFace0(cache.computeDownBlock(level, state, pos), output);
-            case CUBIC_FLAG_1 ->
-                fullFace1(cache.computeDownBlock(level, state, pos), cache.computeDown(level, state, pos), y0, output);
-            case CUBIC_LIGHT_FACE_FLAG_1 -> fullFace1(cache.computeDownBlock(level, state, pos), output);
-            case CUBIC_FLAG_2 ->
-                fullFace2(cache.computeDownBlock(level, state, pos), cache.computeDown(level, state, pos), y0, output);
-            case CUBIC_LIGHT_FACE_FLAG_2 -> fullFace2(cache.computeDownBlock(level, state, pos), output);
-            case CUBIC_FLAG_3 ->
-                fullFace3(cache.computeDownBlock(level, state, pos), cache.computeDown(level, state, pos), y0, output);
-            case CUBIC_LIGHT_FACE_FLAG_3 -> fullFace3(cache.computeDownBlock(level, state, pos), output);
+            case PARTIAL_LIGHT_FACE_FLAG -> partialFace0(
+                cache.computeDownBlock(level, state, pos, shadeDirectionOverride),
+                x0,
+                z0,
+                x1,
+                z1,
+                x2,
+                z2,
+                x3,
+                z3,
+                output
+            );
+            case CUBIC_FLAG_0 -> fullFace0(
+                cache.computeDownBlock(level, state, pos, shadeDirectionOverride),
+                cache.computeDown(level, state, pos, shadeDirectionOverride),
+                y0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_0 ->
+                fullFace0(cache.computeDownBlock(level, state, pos, shadeDirectionOverride), output);
+            case CUBIC_FLAG_1 -> fullFace1(
+                cache.computeDownBlock(level, state, pos, shadeDirectionOverride),
+                cache.computeDown(level, state, pos, shadeDirectionOverride),
+                y0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_1 ->
+                fullFace1(cache.computeDownBlock(level, state, pos, shadeDirectionOverride), output);
+            case CUBIC_FLAG_2 -> fullFace2(
+                cache.computeDownBlock(level, state, pos, shadeDirectionOverride),
+                cache.computeDown(level, state, pos, shadeDirectionOverride),
+                y0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_2 ->
+                fullFace2(cache.computeDownBlock(level, state, pos, shadeDirectionOverride), output);
+            case CUBIC_FLAG_3 -> fullFace3(
+                cache.computeDownBlock(level, state, pos, shadeDirectionOverride),
+                cache.computeDown(level, state, pos, shadeDirectionOverride),
+                y0,
+                output
+            );
+            case CUBIC_LIGHT_FACE_FLAG_3 ->
+                fullFace3(cache.computeDownBlock(level, state, pos, shadeDirectionOverride), output);
         }
     }
 
@@ -279,6 +311,7 @@ public class Down extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -286,13 +319,29 @@ public class Down extends Face {
         Vector3fc p2,
         Vector3fc p3
     ) {
-        irregularFace(level, state, pos, output, cache, p0, p1, p2, p3, p0.y(), p1.y(), p2.y(), p3.y());
+        irregularFace(
+            level,
+            state,
+            pos,
+            shadeDirectionOverride,
+            output,
+            cache,
+            p0,
+            p1,
+            p2,
+            p3,
+            p0.y(),
+            p1.y(),
+            p2.y(),
+            p3.y()
+        );
     }
 
     private static void irregularFace(
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         Vector3fc p0,
@@ -304,10 +353,10 @@ public class Down extends Face {
         float y2,
         float y3
     ) {
-        irregularFace(0, level, state, pos, output, cache, y0, p0.x(), p0.z());
-        irregularFace(1, level, state, pos, output, cache, y1, p1.x(), p1.z());
-        irregularFace(2, level, state, pos, output, cache, y2, p2.x(), p2.z());
-        irregularFace(3, level, state, pos, output, cache, y3, p3.x(), p3.z());
+        irregularFace(0, level, state, pos, shadeDirectionOverride, output, cache, y0, p0.x(), p0.z());
+        irregularFace(1, level, state, pos, shadeDirectionOverride, output, cache, y1, p1.x(), p1.z());
+        irregularFace(2, level, state, pos, shadeDirectionOverride, output, cache, y2, p2.x(), p2.z());
+        irregularFace(3, level, state, pos, shadeDirectionOverride, output, cache, y3, p3.x(), p3.z());
     }
 
     public static void irregularShadeFace(
@@ -350,6 +399,7 @@ public class Down extends Face {
         BlockAndTintGetter level,
         BlockState state,
         BlockPos pos,
+        Direction shadeDirectionOverride,
         QuadInstance output,
         AoFaceDataCache cache,
         float y,
@@ -359,12 +409,12 @@ public class Down extends Face {
         float w = clamp(y), u0 = clamp(x), v0 = clamp(z);
         float u1 = 1 - u0, v1 = 1 - v0;
         if (w < 0.00001f) {
-            write(i, cache.computeDownBlock(level, state, pos), u0, v0, u1, v1, output);
+            write(i, cache.computeDownBlock(level, state, pos, shadeDirectionOverride), u0, v0, u1, v1, output);
         } else if (w > 0.99999f) {
-            write(i, cache.computeDown(level, state, pos), u0, v0, u1, v1, output);
+            write(i, cache.computeDown(level, state, pos, shadeDirectionOverride), u0, v0, u1, v1, output);
         } else {
-            AoFaceData f0 = cache.computeDownBlock(level, state, pos);
-            AoFaceData f1 = cache.computeDown(level, state, pos);
+            AoFaceData f0 = cache.computeDownBlock(level, state, pos, shadeDirectionOverride);
+            AoFaceData f1 = cache.computeDown(level, state, pos, shadeDirectionOverride);
             write(i, f0, f1, w, u0, v0, u1, v1, output);
         }
     }

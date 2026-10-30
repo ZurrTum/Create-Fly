@@ -90,8 +90,10 @@ public class ShiftStitchedSprite extends StitchedSprite {
                 sprite,
                 layer,
                 info.itemRenderType(),
+                info.itemGlintRenderType(),
+                info.itemGlintSpecialRenderType(),
                 info.tintIndex(),
-                info.shade(),
+                info.shadeDirectionOverride(),
                 info.lightEmission()
             );
         }

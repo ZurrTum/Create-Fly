@@ -18,11 +18,10 @@ public interface BufferPoseEmitterMixin extends BufferEmitter, FabricEmitterSupp
 
     @Override
     default @NonNull QuadEmitter quadEmitter() {
-        Pose pose = getPose();
-        return Renderer.get().quadEmitter(quad -> quad.buffer(
+        return getOrCreateEmitter((BufferPoseEmitter emitter) -> Renderer.get().quadEmitter(quad -> quad.buffer(
             OverlayTexture.NO_OVERLAY,
-            pose,
-            getBuffer(quad.diffuseShade(), quad.chunkLayer())
-        ));
+            emitter.getPose(),
+            emitter.getBuffer(quad.shadeDirectionOverride(), quad.chunkLayer())
+        )));
     }
 }

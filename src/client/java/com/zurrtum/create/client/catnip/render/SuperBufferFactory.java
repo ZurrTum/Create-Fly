@@ -53,6 +53,6 @@ public class SuperBufferFactory {
 
     private static class ThreadLocalObjects {
         public final EntityBlockSbbBuilder sbbBuilder = new EntityBlockSbbBuilder();
-        public final EntityBlockTransformSbbBuilder transformSbbBuilder = new EntityBlockTransformSbbBuilder();
+        public final EntityBlockTransformSbbBuilder transformSbbBuilder = new EntityBlockTransformSbbBuilder(sbbBuilder);
     }
 }

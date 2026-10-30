@@ -225,8 +225,10 @@ public class BakedModelHelper {
                     info.sprite(),
                     layer,
                     itemRenderType,
+                    info.itemGlintRenderType(),
+                    info.itemGlintSpecialRenderType(),
                     info.tintIndex(),
-                    info.shade(),
+                    info.shadeDirectionOverride(),
                     info.lightEmission()
                 )
             );
