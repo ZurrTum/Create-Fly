@@ -10,11 +10,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.context.ContextKey;
-import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.util.context.ContextMap;
 import org.jspecify.annotations.Nullable;
 
@@ -34,18 +32,9 @@ public final class NeoForgeModelProperties {
     public static final ContextKey<Transformation> TRANSFORM = ContextKey.vanilla("transform");
 
     /**
-     * Render type to use. For block models, this can be specified under the {@code render_type} JSON key.
-     */
-    public static final ContextKey<RenderType> RENDER_TYPE = ContextKey.vanilla("render_type");
-
-    /**
      * Part visibilities. For models with named parts (i.e. OBJ and composite), this can be specified under the {@code visibility} JSON key
      */
     public static final ContextKey<Map<String, Boolean>> PART_VISIBILITY = ContextKey.vanilla("part_visibility");
-
-    public static final ContextKeySet EMPTY_TYPE = new ContextKeySet.Builder().build();
-    public static final ContextKeySet TYPE = new ContextKeySet.Builder().optional(TRANSFORM).optional(RENDER_TYPE)
-        .optional(PART_VISIBILITY).build();
 
     /**
      * {@return a {@link Transformation} if the {@code transform} key is present, otherwise {@code null}}
@@ -81,7 +70,7 @@ public final class NeoForgeModelProperties {
         @Nullable Transformation rootTransform
     ) {
         if (rootTransform != null) {
-            propertiesBuilder.withParameter(TRANSFORM, rootTransform);
+            propertiesBuilder.set(TRANSFORM, rootTransform);
         }
     }
 
@@ -94,7 +83,7 @@ public final class NeoForgeModelProperties {
         Map<String, Boolean> partVisibility
     ) {
         if (!partVisibility.isEmpty()) {
-            Map<String, Boolean> visibility = propertiesBuilder.getOptionalParameter(PART_VISIBILITY);
+            Map<String, Boolean> visibility = propertiesBuilder.get(PART_VISIBILITY);
             if (visibility != null) {
                 visibility = new HashMap<>(visibility);
                 visibility.putAll(partVisibility);
@@ -102,7 +91,7 @@ public final class NeoForgeModelProperties {
                 visibility = partVisibility;
             }
             visibility = Map.copyOf(visibility);
-            propertiesBuilder.withParameter(PART_VISIBILITY, visibility);
+            propertiesBuilder.set(PART_VISIBILITY, visibility);
         }
     }
 }

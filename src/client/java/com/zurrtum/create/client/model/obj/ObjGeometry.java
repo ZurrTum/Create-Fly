@@ -13,7 +13,6 @@ import com.mojang.math.Transformation;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.client.model.ExtendedUnbakedGeometry;
 import com.zurrtum.create.client.model.NeoForgeModelProperties;
-import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.obj.ObjMaterialLibrary.Material;
 import joptsimple.internal.Strings;
 import net.minecraft.client.model.geom.builders.UVPair;
@@ -55,7 +54,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
     public final boolean emissiveAmbient;
     @Nullable
     public final String mtlOverride;
-    public final StandardModelParameters parameters;
+    public final ContextMap additionalProperties;
 
     public final Identifier modelLocation;
 
@@ -65,7 +64,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         shadeQuads = settings.shadeQuads();
         emissiveAmbient = settings.emissiveAmbient();
         mtlOverride = settings.mtlOverride();
-        parameters = settings.parameters();
+        additionalProperties = settings.additionalProperties();
     }
 
     public static ObjGeometry parse(ObjTokenizer tokenizer, Settings settings) throws IOException {
@@ -297,10 +296,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         ModelState state,
         ModelDebugName debugName
     ) {
-        ContextMap.Builder propertiesBuilder = new ContextMap.Builder();
-        NeoForgeModelProperties.fillRootTransformProperty(propertiesBuilder, parameters.rootTransform());
-        NeoForgeModelProperties.fillPartVisibilityProperty(propertiesBuilder, parameters.partVisibility());
-        return bake(textureSlots, baker, state, debugName, propertiesBuilder.create(NeoForgeModelProperties.TYPE));
+        return bake(textureSlots, baker, state, debugName, additionalProperties);
     }
 
     @Override
@@ -614,6 +610,6 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
     }
 
     public record Settings(Identifier modelLocation, boolean automaticCulling, boolean shadeQuads, boolean flipV,
-                           boolean emissiveAmbient, @Nullable String mtlOverride, StandardModelParameters parameters) {
+                           boolean emissiveAmbient, @Nullable String mtlOverride, ContextMap additionalProperties) {
     }
 }

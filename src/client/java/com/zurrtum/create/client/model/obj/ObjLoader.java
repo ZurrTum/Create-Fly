@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.zurrtum.create.client.model.NeoForgeModelProperties;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.UnbakedModelLoader;
 import com.zurrtum.create.foundation.utility.CreateResourceReloader;
@@ -17,6 +18,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.context.ContextMap;
 
 import java.io.FileNotFoundException;
 import java.util.Map;
@@ -62,6 +64,10 @@ public class ObjLoader extends CreateResourceReloader implements UnbakedModelLoa
         boolean emissiveAmbient = GsonHelper.getAsBoolean(jsonObject, "emissive_ambient", true);
         String mtlOverride = GsonHelper.getAsString(jsonObject, "mtl_override", null);
         StandardModelParameters parameters = StandardModelParameters.parse(jsonObject, jsonDeserializationContext);
+        ContextMap.Builder propertiesBuilder = ContextMap.builder();
+        NeoForgeModelProperties.fillRootTransformProperty(propertiesBuilder, parameters.rootTransform());
+        NeoForgeModelProperties.fillPartVisibilityProperty(propertiesBuilder, parameters.partVisibility());
+        ContextMap additionalProperties = propertiesBuilder.build();
 
         var geometry = loadGeometry(new ObjGeometry.Settings(
             Identifier.parse(modelLocation),
@@ -70,7 +76,7 @@ public class ObjLoader extends CreateResourceReloader implements UnbakedModelLoa
             flipV,
             emissiveAmbient,
             mtlOverride,
-            parameters
+            additionalProperties
         ));
         return new ObjModel(parameters, geometry);
     }

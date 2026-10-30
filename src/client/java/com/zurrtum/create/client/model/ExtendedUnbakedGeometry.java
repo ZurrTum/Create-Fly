@@ -18,8 +18,6 @@ import net.minecraft.util.context.ContextMap;
  */
 @FunctionalInterface
 public interface ExtendedUnbakedGeometry extends UnbakedGeometry {
-    ContextMap EMPTY = new ContextMap.Builder().create(NeoForgeModelProperties.EMPTY_TYPE);
-
     @Override
     default QuadCollection bake(
         TextureSlots p_405831_,
@@ -27,7 +25,7 @@ public interface ExtendedUnbakedGeometry extends UnbakedGeometry {
         ModelState p_405122_,
         ModelDebugName p_405635_
     ) {
-        return bake(p_405831_, p_405026_, p_405122_, p_405635_, EMPTY);
+        return bake(p_405831_, p_405026_, p_405122_, p_405635_, ContextMap.EMPTY);
     }
 
     // Re-abstract the extended version
