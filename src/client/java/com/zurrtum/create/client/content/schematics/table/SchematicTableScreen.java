@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.schematics.table;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.Blaze3D;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
@@ -27,7 +28,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -140,9 +140,7 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
         });
 
         folderButton = new IconButton(leftPos + 20, y + 21, AllIcons.I_OPEN_FOLDER);
-        folderButton.withCallback(() -> {
-            Util.getPlatform().openFile(CreatePaths.SCHEMATICS_DIR.toFile());
-        });
+        folderButton.withCallback(() -> Blaze3D.openPath(CreatePaths.SCHEMATICS_DIR));
         folderButton.setToolTip(folder);
         refreshButton = new IconButton(leftPos + 206, y + 21, AllIcons.I_REFRESH);
         refreshButton.withCallback(() -> {
