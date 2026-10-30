@@ -15,7 +15,7 @@ public class SeatRenderer extends EntityRenderer<SeatEntity, EntityRenderState> 
     }
 
     @Override
-    public boolean shouldRender(SeatEntity entity, Frustum frustum, double x, double y, double z) {
+    public boolean shouldRender(SeatEntity entity, Frustum frustum, double x, double y, double z, float partialTicks) {
         return false;
     }
 

@@ -18,7 +18,14 @@ public class SuperGlueRenderer extends EntityRenderer<SuperGlueEntity, EntityRen
     }
 
     @Override
-    public boolean shouldRender(SuperGlueEntity entity, Frustum frustum, double x, double y, double z) {
+    public boolean shouldRender(
+        SuperGlueEntity entity,
+        Frustum frustum,
+        double x,
+        double y,
+        double z,
+        float partialTicks
+    ) {
         return false;
     }
 
