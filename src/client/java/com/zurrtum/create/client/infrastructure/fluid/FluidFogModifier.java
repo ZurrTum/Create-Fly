@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Vector3fc;
 
 public class FluidFogModifier extends WaterFogEnvironment {
     @Override
@@ -40,9 +41,9 @@ public class FluidFogModifier extends WaterFogEnvironment {
     }
 
     @Override
-    public int getBaseColor(ClientLevel world, Camera camera, int viewDistance, float skyDarkness) {
-        int color = AllFluidConfigs.FOG_COLOR.getOrDefault(world.getFluidState(camera.blockPosition()).getType(), -1);
-        if (color != -1) {
+    public Vector3fc getBaseColor(ClientLevel world, Camera camera, int viewDistance, float skyDarkness) {
+        Vector3fc color = AllFluidConfigs.FOG_COLOR.get(world.getFluidState(camera.blockPosition()).getType());
+        if (color != null) {
             return color;
         }
         return super.getBaseColor(world, camera, viewDistance, skyDarkness);

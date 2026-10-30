@@ -7,8 +7,6 @@ import com.zurrtum.create.client.infrastructure.fluid.FluidFogModifier;
 import com.zurrtum.create.client.infrastructure.fluid.FluidTintSource;
 import com.zurrtum.create.client.infrastructure.fluid.FogDistanceSupplier;
 import com.zurrtum.create.infrastructure.fluids.FlowableFluid;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.loader.api.FabricLoader;
@@ -23,11 +21,13 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class AllFluidConfigs {
     public static final Map<FlowingFluid, FluidModel.Unbaked> MODEL = new IdentityHashMap<>();
     public static final Map<Fluid, FogDistanceSupplier> FOG_DISTANCE = new IdentityHashMap<>();
-    public static final Object2IntMap<Fluid> FOG_COLOR = new Object2IntOpenHashMap<>();
+    public static final Map<Fluid, Vector3fc> FOG_COLOR = new IdentityHashMap<>();
     public static final Map<Fluid, FluidTintSource> TINT = new IdentityHashMap<>();
     public static final FluidModel.Unbaked POTION = model(AllFluids.POTION);
     public static final FluidModel.Unbaked TEA = model(AllFluids.TEA);
@@ -54,7 +54,7 @@ public class AllFluidConfigs {
         return model;
     }
 
-    public static void fog(FlowableFluid fluid, int fogColor, FogDistanceSupplier fogDistance) {
+    public static void fog(FlowableFluid fluid, Vector3fc fogColor, FogDistanceSupplier fogDistance) {
         FOG_COLOR.put(fluid, fogColor);
         FOG_DISTANCE.put(fluid, fogDistance);
         Fluid flowing = fluid.getFlowing();
@@ -155,12 +155,12 @@ public class AllFluidConfigs {
         FogRenderer.FOG_ENVIRONMENTS.addFirst(new FluidFogModifier());
         fog(
             AllFluids.HONEY,
-            0xEAAE2F,
+            ARGB.vector3fFromRGB24(0xEAAE2F),
             () -> 96.0f * (1.0f / 8.0f * AllConfigs.client().honeyTransparencyMultiplier.getF())
         );
         fog(
             AllFluids.CHOCOLATE,
-            0x622020,
+            ARGB.vector3fFromRGB24(0x622020),
             () -> 96.0f * (1.0f / 32.0f * AllConfigs.client().chocolateTransparencyMultiplier.getF())
         );
         tint(
