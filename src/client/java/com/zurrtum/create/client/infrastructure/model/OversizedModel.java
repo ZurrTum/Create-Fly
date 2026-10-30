@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
@@ -37,64 +38,62 @@ import static com.zurrtum.create.client.flywheel.lib.model.baked.ItemModelRender
 public class OversizedModel implements ItemModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/oversized");
     private final List<ItemTintSource> tints;
-    private final QuadCollection quads;
-    private final Supplier<Vector3fc[]> vector;
-    private final ModelRenderProperties settings;
+    private final boolean animated;
+    private final ItemQuads itemQuads;
+    private final Supplier<Vector3fc[]> extents;
+    private final ModelRenderProperties properties;
     private final Matrix4fc transformation;
     private final AABB box;
 
     public OversizedModel(
         List<ItemTintSource> tints,
         QuadCollection quads,
-        ModelRenderProperties settings,
+        ModelRenderProperties properties,
         Matrix4fc transformation,
         AABB box
     ) {
         this.tints = tints;
-        this.quads = quads;
-        this.settings = settings;
+        animated = quads.hasMaterialFlag(2);
+        itemQuads = ItemQuads.split(quads.getAll());
+        this.properties = properties;
         this.transformation = transformation;
-        vector = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(quads.getAll()));
+        extents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(quads.getAll()));
         this.box = box;
     }
 
     @Override
     public void update(
-        ItemStackRenderState state,
-        ItemStack stack,
+        ItemStackRenderState output,
+        ItemStack item,
         ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientLevel world,
-        @Nullable ItemOwner heldItemContext,
+        @Nullable ClientLevel level,
+        @Nullable ItemOwner owner,
         int seed
     ) {
-        state.appendModelIdentityElement(this);
-        LayerRenderState layerRenderState = submitQuads(state, settings, displayContext, quads.getAll());
-        if (stack.hasFoil()) {
+        output.appendModelIdentityElement(this);
+        LayerRenderState layerRenderState = submitQuads(output, properties, displayContext, itemQuads);
+        if (item.hasFoil()) {
             layerRenderState.setFoilType(FoilType.STANDARD);
-            state.setAnimated();
-            state.appendModelIdentityElement(FoilType.STANDARD);
-        } else if (quads.hasMaterialFlag(2)) {
-            state.setAnimated();
+            output.setAnimated();
+            output.appendModelIdentityElement(FoilType.STANDARD);
+        } else if (animated) {
+            output.setAnimated();
         }
         if (!tints.isEmpty()) {
             IntList tintLayers = layerRenderState.tintLayers();
 
             for (ItemTintSource tintSource : tints) {
-                int tint = tintSource.calculate(
-                    stack,
-                    world,
-                    heldItemContext == null ? null : heldItemContext.asLivingEntity()
-                );
+                int tint = tintSource.calculate(item, level, owner == null ? null : owner.asLivingEntity());
                 tintLayers.add(tint);
-                state.appendModelIdentityElement(tint);
+                output.appendModelIdentityElement(tint);
             }
         }
-        layerRenderState.setExtents(vector);
+        layerRenderState.setExtents(extents);
         layerRenderState.setLocalTransform(transformation);
         if (displayContext == ItemDisplayContext.GUI) {
-            state.setOversizedInGui(true);
-            state.cachedModelBoundingBox = box;
+            output.setOversizedInGui(true);
+            output.cachedModelBoundingBox = box;
         }
     }
 

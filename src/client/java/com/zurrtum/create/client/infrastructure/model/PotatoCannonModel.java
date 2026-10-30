@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -42,17 +43,17 @@ public class PotatoCannonModel implements ItemModel {
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/item");
     public static final Identifier COG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/cog");
 
-    private final List<BakedQuad> itemQuads;
+    private final ItemQuads itemQuads;
     private final ModelRenderProperties itemSettings;
     private final Supplier<Vector3fc[]> itemExtents;
-    private final List<BakedQuad> cogQuads;
+    private final ItemQuads cogQuads;
     private final Supplier<Vector3fc[]> cogExtents;
 
     public PotatoCannonModel(List<BakedQuad> itemQuads, ModelRenderProperties itemSettings, List<BakedQuad> cogQuads) {
-        this.itemQuads = itemQuads;
+        this.itemQuads = ItemQuads.split(itemQuads);
         this.itemSettings = itemSettings;
-        itemExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(this.itemQuads));
-        this.cogQuads = cogQuads;
+        itemExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(itemQuads));
+        this.cogQuads = ItemQuads.split(cogQuads);
         cogExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(cogQuads));
     }
 

@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.item.ModelRenderProperties;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3fc;
@@ -34,12 +35,12 @@ public class ItemModelRenderHelperMixin {
         ItemStackRenderState state,
         ModelRenderProperties settings,
         ItemDisplayContext displayContext,
-        List<BakedQuad> quads
+        ItemQuads quads
     ) {
         LayerRenderState layer = state.newLayer();
         settings.applyToLayer(layer, displayContext);
         QuadEmitter emitter = ((FabricLayerRenderState) layer).emitter();
-        for (BakedQuad quad : quads) {
+        for (BakedQuad quad : quads.all()) {
             emitter.fromBakedQuad(quad);
             emitter.emit();
         }
@@ -53,11 +54,11 @@ public class ItemModelRenderHelperMixin {
         ItemDisplayContext displayContext,
         int lightCoords,
         int[] tints,
-        List<BakedQuad> quads
+        ItemQuads quads
     ) {
         LayerRenderState layer = state.newLayer();
         settings.applyToLayer(layer, displayContext);
-        CustomRenderLayer.setup(layer, lightCoords, tints, quads);
+        CustomRenderLayer.setup(layer, lightCoords, tints, quads.all());
         return layer;
     }
 

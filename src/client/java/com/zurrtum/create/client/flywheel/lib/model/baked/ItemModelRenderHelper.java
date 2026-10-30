@@ -8,14 +8,13 @@ import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
 import net.minecraft.client.renderer.item.ModelRenderProperties;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.cuboid.ItemTransform;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class ItemModelRenderHelper {
@@ -31,11 +30,11 @@ public class ItemModelRenderHelper {
         ItemStackRenderState state,
         ModelRenderProperties settings,
         ItemDisplayContext displayContext,
-        List<BakedQuad> quads
+        ItemQuads quads
     ) {
         LayerRenderState layer = state.newLayer();
         settings.applyToLayer(layer, displayContext);
-        layer.prepareQuadList().addAll(quads);
+        layer.setQuads(quads);
         return layer;
     }
 
@@ -44,7 +43,7 @@ public class ItemModelRenderHelper {
         ModelRenderProperties settings,
         ItemDisplayContext displayContext,
         int lightCoords,
-        List<BakedQuad> quads
+        ItemQuads quads
     ) {
         return submitCustomLayerWithLightTint(
             state,
@@ -62,7 +61,7 @@ public class ItemModelRenderHelper {
         ItemDisplayContext displayContext,
         int lightCoords,
         int[] tints,
-        List<BakedQuad> quads
+        ItemQuads quads
     ) {
         LayerRenderState layer = state.newLayer();
         settings.applyToLayer(layer, displayContext);
@@ -70,8 +69,8 @@ public class ItemModelRenderHelper {
         return layer;
     }
 
-    private record CustomLayer(int light, int[] tints, List<BakedQuad> quads) implements SpecialModelRenderer<Object> {
-        public static void setup(LayerRenderState layer, int lightCoords, int[] tints, List<BakedQuad> quads) {
+    private record CustomLayer(int light, int[] tints, ItemQuads quads) implements SpecialModelRenderer<Object> {
+        public static void setup(LayerRenderState layer, int lightCoords, int[] tints, ItemQuads quads) {
             CustomLayer renderer = new CustomLayer(lightCoords, tints, quads);
             layer.setupSpecialModel(renderer, null);
         }

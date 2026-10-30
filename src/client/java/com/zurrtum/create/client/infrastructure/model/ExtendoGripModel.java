@@ -19,6 +19,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.cuboid.ItemTransform;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -72,30 +73,30 @@ public class ExtendoGripModel implements ItemModel {
 
     private final ModelRenderProperties settings;
     private final Supplier<Vector3fc[]> extents;
-    private final List<BakedQuad> item;
-    private final List<BakedQuad> cog;
-    private final List<BakedQuad> thinShort;
-    private final List<BakedQuad> wideShort;
-    private final List<BakedQuad> thinLong;
-    private final List<BakedQuad> wideLong;
-    private final List<BakedQuad> pointing;
-    private final List<BakedQuad> punching;
-    private final List<BakedQuad> holding;
+    private final ItemQuads item;
+    private final ItemQuads cog;
+    private final ItemQuads thinShort;
+    private final ItemQuads wideShort;
+    private final ItemQuads thinLong;
+    private final ItemQuads wideLong;
+    private final ItemQuads pointing;
+    private final ItemQuads punching;
+    private final ItemQuads holding;
 
     public ExtendoGripModel(
         ModelRenderProperties settings,
         List<BakedQuad> item,
-        List<BakedQuad> cog,
-        List<BakedQuad> thinShort,
-        List<BakedQuad> wideShort,
-        List<BakedQuad> thinLong,
-        List<BakedQuad> wideLong,
-        List<BakedQuad> pointing,
-        List<BakedQuad> punching,
-        List<BakedQuad> holding
+        ItemQuads cog,
+        ItemQuads thinShort,
+        ItemQuads wideShort,
+        ItemQuads thinLong,
+        ItemQuads wideLong,
+        ItemQuads pointing,
+        ItemQuads punching,
+        ItemQuads holding
     ) {
         this.settings = settings;
-        this.item = item;
+        this.item = ItemQuads.split(item);
         extents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(item));
         this.cog = cog;
         this.thinShort = thinShort;
@@ -122,7 +123,7 @@ public class ExtendoGripModel implements ItemModel {
         boolean leftHand = displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         boolean rightHand = displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
         boolean applyLeftHandFix = displayContext.leftHand();
-        List<BakedQuad> hand = leftHand || rightHand ? ExtendoGripRenderHandler.holding ? holding : punching : pointing;
+        ItemQuads hand = leftHand || rightHand ? ExtendoGripRenderHandler.holding ? holding : punching : pointing;
         float animation;
         if (leftHand || rightHand) {
             animation = Mth.lerp(
@@ -288,14 +289,14 @@ public class ExtendoGripModel implements ItemModel {
             return new ExtendoGripModel(
                 settings,
                 quads,
-                BakedModelHelper.bakeQuads(baker, COG_ID),
-                BakedModelHelper.bakeQuads(baker, THIN_SHORT_ID),
-                BakedModelHelper.bakeQuads(baker, WIDE_SHORT_ID),
-                BakedModelHelper.bakeQuads(baker, THIN_LONG_ID),
-                BakedModelHelper.bakeQuads(baker, WIDE_LONG_ID),
-                BakedModelHelper.bakeQuads(baker, DEPLOYER_HAND_POINTING),
-                BakedModelHelper.bakeQuads(baker, DEPLOYER_HAND_PUNCHING),
-                BakedModelHelper.bakeQuads(baker, DEPLOYER_HAND_HOLDING)
+                BakedModelHelper.bakeItemQuads(baker, COG_ID),
+                BakedModelHelper.bakeItemQuads(baker, THIN_SHORT_ID),
+                BakedModelHelper.bakeItemQuads(baker, WIDE_SHORT_ID),
+                BakedModelHelper.bakeItemQuads(baker, THIN_LONG_ID),
+                BakedModelHelper.bakeItemQuads(baker, WIDE_LONG_ID),
+                BakedModelHelper.bakeItemQuads(baker, DEPLOYER_HAND_POINTING),
+                BakedModelHelper.bakeItemQuads(baker, DEPLOYER_HAND_PUNCHING),
+                BakedModelHelper.bakeItemQuads(baker, DEPLOYER_HAND_HOLDING)
             );
         }
     }

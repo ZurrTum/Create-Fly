@@ -16,6 +16,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
@@ -199,6 +200,10 @@ public class BakedModelHelper {
         return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
     }
 
+    public static ItemQuads bakeItemQuads(ModelBaker baker, Identifier id) {
+        return ItemQuads.split(bakeQuads(baker, id));
+    }
+
     public static List<BakedQuad> replaceQuadLayer(
         List<BakedQuad> quads,
         ChunkSectionLayer layer,
@@ -236,6 +241,48 @@ public class BakedModelHelper {
             result.add(newQuad);
         }
         return result;
+    }
+
+    public static ItemQuads replaceItemQuadLayer(
+        List<BakedQuad> quads,
+        ChunkSectionLayer layer,
+        RenderType itemRenderType
+    ) {
+        int size = quads.size();
+        if (size == 0) {
+            return ItemQuads.EMPTY;
+        }
+        List<BakedQuad> all = new ArrayList<>(size);
+        for (BakedQuad quad : quads) {
+            MaterialInfo info = quad.materialInfo();
+            BakedQuad newQuad = new BakedQuad(
+                quad.position0(),
+                quad.position1(),
+                quad.position2(),
+                quad.position3(),
+                quad.packedUV0(),
+                quad.packedUV1(),
+                quad.packedUV2(),
+                quad.packedUV3(),
+                quad.direction(),
+                new MaterialInfo(
+                    info.sprite(),
+                    layer,
+                    itemRenderType,
+                    info.itemGlintRenderType(),
+                    info.itemGlintSpecialRenderType(),
+                    info.tintIndex(),
+                    info.shadeDirectionOverride(),
+                    info.lightEmission()
+                )
+            );
+            setNormals(newQuad, quad);
+            all.add(newQuad);
+        }
+        if (itemRenderType.hasBlending()) {
+            return new ItemQuads(all, List.of(), all);
+        }
+        return new ItemQuads(all, all, List.of());
     }
 
     public static BakedQuad replaceBakedQuadUV(

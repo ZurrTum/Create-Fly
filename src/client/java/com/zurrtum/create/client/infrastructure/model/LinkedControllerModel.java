@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -100,24 +101,24 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
     private final ModelRenderProperties settings;
     private final Matrix4fc transformation;
     private final Supplier<Vector3fc[]> extents;
-    private final List<BakedQuad> item;
-    private final List<BakedQuad> powered;
-    private final List<BakedQuad> torch;
-    private final List<BakedQuad> torchOff;
-    private final List<BakedQuad> button;
+    private final ItemQuads item;
+    private final ItemQuads powered;
+    private final ItemQuads torch;
+    private final ItemQuads torchOff;
+    private final ItemQuads button;
 
     public LinkedControllerModel(
         ModelRenderProperties settings,
         Matrix4fc transformation,
         List<BakedQuad> item,
-        List<BakedQuad> powered,
-        List<BakedQuad> torch,
-        List<BakedQuad> torchOff,
-        List<BakedQuad> button
+        ItemQuads powered,
+        ItemQuads torch,
+        ItemQuads torchOff,
+        ItemQuads button
     ) {
         this.settings = settings;
         this.transformation = transformation;
-        this.item = item;
+        this.item = ItemQuads.split(item);
         extents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(item));
         this.powered = powered;
         this.torch = torch;
@@ -323,7 +324,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
         SubmitNodeCollector queue,
         int light,
         int overlay,
-        List<BakedQuad> button,
+        ItemQuads button,
         float pt,
         int index
     ) {
@@ -339,7 +340,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
         SubmitNodeCollector queue,
         int light,
         int overlay,
-        List<BakedQuad> quads
+        ItemQuads quads
     ) {
         queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, FoilType.NONE);
     }
@@ -393,15 +394,15 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Re
                 settings,
                 transformation,
                 quads,
-                BakedModelHelper.bakeQuads(baker, POWERED_ID),
+                BakedModelHelper.bakeItemQuads(baker, POWERED_ID),
                 bakeBlockQuads(baker, TORCH_ID),
-                BakedModelHelper.bakeQuads(baker, TORCH_OFF_ID),
-                BakedModelHelper.bakeQuads(baker, BUTTON_ID)
+                BakedModelHelper.bakeItemQuads(baker, TORCH_OFF_ID),
+                BakedModelHelper.bakeItemQuads(baker, BUTTON_ID)
             );
         }
 
-        private static List<BakedQuad> bakeBlockQuads(ModelBaker baker, Identifier id) {
-            return BakedModelHelper.replaceQuadLayer(
+        private static ItemQuads bakeBlockQuads(ModelBaker baker, Identifier id) {
+            return BakedModelHelper.replaceItemQuadLayer(
                 BakedModelHelper.bakeQuads(baker, id),
                 ChunkSectionLayer.CUTOUT,
                 RenderTypes.solidMovingBlock()

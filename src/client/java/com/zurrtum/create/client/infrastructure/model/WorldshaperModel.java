@@ -31,6 +31,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
@@ -90,30 +91,30 @@ public class WorldshaperModel implements ItemModel {
     };
 
     private final ModelRenderProperties settings;
-    private final List<BakedQuad> item;
-    private final List<BakedQuad> core;
-    private final List<BakedQuad> coreGlow;
-    private final List<BakedQuad> accelerator;
+    private final ItemQuads item;
+    private final ItemQuads core;
+    private final ItemQuads coreGlow;
+    private final ItemQuads accelerator;
     private final Supplier<Vector3fc[]> extents;
 
     public WorldshaperModel(
         ModelRenderProperties settings,
         List<BakedQuad> item,
-        List<BakedQuad> core,
-        List<BakedQuad> coreGlow,
-        List<BakedQuad> accelerator
+        ItemQuads core,
+        ItemQuads coreGlow,
+        ItemQuads accelerator
     ) {
         this.settings = settings;
-        this.item = item;
+        this.item = ItemQuads.split(item);
         this.core = core;
         this.coreGlow = coreGlow;
         this.accelerator = accelerator;
         extents = Suppliers.memoize(() -> {
             Set<Vector3fc> set = new HashSet<>();
             addPosition(set, item);
-            addPosition(set, core);
-            addPosition(set, coreGlow);
-            addPosition(set, accelerator);
+            addPosition(set, core.all());
+            addPosition(set, coreGlow.all());
+            addPosition(set, accelerator.all());
             return set.toArray(Vector3fc[]::new);
         });
     }
@@ -209,16 +210,13 @@ public class WorldshaperModel implements ItemModel {
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
-            List<BakedQuad> core = BakedModelHelper.replaceQuadLayer(
+            ItemQuads core = BakedModelHelper.replaceItemQuadLayer(
                 BakedModelHelper.bakeQuads(baker, CORE_ID),
                 ChunkSectionLayer.SOLID,
                 CreateRenderTypes.itemGlowingSolid()
             );
-            List<BakedQuad> coreGlow = BakedModelHelper.replaceQuadLayer(
-                BakedModelHelper.bakeQuads(
-                    baker,
-                    CORE_GLOW_ID
-                ),
+            ItemQuads coreGlow = BakedModelHelper.replaceItemQuadLayer(
+                BakedModelHelper.bakeQuads(baker, CORE_GLOW_ID),
                 ChunkSectionLayer.TRANSLUCENT,
                 CreateRenderTypes.itemGlowingTranslucent()
             );
@@ -227,7 +225,7 @@ public class WorldshaperModel implements ItemModel {
                 quads,
                 core,
                 coreGlow,
-                BakedModelHelper.bakeQuads(baker, ACCELERATOR_ID)
+                BakedModelHelper.bakeItemQuads(baker, ACCELERATOR_ID)
             );
         }
     }

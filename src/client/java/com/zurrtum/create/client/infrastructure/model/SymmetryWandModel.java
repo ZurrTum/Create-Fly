@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.item.ModelRenderProperties;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
@@ -47,30 +48,30 @@ public class SymmetryWandModel implements ItemModel {
     );
     public static final Identifier BITS_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/bits");
     private final ModelRenderProperties settings;
-    private final List<BakedQuad> item;
-    private final List<BakedQuad> core;
-    private final List<BakedQuad> coreGlow;
-    private final List<BakedQuad> bits;
+    private final ItemQuads item;
+    private final ItemQuads core;
+    private final ItemQuads coreGlow;
+    private final ItemQuads bits;
     private final Supplier<Vector3fc[]> vector;
 
     public SymmetryWandModel(
         ModelRenderProperties settings,
         List<BakedQuad> item,
-        List<BakedQuad> core,
-        List<BakedQuad> coreGlow,
-        List<BakedQuad> bits
+        ItemQuads core,
+        ItemQuads coreGlow,
+        ItemQuads bits
     ) {
         this.settings = settings;
-        this.item = item;
+        this.item = ItemQuads.split(item);
         this.core = core;
         this.coreGlow = coreGlow;
         this.bits = bits;
         vector = Suppliers.memoize(() -> {
             Set<Vector3fc> set = new HashSet<>();
             addPosition(set, item);
-            addPosition(set, core);
-            addPosition(set, coreGlow);
-            addPosition(set, bits);
+            addPosition(set, core.all());
+            addPosition(set, coreGlow.all());
+            addPosition(set, bits.all());
             return set.toArray(Vector3fc[]::new);
         });
     }
@@ -133,20 +134,17 @@ public class SymmetryWandModel implements ItemModel {
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
-            List<BakedQuad> core = BakedModelHelper.replaceQuadLayer(
+            ItemQuads core = BakedModelHelper.replaceItemQuadLayer(
                 BakedModelHelper.bakeQuads(baker, CORE_ID),
                 ChunkSectionLayer.SOLID,
                 CreateRenderTypes.itemGlowingSolid()
             );
-            List<BakedQuad> coreGlow = BakedModelHelper.replaceQuadLayer(
-                BakedModelHelper.bakeQuads(
-                    baker,
-                    CORE_GLOW_ID
-                ),
+            ItemQuads coreGlow = BakedModelHelper.replaceItemQuadLayer(
+                BakedModelHelper.bakeQuads(baker, CORE_GLOW_ID),
                 ChunkSectionLayer.TRANSLUCENT,
                 CreateRenderTypes.itemGlowingTranslucent()
             );
-            List<BakedQuad> bits = BakedModelHelper.replaceQuadLayer(
+            ItemQuads bits = BakedModelHelper.replaceItemQuadLayer(
                 BakedModelHelper.bakeQuads(baker, BITS_ID),
                 ChunkSectionLayer.TRANSLUCENT,
                 CreateRenderTypes.itemGlowingTranslucent()

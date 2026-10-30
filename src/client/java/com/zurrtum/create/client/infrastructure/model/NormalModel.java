@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
@@ -38,7 +39,8 @@ import static com.zurrtum.create.client.flywheel.lib.model.baked.ItemModelRender
 public class NormalModel implements ItemModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/normal");
     private final List<ItemTintSource> tints;
-    private final QuadCollection quads;
+    private final boolean animated;
+    private final ItemQuads itemQuads;
     private final Supplier<Vector3fc[]> extents;
     private final ModelRenderProperties properties;
     private final Matrix4fc transformation;
@@ -50,7 +52,8 @@ public class NormalModel implements ItemModel {
         Matrix4fc transformation
     ) {
         this.tints = tints;
-        this.quads = quads;
+        animated = quads.hasMaterialFlag(2);
+        itemQuads = ItemQuads.split(quads.getAll());
         this.properties = properties;
         this.transformation = transformation;
         extents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(quads.getAll()));
@@ -67,12 +70,12 @@ public class NormalModel implements ItemModel {
         int seed
     ) {
         output.appendModelIdentityElement(this);
-        LayerRenderState layer = submitQuads(output, properties, displayContext, quads.getAll());
+        LayerRenderState layer = submitQuads(output, properties, displayContext, itemQuads);
         if (item.hasFoil()) {
             layer.setFoilType(FoilType.STANDARD);
             output.setAnimated();
             output.appendModelIdentityElement(FoilType.STANDARD);
-        } else if (quads.hasMaterialFlag(2)) {
+        } else if (animated) {
             output.setAnimated();
         }
         if (!tints.isEmpty()) {

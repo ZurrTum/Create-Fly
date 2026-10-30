@@ -19,6 +19,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.cuboid.ItemTransform;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -39,14 +40,14 @@ import static com.zurrtum.create.client.flywheel.lib.model.baked.ItemModelRender
 public class SandPaperModel implements ItemModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/sand_paper");
 
-    private final List<BakedQuad> quads;
+    private final ItemQuads quads;
     private final ModelRenderProperties settings;
     private final Supplier<Vector3fc[]> extents;
 
     public SandPaperModel(List<BakedQuad> quads, ModelRenderProperties settings) {
-        this.quads = quads;
+        this.quads = ItemQuads.split(quads);
         this.settings = settings;
-        extents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(this.quads));
+        extents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(quads));
     }
 
     @Override

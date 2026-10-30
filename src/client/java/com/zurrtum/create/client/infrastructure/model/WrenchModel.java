@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -33,10 +34,10 @@ public class WrenchModel implements ItemModel {
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wrench/item");
     public static final Identifier GEAR_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wrench/gear");
 
-    private final List<BakedQuad> itemQuads;
+    private final ItemQuads itemQuads;
     private final ModelRenderProperties itemSettings;
     private final Supplier<Vector3fc[]> itemExtents;
-    private final List<BakedQuad> gearQuads;
+    private final ItemQuads gearQuads;
     private final ModelRenderProperties gearSettings;
     private final Supplier<Vector3fc[]> gearExtents;
 
@@ -46,12 +47,12 @@ public class WrenchModel implements ItemModel {
         List<BakedQuad> gearQuads,
         ModelRenderProperties gearSettings
     ) {
-        this.itemQuads = itemQuads;
+        this.itemQuads = ItemQuads.split(itemQuads);
         this.itemSettings = itemSettings;
-        itemExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(this.itemQuads));
-        this.gearQuads = gearQuads;
+        itemExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(itemQuads));
+        this.gearQuads = ItemQuads.split(gearQuads);
         this.gearSettings = gearSettings;
-        gearExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(this.gearQuads));
+        gearExtents = Suppliers.memoize(() -> CuboidItemModelWrapper.computeExtents(gearQuads));
     }
 
     @Override
