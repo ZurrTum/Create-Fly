@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.block.BlockModelResolver;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -44,9 +43,9 @@ public class VanillaVisuals {
 
         builder(EntityTypes.BLOCK_DISPLAY).factory(BlockDisplayVisual::new).apply(STABLE);
 
-        composable(EntityTypes.ITEM_DISPLAY).with(element(VisualElements.ITEM_DISPLAY).build())
-            .shouldVisualize((ctx, e) -> ItemDisplayVisual.shouldVisualize(e)).build()
-            .skipVanillaRender(ItemDisplayVisual::shouldVisualize).apply(EXPERIMENTAL);
+        //        composable(EntityTypes.ITEM_DISPLAY).with(element(VisualElements.ITEM_DISPLAY).build())
+        //            .shouldVisualize((ctx, e) -> ItemDisplayVisual.shouldVisualize(e)).build()
+        //            .skipVanillaRender(ItemDisplayVisual::shouldVisualize).apply(EXPERIMENTAL);
 
         minecart(EntityTypes.CHEST_MINECART, ModelLayers.CHEST_MINECART).apply(STABLE);
         minecart(EntityTypes.COMMAND_BLOCK_MINECART, ModelLayers.COMMAND_BLOCK_MINECART).apply(STABLE);
@@ -62,8 +61,8 @@ public class VanillaVisuals {
             )).build()).with(element(VisualElements.FIRE).build()).with(element(VisualElements.TNT_MINECART).build())
             .build().skipVanillaRender(MinecartVisual::shouldSkipRender).apply(STABLE);
 
-        itemFrame(EntityTypes.ITEM_FRAME).apply(EXPERIMENTAL);
-        itemFrame(EntityTypes.GLOW_ITEM_FRAME).apply(EXPERIMENTAL);
+        //        itemFrame(EntityTypes.ITEM_FRAME).apply(EXPERIMENTAL);
+        //        itemFrame(EntityTypes.GLOW_ITEM_FRAME).apply(EXPERIMENTAL);
 
         //TODO FRAPI
         //        composable(EntityTypes.ITEM).apply(VanillaVisuals::commonElements).with(element(VisualElements.FIRE).build())
@@ -78,11 +77,11 @@ public class VanillaVisuals {
         builder.with(element(VisualElements.HITBOX).configure(false).build());
     }
 
-    public static <T extends ItemFrame> EntityVisualizerBuilder<T> itemFrame(EntityType<T> type) {
-        return composable(type).apply(VanillaVisuals::commonElements).with(element(VisualElements.ITEM_FRAME).build())
-            .shouldVisualize((ctx, entity) -> ItemFrameVisual.shouldVisualize(entity)).build()
-            .skipVanillaRender(ItemFrameVisual::shouldVisualize);
-    }
+    //    public static <T extends ItemFrame> EntityVisualizerBuilder<T> itemFrame(EntityType<T> type) {
+    //        return composable(type).apply(VanillaVisuals::commonElements).with(element(VisualElements.ITEM_FRAME).build())
+    //            .shouldVisualize((ctx, entity) -> ItemFrameVisual.shouldVisualize(entity)).build()
+    //            .skipVanillaRender(ItemFrameVisual::shouldVisualize);
+    //    }
 
     public static <T extends AbstractMinecart> EntityVisualizerBuilder<T> minecart(
         EntityType<T> type,

@@ -65,6 +65,13 @@ sourceSets {
             exclude 'com/zurrtum/create/client/mixin/ItemFeatureRendererMixin.java'
             exclude 'com/zurrtum/create/client/mixin/ModelMixin.java'
             exclude 'com/zurrtum/create/client/mixin/ModelPartMixin.java'
+            exclude 'com/zurrtum/create/client/flywheel/lib/model/baked/BakedItemModelBufferer.java'
+            exclude 'com/zurrtum/create/client/flywheel/lib/model/baked/ItemMeshEmitter.java'
+            exclude 'com/zurrtum/create/client/flywheel/lib/model/baked/ItemChunkLayerSortedListBuilder.java'
+            exclude 'com/zurrtum/create/client/vanillin/item/ItemModels.java'
+            exclude 'com/zurrtum/create/client/vanillin/visuals/ItemDisplayVisual.java'
+            exclude 'com/zurrtum/create/client/vanillin/visuals/ItemFrameVisual.java'
+            exclude 'com/zurrtum/create/client/vanillin/visuals/ItemVisual.java'
         }
     }
 }
