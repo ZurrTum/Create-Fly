@@ -1,7 +1,6 @@
 package com.zurrtum.create.content.redstone.diodes;
 
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConnectBlock {
+public class ToggleLatchBlock extends AbstractDiodeBlock {
 
     public static BooleanProperty POWERING = BooleanProperty.create("powering");
 
@@ -92,7 +91,12 @@ public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConn
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
+    protected boolean shouldRedstoneWireConnectTo(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        @Nullable Direction side
+    ) {
         if (side == null) {
             return false;
         }

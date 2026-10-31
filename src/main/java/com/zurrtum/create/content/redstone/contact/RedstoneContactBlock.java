@@ -3,7 +3,6 @@ package com.zurrtum.create.content.redstone.contact;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn.ColumnCoords;
-import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
@@ -23,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.jspecify.annotations.Nullable;
 
-public class RedstoneContactBlock extends WrenchableDirectionalBlock implements RedStoneConnectBlock, WeakPowerControlBlock {
+public class RedstoneContactBlock extends WrenchableDirectionalBlock implements WeakPowerControlBlock {
 
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -132,7 +131,12 @@ public class RedstoneContactBlock extends WrenchableDirectionalBlock implements 
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
+    protected boolean shouldRedstoneWireConnectTo(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        @Nullable Direction side
+    ) {
         return side != null && state.getValue(FACING) != side.getOpposite();
     }
 

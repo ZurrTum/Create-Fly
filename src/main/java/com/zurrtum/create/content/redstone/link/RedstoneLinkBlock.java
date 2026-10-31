@@ -5,7 +5,6 @@ import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +29,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
-public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE<RedstoneLinkBlockEntity>, RedStoneConnectBlock, NeighborUpdateListeningBlock {
+public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE<RedstoneLinkBlockEntity>, NeighborUpdateListeningBlock {
 
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty RECEIVER = BooleanProperty.create("receiver");
@@ -206,7 +205,12 @@ public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
+    protected boolean shouldRedstoneWireConnectTo(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        @Nullable Direction side
+    ) {
         return side != null;
     }
 

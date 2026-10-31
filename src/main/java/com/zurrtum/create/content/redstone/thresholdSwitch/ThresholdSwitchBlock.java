@@ -5,7 +5,6 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.core.BlockPos;
@@ -31,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IBE<ThresholdSwitchBlockEntity>, RedStoneConnectBlock {
+public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IBE<ThresholdSwitchBlockEntity> {
 
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 5);
 
@@ -49,7 +48,12 @@ public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IB
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
+    protected boolean shouldRedstoneWireConnectTo(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        @Nullable Direction side
+    ) {
         return side != null && side.getOpposite() != getTargetDirection(state);
     }
 

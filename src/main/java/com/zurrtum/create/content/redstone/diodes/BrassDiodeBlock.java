@@ -4,7 +4,6 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -23,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiodeBlockEntity>, RedStoneConnectBlock {
+public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiodeBlockEntity> {
 
     public static final BooleanProperty POWERING = BooleanProperty.create("powering");
     public static final BooleanProperty INVERTED = BooleanProperty.create("inverted");
@@ -94,7 +93,12 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
+    protected boolean shouldRedstoneWireConnectTo(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        @Nullable Direction side
+    ) {
         if (side == null) {
             return false;
         }

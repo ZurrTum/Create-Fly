@@ -10,7 +10,6 @@ import com.zurrtum.create.content.redstone.contact.RedstoneContactBlock;
 import com.zurrtum.create.content.redstone.diodes.BrassDiodeBlock;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
@@ -38,7 +37,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
-public class ElevatorContactBlock extends WrenchableDirectionalBlock implements IBE<ElevatorContactBlockEntity>, SpecialBlockItemRequirement, RedStoneConnectBlock, WeakPowerControlBlock {
+public class ElevatorContactBlock extends WrenchableDirectionalBlock implements IBE<ElevatorContactBlockEntity>, SpecialBlockItemRequirement, WeakPowerControlBlock {
 
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty CALLING = BooleanProperty.create("calling");
@@ -222,7 +221,12 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, @Nullable Direction side) {
+    protected boolean shouldRedstoneWireConnectTo(
+        BlockState state,
+        BlockGetter level,
+        BlockPos pos,
+        @Nullable Direction side
+    ) {
         if (side == null) {
             return true;
         }
