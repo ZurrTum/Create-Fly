@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/clutch"
+        "recipes": "create:crafting/kinetics/clutch"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

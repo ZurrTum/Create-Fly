@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/steam_engine"
+        "recipes": "create:crafting/kinetics/steam_engine"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

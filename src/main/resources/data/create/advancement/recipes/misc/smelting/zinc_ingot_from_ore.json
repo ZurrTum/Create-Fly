@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:smelting/zinc_ingot_from_ore"
+        "recipes": "create:smelting/zinc_ingot_from_ore"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

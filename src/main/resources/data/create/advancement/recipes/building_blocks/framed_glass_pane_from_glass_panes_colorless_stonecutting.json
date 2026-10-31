@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:framed_glass_pane_from_glass_panes_colorless_stonecutting"
+        "recipes": "create:framed_glass_pane_from_glass_panes_colorless_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

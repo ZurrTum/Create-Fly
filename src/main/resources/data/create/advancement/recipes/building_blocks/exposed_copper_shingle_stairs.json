@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:exposed_copper_shingle_stairs"
+        "recipes": "create:exposed_copper_shingle_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

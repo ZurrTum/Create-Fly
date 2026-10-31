@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/transmitter"
+        "recipes": "create:crafting/materials/transmitter"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/sequenced_gearshift"
+        "recipes": "create:crafting/kinetics/sequenced_gearshift"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

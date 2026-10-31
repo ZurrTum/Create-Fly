@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/controller_rail"
+        "recipes": "create:crafting/kinetics/controller_rail"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

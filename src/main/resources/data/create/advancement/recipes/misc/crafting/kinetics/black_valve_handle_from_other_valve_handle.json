@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/black_valve_handle_from_other_valve_handle"
+        "recipes": "create:crafting/kinetics/black_valve_handle_from_other_valve_handle"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

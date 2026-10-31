@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/copper_backtank"
+        "recipes": "create:crafting/appliances/copper_backtank"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

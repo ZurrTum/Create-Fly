@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/crafting_blueprint"
+        "recipes": "create:crafting/appliances/crafting_blueprint"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

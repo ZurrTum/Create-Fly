@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/clipboard"
+        "recipes": "create:crafting/appliances/clipboard"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

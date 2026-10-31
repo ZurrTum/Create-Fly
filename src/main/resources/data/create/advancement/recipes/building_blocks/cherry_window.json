@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cherry_window"
+        "recipes": "create:cherry_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

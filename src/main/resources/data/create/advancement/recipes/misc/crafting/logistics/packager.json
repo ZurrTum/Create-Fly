@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/packager"
+        "recipes": "create:crafting/logistics/packager"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

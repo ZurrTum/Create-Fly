@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/linear_chassis"
+        "recipes": "create:crafting/kinetics/linear_chassis"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

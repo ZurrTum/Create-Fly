@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:mangrove_window_pane"
+        "recipes": "create:mangrove_window_pane"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

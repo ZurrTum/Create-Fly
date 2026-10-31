@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:oak_window"
+        "recipes": "create:oak_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/hose_pulley"
+        "recipes": "create:crafting/kinetics/hose_pulley"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

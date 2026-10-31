@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/rose_quartz_lamp"
+        "recipes": "create:crafting/kinetics/rose_quartz_lamp"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

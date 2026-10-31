@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_crafter"
+        "recipes": "create:crafting/kinetics/mechanical_crafter"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/brown_postbox"
+        "recipes": "create:crafting/logistics/brown_postbox"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

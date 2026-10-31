@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_crimsite_brick_wall_from_stone_types_crimsite_stonecutting"
+        "recipes": "create:cut_crimsite_brick_wall_from_stone_types_crimsite_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

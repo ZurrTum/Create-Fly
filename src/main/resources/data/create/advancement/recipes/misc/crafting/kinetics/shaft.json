@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/shaft"
+        "recipes": "create:crafting/kinetics/shaft"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

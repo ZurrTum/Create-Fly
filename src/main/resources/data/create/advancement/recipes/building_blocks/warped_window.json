@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:warped_window"
+        "recipes": "create:warped_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

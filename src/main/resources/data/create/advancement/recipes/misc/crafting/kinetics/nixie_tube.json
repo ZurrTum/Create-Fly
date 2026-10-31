@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/nixie_tube"
+        "recipes": "create:crafting/kinetics/nixie_tube"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

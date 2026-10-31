@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mysterious_cuckoo_clock"
+        "recipes": "create:crafting/kinetics/mysterious_cuckoo_clock"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

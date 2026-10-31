@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/minecart_from_contraption_cart"
+        "recipes": "create:crafting/kinetics/minecart_from_contraption_cart"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

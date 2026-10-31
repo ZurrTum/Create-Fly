@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_limestone_wall"
+        "recipes": "create:cut_limestone_wall"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

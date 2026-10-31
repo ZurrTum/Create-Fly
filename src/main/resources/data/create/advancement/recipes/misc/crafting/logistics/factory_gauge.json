@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/factory_gauge"
+        "recipes": "create:crafting/logistics/factory_gauge"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

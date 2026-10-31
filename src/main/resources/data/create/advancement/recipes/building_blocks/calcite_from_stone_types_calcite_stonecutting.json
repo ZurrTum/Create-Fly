@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:calcite_from_stone_types_calcite_stonecutting"
+        "recipes": "create:calcite_from_stone_types_calcite_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

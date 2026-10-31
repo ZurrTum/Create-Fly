@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/wrench"
+        "recipes": "create:crafting/kinetics/wrench"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/schematics/schematic_and_quill"
+        "recipes": "create:crafting/schematics/schematic_and_quill"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

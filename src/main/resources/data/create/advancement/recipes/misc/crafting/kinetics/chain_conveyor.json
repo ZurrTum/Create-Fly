@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/chain_conveyor"
+        "recipes": "create:crafting/kinetics/chain_conveyor"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

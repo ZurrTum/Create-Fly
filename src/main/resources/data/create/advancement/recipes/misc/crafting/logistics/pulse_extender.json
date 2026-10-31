@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/pulse_extender"
+        "recipes": "create:crafting/logistics/pulse_extender"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

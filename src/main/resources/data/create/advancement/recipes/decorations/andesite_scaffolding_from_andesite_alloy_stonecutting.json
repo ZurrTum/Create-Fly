@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:andesite_scaffolding_from_andesite_alloy_stonecutting"
+        "recipes": "create:andesite_scaffolding_from_andesite_alloy_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

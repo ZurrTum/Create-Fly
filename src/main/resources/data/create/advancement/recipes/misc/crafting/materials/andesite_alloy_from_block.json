@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/andesite_alloy_from_block"
+        "recipes": "create:crafting/materials/andesite_alloy_from_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

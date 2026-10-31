@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/chain_from_zinc"
+        "recipes": "create:crafting/appliances/chain_from_zinc"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/propeller"
+        "recipes": "create:crafting/kinetics/propeller"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

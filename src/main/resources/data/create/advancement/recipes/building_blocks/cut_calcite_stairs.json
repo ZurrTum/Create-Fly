@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_calcite_stairs"
+        "recipes": "create:cut_calcite_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_bearing"
+        "recipes": "create:crafting/kinetics/mechanical_bearing"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

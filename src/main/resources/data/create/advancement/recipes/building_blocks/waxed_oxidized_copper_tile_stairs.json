@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:waxed_oxidized_copper_tile_stairs"
+        "recipes": "create:waxed_oxidized_copper_tile_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

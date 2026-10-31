@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/encased_fan"
+        "recipes": "create:crafting/kinetics/encased_fan"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

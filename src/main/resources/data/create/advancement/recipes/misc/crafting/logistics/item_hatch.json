@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/item_hatch"
+        "recipes": "create:crafting/logistics/item_hatch"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

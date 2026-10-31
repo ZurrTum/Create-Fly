@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/orange_seat"
+        "recipes": "create:crafting/kinetics/orange_seat"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

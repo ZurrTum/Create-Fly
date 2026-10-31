@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:weathered_copper_shingle_slab"
+        "recipes": "create:weathered_copper_shingle_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

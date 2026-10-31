@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/gearshift"
+        "recipes": "create:crafting/kinetics/gearshift"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

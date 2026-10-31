@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/brown_table_cloth"
+        "recipes": "create:crafting/logistics/brown_table_cloth"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

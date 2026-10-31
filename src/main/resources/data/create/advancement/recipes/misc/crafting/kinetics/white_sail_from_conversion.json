@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/white_sail_from_conversion"
+        "recipes": "create:crafting/kinetics/white_sail_from_conversion"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

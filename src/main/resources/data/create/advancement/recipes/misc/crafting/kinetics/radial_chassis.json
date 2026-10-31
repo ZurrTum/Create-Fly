@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/radial_chassis"
+        "recipes": "create:crafting/kinetics/radial_chassis"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

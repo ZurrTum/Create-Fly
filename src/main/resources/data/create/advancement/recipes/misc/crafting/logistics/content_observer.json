@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/content_observer"
+        "recipes": "create:crafting/logistics/content_observer"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

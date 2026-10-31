@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/track_observer"
+        "recipes": "create:crafting/kinetics/track_observer"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

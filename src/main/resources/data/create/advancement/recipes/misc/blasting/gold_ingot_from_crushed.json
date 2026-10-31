@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:blasting/gold_ingot_from_crushed"
+        "recipes": "create:blasting/gold_ingot_from_crushed"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

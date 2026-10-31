@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_calcite_slab"
+        "recipes": "create:cut_calcite_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

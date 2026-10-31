@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_plough"
+        "recipes": "create:crafting/kinetics/mechanical_plough"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

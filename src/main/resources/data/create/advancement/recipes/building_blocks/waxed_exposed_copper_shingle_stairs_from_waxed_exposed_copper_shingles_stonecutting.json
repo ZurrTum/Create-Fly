@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:waxed_exposed_copper_shingle_stairs_from_waxed_exposed_copper_shingles_stonecutting"
+        "recipes": "create:waxed_exposed_copper_shingle_stairs_from_waxed_exposed_copper_shingles_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

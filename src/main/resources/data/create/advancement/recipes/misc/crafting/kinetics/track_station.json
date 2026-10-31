@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/track_station"
+        "recipes": "create:crafting/kinetics/track_station"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:small_ochrum_bricks_from_stone_types_ochrum_stonecutting"
+        "recipes": "create:small_ochrum_bricks_from_stone_types_ochrum_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

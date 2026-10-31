@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/copper_valve_handle_from_others"
+        "recipes": "create:crafting/kinetics/copper_valve_handle_from_others"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

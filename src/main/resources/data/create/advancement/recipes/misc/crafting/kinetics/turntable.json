@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/turntable"
+        "recipes": "create:crafting/kinetics/turntable"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:small_scorchia_brick_slab"
+        "recipes": "create:small_scorchia_brick_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

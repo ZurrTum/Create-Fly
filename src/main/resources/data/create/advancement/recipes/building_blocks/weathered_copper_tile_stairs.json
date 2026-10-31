@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:weathered_copper_tile_stairs"
+        "recipes": "create:weathered_copper_tile_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

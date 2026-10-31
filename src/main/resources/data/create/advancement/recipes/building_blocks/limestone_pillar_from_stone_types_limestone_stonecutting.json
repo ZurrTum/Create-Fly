@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:limestone_pillar_from_stone_types_limestone_stonecutting"
+        "recipes": "create:limestone_pillar_from_stone_types_limestone_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

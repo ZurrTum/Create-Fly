@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/water_wheel"
+        "recipes": "create:crafting/kinetics/water_wheel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

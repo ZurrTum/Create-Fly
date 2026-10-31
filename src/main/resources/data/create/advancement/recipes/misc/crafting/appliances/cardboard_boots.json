@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/cardboard_boots"
+        "recipes": "create:crafting/appliances/cardboard_boots"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

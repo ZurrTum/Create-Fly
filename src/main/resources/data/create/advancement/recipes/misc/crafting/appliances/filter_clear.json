@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/filter_clear"
+        "recipes": "create:crafting/appliances/filter_clear"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

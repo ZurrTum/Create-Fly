@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:layered_crimsite_from_stone_types_crimsite_stonecutting"
+        "recipes": "create:layered_crimsite_from_stone_types_crimsite_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

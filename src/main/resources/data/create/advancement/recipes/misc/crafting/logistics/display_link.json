@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/display_link"
+        "recipes": "create:crafting/logistics/display_link"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

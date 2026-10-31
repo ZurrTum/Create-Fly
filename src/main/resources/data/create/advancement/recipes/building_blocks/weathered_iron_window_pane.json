@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:weathered_iron_window_pane"
+        "recipes": "create:weathered_iron_window_pane"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

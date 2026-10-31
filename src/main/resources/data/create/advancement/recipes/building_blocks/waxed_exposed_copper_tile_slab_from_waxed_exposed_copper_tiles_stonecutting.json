@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:waxed_exposed_copper_tile_slab_from_waxed_exposed_copper_tiles_stonecutting"
+        "recipes": "create:waxed_exposed_copper_tile_slab_from_waxed_exposed_copper_tiles_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

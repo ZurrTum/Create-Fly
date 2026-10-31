@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/portable_fluid_interface"
+        "recipes": "create:crafting/kinetics/portable_fluid_interface"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

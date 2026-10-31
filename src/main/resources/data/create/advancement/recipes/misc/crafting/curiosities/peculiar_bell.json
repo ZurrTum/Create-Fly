@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/curiosities/peculiar_bell"
+        "recipes": "create:crafting/curiosities/peculiar_bell"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

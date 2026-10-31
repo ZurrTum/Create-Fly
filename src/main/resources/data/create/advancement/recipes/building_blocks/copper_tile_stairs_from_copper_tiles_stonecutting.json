@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:copper_tile_stairs_from_copper_tiles_stonecutting"
+        "recipes": "create:copper_tile_stairs_from_copper_tiles_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

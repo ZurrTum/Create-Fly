@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/brass_ingot_from_compacting"
+        "recipes": "create:crafting/materials/brass_ingot_from_compacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

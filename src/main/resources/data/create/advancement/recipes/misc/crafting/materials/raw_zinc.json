@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/raw_zinc"
+        "recipes": "create:crafting/materials/raw_zinc"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

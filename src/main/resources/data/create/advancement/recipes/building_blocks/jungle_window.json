@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:jungle_window"
+        "recipes": "create:jungle_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

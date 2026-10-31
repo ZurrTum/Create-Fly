@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/stock_link_clear"
+        "recipes": "create:crafting/logistics/stock_link_clear"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

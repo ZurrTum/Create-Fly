@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/gearbox"
+        "recipes": "create:crafting/kinetics/gearbox"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

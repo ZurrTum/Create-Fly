@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/display_board"
+        "recipes": "create:crafting/kinetics/display_board"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

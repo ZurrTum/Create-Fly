@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_saw"
+        "recipes": "create:crafting/kinetics/mechanical_saw"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

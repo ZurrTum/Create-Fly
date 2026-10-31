@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crimson_window"
+        "recipes": "create:crimson_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

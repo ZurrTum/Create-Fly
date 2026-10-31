@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:waxed_oxidized_copper_shingle_slab"
+        "recipes": "create:waxed_oxidized_copper_shingle_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:rose_quartz_block_from_rose_quartz_stonecutting"
+        "recipes": "create:rose_quartz_block_from_rose_quartz_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

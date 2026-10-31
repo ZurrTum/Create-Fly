@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/palettes/scorchia"
+        "recipes": "create:crafting/palettes/scorchia"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

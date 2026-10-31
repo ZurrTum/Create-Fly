@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_tuff_stairs"
+        "recipes": "create:cut_tuff_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/bound_cardboard_block"
+        "recipes": "create:crafting/materials/bound_cardboard_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

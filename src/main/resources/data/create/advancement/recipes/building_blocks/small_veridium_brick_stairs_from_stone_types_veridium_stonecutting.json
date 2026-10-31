@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:small_veridium_brick_stairs_from_stone_types_veridium_stonecutting"
+        "recipes": "create:small_veridium_brick_stairs_from_stone_types_veridium_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

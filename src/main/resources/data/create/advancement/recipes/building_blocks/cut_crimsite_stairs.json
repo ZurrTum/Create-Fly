@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_crimsite_stairs"
+        "recipes": "create:cut_crimsite_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

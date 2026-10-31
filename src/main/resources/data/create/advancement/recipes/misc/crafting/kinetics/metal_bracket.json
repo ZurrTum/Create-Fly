@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/metal_bracket"
+        "recipes": "create:crafting/kinetics/metal_bracket"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

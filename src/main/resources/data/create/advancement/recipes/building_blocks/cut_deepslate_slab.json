@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_deepslate_slab"
+        "recipes": "create:cut_deepslate_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

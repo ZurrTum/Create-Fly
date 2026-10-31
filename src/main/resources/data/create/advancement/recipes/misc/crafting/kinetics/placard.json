@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/placard"
+        "recipes": "create:crafting/kinetics/placard"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/weighted_ejector"
+        "recipes": "create:crafting/kinetics/weighted_ejector"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

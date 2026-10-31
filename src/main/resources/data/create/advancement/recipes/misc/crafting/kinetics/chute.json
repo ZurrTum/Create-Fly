@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/chute"
+        "recipes": "create:crafting/kinetics/chute"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/pulse_repeater"
+        "recipes": "create:crafting/logistics/pulse_repeater"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

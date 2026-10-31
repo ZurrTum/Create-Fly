@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:tiled_glass_pane"
+        "recipes": "create:tiled_glass_pane"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

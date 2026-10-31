@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/curiosities/cake"
+        "recipes": "create:crafting/curiosities/cake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

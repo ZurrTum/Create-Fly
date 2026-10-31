@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:industrial_iron_window"
+        "recipes": "create:industrial_iron_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

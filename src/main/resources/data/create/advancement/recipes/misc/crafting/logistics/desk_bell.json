@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/desk_bell"
+        "recipes": "create:crafting/logistics/desk_bell"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

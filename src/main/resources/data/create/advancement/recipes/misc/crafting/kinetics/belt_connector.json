@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/belt_connector"
+        "recipes": "create:crafting/kinetics/belt_connector"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

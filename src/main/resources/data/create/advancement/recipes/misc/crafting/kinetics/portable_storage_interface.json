@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/portable_storage_interface"
+        "recipes": "create:crafting/kinetics/portable_storage_interface"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

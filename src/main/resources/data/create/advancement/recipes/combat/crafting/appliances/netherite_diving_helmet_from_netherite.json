@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/netherite_diving_helmet_from_netherite"
+        "recipes": "create:crafting/appliances/netherite_diving_helmet_from_netherite"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

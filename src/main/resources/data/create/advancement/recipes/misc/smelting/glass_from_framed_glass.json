@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:smelting/glass_from_framed_glass"
+        "recipes": "create:smelting/glass_from_framed_glass"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

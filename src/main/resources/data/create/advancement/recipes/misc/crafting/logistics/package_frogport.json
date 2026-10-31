@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/package_frogport"
+        "recipes": "create:crafting/logistics/package_frogport"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

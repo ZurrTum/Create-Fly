@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:polished_cut_asurine_wall"
+        "recipes": "create:polished_cut_asurine_wall"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:exposed_copper_tile_slab_from_exposed_copper_tiles_stonecutting"
+        "recipes": "create:exposed_copper_tile_slab_from_exposed_copper_tiles_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

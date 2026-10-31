@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/pink_seat"
+        "recipes": "create:crafting/kinetics/pink_seat"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

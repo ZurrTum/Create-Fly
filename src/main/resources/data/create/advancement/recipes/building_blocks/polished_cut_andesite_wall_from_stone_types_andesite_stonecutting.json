@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:polished_cut_andesite_wall_from_stone_types_andesite_stonecutting"
+        "recipes": "create:polished_cut_andesite_wall_from_stone_types_andesite_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

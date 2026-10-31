@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/brass_tunnel"
+        "recipes": "create:crafting/logistics/brass_tunnel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

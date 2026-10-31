@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/gantry_shaft"
+        "recipes": "create:crafting/kinetics/gantry_shaft"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

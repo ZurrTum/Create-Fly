@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/encased_chain_drive_from_zinc"
+        "recipes": "create:crafting/kinetics/encased_chain_drive_from_zinc"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

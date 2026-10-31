@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_press"
+        "recipes": "create:crafting/kinetics/mechanical_press"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

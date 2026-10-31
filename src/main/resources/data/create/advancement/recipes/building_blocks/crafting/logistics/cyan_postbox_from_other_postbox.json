@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/cyan_postbox_from_other_postbox"
+        "recipes": "create:crafting/logistics/cyan_postbox_from_other_postbox"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

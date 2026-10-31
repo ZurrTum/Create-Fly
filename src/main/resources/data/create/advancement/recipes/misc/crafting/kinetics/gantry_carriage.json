@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/gantry_carriage"
+        "recipes": "create:crafting/kinetics/gantry_carriage"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

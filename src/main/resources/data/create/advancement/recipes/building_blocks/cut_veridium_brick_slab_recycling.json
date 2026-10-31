@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_veridium_brick_slab_recycling"
+        "recipes": "create:cut_veridium_brick_slab_recycling"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

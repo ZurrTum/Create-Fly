@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:scoria_pillar_from_stone_types_scoria_stonecutting"
+        "recipes": "create:scoria_pillar_from_stone_types_scoria_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/steam_whistle"
+        "recipes": "create:crafting/kinetics/steam_whistle"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

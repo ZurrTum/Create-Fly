@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/andesite_alloy_from_zinc"
+        "recipes": "create:crafting/materials/andesite_alloy_from_zinc"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

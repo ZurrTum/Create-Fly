@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:smoking/bread"
+        "recipes": "create:smoking/bread"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

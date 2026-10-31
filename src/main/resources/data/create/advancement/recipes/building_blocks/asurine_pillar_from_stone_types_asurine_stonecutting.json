@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:asurine_pillar_from_stone_types_asurine_stonecutting"
+        "recipes": "create:asurine_pillar_from_stone_types_asurine_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

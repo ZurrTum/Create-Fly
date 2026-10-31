@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:brass_scaffolding_from_ingots_brass_stonecutting"
+        "recipes": "create:brass_scaffolding_from_ingots_brass_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

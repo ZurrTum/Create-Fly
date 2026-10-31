@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/contraption_controls"
+        "recipes": "create:crafting/kinetics/contraption_controls"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

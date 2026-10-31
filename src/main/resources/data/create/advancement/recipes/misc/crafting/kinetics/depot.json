@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/depot"
+        "recipes": "create:crafting/kinetics/depot"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

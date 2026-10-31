@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/stockpile_switch"
+        "recipes": "create:crafting/logistics/stockpile_switch"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

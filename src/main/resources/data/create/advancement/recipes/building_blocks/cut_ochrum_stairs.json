@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_ochrum_stairs"
+        "recipes": "create:cut_ochrum_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

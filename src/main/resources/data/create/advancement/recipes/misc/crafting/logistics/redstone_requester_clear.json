@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/redstone_requester_clear"
+        "recipes": "create:crafting/logistics/redstone_requester_clear"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

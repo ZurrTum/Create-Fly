@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/yellow_seat_from_other_seat"
+        "recipes": "create:crafting/kinetics/yellow_seat_from_other_seat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

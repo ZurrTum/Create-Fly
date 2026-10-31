@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/framed_glass_door"
+        "recipes": "create:crafting/kinetics/framed_glass_door"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

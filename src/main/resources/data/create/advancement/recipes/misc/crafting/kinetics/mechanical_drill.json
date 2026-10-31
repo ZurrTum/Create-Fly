@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_drill"
+        "recipes": "create:crafting/kinetics/mechanical_drill"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

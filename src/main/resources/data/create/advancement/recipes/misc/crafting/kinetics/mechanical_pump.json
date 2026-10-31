@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/mechanical_pump"
+        "recipes": "create:crafting/kinetics/mechanical_pump"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

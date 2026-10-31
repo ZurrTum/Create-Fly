@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:granite_from_stone_types_granite_stonecutting"
+        "recipes": "create:granite_from_stone_types_granite_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

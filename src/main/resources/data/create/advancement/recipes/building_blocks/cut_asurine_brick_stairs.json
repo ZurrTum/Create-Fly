@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_asurine_brick_stairs"
+        "recipes": "create:cut_asurine_brick_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

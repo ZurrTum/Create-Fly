@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_ochrum_wall"
+        "recipes": "create:cut_ochrum_wall"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

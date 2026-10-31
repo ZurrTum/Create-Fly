@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/cardboard_leggings"
+        "recipes": "create:crafting/appliances/cardboard_leggings"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

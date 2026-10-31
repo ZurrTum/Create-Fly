@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/andesite_door"
+        "recipes": "create:crafting/kinetics/andesite_door"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

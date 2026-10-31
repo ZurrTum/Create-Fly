@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:tuff_pillar_from_stone_types_tuff_stonecutting"
+        "recipes": "create:tuff_pillar_from_stone_types_tuff_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

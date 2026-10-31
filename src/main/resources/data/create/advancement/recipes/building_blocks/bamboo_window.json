@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:bamboo_window"
+        "recipes": "create:bamboo_window"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

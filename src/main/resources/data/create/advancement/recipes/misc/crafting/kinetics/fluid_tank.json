@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/fluid_tank"
+        "recipes": "create:crafting/kinetics/fluid_tank"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

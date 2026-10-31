@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/linked_controller"
+        "recipes": "create:crafting/appliances/linked_controller"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

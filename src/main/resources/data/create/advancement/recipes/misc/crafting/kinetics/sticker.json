@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/sticker"
+        "recipes": "create:crafting/kinetics/sticker"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

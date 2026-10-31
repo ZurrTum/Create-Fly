@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_dripstone_brick_wall"
+        "recipes": "create:cut_dripstone_brick_wall"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

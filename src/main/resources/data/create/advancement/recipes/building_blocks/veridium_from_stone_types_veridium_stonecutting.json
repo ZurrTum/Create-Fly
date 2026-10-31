@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:veridium_from_stone_types_veridium_stonecutting"
+        "recipes": "create:veridium_from_stone_types_veridium_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/andesite_tunnel"
+        "recipes": "create:crafting/logistics/andesite_tunnel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

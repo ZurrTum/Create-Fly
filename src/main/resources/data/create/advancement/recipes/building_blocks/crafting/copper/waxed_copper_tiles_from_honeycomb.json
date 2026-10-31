@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/copper/waxed_copper_tiles_from_honeycomb"
+        "recipes": "create:crafting/copper/waxed_copper_tiles_from_honeycomb"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

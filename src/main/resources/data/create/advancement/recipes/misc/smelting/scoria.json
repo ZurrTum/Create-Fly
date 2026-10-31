@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:smelting/scoria"
+        "recipes": "create:smelting/scoria"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

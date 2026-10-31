@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/redstone_contact"
+        "recipes": "create:crafting/logistics/redstone_contact"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

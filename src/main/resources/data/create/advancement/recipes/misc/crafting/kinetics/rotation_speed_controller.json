@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/rotation_speed_controller"
+        "recipes": "create:crafting/kinetics/rotation_speed_controller"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

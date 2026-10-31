@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/analog_lever"
+        "recipes": "create:crafting/kinetics/analog_lever"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

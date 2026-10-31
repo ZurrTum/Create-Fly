@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_scoria_stairs"
+        "recipes": "create:cut_scoria_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

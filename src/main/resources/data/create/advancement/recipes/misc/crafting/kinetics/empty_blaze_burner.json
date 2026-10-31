@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/empty_blaze_burner"
+        "recipes": "create:crafting/kinetics/empty_blaze_burner"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

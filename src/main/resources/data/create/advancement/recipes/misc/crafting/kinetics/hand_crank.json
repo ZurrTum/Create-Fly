@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/hand_crank"
+        "recipes": "create:crafting/kinetics/hand_crank"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

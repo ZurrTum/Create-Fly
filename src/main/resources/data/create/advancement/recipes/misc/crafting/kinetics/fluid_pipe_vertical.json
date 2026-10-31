@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/fluid_pipe_vertical"
+        "recipes": "create:crafting/kinetics/fluid_pipe_vertical"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/zinc_block_from_compacting"
+        "recipes": "create:crafting/materials/zinc_block_from_compacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

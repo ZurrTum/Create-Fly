@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/fluid_valve"
+        "recipes": "create:crafting/kinetics/fluid_valve"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

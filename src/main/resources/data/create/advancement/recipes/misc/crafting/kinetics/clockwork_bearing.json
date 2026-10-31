@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/clockwork_bearing"
+        "recipes": "create:crafting/kinetics/clockwork_bearing"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

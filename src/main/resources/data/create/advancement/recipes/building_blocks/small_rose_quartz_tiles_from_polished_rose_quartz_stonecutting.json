@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:small_rose_quartz_tiles_from_polished_rose_quartz_stonecutting"
+        "recipes": "create:small_rose_quartz_tiles_from_polished_rose_quartz_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

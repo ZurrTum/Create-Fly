@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:campfire_cooking/bread"
+        "recipes": "create:campfire_cooking/bread"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

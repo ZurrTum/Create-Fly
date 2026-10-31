@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/filter"
+        "recipes": "create:crafting/kinetics/filter"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

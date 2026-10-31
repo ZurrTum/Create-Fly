@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/logistics/orange_table_cloth_clear"
+        "recipes": "create:crafting/logistics/orange_table_cloth_clear"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

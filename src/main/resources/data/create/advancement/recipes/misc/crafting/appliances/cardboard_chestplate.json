@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/cardboard_chestplate"
+        "recipes": "create:crafting/appliances/cardboard_chestplate"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

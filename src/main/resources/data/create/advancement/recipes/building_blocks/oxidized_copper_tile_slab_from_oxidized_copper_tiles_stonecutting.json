@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:oxidized_copper_tile_slab_from_oxidized_copper_tiles_stonecutting"
+        "recipes": "create:oxidized_copper_tile_slab_from_oxidized_copper_tiles_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

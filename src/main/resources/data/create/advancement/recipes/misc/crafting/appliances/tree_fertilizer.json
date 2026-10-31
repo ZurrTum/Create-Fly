@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/appliances/tree_fertilizer"
+        "recipes": "create:crafting/appliances/tree_fertilizer"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

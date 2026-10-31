@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:cut_scorchia_from_stone_types_scorchia_stonecutting"
+        "recipes": "create:cut_scorchia_from_stone_types_scorchia_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

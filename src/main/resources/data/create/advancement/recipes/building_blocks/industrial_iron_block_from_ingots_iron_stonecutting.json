@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:industrial_iron_block_from_ingots_iron_stonecutting"
+        "recipes": "create:industrial_iron_block_from_ingots_iron_stonecutting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/schedule"
+        "recipes": "create:crafting/kinetics/schedule"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/crafter_slot_cover"
+        "recipes": "create:crafting/kinetics/crafter_slot_cover"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

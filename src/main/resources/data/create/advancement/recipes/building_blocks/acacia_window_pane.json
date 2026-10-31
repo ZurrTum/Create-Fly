@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:acacia_window_pane"
+        "recipes": "create:acacia_window_pane"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

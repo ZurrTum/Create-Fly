@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:polished_cut_ochrum_slab"
+        "recipes": "create:polished_cut_ochrum_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

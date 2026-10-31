@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/large_cogwheel"
+        "recipes": "create:crafting/kinetics/large_cogwheel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

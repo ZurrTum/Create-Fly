@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/red_sand_paper"
+        "recipes": "create:crafting/materials/red_sand_paper"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

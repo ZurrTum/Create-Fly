@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/kinetics/deployer"
+        "recipes": "create:crafting/kinetics/deployer"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

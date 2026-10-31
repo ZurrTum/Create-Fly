@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/materials/rose_quartz"
+        "recipes": "create:crafting/materials/rose_quartz"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

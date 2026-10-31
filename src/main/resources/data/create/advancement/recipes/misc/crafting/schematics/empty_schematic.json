@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create:crafting/schematics/empty_schematic"
+        "recipes": "create:crafting/schematics/empty_schematic"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
