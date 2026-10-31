@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Blocks.class)
 public class BlocksMixin {
-    @Inject(method = "<clinit>", at = @At(value = "INVOKE", target = "net/minecraft/core/DefaultedRegistry.iterator()Ljava/util/Iterator;"))
+    @Inject(method = "lambda$static$429()V", at = @At("HEAD"))
     private static void register(CallbackInfo ci) {
         CreateRegisterPlugin.registerBlock();
     }

@@ -149,7 +149,7 @@ public abstract class EntityMixin implements SyncedDataHolder {
         return getBlockStateOn().getBlock() instanceof SeatBlock ? getOnPos() : original.call(instance);
     }
 
-    @WrapOperation(method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;canSimulateMovement()Z"))
+    @WrapOperation(method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;canSimulateMovement()Z", ordinal = 1))
     private boolean onEntityMovement(Entity entity, Operation<Boolean> original, @Local BlockState effectState) {
         if (original.call(entity)) {
             if (effectState.getBlock() instanceof EntityControlBlock block) {

@@ -26,7 +26,6 @@ import com.zurrtum.create.content.redstone.displayLink.ClickToLinkBlockItem;
 import com.zurrtum.create.content.redstone.link.controller.LinkedControllerItem;
 import com.zurrtum.create.content.trains.schedule.ScheduleItemEntityInteraction;
 import com.zurrtum.create.foundation.block.BreakControlBlock;
-import com.zurrtum.create.foundation.block.SoundControlBlock;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -41,7 +40,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -264,17 +262,5 @@ public class MultiPlayerGameModeMixin {
             return false;
         }
         return original.call(world, pos, blockState, updateFlags);
-    }
-
-    @WrapOperation(method = "continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getSoundType()Lnet/minecraft/world/level/block/SoundType;"))
-    private SoundType getHitSound(
-        BlockState state,
-        Operation<SoundType> original,
-        @Local(argsOnly = true) BlockPos pos
-    ) {
-        if (state.getBlock() instanceof SoundControlBlock block) {
-            return block.getSoundGroup(minecraft.level, pos);
-        }
-        return original.call(state);
     }
 }

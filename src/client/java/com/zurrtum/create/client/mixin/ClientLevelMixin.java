@@ -1,6 +1,8 @@
 package com.zurrtum.create.client.mixin;
 
 import com.google.common.collect.Sets;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.AllExtensions;
 import com.zurrtum.create.client.Create;
@@ -14,6 +16,7 @@ import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
 import com.zurrtum.create.content.equipment.armor.DivingBootsItem;
+import com.zurrtum.create.foundation.block.SoundControlBlock;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -23,6 +26,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -129,5 +133,17 @@ public abstract class ClientLevelMixin extends Level {
                 }
             }
         }
+    }
+
+    @WrapOperation(method = "playBreakingSound(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getSoundType()Lnet/minecraft/world/level/block/SoundType;"))
+    private SoundType getHitSound(
+        BlockState state,
+        Operation<SoundType> original,
+        @Local(argsOnly = true) BlockPos pos
+    ) {
+        if (state.getBlock() instanceof SoundControlBlock block) {
+            return block.getSoundGroup(this, pos);
+        }
+        return original.call(state);
     }
 }

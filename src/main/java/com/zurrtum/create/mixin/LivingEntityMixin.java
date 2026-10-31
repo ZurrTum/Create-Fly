@@ -222,8 +222,12 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "getVisibilityPercent(Lnet/minecraft/world/entity/Entity;)D", at = @At("HEAD"), cancellable = true)
-    private void getAttackDistanceScalingFactor(Entity targetingEntity, CallbackInfoReturnable<Double> cir) {
+    @Inject(method = "getVisibilityPercent(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)D", at = @At("HEAD"), cancellable = true)
+    private void getAttackDistanceScalingFactor(
+        ServerLevel serverLevel,
+        Entity targetingEntity,
+        CallbackInfoReturnable<Double> cir
+    ) {
         if (CardboardArmorHandler.testForStealth(targetingEntity)) {
             cir.setReturnValue(0.0d);
         }
