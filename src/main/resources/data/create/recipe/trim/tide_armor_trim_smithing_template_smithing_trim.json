@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:smithing_trim",
+  "addition": "#minecraft:trim_materials",
+  "base": "#create:trimmable_armor",
+  "pattern": "create:tide",
+  "template": "minecraft:tide_armor_trim_smithing_template"
+}

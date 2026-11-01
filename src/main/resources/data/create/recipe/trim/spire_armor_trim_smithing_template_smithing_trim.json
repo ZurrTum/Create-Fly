@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:smithing_trim",
+  "addition": "#minecraft:trim_materials",
+  "base": "#create:trimmable_armor",
+  "pattern": "create:spire",
+  "template": "minecraft:spire_armor_trim_smithing_template"
+}

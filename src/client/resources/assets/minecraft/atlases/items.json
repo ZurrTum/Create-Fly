@@ -1,31 +1,32 @@
 {
   "sources": [
     {
-      "type": "paletted_permutations",
+      "type": "minecraft:paletted_permutations",
+      "palette_key": "minecraft:trim_base",
+      "permutations": {
+        "amethyst": "minecraft:trim/amethyst",
+        "copper": "minecraft:trim/copper",
+        "copper_darker": "minecraft:trim/copper_darker",
+        "diamond": "minecraft:trim/diamond",
+        "diamond_darker": "minecraft:trim/diamond_darker",
+        "emerald": "minecraft:trim/emerald",
+        "gold": "minecraft:trim/gold",
+        "gold_darker": "minecraft:trim/gold_darker",
+        "iron": "minecraft:trim/iron",
+        "iron_darker": "minecraft:trim/iron_darker",
+        "lapis": "minecraft:trim/lapis",
+        "netherite": "minecraft:trim/netherite",
+        "netherite_darker": "minecraft:trim/netherite_darker",
+        "quartz": "minecraft:trim/quartz",
+        "redstone": "minecraft:trim/redstone",
+        "resin": "minecraft:trim/resin"
+      },
       "textures": [
         "create:trims/items/card_leggings_trim",
         "create:trims/items/card_chestplate_trim",
         "create:trims/items/card_helmet_trim",
         "create:trims/items/card_boots_trim"
-      ],
-      "palette_key": "minecraft:trims/color_palettes/trim_palette",
-      "permutations": {
-        "quartz": "minecraft:trims/color_palettes/quartz",
-        "iron": "minecraft:trims/color_palettes/iron",
-        "gold": "minecraft:trims/color_palettes/gold",
-        "diamond": "minecraft:trims/color_palettes/diamond",
-        "netherite": "minecraft:trims/color_palettes/netherite",
-        "redstone": "minecraft:trims/color_palettes/redstone",
-        "copper": "minecraft:trims/color_palettes/copper",
-        "emerald": "minecraft:trims/color_palettes/emerald",
-        "lapis": "minecraft:trims/color_palettes/lapis",
-        "amethyst": "minecraft:trims/color_palettes/amethyst",
-        "iron_darker": "minecraft:trims/color_palettes/iron_darker",
-        "gold_darker": "minecraft:trims/color_palettes/gold_darker",
-        "diamond_darker": "minecraft:trims/color_palettes/diamond_darker",
-        "netherite_darker": "minecraft:trims/color_palettes/netherite_darker",
-        "resin": "minecraft:trims/color_palettes/resin"
-      }
+      ]
     }
   ]
 }

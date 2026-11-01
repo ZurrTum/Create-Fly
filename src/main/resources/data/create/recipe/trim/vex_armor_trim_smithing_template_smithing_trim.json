@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:smithing_trim",
+  "addition": "#minecraft:trim_materials",
+  "base": "#create:trimmable_armor",
+  "pattern": "create:vex",
+  "template": "minecraft:vex_armor_trim_smithing_template"
+}
