@@ -71,7 +71,7 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
         UseOnContext ctx = new UseOnContext(
             world,
             null,
-            InteractionHand.MAIN_HAND,
+            InteractionHand.OFF_HAND,
             Items.DIAMOND_HOE.getDefaultInstance(),
             ray
         );
