@@ -210,7 +210,8 @@ public abstract class MinecraftMixin {
         ClipboardValueSettingsClientHandler.clientTick(mc);
         Create.VALUE_SETTINGS_HANDLER.tick(mc);
         ScrollValueHandler.tick(mc);
-        ContraptionPlayerPassengerRotation.tick();
+        ContraptionPlayerPassengerRotation.tick(mc);
+        TurntableHandler.tick(mc);
         ChainConveyorInteractionHandler.clientTick(mc);
         ChainConveyorRidingHandler.clientTick(mc);
         ChainConveyorConnectionHandler.clientTick(mc);
@@ -221,11 +222,6 @@ public abstract class MinecraftMixin {
         FactoryPanelConnectionHandler.clientTick(mc);
         TickBasedCache.clientTick();
         SymmetryHandlerClient.onClientTick(mc);
-    }
-
-    @Inject(method = "renderFrame(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render()V"))
-    private void render(boolean advanceGameTime, CallbackInfo ci) {
-        TurntableHandler.gameRenderFrame((Minecraft) (Object) this);
     }
 
     @Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;tick(Ljava/util/function/BooleanSupplier;)V", shift = At.Shift.AFTER))

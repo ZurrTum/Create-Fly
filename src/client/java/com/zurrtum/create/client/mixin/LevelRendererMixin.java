@@ -10,7 +10,6 @@ import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.ghostblock.GhostBlocks;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
-import com.zurrtum.create.client.content.contraptions.actors.seat.ContraptionPlayerPassengerRotation;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingRenderer;
 import com.zurrtum.create.client.content.equipment.clipboard.ClipboardValueSettingsClientHandler;
 import com.zurrtum.create.client.content.equipment.symmetryWand.SymmetryHandlerClient;
@@ -136,7 +135,6 @@ public abstract class LevelRendererMixin implements RenderContextHolder {
         Create.SCHEMATIC_HANDLER.render(minecraft, poseStack, submitNodeCollector, cameraRenderState);
         ChainConveyorInteractionHandler.drawCustomBlockSelection(poseStack, submitNodeCollector, cameraPos, lineWidth);
         SymmetryHandlerClient.onRenderWorld(minecraft, poseStack, submitNodeCollector, cameraPos);
-        ContraptionPlayerPassengerRotation.frame(minecraft);
     }
 
     @Inject(method = "submitBlockOutline(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/LevelRenderState;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/state/level/LevelRenderState;cameraRenderState:Lnet/minecraft/client/renderer/state/level/CameraRenderState;", opcode = Opcodes.GETFIELD), cancellable = true)
