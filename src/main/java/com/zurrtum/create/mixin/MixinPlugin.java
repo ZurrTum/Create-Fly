@@ -32,6 +32,10 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (loader.isModLoaded("fabric-resource-loader-v1")) {
             mixins.add("ReloadListenerMixin");
         }
+        if (!loader.isModLoaded("fabric-tag-api-v1")) {
+            mixins.add("TagFileMixin");
+            mixins.add("TagLoaderMixin");
+        }
     }
 
     @Override
