@@ -53,7 +53,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
 
     List<List<ClipboardEntry>> pages;
     List<ClipboardEntry> currentEntries;
-    int editingIndex;
+    int editingIndex = -1;
     int frameTick;
     PageButton forward;
     PageButton backward;
@@ -96,6 +96,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (startEmpty) {
             currentEntries.add(new ClipboardEntry(false, Component.empty()));
         }
+        int prevIndex = editingIndex;
         editingIndex = 0;
         editContext = new TextFieldHelper(
             this::getCurrentEntryText,
@@ -104,9 +105,15 @@ public class ClipboardScreen extends AbstractSimiScreen {
             this::setClipboard,
             this::validateTextForEntry
         );
-        editingIndex = startEmpty ? 0 : -1;
         readonly = content != null && content.readOnly();
-        if (readonly) {
+        if (!readonly && startEmpty) {
+            if (prevIndex == -1) {
+                minecraft.onTextInputFocusChange(this, true);
+            }
+        } else {
+            if (prevIndex != -1) {
+                minecraft.onTextInputFocusChange(this, false);
+            }
             editingIndex = -1;
         }
         if (clearBtn != null) {
@@ -125,7 +132,10 @@ public class ClipboardScreen extends AbstractSimiScreen {
 
         clearWidgets();
         clearBtn = new IconButton(x + 234, y + 153, AllIcons.I_CLEAR_CHECKED).withCallback(() -> {
-            editingIndex = -1;
+            if (editingIndex != -1) {
+                minecraft.onTextInputFocusChange(this, false);
+                editingIndex = -1;
+            }
             currentEntries.removeIf(ce -> ce.checked);
             if (currentEntries.isEmpty()) {
                 currentEntries.add(new ClipboardEntry(false, Component.empty()));
@@ -248,7 +258,6 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (currentPage == previously) {
             return;
         }
-        editingIndex = -1;
         if (pages.size() <= currentPage) {
             if (readonly) {
                 currentPage = previously;
@@ -260,10 +269,16 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (currentEntries.isEmpty()) {
             currentEntries.add(new ClipboardEntry(false, Component.empty()));
             if (!readonly) {
+                if (editingIndex == -1) {
+                    minecraft.onTextInputFocusChange(this, true);
+                }
                 editingIndex = 0;
                 editContext.setCursorToEnd();
                 clearDisplayCacheAfterChange();
             }
+        } else if (editingIndex != -1) {
+            minecraft.onTextInputFocusChange(this, false);
+            editingIndex = -1;
         }
 
         forward.visible = currentPage < 50 && (!readonly || currentPage + 1 < pages.size());
@@ -355,6 +370,10 @@ public class ClipboardScreen extends AbstractSimiScreen {
 
     @Override
     public void removed() {
+        if (editingIndex != -1) {
+            minecraft.onTextInputFocusChange(this, false);
+            editingIndex = -1;
+        }
         pages.forEach(list -> list.removeIf(ce -> ce.text.getString().isBlank()));
         pages.removeIf(List::isEmpty);
 
@@ -454,11 +473,11 @@ public class ClipboardScreen extends AbstractSimiScreen {
                     return true;
                 }
                 if (!input.hasControlDown()) {
-                    if (currentEntries.size() <= editingIndex + 1 || !currentEntries.get(editingIndex + 1).text.getString()
-                        .isEmpty()) {
-                        currentEntries.add(editingIndex + 1, new ClipboardEntry(false, Component.empty()));
-                    }
                     editingIndex += 1;
+                    if (currentEntries.size() <= editingIndex || !currentEntries.get(editingIndex).text.getString()
+                        .isEmpty()) {
+                        currentEntries.add(editingIndex, new ClipboardEntry(false, Component.empty()));
+                    }
                     editContext.setCursorToEnd();
                     if (validateTextForEntry(" ")) {
                         return true;
@@ -468,6 +487,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                     editContext.setCursorToEnd();
                     return true;
                 }
+                minecraft.onTextInputFocusChange(this, false);
                 editingIndex = -1;
                 return true;
             case InputConstants.KEY_BACKSPACE:
@@ -603,7 +623,10 @@ public class ClipboardScreen extends AbstractSimiScreen {
 
         if (hoveredEntry != -1) {
             if (hoveredCheck) {
-                editingIndex = -1;
+                if (editingIndex != -1) {
+                    minecraft.onTextInputFocusChange(this, false);
+                    editingIndex = -1;
+                }
                 if (hoveredEntry < currentEntries.size()) {
                     currentEntries.get(hoveredEntry).checked ^= true;
                     if (currentEntries.get(hoveredEntry).checked) {
@@ -625,14 +648,26 @@ public class ClipboardScreen extends AbstractSimiScreen {
             }
 
             if (hoveredEntry != editingIndex && !readonly) {
-                editingIndex = hoveredEntry;
                 if (hoveredEntry >= currentEntries.size()) {
                     currentEntries.add(new ClipboardEntry(false, Component.empty()));
+                    int prevIndex = editingIndex;
+                    editingIndex = hoveredEntry;
                     if (!validateTextForEntry(" ")) {
                         currentEntries.remove(hoveredEntry);
+                        if (prevIndex != -1) {
+                            minecraft.onTextInputFocusChange(this, false);
+                        }
                         editingIndex = -1;
                         return true;
                     }
+                    if (prevIndex == -1) {
+                        minecraft.onTextInputFocusChange(this, true);
+                    }
+                } else {
+                    if (editingIndex == -1) {
+                        minecraft.onTextInputFocusChange(this, true);
+                    }
+                    editingIndex = hoveredEntry;
                 }
                 clearDisplayCacheAfterChange();
             }
@@ -647,6 +682,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (pMouseX < guiLeft + 50 || pMouseX > guiLeft + 220 || pMouseY < guiTop + 30 || pMouseY > guiTop + 230) {
             setFocused(null);
             clearDisplayCache();
+            minecraft.onTextInputFocusChange(this, false);
             editingIndex = -1;
             return false;
         }
