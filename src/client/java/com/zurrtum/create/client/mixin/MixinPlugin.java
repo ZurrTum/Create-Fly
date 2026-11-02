@@ -32,9 +32,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("RrvRecipeViewMenuMixin");
             mixins.add("RrvRecipeViewScreenMixin");
         }
-        if (!loader.isModLoaded("fabric-creative-tab-api-v1")) {
-            mixins.add("CreativeModeInventoryScreenMixin");
-        }
         if (loader.isModLoaded("fabric-renderer-api-v1")) {
             mixins.add("SimpleModelPartMixin");
             mixins.add("SimpleModelWrapperMixin");
@@ -61,6 +58,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
         }
         if (loader.isModLoaded("fabric-block-api-v1")) {
             mixins.add("ConnectedTextureBehaviourMixin");
+        }
+        if (!loader.isModLoaded("fabric-creative-tab-api-v1")) {
+            mixins.add("CreativeModeInventoryScreenMixin");
         }
         if (!loader.isModLoaded("fabric-model-loading-api-v1")) {
             mixins.add("LoadBlockModelMixin");

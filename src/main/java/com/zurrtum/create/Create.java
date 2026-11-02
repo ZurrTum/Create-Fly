@@ -135,6 +135,7 @@ public class Create implements ModInitializer {
         AllBlockSpoutingBehaviours.register();
         AllDataComponentPredicates.register();
         AllTrimPatterns.register();
+        AllResourceModifies.register();
         CompatMod.register();
     }
 }

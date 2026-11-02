@@ -18,13 +18,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
         //        if (FabricLoader.getInstance().isModLoaded("architectury")) {
         //            mixins.add("ArchitecturyMixin");
         //        }
-        if (Create.Lazy) {
+        if (loader.isModLoaded("fabric-registry-sync-v0")) {
             mixins.add("RegistriesMixin");
-        } else {
-            mixins.add("CreativeModeTabMixin");
-            mixins.add("CreativeModeTabsMixin");
-            mixins.add("SavedDataStorageMixin");
-            mixins.add("IngredientMixin");
         }
         if (loader.isModLoaded("fabric-networking-api-v1")) {
             mixins.add("MenuProviderMixin");
@@ -35,6 +30,16 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (!loader.isModLoaded("fabric-tag-api-v1")) {
             mixins.add("TagFileMixin");
             mixins.add("TagLoaderMixin");
+        }
+        if (!loader.isModLoaded("fabric-recipe-api-v1")) {
+            mixins.add("IngredientMixin");
+        }
+        if (!loader.isModLoaded("fabric-creative-tab-api-v1")) {
+            mixins.add("CreativeModeTabMixin");
+            mixins.add("CreativeModeTabsMixin");
+        }
+        if (!loader.isModLoaded("fabric-object-builder-api-v1")) {
+            mixins.add("SavedDataStorageMixin");
         }
     }
 

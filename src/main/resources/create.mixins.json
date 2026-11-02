@@ -24,7 +24,6 @@
     "DirectionAxisMixin",
     "DirectionMixin",
     "EnchantingTableBlockMixin",
-    "EnchantmentMixin",
     "EntityCallbacksMixin",
     "EntityDataSerializersMixin",
     "EntityMixin",
@@ -47,6 +46,7 @@
     "MinecraftServerMixin",
     "MobMixin",
     "MultiNeighborUpdateMixin",
+    "NetworkRegistryLoadTaskMixin",
     "NewMinecartBehaviorMixin",
     "ObserverBlockMixin",
     "OldMinecartBehaviorMixin",
@@ -74,7 +74,6 @@
     "SynchedEntityDataMixin",
     "TooltipContextMixin",
     "UtilMixin",
-    "WeatheringCopperMixin",
     "WorldlyContainerMixin"
   ],
   "plugin": "com.zurrtum.create.mixin.MixinPlugin",
