@@ -16,6 +16,7 @@ import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -165,7 +166,7 @@ public class TrackBlockOutline {
         pose.rotate(Axis.XP, (float) angles.x);
         pose.translate(-0.5f, -0.125f, -0.5f);
         int color = mc.player.getMainHandItem().is(AllItemTags.TRACKS) ? RED_COLOR : BLACK_COLOR;
-        submitShape(AllShapes.TRACK_ORTHO.get(Direction.SOUTH), ms, queue, color, lineWidth);
+        submitShape(mc, AllShapes.TRACK_ORTHO.get(Direction.SOUTH), ms, queue, color, lineWidth);
         ms.popPose();
     }
 
@@ -197,15 +198,29 @@ public class TrackBlockOutline {
         } else {
             color = BLACK_COLOR;
         }
-        submitShape(shape, ms, queue, color, width);
+        submitShape(mc, shape, ms, queue, color, width);
         return true;
     }
 
-    public static void submitShape(VoxelShape shape, PoseStack ms, SubmitNodeCollector queue, int color, float width) {
-        queue.submitShapeOutline(ms, shape, RenderTypes.lines(), color, width, true);
+    public static void submitShape(
+        Minecraft mc,
+        VoxelShape shape,
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        int color,
+        float width
+    ) {
+        RenderType blockOutlineRenderType;
+        if (mc.gameRenderer.useImprovedTransparency()) {
+            blockOutlineRenderType = RenderTypes.linesTranslucentNoDepthWrite();
+        } else {
+            blockOutlineRenderType = RenderTypes.linesTranslucent();
+        }
+        queue.submitShapeOutline(ms, shape, blockOutlineRenderType, color, width, true);
     }
 
     private static void submitShape(
+        Minecraft mc,
         VoxelShape shape,
         float angle,
         PoseStack ms,
@@ -214,10 +229,11 @@ public class TrackBlockOutline {
         float width
     ) {
         ms.rotateYCentered(angle);
-        queue.submitShapeOutline(ms, shape, RenderTypes.lines(), color, width, true);
+        submitShape(mc, shape, ms, queue, color, width);
     }
 
     public static void submitShape(
+        Minecraft mc,
         VoxelShape first,
         VoxelShape second,
         float angle,
@@ -226,11 +242,12 @@ public class TrackBlockOutline {
         int color,
         float width
     ) {
-        submitShape(first, ms, queue, color, width);
-        submitShape(second, angle, ms, queue, color, width);
+        submitShape(mc, first, ms, queue, color, width);
+        submitShape(mc, second, angle, ms, queue, color, width);
     }
 
     private static void submitAscendingShape(
+        Minecraft mc,
         float yRadians,
         PoseStack ms,
         SubmitNodeCollector queue,
@@ -242,32 +259,40 @@ public class TrackBlockOutline {
         pose.rotateYCentered(yRadians);
         pose.rotate(Axis.XP, Radians.DEG_45);
         pose.translate(0, -0.1875f, 0.0625f);
-        submitShape(LONG_ORTHO, ms, queue, color, width);
+        submitShape(mc, LONG_ORTHO, ms, queue, color, width);
     }
 
-    public static void submitShape(TrackShape shape, PoseStack ms, SubmitNodeCollector queue, int color, float width) {
+    public static void submitShape(
+        Minecraft mc,
+        TrackShape shape,
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        int color,
+        float width
+    ) {
         switch (shape) {
-            case ZO -> submitShape(AllShapes.TRACK_ORTHO.get(Direction.SOUTH), ms, queue, color, width);
-            case XO -> submitShape(AllShapes.TRACK_ORTHO.get(Direction.EAST), ms, queue, color, width);
-            case PD -> submitShape(LONG_ORTHO, Radians.DEG_45, ms, queue, color, width);
-            case ND -> submitShape(LONG_ORTHO, Radians.DEG_315, ms, queue, color, width);
+            case ZO -> submitShape(mc, AllShapes.TRACK_ORTHO.get(Direction.SOUTH), ms, queue, color, width);
+            case XO -> submitShape(mc, AllShapes.TRACK_ORTHO.get(Direction.EAST), ms, queue, color, width);
+            case PD -> submitShape(mc, LONG_ORTHO, Radians.DEG_45, ms, queue, color, width);
+            case ND -> submitShape(mc, LONG_ORTHO, Radians.DEG_315, ms, queue, color, width);
             case AN -> {
                 Pose pose = ms.last();
                 pose.translate(0, 1, 0);
                 pose.rotate(Axis.XP, Radians.DEG_45);
                 pose.translate(0, -0.1875f, 0.0625f);
-                submitShape(LONG_ORTHO, ms, queue, color, width);
+                submitShape(mc, LONG_ORTHO, ms, queue, color, width);
             }
-            case AS -> submitAscendingShape(Radians.DEG_180, ms, queue, color, width);
-            case AE -> submitAscendingShape(Radians.DEG_270, ms, queue, color, width);
-            case AW -> submitAscendingShape(Radians.DEG_90, ms, queue, color, width);
-            case TN -> submitShape(LONG_ORTHO_OFFSET, Radians.DEG_180, ms, queue, color, width);
-            case TS -> submitShape(LONG_ORTHO_OFFSET, ms, queue, color, width);
-            case TE -> submitShape(LONG_ORTHO_OFFSET, Radians.DEG_90, ms, queue, color, width);
-            case TW -> submitShape(LONG_ORTHO_OFFSET, Radians.DEG_270, ms, queue, color, width);
-            case CR_O -> submitShape(AllShapes.TRACK_CROSS, ms, queue, color, width);
-            case CR_D -> submitShape(LONG_CROSS, Radians.DEG_45, ms, queue, color, width);
+            case AS -> submitAscendingShape(mc, Radians.DEG_180, ms, queue, color, width);
+            case AE -> submitAscendingShape(mc, Radians.DEG_270, ms, queue, color, width);
+            case AW -> submitAscendingShape(mc, Radians.DEG_90, ms, queue, color, width);
+            case TN -> submitShape(mc, LONG_ORTHO_OFFSET, Radians.DEG_180, ms, queue, color, width);
+            case TS -> submitShape(mc, LONG_ORTHO_OFFSET, ms, queue, color, width);
+            case TE -> submitShape(mc, LONG_ORTHO_OFFSET, Radians.DEG_90, ms, queue, color, width);
+            case TW -> submitShape(mc, LONG_ORTHO_OFFSET, Radians.DEG_270, ms, queue, color, width);
+            case CR_O -> submitShape(mc, AllShapes.TRACK_CROSS, ms, queue, color, width);
+            case CR_D -> submitShape(mc, LONG_CROSS, Radians.DEG_45, ms, queue, color, width);
             case CR_PDX -> submitShape(
+                mc,
                 AllShapes.TRACK_ORTHO.get(Direction.EAST),
                 LONG_ORTHO,
                 Radians.DEG_45,
@@ -277,6 +302,7 @@ public class TrackBlockOutline {
                 width
             );
             case CR_PDZ -> submitShape(
+                mc,
                 AllShapes.TRACK_ORTHO.get(Direction.SOUTH),
                 LONG_ORTHO,
                 Radians.DEG_45,
@@ -286,6 +312,7 @@ public class TrackBlockOutline {
                 width
             );
             case CR_NDX -> submitShape(
+                mc,
                 AllShapes.TRACK_ORTHO.get(Direction.EAST),
                 LONG_ORTHO,
                 Radians.DEG_315,
@@ -295,6 +322,7 @@ public class TrackBlockOutline {
                 width
             );
             case CR_NDZ -> submitShape(
+                mc,
                 AllShapes.TRACK_ORTHO.get(Direction.SOUTH),
                 LONG_ORTHO,
                 Radians.DEG_315,

@@ -5,7 +5,9 @@ import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.math.Axis;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VecHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +25,13 @@ public abstract class ChainConveyorShape {
 
     public abstract float getChainPosition(Vec3 intersection);
 
-    protected abstract void submitOutline(BlockPos anchor, PoseStack ms, SubmitNodeCollector queue, float width);
+    protected abstract void submitOutline(
+        Minecraft mc,
+        BlockPos anchor,
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        float width
+    );
 
     public abstract Vec3 getVec(BlockPos anchor, float position);
 
@@ -79,7 +87,7 @@ public abstract class ChainConveyorShape {
         }
 
         @Override
-        public void submitOutline(BlockPos anchor, PoseStack ms, SubmitNodeCollector queue, float width) {
+        public void submitOutline(Minecraft mc, BlockPos anchor, PoseStack ms, SubmitNodeCollector queue, float width) {
             Pose pose = ms.last();
             float x = (float) pivot.x;
             float y = (float) pivot.y;
@@ -92,7 +100,13 @@ public abstract class ChainConveyorShape {
                 pose.rotate(Axis.XP, Mth.DEG_TO_RAD * (float) pitch);
             }
             pose.translate(-x, -y, -z);
-            queue.submitShapeOutline(ms, voxelShape, RenderTypes.lines(), 0x66000000, width, true);
+            RenderType blockOutlineRenderType;
+            if (mc.gameRenderer.useImprovedTransparency()) {
+                blockOutlineRenderType = RenderTypes.linesTranslucentNoDepthWrite();
+            } else {
+                blockOutlineRenderType = RenderTypes.linesTranslucent();
+            }
+            queue.submitShapeOutline(ms, voxelShape, blockOutlineRenderType, 0x66000000, width, true);
         }
 
         @Override
@@ -139,11 +153,17 @@ public abstract class ChainConveyorShape {
         }
 
         @Override
-        public void submitOutline(BlockPos anchor, PoseStack ms, SubmitNodeCollector queue, float width) {
+        public void submitOutline(Minecraft mc, BlockPos anchor, PoseStack ms, SubmitNodeCollector queue, float width) {
+            RenderType blockOutlineRenderType;
+            if (mc.gameRenderer.useImprovedTransparency()) {
+                blockOutlineRenderType = RenderTypes.linesTranslucentNoDepthWrite();
+            } else {
+                blockOutlineRenderType = RenderTypes.linesTranslucent();
+            }
             queue.submitShapeOutline(
                 ms,
                 AllShapes.CHAIN_CONVEYOR_INTERACTION,
-                RenderTypes.lines(),
+                blockOutlineRenderType,
                 0x66000000,
                 width,
                 true

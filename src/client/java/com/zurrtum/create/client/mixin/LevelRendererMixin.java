@@ -133,7 +133,13 @@ public abstract class LevelRendererMixin implements RenderContextHolder {
         CouplingRenderer.renderAll(minecraft, poseStack, submitNodeCollector, cameraPos);
         CarriageCouplingRenderer.renderAll(minecraft, poseStack, submitNodeCollector, cameraPos);
         Create.SCHEMATIC_HANDLER.render(minecraft, poseStack, submitNodeCollector, cameraRenderState);
-        ChainConveyorInteractionHandler.drawCustomBlockSelection(poseStack, submitNodeCollector, cameraPos, lineWidth);
+        ChainConveyorInteractionHandler.drawCustomBlockSelection(
+            minecraft,
+            poseStack,
+            submitNodeCollector,
+            cameraPos,
+            lineWidth
+        );
         SymmetryHandlerClient.onRenderWorld(minecraft, poseStack, submitNodeCollector, cameraPos);
     }
 

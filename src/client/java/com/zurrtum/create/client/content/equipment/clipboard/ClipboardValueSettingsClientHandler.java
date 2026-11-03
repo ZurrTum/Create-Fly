@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -75,7 +76,13 @@ public class ClipboardValueSettingsClientHandler {
         if (shape.isEmpty()) {
             return false;
         }
-        queue.submitShapeOutline(ms, shape, RenderTypes.lines(), 0x66ffffff, width, true);
+        RenderType blockOutlineRenderType;
+        if (mc.gameRenderer.useImprovedTransparency()) {
+            blockOutlineRenderType = RenderTypes.linesTranslucentNoDepthWrite();
+        } else {
+            blockOutlineRenderType = RenderTypes.linesTranslucent();
+        }
+        queue.submitShapeOutline(ms, shape, blockOutlineRenderType, 0x66ffffff, width, true);
         return true;
     }
 

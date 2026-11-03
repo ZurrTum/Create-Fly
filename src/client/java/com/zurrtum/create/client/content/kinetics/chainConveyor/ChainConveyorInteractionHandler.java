@@ -158,13 +158,19 @@ public class ChainConveyorInteractionHandler {
         return true;
     }
 
-    public static void drawCustomBlockSelection(PoseStack ms, SubmitNodeCollector queue, Vec3 camera, float lineWidth) {
+    public static void drawCustomBlockSelection(
+        Minecraft mc,
+        PoseStack ms,
+        SubmitNodeCollector queue,
+        Vec3 camera,
+        float lineWidth
+    ) {
         if (selectedLift == null || selectedShape == null) {
             return;
         }
         ms.pushPose();
         ms.translate(selectedLift.getX() - camera.x, selectedLift.getY() - camera.y, selectedLift.getZ() - camera.z);
-        selectedShape.submitOutline(selectedLift, ms, queue, lineWidth);
+        selectedShape.submitOutline(mc, selectedLift, ms, queue, lineWidth);
         ms.popPose();
     }
 
