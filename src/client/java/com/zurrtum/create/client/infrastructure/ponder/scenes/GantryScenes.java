@@ -10,6 +10,7 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
+import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
@@ -117,11 +118,18 @@ public class GantryScenes {
         scene.world().moveSection(gantry, util.vector().of(-3, 0, 0), 40);
         scene.idle(40);
 
+        scene.world().setBlock(gantryPos, Blocks.AIR.defaultBlockState(), false);
+        gantryPos = util.grid().at(1, 2, 2);
+        scene.world().showIndependentSectionImmediately(util.select().position(gantryPos));
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(gantryPos), GantryCarriageBlockEntity.class, nbt -> {
+                nbt.putFloat("Speed", 32.0f);
+            }
+        );
         scene.world().toggleRedstonePower(shaft);
         scene.world().toggleRedstonePower(util.select().position(3, 1, 0));
         scene.world().toggleRedstonePower(util.select().position(3, 1, 1));
         scene.effects().indicateRedstone(util.grid().at(3, 1, 0));
-        scene.world().modifyKineticSpeed(util.select().position(gantryPos), f -> 32.0f);
         scene.idle(40);
 
         BlockPos cogPos = util.grid().at(1, 2, 1);
