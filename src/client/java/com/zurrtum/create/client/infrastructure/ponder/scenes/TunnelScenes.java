@@ -36,8 +36,6 @@ public class TunnelScenes {
         scene.title("andesite_tunnel", "Using Andesite Tunnels");
         scene.configureBasePlate(0, 0, 5);
 
-        scene.world().cycleBlockProperty(util.grid().at(2, 1, 2), BeltBlock.CASING);
-
         scene.world().showSection(util.select().layer(0), Direction.UP);
         scene.idle(5);
         scene.world().showSection(util.select().fromTo(4, 1, 5, 4, 1, 3), Direction.DOWN);
@@ -69,6 +67,12 @@ public class TunnelScenes {
 
         for (int i = 0; i < 3; i++) {
             scene.world().cycleBlockProperty(util.grid().at(1 + i, 1, 2), BeltBlock.CASING);
+            scene.world().modifyBlockEntityNBT(
+                util.select().position(1 + i, 1, 2),
+                BeltBlockEntity.class,
+                nbt -> nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.NONE),
+                true
+            );
             scene.world().hideIndependentSection(tunnels.get(i), Direction.UP);
             scene.idle(4);
         }
@@ -104,7 +108,6 @@ public class TunnelScenes {
         CreateSceneBuilder scene = new CreateSceneBuilder(builder);
         scene.title("brass_tunnel", "Using Brass Tunnels");
         scene.configureBasePlate(1, 0, 5);
-        scene.world().cycleBlockProperty(util.grid().at(3, 1, 2), BeltBlock.CASING);
 
         scene.world().showSection(util.select().layer(0), Direction.UP);
         scene.idle(5);
@@ -137,6 +140,12 @@ public class TunnelScenes {
 
         for (int i = 0; i < 3; i++) {
             scene.world().cycleBlockProperty(util.grid().at(2 + i, 1, 2), BeltBlock.CASING);
+            scene.world().modifyBlockEntityNBT(
+                util.select().position(2 + i, 1, 2),
+                BeltBlockEntity.class,
+                nbt -> nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.NONE),
+                true
+            );
             scene.world().hideIndependentSection(tunnels.get(i), Direction.UP);
             scene.idle(4);
         }

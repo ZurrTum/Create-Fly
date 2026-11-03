@@ -367,6 +367,11 @@ public class BeltScenes {
             .withItem(brassCasingItem);
         scene.idle(7);
         scene.world().modifyBlock(beltPos, s -> s.setValue(BeltBlock.CASING, true), true);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(beltPos), BeltBlockEntity.class, nbt -> {
+                nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.BRASS);
+            }
+        );
         scene.idle(20);
 
         scene.overlay().showControls(util.vector().topOf(beltPos2), Pointing.DOWN, 20).rightClick()
@@ -384,6 +389,11 @@ public class BeltScenes {
             .rightClick().withItem(brassCasingItem);
         scene.idle(7);
         scene.world().modifyBlock(beltPos3, s -> s.setValue(BeltBlock.CASING, true), true);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(beltPos3), BeltBlockEntity.class, nbt -> {
+                nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.BRASS);
+            }
+        );
         scene.idle(20);
 
         scene.overlay().showText(80).text("Brass or Andesite Casing can be used to decorate Mechanical Belts")
@@ -419,6 +429,11 @@ public class BeltScenes {
         for (BlockPos pos : brassBelts) {
             scene.idle(4);
             scene.world().modifyBlock(pos, s -> s.setValue(BeltBlock.CASING, true), true);
+            scene.world().modifyBlockEntityNBT(
+                util.select().position(pos), BeltBlockEntity.class, nbt -> {
+                    nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.BRASS);
+                }
+            );
         }
         scene.idle(30);
         scene.addKeyframe();
@@ -427,6 +442,11 @@ public class BeltScenes {
             .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().modifyBlock(beltPos.south(), s -> s.setValue(BeltBlock.CASING, false), true);
+        scene.world().modifyBlockEntityNBT(
+            util.select().position(beltPos.south()), BeltBlockEntity.class, nbt -> {
+                nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.NONE);
+            }
+        );
         scene.overlay().showText(80).text("A wrench can be used to remove the casing").placeNearTarget()
             .pointAt(util.vector().blockSurface(beltPos.south(), Direction.WEST));
     }
