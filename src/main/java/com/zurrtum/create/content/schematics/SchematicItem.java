@@ -6,12 +6,16 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.utility.CreatePaths;
 import net.minecraft.ChatFormatting;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +34,7 @@ import org.slf4j.Logger;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -108,7 +113,8 @@ public class SchematicItem extends Item {
         Path dir;
         Path file;
 
-        if (!level.isClientSide()) {
+        boolean clientSide = level.isClientSide();
+        if (!clientSide) {
             dir = CreatePaths.UPLOADED_SCHEMATICS_DIR;
             file = Paths.get(owner, schematic);
         } else {
@@ -125,12 +131,54 @@ public class SchematicItem extends Item {
             StandardOpenOption.READ
         ))))) {
             CompoundTag nbt = NbtIo.read(stream, NbtAccounter.create(0x20000000L));
-            t.load(level.holderLookup(Registries.BLOCK), nbt);
+            CompoundTag updated = updateToCurrentVersion(nbt, clientSide, dir, path);
+            t.load(level.holderLookup(Registries.BLOCK), updated);
         } catch (IOException e) {
             LOGGER.warn("Failed to read schematic", e);
         }
 
         return t;
+    }
+
+    private static CompoundTag updateToCurrentVersion(CompoundTag nbt, boolean clientSide, Path dir, Path file) {
+        int currentVersion = SharedConstants.getCurrentVersion().dataVersion().version();
+        int fromVersion = NbtUtils.getDataVersion(nbt, currentVersion);
+        if (currentVersion == fromVersion || nbt.contains("SkipUpdate")) {
+            return nbt;
+        }
+        String prefix = dir.relativize(file).toString();
+        prefix = dir.relativize(file).toString().substring(0, prefix.length() - 4);
+        CompoundTag updated = DataFixTypes.STRUCTURE.update(
+            DataFixers.getDataFixer(),
+            nbt,
+            fromVersion,
+            currentVersion
+        );
+        if (updated != nbt) {
+            Path backups =
+                clientSide ? CreatePaths.SCHEMATICS_BACKUPS_DIR : CreatePaths.UPLOADED_SCHEMATICS_BACKUPS_DIR;
+            try {
+                int index = 0;
+                Path target;
+                do {
+                    target = backups.resolve(prefix + (index == 0 ? "" : "_" + index) + ".nbt");
+                    index++;
+                } while (Files.exists(target));
+                Files.createDirectories(target.getParent());
+                Files.move(file, target);
+                try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.CREATE)) {
+                    NbtIo.writeCompressed(NbtUtils.addDataVersion(updated, currentVersion), out);
+                }
+                return updated;
+            } catch (Exception _) {
+            }
+        }
+        nbt.putBoolean("SkipUpdate", true);
+        try (OutputStream out = Files.newOutputStream(file)) {
+            NbtIo.writeCompressed(nbt, out);
+        } catch (Exception _) {
+        }
+        return nbt;
     }
 
     @Override

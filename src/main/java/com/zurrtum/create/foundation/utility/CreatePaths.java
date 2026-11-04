@@ -9,7 +9,9 @@ public class CreatePaths {
     public static final Path GAME_DIR = FabricLoader.getInstance().getGameDir();
 
     public static final Path SCHEMATICS_DIR = GAME_DIR.resolve("schematics");
+    public static final Path SCHEMATICS_BACKUPS_DIR = GAME_DIR.resolve("schematics/backups");
     public static final Path UPLOADED_SCHEMATICS_DIR = SCHEMATICS_DIR.resolve("uploaded");
+    public static final Path UPLOADED_SCHEMATICS_BACKUPS_DIR = SCHEMATICS_DIR.resolve("uploaded/backups");
 
     private CreatePaths() {
     }
