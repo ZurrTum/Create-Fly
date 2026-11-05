@@ -20,7 +20,7 @@ public class BasinInventory implements ItemInventory {
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (check) {
-            if (slot > 9) {
+            if (slot >= 9) {
                 return false;
             }
             for (int i = 0; i < slot; i++) {
