@@ -10,7 +10,7 @@ import net.minecraft.network.chat.MutableComponent;
 public class AccumulatedItemCountDisplaySource extends NumericSingleLineDisplaySource {
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        return Component.literal(String.valueOf(context.sourceConfig().getInt("Collected")));
+        return Component.literal(String.valueOf(context.sourceConfig().getIntOr("Collected", 0)));
     }
 
     public void itemReceived(DisplayLinkBlockEntity be, int amount) {
