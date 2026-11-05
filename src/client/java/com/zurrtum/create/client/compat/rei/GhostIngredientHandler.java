@@ -103,7 +103,7 @@ public class GhostIngredientHandler<T extends GhostItemMenu<?>> implements Dragg
             Slot slot = gui.getMenu().slots.get(slotIndex + 36);
             int minX = gui.getGuiLeft() + slot.x;
             int minY = gui.getGuiTop() + slot.y;
-            area = Shapes.create(minX, minY, 0, minX + 16, minY + 16, 0.1);
+            this.area = Shapes.create(minX, minY, 0, minX + 16, minY + 16, 0.1);
         }
 
         public void accept(ItemStack ingredient) {

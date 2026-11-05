@@ -8,10 +8,12 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
+import com.zurrtum.create.client.catnip.render.QuadRenderHelper;
 import com.zurrtum.create.client.content.kinetics.base.Radians;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.FluidStateModelSet;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +21,12 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 
 public class FanRenderer extends GuiBlockRenderer<FanRenderState> {
+    private final ModelManager modelManager;
+
+    public FanRenderer() {
+        modelManager = Minecraft.getInstance().getModelManager();
+    }
+
     @Override
     protected void renderToTexture(FanRenderState state, PoseStack matrices, SubmitNodeCollector queue) {
         Pose pose = matrices.last();
@@ -44,6 +52,7 @@ public class FanRenderer extends GuiBlockRenderer<FanRenderState> {
 
         matrices.translate(0, 0, 2);
         BlockState blockState = state.target();
+        QuadRenderHelper.markFireSpriteActive(modelManager, blockState);
         FluidState fluidState = blockState.getFluidState();
         if (!fluidState.isEmpty()) {
             Fluid fluid = fluidState.getType();

@@ -57,13 +57,12 @@ public abstract class IrisPipelinesMixin {
             PonderRenderPipelines.ENTITY_TRANSLUCENT_CULL
         );
         IrisPipelines.copyPipeline(RenderPipelines.ENTITY_TRANSLUCENT, PonderRenderPipelines.ENTITY_TRANSLUCENT);
-        IrisPipelines.copyPipeline(RenderPipelines.SOLID_BLOCK, AllRenderPipelines.ADDITIVE);
-        IrisPipelines.copyPipeline(RenderPipelines.SOLID_BLOCK, AllRenderPipelines.ADDITIVE2);
         IrisPipelines.copyPipeline(RenderPipelines.TRANSLUCENT_PARTICLE, AllRenderPipelines.CUBE);
         IrisPipelines.assignPipeline(AllRenderPipelines.GLOWING, ShaderKey.BLOCK_ENTITY_BRIGHT);
         IrisPipelines.assignPipeline(AllRenderPipelines.GLOWING_TRANSLUCENT, ShaderKey.BE_TRANSLUCENT);
-        Function<IrisRenderingPipeline, ShaderKey> getter = p -> ShaderKey.SHADOW_ENTITIES_CUTOUT;
-        assignToShadow(AllRenderPipelines.GLOWING, getter);
-        assignToShadow(AllRenderPipelines.GLOWING_TRANSLUCENT, getter);
+        IrisPipelines.assignPipeline(AllRenderPipelines.ADDITIVE, ShaderKey.BE_TRANSLUCENT);
+        assignToShadow(AllRenderPipelines.ADDITIVE, p -> ShaderKey.SHADOW_TRANSLUCENT);
+        assignToShadow(AllRenderPipelines.GLOWING, p -> ShaderKey.SHADOW_LIGHTNING);
+        assignToShadow(AllRenderPipelines.GLOWING_TRANSLUCENT, p -> ShaderKey.SHADOW_LIGHTNING);
     }
 }

@@ -16,7 +16,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 
@@ -51,7 +50,7 @@ public class CrushingCategory extends CreateCategory<CrushingDisplay> {
             ProcessingOutput output = results.get(i);
             addOutputData(output, start + i * 19, y, outputs, outputIngredients, chances, chanceIngredients);
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 77, bounds.y + 12);

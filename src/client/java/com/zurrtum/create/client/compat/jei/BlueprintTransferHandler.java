@@ -11,6 +11,7 @@ import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.transfer.IRecipeTransferContext;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.types.IRecipeType;
@@ -50,13 +51,22 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
         return RecipeTypes.CRAFTING;
     }
 
+    @SuppressWarnings("removal")
     @Override
     public @Nullable IRecipeTransferError transferRecipe(
-        BlueprintMenu menu,
-        RecipeHolder<CraftingRecipe> craftingRecipe,
+        BlueprintMenu container,
+        RecipeHolder<CraftingRecipe> recipe,
         IRecipeSlotsView recipeSlots,
         Player player,
         boolean maxTransfer,
+        boolean doTransfer
+    ) {
+        return null;
+    }
+
+    @Override
+    public @Nullable IRecipeTransferError transferRecipe(
+        IRecipeTransferContext<RecipeHolder<CraftingRecipe>, BlueprintMenu> context,
         boolean doTransfer
     ) {
         if (!doTransfer) {
@@ -65,7 +75,7 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
 
         List<IRecipeSlotView> inputViews = new ArrayList<>();
         List<IRecipeSlotView> outputViews = new ArrayList<>();
-        for (IRecipeSlotView view : recipeSlots.getSlotViews()) {
+        for (IRecipeSlotView view : context.getRecipeSlots().getSlotViews()) {
             RecipeIngredientRole role = view.getRole();
             if (role == RecipeIngredientRole.INPUT) {
                 inputViews.add(view);
@@ -117,7 +127,7 @@ public class BlueprintTransferHandler implements IRecipeTransferHandler<Blueprin
             input.add(filterItem);
         }
         BlueprintAssignCompleteRecipePacket packet = new BlueprintAssignCompleteRecipePacket(input, output);
-        ((LocalPlayer) player).connection.send(packet);
+        ((LocalPlayer) context.getPlayer()).connection.send(packet);
         return null;
     }
 

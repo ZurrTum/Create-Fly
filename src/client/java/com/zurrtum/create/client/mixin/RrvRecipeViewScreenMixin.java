@@ -17,12 +17,10 @@ import com.zurrtum.create.client.compat.rrv.RrvClientPlugin;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -32,12 +30,12 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @Mixin(RecipeViewScreen.class)
-public class RrvRecipeViewScreenMixin extends AbstractContainerScreen<RecipeViewMenu> {
-    private RrvRecipeViewScreenMixin(RecipeViewMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-    }
+public abstract class RrvRecipeViewScreenMixin {
+    @Shadow
+    public abstract RecipeViewMenu getMenu();
 
-    @Inject(method = "checkGui()V", at = @At(value = "INVOKE_ASSIGN", target = "Lcc/cassian/rrv/common/recipe/inventory/RecipeViewMenu;guiOffsetLeft()I"), remap = false)
+    @Inject(method = "checkGui()V", at = @At(value = "INVOKE_ASSIGN",
+        target = "Lcc/cassian/rrv/common/recipe/inventory/RecipeViewMenu;guiOffsetLeft()I"), remap = false)
     private void initHandler(
         CallbackInfo ci,
         @Local RecipeViewMenu menu,
@@ -62,7 +60,8 @@ public class RrvRecipeViewScreenMixin extends AbstractContainerScreen<RecipeView
         }
     }
 
-    @WrapOperation(method = "checkGui()V", at = @At(value = "NEW", target = "(Lnet/minecraft/network/chat/MutableComponent;Lnet/minecraft/client/gui/components/Button$OnPress;IIII)Lcc/cassian/rrv/common/recipe/inventory/ReliablePlainButton;"))
+    @WrapOperation(method = "checkGui()V", at = @At(value = "NEW",
+        target = "(Lnet/minecraft/network/chat/MutableComponent;Lnet/minecraft/client/gui/components/Button$OnPress;IIII)Lcc/cassian/rrv/common/recipe/inventory/ReliablePlainButton;"))
     private ReliablePlainButton createButton(
         MutableComponent literal,
         Button.OnPress o,
@@ -82,14 +81,18 @@ public class RrvRecipeViewScreenMixin extends AbstractContainerScreen<RecipeView
         return original.call(literal, o, x, y, width, height);
     }
 
-    @Inject(method = "checkGui()V", at = @At(value = "INVOKE", target = "Lcc/cassian/rrv/common/recipe/inventory/RecipeViewScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;", ordinal = 0))
+    @Inject(method = "checkGui()V", at = @At(value = "INVOKE",
+        target = "Lcc/cassian/rrv/common/recipe/inventory/RecipeViewScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;",
+        ordinal = 0))
     private void initButton(CallbackInfo ci, @Local Button transferButton) {
         if (transferButton instanceof RecipeButton button) {
             button.init();
         }
     }
 
-    @ModifyReceiver(method = "extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
+    @ModifyReceiver(method = "extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+        at = @At(value = "INVOKE",
+            target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
     private Stream<Slot> filterSlots(
         Stream<Slot> stream,
         Predicate<Slot> predicate,
@@ -102,7 +105,9 @@ public class RrvRecipeViewScreenMixin extends AbstractContainerScreen<RecipeView
         return stream.filter(slot -> slot.index >= index && slot.index < end);
     }
 
-    @Inject(method = "renderInvalidSlots(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V", at = @At(value = "INVOKE", target = "Lcc/cassian/rrv/common/recipe/inventory/RecipeViewScreen;getMenu()Lnet/minecraft/world/inventory/AbstractContainerMenu;", ordinal = 0), cancellable = true)
+    @Inject(method = "renderInvalidSlots(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V", at = @At(value = "INVOKE",
+        target = "Lcc/cassian/rrv/common/recipe/inventory/RecipeViewScreen;getMenu()Lcc/cassian/rrv/common/recipe/inventory/RecipeViewMenu;",
+        ordinal = 0), cancellable = true)
     private void renderInvalidSlots(
         GuiGraphicsExtractor guiGraphics,
         int displayId,

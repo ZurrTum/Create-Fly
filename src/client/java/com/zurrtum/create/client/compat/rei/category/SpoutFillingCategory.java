@@ -17,7 +17,8 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
@@ -50,7 +51,7 @@ public class SpoutFillingCategory extends CreateCategory<SpoutFillingDisplay> {
         Point fluid = new Point(bounds.x + 32, bounds.y + 37);
         Point output = new Point(bounds.x + 137, bounds.y + 56);
         Slot fluidSlot = createInputSlot(fluid).entries(getRenderEntryStack(display.fluid()));
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             drawSlotBackground(graphics, input, fluid, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 62);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 131, bounds.y + 34);
@@ -60,11 +61,13 @@ public class SpoutFillingCategory extends CreateCategory<SpoutFillingDisplay> {
                 idGenerator.set(0);
             }
             FluidStack stack = slot.getValue();
+            DataComponentPatch components =
+                stack.getComponents() instanceof PatchedDataComponentMap map ? map.asPatch() : stack.getPatch();
             graphics.guiRenderState.addPicturesInPictureState(new SpoutRenderState(
                 i,
                 new Matrix3x2f(graphics.pose()),
                 stack.getFluid(),
-                stack.getComponents().asPatch(),
+                components,
                 bounds.x + 80,
                 bounds.y + 6,
                 0

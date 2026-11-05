@@ -16,7 +16,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -64,7 +63,8 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
             );
         } else {
             input = new Point(bounds.x + 26 + xOffsetAmount * 5, bounds.y + 53);
-            for (int i = 0, left = bounds.x + 146 + xOffsetAmount * 9, top = bounds.y + 53; i < outputSize; i++) {
+            for (int i = 0, left = bounds.x + 146 + xOffsetAmount * 9, top = bounds.y + (outputSize <= 9 ? 53 :
+                62); i < outputSize; i++) {
                 int xOffset = i % 3 * 19;
                 int yOffset = i / 3 * -19;
                 addOutputData(
@@ -78,7 +78,7 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
                 );
             }
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 51, bounds.y + 32);

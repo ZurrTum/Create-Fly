@@ -11,15 +11,16 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.fluid.FluidPotionIngredient;
 import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -38,6 +39,7 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class CreateView implements ReliableClientRecipe {
@@ -182,10 +184,35 @@ public abstract class CreateView implements ReliableClientRecipe {
     }
 
     public static SlotContent createSlot(FluidIngredient ingredient) {
+        int amount = ingredient.amount();
+        if (ingredient instanceof FluidPotionIngredient potionIngredient) {
+            Optional<HolderSet<Potion>> holders = potionIngredient.potions().potions();
+            if (holders.isEmpty()) {
+                return SlotContent.of();
+            }
+            BottleType type = potionIngredient.type();
+            Item item = ItemViewRecipes.INSTANCE.itemForFluid(AllFluids.POTION);
+            List<ItemStack> list = new ArrayList<>();
+            for (Holder<Potion> holder : holders.get()) {
+                ItemStack stack = new ItemStack(item);
+                stack.set(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, type);
+                stack.set(DataComponents.POTION_CONTENTS, new PotionContents(holder));
+                if (type == BottleType.LINGERING) {
+                    stack.set(
+                        DataComponents.POTION_DURATION_SCALE,
+                        Items.LINGERING_POTION.components().get(DataComponents.POTION_DURATION_SCALE)
+                    );
+                }
+                CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+                tag.putInt("fluidAmount", amount);
+                CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
+                list.add(stack);
+            }
+            return SlotContent.of(list);
+        }
         List<Fluid> fluids = ingredient.getMatchingFluids();
         int size = fluids.size();
         List<ItemStack> list = new ArrayList<>(size);
-        int amount = ingredient.amount();
         DataComponentPatch components = null;
         if (ingredient instanceof FluidStackIngredient stackIngredient) {
             components = stackIngredient.components();
@@ -199,7 +226,7 @@ public abstract class CreateView implements ReliableClientRecipe {
             ItemStack stack = new ItemStack(item);
             if (components != null) {
                 stack.applyComponents(components);
-                updatePotionName(fluid, stack);
+                updatePotionScale(fluid, stack);
             }
             CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
             tag.putInt("fluidAmount", amount);
@@ -217,27 +244,25 @@ public abstract class CreateView implements ReliableClientRecipe {
         }
         ItemStack stack = new ItemStack(item);
         stack.applyComponents(fluidStack.getComponents());
-        updatePotionName(fluid, stack);
+        updatePotionScale(fluid, stack);
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         tag.putInt("fluidAmount", fluidStack.getAmount());
         CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
         return SlotContent.of(stack);
     }
 
-    private static void updatePotionName(Fluid fluid, ItemStack stack) {
+    private static void updatePotionScale(Fluid fluid, ItemStack stack) {
         if (fluid != AllFluids.POTION) {
             return;
         }
-        PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-        BottleType bottleType = stack.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
-        Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType)
-            .getDescriptionId() + ".effect.");
-        stack.set(DataComponents.ITEM_NAME, name);
-        if (!stack.has(DataComponents.POTION_DURATION_SCALE) && bottleType == BottleType.LINGERING) {
-            stack.set(
-                DataComponents.POTION_DURATION_SCALE,
-                Items.LINGERING_POTION.components().get(DataComponents.POTION_DURATION_SCALE)
-            );
+        if (!stack.has(DataComponents.POTION_DURATION_SCALE)) {
+            BottleType bottleType = stack.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
+            if (bottleType == BottleType.LINGERING) {
+                stack.set(
+                    DataComponents.POTION_DURATION_SCALE,
+                    Items.LINGERING_POTION.components().get(DataComponents.POTION_DURATION_SCALE)
+                );
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.zurrtum.create.client.compat.rei;
 
 import com.zurrtum.create.client.compat.rei.renderer.ChanceItemRenderer;
 import com.zurrtum.create.client.compat.rei.renderer.FluidStackRenderer;
+import com.zurrtum.create.client.compat.rei.widget.KeepHeldTooltip;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import dev.architectury.fluid.FluidStack;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CreateCategory<T extends Display> implements DisplayCategory<T> {
+    public static final KeepHeldTooltip KEEP_HELD = new KeepHeldTooltip();
+
     public abstract void addWidgets(List<Widget> widgets, T display, Rectangle bounds);
 
     public static void drawSlotBackground(GuiGraphicsExtractor graphics, List<Point> points1, Point... points2) {
@@ -79,11 +82,20 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
     public static EntryIngredient getRenderEntryStack(ProcessingOutput output) {
         float chance = output.chance();
         if (chance == 1) {
-            return EntryIngredients.of(output.stack());
+            return EntryIngredients.of(output.create());
         }
-        EntryStack<ItemStack> stack = EntryStacks.of(output.stack());
+        EntryStack<ItemStack> stack = EntryStacks.of(output.create());
         stack.withRenderer(new ChanceItemRenderer(chance, stack.getRenderer()));
         return EntryIngredient.of(stack);
+    }
+
+    public static EntryIngredient getKeepHeldStack(EntryIngredient ingredient, boolean keepHeldItem) {
+        if (keepHeldItem) {
+            for (EntryStack<ItemStack> stack : ingredient.<ItemStack>castAsList()) {
+                stack.tooltipProcessor(KEEP_HELD);
+            }
+        }
+        return ingredient;
     }
 
     public static List<EntryIngredient> condenseIngredients(List<EntryIngredient> ingredients) {

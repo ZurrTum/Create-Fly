@@ -27,14 +27,15 @@ import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -48,7 +49,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
     static {
         DRAW.put(
             AllRecipeTypes.PRESSING, (graphics, i, point, stack) -> {
-                float scale = 19 / 30.0f;
+                float scale = 19 / 30f;
                 Matrix3x2fStack matrices = graphics.pose();
                 matrices.pushMatrix();
                 matrices.translate(point.x, point.y);
@@ -66,7 +67,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
         );
         DRAW.put(
             AllRecipeTypes.DEPLOYING, (graphics, i, point, stack) -> {
-                float scale = 59 / 78.0f;
+                float scale = 59 / 78f;
                 Matrix3x2fStack matrices = graphics.pose();
                 matrices.pushMatrix();
                 matrices.translate(point.x, point.y);
@@ -84,7 +85,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
         );
         DRAW.put(
             AllRecipeTypes.FILLING, (graphics, i, point, stack) -> {
-                float scale = 35 / 46.0f;
+                float scale = 35 / 46f;
                 Matrix3x2fStack matrices = graphics.pose();
                 matrices.pushMatrix();
                 matrices.translate(point.x, point.y);
@@ -95,7 +96,8 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 if (stack != null) {
                     FluidStack fluidStack = stack.castValue();
                     fluid = fluidStack.getFluid();
-                    components = fluidStack.getComponents().asPatch();
+                    components = fluidStack.getComponents() instanceof PatchedDataComponentMap map ? map.asPatch() :
+                        fluidStack.getPatch();
                 }
                 graphics.guiRenderState.addPicturesInPictureState(new SpoutRenderState(
                     i,
@@ -151,7 +153,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 noBackground[i] = true;
             }
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             for (int i = 0; i < size; i++) {
                 if (noBackground[i]) {
                     continue;
@@ -160,7 +162,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 AllGuiTextures.JEI_SLOT.render(graphics, point.x - 1, point.y - 1);
             }
         }));
-        List<@Nullable Slot> slots = new ArrayList<>();
+        List<Slot> slots = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Point point = points.get(i);
             List<Component> step = tooltips.get(i);
@@ -193,7 +195,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 slots.add(slot);
             }
         }
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             Font textRenderer = graphics.minecraft.font;
             for (int i = 0; i < size; i++) {
                 Point point = points.get(i);

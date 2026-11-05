@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.compat.jei;
 
 import com.google.common.base.Suppliers;
+import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.client.compat.jei.renderer.JunkSlotRenderer;
 import com.zurrtum.create.client.compat.jei.renderer.SlotRenderer;
@@ -11,7 +12,9 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.fluid.FluidPotionIngredient;
 import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
+import com.zurrtum.create.infrastructure.component.BottleType;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -19,9 +22,14 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.material.Fluid;
@@ -29,6 +37,7 @@ import net.minecraft.world.level.material.Fluid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class CreateCategory<T> implements IRecipeCategory<T> {
@@ -107,6 +116,20 @@ public abstract class CreateCategory<T> implements IRecipeCategory<T> {
     ) {
         int amount = fluidIngredient.amount();
         IRecipeSlotBuilder slot = builder.addInputSlot(x, y).setFluidRenderer(amount, false, 16, 16);
+        if (fluidIngredient instanceof FluidPotionIngredient ingredient) {
+            Optional<HolderSet<Potion>> holders = ingredient.potions().potions();
+            if (holders.isEmpty()) {
+                return slot;
+            }
+            BottleType type = ingredient.type();
+            for (Holder<Potion> holder : holders.get()) {
+                DataComponentPatch.Builder components = DataComponentPatch.builder();
+                components.set(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, type);
+                components.set(DataComponents.POTION_CONTENTS, new PotionContents(holder));
+                slot.add(AllFluids.POTION, amount, components.build());
+            }
+            return slot.addRichTooltipCallback(POTION);
+        }
         DataComponentPatch components = DataComponentPatch.EMPTY;
         if (fluidIngredient instanceof FluidStackIngredient stackIngredient) {
             components = stackIngredient.components();

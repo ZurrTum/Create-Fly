@@ -15,7 +15,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +38,12 @@ public record CrushingDisplay(EntryIngredient input, List<ProcessingOutput> outp
         )
     );
 
-    @Nullable
     public static CrushingDisplay of(RecipeHolder<?> entry) {
         Identifier id = entry.id().identifier();
         Recipe<?> recipe = entry.value();
         if (recipe instanceof CrushingRecipe crushingRecipe) {
             return new CrushingDisplay(id, crushingRecipe);
-        }
-        if (recipe instanceof MillingRecipe millingRecipe) {
+        } else if (recipe instanceof MillingRecipe millingRecipe) {
             return new CrushingDisplay(id, millingRecipe);
         }
         return null;
@@ -69,7 +66,7 @@ public record CrushingDisplay(EntryIngredient input, List<ProcessingOutput> outp
     public List<EntryIngredient> getOutputEntries() {
         List<EntryIngredient> list = new ArrayList<>();
         for (ProcessingOutput output : outputs) {
-            list.add(EntryIngredients.of(output.stack()));
+            list.add(EntryIngredients.of(output.create()));
         }
         return list;
     }

@@ -30,6 +30,12 @@
     ],
     "rrv_client": [
       "com.zurrtum.create.client.compat.rrv.RrvClientPlugin"
+    ],
+    "rei_client": [
+      "com.zurrtum.create.client.compat.rei.ReiClientPlugin"
+    ],
+    "rei_common": [
+      "com.zurrtum.create.compat.rei.ReiCommonPlugin"
     ]
   },
   "accessWidener": "create.classtweaker",

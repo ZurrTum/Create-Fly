@@ -30,14 +30,13 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface AutoCompactingDisplay {
     @SuppressWarnings("unchecked")
-    @Nullable
     static Display of(RecipeHolder<?> entry) {
         Recipe<?> recipe = entry.value();
         if (!MechanicalPressBlockEntity.canCompress(recipe) || AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
@@ -45,16 +44,13 @@ public interface AutoCompactingDisplay {
         }
         if (recipe instanceof ShapelessRecipe) {
             return new ShapelessDisplay((RecipeHolder<ShapelessRecipe>) entry);
-        }
-        if (recipe instanceof ShapedRecipe) {
+        } else if (recipe instanceof ShapedRecipe) {
             return new ShapedDisplay((RecipeHolder<ShapedRecipe>) entry);
-        }
-        if (!recipe.isSpecial()) {
+        } else if (!recipe.isSpecial()) {
             for (RecipeDisplay d : recipe.display()) {
                 if (d instanceof ShapedCraftingRecipeDisplay display) {
                     return new CraftingDisplayShaped(display);
-                }
-                if (d instanceof ShapelessCraftingRecipeDisplay display) {
+                } else if (d instanceof ShapelessCraftingRecipeDisplay display) {
                     return new CraftingDisplayShapeless(display);
                 }
             }
@@ -151,7 +147,6 @@ public interface AutoCompactingDisplay {
             );
         }
 
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         public ShapedDisplay(
             List<EntryIngredient> input,
             List<EntryIngredient> output,

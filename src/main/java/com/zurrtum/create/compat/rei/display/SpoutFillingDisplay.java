@@ -15,6 +15,8 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.registry.display.DisplayConsumer;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -72,7 +74,9 @@ public record SpoutFillingDisplay(EntryIngredient input, EntryIngredient fluid, 
     ) {
         List<FluidStack> fluids = fluidStream.map(entry -> {
             dev.architectury.fluid.FluidStack stack = entry.castValue();
-            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getComponents().asPatch());
+            DataComponentPatch components =
+                stack.getComponents() instanceof PatchedDataComponentMap map ? map.asPatch() : stack.getPatch();
+            return new FluidStack(stack.getFluid(), stack.getAmount(), components);
         }).toList();
         itemStream.forEach(entry -> {
             ItemStack stack = entry.castValue();

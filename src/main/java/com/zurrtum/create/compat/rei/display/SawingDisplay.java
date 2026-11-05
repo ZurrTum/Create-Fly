@@ -3,6 +3,7 @@ package com.zurrtum.create.compat.rei.display;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
+import com.zurrtum.create.content.processing.recipe.ProcessingOutput;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
@@ -13,21 +14,22 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record SawingDisplay(EntryIngredient input, EntryIngredient output,
+public record SawingDisplay(EntryIngredient input, List<ProcessingOutput> outputs,
                             Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<SawingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SawingDisplay::input),
-            EntryIngredient.codec().fieldOf("output").forGetter(SawingDisplay::output),
+            ProcessingOutput.CODEC.listOf().fieldOf("outputs").forGetter(SawingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(SawingDisplay::location)
         ).apply(instance, SawingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             SawingDisplay::input,
-            EntryIngredient.streamCodec(),
-            SawingDisplay::output,
+            ProcessingOutput.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            SawingDisplay::outputs,
             ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             SawingDisplay::location,
             SawingDisplay::new
@@ -39,7 +41,7 @@ public record SawingDisplay(EntryIngredient input, EntryIngredient output,
     }
 
     public SawingDisplay(Identifier id, CuttingRecipe recipe) {
-        this(EntryIngredients.ofIngredient(recipe.ingredient()), EntryIngredients.of(recipe.result()), Optional.of(id));
+        this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
     @Override
@@ -49,7 +51,11 @@ public record SawingDisplay(EntryIngredient input, EntryIngredient output,
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(output);
+        List<EntryIngredient> list = new ArrayList<>();
+        for (ProcessingOutput output : outputs) {
+            list.add(EntryIngredients.of(output.create()));
+        }
+        return list;
     }
 
     @Override

@@ -185,7 +185,7 @@ public class SequencedAssemblyView extends CreateView {
         int mouseY,
         float partialTicks
     ) {
-        boolean checkHover = screen.hoveredSlot == null;
+        boolean checkHover = screen.rrv$hoveredStack().isEmpty();
         boolean checkStep = mouseY >= 7 && mouseY <= 86;
         Font textRenderer = screen.getFont();
         Iterator<SlotContent> iterator = ingredients.iterator();

@@ -14,7 +14,6 @@ import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
@@ -42,7 +41,7 @@ public class FanBlastingCategory extends CreateCategory<FanBlastingDisplay> {
     public void addWidgets(List<Widget> widgets, FanBlastingDisplay display, Rectangle bounds) {
         Point input = new Point(bounds.x + 26, bounds.y + 53);
         Point output = new Point(bounds.x + 146, bounds.y + 53);
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             drawSlotBackground(graphics, input, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 51, bounds.y + 32);
             AllGuiTextures.JEI_LIGHT.render(graphics, bounds.x + 70, bounds.y + 44);

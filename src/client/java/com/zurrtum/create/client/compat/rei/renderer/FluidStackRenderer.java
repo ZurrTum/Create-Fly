@@ -8,18 +8,21 @@ import com.zurrtum.create.infrastructure.component.BottleType;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluid;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.level.material.FluidState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +31,7 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
     @Override
     public void render(
         EntryStack<FluidStack> entry,
-        GuiGraphicsExtractor graphics,
+        GuiGraphics graphics,
         Rectangle bounds,
         int mouseX,
         int mouseY,
@@ -36,14 +39,21 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
     ) {
         FluidStack stack = entry.getValue();
         Fluid fluid = stack.getFluid();
-        FluidConfig config = AllFluidConfigs.get(fluid);
-        if (config == null) {
-            return;
-        }
-        int color = config.tint().apply(stack.getComponents().asPatch()) | 0xff000000;
+        FluidState state = fluid.defaultFluidState();
+        FluidModel fluidModel = graphics.minecraft.getModelManager().getFluidStateModelSet().get(state);
+        DataComponentPatch patch =
+            stack.getComponents() instanceof PatchedDataComponentMap map ? map.asPatch() : stack.getPatch();
+        int color = AllFluidConfigs.getTint(
+            null,
+            null,
+            state.createLegacyBlock(),
+            fluidModel,
+            fluid,
+            patch
+        ) | 0xff000000;
         graphics.blitSprite(
             RenderPipelines.GUI_TEXTURED,
-            config.still().get(),
+            fluidModel.stillMaterial().sprite(),
             bounds.x,
             bounds.y,
             bounds.width,
@@ -53,7 +63,6 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
     }
 
     @Override
-    @Nullable
     public Tooltip getTooltip(EntryStack<FluidStack> entry, TooltipContext context) {
         Tooltip tooltip = origin.getTooltip(entry, context);
         if (tooltip == null) {
@@ -64,7 +73,7 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
         if (first.isText()) {
             FluidStack stack = entry.getValue();
             if (stack.getFluid() == AllFluids.POTION) {
-                PatchedDataComponentMap components = stack.getComponents();
+                DataComponentMap components = stack.getComponents();
                 PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                 BottleType bottleType = components.getOrDefault(
                     AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
@@ -78,9 +87,9 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
                 if (scale == null) {
                     if (bottleType == BottleType.LINGERING) {
                         scale = Items.LINGERING_POTION.components()
-                            .getOrDefault(DataComponents.POTION_DURATION_SCALE, 1.0f);
+                            .getOrDefault(DataComponents.POTION_DURATION_SCALE, 1f);
                     } else {
-                        scale = 1.0f;
+                        scale = 1f;
                     }
                 }
                 PotionContents.addPotionTooltip(
@@ -88,12 +97,6 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
                     text -> list.add(Tooltip.entry(text)),
                     scale,
                     context.vanillaContext().tickRate()
-                );
-                contents.addToTooltip(
-                    context.vanillaContext(),
-                    text -> list.add(Tooltip.entry(text)),
-                    context.getFlag(),
-                    components
                 );
                 entries.removeFirst();
                 entries.addAll(0, list);

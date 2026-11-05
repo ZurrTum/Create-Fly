@@ -15,7 +15,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 
@@ -42,7 +41,7 @@ public class SandpaperPolishingCategory extends CreateCategory<SandpaperPolishin
         Point input = new Point(bounds.x + 32, bounds.y + 34);
         Point output = new Point(bounds.x + 137, bounds.y + 34);
         Slot inputSlot = createInputSlot(input).entries(display.input());
-        widgets.add(Widgets.createDrawableWidget((GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) -> {
             drawSlotBackground(graphics, input, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 66, bounds.y + 26);
             AllGuiTextures.JEI_LONG_ARROW.render(graphics, bounds.x + 57, bounds.y + 37);
