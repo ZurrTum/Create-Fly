@@ -66,10 +66,16 @@ public class IngredientTextContent implements ComponentContents {
             return ENTRY_CODEC.encode(list, ops, prefix);
         }
     };
-    public static final MapCodec<IngredientTextContent> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        INGREDIENT_CODEC.optionalFieldOf("ingredient").forGetter(i -> Optional.ofNullable(i.ingredient)),
-        ComponentSerialization.CODEC.optionalFieldOf("name").forGetter(i -> Optional.ofNullable(i.name))
-    ).apply(instance, IngredientTextContent::new));
+    public static final MapCodec<IngredientTextContent> CODEC = RecordCodecBuilder.<IngredientTextContent>mapCodec(
+        instance -> instance.group(
+            INGREDIENT_CODEC.optionalFieldOf("ingredient").forGetter(i -> Optional.ofNullable(i.ingredient)),
+            ComponentSerialization.CODEC.optionalFieldOf("name").forGetter(i -> Optional.ofNullable(i.name))
+        ).apply(instance, IngredientTextContent::new)).validate(context -> {
+        if (context.ingredient == null && context.name == null) {
+            return DataResult.error(() -> "IngredientTextContent must have a ingredient or a name");
+        }
+        return DataResult.success(context);
+    });
 
     public @Nullable Ingredient ingredient;
     public @Nullable Component name;
