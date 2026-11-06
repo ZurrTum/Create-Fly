@@ -62,9 +62,9 @@ public class MixerVisual extends SingleAxisRotatingVisual<MechanicalMixerBlockEn
         MechanicalMixerAnimationBehaviour behaviour = (MechanicalMixerAnimationBehaviour) blockEntity.getBehaviour(
             AnimationBehaviour.TYPE);
         float speed = blockEntity.getSpeed();
+        float offset = behaviour == null ? 0 : behaviour.getOffset(speed, pt);
         mixerHead.setPosition(getVisualPosition()).nudge(0, renderedHeadOffset, 0)
-            .setRotationalSpeed(speed * RotatingInstance.SPEED_MULTIPLIER)
-            .setRotationOffset(behaviour.getOffset(speed, pt)).setChanged();
+            .setRotationalSpeed(speed * RotatingInstance.SPEED_MULTIPLIER).setRotationOffset(offset).setChanged();
     }
 
     private void transformPole(float renderedHeadOffset) {
