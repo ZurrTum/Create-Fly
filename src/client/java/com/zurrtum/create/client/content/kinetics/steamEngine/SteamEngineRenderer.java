@@ -54,11 +54,14 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
         Vec3 cameraPos,
         @Nullable CrumblingOverlay crumblingOverlay
     ) {
+        PoweredShaftBlockEntity shaft = be.getShaft();
+        if (shaft == null) {
+            return;
+        }
         Level level = SmartBlockEntityRenderer.extractBase(be, state, crumblingOverlay);
         CardinalLighting cardinalLighting = SmartBlockEntityRenderer.getCardinalLighting(level);
         Direction facing = SteamEngineBlock.getFacing(state.blockState);
         Direction.Axis facingAxis = facing.getAxis();
-        PoweredShaftBlockEntity shaft = be.getShaft();
         Direction.Axis axis = getRotationAxisOf(shaft);
         state.roll = facingAxis.isHorizontal() && axis == Direction.Axis.Y || facingAxis.isVertical() && axis == Direction.Axis.Z;
         float angle = getAngleForBe(shaft, shaft.getBlockPos(), axis);

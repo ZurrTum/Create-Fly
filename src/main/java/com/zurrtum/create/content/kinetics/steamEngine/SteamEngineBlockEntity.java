@@ -144,13 +144,13 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
     public PoweredShaftBlockEntity getShaft() {
         PoweredShaftBlockEntity shaft = target.get();
         if (shaft == null || shaft.isRemoved() || !shaft.canBePoweredBy(worldPosition)) {
-            if (shaft != null) {
-                target = new WeakReference<>(null);
-            }
             Direction facing = SteamEngineBlock.getFacing(getBlockState());
             BlockEntity anyShaftAt = level.getBlockEntity(worldPosition.relative(facing, 2));
             if (anyShaftAt instanceof PoweredShaftBlockEntity ps && ps.canBePoweredBy(worldPosition)) {
                 target = new WeakReference<>(shaft = ps);
+            } else {
+                shaft = null;
+                target.clear();
             }
         }
         return shaft;
