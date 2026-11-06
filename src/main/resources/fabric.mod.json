@@ -28,6 +28,9 @@
     "jei_mod_plugin": [
       "com.zurrtum.create.client.compat.jei.JeiClientPlugin"
     ],
+    "rrv": [
+      "com.zurrtum.create.compat.rrv.RrvCommonPlugin"
+    ],
     "rrv_client": [
       "com.zurrtum.create.client.compat.rrv.RrvClientPlugin"
     ],

@@ -13,10 +13,16 @@ import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rrv.category.*;
+import com.zurrtum.create.client.compat.rrv.view.DrainingView;
+import com.zurrtum.create.client.compat.rrv.view.SpoutFillingView;
 import com.zurrtum.create.client.content.logistics.stockTicker.StockKeeperRequestScreen;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
+import com.zurrtum.create.compat.rrv.PotionDisplay;
+import com.zurrtum.create.compat.rrv.RrvCommonPlugin;
+import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
@@ -41,10 +47,22 @@ public class RrvClientPlugin implements ReliableRecipeViewerClientPlugin {
     @Override
     public void onIntegrationInitialize() {
         ItemView.addClientRecipeProvider(RrvClientPlugin::register);
+        ItemView.addClientRecipeWrapper(RrvCommonPlugin.POTION, RrvClientPlugin::register);
         addTransferHandler(CraftingClientRecipeType.INSTANCE, new BlueprintTransferHandler());
         addTransferHandler(new StockKeeperTransferHandler());
         AbstractSimiContainerScreen.setExclusionZoneSync(new RrvExclusionZoneSync(OverlayManager.INSTANCE));
         StockKeeperRequestScreen.setSearchSync(new RrvStockSearchSync(ItemViewOverlay.INSTANCE));
+    }
+
+    private static List<CreateView> register(PotionDisplay display) {
+        int id = display.id;
+        ItemStack item = display.item;
+        FluidStack fluid = display.fluid;
+        ItemStack bottle = Items.GLASS_BOTTLE.getDefaultInstance();
+        return List.of(
+            new SpoutFillingView(Identifier.fromNamespaceAndPath(MOD_ID, "filling_potions_" + id), item, fluid, bottle),
+            new DrainingView(Identifier.fromNamespaceAndPath(MOD_ID, "draining_potions_" + id), bottle, fluid, item)
+        );
     }
 
     private static void register(List<ReliableClientRecipe> output) {

@@ -1,13 +1,11 @@
 package com.zurrtum.create.client.compat.rrv.category;
 
-import cc.cassian.rrv.api.recipe.ItemView;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import cc.cassian.rrv.client.recipe.ClientRecipeManager;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.client.compat.rrv.CreateCategory;
 import com.zurrtum.create.client.compat.rrv.view.DrainingView;
-import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.fluids.transfer.EmptyingRecipe;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
@@ -21,7 +19,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -43,17 +40,6 @@ public class DrainingCategory extends CreateCategory {
             }
         }
         registerGenericItem(Items.MILK_BUCKET.getDefaultInstance(), output);
-        HashMap<Item, List<ItemView.StackSensitive>> map = ItemView.getStackSensitive();
-        int i = 0;
-        for (ItemView.StackSensitive stackSensitive : map.get(Items.POTION)) {
-            registerPotionItem(i++, stackSensitive.stack(), output);
-        }
-        for (ItemView.StackSensitive stackSensitive : map.get(Items.SPLASH_POTION)) {
-            registerPotionItem(i++, stackSensitive.stack(), output);
-        }
-        for (ItemView.StackSensitive stackSensitive : map.get(Items.LINGERING_POTION)) {
-            registerPotionItem(i++, stackSensitive.stack(), output);
-        }
     }
 
     private static void registerGenericItem(ItemStack stack, List<ReliableClientRecipe> output) {
@@ -73,15 +59,6 @@ public class DrainingCategory extends CreateCategory {
             );
             output.add(new DrainingView(id, capability.getContainer(), fluid, stack));
         }
-    }
-
-    private static void registerPotionItem(int i, ItemStack item, List<ReliableClientRecipe> output) {
-        output.add(new DrainingView(
-            Identifier.fromNamespaceAndPath(MOD_ID, "draining_potions_" + i),
-            Items.GLASS_BOTTLE.getDefaultInstance(),
-            PotionFluidHandler.getFluidFromPotionItem(item),
-            item
-        ));
     }
 
     public DrainingCategory() {

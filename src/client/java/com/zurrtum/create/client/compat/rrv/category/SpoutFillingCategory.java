@@ -1,13 +1,11 @@
 package com.zurrtum.create.client.compat.rrv.category;
 
-import cc.cassian.rrv.api.recipe.ItemView;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import cc.cassian.rrv.client.recipe.ClientRecipeManager;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.client.compat.rrv.CreateCategory;
 import com.zurrtum.create.client.compat.rrv.view.SpoutFillingView;
-import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
@@ -15,14 +13,12 @@ import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -39,17 +35,6 @@ public class SpoutFillingCategory extends CreateCategory {
             if (fluid.isSource(fluidState)) {
                 registerGenericItem(fluid, output);
             }
-        }
-        HashMap<Item, List<ItemView.StackSensitive>> map = ItemView.getStackSensitive();
-        int i = 0;
-        for (ItemView.StackSensitive stackSensitive : map.get(Items.POTION)) {
-            registerPotionItem(i++, stackSensitive.stack(), output);
-        }
-        for (ItemView.StackSensitive stackSensitive : map.get(Items.SPLASH_POTION)) {
-            registerPotionItem(i++, stackSensitive.stack(), output);
-        }
-        for (ItemView.StackSensitive stackSensitive : map.get(Items.LINGERING_POTION)) {
-            registerPotionItem(i++, stackSensitive.stack(), output);
         }
     }
 
@@ -78,12 +63,6 @@ public class SpoutFillingCategory extends CreateCategory {
             FluidStack fluidStack = new FluidStack(fluid, BucketFluidInventory.CAPACITY);
             output.add(new SpoutFillingView(id, result, fluidStack, item));
         }
-    }
-
-    private static void registerPotionItem(int i, ItemStack stack, List<ReliableClientRecipe> output) {
-        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, "filling_potions_" + i);
-        FluidStack fluidStack = PotionFluidHandler.getFluidFromPotionItem(stack);
-        output.add(new SpoutFillingView(id, stack, fluidStack, Items.GLASS_BOTTLE.getDefaultInstance()));
     }
 
     public SpoutFillingCategory() {
