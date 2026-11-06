@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.AutoCompactingCategory;
@@ -71,7 +71,7 @@ public class AutoCompactingView extends CreateView {
     protected int placeViewSlots(SlotDefinition slotDefinition) {
         int i = 0;
         for (int size = ingredients.size(), rows = size == 4 ? 2 : 3; i < size; i++) {
-            slotDefinition.addItemSlot(i, (rows == 2 ? 27 : 18) + (i % rows) * 19, 49 - (i / rows) * 19);
+            slotDefinition.addItemSlot(i, (rows == 2 ? 27 : 18) + i % rows * 19, 49 - i / rows * 19);
         }
         slotDefinition.addItemSlot(i++, 142, 49);
         return i;
@@ -88,18 +88,12 @@ public class AutoCompactingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 30);
-        AllGuiTextures.JEI_SHADOW.render(context, 81, 66);
-        context.guiRenderState.addPicturesInPictureState(new PressBasinRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 30);
+        AllGuiTextures.JEI_SHADOW.render(graphics, 81, 66);
+        graphics.guiRenderState.addPicturesInPictureState(new PressBasinRenderState(
+            new Matrix3x2f(graphics.pose()),
             91,
             -7
         ));

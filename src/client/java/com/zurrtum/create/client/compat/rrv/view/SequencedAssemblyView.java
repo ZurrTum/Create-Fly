@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
@@ -177,22 +178,19 @@ public class SequencedAssemblyView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        boolean checkHover = screen.rrv$hoveredStack().isEmpty();
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        int mouseX = context.mouseX();
+        int mouseY = context.mouseY();
+        RecipePosition position = context.recipePosition();
+        boolean checkHover = context.screen() instanceof RecipeViewScreen screen && screen.rrv$hoveredStack().isEmpty();
         boolean checkStep = mouseY >= 7 && mouseY <= 86;
-        Font textRenderer = screen.getFont();
+        Font textRenderer = context.font();
         Iterator<SlotContent> iterator = ingredients.iterator();
         for (int i = 0, size = sequence.size(), left = 91 - 14 * size; i < size; i++) {
             int x = left + i * 28;
             String n = ROMANS[Math.min(i, ROMANS.length)];
-            context.text(textRenderer, n, x + 8 - textRenderer.width(n) / 2, 4, 0xff888888, false);
+            graphics.text(textRenderer, n, x + 8 - textRenderer.width(n) / 2, 4, 0xff888888, false);
             Recipe<?> recipe = sequence.get(i);
             ItemStack stack;
             if (empty.contains(i)) {
@@ -203,11 +201,11 @@ public class SequencedAssemblyView extends CreateView {
             }
             SequencedRenderer<?> draw = getRenderer(recipe);
             if (draw != null) {
-                draw.render(context, i, x, 17, stack);
+                draw.render(graphics, i, x, 17, stack);
             } else {
-                AllGuiTextures.JEI_CHANCE_SLOT.render(context, x - 1, 16);
+                AllGuiTextures.JEI_CHANCE_SLOT.render(graphics, x - 1, 16);
                 Component text = Component.literal("?").withStyle(ChatFormatting.BOLD);
-                context.text(textRenderer, text, x + textRenderer.width(text) / -2 + 7, 21, 0xffefefef, true);
+                graphics.text(textRenderer, text, x + textRenderer.width(text) / -2 + 7, 21, 0xffefefef, true);
             }
             if (checkHover && checkStep && mouseX > x - 7 && mouseX < x + 22) {
                 checkHover = false;
@@ -217,7 +215,7 @@ public class SequencedAssemblyView extends CreateView {
                     CreateLang.translateDirect("recipe.assembly.step", i + 1),
                     text.copy().withStyle(ChatFormatting.DARK_GREEN)
                 );
-                context.setComponentTooltipForNextFrame(
+                graphics.setComponentTooltipForNextFrame(
                     textRenderer,
                     tooltip,
                     mouseX + position.left(),
@@ -228,19 +226,19 @@ public class SequencedAssemblyView extends CreateView {
         int xOffset = 0;
         if (chance != 1) {
             xOffset = -7;
-            AllGuiTextures.JEI_CHANCE_SLOT.render(context, 138, 92);
+            AllGuiTextures.JEI_CHANCE_SLOT.render(graphics, 138, 92);
             Component text = Component.literal("?").withStyle(ChatFormatting.BOLD);
-            context.text(textRenderer, text, 146 + textRenderer.width(text) / -2, 97, 0xffefefef, true);
+            graphics.text(textRenderer, text, 146 + textRenderer.width(text) / -2, 97, 0xffefefef, true);
             if (checkHover && mouseX >= 138 && mouseX <= 155 && mouseY >= 92 && mouseY <= 109) {
                 checkHover = false;
-                context.fill(139, 93, 155, 109, 0x80FFFFFF);
+                graphics.fill(139, 93, 155, 109, 0x80FFFFFF);
                 float junk = 1 - chance;
                 String number = junk < 0.01 ? "<1" : junk > 0.99 ? ">99" : String.valueOf(Math.round(junk * 100));
                 List<Component> tooltip = List.of(
                     CreateLang.translateDirect("recipe.assembly.junk"),
                     CreateLang.translateDirect("recipe.processing.chance", number).withStyle(ChatFormatting.GOLD)
                 );
-                context.setComponentTooltipForNextFrame(
+                graphics.setComponentTooltipForNextFrame(
                     textRenderer,
                     tooltip,
                     mouseX + position.left(),
@@ -248,13 +246,13 @@ public class SequencedAssemblyView extends CreateView {
                 );
             }
         }
-        AllGuiTextures.JEI_LONG_ARROW.render(context, xOffset + 47, 96);
+        AllGuiTextures.JEI_LONG_ARROW.render(graphics, xOffset + 47, 96);
         if (loops > 1) {
-            AllIcons.I_SEQ_REPEAT.render(context, xOffset + 60, 101);
-            context.text(textRenderer, Component.literal("x" + loops), xOffset + 76, 106, 0xff888888, false);
+            AllIcons.I_SEQ_REPEAT.render(graphics, xOffset + 60, 101);
+            graphics.text(textRenderer, Component.literal("x" + loops), xOffset + 76, 106, 0xff888888, false);
             if (checkHover && mouseX >= 43 && mouseX < 108 && mouseY >= 94 && mouseY < 118) {
                 Component text = CreateLang.translateDirect("recipe.assembly.repeat", loops);
-                context.setTooltipForNextFrame(textRenderer, text, mouseX + position.left(), mouseY + position.top());
+                graphics.setTooltipForNextFrame(textRenderer, text, mouseX + position.left(), mouseY + position.top());
             }
         }
     }

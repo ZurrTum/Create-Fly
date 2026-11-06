@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import cc.cassian.rrv.common.recipe.item.FluidItem;
 import com.zurrtum.create.client.compat.rrv.CreateView;
@@ -74,20 +74,14 @@ public class DrainingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_SHADOW.render(context, 62, 33);
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 73, 0);
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_SHADOW.render(graphics, 62, 33);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 73, 0);
         ItemStack stack = fluidResult.getByIndex(fluidResult.index());
         if (stack.getItem() instanceof FluidItem item) {
-            context.guiRenderState.addPicturesInPictureState(new DrainRenderState(
-                new Matrix3x2f(context.pose()),
+            graphics.guiRenderState.addPicturesInPictureState(new DrainRenderState(
+                new Matrix3x2f(graphics.pose()),
                 item.getFluid(),
                 stack.getComponentsPatch(),
                 75,

@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.MillingCategory;
@@ -67,7 +67,7 @@ public class MillingView extends CreateView {
         int i = 0;
         slotDefinition.addItemSlot(i++, 8, 5);
         for (int j = 0, size = results.size(); j < size; j++) {
-            slotDefinition.addItemSlot(i++, j % 2 == 0 ? 126 : 145, 23 + (j / 2) * -19);
+            slotDefinition.addItemSlot(i++, j % 2 == 0 ? 126 : 145, 23 + j / 2 * -19);
         }
         return i;
     }
@@ -90,19 +90,13 @@ public class MillingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_ARROW.render(context, 78, 28);
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 36, 0);
-        AllGuiTextures.JEI_SHADOW.render(context, 25, 36);
-        context.guiRenderState.addPicturesInPictureState(new MillstoneRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_ARROW.render(graphics, 78, 28);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 36, 0);
+        AllGuiTextures.JEI_SHADOW.render(graphics, 25, 36);
+        graphics.guiRenderState.addPicturesInPictureState(new MillstoneRenderState(
+            new Matrix3x2f(graphics.pose()),
             35,
             15
         ));

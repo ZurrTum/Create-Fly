@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.ManualApplicationCategory;
@@ -79,7 +79,7 @@ public class ManualApplicationView extends CreateView {
             slotDefinition.addItemSlot(i++, 132, 34);
         } else {
             for (int j = 0; j < size; j++) {
-                slotDefinition.addItemSlot(i++, j % 2 == 0 ? 128 : 147, 34 + (j / 2) * -19);
+                slotDefinition.addItemSlot(i++, j % 2 == 0 ? 128 : 147, 34 + j / 2 * -19);
             }
         }
         return i;
@@ -107,21 +107,15 @@ public class ManualApplicationView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_SHADOW.render(context, 67, 48);
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 79, 11);
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_SHADOW.render(graphics, 67, 48);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 79, 11);
         ItemStack stack = target.getByIndex(target.index());
         if (stack.getItem() instanceof BlockItem blockItem) {
             BlockState block = blockItem.getBlock().defaultBlockState();
-            context.guiRenderState.addPicturesInPictureState(new ManualBlockRenderState(
-                new Matrix3x2f(context.pose()),
+            graphics.guiRenderState.addPicturesInPictureState(new ManualBlockRenderState(
+                new Matrix3x2f(graphics.pose()),
                 block,
                 79,
                 30

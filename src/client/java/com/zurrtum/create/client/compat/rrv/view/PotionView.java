@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rrv.CreateView;
@@ -72,28 +72,22 @@ public class PotionView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
         HeatCondition requiredHeat = HeatCondition.HEATED;
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 32);
-        Matrix3x2f pose = new Matrix3x2f(context.pose());
-        AllGuiTextures.JEI_HEAT_BAR.render(context, 0, 80);
-        AllGuiTextures.JEI_LIGHT.render(context, 77, 88);
-        context.guiRenderState.addPicturesInPictureState(new BasinBlazeBurnerRenderState(
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
+        Matrix3x2f pose = new Matrix3x2f(graphics.pose());
+        AllGuiTextures.JEI_HEAT_BAR.render(graphics, 0, 80);
+        AllGuiTextures.JEI_LIGHT.render(graphics, 77, 88);
+        graphics.guiRenderState.addPicturesInPictureState(new BasinBlazeBurnerRenderState(
             pose,
             87,
             69,
             requiredHeat.visualizeAsBlazeBurner()
         ));
-        context.guiRenderState.addPicturesInPictureState(new MixingBasinRenderState(pose, 87, -5));
-        context.text(
-            screen.getFont(),
+        graphics.guiRenderState.addPicturesInPictureState(new MixingBasinRenderState(pose, 87, -5));
+        graphics.text(
+            context.font(),
             CreateLang.translateDirect(requiredHeat.getTranslationKey()),
             5,
             86,

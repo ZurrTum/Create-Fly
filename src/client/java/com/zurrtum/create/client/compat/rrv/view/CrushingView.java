@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.CrushingCategory;
@@ -86,17 +86,11 @@ public class CrushingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 72, 5);
-        context.guiRenderState.addPicturesInPictureState(new CrushWheelRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 72, 5);
+        graphics.guiRenderState.addPicturesInPictureState(new CrushWheelRenderState(
+            new Matrix3x2f(graphics.pose()),
             42,
             22
         ));

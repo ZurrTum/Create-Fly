@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.FanSmokingCategory;
@@ -61,19 +61,13 @@ public class FanSmokingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_SHADOW.render(context, 42, 34);
-        AllGuiTextures.JEI_LIGHT.render(context, 61, 46);
-        AllGuiTextures.JEI_LONG_ARROW.render(context, 50, 58);
-        context.guiRenderState.addPicturesInPictureState(new FanRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_SHADOW.render(graphics, 42, 34);
+        AllGuiTextures.JEI_LIGHT.render(graphics, 61, 46);
+        AllGuiTextures.JEI_LONG_ARROW.render(graphics, 50, 58);
+        graphics.guiRenderState.addPicturesInPictureState(new FanRenderState(
+            new Matrix3x2f(graphics.pose()),
             52,
             11,
             Blocks.FIRE.defaultBlockState()

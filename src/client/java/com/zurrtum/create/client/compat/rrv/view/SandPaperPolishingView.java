@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.SandPaperPolishingCategory;
@@ -61,19 +61,13 @@ public class SandPaperPolishingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_SHADOW.render(context, 61, 23);
-        AllGuiTextures.JEI_LONG_ARROW.render(context, 52, 34);
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_SHADOW.render(graphics, 61, 23);
+        AllGuiTextures.JEI_LONG_ARROW.render(graphics, 52, 34);
         ItemStack stack = ingredient.getByIndex(ingredient.index());
-        context.guiRenderState.addPicturesInPictureState(new SandPaperRenderState(
-            new Matrix3x2f(context.pose()),
+        graphics.guiRenderState.addPicturesInPictureState(new SandPaperRenderState(
+            new Matrix3x2f(graphics.pose()),
             stack,
             74,
             0

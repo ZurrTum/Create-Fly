@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.MechanicalCraftingCategory;
@@ -74,11 +74,11 @@ public class MechanicalCraftingView extends CreateView {
     protected int placeViewSlots(SlotDefinition slotDefinition) {
         int left = 7;
         if (width < 5) {
-            left += (19 * (5 - width)) / 2;
+            left += 19 * (5 - width) / 2;
         }
         int top = 1;
         if (height < 5) {
-            top += (19 * (5 - height)) / 2;
+            top += 19 * (5 - height) / 2;
         }
         int i = 0;
         for (int h = 0; h < height; h++) {
@@ -86,7 +86,7 @@ public class MechanicalCraftingView extends CreateView {
                 if (empty.contains(h * width + w)) {
                     continue;
                 }
-                slotDefinition.addItemSlot(i++, left + 16 * w + (w * 3), top + 16 * h + (h * 3));
+                slotDefinition.addItemSlot(i++, left + 16 * w + w * 3, top + 16 * h + h * 3);
             }
         }
         slotDefinition.addItemSlot(i++, 133, 74);
@@ -104,22 +104,16 @@ public class MechanicalCraftingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 128, 53);
-        AllGuiTextures.JEI_SHADOW.render(context, 113, 32);
-        context.guiRenderState.addPicturesInPictureState(new CrafterRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 128, 53);
+        AllGuiTextures.JEI_SHADOW.render(graphics, 113, 32);
+        graphics.guiRenderState.addPicturesInPictureState(new CrafterRenderState(
+            new Matrix3x2f(graphics.pose()),
             124,
             12
         ));
         String size = String.valueOf(ingredients.size());
-        context.text(screen.getFont(), size, 142, 33, 0xFFFFFFFF, true);
+        graphics.text(context.font(), size, 142, 33, 0xFFFFFFFF, true);
     }
 }

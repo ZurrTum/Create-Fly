@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rrv.CreateView;
@@ -95,7 +95,7 @@ public class MixingView extends CreateView {
         int i = 0;
         for (int size = ingredients.size(), xOffset = size < 3 ? 8 + (3 - size) * 19 / 2 : 8, yOffset =
              size <= 9 ? 51 : 60; i < size; i++) {
-            slotDefinition.addItemSlot(i, xOffset + (i % 3) * 19, yOffset - (i / 3) * 19);
+            slotDefinition.addItemSlot(i, xOffset + i % 3 * 19, yOffset - i / 3 * 19);
         }
         int size = results.size();
         int end = size - 1;
@@ -145,33 +145,27 @@ public class MixingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
         int size = results.size();
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 132, (size <= 4 ? 32 : 41) - (size - 1) / 2 * 19);
-        Matrix3x2f pose = new Matrix3x2f(context.pose());
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 132, (size <= 4 ? 32 : 41) - (size - 1) / 2 * 19);
+        Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         if (heat == HeatCondition.NONE) {
-            AllGuiTextures.JEI_NO_HEAT_BAR.render(context, 0, 80);
-            AllGuiTextures.JEI_SHADOW.render(context, 77, 68);
+            AllGuiTextures.JEI_NO_HEAT_BAR.render(graphics, 0, 80);
+            AllGuiTextures.JEI_SHADOW.render(graphics, 77, 68);
         } else {
-            AllGuiTextures.JEI_HEAT_BAR.render(context, 0, 80);
-            AllGuiTextures.JEI_LIGHT.render(context, 77, 88);
-            context.guiRenderState.addPicturesInPictureState(new BasinBlazeBurnerRenderState(
+            AllGuiTextures.JEI_HEAT_BAR.render(graphics, 0, 80);
+            AllGuiTextures.JEI_LIGHT.render(graphics, 77, 88);
+            graphics.guiRenderState.addPicturesInPictureState(new BasinBlazeBurnerRenderState(
                 pose,
                 87,
                 69,
                 heat.visualizeAsBlazeBurner()
             ));
         }
-        context.guiRenderState.addPicturesInPictureState(new MixingBasinRenderState(pose, 87, -5));
-        context.text(
-            screen.getFont(),
+        graphics.guiRenderState.addPicturesInPictureState(new MixingBasinRenderState(pose, 87, -5));
+        graphics.text(
+            context.font(),
             CreateLang.translateDirect(heat.getTranslationKey()),
             5,
             86,

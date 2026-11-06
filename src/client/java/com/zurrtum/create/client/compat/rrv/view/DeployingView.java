@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.client.compat.rrv.CreateView;
@@ -87,7 +87,7 @@ public class DeployingView extends CreateView {
             slotDefinition.addItemSlot(i++, 132, 53);
         } else {
             for (int j = 0; j < size; j++) {
-                slotDefinition.addItemSlot(i++, j % 2 == 0 ? 122 : 141, 53 + (j / 2) * -19);
+                slotDefinition.addItemSlot(i++, j % 2 == 0 ? 122 : 141, 53 + j / 2 * -19);
             }
         }
         return i;
@@ -115,18 +115,12 @@ public class DeployingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_SHADOW.render(context, 62, 59);
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 126, results.size() <= 2 ? 31 : 12);
-        context.guiRenderState.addPicturesInPictureState(new DeployerRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_SHADOW.render(graphics, 62, 59);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, results.size() <= 2 ? 31 : 12);
+        graphics.guiRenderState.addPicturesInPictureState(new DeployerRenderState(
+            new Matrix3x2f(graphics.pose()),
             75,
             -8
         ));

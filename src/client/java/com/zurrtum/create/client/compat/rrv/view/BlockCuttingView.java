@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.BlockCuttingCategory;
@@ -58,7 +58,7 @@ public class BlockCuttingView extends CreateView {
         slotDefinition.addItemSlot(0, 3, 1);
         int size = results.size();
         for (int i = 0, left = 76, top = 44; i < size; i++) {
-            slotDefinition.addItemSlot(i + 1, left + (i % 5) * 19, top + (i / 5) * -19);
+            slotDefinition.addItemSlot(i + 1, left + i % 5 * 19, top + i / 5 * -19);
         }
         return size + 1;
     }
@@ -74,16 +74,10 @@ public class BlockCuttingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 29, 2);
-        AllGuiTextures.JEI_SHADOW.render(context, 14, 46);
-        context.guiRenderState.addPicturesInPictureState(new SawRenderState(new Matrix3x2f(context.pose()), 23, 22));
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 29, 2);
+        AllGuiTextures.JEI_SHADOW.render(graphics, 14, 46);
+        graphics.guiRenderState.addPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), 23, 22));
     }
 }

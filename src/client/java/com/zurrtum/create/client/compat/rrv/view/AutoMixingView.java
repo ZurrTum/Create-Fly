@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.zurrtum.create.client.compat.rrv.CreateView;
 import com.zurrtum.create.client.compat.rrv.category.AutoMixingCategory;
@@ -58,7 +58,7 @@ public class AutoMixingView extends CreateView {
     protected int placeViewSlots(SlotDefinition slotDefinition) {
         int i = 0;
         for (int size = ingredients.size(), xOffset = size < 3 ? (3 - size) * 19 / 2 : 0; i < size; i++) {
-            slotDefinition.addItemSlot(i, 12 + xOffset + (i % 3) * 19, 48 - (i / 3) * 19);
+            slotDefinition.addItemSlot(i, 12 + xOffset + i % 3 * 19, 48 - i / 3 * 19);
         }
         slotDefinition.addItemSlot(i++, 142, 48);
         return i;
@@ -75,18 +75,12 @@ public class AutoMixingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 136, 29);
-        AllGuiTextures.JEI_SHADOW.render(context, 81, 65);
-        context.guiRenderState.addPicturesInPictureState(new MixingBasinRenderState(
-            new Matrix3x2f(context.pose()),
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 29);
+        AllGuiTextures.JEI_SHADOW.render(graphics, 81, 65);
+        graphics.guiRenderState.addPicturesInPictureState(new MixingBasinRenderState(
+            new Matrix3x2f(graphics.pose()),
             91,
             -8
         ));

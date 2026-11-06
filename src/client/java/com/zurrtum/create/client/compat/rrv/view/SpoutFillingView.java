@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.compat.rrv.view;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
-import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import cc.cassian.rrv.common.recipe.item.FluidItem;
 import com.zurrtum.create.client.compat.rrv.CreateView;
@@ -77,25 +77,19 @@ public class SpoutFillingView extends CreateView {
     }
 
     @Override
-    public void renderRecipe(
-        RecipeViewScreen screen,
-        RecipePosition position,
-        GuiGraphicsExtractor context,
-        int mouseX,
-        int mouseY,
-        float partialTicks
-    ) {
-        AllGuiTextures.JEI_SHADOW.render(context, 62, 55);
-        AllGuiTextures.JEI_DOWN_ARROW.render(context, 126, 27);
+    public void renderRecipe(RecipeScreenContext context) {
+        GuiGraphicsExtractor graphics = context.guiGraphics();
+        AllGuiTextures.JEI_SHADOW.render(graphics, 62, 55);
+        AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, 27);
         ItemStack stack = fluidIngredient.getByIndex(fluidIngredient.index());
         if (stack.getItem() instanceof FluidItem item) {
             int i = idGenerator.getAndIncrement();
             if (i >= MAX) {
                 idGenerator.set(0);
             }
-            context.guiRenderState.addPicturesInPictureState(new SpoutRenderState(
+            graphics.guiRenderState.addPicturesInPictureState(new SpoutRenderState(
                 i,
-                new Matrix3x2f(context.pose()),
+                new Matrix3x2f(graphics.pose()),
                 item.getFluid(),
                 stack.getComponentsPatch(),
                 75,
