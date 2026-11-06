@@ -22,8 +22,10 @@ import com.zurrtum.create.content.fluids.tank.FluidTankBlock;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlock;
 import com.zurrtum.create.content.kinetics.fan.NozzleBlock;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
+import com.zurrtum.create.content.logistics.packagerLink.PackagerLinkBlock;
 import com.zurrtum.create.content.logistics.vault.ItemVaultBlock;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlock;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.station.StationBlock;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import net.minecraft.core.BlockPos;
@@ -210,7 +212,7 @@ public class BlockMovementChecksImpl {
         if (block instanceof BasePressurePlateBlock) {
             return true;
         }
-        if (block instanceof FaceAttachedHorizontalDirectionalBlock && !(block instanceof GrindstoneBlock)/* && !(block instanceof PackagerLinkBlock)*/) {
+        if (block instanceof FaceAttachedHorizontalDirectionalBlock && !(block instanceof GrindstoneBlock) && !(block instanceof PackagerLinkBlock)) {
             return true;
         }
         if (block instanceof CartAssemblerBlock) {
@@ -348,8 +350,9 @@ public class BlockMovementChecksImpl {
                     pos.relative(direction)), direction.getOpposite()
             );
         }
-        //        if (block instanceof AbstractBogeyBlock<?> bogey)
-        //            return bogey.getStickySurfaces(world, pos, state).contains(direction);
+        if (block instanceof AbstractBogeyBlock<?> bogey) {
+            return bogey.getStickySurfaces(world, pos, state).contains(direction);
+        }
         if (block instanceof WhistleBlock) {
             return direction == (state.getValue(WhistleBlock.WALL) ? state.getValue(WhistleBlock.FACING) :
                 Direction.DOWN);
@@ -377,7 +380,7 @@ public class BlockMovementChecksImpl {
         if (state.is(AllBlocks.PORTABLE_STORAGE_INTERFACE)) {
             return state.getValue(PortableStorageInterfaceBlock.FACING) == facing;
         }
-        if (state.getBlock() instanceof AttachedActorBlock/* && !state.isOf(AllBlocks.MECHANICAL_ROLLER)*/) {
+        if (state.getBlock() instanceof AttachedActorBlock && !state.is(AllBlocks.MECHANICAL_ROLLER)) {
             return state.getValue(BlockStateProperties.HORIZONTAL_FACING) == facing;
         }
         if (state.is(AllBlocks.ROPE_PULLEY)) {
