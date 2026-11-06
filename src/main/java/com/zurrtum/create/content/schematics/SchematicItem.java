@@ -147,7 +147,7 @@ public class SchematicItem extends Item {
             return nbt;
         }
         String prefix = dir.relativize(file).toString();
-        prefix = dir.relativize(file).toString().substring(0, prefix.length() - 4);
+        prefix = prefix.substring(0, prefix.length() - 4);
         CompoundTag updated = DataFixTypes.STRUCTURE.update(
             DataFixers.getDataFixer(),
             nbt,
