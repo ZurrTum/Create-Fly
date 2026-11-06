@@ -64,8 +64,9 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient,
             potionContents = PotionContents.EMPTY;
         }
         FluidStack result = PotionFluidHandler.getFluidStack(81000, potionContents, type);
+        Identifier id = entry.key().identifier();
         RecipeLoader.addRecipe(
-            Identifier.fromNamespaceAndPath(MOD_ID, entry.key().identifier().getPath()),
+            Identifier.fromNamespaceAndPath(MOD_ID, id.getNamespace() + "/" + id.getPath()),
             new PotionRecipe(result, fluidIngredient, ingredient)
         );
     }
