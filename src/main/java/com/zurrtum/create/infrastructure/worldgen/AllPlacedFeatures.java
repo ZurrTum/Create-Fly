@@ -43,8 +43,12 @@ public class AllPlacedFeatures {
         int index,
         List<Holder<PlacedFeature>> entries
     ) {
-        registryManager.lookupOrThrow(Registries.LEVEL_STEM).getValue(options).generator().getBiomeSource()
-            .possibleBiomes().stream().map(Holder::value).map(Biome::getGenerationSettings).forEach(settings -> {
+        LevelStem levelStem = registryManager.lookupOrThrow(Registries.LEVEL_STEM).getValue(options);
+        if (levelStem == null) {
+            return;
+        }
+        levelStem.generator().getBiomeSource().possibleBiomes().stream().map(Holder::value)
+            .map(Biome::getGenerationSettings).forEach(settings -> {
                 if (!(settings.features instanceof ArrayList<HolderSet<PlacedFeature>>)) {
                     settings.features = new ArrayList<>(settings.features);
                 }
