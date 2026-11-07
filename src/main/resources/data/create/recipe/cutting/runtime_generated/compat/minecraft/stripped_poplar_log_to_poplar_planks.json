@@ -1,0 +1,11 @@
+{
+  "processing_time": 50,
+  "results": [
+    {
+      "id": "minecraft:poplar_planks",
+      "count": 6
+    }
+  ],
+  "ingredient": "minecraft:stripped_poplar_log",
+  "type": "create:cutting"
+}

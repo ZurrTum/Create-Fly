@@ -1,0 +1,11 @@
+{
+  "processing_time": 50,
+  "results": [
+    {
+      "id": "minecraft:poplar_slab",
+      "count": 2
+    }
+  ],
+  "ingredient": "minecraft:poplar_planks",
+  "type": "create:cutting"
+}

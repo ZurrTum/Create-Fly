@@ -1,0 +1,10 @@
+{
+  "processing_time": 50,
+  "results": [
+    {
+      "id": "minecraft:poplar_button"
+    }
+  ],
+  "ingredient": "minecraft:poplar_planks",
+  "type": "create:cutting"
+}

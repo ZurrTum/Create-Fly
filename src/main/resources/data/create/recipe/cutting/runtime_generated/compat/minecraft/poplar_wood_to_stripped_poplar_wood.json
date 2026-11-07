@@ -1,0 +1,10 @@
+{
+  "processing_time": 50,
+  "results": [
+    {
+      "id": "minecraft:stripped_poplar_wood"
+    }
+  ],
+  "ingredient": "minecraft:poplar_wood",
+  "type": "create:cutting"
+}
