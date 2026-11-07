@@ -3,6 +3,7 @@
     {
       "id": "#c:fence_gates/wooden",
       "required": false
-    }
+    },
+    "#minecraft:fence_gates"
   ]
 }

@@ -16,6 +16,7 @@
     {
       "id": "#c:flowers/tall",
       "required": false
-    }
+    },
+    "#minecraft:flowers"
   ]
 }

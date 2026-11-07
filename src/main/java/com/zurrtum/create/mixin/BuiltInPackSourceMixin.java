@@ -40,9 +40,9 @@ public class BuiltInPackSourceMixin {
                 List<Path> paths = mod.getRootPaths();
                 addDataPack(
                     result,
-                    createInfo("fabric-convention-tags-v2", "Fabric Convention Tags (v2)", "2.15.2+d9a8963096"),
+                    createInfo("fabric-convention-tags-v2", "Fabric Convention Tags (v2)", "4.10.5+187b64905d"),
                     paths,
-                    Component.nullToEmpty("fabric-convention-tags-v2-2.15.2+d9a8963096"),
+                    Component.literal("fabric-convention-tags-v2-4.10.5+187b64905d"),
                     directory + "/fabric",
                     "c"
                 );
@@ -88,7 +88,7 @@ public class BuiltInPackSourceMixin {
     private static PackLocationInfo createInfo(String id, String name, String version) {
         return new PackLocationInfo(
             id,
-            Component.nullToEmpty(name),
+            Component.literal(name),
             PackSource.BUILT_IN,
             Optional.of(new KnownPack(id, "data", version))
         );

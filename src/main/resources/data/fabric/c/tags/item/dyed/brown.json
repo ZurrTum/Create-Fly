@@ -5,6 +5,8 @@
     "minecraft:brown_candle",
     "minecraft:brown_carpet",
     "minecraft:brown_concrete",
+    "minecraft:brown_concrete_slab",
+    "minecraft:brown_concrete_stairs",
     "minecraft:brown_concrete_powder",
     "minecraft:brown_glazed_terracotta",
     "minecraft:brown_shulker_box",
@@ -12,7 +14,10 @@
     "minecraft:brown_stained_glass_pane",
     "minecraft:brown_terracotta",
     "minecraft:brown_wool",
+    "minecraft:brown_wool_slab",
+    "minecraft:brown_wool_stairs",
     "minecraft:brown_bundle",
+    "minecraft:brown_cushion",
     "minecraft:brown_harness"
   ]
 }

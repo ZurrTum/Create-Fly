@@ -16,9 +16,12 @@
     "minecraft:iron_axe",
     "minecraft:diamond_axe",
     "minecraft:netherite_axe",
-    {
-      "id": "#c:tools/melee_weapons",
-      "required": false
-    }
+    "minecraft:wooden_spear",
+    "minecraft:stone_spear",
+    "minecraft:copper_spear",
+    "minecraft:iron_spear",
+    "minecraft:golden_spear",
+    "minecraft:diamond_spear",
+    "minecraft:netherite_spear"
   ]
 }

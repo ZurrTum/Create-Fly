@@ -7,6 +7,7 @@
     {
       "id": "#c:fences/nether_brick",
       "required": false
-    }
+    },
+    "#minecraft:fences"
   ]
 }

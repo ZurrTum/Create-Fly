@@ -5,11 +5,8 @@
     "minecraft:birch_forest",
     "minecraft:old_growth_birch_forest",
     "minecraft:dark_forest",
+    "minecraft:dappled_forest",
     "minecraft:pale_garden",
-    "minecraft:windswept_forest",
-    {
-      "id": "#c:tree_deciduous",
-      "required": false
-    }
+    "minecraft:windswept_forest"
   ]
 }
