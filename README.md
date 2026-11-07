@@ -43,8 +43,9 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 - Please do not report issues with this mod to simibubi and NeoForge Create.
 - Please do not use old game saves. Because data loading changes, data may be lost.
-- Recommended to use REI or JEI or EIV to view recipes, and please report any game crashes.
+- Recommended to use REI or JEI or RRV or EIV to view recipes, and please report any game crashes.
 - Using shaders will disable Flywheel optimizations.
+- For more related Mods, please follow [Discord](https://discord.gg/epCQxp9fcy).
 
 ### 4. TODO List
 
@@ -84,8 +85,10 @@ repositories {
 }
 
 dependencies {
-    // 26.2-rc-2
-    implementation "maven.modrinth:create-fly:26.2-rc-2-6.0.9-1"
+    // 26.3
+    implementation "maven.modrinth:create-fly:26.3-6.0.9-2"
+    // 26.2
+    implementation "maven.modrinth:create-fly:26.2-6.0.9-2"
     // 26.1.2
     implementation "maven.modrinth:create-fly:26.1.2-6.0.9-4"
     // 1.21.11
@@ -114,8 +117,10 @@ repositories {
 }
 
 dependencies {
-    // 26.2-rc-2
-    implementation "curse.maven:create-fly-1346281:8245554-sources-8245556"
+    // 26.3
+    implementation "curse.maven:create-fly-1346281:9486174-sources-9486189"
+    // 26.2
+    implementation "curse.maven:create-fly-1346281:9165009-sources-9165012"
     // 26.1.2
     implementation "curse.maven:create-fly-1346281:8250336-sources-8250341"
     // 1.21.11
