@@ -55,6 +55,8 @@ public interface Engine {
 
     void onLightUpdate(SectionPos sectionPos, LightLayer layer);
 
+    void flush();
+
     /**
      * Render all instances necessary for the given visual type.
      *

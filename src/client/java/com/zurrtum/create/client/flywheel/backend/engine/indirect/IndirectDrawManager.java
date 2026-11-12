@@ -68,10 +68,14 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <I extends Instance> void initialize(InstancerKey<I> key, IndirectInstancer<?> instancer) {
+    protected <I extends Instance> void initialize(
+        InstancerKey<I> key,
+        IndirectInstancer<?> instancer,
+        GpuTextureManager textureManager
+    ) {
         var group = (IndirectCullingGroup<I>) cullingGroups.computeIfAbsent(
             key.type(),
-            t -> new IndirectCullingGroup<>(t, programs)
+            t -> new IndirectCullingGroup<>(t, programs, textureManager)
         );
         group.add((IndirectInstancer<I>) instancer, key, meshPool);
     }

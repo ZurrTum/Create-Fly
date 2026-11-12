@@ -87,6 +87,16 @@ public class EngineImpl implements Engine {
     }
 
     @Override
+    public void flush() {
+        try {
+            drawManager.flush();
+        } catch (Exception e) {
+            FlwBackend.LOGGER.error("Falling back", e);
+            triggerFallback();
+        }
+    }
+
+    @Override
     public void render(RenderContext context) {
         try (var state = GlStateTracker.getRestoreState()) {
             // Process the render queue for font updates

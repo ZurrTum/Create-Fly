@@ -8,6 +8,7 @@ import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.backend.compile.ContextShader;
 import com.zurrtum.create.client.flywheel.backend.compile.IndirectPrograms;
 import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler;
+import com.zurrtum.create.client.flywheel.backend.engine.GpuTextureManager;
 import com.zurrtum.create.client.flywheel.backend.engine.InstancerKey;
 import com.zurrtum.create.client.flywheel.backend.engine.MaterialRenderState;
 import com.zurrtum.create.client.flywheel.backend.engine.MeshPool;
@@ -36,6 +37,7 @@ public class IndirectCullingGroup<I extends Instance> {
     private final IndirectBuffers buffers;
     private final List<IndirectInstancer<I>> instancers = new ArrayList<>();
     private final List<IndirectDraw> indirectDraws = new ArrayList<>();
+    private final GpuTextureManager textureManager;
     private final List<MultiDraw> multiDraws = new ArrayList<>();
     private final List<MultiDraw> oitDraws = new ArrayList<>();
 
@@ -46,13 +48,14 @@ public class IndirectCullingGroup<I extends Instance> {
     private boolean needsDrawSort;
     private int instanceCountThisFrame;
 
-    IndirectCullingGroup(InstanceType<I> instanceType, IndirectPrograms programs) {
+    IndirectCullingGroup(InstanceType<I> instanceType, IndirectPrograms programs, GpuTextureManager textureManager) {
         this.instanceType = instanceType;
         instanceStride = MoreMath.align4(instanceType.layout().byteSize());
         buffers = new IndirectBuffers(instanceStride);
 
         this.programs = programs;
         cullProgram = programs.getCullingProgram(instanceType);
+        this.textureManager = textureManager;
     }
 
     public boolean flushInstancers() {
@@ -161,7 +164,7 @@ public class IndirectCullingGroup<I extends Instance> {
             var entry = meshes.get(i);
 
             MeshPool.PooledMesh mesh = meshPool.alloc(entry.mesh());
-            var draw = new IndirectDraw(instancer, entry.material(), mesh, key.bias(), i);
+            var draw = new IndirectDraw(instancer, textureManager, entry.material(), mesh, key.bias(), i);
             indirectDraws.add(draw);
             instancer.addDraw(draw);
         }

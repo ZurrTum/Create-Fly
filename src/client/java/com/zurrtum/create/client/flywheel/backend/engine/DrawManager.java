@@ -37,6 +37,8 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
      */
     protected final Queue<UninitializedInstancer<N, ?>> initializationQueue = new ConcurrentLinkedQueue<>();
 
+    protected final GpuTextureManager textureManager = new GpuTextureManager();
+
     /**
      * Function object to pass into computeIfAbsent.
      * <p>Create once and cache to avoid allocating every time.
@@ -62,18 +64,22 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
         return ForEachPlan.of(() -> new ArrayList<>(instancers.values()), AbstractInstancer::parallelUpdate);
     }
 
-    public void render(LightStorage lightStorage, EnvironmentStorage environmentStorage) {
+    public void flush() {
         // Thread safety: flush is called from the render thread after all visual updates have been made,
         // so there are no:tm: threads we could be racing with.
         for (var init : initializationQueue) {
             var instancer = init.instancer();
             if (instancer.instanceCount() > 0) {
-                initialize(init.key(), instancer);
+                initialize(init.key(), instancer, textureManager);
             } else {
                 instancers.remove(init.key());
             }
         }
         initializationQueue.clear();
+        textureManager.prepare();
+    }
+
+    public void render(LightStorage lightStorage, EnvironmentStorage environmentStorage) {
     }
 
     public void onRenderOriginChanged() {
@@ -84,7 +90,11 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
 
     protected abstract <I extends Instance> N create(InstancerKey<I> type);
 
-    protected abstract <I extends Instance> void initialize(InstancerKey<I> key, N instancer);
+    protected abstract <I extends Instance> void initialize(
+        InstancerKey<I> key,
+        N instancer,
+        GpuTextureManager textureManager
+    );
 
     private N createAndDeferInit(InstancerKey<?> key) {
         var out = create(key);

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
 import com.zurrtum.create.client.flywheel.api.material.Material;
+import com.zurrtum.create.client.flywheel.backend.engine.GpuTextureManager;
 import com.zurrtum.create.client.flywheel.backend.engine.MaterialEncoder;
 import com.zurrtum.create.client.flywheel.backend.engine.MeshPool;
 import com.zurrtum.create.client.flywheel.backend.engine.embed.EmbeddedEnvironment;
@@ -8,6 +9,7 @@ import org.lwjgl.system.MemoryUtil;
 
 public class IndirectDraw {
     private final IndirectInstancer<?> instancer;
+    private final GpuTextureManager textureManager;
     private final Material material;
     private final MeshPool.PooledMesh mesh;
     private final int bias;
@@ -19,18 +21,21 @@ public class IndirectDraw {
 
     public IndirectDraw(
         IndirectInstancer<?> instancer,
+        GpuTextureManager textureManager,
         Material material,
         MeshPool.PooledMesh mesh,
         int bias,
         int indexOfMeshInModel
     ) {
         this.instancer = instancer;
+        this.textureManager = textureManager;
         this.material = material;
         this.mesh = mesh;
         this.bias = bias;
         this.indexOfMeshInModel = indexOfMeshInModel;
 
         mesh.acquire();
+        textureManager.add(material);
 
         packedFogAndCutout = MaterialEncoder.packUberShader(material);
         packedMaterialProperties = MaterialEncoder.packProperties(material);
@@ -96,6 +101,7 @@ public class IndirectDraw {
         }
 
         mesh.release();
+        textureManager.remove(material);
 
         deleted = true;
     }

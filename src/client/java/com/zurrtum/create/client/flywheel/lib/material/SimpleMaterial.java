@@ -1,8 +1,11 @@
 package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.UnknownNullability;
 
 public class SimpleMaterial implements Material {
     protected final MaterialShaders shaders;
@@ -25,6 +28,8 @@ public class SimpleMaterial implements Material {
     protected final CardinalLightingMode cardinalLightingMode;
 
     protected final boolean ambientOcclusion;
+
+    protected @UnknownNullability AbstractTexture gpuTexture;
 
     protected SimpleMaterial(Builder builder) {
         shaders = builder.shaders();
@@ -76,6 +81,15 @@ public class SimpleMaterial implements Material {
     @Override
     public Identifier texture() {
         return texture;
+    }
+
+    public AbstractTexture gpuTexture() {
+        return gpuTexture;
+    }
+
+    @Override
+    public void prepareTexture(TextureManager textureManager) {
+        gpuTexture = textureManager.getTexture(texture);
     }
 
     @Override
@@ -310,6 +324,11 @@ public class SimpleMaterial implements Material {
         @Override
         public Identifier texture() {
             return texture;
+        }
+
+        @Override
+        public AbstractTexture gpuTexture() {
+            throw new UnsupportedOperationException();
         }
 
         @Override

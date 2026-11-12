@@ -267,7 +267,9 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
         frameLimiter.tick();
 
-        lateInit().framePlan.execute(taskExecutor, context);
+        LateInit lateInit = lateInit();
+        lateInit.framePlan.execute(taskExecutor, context);
+        lateInit.engine.flush();
     }
 
     /**

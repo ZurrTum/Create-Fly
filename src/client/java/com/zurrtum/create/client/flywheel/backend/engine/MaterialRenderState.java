@@ -14,7 +14,6 @@ import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.material.Transparency;
 import com.zurrtum.create.client.flywheel.api.material.WriteMask;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -49,7 +48,7 @@ public final class MaterialRenderState {
 
     private static void setupTexture(Material material) {
         Samplers.DIFFUSE.makeActive();
-        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(material.texture());
+        AbstractTexture texture = material.gpuTexture();
         GlTexture glTexture = (GlTexture) texture.getTexture();
         int target;
         if ((glTexture.usage() & 16) != 0) {

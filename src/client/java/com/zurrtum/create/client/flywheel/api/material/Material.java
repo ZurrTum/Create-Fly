@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
@@ -13,6 +15,11 @@ public interface Material {
     LightShader light();
 
     Identifier texture();
+
+    AbstractTexture gpuTexture();
+
+    default void prepareTexture(TextureManager textureManager) {
+    }
 
     /**
      * Should this material have linear filtering applied to the diffuse sampler?

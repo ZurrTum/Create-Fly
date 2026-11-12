@@ -213,7 +213,11 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     }
 
     @Override
-    protected <I extends Instance> void initialize(InstancerKey<I> key, InstancedInstancer<?> instancer) {
+    protected <I extends Instance> void initialize(
+        InstancerKey<I> key,
+        InstancedInstancer<?> instancer,
+        GpuTextureManager textureManager
+    ) {
         instancer.init();
 
         var meshes = key.model().meshes();
@@ -222,7 +226,15 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
             var mesh = meshPool.alloc(entry.mesh());
 
             GroupKey<?> groupKey = new GroupKey<>(key.type(), key.environment());
-            InstancedDraw instancedDraw = new InstancedDraw(instancer, mesh, groupKey, entry.material(), key.bias(), i);
+            InstancedDraw instancedDraw = new InstancedDraw(
+                instancer,
+                mesh,
+                groupKey,
+                textureManager,
+                entry.material(),
+                key.bias(),
+                i
+            );
 
             allDraws.add(instancedDraw);
             needSort = true;
