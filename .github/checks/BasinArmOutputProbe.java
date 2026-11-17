@@ -9,6 +9,7 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -30,6 +31,21 @@ public class BasinArmOutputProbe implements DedicatedServerModInitializer {
             ArmBlockEntity arm = new ArmBlockEntity(pos.above(), AllBlocks.MECHANICAL_ARM.defaultBlockState());
             arm.setLevel(level);
             ArmInteractionPoint point = AllArmInteractionPointTypes.BASIN.createPoint(level, pos, level.getBlockState(pos));
+            check("basin selected output observation", () -> {
+                basin.itemCapability.setItem(0, new ItemStack(Items.QUARTZ, 8));
+                basin.itemCapability.setItem(9, new ItemStack(Items.GRANITE, 8));
+                ItemStack preview = point.extract(arm, 9, 1, true);
+                ItemStack actual = point.extract(arm, 9, 1, false);
+                System.out.println("BASIN_ARM_OUTPUT_OBS requestedSlot=9 simulatedItem="
+                    + BuiltInRegistries.ITEM.getKey(preview.getItem()) + " actualItem="
+                    + BuiltInRegistries.ITEM.getKey(actual.getItem()) + " inputRemaining="
+                    + basin.itemCapability.getItem(0).getCount() + " outputRemaining="
+                    + basin.itemCapability.getItem(9).getCount());
+                expect(actual.is(Items.GRANITE) && actual.getCount() == 1, "wrong basin output extracted");
+                expect(preview.is(Items.GRANITE) && preview.getCount() == 1, "wrong basin output preview");
+                expect(basin.itemCapability.getItem(0).getCount() == 8, "basin observation changed ingredient");
+                expect(basin.itemCapability.getItem(9).getCount() == 7, "basin observation did not extract output");
+            });
             check("basin outputs only", () -> {
                 basin.itemCapability.setItem(0, new ItemStack(Items.QUARTZ, 8));
                 basin.itemCapability.setItem(9, new ItemStack(Items.GRANITE, 8));
