@@ -1015,10 +1015,7 @@ public abstract class Contraption {
         updateTags.clear();
         isLegacy.clear();
 
-        HashMapPalette<BlockState> palette = new HashMapPalette<>(
-            16,
-            view.read("Palette", CreateCodecs.BLOCK_STATE_LIST_CODEC).orElseGet(ArrayList::new)
-        );
+        HashMapPalette<BlockState> palette = new HashMapPalette<>(16, readPalette(view));
 
         boolean isServer = !world.isClientSide();
         view.childrenListOrEmpty("BlockList").forEach(c -> {
@@ -1044,6 +1041,30 @@ public abstract class Contraption {
             isLegacy.put(info.pos(), legacy);
         });
         AllClientHandle.INSTANCE.resetClientContraption(this);
+    }
+
+    private static List<BlockState> readPalette(ValueInput view) {
+        List<CompoundTag> entries = view.read("Palette", CompoundTag.CODEC.listOf()).orElseGet(ArrayList::new);
+        List<BlockState> states = new ArrayList<>(entries.size());
+        for (CompoundTag entry : entries) {
+            CompoundTag tag = entry;
+            if (!tag.contains("id") && tag.contains("Name")) {
+                tag = entry.copy();
+                tag.put("id", tag.get("Name"));
+                tag.remove("Name");
+                if (tag.contains("Properties")) {
+                    tag.put("properties", tag.get("Properties"));
+                    tag.remove("Properties");
+                }
+            }
+            CompoundTag decoded = tag;
+            states.add(BlockState.CODEC.parse(NbtOps.INSTANCE, decoded).resultOrPartial(error -> LOGGER.warn(
+                "Contraption palette entry {} could not be read, using air: {}",
+                decoded,
+                error
+            )).orElseGet(Blocks.AIR::defaultBlockState));
+        }
+        return states;
     }
 
     private static StructureBlockInfo readStructureBlockInfo(ValueInput view, HashMapPalette<BlockState> palette) {
