@@ -19,8 +19,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class BearingRecoveryProbe implements DedicatedServerModInitializer {
     private static final BlockPos ORPHAN_POS = new BlockPos(228, 120, 228);
     private static final BlockPos CONTROL_POS = new BlockPos(234, 120, 228);
+    private static final BlockPos WINDMILL_POS = new BlockPos(228, 120, 234);
     private MechanicalBearingBlockEntity orphan;
     private MechanicalBearingBlockEntity control;
+    private MechanicalBearingBlockEntity emptyWindmill;
+    private boolean windmillStopped;
     private CreativeMotorBlockEntity orphanMotor;
     private int ticks;
     private int phase;
@@ -56,7 +59,7 @@ public class BearingRecoveryProbe implements DedicatedServerModInitializer {
             control = place(level, CONTROL_POS);
             orphanMotor = (CreativeMotorBlockEntity) level.getBlockEntity(ORPHAN_POS.below());
             nextPhase();
-        } else if (phase == 1 && ticks - phaseStarted >= 20) {
+        } else if (phase == 1 && ticks - phaseStarted >= 20 && level.getGameTime() % 20 == 19) {
             require(orphan.getSpeed() != 0 && control.getSpeed() != 0, "motors did not power bearings");
             require(orphan.getMovedContraption() == null && control.getMovedContraption() == null,
                 "empty fixtures unexpectedly assembled");
@@ -70,10 +73,34 @@ public class BearingRecoveryProbe implements DedicatedServerModInitializer {
             require(orphan != null, "vanilla block entity loader rejected fixture");
             level.setBlockEntity(orphan);
             require(orphan.isRunning() && orphan.getMovedContraption() == null, "saved orphan state was not loaded");
+            level.setBlockAndUpdate(WINDMILL_POS.above(), Blocks.AIR.defaultBlockState());
+            level.setBlockAndUpdate(WINDMILL_POS, AllBlocks.WINDMILL_BEARING.defaultBlockState()
+                .setValue(BearingBlock.FACING, Direction.UP));
+            var windmill = level.getBlockEntity(WINDMILL_POS);
+            CompoundTag windmillSave = windmill.saveWithFullMetadata(level.registryAccess());
+            windmillSave.putBoolean("Running", true);
+            windmillSave.putFloat("LastGenerated", 8);
+            windmillSave.putFloat("Speed", 8);
+            windmillSave.putBoolean("NeedsSpeedUpdate", false);
+            emptyWindmill = (MechanicalBearingBlockEntity) BlockEntity.loadStatic(WINDMILL_POS,
+                windmill.getBlockState(), windmillSave, level.registryAccess());
+            require(emptyWindmill != null, "vanilla block entity loader rejected empty windmill");
+            level.setBlockEntity(emptyWindmill);
+            require(emptyWindmill.isRunning() && emptyWindmill.getMovedContraption() == null
+                && emptyWindmill.getGeneratedSpeed() == 8 && emptyWindmill.getTheoreticalSpeed() == 8
+                && level.isPositionEntityTicking(WINDMILL_POS), "empty windmill did not load saved rotation");
             control.onSpeedChanged(0);
             System.out.println("BEARING_RECOVERY_SETUP savedRunning=true entity=false speed=" + orphan.getSpeed()
                 + " entityTicking=" + level.isPositionEntityTicking(ORPHAN_POS));
             nextPhase();
+        } else if (phase == 2 && ticks - phaseStarted == 1) {
+            // Check the recovery tick before periodic kinetic validation can drop stale speed.
+            windmillStopped = !emptyWindmill.isRunning() && emptyWindmill.getMovedContraption() == null
+                && emptyWindmill.getGeneratedSpeed() == 0 && emptyWindmill.getTheoreticalSpeed() == 0;
+            System.out.println("BEARING_RECOVERY_WINDMILL running=" + emptyWindmill.isRunning()
+                + " generatedSpeed=" + emptyWindmill.getGeneratedSpeed()
+                + " theoreticalSpeed=" + emptyWindmill.getTheoreticalSpeed());
+            require(windmillStopped, "empty windmill retained stale speed after recovery");
         } else if (phase == 2 && ticks - phaseStarted >= 120) {
             boolean sourcePresent = level.getBlockState(ORPHAN_POS.above()).is(Blocks.STONE);
             boolean ticking = level.isPositionEntityTicking(ORPHAN_POS);
@@ -105,7 +132,7 @@ public class BearingRecoveryProbe implements DedicatedServerModInitializer {
             done = true;
             System.out.println("BEARING_RECOVERY_PROBE_RESULT reproduced=" + reproduced
                 + " automaticRecovery=" + recovered
-                + " ordinaryAssembly=" + assemblyControl + " powerOff=" + stoppedControl
+                + " windmillStopped=" + windmillStopped + " ordinaryAssembly=" + assemblyControl + " powerOff=" + stoppedControl
                 + " powerCycleAssembly=" + powerCycleControl + " unexpected=false");
         }
     }

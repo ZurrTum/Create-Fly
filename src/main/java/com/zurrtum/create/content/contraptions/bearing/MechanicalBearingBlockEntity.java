@@ -251,6 +251,9 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         // without this it stays "running" with nothing attached and never assembles again while powered
         if (!level.isClientSide() && running && movedContraption == null && level.getGameTime() % 20 == 0 && lostContraption()) {
             running = false;
+            if (isWindmill()) {
+                updateGeneratedRotation();
+            }
             assembleNextTick = true;
             sendData();
         }
