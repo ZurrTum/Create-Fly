@@ -89,7 +89,15 @@ public class AllArmInteractionPointTypes {
 
         @Override
         public ArmInteractionPoint createPoint(Level level, BlockPos pos, BlockState state) {
-            return new ArmInteractionPoint(this, level, pos, state);
+            return new ArmInteractionPoint(this, level, pos, state) {
+                @Override
+                public ItemStack extract(ArmBlockEntity arm, int slot, int amount, boolean simulate) {
+                    if (slot < 9) {
+                        return ItemStack.EMPTY;
+                    }
+                    return super.extract(arm, slot, amount, simulate);
+                }
+            };
         }
     }
 
