@@ -104,11 +104,6 @@ public class CartAssemblerBlock extends BaseRailBlock implements IBE<CartAssembl
     }
 
     @Override
-    public boolean isStraight() {
-        return false;
-    }
-
-    @Override
     public void onMinecartPass(BlockState state, Level world, BlockPos pos, AbstractMinecart cart) {
         if (!canAssembleTo(cart)) {
             return;
