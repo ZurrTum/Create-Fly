@@ -42,7 +42,7 @@ public class GenericItemFilling {
             return PotionFluidHandler.getRequiredAmountForFilledBottle(stack, availableFluid);
         }
 
-        try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack)) {
+        try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copyWithCount(1))) {
             if (capability == null) {
                 return -1;
             }
