@@ -261,4 +261,8 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         setPosRaw(x, y, z);
         this.angle = prevAngle = angle;
     }
+
+    public @Nullable BlockPos getControllerPos() {
+        return controllerPos;
+    }
 }
