@@ -16,6 +16,7 @@ import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelBakery;
+import org.lwjgl.system.MemoryUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
         depthPyramid = new DepthPyramid(programs);
 
         oitFramebuffer = new OitFramebuffer(programs.oitPrograms());
+        crumblingDrawBuffer.upload(MemoryUtil.NULL, IndirectBuffers.DRAW_COMMAND_STRIDE);
     }
 
     @Override
@@ -268,7 +270,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
 
                         // Upload the draw command.
                         draw.writeWithOverrides(block.ptr(), instanceIndex, crumblingMaterial);
-                        crumblingDrawBuffer.upload(block);
+                        crumblingDrawBuffer.uploadSpan(0, block);
 
                         // Submit! Everything is already bound by here.
                         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
