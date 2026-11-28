@@ -64,6 +64,7 @@ layout (location = 0) out vec4 _flw_accumulate;
 
 #endif
 
+#elif defined(OIT)
 #else
 
 layout (location = 0) out vec4 _flw_outputColor;
@@ -95,9 +96,13 @@ void _flw_main() {
     #ifdef _FLW_CRUMBLING
     vec4 crumblingSampleColor = texture(_flw_crumblingTex, _flw_crumblingTexCoord);
 
+    #ifndef OIT
     // Make the crumbling overlay transparent when the fragment color after the material shader is transparent.
     flw_fragColor.rgb = crumblingSampleColor.rgb;
     flw_fragColor.a *= crumblingSampleColor.a;
+    #else
+    flw_fragColor = crumblingSampleColor * flw_vertexColor;
+    #endif
     #endif
 
     flw_shaderLight();
@@ -119,10 +124,12 @@ void _flw_main() {
     }
 
     vec4 lightColor = vec4(1.);
+    #ifndef OIT_ALPHA_ONLY
     if (flw_material.useLight) {
         lightColor = texture(flw_lightTex, clamp(flw_fragLight + 0.5 / 16.0, 0.5 / 16.0, 15.5 / 16.0));
         color *= lightColor;
     }
+    #endif
 
     #ifdef _FLW_DEBUG
     switch (_flw_debugMode) {
@@ -150,8 +157,6 @@ void _flw_main() {
     }
     #endif
 
-    color = flw_fogFilter(color);
-
     #ifdef _FLW_OIT
 
     float linearDepth = linear_depth();
@@ -170,6 +175,7 @@ void _flw_main() {
 
     float depth_adjustment = tented_blue_noise(our_depth) * _flw_oitNoise;
 
+    color = flw_fogFilter(color);
     float our_transmittance = 1. - color.a;
     // Don't do the depth adjustment if this fragment is opaque.
     if (our_transmittance > 1e-5) {
@@ -198,13 +204,21 @@ void _flw_main() {
 
     float transmittance = signal_corrected_transmittance(_flw_coefficients, our_depth, our_transmittance);
 
+    color = flw_fogFilter(color);
     _flw_accumulate = vec4(color.rgb * color.a, color.a) * transmittance;
 
     #endif
 
+    #elif defined(OIT)
+    #ifdef OIT_ALPHA_ONLY
+    executeAlphaOnlyPhase(gl_FragCoord.z, color.a);
+    #elif defined(OIT_ACCUMULATE)
+    color = sampleColorForAccumulation(color);
+    _flw_accumulate = flw_fogFilter(color);
+    #endif
     #else
 
-    _flw_outputColor = color;
+    _flw_outputColor = flw_fogFilter(color);
 
     #endif
 }

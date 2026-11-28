@@ -14,4 +14,9 @@ public class Samplers {
     public static final GlTextureUnit DEPTH_RANGE = GlTextureUnit.T7;
     public static final GlTextureUnit COEFFICIENTS = GlTextureUnit.T8;
     public static final GlTextureUnit NOISE = GlTextureUnit.T9;
+
+    public static final GlTextureUnit COEFF0 = GlTextureUnit.T8;
+    public static final GlTextureUnit COEFF1 = GlTextureUnit.T9;
+    public static final GlTextureUnit COEFF2 = GlTextureUnit.T10;
+    public static final GlTextureUnit COEFF3 = GlTextureUnit.T11;
 }

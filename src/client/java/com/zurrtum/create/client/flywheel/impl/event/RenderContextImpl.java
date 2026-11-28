@@ -1,16 +1,14 @@
 package com.zurrtum.create.client.flywheel.impl.event;
 
-import com.zurrtum.create.client.flywheel.api.backend.Engine.CrumblingBlock;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.oit.OitStage;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
 
 public class RenderContextImpl implements RenderContext {
     public LevelRenderState levelRenderState;
@@ -18,31 +16,31 @@ public class RenderContextImpl implements RenderContext {
     public Matrix4f viewProjection;
     public float partialTick;
     public @Nullable VisualizationManager visualizationManager;
-    public ObjectArrayList<CrumblingBlock> crumblingBlocks;
+    private boolean useClassicTransparency;
 
     public RenderContextImpl(LevelRenderState levelRenderState) {
         this.levelRenderState = levelRenderState;
         projection = levelRenderState.cameraRenderState.projectionMatrix;
         viewProjection = new Matrix4f();
-        crumblingBlocks = new ObjectArrayList<>();
     }
 
     public void update(@Nullable ClientLevel level, float partialTick) {
         visualizationManager = VisualizationManager.get(level);
         if (visualizationManager != null) {
-            crumblingBlocks.clear();
-            visualizationManager.collectCrumblingBlocks(levelRenderState.blockBreakingRenderStates, crumblingBlocks);
             this.partialTick = partialTick;
         }
     }
 
     public void updateProjection(Matrix4fc projection) {
-        this.projection = projection;
-        viewProjection.set(projection).mul(levelRenderState.cameraRenderState.viewRotationMatrix);
+        if (visualizationManager != null) {
+            this.projection = projection;
+            viewProjection.set(projection).mul(levelRenderState.cameraRenderState.viewRotationMatrix);
+        }
     }
 
-    public void onStartLevelRender() {
+    public void onStartLevelRender(boolean useImprovedTransparency) {
         if (visualizationManager != null) {
+            useClassicTransparency = !useImprovedTransparency;
             visualizationManager.renderDispatcher().onStartLevelRender(this);
         }
     }
@@ -50,6 +48,17 @@ public class RenderContextImpl implements RenderContext {
     public void afterSolid() {
         if (visualizationManager != null) {
             visualizationManager.renderDispatcher().afterSolid(this);
+        }
+    }
+
+    public void executeOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews
+    ) {
+        if (visualizationManager != null) {
+            visualizationManager.renderDispatcher()
+                .executeOit(stage, depthBoundsCulledTargetView, transmittanceTargetViews);
         }
     }
 
@@ -74,13 +83,13 @@ public class RenderContextImpl implements RenderContext {
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
     public VisualizationManager visualizationManager() {
+        assert visualizationManager != null;
         return visualizationManager;
     }
 
     @Override
-    public List<CrumblingBlock> crumblingBlocks() {
-        return crumblingBlocks;
+    public boolean useClassicTransparency() {
+        return useClassicTransparency;
     }
 }

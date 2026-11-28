@@ -12,23 +12,12 @@ import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.gl.GlTextureUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.resources.Identifier;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL33C;
 
 public class TextureBinder {
-    public static void bind(Identifier Identifier) {
-        GlStateManager._bindTexture(byName(Identifier));
-    }
-
-    public static void bindCrumbling(Identifier Identifier) {
-        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(Identifier);
-        setupTexture(Samplers.CRUMBLING, texture.getTextureView(), texture.getSampler());
-    }
-
     public static void bindLightAndOverlay() {
         GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
         GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
@@ -36,7 +25,7 @@ public class TextureBinder {
         setupTexture(Samplers.LIGHT, gameRenderer.lightmap(), sampler);
     }
 
-    private static void setupTexture(GlTextureUnit unit, GpuTextureView textureView, GpuSampler sampler) {
+    public static void setupTexture(GlTextureUnit unit, GpuTextureView textureView, GpuSampler sampler) {
         unit.makeActive();
         GlTexture texture = (GlTexture) textureView.texture();
         int target;
@@ -51,18 +40,5 @@ public class TextureBinder {
         int mipLevel = textureView.baseMipLevel();
         GlStateManager._texParameter(target, GL12.GL_TEXTURE_BASE_LEVEL, mipLevel);
         GlStateManager._texParameter(target, GL12.GL_TEXTURE_MAX_LEVEL, mipLevel + textureView.mipLevels() - 1);
-    }
-
-    public static void resetLightAndOverlay() {
-    }
-
-    /**
-     * Get a built-in texture by its resource location.
-     *
-     * @param texture The texture's resource location.
-     * @return The texture.
-     */
-    public static int byName(Identifier texture) {
-        return ((GlTexture) Minecraft.getInstance().getTextureManager().getTexture(texture).getTexture()).glId();
     }
 }

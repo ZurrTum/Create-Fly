@@ -31,6 +31,7 @@ public class InstancedInstancer<I extends Instance> extends BaseInstancer<I> {
         writer = type.writer();
     }
 
+    @Override
     public List<InstancedDraw> draws() {
         return draws;
     }

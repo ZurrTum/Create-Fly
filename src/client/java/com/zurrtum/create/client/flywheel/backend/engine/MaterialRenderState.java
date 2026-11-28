@@ -185,49 +185,6 @@ public final class MaterialRenderState {
         GlStateManager._colorMask(mask.color());
     }
 
-    public static void reset() {
-        resetTexture();
-        resetBackfaceCulling();
-        resetPolygonOffset();
-        resetDepthTest();
-        resetTransparency();
-        resetWriteMask();
-    }
-
-    private static void resetTexture() {
-        GL33C.glBindSampler(Samplers.DIFFUSE.number, 0);
-        Samplers.DIFFUSE.makeActive();
-    }
-
-    private static void resetBackfaceCulling() {
-        GlStateManager._enableCull();
-    }
-
-    private static void resetPolygonOffset() {
-        GlStateManager._polygonOffset(0.0F, 0.0F);
-        GlStateManager._disablePolygonOffset();
-    }
-
-    private static void resetDepthTest() {
-        GlStateManager._disableDepthTest();
-        GlStateManager._depthFunc(GL11.GL_GEQUAL);
-    }
-
-    private static void resetTransparency() {
-        GlStateManager._disableBlend(0);
-        GlStateManager._blendFuncSeparate(
-            GlConst.GL_SRC_ALPHA,
-            GlConst.GL_ONE_MINUS_SRC_ALPHA,
-            GlConst.GL_ONE,
-            GlConst.GL_ZERO
-        );
-    }
-
-    private static void resetWriteMask() {
-        GlStateManager._depthMask(true);
-        GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
-    }
-
     public static boolean materialEquals(Material lhs, Material rhs) {
         if (lhs == rhs) {
             return true;

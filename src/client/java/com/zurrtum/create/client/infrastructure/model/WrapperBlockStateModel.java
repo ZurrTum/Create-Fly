@@ -96,6 +96,7 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
         random.setSeed(seed);
         BlockStateRenderModel renderModel = BlockStateRenderModel.create();
         model.addPartsWithInfo(world, pos, state, random, renderModel.parts);
+        renderModel.materialFlags = model.materialFlags();
         return renderModel;
     }
 
@@ -176,6 +177,7 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
     private static class BlockStateRenderModel implements BlockStateModel {
         private static final Deque<BlockStateRenderModel> pool = new ArrayDeque<>();
         private final List<BlockStateModelPart> parts = new ObjectArrayList<>();
+        private int materialFlags;
         private boolean recycle = true;
 
         public static BlockStateRenderModel create() {
@@ -209,7 +211,7 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
 
         @Override
         public int materialFlags() {
-            return 0;
+            return materialFlags;
         }
     }
 }

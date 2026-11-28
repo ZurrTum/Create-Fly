@@ -16,4 +16,10 @@ public class CommonCrumbling {
             .writeMask(WriteMask.COLOR).useOverlay(false).useLight(false)
             .cardinalLightingMode(CardinalLightingMode.OFF);
     }
+
+    public static void applyOitCrumblingProperties(SimpleMaterial.Builder crumblingMaterial, Material baseMaterial) {
+        crumblingMaterial.copyFrom(baseMaterial).fog(FogShaders.NONE).cutout(CutoutShaders.ONE_TENTH)
+            .light(LightShaders.SMOOTH_WHEN_EMBEDDED).writeMask(WriteMask.COLOR).useOverlay(false).useLight(false)
+            .cardinalLightingMode(CardinalLightingMode.OFF);
+    }
 }

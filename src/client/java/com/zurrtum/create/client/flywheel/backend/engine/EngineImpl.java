@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.backend.Engine;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -17,6 +18,7 @@ import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorag
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.Uniforms;
 import com.zurrtum.create.client.flywheel.backend.gl.GlStateTracker;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.client.renderer.oit.OitStage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -87,9 +89,10 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void flush() {
+    public void flush(CrumblingBlockManager crumblingBlockManager, RenderContext context) {
         try {
             drawManager.flush();
+            crumblingBlockManager.prepare(drawManager, context);
         } catch (Exception e) {
             FlwBackend.LOGGER.error("Falling back", e);
             triggerFallback();
@@ -97,12 +100,16 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void render(RenderContext context) {
+    public void render(CrumblingBlockManager crumblingBlockManager, RenderContext context) {
         try (var state = GlStateTracker.getRestoreState()) {
             // Process the render queue for font updates
             Uniforms.update(context);
             environmentStorage.flush();
             drawManager.render(lightStorage, environmentStorage);
+            if (context.useClassicTransparency()) {
+                drawManager.renderClassicTransparency();
+            }
+            drawManager.renderCrumbling(crumblingBlockManager, context);
         } catch (Exception e) {
             FlwBackend.LOGGER.error("Falling back", e);
             triggerFallback();
@@ -110,9 +117,14 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void renderCrumbling(RenderContext context) {
-        try (var state = GlStateTracker.getRestoreState()) {
-            drawManager.renderCrumbling(context.crumblingBlocks());
+    public void renderOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews,
+        CrumblingBlockManager crumblingBlockManager
+    ) {
+        try {
+            drawManager.renderOit(stage, depthBoundsCulledTargetView, transmittanceTargetViews, crumblingBlockManager);
         } catch (Exception e) {
             FlwBackend.LOGGER.error("Falling back", e);
             triggerFallback();

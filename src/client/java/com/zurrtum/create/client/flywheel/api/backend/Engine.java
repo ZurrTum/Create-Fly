@@ -1,18 +1,15 @@
 package com.zurrtum.create.client.flywheel.api.backend;
 
-import com.zurrtum.create.client.flywheel.api.instance.Instance;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.task.Plan;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
+import com.zurrtum.create.client.flywheel.backend.engine.CrumblingBlockManager;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.client.renderer.oit.OitStage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.LightLayer;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Range;
-
-import java.util.List;
 
 @BackendImplemented
 public interface Engine {
@@ -55,28 +52,25 @@ public interface Engine {
 
     void onLightUpdate(SectionPos sectionPos, LightLayer layer);
 
-    void flush();
+    void flush(CrumblingBlockManager crumblingBlockManager, RenderContext context);
 
     /**
      * Render all instances necessary for the given visual type.
      *
      * <p>This method is guaranteed to be called after
-     * {@linkplain #createFramePlan() the frame plan} has finished execution and before
-     * {@link #renderCrumbling} are called. This method is guaranteed to be called on the render thread.
+     * {@linkplain #createFramePlan() the frame plan} has finished execution.
+     * This method is guaranteed to be called on the render thread.
      *
      * @param context The context for the current level render.
      */
-    void render(RenderContext context);
+    void render(CrumblingBlockManager crumblingBlockManager, RenderContext context);
 
-    /**
-     * Render the given instances as a crumbling overlay.
-     *
-     * <p>This method is guaranteed to be called after {@link #render} for the current
-     * level render. This method is guaranteed to be called on the render thread.
-     *
-     * @param context The context for the current level render.
-     */
-    void renderCrumbling(RenderContext context);
+    void renderOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews,
+        CrumblingBlockManager crumblingBlockManager
+    );
 
     /**
      * Free all resources associated with this engine.
@@ -86,26 +80,4 @@ public interface Engine {
      * <p>This method is guaranteed to be called on the render thread.
      */
     void delete();
-
-    /**
-     * A block to be rendered as a crumbling overlay.
-     */
-    @ApiStatus.NonExtendable
-    interface CrumblingBlock {
-        /**
-         * The position of the block.
-         */
-        BlockPos pos();
-
-        /**
-         * The progress of the crumbling animation in the range [0, 10).
-         */
-        @Range(from = 0L, to = 9L)
-        int progress();
-
-        /**
-         * The instances associated with the block entity visual at this position.
-         */
-        List<Instance> instances();
-    }
 }

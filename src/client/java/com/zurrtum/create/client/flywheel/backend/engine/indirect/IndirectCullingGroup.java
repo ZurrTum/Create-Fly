@@ -7,7 +7,7 @@ import com.zurrtum.create.client.flywheel.api.material.Transparency;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.backend.compile.ContextShader;
 import com.zurrtum.create.client.flywheel.backend.compile.IndirectPrograms;
-import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler;
+import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler.OitMode;
 import com.zurrtum.create.client.flywheel.backend.engine.GpuTextureManager;
 import com.zurrtum.create.client.flywheel.backend.engine.InstancerKey;
 import com.zurrtum.create.client.flywheel.backend.engine.MaterialRenderState;
@@ -188,7 +188,7 @@ public class IndirectCullingGroup<I extends Instance> {
                 instanceType,
                 multiDraw.embedded ? ContextShader.EMBEDDED : ContextShader.DEFAULT,
                 multiDraw.material,
-                PipelineCompiler.OitMode.OFF
+                OitMode.OFF
             );
             if (drawProgram != lastProgram) {
                 lastProgram = drawProgram;
@@ -203,7 +203,7 @@ public class IndirectCullingGroup<I extends Instance> {
         }
     }
 
-    public void submitTransparent(PipelineCompiler.OitMode oit) {
+    public void submitTransparent(OitMode oit) {
         if (oitDraws.isEmpty()) {
             return;
         }
@@ -236,13 +236,8 @@ public class IndirectCullingGroup<I extends Instance> {
         }
     }
 
-    public void bindForCrumbling(Material material) {
-        var program = programs.getIndirectProgram(
-            instanceType,
-            ContextShader.CRUMBLING,
-            material,
-            PipelineCompiler.OitMode.OFF
-        );
+    public void bindForCrumbling(Material material, OitMode mode) {
+        var program = programs.getIndirectProgram(instanceType, ContextShader.CRUMBLING, material, mode);
 
         program.bind();
 

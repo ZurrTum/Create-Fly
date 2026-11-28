@@ -115,6 +115,8 @@ accessible field net/minecraft/client/renderer/state/level/QuadParticleRenderSta
 accessible field net/minecraft/client/renderer/state/level/QuadParticleRenderState$Storage intValues [I
 accessible field net/minecraft/client/resources/model/cuboid/CuboidModel GSON Lcom/google/gson/Gson;
 accessible field net/minecraft/client/resources/model/ModelBakery BREAKING_LOCATIONS Ljava/util/List;
+accessible field net/minecraft/client/resources/model/ModelBakery BREAKING_LOCATIONS_OIT Ljava/util/List;
+accessible field net/minecraft/client/resources/model/ModelBakery DESTROY_STAGE_COUNT I
 accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLASS Ljava/util/Map;
 accessible field net/minecraft/core/component/DataComponentPatch map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
 accessible field net/minecraft/core/component/PatchedDataComponentMap patch Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;

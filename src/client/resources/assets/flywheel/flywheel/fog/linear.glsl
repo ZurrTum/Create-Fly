@@ -14,7 +14,11 @@ float totalFogValue(float sphericalVertexDistance, float cylindricalVertexDistan
 
 vec4 linearFog(vec4 color, float sphericalVertexDistance, float cylindricalVertexDistance, float environmentalStart, float environmantalEnd, float renderDistanceStart, float renderDistanceEnd, vec4 fogColor) {
     float fogValue = totalFogValue(sphericalVertexDistance, cylindricalVertexDistance, environmentalStart, environmantalEnd, renderDistanceStart, renderDistanceEnd);
+    #ifdef OIT_ACCUMULATE
+    return vec4(mix(color.rgb, fogColor.rgb * color.a, fogValue * fogColor.a), color.a);
+    #else
     return vec4(mix(color.rgb, fogColor.rgb, fogValue * fogColor.a), color.a);
+    #endif
 }
 
 vec4 flw_fogFilter(vec4 color) {

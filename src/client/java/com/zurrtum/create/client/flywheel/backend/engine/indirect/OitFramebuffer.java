@@ -3,14 +3,19 @@ package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.mojang.renderpearl.backend.opengl.*;
 import com.mojang.renderpearl.frontend.FrontendGpuDevice;
 import com.zurrtum.create.client.flywheel.backend.NoiseTextures;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.compile.OitPrograms;
+import com.zurrtum.create.client.flywheel.backend.engine.TextureBinder;
 import com.zurrtum.create.client.flywheel.backend.gl.GlCompat;
 import com.zurrtum.create.client.flywheel.backend.gl.GlTextureUnit;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import org.lwjgl.opengl.*;
 
 import java.util.Collections;
@@ -82,7 +87,7 @@ public class OitFramebuffer {
         GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
         GlStateManager._enableBlend(0);
         GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
-        GL14.glBlendEquation(GL32.GL_MAX);
+        GlStateManager._blendEquationSeparate(GlConst.GL_MAX, GlConst.GL_MAX);
 
         var far = Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState.depthFar;
 
@@ -96,6 +101,13 @@ public class OitFramebuffer {
         }
     }
 
+    public static void vanillaDepthRange() {
+        GlStateManager._depthMask(false);
+        GlStateManager._enableBlend(0);
+        GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
+        GlStateManager._blendEquationSeparate(GlConst.GL_MAX, GlConst.GL_MAX);
+    }
+
     /**
      * Generate the coefficients to the transmittance function.
      */
@@ -104,8 +116,11 @@ public class OitFramebuffer {
         GlStateManager._depthMask(false);
         GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
         GlStateManager._enableBlend(0);
+        GlStateManager._enableBlend(1);
+        GlStateManager._enableBlend(2);
+        GlStateManager._enableBlend(3);
         GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
-        GL14.glBlendEquation(GL32.GL_FUNC_ADD);
+        GlStateManager._blendEquationSeparate(GlConst.GL_FUNC_ADD, GlConst.GL_FUNC_ADD);
 
         if (GlCompat.SUPPORTS_DSA) {
             GL46.glNamedFramebufferDrawBuffers(fbo, RENDER_TRANSMITTANCE_DRAW_BUFFERS);
@@ -119,6 +134,23 @@ public class OitFramebuffer {
             GL11.glClearColor(0, 0, 0, 0);
             GlStateManager._clear(GL32.GL_COLOR_BUFFER_BIT);
         }
+    }
+
+    public static void vanillaTransmittance(GpuTextureView depthBoundsCulledTargetView) {
+        GlStateManager._depthMask(false);
+        GlStateManager._enableBlend(0);
+        int oitCoefficientCount = LevelRenderer.OIT_COEFFICIENT_COUNT;
+        if (oitCoefficientCount > 4) {
+            GlStateManager._enableBlend(1);
+        }
+        if (oitCoefficientCount > 8) {
+            GlStateManager._enableBlend(2);
+            GlStateManager._enableBlend(3);
+        }
+        GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
+        GlStateManager._blendEquationSeparate(GlConst.GL_FUNC_ADD, GlConst.GL_FUNC_ADD);
+        GpuSampler nearestSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
+        TextureBinder.setupTexture(Samplers.DEPTH_RANGE, depthBoundsCulledTargetView, nearestSampler);
     }
 
     /**
@@ -152,7 +184,7 @@ public class OitFramebuffer {
         GlStateManager._colorMask(ColorTargetState.WRITE_ALL);
         GlStateManager._enableBlend(0);
         GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
-        GL14.glBlendEquation(GL32.GL_FUNC_ADD);
+        GlStateManager._blendEquationSeparate(GlConst.GL_FUNC_ADD, GlConst.GL_FUNC_ADD);
 
         if (GlCompat.SUPPORTS_DSA) {
             GL46.glNamedFramebufferDrawBuffers(fbo, ACCUMULATE_DRAW_BUFFERS);
@@ -163,6 +195,27 @@ public class OitFramebuffer {
             GL11.glClearColor(0, 0, 0, 0);
             GlStateManager._clear(GL32.GL_COLOR_BUFFER_BIT);
         }
+    }
+
+    public static void vanillaAccumulate(
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews
+    ) {
+        GlStateManager._depthMask(false);
+        GlStateManager._enableBlend(0);
+        GlStateManager._blendFuncSeparate(GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE, GlConst.GL_ONE);
+        GlStateManager._blendEquationSeparate(GlConst.GL_FUNC_ADD, GlConst.GL_FUNC_ADD);
+        GpuSampler nearestSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
+        TextureBinder.setupTexture(Samplers.COEFF0, transmittanceTargetViews[0], nearestSampler);
+        int oitCoefficientCount = LevelRenderer.OIT_COEFFICIENT_COUNT;
+        if (oitCoefficientCount > 4) {
+            TextureBinder.setupTexture(Samplers.COEFF1, transmittanceTargetViews[1], nearestSampler);
+        }
+        if (oitCoefficientCount > 8) {
+            TextureBinder.setupTexture(Samplers.COEFF2, transmittanceTargetViews[2], nearestSampler);
+            TextureBinder.setupTexture(Samplers.COEFF3, transmittanceTargetViews[3], nearestSampler);
+        }
+        TextureBinder.setupTexture(Samplers.DEPTH_RANGE, depthBoundsCulledTargetView, nearestSampler);
     }
 
     /**

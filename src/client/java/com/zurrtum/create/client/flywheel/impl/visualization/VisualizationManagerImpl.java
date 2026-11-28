@@ -1,10 +1,9 @@
 package com.zurrtum.create.client.flywheel.impl.visualization;
 
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.backend.BackendManager;
 import com.zurrtum.create.client.flywheel.api.backend.Engine;
-import com.zurrtum.create.client.flywheel.api.backend.Engine.CrumblingBlock;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
-import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.task.Plan;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visual.Effect;
@@ -12,6 +11,7 @@ import com.zurrtum.create.client.flywheel.api.visual.TickableVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualManager;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationLevel;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
+import com.zurrtum.create.client.flywheel.backend.engine.CrumblingBlockManager;
 import com.zurrtum.create.client.flywheel.backend.engine.EngineImpl;
 import com.zurrtum.create.client.flywheel.impl.FlwConfig;
 import com.zurrtum.create.client.flywheel.impl.task.Flag;
@@ -29,25 +29,19 @@ import com.zurrtum.create.client.flywheel.lib.task.SimplePlan;
 import com.zurrtum.create.client.flywheel.lib.util.LevelAttached;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.state.level.BlockBreakingRenderState;
+import net.minecraft.client.renderer.oit.OitStage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Contract;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A manager class for a single level where visualization is supported.
@@ -72,6 +66,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
     private final VisualManagerImpl<BlockEntity, BlockEntityStorage> blockEntities;
     private final VisualManagerImpl<Entity, EntityStorage> entities;
     private final VisualManagerImpl<Effect, EffectStorage> effects;
+    private final CrumblingBlockManager crumblingBlockManager;
 
     private final Flag frameFlag = new Flag("frame");
     private final Flag tickFlag = new Flag("tick");
@@ -84,6 +79,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
         blockEntities = new VisualManagerImpl<>(new BlockEntityStorage());
         entities = new VisualManagerImpl<>(new EntityStorage());
         effects = new VisualManagerImpl<>(new EffectStorage());
+        crumblingBlockManager = new CrumblingBlockManager(blockEntities.getStorage());
 
         if (level instanceof Level l) {
             l.getEntities().getAll().forEach(entities::queueAdd);
@@ -269,7 +265,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
         LateInit lateInit = lateInit();
         lateInit.framePlan.execute(taskExecutor, context);
-        lateInit.engine.flush();
+        lateInit.engine.flush(crumblingBlockManager, context);
     }
 
     /**
@@ -277,50 +273,20 @@ public class VisualizationManagerImpl implements VisualizationManager {
      */
     private void render(RenderContext context) {
         taskExecutor.syncUntil(frameFlag::isRaised);
-        lateInit().engine.render(context);
+        lateInit().engine.render(crumblingBlockManager, context);
     }
 
-    @Override
-    public void collectCrumblingBlocks(
-        List<BlockBreakingRenderState> destructionProgress,
-        List<CrumblingBlock> crumblingBlocks
+    private void renderOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews
     ) {
-        if (destructionProgress.isEmpty()) {
-            return;
-        }
-        for (BlockBreakingRenderState entry : destructionProgress) {
-            BlockState state = entry.blockState();
-
-            if (state.getRenderShape() == RenderShape.MODEL) {
-                BlockPos pos = entry.blockPos();
-
-                var visual = blockEntities.getStorage().visualAtPos(pos.asLong());
-
-                if (visual == null) {
-                    // The block doesn't have a visual, this is probably the common case.
-                    continue;
-                }
-
-                List<Instance> instances = new ArrayList<>();
-
-                visual.collectCrumblingInstances(instance -> {
-                    if (instance != null) {
-                        instances.add(instance);
-                    }
-                });
-
-                if (instances.isEmpty()) {
-                    // The visual doesn't want to render anything crumbling.
-                    continue;
-                }
-
-                crumblingBlocks.add(new CrumblingBlockImpl(pos, entry.progress(), instances));
-            }
-        }
-    }
-
-    private void renderCrumbling(RenderContext context) {
-        lateInit().engine.renderCrumbling(context);
+        lateInit().engine.renderOit(
+            stage,
+            depthBoundsCulledTargetView,
+            transmittanceTargetViews,
+            crumblingBlockManager
+        );
     }
 
     public void onLightUpdate(SectionPos sectionPos, LightLayer layer) {
@@ -372,10 +338,15 @@ public class VisualizationManagerImpl implements VisualizationManager {
         @Override
         public void afterSolid(RenderContext ctx) {
             render(ctx);
-            renderCrumbling(ctx);
         }
-    }
 
-    private record CrumblingBlockImpl(BlockPos pos, int progress, List<Instance> instances) implements CrumblingBlock {
+        @Override
+        public void executeOit(
+            OitStage stage,
+            GpuTextureView depthBoundsCulledTargetView,
+            GpuTextureView[] transmittanceTargetViews
+        ) {
+            renderOit(stage, depthBoundsCulledTargetView, transmittanceTargetViews);
+        }
     }
 }

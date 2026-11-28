@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
-import com.mojang.datafixers.util.Pair;
-import com.zurrtum.create.client.flywheel.api.backend.Engine;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
@@ -11,12 +10,13 @@ import com.zurrtum.create.client.flywheel.backend.FlwBackend;
 import com.zurrtum.create.client.flywheel.backend.engine.embed.Environment;
 import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorage;
 import com.zurrtum.create.client.flywheel.lib.task.ForEachPlan;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.oit.OitStage;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
@@ -79,14 +79,25 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
         textureManager.prepare();
     }
 
-    public void render(LightStorage lightStorage, EnvironmentStorage environmentStorage) {
-    }
+    public abstract void render(LightStorage lightStorage, EnvironmentStorage environmentStorage);
+
+    public abstract void renderClassicTransparency();
+
+    public abstract void renderOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews,
+        CrumblingBlockManager crumblingBlockManager
+    );
 
     public void onRenderOriginChanged() {
         instancers.values().forEach(AbstractInstancer::clear);
     }
 
-    public abstract void renderCrumbling(List<Engine.CrumblingBlock> crumblingBlocks);
+    @Nullable
+    public abstract N cast(InstanceHandleImpl.State<?> state);
+
+    public abstract void renderCrumbling(CrumblingBlockManager crumblingBlockManager, RenderContext context);
 
     protected abstract <I extends Instance> N create(InstancerKey<I> type);
 
@@ -138,47 +149,6 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
         }
 
         return true;
-    }
-
-    @FunctionalInterface
-    protected interface State2Instancer<I extends AbstractInstancer<?>> {
-        // I tried using a plain Function<State<?>, I> here, but it exploded with type errors.
-        @Nullable I apply(InstanceHandleImpl.State<?> state);
-    }
-
-    protected static <I extends AbstractInstancer<?>> Map<GroupKey<?>, Int2ObjectMap<List<Pair<I, InstanceHandleImpl<?>>>>> doCrumblingSort(
-        List<Engine.CrumblingBlock> crumblingBlocks,
-        State2Instancer<I> cast
-    ) {
-        Map<GroupKey<?>, Int2ObjectMap<List<Pair<I, InstanceHandleImpl<?>>>>> byType = new HashMap<>();
-        for (Engine.CrumblingBlock block : crumblingBlocks) {
-            int progress = block.progress();
-
-            if (progress < 0 || progress >= ModelBakery.DESTROY_TYPES.size()) {
-                continue;
-            }
-
-            for (Instance instance : block.instances()) {
-                // Filter out instances that weren't created by this engine.
-                // If all is well, we probably shouldn't take the `continue`
-                // branches but better to do checked casts.
-                if (!(instance.handle() instanceof InstanceHandleImpl<?> impl)) {
-                    continue;
-                }
-
-                var instancer = cast.apply(impl.state);
-
-                if (instancer == null) {
-                    continue;
-                }
-
-                byType.computeIfAbsent(
-                    new GroupKey<>(instancer.type, instancer.environment),
-                    $ -> new Int2ObjectArrayMap<>()
-                ).computeIfAbsent(progress, $ -> new ArrayList<>()).add(Pair.of(instancer, impl));
-            }
-        }
-        return byType;
     }
 
     public void delete() {

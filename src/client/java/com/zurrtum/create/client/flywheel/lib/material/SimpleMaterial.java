@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 public class SimpleMaterial implements Material {
@@ -168,6 +169,7 @@ public class SimpleMaterial implements Material {
         protected CardinalLightingMode cardinalLightingMode;
 
         protected boolean ambientOcclusion;
+        protected @Nullable AbstractTexture gpuTexture;
 
         @SuppressWarnings("deprecation")
         public Builder() {
@@ -210,6 +212,7 @@ public class SimpleMaterial implements Material {
             useLight = material.useLight();
             cardinalLightingMode = material.cardinalLightingMode();
             ambientOcclusion = material.ambientOcclusion();
+            gpuTexture = material.gpuTexture();
             return this;
         }
 
@@ -328,7 +331,10 @@ public class SimpleMaterial implements Material {
 
         @Override
         public AbstractTexture gpuTexture() {
-            throw new UnsupportedOperationException();
+            if (gpuTexture == null) {
+                throw new UnsupportedOperationException();
+            }
+            return gpuTexture;
         }
 
         @Override

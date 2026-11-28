@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.flywheel.backend.compile;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.device.DeviceInfo;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.api.material.LightShader;
 import com.zurrtum.create.client.flywheel.api.material.Material;
@@ -10,6 +12,7 @@ import com.zurrtum.create.client.flywheel.backend.MaterialShaderIndices;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.compile.component.InstanceStructComponent;
 import com.zurrtum.create.client.flywheel.backend.compile.component.UberShaderComponent;
+import com.zurrtum.create.client.flywheel.backend.compile.core.Compilation;
 import com.zurrtum.create.client.flywheel.backend.compile.core.CompilationHarness;
 import com.zurrtum.create.client.flywheel.backend.compile.core.Compile;
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.FrameUniforms;
@@ -24,9 +27,12 @@ import com.zurrtum.create.client.flywheel.backend.glsl.generate.FnSignature;
 import com.zurrtum.create.client.flywheel.backend.glsl.generate.GlslExpr;
 import com.zurrtum.create.client.flywheel.lib.material.CutoutShaders;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.resources.Identifier;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public final class PipelineCompiler {
     private static final Set<PipelineCompiler> ALL = Collections.newSetFromMap(new WeakHashMap<>());
@@ -144,10 +150,7 @@ public final class PipelineCompiler {
                         comp.define("_FLW_USE_DISCARD");
                     }
                 }).onCompile((key, comp) -> {
-                    if (key.oit() != OitMode.OFF) {
-                        comp.define("_FLW_OIT");
-                        comp.define(key.oit().define);
-                    }
+                    key.oit().onCompile(comp);
                 }).withResource(API_IMPL_FRAG).withResource(key -> key.materialShaders().fragmentSource())
                 .withComponents(fragmentComponents).withComponent(key -> FOG).withResource(key -> key.light().source())
                 .with((key, fetcher) -> key.useCutout() ? CUTOUT : fetcher.get(CutoutShaders.OFF.source()))
@@ -166,9 +169,7 @@ public final class PipelineCompiler {
                 program.setSamplerBinding("flw_diffuseTex", Samplers.DIFFUSE);
                 program.setSamplerBinding("flw_overlayTex", Samplers.OVERLAY);
                 program.setSamplerBinding("flw_lightTex", Samplers.LIGHT);
-                program.setSamplerBinding("_flw_depthRange", Samplers.DEPTH_RANGE);
-                program.setSamplerBinding("_flw_coefficients", Samplers.COEFFICIENTS);
-                program.setSamplerBinding("_flw_blueNoise", Samplers.NOISE);
+                key.oit().onBinding(program);
                 pipeline.onLink().accept(program);
                 key.contextShader().onLink(program);
 
@@ -208,18 +209,96 @@ public final class PipelineCompiler {
     }
 
     public enum OitMode {
-        OFF("", ""),
-        DEPTH_RANGE("_FLW_DEPTH_RANGE", "_depth_range"),
-        GENERATE_COEFFICIENTS("_FLW_COLLECT_COEFFS", "_generate_coefficients"),
-        EVALUATE("_FLW_EVALUATE", "_resolve"),
+        OFF("", "", OitMode::none, OitMode::none),
+        DEPTH_RANGE("_FLW_DEPTH_RANGE", "_depth_range", OitMode::flwDefine, OitMode::flwSampler),
+        GENERATE_COEFFICIENTS("_FLW_COLLECT_COEFFS", "_generate_coefficients", OitMode::flwDefine, OitMode::flwSampler),
+        EVALUATE("_FLW_EVALUATE", "_resolve", OitMode::flwDefine, OitMode::flwSampler),
+        VANILLA_DEPTH_BOUNDS("OIT_DEPTH_BOUNDS", "_vanilla_depth_bounds", OitMode::vanillaDefine, OitMode::none),
+        VANILLA_TRANSMITTANCE(
+            "OIT_TRANSMITTANCE",
+            "_vanilla_transmittance",
+            OitMode::vanillaDefine,
+            OitMode::vanillaTransmittanceSampler
+        ),
+        VANILLA_ACCUMULATE(
+            "OIT_ACCUMULATE",
+            "_vanilla_accumulate",
+            OitMode::vanillaDefine,
+            OitMode::vanillaAccumulateSampler
+        ),
         ;
 
         public final String define;
         public final String name;
+        private final BiConsumer<Compilation, OitMode> onCompile;
+        private final Consumer<GlProgram> onBinding;
 
-        OitMode(String define, String name) {
+        OitMode(String define, String name, BiConsumer<Compilation, OitMode> onCompile, Consumer<GlProgram> onBinding) {
             this.define = define;
             this.name = name;
+            this.onCompile = onCompile;
+            this.onBinding = onBinding;
+        }
+
+        private void onCompile(Compilation comp) {
+            onCompile.accept(comp, this);
+        }
+
+        private void onBinding(GlProgram program) {
+            onBinding.accept(program);
+        }
+
+        private static void none(Compilation comp, OitMode oit) {
+        }
+
+        private static void none(GlProgram program) {
+        }
+
+        private static void vanillaDefine(Compilation comp, OitMode oit) {
+            comp.define("OIT");
+            comp.define("OIT_WAVELET_RANK", Integer.toString(LevelRenderer.OIT_WAVELET_RANK));
+            comp.define("OIT_COEFF_COUNT", Integer.toString(LevelRenderer.OIT_COEFFICIENT_COUNT));
+            comp.define("OIT_COEFF_ATTACHMENT_COUNT", Integer.toString(LevelRenderer.OIT_TRANSMITTANCE_TARGET_COUNT));
+            String define = oit.define;
+            if (!define.equals("OIT_ACCUMULATE")) {
+                comp.define("OIT_ALPHA_ONLY");
+            }
+            DeviceInfo deviceInfo = RenderSystem.getDevice().getDeviceInfo();
+            if (deviceInfo.isZZeroToOne()) {
+                comp.define("RENDERPEARL_DEPTH_IS_ZERO_TO_ONE");
+            }
+            if (deviceInfo.hintsAndWorkarounds().isExplicitDepthRequired()) {
+                comp.define("RENDERPEARL_EXPLICIT_DEPTH_INVARIANCE");
+            }
+            comp.define(define);
+        }
+
+        private static void vanillaTransmittanceSampler(GlProgram program) {
+            program.setSamplerBinding("_flw_depthRange", Samplers.DEPTH_RANGE);
+        }
+
+        private static void vanillaAccumulateSampler(GlProgram program) {
+            program.setSamplerBinding("_flw_depthRange", Samplers.DEPTH_RANGE);
+            program.setSamplerBinding("_flw_coeffs0", Samplers.COEFF0);
+            int oitCoefficientCount = LevelRenderer.OIT_COEFFICIENT_COUNT;
+            if (oitCoefficientCount > 4) {
+                program.setSamplerBinding("_flw_coeffs1", Samplers.COEFF1);
+            }
+            if (oitCoefficientCount > 8) {
+                program.setSamplerBinding("_flw_coeffs2", Samplers.COEFF2);
+                program.setSamplerBinding("_flw_coeffs3", Samplers.COEFF3);
+            }
+        }
+
+        private static void flwDefine(Compilation comp, OitMode oit) {
+            comp.define("_FLW_OIT");
+            comp.define(oit.define);
+        }
+
+        private static void flwSampler(GlProgram program) {
+            program.setSamplerBinding("_flw_depthRange", Samplers.DEPTH_RANGE);
+            program.setSamplerBinding("_flw_coefficients", Samplers.COEFFICIENTS);
+            program.setSamplerBinding("_flw_blueNoise", Samplers.NOISE);
         }
     }
 }

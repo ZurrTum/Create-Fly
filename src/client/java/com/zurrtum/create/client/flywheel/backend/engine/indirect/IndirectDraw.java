@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
 import com.zurrtum.create.client.flywheel.api.material.Material;
+import com.zurrtum.create.client.flywheel.backend.engine.AbstractDraw;
 import com.zurrtum.create.client.flywheel.backend.engine.GpuTextureManager;
 import com.zurrtum.create.client.flywheel.backend.engine.MaterialEncoder;
 import com.zurrtum.create.client.flywheel.backend.engine.MeshPool;
 import com.zurrtum.create.client.flywheel.backend.engine.embed.EmbeddedEnvironment;
 import org.lwjgl.system.MemoryUtil;
 
-public class IndirectDraw {
+public class IndirectDraw implements AbstractDraw {
     private final IndirectInstancer<?> instancer;
     private final GpuTextureManager textureManager;
     private final Material material;
@@ -45,6 +46,7 @@ public class IndirectDraw {
         return deleted;
     }
 
+    @Override
     public Material material() {
         return material;
     }

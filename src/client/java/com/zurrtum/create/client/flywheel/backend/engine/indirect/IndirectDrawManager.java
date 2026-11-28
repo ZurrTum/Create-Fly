@@ -1,10 +1,11 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
-import com.zurrtum.create.client.flywheel.api.backend.Engine;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.backend.compile.IndirectPrograms;
-import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler;
+import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler.OitMode;
 import com.zurrtum.create.client.flywheel.backend.engine.*;
 import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorage;
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.Uniforms;
@@ -15,11 +16,11 @@ import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferUsage;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.oit.OitStage;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -43,6 +44,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
     private final DepthPyramid depthPyramid;
 
     private final OitFramebuffer oitFramebuffer;
+    private boolean useOit;
 
     public IndirectDrawManager(IndirectPrograms programs) {
         this.programs = programs;
@@ -84,8 +86,6 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
 
     @Override
     public void render(LightStorage lightStorage, EnvironmentStorage environmentStorage) {
-        super.render(lightStorage, environmentStorage);
-
         // Flush instance counts, page mappings, and prune empty groups.
         cullingGroups.values().removeIf(IndirectCullingGroup::flushInstancers);
 
@@ -149,27 +149,30 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
         }
 
         // Let's avoid invoking the oit chain if we don't have anything to do
-        boolean useOit = false;
         for (var group : cullingGroups.values()) {
             if (group.hasOitDraws()) {
                 useOit = true;
-                break;
+                return;
             }
         }
+        useOit = false;
+    }
 
+    @Override
+    public void renderClassicTransparency() {
         if (useOit) {
             oitFramebuffer.prepare();
 
             oitFramebuffer.depthRange();
 
             for (var group : cullingGroups.values()) {
-                group.submitTransparent(PipelineCompiler.OitMode.DEPTH_RANGE);
+                group.submitTransparent(OitMode.DEPTH_RANGE);
             }
 
             oitFramebuffer.renderTransmittance();
 
             for (var group : cullingGroups.values()) {
-                group.submitTransparent(PipelineCompiler.OitMode.GENERATE_COEFFICIENTS);
+                group.submitTransparent(OitMode.GENERATE_COEFFICIENTS);
             }
 
             oitFramebuffer.renderDepthFromTransmittance();
@@ -180,14 +183,52 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
             oitFramebuffer.accumulate();
 
             for (var group : cullingGroups.values()) {
-                group.submitTransparent(PipelineCompiler.OitMode.EVALUATE);
+                group.submitTransparent(OitMode.EVALUATE);
             }
 
             oitFramebuffer.composite();
         }
+    }
 
-        MaterialRenderState.reset();
-        TextureBinder.resetLightAndOverlay();
+    @Override
+    public void renderOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews,
+        CrumblingBlockManager crumblingBlockManager
+    ) {
+        if (useOit) {
+            TextureBinder.bindLightAndOverlay();
+            vertexArray.bindForDraw();
+            lightBuffers.bind();
+            matrixBuffer.bind();
+            Uniforms.bindAll();
+            switch (stage) {
+                case DEPTH_BOUNDS -> {
+                    for (var group : cullingGroups.values()) {
+                        OitFramebuffer.vanillaDepthRange();
+                        group.submitTransparent(OitMode.VANILLA_DEPTH_BOUNDS);
+                    }
+                    renderOitCrumbling(crumblingBlockManager, OitMode.VANILLA_DEPTH_BOUNDS);
+                }
+                case TRANSMITTANCE -> {
+                    OitFramebuffer.vanillaTransmittance(depthBoundsCulledTargetView);
+                    for (var group : cullingGroups.values()) {
+                        group.submitTransparent(OitMode.VANILLA_TRANSMITTANCE);
+                    }
+                    renderOitCrumbling(crumblingBlockManager, OitMode.VANILLA_TRANSMITTANCE);
+                }
+                case ACCUMULATE -> {
+                    OitFramebuffer.vanillaAccumulate(depthBoundsCulledTargetView, transmittanceTargetViews);
+                    for (var group : cullingGroups.values()) {
+                        group.submitTransparent(OitMode.VANILLA_ACCUMULATE);
+                    }
+                    renderOitCrumbling(crumblingBlockManager, OitMode.VANILLA_ACCUMULATE);
+                }
+            }
+        } else if (stage == OitStage.ACCUMULATE && crumblingBlockManager.hasOitCrumbling()) {
+            crumblingBlockManager.drainOit((shader, map) -> map.clearOwned());
+        }
     }
 
     @Override
@@ -215,75 +256,167 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
     }
 
     @Override
-    public void renderCrumbling(List<Engine.CrumblingBlock> crumblingBlocks) {
-        var byType = doCrumblingSort(crumblingBlocks, IndirectInstancer::fromState);
+    public @Nullable IndirectInstancer<?> cast(InstanceHandleImpl.State<?> handle) {
+        return IndirectInstancer.fromState(handle);
+    }
 
-        if (byType.isEmpty()) {
-            return;
-        }
+    @Override
+    public void renderCrumbling(CrumblingBlockManager crumblingBlockManager, RenderContext context) {
+        if (crumblingBlockManager.hasCrumbling()) {
+            TextureBinder.bindLightAndOverlay();
 
-        TextureBinder.bindLightAndOverlay();
+            vertexArray.bindForDraw();
+            Uniforms.bindAll();
 
-        vertexArray.bindForDraw();
-        Uniforms.bindAll();
+            var crumblingMaterial = SimpleMaterial.builder();
 
-        var crumblingMaterial = SimpleMaterial.builder();
+            // Scratch memory for writing draw commands.
+            var block = MemoryBlock.malloc(IndirectBuffers.DRAW_COMMAND_STRIDE);
 
-        // Scratch memory for writing draw commands.
-        var block = MemoryBlock.malloc(IndirectBuffers.DRAW_COMMAND_STRIDE);
-
-        // Set up the crumbling program buffers. Nothing changes here between draws.
-        GlBufferType.DRAW_INDIRECT_BUFFER.bind(crumblingDrawBuffer.handle());
-        glBindBufferRange(
-            GL_SHADER_STORAGE_BUFFER,
-            BufferBindings.DRAW,
-            crumblingDrawBuffer.handle(),
-            0,
-            IndirectBuffers.DRAW_COMMAND_STRIDE
-        );
-
-
-        for (var groupEntry : byType.entrySet()) {
-            var byProgress = groupEntry.getValue();
-
-            GroupKey<?> groupKey = groupEntry.getKey();
-            IndirectCullingGroup<?> cullingGroup = cullingGroups.get(groupKey.instanceType());
-
-            if (cullingGroup == null) {
-                continue;
-            }
-
-            for (var progressEntry : byProgress.int2ObjectEntrySet()) {
-                TextureBinder.bindCrumbling(ModelBakery.BREAKING_LOCATIONS.get(progressEntry.getIntKey()));
-
-                for (var instanceHandlePair : progressEntry.getValue()) {
-                    IndirectInstancer<?> instancer = instanceHandlePair.getFirst();
-                    int instanceIndex = instanceHandlePair.getSecond().index;
-
-                    for (IndirectDraw draw : instancer.draws()) {
-                        // Transform the material to be suited for crumbling.
-                        CommonCrumbling.applyCrumblingProperties(crumblingMaterial, draw.material());
-
-                        cullingGroup.bindForCrumbling(crumblingMaterial);
-
-                        MaterialRenderState.setup(crumblingMaterial);
-
-                        // Upload the draw command.
-                        draw.writeWithOverrides(block.ptr(), instanceIndex, crumblingMaterial);
-                        crumblingDrawBuffer.uploadSpan(0, block);
-
-                        // Submit! Everything is already bound by here.
-                        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
+            // Set up the crumbling program buffers. Nothing changes here between draws.
+            int handle = crumblingDrawBuffer.handle();
+            GlBufferType.DRAW_INDIRECT_BUFFER.bind(handle);
+            glBindBufferRange(
+                GL_SHADER_STORAGE_BUFFER,
+                BufferBindings.DRAW,
+                handle,
+                0,
+                IndirectBuffers.DRAW_COMMAND_STRIDE
+            );
+            if (context.useClassicTransparency()) {
+                crumblingBlockManager.drain((shader, map) -> {
+                    IndirectCullingGroup<?> cullingGroup = cullingGroups.get(shader.instanceType());
+                    if (cullingGroup == null) {
+                        map.clear();
+                        return;
                     }
-                }
-
+                    map.<IndirectDraw>drain((index, draw) -> renderCrumbling(
+                        crumblingDrawBuffer,
+                        block,
+                        crumblingMaterial,
+                        cullingGroup,
+                        index,
+                        draw
+                    ));
+                });
+            } else {
+                crumblingBlockManager.drain((shader, map) -> {
+                    IndirectCullingGroup<?> cullingGroup = cullingGroups.get(shader.instanceType());
+                    if (cullingGroup == null) {
+                        map.clearOwned();
+                        return;
+                    }
+                    map.<IndirectDraw>drainOwned((index, draw) -> renderCrumbling(
+                        crumblingDrawBuffer,
+                        block,
+                        crumblingMaterial,
+                        cullingGroup,
+                        index,
+                        draw
+                    ));
+                });
             }
+            block.free();
         }
+    }
 
-        MaterialRenderState.reset();
-        TextureBinder.resetLightAndOverlay();
+    private void renderOitCrumbling(CrumblingBlockManager crumblingBlockManager, OitMode mode) {
+        if (crumblingBlockManager.hasOitCrumbling()) {
+            TextureBinder.bindLightAndOverlay();
 
-        block.free();
+            vertexArray.bindForDraw();
+            Uniforms.bindAll();
+
+            var crumblingMaterial = SimpleMaterial.builder();
+
+            // Scratch memory for writing draw commands.
+            var block = MemoryBlock.malloc(IndirectBuffers.DRAW_COMMAND_STRIDE);
+
+            // Set up the crumbling program buffers. Nothing changes here between draws.
+            int handle = crumblingDrawBuffer.handle();
+            GlBufferType.DRAW_INDIRECT_BUFFER.bind(handle);
+            glBindBufferRange(
+                GL_SHADER_STORAGE_BUFFER,
+                BufferBindings.DRAW,
+                handle,
+                0,
+                IndirectBuffers.DRAW_COMMAND_STRIDE
+            );
+            if (mode != OitMode.VANILLA_ACCUMULATE) {
+                crumblingBlockManager.forEachOit((shader, map) -> {
+                    IndirectCullingGroup<?> cullingGroup = cullingGroups.get(shader.instanceType());
+                    if (cullingGroup == null) {
+                        return;
+                    }
+                    map.<IndirectDraw>forEach((index, draw) -> renderOitCrumbling(
+                        crumblingDrawBuffer,
+                        block,
+                        mode,
+                        crumblingMaterial,
+                        cullingGroup,
+                        index,
+                        draw
+                    ));
+                });
+            } else {
+                crumblingBlockManager.drainOit((shader, map) -> {
+                    IndirectCullingGroup<?> cullingGroup = cullingGroups.get(shader.instanceType());
+                    if (cullingGroup == null) {
+                        map.clearOwned();
+                        return;
+                    }
+                    map.<IndirectDraw>drainOwned((index, draw) -> renderOitCrumbling(
+                        crumblingDrawBuffer,
+                        block,
+                        mode,
+                        crumblingMaterial,
+                        cullingGroup,
+                        index,
+                        draw
+                    ));
+                });
+            }
+            block.free();
+        }
+    }
+
+    private static void renderCrumbling(
+        GlBuffer crumblingDrawBuffer,
+        MemoryBlock block,
+        SimpleMaterial.Builder crumblingMaterial,
+        IndirectCullingGroup<?> cullingGroup,
+        int index,
+        IndirectDraw draw
+    ) {
+        // Transform the material to be suited for crumbling.
+        CommonCrumbling.applyCrumblingProperties(crumblingMaterial, draw.material());
+        cullingGroup.bindForCrumbling(crumblingMaterial, OitMode.OFF);
+        MaterialRenderState.setup(crumblingMaterial);
+        // Upload the draw command.
+        draw.writeWithOverrides(block.ptr(), index, crumblingMaterial);
+        crumblingDrawBuffer.uploadSpan(0, block);
+        // Submit! Everything is already bound by here.
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
+    }
+
+    private static void renderOitCrumbling(
+        GlBuffer crumblingDrawBuffer,
+        MemoryBlock block,
+        OitMode mode,
+        SimpleMaterial.Builder crumblingMaterial,
+        IndirectCullingGroup<?> cullingGroup,
+        int index,
+        IndirectDraw draw
+    ) {
+        // Transform the material to be suited for crumbling.
+        CommonCrumbling.applyOitCrumblingProperties(crumblingMaterial, draw.material());
+        cullingGroup.bindForCrumbling(crumblingMaterial, mode);
+        MaterialRenderState.setupOit(crumblingMaterial);
+        // Upload the draw command.
+        draw.writeWithOverrides(block.ptr(), index, crumblingMaterial);
+        crumblingDrawBuffer.uploadSpan(0, block);
+        // Submit! Everything is already bound by here.
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
     }
 
     @Override

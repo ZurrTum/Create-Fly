@@ -278,6 +278,7 @@ public class IndirectInstancer<I extends Instance> extends AbstractInstancer<I> 
         associatedDraws.add(draw);
     }
 
+    @Override
     public List<IndirectDraw> draws() {
         return associatedDraws;
     }

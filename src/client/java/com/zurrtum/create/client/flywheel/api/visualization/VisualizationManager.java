@@ -1,18 +1,16 @@
 package com.zurrtum.create.client.flywheel.api.visualization;
 
-import com.zurrtum.create.client.flywheel.api.backend.Engine.CrumblingBlock;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.internal.FlwApiLink;
 import com.zurrtum.create.client.flywheel.api.visual.Effect;
-import net.minecraft.client.renderer.state.level.BlockBreakingRenderState;
+import net.minecraft.client.renderer.oit.OitStage;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
-
-import java.util.List;
 
 @ApiStatus.NonExtendable
 public interface VisualizationManager {
@@ -43,11 +41,6 @@ public interface VisualizationManager {
      */
     RenderDispatcher renderDispatcher();
 
-    void collectCrumblingBlocks(
-        List<BlockBreakingRenderState> destructionProgress,
-        List<CrumblingBlock> crumblingBlocks
-    );
-
     @ApiStatus.NonExtendable
     interface RenderDispatcher {
         /**
@@ -68,5 +61,11 @@ public interface VisualizationManager {
          * this between rendering entities and block entities.
          */
         void afterSolid(RenderContext var1);
+
+        void executeOit(
+            OitStage stage,
+            GpuTextureView depthBoundsCulledTargetView,
+            GpuTextureView[] transmittanceTargetViews
+        );
     }
 }

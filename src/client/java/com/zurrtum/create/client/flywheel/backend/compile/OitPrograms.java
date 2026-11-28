@@ -36,6 +36,7 @@ public class OitPrograms {
                         // Need to define FMA for the wavelet calculations
                         compilation.define("fma(a, b, c) ((a) * (b) + (c))");
                     }
+                    compilation.define("_FLW_OIT");
                 }).withResource(s -> s)).postLink((key, program) -> {
                 program.bind();
                 Uniforms.setUniformBlockBindings(program);

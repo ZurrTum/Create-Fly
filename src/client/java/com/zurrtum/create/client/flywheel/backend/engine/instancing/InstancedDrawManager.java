@@ -1,13 +1,15 @@
 package com.zurrtum.create.client.flywheel.backend.engine.instancing;
 
-import com.zurrtum.create.client.flywheel.api.backend.Engine;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
+import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.material.Transparency;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.compile.ContextShader;
 import com.zurrtum.create.client.flywheel.backend.compile.InstancingPrograms;
-import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler;
+import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler.OitMode;
 import com.zurrtum.create.client.flywheel.backend.engine.*;
 import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorage;
 import com.zurrtum.create.client.flywheel.backend.engine.indirect.OitFramebuffer;
@@ -17,7 +19,8 @@ import com.zurrtum.create.client.flywheel.backend.gl.array.GlVertexArray;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.oit.OitStage;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -62,8 +65,6 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
 
     @Override
     public void render(LightStorage lightStorage, EnvironmentStorage environmentStorage) {
-        super.render(lightStorage, environmentStorage);
-
         instancers.values().removeIf(instancer -> {
             if (instancer.instanceCount() == 0) {
                 instancer.delete();
@@ -107,17 +108,20 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
         light.bind();
 
         submitDraws();
+    }
 
+    @Override
+    public void renderClassicTransparency() {
         if (!oitDraws.isEmpty()) {
             oitFramebuffer.prepare();
 
             oitFramebuffer.depthRange();
 
-            submitOitDraws(PipelineCompiler.OitMode.DEPTH_RANGE);
+            submitOitDraws(OitMode.DEPTH_RANGE);
 
             oitFramebuffer.renderTransmittance();
 
-            submitOitDraws(PipelineCompiler.OitMode.GENERATE_COEFFICIENTS);
+            submitOitDraws(OitMode.GENERATE_COEFFICIENTS);
 
             oitFramebuffer.renderDepthFromTransmittance();
 
@@ -126,13 +130,46 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
 
             oitFramebuffer.accumulate();
 
-            submitOitDraws(PipelineCompiler.OitMode.EVALUATE);
+            submitOitDraws(OitMode.EVALUATE);
 
             oitFramebuffer.composite();
         }
+    }
 
-        MaterialRenderState.reset();
-        TextureBinder.resetLightAndOverlay();
+    @Override
+    public void renderOit(
+        OitStage stage,
+        GpuTextureView depthBoundsCulledTargetView,
+        GpuTextureView[] transmittanceTargetViews,
+        CrumblingBlockManager crumblingBlockManager
+    ) {
+        if (oitDraws.isEmpty()) {
+            if (stage == OitStage.ACCUMULATE && crumblingBlockManager.hasOitCrumbling()) {
+                crumblingBlockManager.drainOit((shader, map) -> map.clearOwned());
+            }
+            return;
+        }
+        Uniforms.bindAll();
+        vao.bindForDraw();
+        TextureBinder.bindLightAndOverlay();
+        light.bind();
+        switch (stage) {
+            case DEPTH_BOUNDS -> {
+                OitFramebuffer.vanillaDepthRange();
+                submitOitDraws(OitMode.VANILLA_DEPTH_BOUNDS);
+                renderOitCrumbling(crumblingBlockManager, OitMode.VANILLA_DEPTH_BOUNDS);
+            }
+            case TRANSMITTANCE -> {
+                OitFramebuffer.vanillaTransmittance(depthBoundsCulledTargetView);
+                submitOitDraws(OitMode.VANILLA_TRANSMITTANCE);
+                renderOitCrumbling(crumblingBlockManager, OitMode.VANILLA_TRANSMITTANCE);
+            }
+            case ACCUMULATE -> {
+                OitFramebuffer.vanillaAccumulate(depthBoundsCulledTargetView, transmittanceTargetViews);
+                submitOitDraws(OitMode.VANILLA_ACCUMULATE);
+                renderOitCrumbling(crumblingBlockManager, OitMode.VANILLA_ACCUMULATE);
+            }
+        }
     }
 
     private void submitDraws() {
@@ -141,12 +178,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
             var groupKey = drawCall.groupKey;
             var environment = groupKey.environment();
 
-            var program = programs.get(
-                groupKey.instanceType(),
-                environment.contextShader(),
-                material,
-                PipelineCompiler.OitMode.OFF
-            );
+            var program = programs.get(groupKey.instanceType(), environment.contextShader(), material, OitMode.OFF);
             program.bind();
 
             environment.setupDraw(program);
@@ -163,7 +195,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
         }
     }
 
-    private void submitOitDraws(PipelineCompiler.OitMode mode) {
+    private void submitOitDraws(OitMode mode) {
         for (var drawCall : oitDraws) {
             var material = drawCall.material();
             var groupKey = drawCall.groupKey;
@@ -225,7 +257,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
             var entry = meshes.get(i);
             var mesh = meshPool.alloc(entry.mesh());
 
-            GroupKey<?> groupKey = new GroupKey<>(key.type(), key.environment());
+            GroupKey groupKey = new GroupKey(key.type(), key.environment());
             InstancedDraw instancedDraw = new InstancedDraw(
                 instancer,
                 mesh,
@@ -243,66 +275,129 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     }
 
     @Override
-    public void renderCrumbling(List<Engine.CrumblingBlock> crumblingBlocks) {
-        // Sort draw calls into buckets, so we don't have to do as many shader binds.
-        var byType = doCrumblingSort(
-            crumblingBlocks, handle -> {
-                // AbstractInstancer directly implement HandleState, so this check is valid.
-                if (handle instanceof InstancedInstancer<?> instancer) {
-                    return instancer;
-                }
-                // This rejects instances that were created by a different engine,
-                // and also instances that are hidden or deleted.
-                return null;
-            }
-        );
-
-        if (byType.isEmpty()) {
-            return;
+    public @Nullable InstancedInstancer<?> cast(InstanceHandleImpl.State<?> handle) {
+        // AbstractInstancer directly implement HandleState, so this check is valid.
+        if (handle instanceof InstancedInstancer<?> instancer) {
+            return instancer;
         }
+        // This rejects instances that were created by a different engine,
+        // and also instances that are hidden or deleted.
+        return null;
+    }
 
-        var crumblingMaterial = SimpleMaterial.builder();
-
-        Uniforms.bindAll();
-        vao.bindForDraw();
-        TextureBinder.bindLightAndOverlay();
-
-        for (var groupEntry : byType.entrySet()) {
-            var byProgress = groupEntry.getValue();
-
-            GroupKey<?> shader = groupEntry.getKey();
-
-            for (var progressEntry : byProgress.int2ObjectEntrySet()) {
-                TextureBinder.bindCrumbling(ModelBakery.BREAKING_LOCATIONS.get(progressEntry.getIntKey()));
-
-                for (var instanceHandlePair : progressEntry.getValue()) {
-                    InstancedInstancer<?> instancer = instanceHandlePair.getFirst();
-                    var index = instanceHandlePair.getSecond().index;
-
-                    for (InstancedDraw draw : instancer.draws()) {
-                        CommonCrumbling.applyCrumblingProperties(crumblingMaterial, draw.material());
-                        var program = programs.get(
-                            shader.instanceType(),
-                            ContextShader.CRUMBLING,
-                            crumblingMaterial,
-                            PipelineCompiler.OitMode.OFF
-                        );
-                        program.bind();
-                        program.setInt("_flw_baseInstance", index);
-                        uploadMaterialUniform(program, crumblingMaterial);
-
-                        MaterialRenderState.setup(crumblingMaterial);
-
-                        Samplers.INSTANCE_BUFFER.makeActive();
-
-                        draw.renderOne(instanceTexture);
-                    }
-                }
+    @Override
+    public void renderCrumbling(CrumblingBlockManager crumblingBlockManager, RenderContext context) {
+        if (crumblingBlockManager.hasCrumbling()) {
+            var crumblingMaterial = SimpleMaterial.builder();
+            Uniforms.bindAll();
+            vao.bindForDraw();
+            TextureBinder.bindLightAndOverlay();
+            if (context.useClassicTransparency()) {
+                crumblingBlockManager.drain((shader, map) -> {
+                    InstanceType<?> instanceType = shader.instanceType();
+                    map.<InstancedDraw>drain((index, draw) -> renderCrumbling(
+                        programs,
+                        instanceTexture,
+                        crumblingMaterial,
+                        instanceType,
+                        index,
+                        draw
+                    ));
+                });
+            } else {
+                crumblingBlockManager.drain((shader, map) -> {
+                    InstanceType<?> instanceType = shader.instanceType();
+                    map.<InstancedDraw>drainOwned((index, draw) -> renderCrumbling(
+                        programs,
+                        instanceTexture,
+                        crumblingMaterial,
+                        instanceType,
+                        index,
+                        draw
+                    ));
+                });
             }
         }
+    }
 
-        MaterialRenderState.reset();
-        TextureBinder.resetLightAndOverlay();
+    private void renderOitCrumbling(CrumblingBlockManager crumblingBlockManager, OitMode mode) {
+        if (crumblingBlockManager.hasOitCrumbling()) {
+            var crumblingMaterial = SimpleMaterial.builder();
+            Uniforms.bindAll();
+            vao.bindForDraw();
+            TextureBinder.bindLightAndOverlay();
+            if (mode != OitMode.VANILLA_ACCUMULATE) {
+                crumblingBlockManager.forEachOit((shader, map) -> {
+                    InstanceType<?> instanceType = shader.instanceType();
+                    map.<InstancedDraw>forEach((index, draw) -> renderOitCrumbling(
+                        programs,
+                        instanceTexture,
+                        mode,
+                        crumblingMaterial,
+                        instanceType,
+                        index,
+                        draw
+                    ));
+                });
+            } else {
+                crumblingBlockManager.drainOit((shader, map) -> {
+                    InstanceType<?> instanceType = shader.instanceType();
+                    map.<InstancedDraw>drainOwned((index, draw) -> renderOitCrumbling(
+                        programs,
+                        instanceTexture,
+                        mode,
+                        crumblingMaterial,
+                        instanceType,
+                        index,
+                        draw
+                    ));
+                });
+            }
+        }
+    }
+
+    private static void renderCrumbling(
+        InstancingPrograms programs,
+        TextureBuffer instanceTexture,
+        SimpleMaterial.Builder crumblingMaterial,
+        InstanceType<?> instanceType,
+        int index,
+        InstancedDraw draw
+    ) {
+        CommonCrumbling.applyCrumblingProperties(crumblingMaterial, draw.material());
+        bindForCrumbling(programs, OitMode.OFF, crumblingMaterial, instanceType, index);
+        MaterialRenderState.setup(crumblingMaterial);
+        Samplers.INSTANCE_BUFFER.makeActive();
+        draw.renderOne(instanceTexture);
+    }
+
+    private static void renderOitCrumbling(
+        InstancingPrograms programs,
+        TextureBuffer instanceTexture,
+        OitMode mode,
+        SimpleMaterial.Builder crumblingMaterial,
+        InstanceType<?> instanceType,
+        int index,
+        InstancedDraw draw
+    ) {
+        CommonCrumbling.applyOitCrumblingProperties(crumblingMaterial, draw.material());
+        bindForCrumbling(programs, mode, crumblingMaterial, instanceType, index);
+        MaterialRenderState.setupOit(crumblingMaterial);
+        Samplers.INSTANCE_BUFFER.makeActive();
+        draw.renderOne(instanceTexture);
+    }
+
+    private static void bindForCrumbling(
+        InstancingPrograms programs,
+        OitMode mode,
+        SimpleMaterial.Builder crumblingMaterial,
+        InstanceType<?> instanceType,
+        int index
+    ) {
+        var program = programs.get(instanceType, ContextShader.CRUMBLING, crumblingMaterial, mode);
+        program.bind();
+        program.setInt("_flw_baseInstance", index);
+        uploadMaterialUniform(program, crumblingMaterial);
     }
 
     @Override

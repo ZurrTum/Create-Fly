@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.flywheel.backend.engine.instancing;
 
 import com.zurrtum.create.client.flywheel.api.material.Material;
+import com.zurrtum.create.client.flywheel.backend.engine.AbstractDraw;
 import com.zurrtum.create.client.flywheel.backend.engine.GpuTextureManager;
 import com.zurrtum.create.client.flywheel.backend.engine.GroupKey;
 import com.zurrtum.create.client.flywheel.backend.engine.MeshPool;
 import com.zurrtum.create.client.flywheel.backend.gl.TextureBuffer;
 
-public class InstancedDraw {
-    public final GroupKey<?> groupKey;
+public class InstancedDraw implements AbstractDraw {
+    public final GroupKey groupKey;
     private final InstancedInstancer<?> instancer;
     private final MeshPool.PooledMesh mesh;
     private final GpuTextureManager textureManager;
@@ -20,7 +21,7 @@ public class InstancedDraw {
     public InstancedDraw(
         InstancedInstancer<?> instancer,
         MeshPool.PooledMesh mesh,
-        GroupKey<?> groupKey,
+        GroupKey groupKey,
         GpuTextureManager textureManager,
         Material material,
         int bias,
@@ -46,6 +47,7 @@ public class InstancedDraw {
         return indexOfMeshInModel;
     }
 
+    @Override
     public Material material() {
         return material;
     }
