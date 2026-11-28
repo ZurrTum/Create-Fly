@@ -152,6 +152,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     if (isOpenInContainer(player)) {
                         ItemStack extracted = inventory.takeFromCompartment(amountToReplenish, slot, true);
                         if (!extracted.isEmpty()) {
+                            playerEntries.remove();
                             ToolboxHandler.unequip(player, hotbarSlot, false);
                             ToolboxHandler.syncData(player, AllSynchedDatas.TOOLBOX.get(player));
                             continue;
@@ -173,6 +174,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     if (isOpenInContainer(player)) {
                         int deposited = inventory.distributeToCompartment(toDistribute, slot, true);
                         if (deposited > 0) {
+                            playerEntries.remove();
                             ToolboxHandler.unequip(player, hotbarSlot, true);
                             ToolboxHandler.syncData(player, AllSynchedDatas.TOOLBOX.get(player));
                             continue;
@@ -213,10 +215,13 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 
             WeakHashMap<Player, Integer> set = toolboxSlotEntry.getValue();
 
-            for (Map.Entry<Player, Integer> playerEntry : set.entrySet()) {
+            for (Iterator<Map.Entry<Player, Integer>> playerEntries = set.entrySet()
+                .iterator(); playerEntries.hasNext(); ) {
+                Map.Entry<Player, Integer> playerEntry = playerEntries.next();
                 Player player = playerEntry.getKey();
                 int hotbarSlot = playerEntry.getValue();
 
+                playerEntries.remove();
                 ToolboxHandler.unequip(player, hotbarSlot, false);
                 if (player instanceof ServerPlayer serverPlayer) {
                     affected.add(serverPlayer);
