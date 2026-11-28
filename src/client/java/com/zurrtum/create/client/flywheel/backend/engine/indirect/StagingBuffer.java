@@ -282,6 +282,7 @@ public class StagingBuffer {
         long remaining = capacity - alignedPos;
         if (scatterSize <= remaining && scatterSize <= totalAvailable) {
             MemoryUtil.memCopy(scatterList.ptr(), map + alignedPos, scatterSize);
+            GL45.glFlushMappedNamedBufferRange(vbo, alignedPos, scatterSize);
             GL45.glBindBufferRange(GL45C.GL_SHADER_STORAGE_BUFFER, 0, vbo, alignedPos, scatterSize);
 
             long alignmentCost = alignedPos - pos;
